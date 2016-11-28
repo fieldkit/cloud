@@ -1,5 +1,7 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
+import { EmailSignInForm } from "redux-auth/default-theme";
+
 
 class SignInPage extends React.Component {
   constructor (props) {
@@ -10,6 +12,9 @@ class SignInPage extends React.Component {
   }
 
   render () {
+
+    const { connect } = this.props
+
     return (
       <div id="signup-page" className="page">
         <div id="header">
@@ -28,11 +33,13 @@ class SignInPage extends React.Component {
         </div>
         <div className="content">
           <h1>Sign in</h1>
-          <form>
-            Login:<br/>
-            Password:<br/>
+          <EmailSignInForm 
+            endpoint={'localhost:3000/signin'}
+            next={connect}
+          />
+          <div onClick={connect}>
             <Link to={'/admin/okavango_16'}>Sign in</Link>
-          </form>
+          </div>
           <p className="forgot-label">
             <Link to={'/forgot'}>Forgot your password?</Link>
           </p>
@@ -44,7 +51,7 @@ class SignInPage extends React.Component {
 }
 
 SignInPage.propTypes = {
-
+  connect: PropTypes.func.isRequired
 }
 
 export default SignInPage

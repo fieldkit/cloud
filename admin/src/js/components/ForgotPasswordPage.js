@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
+import { RequestPasswordResetForm } from 'redux-auth/default-theme'
 
 class ForgotPasswordPage extends React.Component {
   constructor (props) {
@@ -29,15 +30,10 @@ class ForgotPasswordPage extends React.Component {
         </div>
         <div className="content">
           <h1>Forgot your password?</h1>
-          <form>
-            Forgot form
-            <p className="forgot-label">
-              We will send you a link to reset your password.
-            </p>
-            <div className="button">
-              Reset password
-            </div>
-          </form>
+          <RequestPassswordResetForm />
+          <p className="forgot-label">
+            We will send you a link to reset your password.
+          </p>
         </div>
       </div>
     )

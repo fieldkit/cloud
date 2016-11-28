@@ -13,7 +13,7 @@ import thunkMiddleware from 'redux-thunk'
 import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
 
 import { fetchExpeditions } from './actions'
-import okavangoReducer from './reducers'
+import fieldKitReducer from './reducers'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import RootContainer from './containers/RootContainer'
@@ -31,10 +31,15 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
+import { authStateReducer } from 'redux-auth'
+
 document.getElementById('root').remove()
 
 let store = createStore(
-  okavangoReducer,
+  combineReducers({
+    auth: authStateReducer,
+    fieldKitReducer
+  }),
   applyMiddleware(
     thunkMiddleware
   )

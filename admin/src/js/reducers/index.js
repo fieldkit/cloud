@@ -2,8 +2,9 @@
 import * as actions from '../actions'
 import * as d3 from 'd3'
 import randomColor from 'randomcolor'
+import { authStateReducer } from 'redux-auth'
 
-const okavangoReducer = (
+const fieldKitReducer = (
   state = {
     mapStateNeedsUpdate: false,
     animate: false,
@@ -830,4 +831,4 @@ const featureReducer = (
   return state
 }
 
-export default okavangoReducer
+export default fieldKitReducer

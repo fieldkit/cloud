@@ -4,16 +4,15 @@ import Root from '../components/Root'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
-  return {
-    foo: 'bar'
-  }
+  return {}
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    // initialize: (currentDate) => {
-    //   return dispatch(actions.initialize(null))
-    // }
+    // connect: () => {
+    connect () {
+      return dispatch(actions.connect())
+    }
   }
 }
 
