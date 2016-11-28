@@ -1,5 +1,7 @@
 
-import fetch from 'isomorphic-fetch'
+// import fetch from 'isomorphic-fetch'
+import { fetch } from "redux-auth"
+
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 
@@ -11,6 +13,16 @@ export function connect () {
     type: CONNECT
   }
 }
+
+export const DISCONNECT = 'DISCONNECT'
+
+export function disconnect () {
+  browserHistory.push('/')
+  return {
+    type: DISCONNECT
+  }
+}
+
 
 // function timestampToString (t) {
 //   var d = new Date(t)

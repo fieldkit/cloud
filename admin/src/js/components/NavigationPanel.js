@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
+import { SignOutButton } from 'redux-auth/default-theme'
 import { Link } from 'react-router'
 
 class NavigationPanel extends React.Component {
@@ -8,7 +9,7 @@ class NavigationPanel extends React.Component {
 
   render () {
 
-    const { expeditionID, expeditions } = this.props
+    const { expeditionID, expeditions, disconnect } = this.props
 
     const items = expeditions.map(expedition => {
       return <NavigationItem {...expedition} active={expeditionID === expedition.id} key={expedition.id} />
@@ -17,7 +18,13 @@ class NavigationPanel extends React.Component {
     return (
       <div id="header">
         <h1>FieldKit</h1>
-        <Link to={'/admin/profile'}>Adjany Costa</Link> <Link to={'/'}>X</Link>
+        <Link to={'/admin/profile'}>Adjany Costa</Link> 
+        <SignOutButton
+          endpoint={'localhost:3000/signout'}
+          next={disconnect}
+        >
+          X
+        </SignOutButton>
         <div id="navigation">
           <ul>
             {items}
@@ -29,6 +36,8 @@ class NavigationPanel extends React.Component {
 
 }
 
-NavigationPanel.propTypes = {}
+NavigationPanel.propTypes = {
+  disconnect: PropTypes.func.isRequired
+}
 
 export default NavigationPanel

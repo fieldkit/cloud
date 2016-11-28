@@ -31,7 +31,8 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
-import { authStateReducer } from 'redux-auth'
+import {configure, authStateReducer} from 'redux-auth'
+
 
 document.getElementById('root').remove()
 
@@ -78,8 +79,18 @@ var render = function () {
 }
 
 store.subscribe(render)
-render()
-// // store.dispatch(fetchExpeditions(getURLParameters()))
+store.dispatch(configure(
+  {
+    apiUrl: 'https://api.graveflex.com'
+  },
+  {
+    serverSideRendering: true, 
+    cleanSession: true,
+    clientOnly: true
+  }
+)).then(() => {
+  render()
+})
 
 // window.onclick = function (event) {
 //   if (!event.target.matches('.dropbtn')) {

@@ -28,12 +28,12 @@ class AdminPage extends React.Component {
 
   render () {
 
-    const { children, params } = this.props
+    const { children, params, disconnect } = this.props
     const { expeditions } = this.state
 
     return (
       <div id="admin-page" className="page">
-        <NavigationPanel {...params} expeditions={expeditions} />
+        <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
         <h1>Admin Page</h1>
         {children}
       </div>
@@ -42,7 +42,7 @@ class AdminPage extends React.Component {
 }
 
 AdminPage.propTypes = {
-
+  disconnect: PropTypes.func.isRequired
 }
 
 export default AdminPage

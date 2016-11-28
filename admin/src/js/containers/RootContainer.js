@@ -12,6 +12,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     // connect: () => {
     connect () {
       return dispatch(actions.connect())
+    },
+    disconnect () {
+      return dispatch(actions.disconnect())
     }
   }
 }

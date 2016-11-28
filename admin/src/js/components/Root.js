@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import { AuthGlobals } from 'redux-auth/default-theme'
 
 export default class Root extends React.Component {
   render () {
@@ -8,12 +9,14 @@ export default class Root extends React.Component {
     const children = React.Children.map(
       this.props.children,
       (child) => React.cloneElement(child, {
-        connect: connect
+        connect,
+        disconnect
       })
     )
 
     return (
       <div id="root">
+        <AuthGlobals />
         { children }
       </div>      
     )
@@ -21,5 +24,6 @@ export default class Root extends React.Component {
 }
 
 Root.propTypes = {
-  connect: PropTypes.func.isRequired
+  connect: PropTypes.func.isRequired,
+  disconnect: PropTypes.func.isRequired
 }
