@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import NavigationPanel from './NavigationPanel'
+import BreadCrumbs from './BreadCrumbs'
 
 class AdminPage extends React.Component {
   constructor (props) {
@@ -28,13 +29,16 @@ class AdminPage extends React.Component {
 
   render () {
 
-    const { children, params, disconnect } = this.props
+    const { children, params, disconnect, location } = this.props
     const { expeditions } = this.state
+
+    console.log('wow', this.props)
 
     return (
       <div id="admin-page" className="page">
         <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
         <div className="page-content">
+          <BreadCrumbs {...location} />
           <h1>Admin Page</h1>
           {children}
         </div>
