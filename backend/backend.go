@@ -2,14 +2,18 @@ package backend
 
 import (
 	"crypto/tls"
+	"errors"
 	"net"
 	"time"
 
 	"gopkg.in/mgo.v2"
+
+	"github.com/O-C-R/fieldkit/data"
 )
 
 var (
-	dialer = &net.Dialer{
+	DuplicateKeyError = errors.New("duplicate key")
+	dialer            = &net.Dialer{
 		// Default timeout that mgo uses.
 		Timeout:   10 * time.Second,
 		KeepAlive: time.Second,
@@ -36,7 +40,7 @@ type Backend struct {
 	session *mgo.Session
 }
 
-func NewBackend(url string, tls bool) (*Backend, error) {
+func newBackend(url string, tls bool) (*Backend, error) {
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {
 		return nil, err
@@ -55,6 +59,15 @@ func NewBackend(url string, tls bool) (*Backend, error) {
 		session: session,
 	}
 
+	return backend, nil
+}
+
+func NewBackend(url string, tls bool) (*Backend, error) {
+	backend, err := newBackend(url, tls)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := backend.init(); err != nil {
 		return nil, err
 	}
@@ -70,6 +83,7 @@ func (b *Backend) init() error {
 	session := b.newSession()
 	defer session.Close()
 
+	session.ResetIndexCache()
 	for collection, indexes := range indexes {
 		for _, index := range indexes {
 			if err := session.DB("").C(collection).EnsureIndex(index); err != nil {
@@ -81,9 +95,28 @@ func (b *Backend) init() error {
 	return nil
 }
 
+func (b *Backend) dropDatabase() error {
+	session := b.newSession()
+	defer session.Close()
+
+	return session.DB("").DropDatabase()
+}
+
 func (b *Backend) Ping() error {
 	session := b.newSession()
 	defer session.Close()
 
 	return session.Ping()
+}
+
+func (b *Backend) AddUser(user *data.User) error {
+	session := b.newSession()
+	defer session.Close()
+
+	err := session.DB("").C("user").Insert(user)
+	if mgo.IsDup(err) {
+		return DuplicateKeyError
+	}
+
+	return err
 }
