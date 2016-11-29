@@ -13,7 +13,7 @@ import thunkMiddleware from 'redux-thunk'
 import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
 
 import { fetchExpeditions } from './actions'
-import fieldKitReducer from './reducers'
+import expeditionReducer from './reducers'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import RootContainer from './containers/RootContainer'
@@ -26,10 +26,11 @@ import AdminPage from './components/AdminPage'
 import DashboardSection from './components/DashboardSection'
 import UploaderSection from './components/UploaderSection'
 import SourcesSection from './components/SourcesSection'
-import TeamsSection from './components/TeamsSection'
 import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
+
+import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
 import {configure, authStateReducer} from 'redux-auth'
 
@@ -39,7 +40,7 @@ document.getElementById('root').remove()
 let store = createStore(
   combineReducers({
     auth: authStateReducer,
-    fieldKitReducer
+    expeditions: expeditionReducer
   }),
   applyMiddleware(
     thunkMiddleware
@@ -60,7 +61,7 @@ const routes = (
         <Route path="dashboard" component={DashboardSection}/>
         <Route path="uploader" component={UploaderSection}/>
         <Route path="sources" component={SourcesSection}/>
-        <Route path="teams" component={TeamsSection}/>
+        <Route path="teams" component={TeamsSectionContainer}/>
         <Route path="editor" component={EditorSection}/>
         <Route path="identity" component={IdentitySection}/>
       </Route>

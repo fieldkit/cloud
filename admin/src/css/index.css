@@ -6,10 +6,20 @@ html, body {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
   font-size: 14px;
   margin: 0;
-  line-height: 20px;
+  line-height: 25px;
 }
 
-h1, h2, h3, h4 {
+p {
+  margin-top: 0;
+}
+
+p.intro {
+  font-size: 18px;
+  line-height: 30px;
+  margin-bottom: 40px;
+}
+
+h1, h2, h3, h4, h5 {
   margin-top: 0;
 }
 
@@ -43,8 +53,132 @@ h4 {
   letter-spacing: 0.04em;
 }
 
+h5 {
+  color: black;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 0;
+}
+
 a {
   text-decoration: none;
+}
+
+div.button {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: #D0462C;
+  color: white;
+  padding: 0px 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+div.button.secondary {
+  background-color: transparent;
+  border: 1px solid #D0462C;
+  color: #D0462C;
+  border-radius: 3px;
+}
+
+table {
+  border-collapse: collapse;
+  line-height: 20px;
+  font-size: 13px;
+}
+
+th {
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+  padding: 10px 10px;
+  vertical-align: top;
+}
+
+td {
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+  padding: 10px 10px;
+  vertical-align: top;
+}
+
+th:first-child, td:first-child {
+  padding-left: 0;
+}
+
+tr:last-child th, tr:last-child td {
+  padding-right: 0;
+  border-bottom: 0;
+}
+
+td, th, td *, th * {
+  vertical-align: top;
+} 
+
+
+  table svg {
+    width: calc(100% - 10px);
+    height: 40px;
+  } 
+
+  table ul {
+    margin: 0;
+    padding: 0;
+  } 
+
+    table ul li{
+      display: inline-block;
+      background-color: #D8D8D8;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-bottom: 2px;
+      margin-right: 2px;
+      font-size: 11px;
+    } 
+
+ul.tabs {
+  margin: 0;
+  padding: 0;
+  margin-left: -20px;
+  list-style: none;
+}
+  
+  ul.tabs li {
+    display: inline-block;
+    padding: 0 20px;
+    border-right: 1px solid #999;
+    font-weight: 700;
+    color: #999;
+  }
+
+  ul.tabs li.active {
+    color: black;
+    padding: 10px 20px;
+    border: 1px solid #999;
+    border-bottom: 1px solid white;
+  }
+
+  ul.tabs li:last-child:not(.active) {
+    border: 0;
+    color: black;
+  }
+
+div.selected-tab {
+  margin-left: -20px;
+  padding: 20px;
+  width: 100%;
+  margin-top: -1px;
+  border: 1px solid #999;
+}
+
+
+
+.activity svg {
+  background-color: #ddd;
+  height: 40px;
 }
 
   .page {
@@ -138,8 +272,65 @@ a {
         }
 
       .page .page-content {
+        width: 65.6%;
         padding: 40px 7.8vw;
       }
+
+#teams-section {}
+
+  #teams-section .selected-tab div.actions {
+    width: 100%;
+    height: 40px;
+  }
+
+  #teams-section .selected-tab div.actions div.button {
+    float:right;
+  }
+
+  #teams-section .selected-tab div.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+    #teams-section .selected-tab div.header .column  {
+      flex-basis: 42.8%;
+    }
+
+    #teams-section .selected-tab div.header svg  {
+      height: 40px;
+      background-color: #ddd;
+    }
+
+  #teams-section table.members-list {}
+
+  #teams-section table.members-list .name {
+    width: 10%;
+  }
+
+  #teams-section table.members-list .role {
+    width: 10%;
+  }
+
+  #teams-section table.members-list .inputs {
+    width: 20%;
+  }
+
+  #teams-section table.members-list .activity {
+    width: 25%;
+  }
+
+  #teams-section table.members-list .data {
+    width: 5%;
+  }
+
+  #teams-section table.members-list .edit {
+    width: 5%;
+  }
+
+  #teams-section table.members-list .remove {
+    width: 5%;
+  }
 
 
 

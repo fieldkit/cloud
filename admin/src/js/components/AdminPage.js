@@ -32,14 +32,11 @@ class AdminPage extends React.Component {
     const { children, params, disconnect, location } = this.props
     const { expeditions } = this.state
 
-    console.log('wow', this.props)
-
     return (
       <div id="admin-page" className="page">
         <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
         <div className="page-content">
           <BreadCrumbs {...location} />
-          <h1>Admin Page</h1>
           {children}
         </div>
       </div>
