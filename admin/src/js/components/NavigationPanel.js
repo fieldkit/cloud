@@ -4,11 +4,8 @@ import { SignOutButton } from 'redux-auth/default-theme'
 import { Link } from 'react-router'
 
 class NavigationPanel extends React.Component {
-          // <NavigationItem active={pathName === '/data'}>Data</NavigationItem>
-          // <NavigationItem active={pathName === '/share'}>Share</NavigationItem>
 
   render () {
-
     const { expeditionID, expeditions, disconnect } = this.props
 
     const items = expeditions.map(expedition => {
@@ -17,23 +14,30 @@ class NavigationPanel extends React.Component {
 
     return (
       <div id="header">
-        <h1>FieldKit</h1>
-        <Link to={'/admin/profile'}>Adjany Costa</Link> 
-        <SignOutButton
-          endpoint={'localhost:3000/signout'}
-          next={disconnect}
-        >
-          X
-        </SignOutButton>
+        <div id="logo">
+          <Link to="/admin">
+            <img src="/src/img/fieldkit-logo.svg" alt="fieldkit logo" />
+          </Link>
+          <Link to={'/admin/profile'}>
+            <img src="/src/img/profile-button.png" />
+          </Link> 
+          {/*
+          <SignOutButton
+            endpoint={'localhost:3000/signout'}
+            next={disconnect}
+          >
+            X
+          </SignOutButton>
+          */}
+        </div>
         <div id="navigation">
-          <ul>
+          <ul className="expeditions">
             {items}
           </ul>
         </div>
       </div>
     )
   }
-
 }
 
 NavigationPanel.propTypes = {

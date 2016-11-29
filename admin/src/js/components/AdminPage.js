@@ -34,8 +34,10 @@ class AdminPage extends React.Component {
     return (
       <div id="admin-page" className="page">
         <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
-        <h1>Admin Page</h1>
-        {children}
+        <div className="page-content">
+          <h1>Admin Page</h1>
+          {children}
+        </div>
       </div>
     )
   }

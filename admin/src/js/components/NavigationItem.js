@@ -14,13 +14,23 @@ class NavigationItem extends React.Component {
         </Link>
         { 
           active &&
-          <div>
+          <ul className="sections">
+            <li>
             <Link to={'/admin/' + id + '/uploader'}>Upload Data</Link>
+            </li>
+            <li>
             <Link to={'/admin/' + id + '/teams'}>Teams</Link>
+            </li>
+            <li>
             <Link to={'/admin/' + id + '/sources'}>Data Sources</Link>
+            </li>
+            <li>
             <Link to={'/admin/' + id + '/editor'}>Data Editor</Link>
+            </li>
+            <li>
             <Link to={'/admin/' + id + '/identity'}>Expedition Identity</Link>
-          </div>
+            </li>
+          </ul>
         }
       </li>
     )

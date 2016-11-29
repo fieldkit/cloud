@@ -53,6 +53,7 @@ const routes = (
     <Route path="signin" component={SignInPage}/>
     <Route path="forgot" component={ForgotPasswordPage}/>
     <Route path="admin" component={AdminPage}>
+      <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
       <Route path=":expeditionID">
         <IndexRoute component={DashboardSection}/>

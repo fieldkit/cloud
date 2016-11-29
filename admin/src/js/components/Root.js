@@ -4,7 +4,7 @@ import { AuthGlobals } from 'redux-auth/default-theme'
 export default class Root extends React.Component {
   render () {
 
-    const { connect } = this.props
+    const { connect, disconnect } = this.props
     
     const children = React.Children.map(
       this.props.children,

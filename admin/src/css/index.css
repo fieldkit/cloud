@@ -1,0 +1,144 @@
+
+html, body {
+  background-color: white;
+  padding: 0;
+  color: black;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+  font-size: 14px;
+  margin: 0;
+  line-height: 20px;
+}
+
+h1, h2, h3, h4 {
+  margin-top: 0;
+}
+
+h1 {
+  color: #DF250D;
+  font-weight: 100;
+  font-size: 48px;
+  line-height: 60px;
+}
+
+h2 {
+  color: black;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 40px;
+}
+
+h3 {
+  color: black;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+a {
+  text-decoration: none;
+}
+
+  .page {
+    display: flex;
+  }
+
+    #header {
+      width: 18.8%;
+      min-height: calc(100vh - 50px);
+      background-color: #ddd;
+      display: block;
+      padding-bottom: 50px;
+    }
+
+      #logo {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1.5vw;
+        margin-top: 40px;
+      }
+
+        #logo a {
+          display:block;
+        }
+
+          #logo a:first-child {
+            align-self: center;
+            margin-right: 20px;
+          }
+
+            #logo a:first-child img {
+              width: 100%;
+            }
+
+          #logo a:last-child {
+            flex: 0;
+          }
+
+            #logo a:last-child img {
+            }
+
+      #navigation {
+        padding: 1.5vw 1.5vw;
+        position: relative;
+        margin-top: 40px;
+      }
+
+        #navigation::before {
+            content: "";
+            display: block;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #DE2C00;
+            mix-blend-mode: multiply;
+        }
+
+        #navigation ul.expeditions {
+          position: relative;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          margin-top: 10px;
+          font-size: 13px;
+        }
+
+        #navigation ul.sections {
+          margin-bottom: 20px;
+          list-style: none;
+          padding: 0 0 0 10px;
+        }
+
+          #navigation ul.sections li {
+            margin-bottom: 5px;
+          }
+
+          #navigation ul.sections li:first-child {
+            background-color: #DF380D;
+            width: auto;
+            display: inline-block;
+            padding: 2px 10px;
+            margin-left: -10px;
+            border-radius: 3px;
+          }
+
+
+        #navigation a {
+          color: white;
+        }
+
+      .page .page-content {
+        padding: 40px 7.8vw;
+      }
+
+
+
+
