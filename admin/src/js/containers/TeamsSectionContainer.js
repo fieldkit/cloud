@@ -5,13 +5,12 @@ import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
   const { children, params, disconnect, location } = ownProps
-  // console.log(params.expeditionID, state.expeditions.get('expeditions').toJS())
+
   const expedition = state.expeditions
     .get('expeditions')
     .find(e => {
       return e.get('id') === params.expeditionID
-  })
-
+    })
 
   return {
     ...ownProps,
@@ -21,6 +20,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    updateExpedition (expedition) {
+      return dispatch(actions.updateExpedition(expedition))
+    }
     // connect: () => {
     // connect () {
     //   return dispatch(actions.connect())

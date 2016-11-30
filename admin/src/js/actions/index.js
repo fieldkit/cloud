@@ -5,6 +5,44 @@ import { fetch } from "redux-auth"
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 
+export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
+
+export function updateExpedition (expedition) {
+  return function (dispatch, getState) {
+    window.setTimeout(() => {
+      dispatch(expeditionUpdated(expedition))
+    }, 1000)
+    dispatch({
+      type: UPDATE_EXPEDITION,
+      expedition
+    })
+  }
+}
+
+export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
+
+export function expeditionUpdated (expedition) {
+  return {
+    type: EXPEDITION_UPDATED,
+    expedition
+  }
+}
+
+export function jumpTo (date, expeditionID) {
+  return function (dispatch, getState) {
+    var state = getState()
+    var expedition = state.expeditions[expeditionID]
+    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    if (expedition.days[expeditionDay]) {
+      dispatch(updateTime(date, true, expeditionID))
+      return dispatch(fetchDay(date))
+    } else {
+      dispatch(showLoadingWheel())
+      return dispatch(fetchDay(date))
+    }
+  }
+}
+
 export const CONNECT = 'CONNECT'
 
 export function connect () {

@@ -49,7 +49,7 @@ h4 {
   font-size: 16px;
   line-height: 20px;
   margin-bottom: 20px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.04em;
 }
 
@@ -152,19 +152,25 @@ ul.tabs {
     border-right: 1px solid #999;
     font-weight: 700;
     color: #999;
+    cursor: pointer;
+    margin-right: -1px;
   }
 
-  ul.tabs li.active {
-    color: black;
-    padding: 10px 20px;
-    border: 1px solid #999;
-    border-bottom: 1px solid white;
-  }
+    ul.tabs li.active {
+      color: black;
+      padding: 10px 20px;
+      border: 1px solid #999;
+      border-bottom: 1px solid white;
+    }
 
-  ul.tabs li:last-child:not(.active) {
-    border: 0;
-    color: black;
-  }
+    ul.tabs li:last-child:not(.active) {
+      border: 0;
+      color: black;
+    }
+
+    ul.tabs li:hover {
+      color: black;
+    }
 
 div.selected-tab {
   margin-left: -20px;
@@ -290,47 +296,58 @@ div.selected-tab {
   #teams-section .selected-tab div.header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
 
     #teams-section .selected-tab div.header .column  {
       flex-basis: 42.8%;
     }
 
-    #teams-section .selected-tab div.header svg  {
-      height: 40px;
-      background-color: #ddd;
+      #teams-section .selected-tab div.header .description div {
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+      }
+
+        #teams-section .selected-tab div.header .description div:hover {
+          border-color: #D0462C;
+        }
+
+      #teams-section .selected-tab div.header svg  {
+        height: 40px;
+        background-color: #ddd;
+      }
+
+  #teams-section table.members-list {
+  }
+
+    #teams-section table.members-list tr:not(:first-child) {
+      cursor: pointer;
     }
 
-  #teams-section table.members-list {}
+    #teams-section table.members-list .name {
+      width: 10%;
+    }
 
-  #teams-section table.members-list .name {
-    width: 10%;
-  }
+    #teams-section table.members-list .role {
+      width: 10%;
+    }
 
-  #teams-section table.members-list .role {
-    width: 10%;
-  }
+    #teams-section table.members-list .inputs {
+      width: 20%;
+    }
 
-  #teams-section table.members-list .inputs {
-    width: 20%;
-  }
+    #teams-section table.members-list .activity {
+      width: 30%;
+    }
 
-  #teams-section table.members-list .activity {
-    width: 25%;
-  }
+    #teams-section table.members-list .edit {
+      width: 5%;
+    }
 
-  #teams-section table.members-list .data {
-    width: 5%;
-  }
-
-  #teams-section table.members-list .edit {
-    width: 5%;
-  }
-
-  #teams-section table.members-list .remove {
-    width: 5%;
-  }
+    #teams-section table.members-list .remove {
+      width: 5%;
+    }
 
 
 
