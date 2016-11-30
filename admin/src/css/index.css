@@ -1,0 +1,354 @@
+
+html, body {
+  background-color: white;
+  padding: 0;
+  color: black;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+  font-size: 14px;
+  margin: 0;
+  line-height: 25px;
+}
+
+p {
+  margin-top: 0;
+}
+
+p.intro {
+  font-size: 18px;
+  line-height: 30px;
+  margin-bottom: 40px;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 0;
+}
+
+h1 {
+  color: #D0462C;
+  font-weight: 100;
+  font-size: 48px;
+  line-height: 60px;
+}
+
+h2 {
+  color: black;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 40px;
+}
+
+h3 {
+  color: black;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+h5 {
+  color: black;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+div.button {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: #D0462C;
+  color: white;
+  padding: 0px 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+div.button.secondary {
+  background-color: transparent;
+  border: 1px solid #D0462C;
+  color: #D0462C;
+  border-radius: 3px;
+}
+
+table {
+  border-collapse: collapse;
+  line-height: 20px;
+  font-size: 13px;
+}
+
+th {
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+  padding: 10px 10px;
+  vertical-align: top;
+}
+
+td {
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+  padding: 10px 10px;
+  vertical-align: top;
+}
+
+th:first-child, td:first-child {
+  padding-left: 0;
+}
+
+tr:last-child th, tr:last-child td {
+  padding-right: 0;
+  border-bottom: 0;
+}
+
+td, th, td *, th * {
+  vertical-align: top;
+} 
+
+
+  table svg {
+    width: calc(100% - 10px);
+    height: 40px;
+  } 
+
+  table ul {
+    margin: 0;
+    padding: 0;
+  } 
+
+    table ul li{
+      display: inline-block;
+      background-color: #D8D8D8;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-bottom: 2px;
+      margin-right: 2px;
+      font-size: 11px;
+    } 
+
+ul.tabs {
+  margin: 0;
+  padding: 0;
+  margin-left: -20px;
+  list-style: none;
+}
+  
+  ul.tabs li {
+    display: inline-block;
+    padding: 0 20px;
+    border-right: 1px solid #999;
+    font-weight: 700;
+    color: #999;
+    cursor: pointer;
+    margin-right: -1px;
+  }
+
+    ul.tabs li.active {
+      color: black;
+      padding: 10px 20px;
+      border: 1px solid #999;
+      border-bottom: 1px solid white;
+    }
+
+    ul.tabs li:last-child:not(.active) {
+      border: 0;
+      color: black;
+    }
+
+    ul.tabs li:hover {
+      color: black;
+    }
+
+div.selected-tab {
+  margin-left: -20px;
+  padding: 20px;
+  width: 100%;
+  margin-top: -1px;
+  border: 1px solid #999;
+}
+
+
+
+.activity svg {
+  background-color: #ddd;
+  height: 40px;
+}
+
+  .page {
+    display: flex;
+  }
+
+    #header {
+      width: 18.8%;
+      min-height: calc(100vh - 50px);
+      background-color: #ddd;
+      display: block;
+      padding-bottom: 50px;
+    }
+
+      #logo {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1.5vw;
+        margin-top: 40px;
+      }
+
+        #logo a {
+          display:block;
+        }
+
+          #logo a:first-child {
+            align-self: center;
+            margin-right: 20px;
+          }
+
+            #logo a:first-child img {
+              width: 100%;
+            }
+
+          #logo a:last-child {
+            flex: 0;
+          }
+
+            #logo a:last-child img {
+            }
+
+      #navigation {
+        padding: 1.5vw 1.5vw;
+        position: relative;
+        margin-top: 40px;
+      }
+
+        #navigation::before {
+            content: "";
+            display: block;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #D0462C;
+            mix-blend-mode: multiply;
+        }
+
+        #navigation ul.expeditions {
+          position: relative;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          margin-top: 10px;
+          font-size: 13px;
+        }
+
+        #navigation ul.sections {
+          margin-bottom: 20px;
+          list-style: none;
+          padding: 0 0 0 10px;
+        }
+
+          #navigation ul.sections li {
+            margin-bottom: 5px;
+          }
+
+          #navigation ul.sections li:first-child {
+            background-color: #D0462C;
+            width: auto;
+            display: inline-block;
+            padding: 2px 10px;
+            margin-left: -10px;
+            border-radius: 3px;
+          }
+
+
+        #navigation a {
+          color: white;
+        }
+
+      .page .page-content {
+        width: 65.6%;
+        padding: 40px 7.8vw;
+      }
+
+#teams-section {}
+
+  #teams-section .selected-tab div.actions {
+    width: 100%;
+    height: 40px;
+  }
+
+  #teams-section .selected-tab div.actions div.button {
+    float:right;
+  }
+
+  #teams-section .selected-tab div.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+    #teams-section .selected-tab div.header .column  {
+      flex-basis: 42.8%;
+    }
+
+      #teams-section .selected-tab div.header .description div {
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+      }
+
+        #teams-section .selected-tab div.header .description div:hover {
+          border-color: #D0462C;
+        }
+
+      #teams-section .selected-tab div.header svg  {
+        height: 40px;
+        background-color: #ddd;
+      }
+
+  #teams-section table.members-list {
+  }
+
+    #teams-section table.members-list tr:not(:first-child) {
+      cursor: pointer;
+    }
+
+    #teams-section table.members-list .name {
+      width: 10%;
+    }
+
+    #teams-section table.members-list .role {
+      width: 10%;
+    }
+
+    #teams-section table.members-list .inputs {
+      width: 20%;
+    }
+
+    #teams-section table.members-list .activity {
+      width: 30%;
+    }
+
+    #teams-section table.members-list .edit {
+      width: 5%;
+    }
+
+    #teams-section table.members-list .remove {
+      width: 5%;
+    }
+
+
+
+
