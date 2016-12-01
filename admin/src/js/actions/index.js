@@ -12,6 +12,12 @@ export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
 export const SIGNUP_ERROR = 'SIGNUP_ERROR'
 
+export const CONNECT = 'CONNECT'
+export const DISCONNECT = 'DISCONNECT'
+
+export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
+export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
+
 export function requestSignIn (email, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
@@ -102,7 +108,7 @@ export function signupError (message) {
 
 
 
-export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
+
 
 export function updateExpedition (expedition) {
   return function (dispatch, getState) {
@@ -116,7 +122,7 @@ export function updateExpedition (expedition) {
   }
 }
 
-export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
+
 
 export function expeditionUpdated (expedition) {
   return {
@@ -140,7 +146,7 @@ export function jumpTo (date, expeditionID) {
   }
 }
 
-export const CONNECT = 'CONNECT'
+
 
 export function connect () {
   browserHistory.push('/admin/okavango_16')
@@ -149,7 +155,7 @@ export function connect () {
   }
 }
 
-export const DISCONNECT = 'DISCONNECT'
+
 
 export function disconnect () {
   browserHistory.push('/')

@@ -14,7 +14,7 @@ import thunkMiddleware from 'redux-thunk'
 // import { routerReducer, syncHistoryWithStore } from 'react-router-redux'
 
 import { fetchExpeditions } from './actions'
-import expeditionReducer from './reducers'
+import expeditionReducer from './reducers/expeditions'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
@@ -34,9 +34,6 @@ import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
-// import {configure, authStateReducer} from 'redux-auth'
-// import {configure, authStateReducer} from './vendor_modules/redux-auth'
-
 import {FKApiClient} from './api/api.js';
 
 document.getElementById('root').remove()
@@ -52,6 +49,8 @@ let store = createStore(
 )
 
 function requireAuth(nextState, replace): void {
+  // temporary as we're setting up auth
+  return
   if (!FKApiClient.get().loggedIn()) {
     replace({
       pathname: '/signup',
