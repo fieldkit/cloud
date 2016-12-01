@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
+import autobind from 'autobind-decorator'
+import { signupUser } from '../actions'
 
-import { EmailSignUpForm } from "redux-auth/default-theme";
+// import { EmailSignUpForm } from "../vendor_modules/redux-auth/default-theme";
 
 class SignUpPage extends React.Component {
   constructor (props) {
@@ -11,7 +13,20 @@ class SignUpPage extends React.Component {
     }
   }
 
+  @autobind
+  onSignUp(event) {
+    const email = this.refs.email
+    const password = this.refs.password
+    const creds = { email: email.value.trim(), password: password.value.trim() }
+    this.props.dispatch(signupUser(creds))
+    event.preventDefault()
+    return false
+  }
+
   render () {
+
+    const { errorMessage } = this.props
+
     return (
       <div id="signup-page" className="page">
         <div id="header">
@@ -30,9 +45,21 @@ class SignUpPage extends React.Component {
         </div>
         <div className="content">
           <h1>Sign up</h1>
+          {/*
           <EmailSignUpForm 
-            endpoint={'localhost:3000/signup'}
+            endpoint={'http://localhost:3000/api/user/sign-up'}
           />
+          */}
+          <form>
+            <input type='text' ref='email' className="form-control" placeholder='Email'/>
+            <input type='password' ref='password' className="form-control" placeholder='Password'/>
+            <button onClick={this.onSignUp} className="btn btn-primary">
+              Sign Up
+            </button>
+            {errorMessage &&
+              <p>{errorMessage}</p>
+            }
+          </form>
           <p className="signin-label">
             Already have an account? <Link to={'/signin'}>Sign in</Link>
           </p>
@@ -56,7 +83,10 @@ class SignUpPage extends React.Component {
 */
 
 SignUpPage.propTypes = {
-
+  connect: PropTypes.func,
+  dispatch: PropTypes.func,
+  isAuthenticated: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string
 }
 
 export default SignUpPage

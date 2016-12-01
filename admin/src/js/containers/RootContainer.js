@@ -4,7 +4,10 @@ import Root from '../components/Root'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
-  return {}
+  return {
+    isAuthenticated: state.auth.isAuthenticated,
+    errorMessage: state.auth.errorMessage
+  }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
@@ -15,7 +18,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     disconnect () {
       return dispatch(actions.disconnect())
-    }
+    },
+    dispatch
   }
 }
 

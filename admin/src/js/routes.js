@@ -10,10 +10,12 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
-import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
+// import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
+// import { routerReducer, syncHistoryWithStore } from 'react-router-redux'
 
 import { fetchExpeditions } from './actions'
 import expeditionReducer from './reducers'
+import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import RootContainer from './containers/RootContainer'
@@ -32,14 +34,14 @@ import ProfileSection from './components/ProfileSection'
 
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
-import {configure, authStateReducer} from 'redux-auth'
-
+// import {configure, authStateReducer} from 'redux-auth'
+// import {configure, authStateReducer} from './vendor_modules/redux-auth'
 
 document.getElementById('root').remove()
 
 let store = createStore(
   combineReducers({
-    auth: authStateReducer,
+    auth: authReducer,
     expeditions: expeditionReducer
   }),
   applyMiddleware(
@@ -81,29 +83,32 @@ var render = function () {
 }
 
 store.subscribe(render)
-store.dispatch(configure(
-  {
-    apiUrl: 'https://api.graveflex.com'
-  },
-  {
-    serverSideRendering: true, 
-    cleanSession: true,
-    clientOnly: true
-  }
-)).then(() => {
-  render()
-})
+render()
 
-// window.onclick = function (event) {
-//   if (!event.target.matches('.dropbtn')) {
-//     var dropdowns = document.getElementsByClassName('dropdown-content')
-//     var i
-//     for (i = 0; i < dropdowns.length; i++) {
-//       var openDropdown = dropdowns[i]
-//       if (openDropdown.classList.contains('show')) {
-//         openDropdown.classList.remove('show')
+
+// store.dispatch(configure(
+//   [
+//       {
+//         default: {
+//           apiUrl: "http://devise-token-auth-demo.dev"
+//         }
 //       }
-//     }
+//     ], {isServer: false, serverSideRendering: true, cleanSession: true, clientOnly: true}
+// )).then(({redirectPath, blank} = {}) => {
+//   if (blank) {
+//     // if `blank` is true, this is an OAuth redirect and should not
+//     // be rendered
+//     return <noscript />;
+//   } else {
+//     return ({
+//       blank,
+//       store,
+//       history,
+//       routes,
+//       redirectPath,
+//       provider: (
+//         <Provider store={store} key="provider" children={routes} />
+//       )
+//     });
 //   }
-// }
-
+// })
