@@ -10,14 +10,12 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    // connect: () => {
     connect () {
       return dispatch(actions.connect())
     },
     disconnect () {
       return dispatch(actions.disconnect())
     },
-    dispatch
   }
 }
 

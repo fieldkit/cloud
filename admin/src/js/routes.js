@@ -18,7 +18,7 @@ import expeditionReducer from './reducers'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
-import RootContainer from './containers/RootContainer'
+import Root from './components/Root'
 import LandingPage from './components/LandingPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
 import AdminPage from './components/AdminPage'
@@ -65,7 +65,7 @@ function onLogout () {
 }
 
 const routes = (
-  <Route path="/" component={RootContainer}>
+  <Route path="/" component={Root}>
     <IndexRoute component={LandingPage}/>
     <Route path="signup" component={SignUpPageContainer}/>
     <Route path="signin" component={SignInPageContainer}/>
