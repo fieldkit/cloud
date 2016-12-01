@@ -7,6 +7,7 @@ import {BaseError} from '../common/util';
 import type {PersonResponse} from './types';
 
 export class APIError extends BaseError {};
+
 export class AuthenticationError extends APIError {};
 
 export class APIClient {

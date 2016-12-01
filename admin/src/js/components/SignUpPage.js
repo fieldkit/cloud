@@ -12,12 +12,13 @@ class SignUpPage extends React.Component {
 
     }
   }
-  
+
   @autobind
   async onSubmit(e: Event) {
     e.preventDefault()
     try {
-      await FKApiClient.get().register(this.state.email, this.state.password);
+      console.log('registering as', this.refs.email.value, this.refs.password.value)
+      await FKApiClient.get().register(this.refs.email.value, this.refs.password.value);
       // this.setState(initialState());
       browserHistory.push('/signin')
       // this.props.showMessage('Registered successfully! Please log in in the extension.');
