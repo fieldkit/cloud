@@ -13,7 +13,14 @@ class SignInPage extends React.Component {
   }
 
   @autobind
+  // onSubmit (event) {
+  //   event.preventDefault()
+
+  //   this.props.dispatch(requestLogin(this.refs.email, this.refs.password))
+  //   return false
+  // }
   async onSubmit (event) {
+    console.log('login in as', this.refs.email.value, this.refs.password.value)
     event.preventDefault()
     try {
       await FKApiClient.get().login(this.refs.email, this.refs.password)
