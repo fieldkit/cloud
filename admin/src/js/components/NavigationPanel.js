@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
-import { SignOutButton } from '../vendor_modules/redux-auth/default-theme'
 import { Link } from 'react-router'
 
 class NavigationPanel extends React.Component {
