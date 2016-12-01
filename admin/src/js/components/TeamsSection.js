@@ -17,23 +17,26 @@ class TeamsSection extends React.Component {
 
   @autobind
   selectTeam (i) {
-    this.setState(
-      this.state.set('selectedTeamIndex', i)
-    )
+    this.setState({
+      ...this.state,
+      selectedTeamIndex: i
+    })
   }
 
   @autobind
   selectMember (i) {
-    this.setState(
-      this.state.set('selectedMemberIndex', i)
-    )
+    this.setState({
+      ...this.state,
+      selectedMemberIndex: i
+    })
   }
 
   @autobind
   unselectMember (i) {
-    this.setState(
-      this.state.set('selectedMemberIndex', -1)
-    )
+    this.setState({
+      ...this.state,
+      selectedMemberIndex: -1
+    })
   }
 
   @autobind
@@ -50,6 +53,16 @@ class TeamsSection extends React.Component {
     })
   }
 
+  @autobind
+  resetChanges () {
+    const { updateExpedition } = this.props
+    this.setState({
+      ...this.state,
+      expedition: this.state.initialExpedition
+    })
+    updateExpedition(this.state.initialExpedition)
+  }
+
   componentWillReceiveProps (nextProps) {
 
     const { expedition } = nextProps
@@ -64,8 +77,6 @@ class TeamsSection extends React.Component {
     // const selectedTeamIndex = this.state.get('selectedTeamIndex')
     // const selectedMemberIndex = this.state.get('selectedMemberIndex')
     // const expedition = this.state.get('expedition')
-
-    console.log('woop', this.state.expedition.get('loading'))
 
     const tabLabels = expedition.get('teams')
       .map((t, i) => {
@@ -169,39 +180,38 @@ class TeamsSection extends React.Component {
         )
       })
 
-    const actions = () => {
-      return (
-        <ul className="actions">
-          <li>
-            { expedition.get('updating') &&
-              (
-                <div class="status">
-                  <span className="spinning-wheel"></span> Saving Changes
-                </div>
-              )
-            }
-            { !expedition.get('updating') &&
-              initialExpedition !== expedition &&
-              (
-                <div class="status">
-                  Changes saved
-                </div>
-              )
-            }
-          </li>
-          <li>
-            <div class={'button primary ' + (initialExpedition === expedition ? 'diabled' : '')}>
-              Reset Changes
-            </div>
-          </li>
-        </ul>
-      )
-    }
+    const sectionActions = (
+      <ul className="section-actions">
+        <li>
+          { expedition.get('updating') &&
+            (
+              <div class="status">
+                <span className="spinning-wheel-container"><div className="spinning-wheel"></div></span>
+                Saving Changes
+              </div>
+            )
+          }
+          { !expedition.get('updating') &&
+            initialExpedition !== this.props.expedition &&
+            (
+              <div class="status">
+                Changes saved
+              </div>
+            )
+          }
+        </li>
+        <li>
+          <div class={'button primary ' + (initialExpedition === expedition ? 'disabled' : '')} onClick={this.resetChanges}>
+            Reset Changes
+          </div>
+        </li>
+      </ul>
+    )
 
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          {actions()}
+          {sectionActions}
           <h1>Teams</h1>
         </div>
         <p className="intro">
@@ -216,7 +226,7 @@ class TeamsSection extends React.Component {
         <div id="selected-team" class="selected-tab">
           {selectedTeam}
         </div>
-        {actions()}
+        {sectionActions}
       </div>
     )
   }

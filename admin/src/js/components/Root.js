@@ -1,22 +1,24 @@
 import React, { PropTypes } from 'react'
-import { AuthGlobals } from 'redux-auth/default-theme'
+import { AuthGlobals } from '../vendor_modules/redux-auth'
 
 export default class Root extends React.Component {
   render () {
 
-    const { connect, disconnect } = this.props
-    
+    const { connect, disconnect, dispatch, isAuthenticated, errorMessage } = this.props
+
     const children = React.Children.map(
       this.props.children,
       (child) => React.cloneElement(child, {
         connect,
-        disconnect
+        disconnect,
+        dispatch,
+        isAuthenticated,
+        errorMessage
       })
     )
 
     return (
       <div id="root">
-        <AuthGlobals />
         { children }
       </div>      
     )
@@ -25,5 +27,8 @@ export default class Root extends React.Component {
 
 Root.propTypes = {
   connect: PropTypes.func.isRequired,
-  disconnect: PropTypes.func.isRequired
+  disconnect: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string
 }

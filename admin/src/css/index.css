@@ -76,7 +76,13 @@ div.button {
   font-size: 10px;
   letter-spacing: 0.05em;
   text-align: center;
+  cursor: pointer;
 }
+
+  div.button.disabled {
+    background-color: #DFDFCF;
+    cursor: auto;
+  }
 
 div.button.secondary {
   background-color: transparent;
@@ -84,6 +90,11 @@ div.button.secondary {
   color: #D0462C;
   border-radius: 3px;
 }
+
+  div.button.secondary.disabled {
+    background-color: transparent;
+    border-color: background-color: #DFDFCF;;
+  }
 
 table {
   border-collapse: collapse;
@@ -131,7 +142,7 @@ td, th, td *, th * {
 
     table ul li{
       display: inline-block;
-      background-color: #D8D8D8;
+      background-color: #DFDFCF;
       padding: 0 5px;
       border-radius: 3px;
       margin-bottom: 2px;
@@ -183,7 +194,7 @@ div.selected-tab {
 
 
 .activity svg {
-  background-color: #ddd;
+  background-color: #DFDFCF;
   height: 40px;
 }
 
@@ -194,7 +205,7 @@ div.selected-tab {
     #header {
       width: 18.8%;
       min-height: calc(100vh - 50px);
-      background-color: #ddd;
+      background-color: #DFDFCF;
       display: block;
       padding-bottom: 50px;
     }
@@ -305,7 +316,7 @@ div.selected-tab {
 
       #teams-section .selected-tab div.header .description div {
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #DFDFCF;
         margin-top: 10px;
       }
 
@@ -315,7 +326,7 @@ div.selected-tab {
 
       #teams-section .selected-tab div.header svg  {
         height: 40px;
-        background-color: #ddd;
+        background-color: #DFDFCF;
       }
 
   #teams-section table.members-list {
@@ -349,6 +360,105 @@ div.selected-tab {
       width: 5%;
     }
 
+.section-actions {
+  float: right;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-top: 20px;
+}
 
+  .section-actions li {
+    display: inline-block;
+    margin-left: 20px;
+  }
+
+.spinning-wheel-container{
+  display: inline-block;
+  height: 16px;
+  margin: 0 10px;
+}
+
+  .spinning-wheel {
+    margin: 10% auto;
+    border-bottom: 4px solid #DFDFCF;
+    border-left: 4px solid #DFDFCF;
+    border-right: 4px solid #c30;
+    border-top: 4px solid #c30;
+    border-radius: 100%;
+    height: 14px;
+    width: 14px;
+    -webkit-animation: spin .6s infinite linear;
+    -moz-animation: spin .6s infinite linear;
+    -ms-animation: spin .6s infinite linear;
+    -o-animation: spin .6s infinite linear;
+    animation: spin .6s infinite linear;
+  }
+
+@keyframes "spin" {
+ from {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+ }
+ to {
+    -webkit-transform: rotate(359deg);
+    -moz-transform: rotate(359deg);
+    -o-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+    transform: rotate(359deg);
+ }
+
+}
+
+@-moz-keyframes spin {
+ from {
+   -moz-transform: rotate(0deg);
+   transform: rotate(0deg);
+ }
+ to {
+   -moz-transform: rotate(359deg);
+   transform: rotate(359deg);
+ }
+
+}
+
+@-webkit-keyframes "spin" {
+ from {
+   -webkit-transform: rotate(0deg);
+   transform: rotate(0deg);
+ }
+ to {
+   -webkit-transform: rotate(359deg);
+   transform: rotate(359deg);
+ }
+
+}
+
+@-ms-keyframes "spin" {
+ from {
+   -ms-transform: rotate(0deg);
+   transform: rotate(0deg);
+ }
+ to {
+   -ms-transform: rotate(359deg);
+   transform: rotate(359deg);
+ }
+
+}
+
+@-o-keyframes "spin" {
+ from {
+   -o-transform: rotate(0deg);
+   transform: rotate(0deg);
+ }
+ to {
+   -o-transform: rotate(359deg);
+   transform: rotate(359deg);
+ }
+
+}
 
 

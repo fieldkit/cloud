@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
-import { RequestPasswordResetForm } from 'redux-auth/default-theme'
+import { RequestPasswordResetForm } from '../vendor_modules/redux-auth/default-theme'
 
 class ForgotPasswordPage extends React.Component {
   constructor (props) {

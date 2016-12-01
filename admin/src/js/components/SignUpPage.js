@@ -1,7 +1,11 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
+import autobind from 'autobind-decorator'
+import { signupUser, signupError } from '../actions'
+import { browserHistory } from 'react-router'
+import {FKApiClient} from '../api/api.js';
 
-import { EmailSignUpForm } from "redux-auth/default-theme";
+// import { EmailSignUpForm } from "../vendor_modules/redux-auth/default-theme";
 
 class SignUpPage extends React.Component {
   constructor (props) {
@@ -11,7 +15,42 @@ class SignUpPage extends React.Component {
     }
   }
 
+  // @autobind
+  // onSubmit(event) {
+  //   const email = this.refs.email
+  //   const password = this.refs.password
+  //   const creds = { email: email.value.trim(), password: password.value.trim() }
+  //   this.props.dispatch(signupUser(creds))
+  //   event.preventDefault()
+  //   return false
+  // }
+
+  @autobind
+  async onSubmit(e: Event) {
+    e.preventDefault()
+    try {
+      await FKApiClient.get().register(this.state.email, this.state.password);
+      // this.setState(initialState());
+      browserHistory.push('/signin')
+      // this.props.showMessage('Registered successfully! Please log in in the extension.');
+      history.push('/login');
+    } catch (error) {
+      console.error(error);
+
+      if (error.response && error.response.status === 400) {
+        const errors = await error.response.json();
+        this.props.dispatch(signupError(errors))
+      } else {
+        this.props.dispatch(signupError('A server error occurred.'))
+      }
+    }
+    return false
+  }
+
   render () {
+
+    const { errorMessage } = this.props
+
     return (
       <div id="signup-page" className="page">
         <div id="header">
@@ -30,9 +69,21 @@ class SignUpPage extends React.Component {
         </div>
         <div className="content">
           <h1>Sign up</h1>
+          {/*
           <EmailSignUpForm 
-            endpoint={'localhost:3000/signup'}
+            endpoint={'http://localhost:3000/api/user/sign-up'}
           />
+          */}
+          <form>
+            <input type='text' ref='email' className="form-control" placeholder='Email'/>
+            <input type='password' ref='password' className="form-control" placeholder='Password'/>
+            <button onClick={this.onSubmit} className="btn btn-primary">
+              Sign Up
+            </button>
+            {errorMessage &&
+              <p>{errorMessage}</p>
+            }
+          </form>
           <p className="signin-label">
             Already have an account? <Link to={'/signin'}>Sign in</Link>
           </p>
@@ -56,7 +107,10 @@ class SignUpPage extends React.Component {
 */
 
 SignUpPage.propTypes = {
-
+  connect: PropTypes.func,
+  dispatch: PropTypes.func,
+  isAuthenticated: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string
 }
 
 export default SignUpPage
