@@ -5,8 +5,6 @@ import { signupUser, signupError } from '../actions'
 import { browserHistory } from 'react-router'
 import {FKApiClient} from '../api/api.js';
 
-// import { EmailSignUpForm } from "../vendor_modules/redux-auth/default-theme";
-
 class SignUpPage extends React.Component {
   constructor (props) {
     super(props)
@@ -14,17 +12,7 @@ class SignUpPage extends React.Component {
 
     }
   }
-
-  // @autobind
-  // onSubmit(event) {
-  //   const email = this.refs.email
-  //   const password = this.refs.password
-  //   const creds = { email: email.value.trim(), password: password.value.trim() }
-  //   this.props.dispatch(signupUser(creds))
-  //   event.preventDefault()
-  //   return false
-  // }
-
+  
   @autobind
   async onSubmit(e: Event) {
     e.preventDefault()

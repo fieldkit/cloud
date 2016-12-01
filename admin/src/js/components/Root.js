@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import { AuthGlobals } from '../vendor_modules/redux-auth'
 
 export default class Root extends React.Component {
   render () {
