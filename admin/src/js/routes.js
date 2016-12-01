@@ -20,8 +20,6 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 
 import RootContainer from './containers/RootContainer'
 import LandingPage from './components/LandingPage'
-import SignUpPage from './components/SignUpPage'
-import SignInPage from './components/SignInPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
 import AdminPage from './components/AdminPage'
 
@@ -32,6 +30,8 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
+import SignUpPageContainer from './containers/SignUpPageContainer'
+import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
 // import {configure, authStateReducer} from 'redux-auth'
@@ -67,8 +67,8 @@ function onLogout () {
 const routes = (
   <Route path="/" component={RootContainer}>
     <IndexRoute component={LandingPage}/>
-    <Route path="signup" component={SignUpPage}/>
-    <Route path="signin" component={SignInPage}/>
+    <Route path="signup" component={SignUpPageContainer}/>
+    <Route path="signin" component={SignInPageContainer}/>
     <Route path="forgot" component={ForgotPasswordPage}/>
     <Route path="admin" component={AdminPage} onEnter={requireAuth}>
       <IndexRoute component={ProfileSection}/>

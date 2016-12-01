@@ -1,60 +1,45 @@
 
 import * as actions from '../../actions'
 import I from 'immutable'
-// import * as d3 from 'd3'
-// import randomColor from 'randomcolor'
-// import { authStateReducer } from 'redux-auth'
 
-export const initialState = {
-  isFetching: false,
-  isAuthenticated: localStorage.getItem('id_token') ? true : false,
-  errorMessage: '-'
-}
+export const initialState = I.fromJS({
+  signInError: null,
+  signInFetching: false,
+  signUpError: null,
+  signUpSuccess: false,
+  signUpFetching: false
+})
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case actions.LOGIN_REQUEST:
-      return Object.assign({}, state, {
-        isFetching: true,
-        isAuthenticated: false,
-        user: action.creds
-      })
+      return state
+        .set('signInFetching', true)
+        .set('signInError', null)
     case actions.LOGIN_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: true,
-        errorMessage: ''
-      })
-    case actions.LOGIN_FAILURE:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: false,
-        errorMessage: action.message
-      })
+      return state
+        .set('signInFetching', false)
+        .set('signInError', null)
+    case actions.LOGIN_ERROR:
+      return state
+        .set('signInFetching', false)
+        .set('signInError', action.message)
     case actions.SIGNUP_REQUEST:
-      return Object.assign({}, state, {
-        isFetching: true,
-        isAuthenticated: false,
-        user: action.creds
-      })
+      return state
+        .set('signUpFetching', true)
+        .set('signUpSuccess', false)
+        .set('signUpError', null)
     case actions.SIGNUP_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: true,
-        errorMessage: ''
-      })
-    case actions.SIGNUP_FAILURE:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: false,
-        errorMessage: action.message
-      })
-    case actions.LOGOUT_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: true,
-        isAuthenticated: false
-      })
-    default:
+      return state
+        .set('signUpFetching', false)
+        .set('signUpSuccess', true)
+        .set('signUpError', null)
+    case actions.SIGNUP_ERROR:
+      return state
+        .set('signUpFetching', false)
+        .set('signUpSuccess', false)
+        .set('signUpError', action.message)
+    default: 
       return state
   }
 }

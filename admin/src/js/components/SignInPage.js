@@ -1,9 +1,8 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
-import { loginUser, loginError } from '../actions'
+// import { , loginUser, loginError } from '../actions'
 import { browserHistory } from 'react-router'
-import {FKApiClient} from '../api/api.js'
 
 class SignInPage extends React.Component {
   constructor (props) {
@@ -13,42 +12,42 @@ class SignInPage extends React.Component {
   }
 
   @autobind
-  // onSubmit (event) {
-  //   event.preventDefault()
-
-  //   this.props.dispatch(requestLogin(this.refs.email, this.refs.password))
-  //   return false
-  // }
-  async onSubmit (event) {
-    console.log('login in as', this.refs.email.value, this.refs.password.value)
+  onSubmit (event) {
     event.preventDefault()
-    try {
-      await FKApiClient.get().login(this.refs.email, this.refs.password)
-      // this.props.loginChanged()
-      browserHistory.push('/admin/okavango_16')
-    } catch (error) {
-
-      console.log(error)
-
-      if(error.response) {
-        switch(error.response.status){
-          case 429:
-            this.props.dispatch(loginError('Try again later.'))
-            break
-          case 401:
-            this.props.dispatch(loginError('Username or password incorrect.'))
-            break
-        }
-      } else {
-        this.props.dispatch(loginError('A server error occured.'))
-      }
-    }
+    this.props.requestSignIn(this.refs.email.value, this.refs.password.value)
     return false
   }
 
+  // async onSubmit (event) {
+  //   console.log('login in as', this.refs.email.value, this.refs.password.value)
+  //   event.preventDefault()
+  //   try {
+  //     await FKApiClient.get().login(this.refs.email, this.refs.password)
+  //     // this.props.loginChanged()
+  //     browserHistory.push('/admin/okavango_16')
+  //   } catch (error) {
+
+  //     console.log(error)
+
+  //     if(error.response) {
+  //       switch(error.response.status){
+  //         case 429:
+  //           this.props.dispatch(loginError('Try again later.'))
+  //           break
+  //         case 401:
+  //           this.props.dispatch(loginError('Username or password incorrect.'))
+  //           break
+  //       }
+  //     } else {
+  //       this.props.dispatch(loginError('A server error occured.'))
+  //     }
+  //   }
+  //   return false
+  // }
+
   render () {
 
-    const { connect, errorMessage } = this.props
+    const { connect, signinError } = this.props
 
     return (
       <div id="signin-page" className="page">
@@ -81,8 +80,8 @@ class SignInPage extends React.Component {
               Login
             </button>
 
-            {errorMessage &&
-              <p>{errorMessage}</p>
+            {signinError &&
+              <p>{signinError}</p>
             }
           </form>
 
@@ -100,9 +99,8 @@ class SignInPage extends React.Component {
 }
 
 SignInPage.propTypes = {
+  requestSignIn: PropTypes.func.isRequired,
   connect: PropTypes.func,
-  dispatch: PropTypes.func,
-  isAuthenticated: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string
 }
 

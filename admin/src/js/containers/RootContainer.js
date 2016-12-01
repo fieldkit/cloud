@@ -5,8 +5,6 @@ import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    isAuthenticated: state.auth.isAuthenticated,
-    errorMessage: state.auth.errorMessage
   }
 }
 
