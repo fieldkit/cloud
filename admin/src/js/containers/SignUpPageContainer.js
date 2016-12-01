@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     errorMessage: state.auth.signUpError,
     success: state.auth.signUpSuccess,
-    signUpFetching: state.auth.signUpFetching
+    fetching: state.auth.signUpFetching
   }
 }
 

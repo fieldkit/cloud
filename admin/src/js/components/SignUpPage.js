@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
-import { signupUser, signupError } from '../actions'
+import { signupUser, errorMessage } from '../actions'
 import { browserHistory } from 'react-router'
 import {FKApiClient} from '../api/api.js';
 
@@ -22,7 +22,8 @@ class SignUpPage extends React.Component {
 
   render () {
 
-    const { signupError } = this.props
+
+    const { errorMessage, success, fetching } = this.props
 
     return (
       <div id="signup-page" className="page">
@@ -48,13 +49,23 @@ class SignUpPage extends React.Component {
             <button onClick={this.onSubmit} className="btn btn-primary">
               Sign Up
             </button>
-            {signupError &&
-              <p>{signupError}</p>
+            {fetching &&
+              <span className="spinning-wheel-container"><div className="spinning-wheel"></div></span>
+            }
+            {errorMessage &&
+              <p>{errorMessage}</p>
             }
           </form>
-          <p className="signin-label">
-            Already have an account? <Link to={'/signin'}>Sign in</Link>
-          </p>
+          {!success &&
+            <p className="signin-label">
+              Already have an account? <Link to={'/signin'}>Sign in</Link>
+            </p>
+          }
+          {success &&
+            <p>
+              You successfully signed up to FieldKit! <Link to={'/signin'}>Sign in</Link>
+            </p>
+          }
         </div>
       </div>
     )
@@ -64,7 +75,8 @@ class SignUpPage extends React.Component {
 SignUpPage.propTypes = {
   requestSignUp: PropTypes.func.isRequired,
   errorMessage: PropTypes.string,
-  success: PropTypes.bool
+  success: PropTypes.bool,
+  fetching: PropTypes.bool.isRequired
 }
 
 export default SignUpPage

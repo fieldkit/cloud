@@ -6,7 +6,7 @@ import * as actions from '../actions'
 const mapStateToProps = (state, ownProps) => {
   return {
     errorMessage: state.auth.signInError,
-    signInFetching: state.auth.signInFetching
+    fetching: state.auth.signInFetching,
   }
 }
 

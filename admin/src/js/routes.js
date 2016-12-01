@@ -100,32 +100,3 @@ var render = function () {
 store.subscribe(render)
 FKApiClient.setup('http://localhost:3000' || '', onLogout);
 render()
-
-
-
-// store.dispatch(configure(
-//   [
-//       {
-//         default: {
-//           apiUrl: "http://devise-token-auth-demo.dev"
-//         }
-//       }
-//     ], {isServer: false, serverSideRendering: true, cleanSession: true, clientOnly: true}
-// )).then(({redirectPath, blank} = {}) => {
-//   if (blank) {
-//     // if `blank` is true, this is an OAuth redirect and should not
-//     // be rendered
-//     return <noscript />;
-//   } else {
-//     return ({
-//       blank,
-//       store,
-//       history,
-//       routes,
-//       redirectPath,
-//       provider: (
-//         <Provider store={store} key="provider" children={routes} />
-//       )
-//     });
-//   }
-// })
