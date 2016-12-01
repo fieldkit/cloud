@@ -95,6 +95,7 @@
     "webpack-preset": "^0.2.0",
     "webpack-preset-babel": "^0.2.0",
     "webpack-preset-babel-stage-0": "^0.2.0",
-    "webworkify-webpack": "1.1.3"
+    "webworkify-webpack": "1.1.3",
+    "whatwg-fetch": "^2.0.1"
   }
 }

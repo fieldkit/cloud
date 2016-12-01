@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
-import { signupUser } from '../actions'
+import { signupUser, signupError } from '../actions'
+import { browserHistory } from 'react-router'
+import {FKApiClient} from '../api/api.js';
 
 // import { EmailSignUpForm } from "../vendor_modules/redux-auth/default-theme";
 
@@ -13,13 +15,35 @@ class SignUpPage extends React.Component {
     }
   }
 
+  // @autobind
+  // onSubmit(event) {
+  //   const email = this.refs.email
+  //   const password = this.refs.password
+  //   const creds = { email: email.value.trim(), password: password.value.trim() }
+  //   this.props.dispatch(signupUser(creds))
+  //   event.preventDefault()
+  //   return false
+  // }
+
   @autobind
-  onSignUp(event) {
-    const email = this.refs.email
-    const password = this.refs.password
-    const creds = { email: email.value.trim(), password: password.value.trim() }
-    this.props.dispatch(signupUser(creds))
-    event.preventDefault()
+  async onSubmit(e: Event) {
+    e.preventDefault()
+    try {
+      await FKApiClient.get().register(this.state.email, this.state.password);
+      // this.setState(initialState());
+      browserHistory.push('/signin')
+      // this.props.showMessage('Registered successfully! Please log in in the extension.');
+      history.push('/login');
+    } catch (error) {
+      console.error(error);
+
+      if (error.response && error.response.status === 400) {
+        const errors = await error.response.json();
+        this.props.dispatch(signupError(errors))
+      } else {
+        this.props.dispatch(signupError('A server error occurred.'))
+      }
+    }
     return false
   }
 
@@ -53,7 +77,7 @@ class SignUpPage extends React.Component {
           <form>
             <input type='text' ref='email' className="form-control" placeholder='Email'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
-            <button onClick={this.onSignUp} className="btn btn-primary">
+            <button onClick={this.onSubmit} className="btn btn-primary">
               Sign Up
             </button>
             {errorMessage &&

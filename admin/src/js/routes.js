@@ -37,6 +37,8 @@ import TeamsSectionContainer from './containers/TeamsSectionContainer'
 // import {configure, authStateReducer} from 'redux-auth'
 // import {configure, authStateReducer} from './vendor_modules/redux-auth'
 
+import {FKApiClient} from './api/api.js';
+
 document.getElementById('root').remove()
 
 let store = createStore(
@@ -49,13 +51,26 @@ let store = createStore(
   )
 )
 
+function requireAuth(nextState, replace): void {
+  if (!FKApiClient.get().loggedIn()) {
+    replace({
+      pathname: '/signup',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+}
+
+function onLogout () {
+  // todo
+}
+
 const routes = (
   <Route path="/" component={RootContainer}>
     <IndexRoute component={LandingPage}/>
     <Route path="signup" component={SignUpPage}/>
     <Route path="signin" component={SignInPage}/>
     <Route path="forgot" component={ForgotPasswordPage}/>
-    <Route path="admin" component={AdminPage}>
+    <Route path="admin" component={AdminPage} onEnter={requireAuth}>
       <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
       <Route path=":expeditionID">
@@ -83,7 +98,9 @@ var render = function () {
 }
 
 store.subscribe(render)
+FKApiClient.setup('http://localhost:3000' || '', onLogout);
 render()
+
 
 
 // store.dispatch(configure(

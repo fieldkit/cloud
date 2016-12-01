@@ -1,25 +1,41 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
-import { EmailSignInForm } from "../vendor_modules/redux-auth/default-theme"
 import autobind from 'autobind-decorator'
-import { loginUser } from '../actions'
-
+import { loginUser, loginError } from '../actions'
+import { browserHistory } from 'react-router'
+import {FKApiClient} from '../api/api.js'
 
 class SignInPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-
     }
   }
 
   @autobind
-  onSignIn (event) {
-    const email = this.refs.email
-    const password = this.refs.password
-    const creds = { email: email.value.trim(), password: password.value.trim() }
-    this.props.dispatch(loginUser(creds))
+  async onSubmit (event) {
     event.preventDefault()
+    try {
+      await FKApiClient.get().login(this.refs.email, this.refs.password)
+      // this.props.loginChanged()
+      browserHistory.push('/admin/okavango_16')
+    } catch (error) {
+
+      console.log(error)
+
+      if(error.response) {
+        switch(error.response.status){
+          case 429:
+            this.props.dispatch(loginError('Try again later.'))
+            break
+          case 401:
+            this.props.dispatch(loginError('Username or password incorrect.'))
+            break
+        }
+      } else {
+        this.props.dispatch(loginError('A server error occured.'))
+      }
+    }
     return false
   }
 
@@ -54,7 +70,7 @@ class SignInPage extends React.Component {
           <form>
             <input type='text' ref='email' className="form-control" placeholder='Email'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
-            <button onClick={this.onSignIn} className="btn btn-primary">
+            <button onClick={this.onSubmit} className="btn btn-primary">
               Login
             </button>
 

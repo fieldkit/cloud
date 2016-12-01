@@ -1,15 +1,16 @@
 
-import fetch from 'isomorphic-fetch'
+import fetch from 'whatwg-fetch'
 // import { fetch } from "../vendor_modules/redux-auth"
 
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 
+
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST'
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE'
 
-function requestLogout() {
+export function requestLogout() {
   return {
     type: LOGOUT_REQUEST,
     isFetching: true,
@@ -17,7 +18,7 @@ function requestLogout() {
   }
 }
 
-function receiveLogout() {
+export function receiveLogout() {
   return {
     type: LOGOUT_SUCCESS,
     isFetching: false,
@@ -72,7 +73,7 @@ export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
 export const SIGNUP_FAILURE = 'SIGNUP_FAILURE'
 
-function requestSignup(creds) {
+export function requestSignup(creds) {
   return {
     type: SIGNUP_REQUEST,
     isFetching: true,
@@ -81,7 +82,7 @@ function requestSignup(creds) {
   }
 }
 
-function receiveSignup(user) {
+export function receiveSignup(user) {
   return {
     type: SIGNUP_SUCCESS,
     isFetching: false,
@@ -90,7 +91,7 @@ function receiveSignup(user) {
   }
 }
 
-function signupError(message) {
+export function signupError(message) {
   return {
     type: SIGNUP_FAILURE,
     isFetching: false,
@@ -136,7 +137,7 @@ export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
 
-function requestLogin(creds) {
+export function requestLogin(creds) {
   return {
     type: LOGIN_REQUEST,
     isFetching: true,
@@ -145,7 +146,7 @@ function requestLogin(creds) {
   }
 }
 
-function receiveLogin(user) {
+export function receiveLogin (user) {
   return {
     type: LOGIN_SUCCESS,
     isFetching: false,
@@ -154,7 +155,7 @@ function receiveLogin(user) {
   }
 }
 
-function loginError(message) {
+export function loginError (message) {
   return {
     type: LOGIN_FAILURE,
     isFetching: false,
