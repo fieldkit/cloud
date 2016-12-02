@@ -14,14 +14,12 @@ import thunkMiddleware from 'redux-thunk'
 // import { routerReducer, syncHistoryWithStore } from 'react-router-redux'
 
 import { fetchExpeditions } from './actions'
-import expeditionReducer from './reducers'
+import expeditionReducer from './reducers/expeditions'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
-import RootContainer from './containers/RootContainer'
+import Root from './components/Root'
 import LandingPage from './components/LandingPage'
-import SignUpPage from './components/SignUpPage'
-import SignInPage from './components/SignInPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
 import AdminPage from './components/AdminPage'
 
@@ -32,10 +30,9 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
+import SignUpPageContainer from './containers/SignUpPageContainer'
+import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
-
-// import {configure, authStateReducer} from 'redux-auth'
-// import {configure, authStateReducer} from './vendor_modules/redux-auth'
 
 import {FKApiClient} from './api/api.js';
 
@@ -52,6 +49,8 @@ let store = createStore(
 )
 
 function requireAuth(nextState, replace): void {
+  // temporary as we're setting up auth
+  return
   if (!FKApiClient.get().loggedIn()) {
     replace({
       pathname: '/signup',
@@ -65,10 +64,10 @@ function onLogout () {
 }
 
 const routes = (
-  <Route path="/" component={RootContainer}>
+  <Route path="/" component={Root}>
     <IndexRoute component={LandingPage}/>
-    <Route path="signup" component={SignUpPage}/>
-    <Route path="signin" component={SignInPage}/>
+    <Route path="signup" component={SignUpPageContainer}/>
+    <Route path="signin" component={SignInPageContainer}/>
     <Route path="forgot" component={ForgotPasswordPage}/>
     <Route path="admin" component={AdminPage} onEnter={requireAuth}>
       <IndexRoute component={ProfileSection}/>
@@ -100,32 +99,3 @@ var render = function () {
 store.subscribe(render)
 FKApiClient.setup('http://localhost:3000' || '', onLogout);
 render()
-
-
-
-// store.dispatch(configure(
-//   [
-//       {
-//         default: {
-//           apiUrl: "http://devise-token-auth-demo.dev"
-//         }
-//       }
-//     ], {isServer: false, serverSideRendering: true, cleanSession: true, clientOnly: true}
-// )).then(({redirectPath, blank} = {}) => {
-//   if (blank) {
-//     // if `blank` is true, this is an OAuth redirect and should not
-//     // be rendered
-//     return <noscript />;
-//   } else {
-//     return ({
-//       blank,
-//       store,
-//       history,
-//       routes,
-//       redirectPath,
-//       provider: (
-//         <Provider store={store} key="provider" children={routes} />
-//       )
-//     });
-//   }
-// })

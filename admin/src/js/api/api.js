@@ -190,16 +190,16 @@ export class FKApiClient extends APIClient {
   }
 
   async register(email: string, password: string): Promise<void> {
-    await this.postForm('/api/sign-up', { email, password });
+    await this.postForm('/api/user/sign-up', { email, password });
   }
 
   async login(email: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
-    await this.postForm('/api/sign-in', { email, password });
+    await this.postForm('/api/user/sign-in', { email, password });
   }
 
   async logout(): Promise<void> {
-    await this.postForm('/api/logout');
+    await this.postForm('/api/user/logout');
     this.onLogout();
   }
 

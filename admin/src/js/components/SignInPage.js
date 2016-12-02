@@ -1,9 +1,8 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
-import { loginUser, loginError } from '../actions'
+// import { , loginUser, loginError } from '../actions'
 import { browserHistory } from 'react-router'
-import {FKApiClient} from '../api/api.js'
 
 class SignInPage extends React.Component {
   constructor (props) {
@@ -13,43 +12,14 @@ class SignInPage extends React.Component {
   }
 
   @autobind
-  // onSubmit (event) {
-  //   event.preventDefault()
-
-  //   this.props.dispatch(requestLogin(this.refs.email, this.refs.password))
-  //   return false
-  // }
-  async onSubmit (event) {
-    console.log('login in as', this.refs.email.value, this.refs.password.value)
+  onSubmit (event) {
     event.preventDefault()
-    try {
-      await FKApiClient.get().login(this.refs.email, this.refs.password)
-      // this.props.loginChanged()
-      browserHistory.push('/admin/okavango_16')
-    } catch (error) {
-
-      console.log(error)
-
-      if(error.response) {
-        switch(error.response.status){
-          case 429:
-            this.props.dispatch(loginError('Try again later.'))
-            break
-          case 401:
-            this.props.dispatch(loginError('Username or password incorrect.'))
-            break
-        }
-      } else {
-        this.props.dispatch(loginError('A server error occured.'))
-      }
-    }
+    this.props.requestSignIn(this.refs.email.value, this.refs.password.value)
     return false
   }
 
   render () {
-
-    const { connect, errorMessage } = this.props
-
+    const { connect, errorMessage, fetching } = this.props
     return (
       <div id="signin-page" className="page">
         <div id="header">
@@ -68,24 +38,19 @@ class SignInPage extends React.Component {
         </div>
         <div className="content">
           <h1>Sign in</h1>
-          {/*
-            <EmailSignInForm 
-              endpoint={'http://localhost:3000/api/user/sign-in'}
-              next={connect}
-            />
-          */}
           <form>
             <input type='text' ref='email' className="form-control" placeholder='Email'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
             <button onClick={this.onSubmit} className="btn btn-primary">
               Login
             </button>
-
+            {fetching &&
+              <span className="spinning-wheel-container"><div className="spinning-wheel"></div></span>
+            }
             {errorMessage &&
               <p>{errorMessage}</p>
             }
           </form>
-
           <div onClick={connect}>
             <Link to={'/admin/okavango_16'}>(Fake sign in)</Link>
           </div>
@@ -100,10 +65,10 @@ class SignInPage extends React.Component {
 }
 
 SignInPage.propTypes = {
+  requestSignIn: PropTypes.func.isRequired,
   connect: PropTypes.func,
-  dispatch: PropTypes.func,
-  isAuthenticated: PropTypes.bool.isRequired,
-  errorMessage: PropTypes.string
+  errorMessage: PropTypes.string,
+  fetching: PropTypes.bool.isRequired
 }
 
 export default SignInPage

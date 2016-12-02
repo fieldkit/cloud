@@ -1,10 +1,12 @@
 
 import { connect } from 'react-redux'
-import Root from '../components/Root'
+import SignInPage from '../components/SignInPage'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    errorMessage: state.auth.signInError,
+    fetching: state.auth.signInFetching,
   }
 }
 
@@ -13,15 +15,15 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     connect () {
       return dispatch(actions.connect())
     },
-    disconnect () {
-      return dispatch(actions.disconnect())
-    },
+    requestSignIn (email, password) {
+      dispatch(actions.requestSignIn(email, password))
+    }
   }
 }
 
-const RootContainer = connect(
+const SignInPageContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(Root)
+)(SignInPage)
 
-export default RootContainer
+export default SignInPageContainer
