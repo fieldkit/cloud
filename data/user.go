@@ -1,12 +1,19 @@
 package data
 
 import (
+	"errors"
+	"time"
+
 	"github.com/O-C-R/auth/id"
 	"golang.org/x/crypto/bcrypt"
 )
 
 const (
 	bcryptCost = bcrypt.DefaultCost
+)
+
+var (
+	IncorrectPasswordError = errors.New("incorrect password")
 )
 
 func generateHashFromPassword(password string) ([]byte, error) {
@@ -31,9 +38,12 @@ func compareHashAndPassword(hashedPassword []byte, password string) ([]byte, err
 }
 
 type User struct {
-	ID       id.ID  `bson:"id" json:"-"`
-	Email    string `bson:"email" json:"email"`
-	Password []byte `bson:"password" json:"-"`
+	ID                    id.ID     `bson:"id" json:"-"`
+	Email                 string    `bson:"email" json:"email"`
+	Password              []byte    `bson:"password" json:"-"`
+	Valid                 bool      `bson:"valid" json:"valid"`
+	ValidationToken       id.ID     `bson:"validation_token" json:"-"`
+	ValidationTokenExpire time.Time `bson:"validation_token_expire" json:"-"`
 }
 
 func NewUser(email, password string) (*User, error) {
@@ -42,9 +52,16 @@ func NewUser(email, password string) (*User, error) {
 		return nil, err
 	}
 
+	validationToken, err := id.New()
+	if err != nil {
+		return nil, err
+	}
+
 	u := &User{
-		ID:    userID,
-		Email: email,
+		ID:                    userID,
+		Email:                 email,
+		ValidationToken:       validationToken,
+		ValidationTokenExpire: time.Now().Add(8 * time.Hour),
 	}
 
 	if err := u.SetPassword(password); err != nil {
@@ -66,6 +83,10 @@ func (u *User) SetPassword(password string) error {
 
 func (u *User) CheckPassword(password string) error {
 	hashedPassword, err := compareHashAndPassword(u.Password, password)
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return IncorrectPasswordError
+	}
+
 	if err != nil {
 		return err
 	}
