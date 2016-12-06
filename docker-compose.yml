@@ -1,0 +1,14 @@
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - mongo
+    command: fieldkit -a :8080 -backend-url mongodb://mongo/fieldkit -session-store-address redis:6379
+  redis:
+    image: redis:alpine
+  mongo:
+    image: mongo

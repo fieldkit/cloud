@@ -70,5 +70,6 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println(c.Addr)
 	log.Fatal(server.ListenAndServe())
 }
