@@ -53,7 +53,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	handler = handlers.CORS(
 		handlers.AllowCredentials(),
 		handlers.AllowedOrigins([]string{"http://localhost:8000"}),
-	)
+	)(handler)
 
 	server := &http.Server{
 		Addr:    c.Addr,
