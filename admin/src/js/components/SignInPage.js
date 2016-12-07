@@ -51,9 +51,6 @@ class SignInPage extends React.Component {
               <p>{errorMessage}</p>
             }
           </form>
-          <div onClick={connect}>
-            <Link to={'/admin/okavango_16'}>(Fake sign in)</Link>
-          </div>
           <p className="forgot-label">
             <Link to={'/forgot'}>Forgot your password?</Link>
           </p>
