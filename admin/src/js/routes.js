@@ -10,10 +10,13 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
+import multiMiddleware from 'redux-multi'
+import { batchedSubscribe } from 'redux-batched-subscribe'
+// import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 // import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
 // import { routerReducer, syncHistoryWithStore } from 'react-router-redux'
 
-import { fetchExpeditions } from './actions'
+import { initTeamSection } from './actions'
 import expeditionReducer from './reducers/expeditions'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
@@ -38,15 +41,21 @@ import {FKApiClient} from './api/api.js';
 
 document.getElementById('root').remove()
 
-let store = createStore(
-  combineReducers({
-    auth: authReducer,
-    expeditions: expeditionReducer
-  }),
-  applyMiddleware(
-    thunkMiddleware
-  )
-)
+
+const createStoreWithMiddleware = applyMiddleware(
+  thunkMiddleware,
+  multiMiddleware,
+)(createStore)
+const createStoreWithBatching = batchedSubscribe(
+  fn => fn()
+)(createStoreWithMiddleware)
+const reducer = combineReducers({
+  auth: authReducer,
+  expeditions: expeditionReducer,
+  // routing: routerReducer
+})
+const store = createStoreWithBatching(reducer)
+
 
 function requireAuth(nextState, replace): void {
   // temporary as we're setting up auth
@@ -63,6 +72,7 @@ function onLogout () {
   // todo
 }
 
+
 const routes = (
   <Route path="/" component={Root}>
     <IndexRoute component={LandingPage}/>
@@ -77,13 +87,16 @@ const routes = (
         <Route path="dashboard" component={DashboardSection}/>
         <Route path="uploader" component={UploaderSection}/>
         <Route path="sources" component={SourcesSection}/>
-        <Route path="teams" component={TeamsSectionContainer}/>
+        <Route path="teams" component={TeamsSectionContainer} onEnter={() => store.dispatch(initTeamSection())}/>
         <Route path="editor" component={EditorSection}/>
         <Route path="identity" component={IdentitySection}/>
       </Route>
     </Route>
   </Route>
 )
+
+
+// const history = syncHistoryWithStore(browserHistory, store)
 
 var render = function () {
   ReactDOM.render(
@@ -96,6 +109,5 @@ var render = function () {
   )
 }
 
-store.subscribe(render)
 FKApiClient.setup('http://localhost:3000' || '', onLogout);
 render()

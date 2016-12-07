@@ -295,6 +295,20 @@ div.selected-tab {
 
 #teams-section {}
 
+  #teams-section .editable div {
+    border: 1px solid #ddd;
+    padding: 0 4px;
+    margin: 0 -4px;
+  }
+
+    #teams-section .editable div:hover {
+      border-color: #D0462C;
+    }
+
+  #teams-section .editable.required div {
+    border-color: #D0462C;
+  }
+
   #teams-section .selected-tab div.actions {
     width: 100%;
     height: 40px;
@@ -302,6 +316,7 @@ div.selected-tab {
 
   #teams-section .selected-tab div.actions div.button {
     float:right;
+    margin-left: 10px;
   }
 
   #teams-section .selected-tab div.header {

@@ -18,6 +18,139 @@ export const DISCONNECT = 'DISCONNECT'
 export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
 export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
 
+
+
+
+/*
+
+TEAM ACTIONS
+
+*/
+
+export const SET_CURRENT_EXPEDITION = 'SET_CURRENT_EXPEDITION'
+export const SET_CURRENT_TEAM = 'SET_CURRENT_TEAM'
+export const SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER'
+export const ADD_TEAM = 'ADD_TEAM'
+export const REMOVE_CURRENT_TEAM = 'REMOVE_CURRENT_TEAM'
+export const START_EDITING_TEAM = 'START_EDITING_TEAM'
+export const STOP_EDITING_TEAM = 'STOP_EDITING_TEAM'
+export const SET_TEAM_PROPERTY = 'SET_TEAM_PROPERTY'
+export const CLEAR_CHANGES_TO_TEAM = 'CLEAR_CHANGES_TO_TEAM'
+export const SAVE_CHANGES_TO_TEAM = 'SAVE_CHANGES_TO_TEAM'
+
+export function initTeamSection () {
+  return function (dispatch, getState) {
+    const expeditionID = location.pathname.split('/')[2]
+    const teamID = getState().expeditions.getIn(['expeditions', expeditionID,'teams',0])
+    dispatch([
+      {
+        type: SET_CURRENT_EXPEDITION,
+        expeditionID
+      },
+      {
+        type: SET_CURRENT_TEAM,
+        teamID
+      },
+      {
+        type: SET_CURRENT_MEMBER,
+        memberID: null
+      }
+    ])
+  }
+}
+
+export function setCurrentExpedition (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_EXPEDITION,
+      expeditionID: id
+    })
+  }
+}
+
+export function setCurrentTeam (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_TEAM,
+      teamID: id
+    })
+  }
+}
+
+export function setCurrentMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_MEMBER,
+      memberID: id
+    })
+  }
+}
+
+export function addTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: ADD_TEAM
+    })
+  }
+}
+
+export function removeCurrentTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REMOVE_CURRENT_TEAM
+    })
+  }
+}
+
+export function startEditingTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: START_EDITING_TEAM
+    })
+  }
+}
+
+export function stopEditingTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: STOP_EDITING_TEAM
+    })
+  }
+}
+
+export function setTeamProperty (key, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_TEAM_PROPERTY,
+      key,
+      value
+    })
+  }
+}
+
+export function saveChangesToTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SAVE_CHANGES_TO_TEAM
+    })
+  }
+}
+
+export function clearChangesToTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLEAR_CHANGES_TO_TEAM
+    })
+  }
+}
+
+
+/*
+
+AUTH ACTIONS
+
+*/
+
 export function requestSignIn (email, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())

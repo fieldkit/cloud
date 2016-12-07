@@ -5,106 +5,131 @@ import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
 
 class TeamsSection extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      selectedTeamIndex: 0,
-      selectedMemberIndex: -1,
-      initialExpedition: props.expedition,
-      expedition: props.expedition
-    }
-  }
+  // constructor (props) {
+    // super(props)
+    // this.state = {
+    //   ...props
+    // }
+  // }
 
-  @autobind
-  selectTeam (i) {
-    this.setState({
-      ...this.state,
-      selectedTeamIndex: i
-    })
-  }
 
-  @autobind
-  selectMember (i) {
-    this.setState({
-      ...this.state,
-      selectedMemberIndex: i
-    })
-  }
+  // @autobind
+  // resetCurrentTeam () {
+  //   this.setState({
+  //     ...this.state,
+  //     currentTeam: {
+  //       name: '',
+  //       editing: false,
+  //       description: '',
+  //       members: []
+  //     }
+  //   })
+  // }
 
-  @autobind
-  unselectMember (i) {
-    this.setState({
-      ...this.state,
-      selectedMemberIndex: -1
-    })
-  }
+  // @autobind
+  // selectMember (i) {
+  //   this.setState({
+  //     ...this.state,
+  //     selectedMemberIndex: i
+  //   })
+  // }
 
-  @autobind
-  onContentEdited (e) {
-    const { updateExpedition } = this.props
-    updateExpedition(this.state.expedition)
-  }
+  // @autobind
+  // unselectMember (i) {
+  //   this.setState({
+  //     ...this.state,
+  //     selectedMemberIndex: -1
+  //   })
+  // }
 
-  @autobind
-  onContentChange (e) {
-    this.setState({
-      ...this.state,
-      expedition: this.state.expedition.setIn(['teams', this.state.selectedTeamIndex, 'description'], e.target.value)
-    })
-  }
+  // @autobind
+  // onContentEdited (e) {
+  //   const { updateExpedition } = this.props
+  //   updateExpedition(this.state.expedition)
+  // }
 
-  @autobind
-  resetChanges () {
-    const { updateExpedition } = this.props
-    this.setState({
-      ...this.state,
-      expedition: this.state.initialExpedition
-    })
-    updateExpedition(this.state.initialExpedition)
-  }
+  // @autobind
+  // onContentChange (e) {
+  //   this.setState({
+  //     ...this.state,
+  //     expedition: this.state.expedition.setIn(['teams', this.state.selectedTeamIndex, 'description'], e.target.value)
+  //   })
+  // }
 
-  componentWillReceiveProps (nextProps) {
+  // @autobind
+  // resetChanges () {
+  //   const { updateExpedition } = this.props
+  //   this.setState({
+  //     ...this.state,
+  //     expedition: this.state.initialExpedition
+  //   })
+  //   updateExpedition(this.state.initialExpedition)
+  // }
 
-    const { expedition } = nextProps
-    this.setState({
-      ...this.state,
-      expedition
-    })
-  }
+  // componentWillReceiveProps (nextProps) {
+  //   this.setState(nextProps)
+  // }
 
   render () {
-    const { selectedTeamIndex, selectedMemberIndex, expedition, initialExpedition } = this.state
-    // const selectedTeamIndex = this.state.get('selectedTeamIndex')
-    // const selectedMemberIndex = this.state.get('selectedMemberIndex')
-    // const expedition = this.state.get('expedition')
 
-    const tabLabels = expedition.get('teams')
+    const { 
+      expedition,
+      teams,
+      members,
+      currentTeam,
+      currentMember,
+      editedTeam,
+      setCurrentTeam,
+      setCurrentMember,
+      addTeam,
+      startEditingTeam,
+      stopEditingTeam,
+      setTeamProperty,
+      saveChangesToTeam,
+      clearChangesToTeam
+    } = this.props
+
+    const teamTabs = teams
       .map((t, i) => {
+        let className = 'team-name '
+        if (t === currentTeam) className += 'editable active '
+        if (currentTeam.get('name') === '') className += 'required '
+
         return (
           <li 
-            className={'team-name ' + (i === selectedTeamIndex ? 'active' : '')}
-            key={i}
-            onClick={() => {
-              this.selectTeam(i)
-            }}
+            className={ className }
+            key={t.get('id')}
+            onClick={() => { setCurrentTeam(t.get('id')) }}
           >
-            {t.get('name')}
+            <ContentEditable
+              html={(() => {
+                if (!!t.get('name')) return t.get('name')
+                else if (t.get('status') === 'new') return 'New Team Name'
+                else return ''
+              })()}
+              disabled={t !== currentTeam}
+              onClick={(e) => {
+                if (t === currentTeam) startEditingTeam()
+              }}
+              onBlur={(e) => {
+                stopEditingTeam()
+              }}
+              onChange={(e) => { 
+                setTeamProperty('name', e.target.value)
+              }}
+            />
           </li>
         )
       })
 
-    const members = expedition.get('teams')
-      .find((t, i) => {
-        return i === selectedTeamIndex
-      })
-      .get('members')
+     const teamMembers = members
       .map((m, i) => {
         const inputs = m.get('inputs')
           .map((d, j) => {
             return <li key={j}>{d}</li>
           })
 
-        if (i !== selectedMemberIndex) {
+        if (!!currentMember && i !== currentMember.get('id')) {
           return (
             <tr key={i} onClick={() => {
               this.selectMember(i)
@@ -113,7 +138,7 @@ class TeamsSection extends React.Component {
               <td className="role">{m.get('role')}</td>
               <td className="inputs">
                 <ul>
-                  {inputs}
+                  { inputs }
                 </ul>
               </td>
               <td className="activity">
@@ -140,78 +165,129 @@ class TeamsSection extends React.Component {
         }
       })
 
-    const selectedTeam = expedition.get('teams')
-      .filter((t, i) => {
-        return i === selectedTeamIndex
-      })
-      .map((t, i) => {
-        return (
-          <div className="team" key={i}>
-              <div className="actions">
-                <div className="button secondary">
-                  Remove team
-                </div>
-              </div>
-              <div className="header">
-                <div className="column description">
-                  <h5>Description</h5>
-                  <ContentEditable
-                    html={t.get('description')}
-                    disabled={false}
-                    onBlur={this.onContentEdited}
-                    onChange={this.onContentChange}
-                  />
-                </div>
-                <svg className="activity column">
-                </svg>
-              </div>
-              <table className="members-list">
-                <tr>
-                  <th className="name">Name</th>
-                  <th className="role">Role</th>
-                  <th className="inputs">Inputs</th>
-                  <th className="activity">Activity</th>
-                  <th className="edit"></th>
-                  <th className="remove"></th>
-                </tr>
-                {members}
-              </table>
+    const teamActionButtons = () => {
+      const actionButtons = []
+
+      if (currentTeam.get('status') === 'new') {
+        actionButtons.push(
+          <div
+            className="button secondary"
+            onClick={() => {
+              this.props.removeCurrentTeam()
+            }}
+          >
+            Cancel
           </div>
         )
-      })
-
-    const sectionActions = (
-      <ul className="section-actions">
-        <li>
-          { expedition.get('updating') &&
-            (
-              <div class="status">
-                <span className="spinning-wheel-container"><div className="spinning-wheel"></div></span>
-                Saving Changes
-              </div>
-            )
-          }
-          { !expedition.get('updating') &&
-            initialExpedition !== this.props.expedition &&
-            (
-              <div class="status">
-                Changes saved
-              </div>
-            )
-          }
-        </li>
-        <li>
-          <div class={'button primary ' + (initialExpedition === expedition ? 'disabled' : '')} onClick={this.resetChanges}>
-            Reset Changes
+        actionButtons.push(
+          <div
+            className="button secondary"
+            onClick={() => {
+              this.props.saveChangesToTeam()
+            }}
+          >
+            Save New Team
           </div>
-        </li>
-      </ul>
+        )
+      } else {
+        actionButtons.push(
+          <div
+            className="button secondary"
+            onClick={() => {
+              this.props.removeCurrentTeam()
+            }}
+          >
+            Remove Team
+          </div>
+        )
+
+        if (!!currentTeam && !!editedTeam && 
+            !!currentTeam.find((val, key) => {
+              return key !== 'status' && editedTeam.get(key) !== val
+            })) {
+          actionButtons.push(
+            <div
+              className="button secondary"
+              onClick={() => {
+                this.props.saveChangesToTeam()
+              }}
+            >
+              Save Changes
+            </div>
+          )
+          if (editedTeam.get('status') !== 'new') {
+            actionButtons.push(
+              <div
+                className="button secondary"
+                onClick={() => {
+                  this.props.clearChangesToTeam()
+                }}
+              >
+                Clear Changes
+              </div>
+            )
+          }
+        }
+      }
+      return (
+        <div className="actions">
+          { actionButtons }
+        </div>
+      )
+    }
+
+    const selectedTeam = (
+      <div className="team" key={currentTeam.get('id')}>
+          { teamActionButtons() }
+          <div className="header">
+            <div className="column description">
+              <h5>Description</h5>
+              <ContentEditable
+                html={(() => {
+                  if (!!currentTeam.get('description')) return currentTeam.get('description')
+                  else if (currentTeam.get('status') === 'new') return 'Enter a description for this new team.'
+                  else return ''
+                })()}
+                disabled={false}
+                onClick={(e) => {
+                  startEditingTeam()
+                }}
+                onBlur={(e) => {
+                  stopEditingTeam()
+                }}
+                onChange={(e) => { 
+                  setTeamProperty('description', e.target.value)
+                }}
+              />
+            </div>
+            <svg className="activity column">
+            </svg>
+          </div>
+          <table className="members-list">
+            <tr>
+              <th className="name">Name</th>
+              <th className="role">Role</th>
+              <th className="inputs">Inputs</th>
+              <th className="activity">Activity</th>
+              <th className="edit"></th>
+              <th className="remove"></th>
+            </tr>
+            { teamMembers }
+          </table>
+      </div>
+    )
+      
+
+    const selectedTeamContainer = !teams.size ? null : (
+      <div id="selected-team" class="selected-tab">
+        { selectedTeam }
+      </div>
     )
 
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          {sectionActions}
+          {/*sectionActions*/}
           <h1>Teams</h1>
         </div>
         <p className="intro">
@@ -219,16 +295,63 @@ class TeamsSection extends React.Component {
         </p>
 
         <ul id="teams-tabs" class="tabs">
-          {tabLabels}
-          <li className="team-name">+</li>
+          { teamTabs }
+          <li className="team-name add" onClick={() => { addTeam() }}>ADD A TEAM</li>
         </ul>
-
-        <div id="selected-team" class="selected-tab">
-          {selectedTeam}
-        </div>
-        {sectionActions}
+        { selectedTeamContainer }
+        {/*sectionActions*/}
       </div>
     )
+
+      ////////
+      ////////
+      ////////
+      ////////
+      ////////
+      ////////
+      ////////
+
+
+
+    return null
+    // const { selectedTeamIndex, selectedMemberIndex, expedition, initialExpedition } = this.state
+    // const selectedTeamIndex = this.state.get('selectedTeamIndex')
+    // const selectedMemberIndex = this.state.get('selectedMemberIndex')
+    // const expedition = this.state.get('expedition')
+
+    
+
+   
+
+    // const sectionActions = (
+    //   <ul className="section-actions">
+    //     <li>
+    //       { expedition.get('updating') &&
+    //         (
+    //           <div class="status">
+    //             <span className="spinning-wheel-container"><div className="spinning-wheel"></div></span>
+    //             Saving Changes
+    //           </div>
+    //         )
+    //       }
+    //       { !expedition.get('updating') &&
+    //         initialExpedition !== this.props.expedition &&
+    //         (
+    //           <div class="status">
+    //             Changes saved
+    //           </div>
+    //         )
+    //       }
+    //     </li>
+    //     <li>
+    //       <div class={'button primary ' + (initialExpedition === expedition ? 'disabled' : '')} onClick={this.resetChanges}>
+    //         Reset Changes
+    //       </div>
+    //     </li>
+    //   </ul>
+    // )
+
+    
   }
 }
 

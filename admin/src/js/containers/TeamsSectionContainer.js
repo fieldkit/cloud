@@ -4,25 +4,81 @@ import TeamsSection from '../components/TeamsSection'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
-  const { children, params, disconnect, location } = ownProps
+  const expeditions = state.expeditions
 
-  const expedition = state.expeditions
-    .get('expeditions')
-    .find(e => {
-      return e.get('id') === params.expeditionID
+  const currentExpeditionID = expeditions.get('currentExpeditionID')
+  const currentTeamID = expeditions.get('currentTeamID')
+  const currentMemberID = expeditions.get('currentMemberID')
+
+  const expedition = expeditions.getIn(['expeditions', currentExpeditionID])
+
+  const teams = expeditions.getIn(['expeditions', currentExpeditionID, 'teams'])
+    .map(t => {
+      return expeditions.getIn(['teams', t]) 
     })
+
+  const members = teams.size > 0 ? (expeditions.getIn(['teams', currentTeamID, 'members'])
+    .map(m => {
+      return expeditions.getIn(['people', m])
+    })) : []
+
+  const currentTeam = !!teams.size ? teams.find(t => {
+    return t.get('id') === currentTeamID
+  }) : null
+
+  const currentMember = !!members.size ? members.find(t => {
+    return t.get('id') === currentTeamID
+  }) : null
+
+  const editedTeam = expeditions.get('editedTeam')
 
   return {
     ...ownProps,
-    expedition
+    expedition,
+    teams,
+    members,
+    currentTeam,
+    currentMember,
+    editedTeam
+    // expedition,
+    // currentExpedition: expeditions.getIn('expeditions', currentExpeditionID),
+    // teamsID
   }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
     updateExpedition (expedition) {
       return dispatch(actions.updateExpedition(expedition))
-    }
+    },
+    addTeam () {
+      return dispatch(actions.addTeam())
+    },
+    setCurrentTeam (teamID) {
+      return dispatch(actions.setCurrentTeam(teamID))
+    },
+    setCurrentMember (memberID) {
+      return dispatch(actions.setCurrentMember(memberID))
+    },
+    removeCurrentTeam () {
+      return dispatch(actions.removeCurrentTeam())
+    },
+    startEditingTeam () {
+      return dispatch(actions.startEditingTeam())
+    },
+    stopEditingTeam () {
+      return dispatch(actions.stopEditingTeam())
+    },
+    setTeamProperty (key, value) {
+      return dispatch(actions.setTeamProperty(key, value))
+    },
+    saveChangesToTeam () {
+      return dispatch(actions.saveChangesToTeam())
+    },
+    clearChangesToTeam () {
+      return dispatch(actions.clearChangesToTeam())
+    },
+
     // connect: () => {
     // connect () {
     //   return dispatch(actions.connect())
