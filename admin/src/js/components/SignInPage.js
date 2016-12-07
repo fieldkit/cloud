@@ -14,7 +14,7 @@ class SignInPage extends React.Component {
   @autobind
   onSubmit (event) {
     event.preventDefault()
-    this.props.requestSignIn(this.refs.email.value, this.refs.password.value)
+    this.props.requestSignIn(this.refs.userName.value, this.refs.password.value)
     return false
   }
 
@@ -39,7 +39,7 @@ class SignInPage extends React.Component {
         <div className="content">
           <h1>Sign in</h1>
           <form>
-            <input type='text' ref='email' className="form-control" placeholder='Email'/>
+            <input type='text' ref='userName' className="form-control" placeholder='Username'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
             <button onClick={this.onSubmit} className="btn btn-primary">
               Login
@@ -51,9 +51,6 @@ class SignInPage extends React.Component {
               <p>{errorMessage}</p>
             }
           </form>
-          <div onClick={connect}>
-            <Link to={'/admin/okavango_16'}>(Fake sign in)</Link>
-          </div>
           <p className="forgot-label">
             <Link to={'/forgot'}>Forgot your password?</Link>
           </p>

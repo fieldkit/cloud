@@ -20,7 +20,6 @@ export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
 
 
 
-
 /*
 
 TEAM ACTIONS
@@ -154,7 +153,7 @@ AUTH ACTIONS
 export function requestSignIn (email, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
-    FKApiClient.get().login(email, password)
+    FKApiClient.get().login(userName, password)
       .then(() => {
         dispatch(loginSuccess())
         browserHistory.push('/admin/okavango_16')
@@ -184,6 +183,7 @@ export function loginRequest() {
 }
 
 export function loginSuccess () {
+  console.log('login success!')
   return {
     type: LOGIN_SUCCESS
   }
@@ -196,12 +196,21 @@ export function loginError (message) {
   }
 }
 
-export function requestSignUp (email, password) {
+export function requestSignUp (email, userName, firstName, lastName, password) {
   return function (dispatch, getState) {
     dispatch(signupRequest())
-    FKApiClient.get().register(email, password)
+
+    const params = {
+      'email': email,
+      'username': userName,
+      'first_name': firstName,
+      'last_name': lastName,
+      'password': password
+    }
+
+    FKApiClient.get().register(params)
       .then(() => {
-        dispatch(loginSuccess())
+        dispatch(signupSuccess())
         browserHistory.push('/signin')
       })
       .catch(error => {
@@ -225,6 +234,7 @@ export function signupRequest () {
 }
 
 export function signupSuccess () {
+  console.log('signup success!')
   return {
     type: SIGNUP_SUCCESS
   }

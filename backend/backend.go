@@ -6,13 +6,16 @@ import (
 	"net"
 	"time"
 
+	"github.com/O-C-R/auth/id"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/O-C-R/fieldkit/data"
 )
 
 var (
 	DuplicateKeyError = errors.New("duplicate key")
+	NotFoundError     = errors.New("not found")
 	dialer            = &net.Dialer{
 		// Default timeout that mgo uses.
 		Timeout:   10 * time.Second,
@@ -21,11 +24,15 @@ var (
 	indexes = map[string][]mgo.Index{
 		"user": []mgo.Index{
 			mgo.Index{
-				Key:    []string{"id"},
+				Key:    []string{"email"},
 				Unique: true,
 			},
 			mgo.Index{
-				Key:    []string{"email"},
+				Key:    []string{"username"},
+				Unique: true,
+			},
+			mgo.Index{
+				Key:    []string{"validation_token"},
 				Unique: true,
 			},
 		},
@@ -65,6 +72,23 @@ func newBackend(url string, tls bool) (*Backend, error) {
 func NewBackend(url string, tls bool) (*Backend, error) {
 	backend, err := newBackend(url, tls)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := backend.init(); err != nil {
+		return nil, err
+	}
+
+	return backend, nil
+}
+
+func NewTestBackend() (*Backend, error) {
+	backend, err := newBackend("mongodb://localhost/test", false)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := backend.dropDatabase(); err != nil {
 		return nil, err
 	}
 
@@ -119,4 +143,112 @@ func (b *Backend) AddUser(user *data.User) error {
 	}
 
 	return err
+}
+
+func (b *Backend) UpdateUser(user *data.User) error {
+	session := b.newSession()
+	defer session.Close()
+
+	err := session.DB("").C("user").Update(bson.M{"_id": user.ID}, user)
+	if mgo.IsDup(err) {
+		return DuplicateKeyError
+	}
+
+	if err == mgo.ErrNotFound {
+		return NotFoundError
+	}
+
+	return err
+}
+
+func (b *Backend) UserByID(userID id.ID) (*data.User, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	user := &data.User{}
+	err := session.DB("").C("user").Find(bson.M{"_id": userID}).One(user)
+	if err == mgo.ErrNotFound {
+		return nil, NotFoundError
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (b *Backend) UserByEmail(email string) (*data.User, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	user := &data.User{}
+	err := session.DB("").C("user").Find(bson.M{"email": email}).One(user)
+	if err == mgo.ErrNotFound {
+		return nil, NotFoundError
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (b *Backend) UserByUsername(username string) (*data.User, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	user := &data.User{}
+	err := session.DB("").C("user").Find(bson.M{"username": username}).One(user)
+	if err == mgo.ErrNotFound {
+		return nil, NotFoundError
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (b *Backend) UserByValidationToken(token id.ID) (*data.User, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	user := &data.User{}
+	err := session.DB("").C("user").Find(bson.M{"validation_token": token}).One(user)
+	if err == mgo.ErrNotFound {
+		return nil, NotFoundError
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func (b *Backend) UserEmailInUse(email string) (bool, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	n, err := session.DB("").C("user").Find(bson.M{"email": email}).Count()
+	if err != nil {
+		return false, err
+	}
+
+	return n > 0, nil
+}
+
+func (b *Backend) UserUsernameInUse(username string) (bool, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	n, err := session.DB("").C("user").Find(bson.M{"username": username}).Count()
+	if err != nil {
+		return false, err
+	}
+
+	return n > 0, nil
 }

@@ -1,0 +1,5 @@
+.git
+.gitignore
+admin/
+README.md
+vendor/vendor.json

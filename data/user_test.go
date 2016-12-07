@@ -2,12 +2,10 @@ package data
 
 import (
 	"testing"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func TestUserPassword(t *testing.T) {
-	user, err := NewUser("test@ocr.nyc", "password")
+	user, err := NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -16,11 +14,11 @@ func TestUserPassword(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := user.CheckPassword(""); err != bcrypt.ErrMismatchedHashAndPassword {
+	if err := user.CheckPassword(""); err != IncorrectPasswordError {
 		t.Error("empty password succeeded")
 	}
 
-	if err := user.CheckPassword("incorrect password"); err != bcrypt.ErrMismatchedHashAndPassword {
+	if err := user.CheckPassword("incorrect password"); err != IncorrectPasswordError {
 		t.Error("incorrect password succeeded")
 	}
 }

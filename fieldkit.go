@@ -4,22 +4,30 @@ import (
 	"flag"
 	"log"
 	"os"
+	"time"
+
+	"github.com/O-C-R/auth/session"
 
 	"github.com/O-C-R/fieldkit/backend"
 	"github.com/O-C-R/fieldkit/config"
+	"github.com/O-C-R/fieldkit/email"
 	"github.com/O-C-R/fieldkit/webserver"
 )
 
 var flagConfig struct {
-	addr       string
-	backendURL string
-	backendTLS bool
+	addr                 string
+	backendURL           string
+	backendTLS           bool
+	sessionStoreAddr     string
+	sessionStorePassword string
 }
 
 func init() {
 	flag.StringVar(&flagConfig.addr, "a", "127.0.0.1:8080", "address to listen on")
 	flag.StringVar(&flagConfig.backendURL, "backend-url", "mongodb://localhost/fieldkit", "MongoDB URL")
 	flag.BoolVar(&flagConfig.backendTLS, "backend-tls", false, "use TLS")
+	flag.StringVar(&flagConfig.sessionStoreAddr, "session-store-address", "localhost:6379", "redis session store address")
+	flag.StringVar(&flagConfig.sessionStorePassword, "session-store-password", "", "redis session store password")
 }
 
 func getenvString(p *string, key string) {
@@ -37,9 +45,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	emailer := email.NewEmailer()
+
+	getenvString(&flagConfig.sessionStoreAddr, "SESSION_STORE_ADDR")
+	getenvString(&flagConfig.sessionStorePassword, "SESSION_STORE_PASSWORD")
+	sessionStore, err := session.NewSessionStore(session.SessionStoreOptions{
+		Addr:            flagConfig.sessionStoreAddr,
+		Password:        flagConfig.sessionStorePassword,
+		SessionDuration: time.Hour * 72,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	c := &config.Config{
-		Addr:    flagConfig.addr,
-		Backend: b,
+		Addr:         flagConfig.addr,
+		Backend:      b,
+		Emailer:      emailer,
+		SessionStore: sessionStore,
 	}
 
 	server, err := webserver.NewWebserver(c)
@@ -47,5 +70,6 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println(c.Addr)
 	log.Fatal(server.ListenAndServe())
 }

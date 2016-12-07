@@ -6,29 +6,8 @@ import (
 	"github.com/O-C-R/fieldkit/data"
 )
 
-const (
-	testURL = "mongodb://localhost/test"
-)
-
-func testBackend() (*Backend, error) {
-	backend, err := newBackend(testURL, false)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := backend.dropDatabase(); err != nil {
-		return nil, err
-	}
-
-	if err := backend.init(); err != nil {
-		return nil, err
-	}
-
-	return backend, nil
-}
-
 func TestBackend(t *testing.T) {
-	backend, err := NewBackend(testURL, false)
+	backend, err := NewTestBackend()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,12 +18,12 @@ func TestBackend(t *testing.T) {
 }
 
 func TestBackendAddUser(t *testing.T) {
-	backend, err := testBackend()
+	backend, err := NewTestBackend()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	user, err := data.NewUser("test@ocr.nyc", "password")
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,5 +34,105 @@ func TestBackendAddUser(t *testing.T) {
 
 	if err := backend.AddUser(user); err != DuplicateKeyError {
 		t.Error("duplicate key succeeded")
+	}
+}
+
+func TestBackendUserByID(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByID(user.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
+	}
+}
+
+func TestBackendUserByEmail(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByEmail(user.Email)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
+	}
+}
+
+func TestBackendUserByUsername(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByUsername(user.Username)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
+	}
+}
+
+func TestBackendUserByValidationToken(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByValidationToken(user.ValidationToken)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
 	}
 }
