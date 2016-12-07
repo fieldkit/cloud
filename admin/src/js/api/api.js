@@ -17,10 +17,10 @@ export class APIClient {
     this.baseUrl = baseUrl;
   }
 
-  async post(path: string, body?: FormData | string): Promise<Response> {
+  async post(path: string, body?: Object | string): Promise<Response> {
     const url = new URL(path, this.baseUrl);
 
-    log.info('POST', path, body, body);
+    console.log('POST', path, body);
 
     let res;
     try {
@@ -30,16 +30,16 @@ export class APIClient {
         body
       });
     } catch (e) {
-      log.error(e);
-      log.error('Threw while POSTing', url.toString());
+      console.log(e);
+      console.log('Threw while POSTing', url.toString());
       throw new APIError('HTTP error');
     }
 
     if (res.status == 401) {
-      log.error('Bad auth while POSTing', url.toString(), await res.text());
+      console.log('Bad auth while POSTing', url.toString(), await res.text());
       throw new AuthenticationError();
     } else if (!res.ok) {
-      log.error('Non-OK response while POSTing', url.toString(), await res.text());
+      console.log('Non-OK response while POSTing', url.toString(), await res.text());
       throw new APIError('HTTP error');
     }
 
@@ -55,7 +55,7 @@ export class APIClient {
       }
     }
 
-    log.info('GET', path, params);
+    console.log('GET', path, params);
 
     let res;
     try {
@@ -64,16 +64,16 @@ export class APIClient {
         credentials: 'include'
       });
     } catch (e) {
-      log.error(e);
-      log.error('Threw while GETing', url.toString());
+      console.log(e);
+      console.log('Threw while GETing', url.toString());
       throw new APIError('HTTP error');
     }
 
     if (res.status == 401) {
-      log.error('Bad auth while GETing', url.toString(), await res.text());
+      console.log('Bad auth while GETing', url.toString(), await res.text());
       throw new AuthenticationError();
     } else if (!res.ok) {
-      log.error('Non-OK response while GETing', url.toString(), await res.text());
+      console.log('Non-OK response while GETing', url.toString(), await res.text());
       throw new APIError('HTTP error');
     }
 
@@ -81,15 +81,15 @@ export class APIClient {
   }
 
   async postForm(path: string, body?: Object): Promise<string> {
-    const data = new FormData();
+    // const data = new FormData();
 
-    if (body) {
-      for (const key in body) {
-        data.append(key, body[key]);
-      }
-    }
+    // if (body) {
+    //   for (const key in body) {
+    //     data.append(key, body[key]);
+    //   }
+    // }
 
-    const res = await this.post(path, data);
+    const res = await this.post(path, body);
     return res.text();
   }
 
@@ -181,7 +181,7 @@ export class FKApiClient extends APIClient {
 
   async getCurrentPerson(): Promise<PersonResponse> {
     // response has no content, so any non-error means success
-    const res: PersonResponse = await this.getJSON('/api/person/current');
+    const res: PersonResponse = await this.getJSON('http://localhost:8080/api/person/current');
 
     // Also this method acts as a proxy for logging in sometimes...
     this.onLogin();
@@ -189,17 +189,17 @@ export class FKApiClient extends APIClient {
     return res;
   }
 
-  async register(email: string, password: string): Promise<void> {
-    await this.postForm('/api/user/sign-up', { email, password });
+  async register(params: Object): Promise<void> {
+    await this.postForm('http://localhost:8080/api/user/sign-up', params);
   }
 
   async login(email: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
-    await this.postForm('/api/user/sign-in', { email, password });
+    await this.postForm('http://localhost:8080/api/user/sign-in', { email, password });
   }
 
   async logout(): Promise<void> {
-    await this.postForm('/api/user/logout');
+    await this.postForm('http://localhost:8080/api/user/logout');
     this.onLogout();
   }
 

@@ -63,10 +63,19 @@ export function loginError (message) {
   }
 }
 
-export function requestSignUp (email, password) {
+export function requestSignUp (email, userName, firstName, lastName, password) {
   return function (dispatch, getState) {
     dispatch(signupRequest())
-    FKApiClient.get().register(email, password)
+
+    const params = {
+      'email': email,
+      'username': userName,
+      'first_name': firstName,
+      'last_name': lastName,
+      'password': password
+    }
+
+    FKApiClient.get().register(params)
       .then(() => {
         dispatch(loginSuccess())
         browserHistory.push('/signin')
