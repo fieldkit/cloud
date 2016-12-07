@@ -15,8 +15,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     connect () {
       return dispatch(actions.connect())
     },
-    requestSignIn (email, password) {
-      dispatch(actions.requestSignIn(email, password))
+    requestSignIn (userName, password) {
+      dispatch(actions.requestSignIn(userName, password))
     }
   }
 }

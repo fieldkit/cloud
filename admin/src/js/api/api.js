@@ -17,10 +17,15 @@ export class APIClient {
     this.baseUrl = baseUrl;
   }
 
-  async post(path: string, body?: Object | string): Promise<Response> {
+  async post(path: string, body?: FormData | string): Promise<Response> {
     const url = new URL(path, this.baseUrl);
 
-    console.log('POST', path, body);
+    // const params = Object.keys(body).map(function(k) {
+    //     return encodeURIComponent(k) + '=' + encodeURIComponent(body[k])
+    // }).join('&')
+    // console.log('POST', path, params);
+
+    // console.log('POST', path, body)
 
     let res;
     try {
@@ -81,15 +86,15 @@ export class APIClient {
   }
 
   async postForm(path: string, body?: Object): Promise<string> {
-    // const data = new FormData();
+    const data = new FormData();
 
-    // if (body) {
-    //   for (const key in body) {
-    //     data.append(key, body[key]);
-    //   }
-    // }
+    if (body) {
+      for (const key in body) {
+        data.append(key, body[key]);
+      }
+    }
 
-    const res = await this.post(path, body);
+    const res = await this.post(path, data);
     return res.text();
   }
 
@@ -193,9 +198,9 @@ export class FKApiClient extends APIClient {
     await this.postForm('http://localhost:8080/api/user/sign-up', params);
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(username: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
-    await this.postForm('http://localhost:8080/api/user/sign-in', { email, password });
+    await this.postForm('http://localhost:8080/api/user/sign-in', { username, password });
   }
 
   async logout(): Promise<void> {
