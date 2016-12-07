@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/O-C-R/fieldkit/config"
@@ -49,6 +50,10 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	router.Handle("/api/user/current", AuthHandler(c, UserCurrentHandler(c)))
 
 	handler := http.Handler(router)
+	handler = handlers.CORS(
+		handlers.AllowCredentials(),
+		handlers.AllowedOrigins([]string{"http://localhost:8000"}),
+	)
 
 	server := &http.Server{
 		Addr:    c.Addr,
