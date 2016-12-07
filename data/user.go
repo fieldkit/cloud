@@ -38,15 +38,18 @@ func compareHashAndPassword(hashedPassword []byte, password string) ([]byte, err
 }
 
 type User struct {
-	ID                    id.ID     `bson:"id" json:"-"`
+	ID                    id.ID     `bson:"_id" json:"id"`
 	Email                 string    `bson:"email" json:"email"`
+	Username              string    `bson:"username" json:"username"`
+	FirstName             string    `bson:"first_name" json:"first_name,omitempty"`
+	LastName              string    `bson:"last_name" json:"last_name,omitempty"`
 	Password              []byte    `bson:"password" json:"-"`
 	Valid                 bool      `bson:"valid" json:"valid"`
 	ValidationToken       id.ID     `bson:"validation_token" json:"-"`
 	ValidationTokenExpire time.Time `bson:"validation_token_expire" json:"-"`
 }
 
-func NewUser(email, password string) (*User, error) {
+func NewUser(email, username, password string) (*User, error) {
 	userID, err := id.New()
 	if err != nil {
 		return nil, err
@@ -60,6 +63,7 @@ func NewUser(email, password string) (*User, error) {
 	u := &User{
 		ID:                    userID,
 		Email:                 email,
+		Username:              username,
 		ValidationToken:       validationToken,
 		ValidationTokenExpire: time.Now().Add(8 * time.Hour),
 	}

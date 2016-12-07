@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/O-C-R/auth/id"
@@ -20,12 +21,13 @@ const (
 )
 
 var (
-	emailRegexp      *regexp.Regexp
-	InvalidUserError = errors.New("invalid user")
+	emailRegexp, usernameRegexp *regexp.Regexp
+	InvalidUserError            = errors.New("invalid user")
 )
 
 func init() {
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	usernameRegexp = regexp.MustCompile(`^[a-zA-Z\d][\w-]+[a-zA-Z\d]$`)
 }
 
 const (
@@ -74,24 +76,49 @@ func UserSignUpHandler(c *config.Config) http.Handler {
 		email := req.FormValue("email")
 		if !emailRegexp.MatchString(email) {
 			errs.Error("email", "invalid Email")
+		} else {
+			emailInUse, err := c.Backend.UserEmailInUse(email)
+			if err != nil {
+				Error(w, err, 500)
+				return
+			}
+
+			if emailInUse {
+				errs.Error("email", "Email in use")
+			}
+		}
+
+		// Validate the user's username.
+		username := req.FormValue("username")
+		if !usernameRegexp.MatchString(username) {
+			errs.Error("username", "invalid Username")
+		} else {
+			usernameInUse, err := c.Backend.UserUsernameInUse(username)
+			if err != nil {
+				Error(w, err, 500)
+				return
+			}
+
+			if usernameInUse {
+				errs.Error("username", "Username in use")
+			}
+		}
+
+		if len(errs) > 0 {
 			WriteJSONStatusCode(w, errs, 400)
 			return
 		}
 
-		user, err := data.NewUser(req.FormValue("email"), req.FormValue("password"))
+		user, err := data.NewUser(email, username, req.FormValue("password"))
 		if err != nil {
 			Error(w, err, 500)
 			return
 		}
 
+		user.FirstName = strings.TrimSpace(req.FormValue("first_name"))
+		user.LastName = strings.TrimSpace(req.FormValue("last_name"))
 		if err := c.Backend.AddUser(user); err != nil {
-			if err != backend.DuplicateKeyError {
-				Error(w, err, 500)
-				return
-			}
-
-			errs.Error("email", "Email in use")
-			WriteJSONStatusCode(w, errs, 400)
+			WriteJSONStatusCode(w, errs, 500)
 			return
 		}
 
@@ -108,7 +135,7 @@ func UserSignUpHandler(c *config.Config) http.Handler {
 
 func UserSignInHandler(c *config.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		user, err := c.Backend.UserByEmail(req.FormValue("email"))
+		user, err := c.Backend.UserByUsername(req.FormValue("username"))
 		if err == backend.NotFoundError {
 			Error(w, err, 401)
 			return

@@ -24,11 +24,15 @@ var (
 	indexes = map[string][]mgo.Index{
 		"user": []mgo.Index{
 			mgo.Index{
-				Key:    []string{"id"},
+				Key:    []string{"email"},
 				Unique: true,
 			},
 			mgo.Index{
-				Key:    []string{"email"},
+				Key:    []string{"username"},
+				Unique: true,
+			},
+			mgo.Index{
+				Key:    []string{"validation_token"},
 				Unique: true,
 			},
 		},
@@ -145,7 +149,7 @@ func (b *Backend) UpdateUser(user *data.User) error {
 	session := b.newSession()
 	defer session.Close()
 
-	err := session.DB("").C("user").Update(bson.M{"id": user.ID}, user)
+	err := session.DB("").C("user").Update(bson.M{"_id": user.ID}, user)
 	if mgo.IsDup(err) {
 		return DuplicateKeyError
 	}
@@ -162,7 +166,7 @@ func (b *Backend) UserByID(userID id.ID) (*data.User, error) {
 	defer session.Close()
 
 	user := &data.User{}
-	err := session.DB("").C("user").Find(bson.M{"id": userID}).One(user)
+	err := session.DB("").C("user").Find(bson.M{"_id": userID}).One(user)
 	if err == mgo.ErrNotFound {
 		return nil, NotFoundError
 	}
@@ -191,6 +195,23 @@ func (b *Backend) UserByEmail(email string) (*data.User, error) {
 	return user, err
 }
 
+func (b *Backend) UserByUsername(username string) (*data.User, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	user := &data.User{}
+	err := session.DB("").C("user").Find(bson.M{"username": username}).One(user)
+	if err == mgo.ErrNotFound {
+		return nil, NotFoundError
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
 func (b *Backend) UserByValidationToken(token id.ID) (*data.User, error) {
 	session := b.newSession()
 	defer session.Close()
@@ -206,4 +227,28 @@ func (b *Backend) UserByValidationToken(token id.ID) (*data.User, error) {
 	}
 
 	return user, err
+}
+
+func (b *Backend) UserEmailInUse(email string) (bool, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	n, err := session.DB("").C("user").Find(bson.M{"email": email}).Count()
+	if err != nil {
+		return false, err
+	}
+
+	return n > 0, nil
+}
+
+func (b *Backend) UserUsernameInUse(username string) (bool, error) {
+	session := b.newSession()
+	defer session.Close()
+
+	n, err := session.DB("").C("user").Find(bson.M{"username": username}).Count()
+	if err != nil {
+		return false, err
+	}
+
+	return n > 0, nil
 }

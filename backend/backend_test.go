@@ -23,7 +23,7 @@ func TestBackendAddUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	user, err := data.NewUser("test@ocr.nyc", "password")
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func TestBackendUserByID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	user, err := data.NewUser("test@ocr.nyc", "password")
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,13 +62,63 @@ func TestBackendUserByID(t *testing.T) {
 	}
 }
 
+func TestBackendUserByEmail(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByEmail(user.Email)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
+	}
+}
+
+func TestBackendUserByUsername(t *testing.T) {
+	backend, err := NewTestBackend()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := backend.AddUser(user); err != nil {
+		t.Fatal(err)
+	}
+
+	returnedUser, err := backend.UserByUsername(user.Username)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if returnedUser.ID != user.ID {
+		t.Error("incorrect returned user ID")
+	}
+}
+
 func TestBackendUserByValidationToken(t *testing.T) {
 	backend, err := NewTestBackend()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	user, err := data.NewUser("test@ocr.nyc", "password")
+	user, err := data.NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}

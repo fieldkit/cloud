@@ -5,7 +5,7 @@ import (
 )
 
 func TestUserPassword(t *testing.T) {
-	user, err := NewUser("test@ocr.nyc", "password")
+	user, err := NewUser("test@ocr.nyc", "test", "password")
 	if err != nil {
 		t.Fatal(err)
 	}

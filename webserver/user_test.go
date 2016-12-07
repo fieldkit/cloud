@@ -30,7 +30,7 @@ func TestUserSignUp(t *testing.T) {
 		},
 	}
 
-	signUpResponse, err := client.Get(server.URL + "/api/user/sign-up?email=test@ocr.nyc&password=password")
+	signUpResponse, err := client.Get(server.URL + "/api/user/sign-up?email=test@ocr.nyc&username=test&password=password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +66,7 @@ func TestUserSignUp(t *testing.T) {
 		t.Error("expected valid")
 	}
 
-	signInResponse, err := client.Get(server.URL + "/api/user/sign-in?email=test@ocr.nyc&password=password")
+	signInResponse, err := client.Get(server.URL + "/api/user/sign-in?username=test&password=password")
 	if err != nil {
 		t.Fatal(err)
 	}
