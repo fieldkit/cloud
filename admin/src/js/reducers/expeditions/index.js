@@ -3,6 +3,11 @@ import * as actions from '../../actions'
 import I from 'immutable'
 
 export const initialState = I.fromJS({
+  modal: {
+    type: null,
+    nextAction: null,
+    nextPath: null
+  },
   currentExpeditionID: null,
   currentTeamID: [],
   currentMemberID: [],
@@ -158,7 +163,7 @@ export const initialState = I.fromJS({
 
 const expeditionReducer = (state = initialState, action) => {
 
-
+  // console.log('reducer:', action.type, action)
   switch (action.type) {
 
     case actions.SET_CURRENT_EXPEDITION: 
@@ -179,8 +184,8 @@ const expeditionReducer = (state = initialState, action) => {
           ['teams', teamID], 
           I.fromJS({
             id: 'team-' + Date.now(),
-            name: '',
-            description: '',
+            name: 'New Team',
+            description: 'Enter a description',
             members: [],
             new: true,
             status: 'new'
@@ -245,11 +250,15 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.SAVE_CHANGES_TO_TEAM: {
       return state
-        .set('editedTeam', null) 
+        .set('editedTeam', null)
         .setIn(
           ['teams', state.get('currentTeamID'), 'status'],
           'ready'
         ) 
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'new'],
+          false
+        )
     }
 
     case actions.CLEAR_CHANGES_TO_TEAM: {
@@ -259,6 +268,20 @@ const expeditionReducer = (state = initialState, action) => {
           ['teams', state.get('currentTeamID')],
           state.get('editedTeam')
         )
+    }
+
+    case actions.PROMPT_MODAL_CONFIRM_CHANGES: {
+      return state
+        .setIn(['modal', 'type'], 'confirm_changes')
+        .setIn(['modal', 'nextAction'], I.fromJS(action.nextAction))
+        .setIn(['modal', 'nextPath'], action.nextPath)
+    }
+
+    case actions.CLEAR_MODAL: {
+      return state
+        .setIn(['modal', 'type'], null)
+        .setIn(['modal', 'nextPath'], null)
+        .setIn(['modal', 'nextAction'], null)
     }
 
     ///////

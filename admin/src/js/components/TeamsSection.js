@@ -99,19 +99,26 @@ class TeamsSection extends React.Component {
           <li 
             className={ className }
             key={t.get('id')}
-            onClick={() => { setCurrentTeam(t.get('id')) }}
+            onClick={() => { 
+              if (t !== currentTeam) setCurrentTeam(t.get('id'))
+            }}
           >
             <ContentEditable
               html={(() => {
-                if (!!t.get('name')) return t.get('name')
-                else if (t.get('status') === 'new') return 'New Team Name'
-                else return ''
+                return this.props.teams.get(i).get('name')
+                // if (!!t.get('name')) return t.get('name')
+                // else if (t.get('status') === 'new') return 'New Team Name'
+                // else return ''
               })()}
               disabled={t !== currentTeam}
               onClick={(e) => {
-                if (t === currentTeam) startEditingTeam()
+                if (t === currentTeam) {
+                  if (this.props.teams.get(i).get('name') === 'New Team') setTeamProperty('name', '')
+                  startEditingTeam()
+                }
               }}
               onBlur={(e) => {
+                if (this.props.teams.get(i).get('name') === '') setTeamProperty('name', 'New Team')
                 stopEditingTeam()
               }}
               onChange={(e) => { 
@@ -168,7 +175,7 @@ class TeamsSection extends React.Component {
     const teamActionButtons = () => {
       const actionButtons = []
 
-      if (currentTeam.get('status') === 'new') {
+      if (currentTeam.get('new')) {
         actionButtons.push(
           <div
             className="button secondary"
@@ -244,19 +251,24 @@ class TeamsSection extends React.Component {
               <h5>Description</h5>
               <ContentEditable
                 html={(() => {
-                  if (!!currentTeam.get('description')) return currentTeam.get('description')
-                  else if (currentTeam.get('status') === 'new') return 'Enter a description for this new team.'
-                  else return ''
+                  return currentTeam.get('description')
+                  // if (!!currentTeam.get('description')) return currentTeam.get('description')
+                  // else if (currentTeam.get('status') === 'new') return 'Enter a description for this new team.'
+                  // else return ''
                 })()}
                 disabled={false}
                 onClick={(e) => {
+                  if (this.props.currentTeam.get('description') === 'Enter a description') setTeamProperty('description', '')
                   startEditingTeam()
                 }}
                 onBlur={(e) => {
+                  // console.log('aga', currentTeam.get('description'), currentTeam.get('id'))
+                  if (this.props.currentTeam.get('description') === '') setTeamProperty('description', 'Enter a description')
                   stopEditingTeam()
                 }}
                 onChange={(e) => { 
                   setTeamProperty('description', e.target.value)
+                  // console.log(currentTeam.get('description'), currentTeam.get('id'))
                 }}
               />
             </div>
@@ -296,7 +308,7 @@ class TeamsSection extends React.Component {
 
         <ul id="teams-tabs" class="tabs">
           { teamTabs }
-          <li className="team-name add" onClick={() => { addTeam() }}>ADD A TEAM</li>
+          <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
         {/*sectionActions*/}

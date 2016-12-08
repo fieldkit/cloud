@@ -1,7 +1,6 @@
 // @flow
 
 import 'whatwg-fetch';
-import log from 'loglevel';
 
 import {BaseError} from '../common/util';
 import type {PersonResponse} from './types';

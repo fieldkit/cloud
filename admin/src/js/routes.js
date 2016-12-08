@@ -12,11 +12,8 @@ import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
 import multiMiddleware from 'redux-multi'
 import { batchedSubscribe } from 'redux-batched-subscribe'
-// import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
-// import { syncHistory, syncParams, routeParamsReducer } from 'react-router-redux-params'
-// import { routerReducer, syncHistoryWithStore } from 'react-router-redux'
 
-import { initTeamSection } from './actions'
+import * as actions from './actions'
 import expeditionReducer from './reducers/expeditions'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
@@ -24,7 +21,6 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 import Root from './components/Root'
 import LandingPage from './components/LandingPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
-import AdminPage from './components/AdminPage'
 
 import DashboardSection from './components/DashboardSection'
 import UploaderSection from './components/UploaderSection'
@@ -33,6 +29,7 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
+import AdminPageContainer from './containers/AdminPageContainer'
 import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
@@ -79,7 +76,18 @@ const routes = (
     <Route path="signup" component={SignUpPageContainer}/>
     <Route path="signin" component={SignInPageContainer}/>
     <Route path="forgot" component={ForgotPasswordPage}/>
-    <Route path="admin" component={AdminPage} onEnter={requireAuth}>
+    <Route path="admin" 
+      component={AdminPageContainer} 
+      onEnter={requireAuth}
+      onChange={(prevState, nextState, replace) => {
+        const previousSection = prevState.location.pathname.split('/')[3]
+        const nextSection = nextState.location.pathname.split('/')[3]
+        if (previousSection === 'teams' && nextSection !== 'teams' && !!store.getState().expeditions.get('editedTeam')) {
+          store.dispatch(actions.promptModalConfirmChanges(nextState.location.pathname))
+          replace(prevState.location.pathname)
+        } 
+      }}
+    >
       <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
       <Route path=":expeditionID">
@@ -87,7 +95,10 @@ const routes = (
         <Route path="dashboard" component={DashboardSection}/>
         <Route path="uploader" component={UploaderSection}/>
         <Route path="sources" component={SourcesSection}/>
-        <Route path="teams" component={TeamsSectionContainer} onEnter={() => store.dispatch(initTeamSection())}/>
+        <Route path="teams" 
+          component={TeamsSectionContainer} 
+          onEnter={() => store.dispatch(actions.initTeamSection())}
+        />
         <Route path="editor" component={EditorSection}/>
         <Route path="identity" component={IdentitySection}/>
       </Route>

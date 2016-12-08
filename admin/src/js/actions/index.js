@@ -36,6 +36,9 @@ export const STOP_EDITING_TEAM = 'STOP_EDITING_TEAM'
 export const SET_TEAM_PROPERTY = 'SET_TEAM_PROPERTY'
 export const CLEAR_CHANGES_TO_TEAM = 'CLEAR_CHANGES_TO_TEAM'
 export const SAVE_CHANGES_TO_TEAM = 'SAVE_CHANGES_TO_TEAM'
+export const PROMPT_MODAL_CONFIRM_CHANGES = 'PROMPT_MODAL_CONFIRM_CHANGES'
+export const CANCEL_ACTION = 'CANCEL_ACTION'
+export const CLEAR_MODAL = 'CLEAR_MODAL'
 
 export function initTeamSection () {
   return function (dispatch, getState) {
@@ -69,10 +72,15 @@ export function setCurrentExpedition (id) {
 
 export function setCurrentTeam (id) {
   return function (dispatch, getState) {
-    dispatch({
+    const action = {
       type: SET_CURRENT_TEAM,
       teamID: id
-    })
+    }
+    if (!!getState().expeditions.get('editedTeam')) {
+      dispatch(promptModalConfirmChanges(null, action))
+    } else {
+      dispatch(action)
+    }
   }
 }
 
@@ -87,9 +95,22 @@ export function setCurrentMember (id) {
 
 export function addTeam () {
   return function (dispatch, getState) {
-    dispatch({
-      type: ADD_TEAM
-    })
+    const actions = [
+      {
+        type: ADD_TEAM
+      },
+      {
+        type: START_EDITING_TEAM
+      }
+    ]
+    if (!!getState().expeditions.get('editedTeam')) {
+      dispatch(promptModalConfirmChanges(
+        null, 
+        actions
+      ))
+    } else {
+      dispatch(actions)
+    }
   }
 }
 
@@ -135,11 +156,59 @@ export function saveChangesToTeam () {
   }
 }
 
+export function saveChangesAndResume () {
+  return function (dispatch, getState) {
+    const modal = getState().expeditions.get('modal')
+    dispatch([
+      {
+        type: SAVE_CHANGES_TO_TEAM
+      }
+    ])
+    // console.log('modal', modal.toJS())
+    if (!!modal.get('nextAction')) {
+      dispatch([
+        modal.get('nextAction').toJS(),
+        {
+          type: CLEAR_MODAL
+        }
+      ])
+    } else if (!!modal.get('nextPath')) {
+      // console.log('aga', modal.get('nextPath'))
+      dispatch(
+        {
+          type: CLEAR_MODAL
+        }
+      )
+      browserHistory.push(modal.get('nextPath'))
+    }
+  }
+}
+
 export function clearChangesToTeam () {
   return function (dispatch, getState) {
     dispatch({
       type: CLEAR_CHANGES_TO_TEAM
     })
+  }
+}
+
+export function promptModalConfirmChanges (nextPath, nextAction) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: PROMPT_MODAL_CONFIRM_CHANGES,
+      nextPath,
+      nextAction
+    })
+  }
+}
+
+export function cancelAction () {
+  return function (dispatch, getState) {
+    dispatch(
+      {
+        type: CLEAR_MODAL
+      }
+    )
   }
 }
 
