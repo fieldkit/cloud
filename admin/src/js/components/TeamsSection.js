@@ -214,8 +214,8 @@ class TeamsSection extends React.Component {
         )
 
         if (!!currentTeam && !!editedTeam && 
-            !!currentTeam.find((val, key) => {
-              return key !== 'status' && editedTeam.get(key) !== val
+            !!editedTeam.find((val, key) => {
+              return currentTeam.get(key) !== val
             })) {
           actionButtons.push(
             <div
@@ -331,6 +331,7 @@ class TeamsSection extends React.Component {
                     className={ "button" + (!!currentTeam.get('selectedMember') ? '' : ' disabled') }
                     onClick={() => {
                       if (!!currentTeam.get('selectedMember')) {
+                        startEditingTeam()
                         addMember(currentTeam.get('selectedMember'))
                       }
                     }}

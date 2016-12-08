@@ -233,10 +233,15 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.START_EDITING_TEAM: {
       if (!state.get('editedTeam')) {
+        const currentTeam = state.getIn(['teams', state.get('currentTeamID')])
         return state
           .set(
             'editedTeam',
-            state.getIn(['teams', state.get('currentTeamID')])
+            I.fromJS({
+              name: currentTeam.get('name'),
+              description: currentTeam.get('description'),
+              members: currentTeam.get('members')
+            })
           )
           .setIn(
             ['teams', state.get('currentTeamID'), 'status'],
