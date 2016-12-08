@@ -40,6 +40,57 @@ export const PROMPT_MODAL_CONFIRM_CHANGES = 'PROMPT_MODAL_CONFIRM_CHANGES'
 export const CANCEL_ACTION = 'CANCEL_ACTION'
 export const CLEAR_MODAL = 'CLEAR_MODAL'
 
+// export const FETCH_SUGGESTED_MEMBERS = 'FETCH_SUGGESTED_MEMBERS'
+export const RECEIVE_SUGGESTED_MEMBERS = 'RECEIVE_SUGGESTED_MEMBERS'
+export const SUGGESTED_MEMBERS_ERROR = 'SUGGESTED_MEMBERS_ERROR'
+export const CLEAR_SUGGESTED_MEMBERS = 'CLEAR_SUGGESTED_MEMBERS'
+export const ADD_MEMBER = 'ADD_MEMBER'
+
+export function fetchSuggestedMembers (query) {
+  return function (dispatch, getState) {
+    if (query.length > 0) {
+      window.setTimeout(() => {
+        const members = getState().expeditions
+          .get('people')
+          .filter((m) => {
+            const nameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
+            const usernameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
+            const membershipCheck = getState().expeditions
+              .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
+              .includes(m.get('id'))
+            return (nameCheck || usernameCheck) && !membershipCheck
+          })
+        dispatch({
+          type: RECEIVE_SUGGESTED_MEMBERS,
+          members
+        })
+      }, 200)
+    } else {
+      dispatch(clearSuggestedMembers())
+    }
+    dispatch([
+      {
+        type: SET_TEAM_PROPERTY,
+        key: 'queriedMember',
+        value: query
+      },
+      {
+        type: SET_TEAM_PROPERTY,
+        key: 'selectedMember',
+        value: null
+      },
+    ])
+  }
+}
+
+export function clearSuggestedMembers () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLEAR_SUGGESTED_MEMBERS
+    })
+  }
+}
+
 export function initTeamSection () {
   return function (dispatch, getState) {
     const expeditionID = location.pathname.split('/')[2]
@@ -204,11 +255,18 @@ export function promptModalConfirmChanges (nextPath, nextAction) {
 
 export function cancelAction () {
   return function (dispatch, getState) {
-    dispatch(
-      {
-        type: CLEAR_MODAL
-      }
-    )
+    dispatch({
+      type: CLEAR_MODAL
+    })
+  }
+}
+
+export function addMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: ADD_MEMBER,
+      id
+    })
   }
 }
 

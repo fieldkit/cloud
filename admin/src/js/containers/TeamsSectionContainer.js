@@ -31,6 +31,7 @@ const mapStateToProps = (state, ownProps) => {
   }) : null
 
   const editedTeam = expeditions.get('editedTeam')
+  const suggestedMembers = expeditions.get('suggestedMembers')
 
   return {
     ...ownProps,
@@ -39,7 +40,8 @@ const mapStateToProps = (state, ownProps) => {
     members,
     currentTeam,
     currentMember,
-    editedTeam
+    editedTeam,
+    suggestedMembers,
     // expedition,
     // currentExpedition: expeditions.getIn('expeditions', currentExpeditionID),
     // teamsID
@@ -78,6 +80,15 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     clearChangesToTeam () {
       return dispatch(actions.clearChangesToTeam())
     },
+    fetchSuggestedMembers (query) {
+      return dispatch(actions.fetchSuggestedMembers(query))
+    },
+    clearSuggestedMembers () {
+      return dispatch(actions.clearSuggestedMembers())
+    },
+    addMember (id) {
+      return dispatch(actions.addMember(id))
+    }
 
     // connect: () => {
     // connect () {

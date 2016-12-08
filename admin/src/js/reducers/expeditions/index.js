@@ -3,6 +3,7 @@ import * as actions from '../../actions'
 import I from 'immutable'
 
 export const initialState = I.fromJS({
+  suggestedMembers: null,
   modal: {
     type: null,
     nextAction: null,
@@ -48,7 +49,9 @@ export const initialState = I.fromJS({
       members: ['steve', 'jer', 'adjany'],
       new: false,
       status: 'ready',
-      editing: false
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
     },
     'o16-ground-team': {
       id: 'o16-ground-team',
@@ -57,7 +60,9 @@ export const initialState = I.fromJS({
       members: ['john', 'shah', 'jer'],
       new: false,
       status: 'ready',
-      editing: false
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
     },
     'b16-ground-team': {
       id: 'b16-ground-team',  
@@ -66,7 +71,9 @@ export const initialState = I.fromJS({
       members: ['jer', 'john'],
       new: false,
       status: 'ready',
-      editing: false
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
     },
     'c16-river-team': {
       id: 'c16-river-team',
@@ -75,7 +82,9 @@ export const initialState = I.fromJS({
       members: ['steve', 'jer', 'shah'],
       new: false,
       status: 'ready',
-      editing: false
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
     },
     'c16-ground-team': {
       id: 'c16-ground-team',
@@ -84,7 +93,9 @@ export const initialState = I.fromJS({
       members: ['john', 'adjany'],
       new: false,
       status: 'ready',
-      editing: false
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
     },
   },
   people: {
@@ -284,29 +295,47 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['modal', 'nextAction'], null)
     }
 
-    ///////
-
-
-    case actions.UPDATE_EXPEDITION:
+    case actions.RECEIVE_SUGGESTED_MEMBERS: {
       return state
-        .setIn([
-          'expeditions',
-          state.get('expeditions').findIndex(function(e) {
-            return e.get('id') === action.expedition.get('id')
-          })
-        ],
-          action.expedition.set('updating', true)
-        )
-    case actions.EXPEDITION_UPDATED:
+        .set('suggestedMembers', action.members)
+    }
+
+    case actions.CLEAR_SUGGESTED_MEMBERS: {
       return state
-        .setIn([
-          'expeditions',
-          state.get('expeditions').findIndex(function(e) {
-            return e.get('id') === action.expedition.get('id')
-          })
-        ],
-          action.expedition.set('updating', false)
+        .set('suggestedMembers', null)
+    }
+
+    case actions.FETCH_SUGGESTED_MEMBERS: {
+      return state
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'queriedMember'], 
+          action.query
         )
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'selectedMember'], 
+          null
+        )
+    }
+
+    case actions.ADD_MEMBER: {
+      let newState = state
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'queriedMember'], 
+          null
+        )
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'selectedMember'], 
+          null
+        )
+      if (!state.getIn(['teams', state.get('currentTeamID'), 'members']).includes(action.id)) {
+        newState = newState.setIn(
+          ['teams', state.get('currentTeamID'), 'members'], 
+          state.getIn(['teams', state.get('currentTeamID'), 'members']).push(action.id)
+        )
+      }
+      return newState        
+    }
+
     default:
       return state
   }

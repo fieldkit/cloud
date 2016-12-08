@@ -43,15 +43,15 @@ const createStoreWithMiddleware = applyMiddleware(
   thunkMiddleware,
   multiMiddleware,
 )(createStore)
-const createStoreWithBatching = batchedSubscribe(
-  fn => fn()
-)(createStoreWithMiddleware)
+// const createStoreWithBatching = batchedSubscribe(
+//   fn => fn()
+// )(createStoreWithMiddleware)
 const reducer = combineReducers({
   auth: authReducer,
   expeditions: expeditionReducer,
   // routing: routerReducer
 })
-const store = createStoreWithBatching(reducer)
+const store = createStoreWithMiddleware(reducer)
 
 
 function requireAuth(nextState, replace): void {

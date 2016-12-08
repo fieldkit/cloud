@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react'
+import {findDOMNode} from 'react-dom'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
@@ -79,6 +80,7 @@ class TeamsSection extends React.Component {
       currentTeam,
       currentMember,
       editedTeam,
+      suggestedMembers,
       setCurrentTeam,
       setCurrentMember,
       addTeam,
@@ -86,7 +88,10 @@ class TeamsSection extends React.Component {
       stopEditingTeam,
       setTeamProperty,
       saveChangesToTeam,
-      clearChangesToTeam
+      clearChangesToTeam,
+      fetchSuggestedMembers,
+      clearSuggestedMembers,
+      addMember
     } = this.props
 
     const teamTabs = teams
@@ -133,7 +138,7 @@ class TeamsSection extends React.Component {
       .map((m, i) => {
         const inputs = m.get('inputs')
           .map((d, j) => {
-            return <li key={j}>{d}</li>
+            return <li className="tag" key={j}>{d}</li>
           })
 
         if (!!currentMember && i !== currentMember.get('id')) {
@@ -243,6 +248,27 @@ class TeamsSection extends React.Component {
       )
     }
 
+    const suggestedMembersListItems = (!!suggestedMembers && !!suggestedMembers.size) ? suggestedMembers
+      .map((m, i) => {
+        return (
+          <li 
+            key={m.get('id')}
+            onClick={() => {
+              setTeamProperty('selectedMember', m.get('id'))
+            }}
+            className="suggested-member"
+          >
+            {m.get('name')} <span>— {m.get('id')}</span>
+          </li>
+        )
+      }) : !!currentTeam.get('queriedMember') && !currentTeam.get('selectedMember') && document.activeElement === findDOMNode(this.refs.userSearch) ? (
+        <li
+          className="no-suggestion"
+        >
+          No other FieldKit user matching for this name
+        </li>
+      ) : null
+
     const selectedTeam = (
       <div className="team" key={currentTeam.get('id')}>
           { teamActionButtons() }
@@ -252,9 +278,6 @@ class TeamsSection extends React.Component {
               <ContentEditable
                 html={(() => {
                   return currentTeam.get('description')
-                  // if (!!currentTeam.get('description')) return currentTeam.get('description')
-                  // else if (currentTeam.get('status') === 'new') return 'Enter a description for this new team.'
-                  // else return ''
                 })()}
                 disabled={false}
                 onClick={(e) => {
@@ -262,13 +285,11 @@ class TeamsSection extends React.Component {
                   startEditingTeam()
                 }}
                 onBlur={(e) => {
-                  // console.log('aga', currentTeam.get('description'), currentTeam.get('id'))
                   if (this.props.currentTeam.get('description') === '') setTeamProperty('description', 'Enter a description')
                   stopEditingTeam()
                 }}
                 onChange={(e) => { 
                   setTeamProperty('description', e.target.value)
-                  // console.log(currentTeam.get('description'), currentTeam.get('id'))
                 }}
               />
             </div>
@@ -285,10 +306,49 @@ class TeamsSection extends React.Component {
               <th className="remove"></th>
             </tr>
             { teamMembers }
+            <tr>
+              <td className="add-member" colSpan="3" with="50%">
+                <div className="add-member-container">
+                  <div className="input">
+                    <input
+                      type='text'
+                      ref='userSearch'
+                      onChange={(e) => {
+                        fetchSuggestedMembers(e.target.value)
+                      }}
+                      onBlur={(e) => {
+                        // TODO: find better than this dumb hack
+                        // needed because this onBlur is called before recommended users <li>'s onEnter
+                        // Could lead to race condition
+                        window.setTimeout(() => {
+                          clearSuggestedMembers()
+                        }, 200)
+                      }}
+                      value={currentTeam.get('selectedMember') || currentTeam.get('queriedMember') || ''}
+                    />
+                  </div>
+                  <div
+                    className={ "button" + (!!currentTeam.get('selectedMember') ? '' : ' disabled') }
+                    onClick={() => {
+                      if (!!currentTeam.get('selectedMember')) {
+                        addMember(currentTeam.get('selectedMember'))
+                      }
+                    }}
+                  >
+                    Add member
+                  </div>
+                  <ul className="suggested-members">
+                    { suggestedMembersListItems }
+                  </ul>
+                </div>
+              </td>
+              <td className="add-member-label" colSpan="3" with="50%">
+                Search by username, full name or email address
+              </td>
+            </tr>
           </table>
       </div>
-    )
-      
+    ) 
 
     const selectedTeamContainer = !teams.size ? null : (
       <div id="selected-team" class="selected-tab">
