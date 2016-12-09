@@ -3,266 +3,344 @@ import * as actions from '../../actions'
 import I from 'immutable'
 
 export const initialState = I.fromJS({
-  expeditions: [
-    {
+  suggestedMembers: null,
+  modal: {
+    type: null,
+    nextAction: null,
+    nextPath: null
+  },
+  currentExpeditionID: null,
+  currentTeamID: [],
+  currentMemberID: [],
+  editedTeam: null,
+  expeditions: {
+    'okavango_16': {
       id: 'okavango_16',
       name: 'Okavango 2016',
-      updating: false,
       startDate: new Date('2016-08-17 00:00:00+02:00'),
       teams: [
-        {
-          id: 'river',
-          name: 'River Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse porttitor consequat orci, in sagittis est consequat sodales. Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'steve',
-              name: 'Steve Boyes',
-              role: 'Expedition Leader',
-              activity: [8,6,7,7,6,7,8,5,3,2],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'chris',
-              name: 'Chris Boyes',
-              role: 'Team Leader',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Sighting App']
-            },
-            {
-              id: 'shah',
-              name: 'Shah Selbe',
-              role: 'Team Member',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'jer',
-              name: 'Jer Thorp',
-              role: 'Team Member',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            }
-          ],
-        },
-        {
-          id: 'ground',
-          name: 'Ground Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'john',
-              name: 'John Hilton',
-              role: 'Team Leader',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            },
-            {
-              id: 'adjany',
-              name: 'Adjany Costa',
-              role: 'Team Member',
-              activity: [2,1,4,6,2,4,2,1,4,6],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            }
-          ],
-        },
-        {
-          id: 'river',
-          name: 'River Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse porttitor consequat orci, in sagittis est consequat sodales. Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'steve',
-              name: 'Steve Boyes',
-              role: 'Expedition Leader',
-              activity: [8,6,7,7,6,7,8,5,3,2],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'chris',
-              name: 'Chris Boyes',
-              role: 'Team Leader',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Sighting App']
-            },
-            {
-              id: 'shah',
-              name: 'Shah Selbe',
-              role: 'Team Member',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'jer',
-              name: 'Jer Thorp',
-              role: 'Team Member',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            }
-          ],
-        }
+        'o16-river-team',
+        'o16-ground-team'
       ]
     },
-    {
-      id: 'bike_angola_16',
-      name: 'Bike Angola 16',
-      updating: false,
-      startDate: new Date('2016-07-06 00:00:00+02:00'),
+    'bike_16': {
+      id: 'bike_16',
+      name: 'Bike Angola 2016',
+      startDate: new Date('2016-06-21 00:00:00+02:00'),
       teams: [
-        {
-          id: 'river',
-          name: 'River Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse porttitor consequat orci, in sagittis est consequat sodales. Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'steve',
-              name: 'Steve Boyes',
-              role: 'Expedition Leader',
-              activity: [8,6,7,7,6,7,8,5,3,2],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'chris',
-              name: 'Chris Boyes',
-              role: 'Team Leader',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Sighting App']
-            },
-            {
-              id: 'shah',
-              name: 'Shah Selbe',
-              role: 'Team Member',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'jer',
-              name: 'Jer Thorp',
-              role: 'Team Member',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            }
-          ],
-        },
-        {
-          id: 'ground',
-          name: 'Ground Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'john',
-              name: 'John Hilton',
-              role: 'Team Leader',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            },
-            {
-              id: 'adjany',
-              name: 'Adjany Costa',
-              role: 'Team Member',
-              activity: [2,1,4,6,2,4,2,1,4,6],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            }
-          ],
-        }
-      ]  
+        'b16-ground-team'
+      ]
     },
-    {
-      id: 'cuando_16',
-      name: 'Cuando 16',
-      updating: false,
-      startDate: new Date('2016-10-01 00:00:00+02:00'),
+    'cuito_16': {
+      id: 'cuito_16',
+      name: 'Cuito River 2016',
+      startDate: new Date('2016-02-06 00:00:00+02:00'),
       teams: [
-        {
-          id: 'river',
-          name: 'River Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse porttitor consequat orci, in sagittis est consequat sodales. Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'steve',
-              name: 'Steve Boyes',
-              role: 'Expedition Leader',
-              activity: [8,6,7,7,6,7,8,5,3,2],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'chris',
-              name: 'Chris Boyes',
-              role: 'Team Leader',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Sighting App']
-            },
-            {
-              id: 'shah',
-              name: 'Shah Selbe',
-              role: 'Team Member',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            },
-            {
-              id: 'jer',
-              name: 'Jer Thorp',
-              role: 'Team Member',
-              activity: [5,7,2,4,3,4,5,7,7,9],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            }
-          ],
-        },
-        {
-          id: 'ground',
-          name: 'Ground Team',
-          activity: [5,7,2,4,3,4,5,7,7,9],
-          description: 'Integer euismod arcu non nibh laoreet, imperdiet efficitur quam aliquet. Integer felis felis, euismod ac purus a, aliquet scelerisque tortor.',
-          members: [
-            {
-              id: 'john',
-              name: 'John Hilton',
-              role: 'Team Leader',
-              activity: [1,2,5,7,8,9,8,9,0,0],
-              inputs: ['Ambit Wristband', 'Sighting App', 'Twitter', 'Medium', 'SoundCloud']
-            },
-            {
-              id: 'adjany',
-              name: 'Adjany Costa',
-              role: 'Team Member',
-              activity: [2,1,4,6,2,4,2,1,4,6],
-              inputs: ['Ambit Wristband', 'Sighting App']
-            }
-          ],
-        }
+        'c16-river-team',
+        'c16-ground-team'
       ]
     }
-  ]
+  },
+  teams: {
+    'o16-river-team': {
+      id: 'o16-river-team',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      name: 'river team',
+      members: ['steve', 'jer', 'adjany'],
+      new: false,
+      status: 'ready',
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
+    },
+    'o16-ground-team': {
+      id: 'o16-ground-team',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus. Donec id dui quis ante congue placerat. Aenean sodales.',
+      name: 'ground team',
+      members: ['john', 'shah', 'jer'],
+      new: false,
+      status: 'ready',
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
+    },
+    'b16-ground-team': {
+      id: 'b16-ground-team',  
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      name: 'ground team',
+      members: ['jer', 'john'],
+      new: false,
+      status: 'ready',
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
+    },
+    'c16-river-team': {
+      id: 'c16-river-team',
+      description: 'Lorem ipsum dolor sit amet.',
+      name: 'river team',
+      members: ['steve', 'jer', 'shah'],
+      new: false,
+      status: 'ready',
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
+    },
+    'c16-ground-team': {
+      id: 'c16-ground-team',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus.',
+      name: 'ground team',
+      members: ['john', 'adjany'],
+      new: false,
+      status: 'ready',
+      editing: false,
+      queriedMember: null,
+      selectedMember: null
+    },
+  },
+  people: {
+    'jer': {
+      id: 'jer',
+      name: 'Jer Thorp',
+      teams: [
+        'o16-river-team',
+        'c16-river-team',
+      ],
+      inputs: [
+        'ambit',
+        'sightings',
+        'twitter',
+      ]
+    },
+    'steve': {
+      id: 'steve',
+      name: 'Steve Boyes',
+      teams: [
+        'o16-river-team',
+        'b16-ground-team',
+        'c16-river-team',
+      ],
+      inputs: [
+        'ambit',
+        'sightings',
+        'twitter',
+      ]
+    },
+    'shah': {
+      id: 'shah',
+      name: 'Shah Selbe',
+      teams: [
+        'o16-river-team',
+        'c16-ground-team'
+      ],
+      inputs: [
+        'ambit',
+        'sightings',
+        'twitter',
+      ]
+    },
+    'adjany': {
+      id: 'adjany',
+      name: 'Adjany Costa',
+      teams: [
+        'o16-ground-team',
+        'b16-ground-team',
+        'c16-ground-team'
+      ],
+      inputs: [
+        'ambit',
+        'sightings',
+        'twitter',
+      ]
+    },
+    'john': {
+      id: 'john',
+      name: 'John Hilton',
+      teams: [
+        'o16-river-team',
+        'o16-ground-team',
+        'b16-ground-team',
+        'c16-river-team',
+        'c16-ground-team'
+      ],
+      inputs: [
+        'ambit',
+        'sightings',
+        'twitter',
+      ]
+    }
+  }
 })
 
 const expeditionReducer = (state = initialState, action) => {
+
+  // console.log('reducer:', action.type, action)
   switch (action.type) {
-    case actions.UPDATE_EXPEDITION:
+
+    case actions.SET_CURRENT_EXPEDITION: 
+      return state.set('currentExpeditionID', action.expeditionID)
+
+    case actions.SET_CURRENT_TEAM:
+      return state.set('currentTeamID', action.teamID)
+
+    case actions.SET_CURRENT_MEMBER:
+      return state.set('currentMemberID', action.memberID)
+
+    case actions.ADD_TEAM: {
+      const expeditionID = state.get('currentExpeditionID')
+      const teamID = 'team-' + Date.now()
       return state
-        .setIn([
-          'expeditions',
-          state.get('expeditions').findIndex(function(e) {
-            return e.get('id') === action.expedition.get('id')
+        .set('currentTeamID', teamID)
+        .setIn(
+          ['teams', teamID], 
+          I.fromJS({
+            id: 'team-' + Date.now(),
+            name: 'New Team',
+            description: 'Enter a description',
+            members: [],
+            new: true,
+            status: 'new'
           })
-        ],
-          action.expedition.set('updating', true)
         )
-    case actions.EXPEDITION_UPDATED:
+        .setIn(
+          ['expeditions', expeditionID, 'teams'], 
+          state.getIn(['expeditions', expeditionID, 'teams']).push(teamID)
+        )
+    }
+
+    case actions.REMOVE_CURRENT_TEAM: {
+      const expeditionID = state.get('currentExpeditionID')
+      const teamID = state.get('currentTeamID')
       return state
-        .setIn([
-          'expeditions',
-          state.get('expeditions').findIndex(function(e) {
-            return e.get('id') === action.expedition.get('id')
-          })
-        ],
-          action.expedition.set('updating', false)
+        .deleteIn(['teams', teamID])
+        .deleteIn(['expeditions', expeditionID, 'teams', 
+          state.getIn(['expeditions', expeditionID, 'teams'])
+            .findIndex(function(id) {
+              return id === teamID
+            })
+          ]
         )
+        .set(
+          'currentTeamID', 
+          state.getIn(['expeditions', expeditionID, 'teams'])
+            .filter(t => {
+              return t !== teamID 
+            })
+            .first()
+        )
+        .set('editedTeam', null)
+    }
+
+    case actions.START_EDITING_TEAM: {
+      if (!state.get('editedTeam')) {
+        const currentTeam = state.getIn(['teams', state.get('currentTeamID')])
+        return state
+          .set(
+            'editedTeam',
+            I.fromJS({
+              name: currentTeam.get('name'),
+              description: currentTeam.get('description'),
+              members: currentTeam.get('members')
+            })
+          )
+          .setIn(
+            ['teams', state.get('currentTeamID'), 'status'],
+            'editing'
+          )
+      } else return state
+    }
+
+    case actions.STOP_EDITING_TEAM: {
+      return state.setIn(
+        ['teams', state.get('currentTeamID'), 'status'],
+        'ready'
+      )
+    }
+
+    case actions.SET_TEAM_PROPERTY: {
+      return state.setIn(
+        ['teams', state.get('currentTeamID'), action.key],
+        action.value
+      )
+    }
+
+    case actions.SAVE_CHANGES_TO_TEAM: {
+      return state
+        .set('editedTeam', null)
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'status'],
+          'ready'
+        ) 
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'new'],
+          false
+        )
+    }
+
+    case actions.CLEAR_CHANGES_TO_TEAM: {
+      return state
+        .set('editedTeam', null)
+        .setIn(
+          ['teams', state.get('currentTeamID')],
+          state.get('editedTeam')
+        )
+    }
+
+    case actions.PROMPT_MODAL_CONFIRM_CHANGES: {
+      return state
+        .setIn(['modal', 'type'], 'confirm_changes')
+        .setIn(['modal', 'nextAction'], I.fromJS(action.nextAction))
+        .setIn(['modal', 'nextPath'], action.nextPath)
+    }
+
+    case actions.CLEAR_MODAL: {
+      return state
+        .setIn(['modal', 'type'], null)
+        .setIn(['modal', 'nextPath'], null)
+        .setIn(['modal', 'nextAction'], null)
+    }
+
+    case actions.RECEIVE_SUGGESTED_MEMBERS: {
+      return state
+        .set('suggestedMembers', action.members)
+    }
+
+    case actions.CLEAR_SUGGESTED_MEMBERS: {
+      return state
+        .set('suggestedMembers', null)
+    }
+
+    case actions.FETCH_SUGGESTED_MEMBERS: {
+      return state
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'queriedMember'], 
+          action.query
+        )
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'selectedMember'], 
+          null
+        )
+    }
+
+    case actions.ADD_MEMBER: {
+      let newState = state
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'queriedMember'], 
+          null
+        )
+        .setIn(
+          ['teams', state.get('currentTeamID'), 'selectedMember'], 
+          null
+        )
+      if (!state.getIn(['teams', state.get('currentTeamID'), 'members']).includes(action.id)) {
+        newState = newState.setIn(
+          ['teams', state.get('currentTeamID'), 'members'], 
+          state.getIn(['teams', state.get('currentTeamID'), 'members']).push(action.id)
+        )
+      }
+      return newState        
+    }
+
     default:
       return state
   }

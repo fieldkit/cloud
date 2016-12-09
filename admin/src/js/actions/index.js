@@ -18,7 +18,266 @@ export const DISCONNECT = 'DISCONNECT'
 export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
 export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
 
-export function requestSignIn (userName, password) {
+
+
+/*
+
+TEAM ACTIONS
+
+*/
+
+export const SET_CURRENT_EXPEDITION = 'SET_CURRENT_EXPEDITION'
+export const SET_CURRENT_TEAM = 'SET_CURRENT_TEAM'
+export const SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER'
+export const ADD_TEAM = 'ADD_TEAM'
+export const REMOVE_CURRENT_TEAM = 'REMOVE_CURRENT_TEAM'
+export const START_EDITING_TEAM = 'START_EDITING_TEAM'
+export const STOP_EDITING_TEAM = 'STOP_EDITING_TEAM'
+export const SET_TEAM_PROPERTY = 'SET_TEAM_PROPERTY'
+export const CLEAR_CHANGES_TO_TEAM = 'CLEAR_CHANGES_TO_TEAM'
+export const SAVE_CHANGES_TO_TEAM = 'SAVE_CHANGES_TO_TEAM'
+export const PROMPT_MODAL_CONFIRM_CHANGES = 'PROMPT_MODAL_CONFIRM_CHANGES'
+export const CANCEL_ACTION = 'CANCEL_ACTION'
+export const CLEAR_MODAL = 'CLEAR_MODAL'
+
+// export const FETCH_SUGGESTED_MEMBERS = 'FETCH_SUGGESTED_MEMBERS'
+export const RECEIVE_SUGGESTED_MEMBERS = 'RECEIVE_SUGGESTED_MEMBERS'
+export const SUGGESTED_MEMBERS_ERROR = 'SUGGESTED_MEMBERS_ERROR'
+export const CLEAR_SUGGESTED_MEMBERS = 'CLEAR_SUGGESTED_MEMBERS'
+export const ADD_MEMBER = 'ADD_MEMBER'
+
+export function fetchSuggestedMembers (query) {
+  return function (dispatch, getState) {
+    if (query.length > 0) {
+      window.setTimeout(() => {
+        const members = getState().expeditions
+          .get('people')
+          .filter((m) => {
+            const nameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
+            const usernameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
+            const membershipCheck = getState().expeditions
+              .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
+              .includes(m.get('id'))
+            return (nameCheck || usernameCheck) && !membershipCheck
+          })
+        dispatch({
+          type: RECEIVE_SUGGESTED_MEMBERS,
+          members
+        })
+      }, 200)
+    } else {
+      dispatch(clearSuggestedMembers())
+    }
+    dispatch([
+      {
+        type: SET_TEAM_PROPERTY,
+        key: 'queriedMember',
+        value: query
+      },
+      {
+        type: SET_TEAM_PROPERTY,
+        key: 'selectedMember',
+        value: null
+      },
+    ])
+  }
+}
+
+export function clearSuggestedMembers () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLEAR_SUGGESTED_MEMBERS
+    })
+  }
+}
+
+export function initTeamSection () {
+  return function (dispatch, getState) {
+    const expeditionID = location.pathname.split('/')[2]
+    const teamID = getState().expeditions.getIn(['expeditions', expeditionID,'teams',0])
+    dispatch([
+      {
+        type: SET_CURRENT_EXPEDITION,
+        expeditionID
+      },
+      {
+        type: SET_CURRENT_TEAM,
+        teamID
+      },
+      {
+        type: SET_CURRENT_MEMBER,
+        memberID: null
+      }
+    ])
+  }
+}
+
+export function setCurrentExpedition (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_EXPEDITION,
+      expeditionID: id
+    })
+  }
+}
+
+export function setCurrentTeam (id) {
+  return function (dispatch, getState) {
+    const action = {
+      type: SET_CURRENT_TEAM,
+      teamID: id
+    }
+    if (!!getState().expeditions.get('editedTeam')) {
+      dispatch(promptModalConfirmChanges(null, action))
+    } else {
+      dispatch(action)
+    }
+  }
+}
+
+export function setCurrentMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_MEMBER,
+      memberID: id
+    })
+  }
+}
+
+export function addTeam () {
+  return function (dispatch, getState) {
+    const actions = [
+      {
+        type: ADD_TEAM
+      },
+      {
+        type: START_EDITING_TEAM
+      }
+    ]
+    if (!!getState().expeditions.get('editedTeam')) {
+      dispatch(promptModalConfirmChanges(
+        null, 
+        actions
+      ))
+    } else {
+      dispatch(actions)
+    }
+  }
+}
+
+export function removeCurrentTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REMOVE_CURRENT_TEAM
+    })
+  }
+}
+
+export function startEditingTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: START_EDITING_TEAM
+    })
+  }
+}
+
+export function stopEditingTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: STOP_EDITING_TEAM
+    })
+  }
+}
+
+export function setTeamProperty (key, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_TEAM_PROPERTY,
+      key,
+      value
+    })
+  }
+}
+
+export function saveChangesToTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SAVE_CHANGES_TO_TEAM
+    })
+  }
+}
+
+export function saveChangesAndResume () {
+  return function (dispatch, getState) {
+    const modal = getState().expeditions.get('modal')
+    dispatch([
+      {
+        type: SAVE_CHANGES_TO_TEAM
+      }
+    ])
+    // console.log('modal', modal.toJS())
+    if (!!modal.get('nextAction')) {
+      dispatch([
+        modal.get('nextAction').toJS(),
+        {
+          type: CLEAR_MODAL
+        }
+      ])
+    } else if (!!modal.get('nextPath')) {
+      // console.log('aga', modal.get('nextPath'))
+      dispatch(
+        {
+          type: CLEAR_MODAL
+        }
+      )
+      browserHistory.push(modal.get('nextPath'))
+    }
+  }
+}
+
+export function clearChangesToTeam () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLEAR_CHANGES_TO_TEAM
+    })
+  }
+}
+
+export function promptModalConfirmChanges (nextPath, nextAction) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: PROMPT_MODAL_CONFIRM_CHANGES,
+      nextPath,
+      nextAction
+    })
+  }
+}
+
+export function cancelAction () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLEAR_MODAL
+    })
+  }
+}
+
+export function addMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: ADD_MEMBER,
+      id
+    })
+  }
+}
+
+
+/*
+
+AUTH ACTIONS
+
+*/
+
+export function requestSignIn (email, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
     FKApiClient.get().login(userName, password)

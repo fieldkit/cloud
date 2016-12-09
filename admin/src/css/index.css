@@ -19,6 +19,10 @@ p.intro {
   margin-bottom: 40px;
 }
 
+input {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+}
+
 h1, h2, h3, h4, h5 {
   margin-top: 0;
 }
@@ -138,9 +142,10 @@ td, th, td *, th * {
   table ul {
     margin: 0;
     padding: 0;
+    list-style: none;
   } 
 
-    table ul li{
+    table ul li.tag{
       display: inline-block;
       background-color: #DFDFCF;
       padding: 0 5px;
@@ -295,6 +300,20 @@ div.selected-tab {
 
 #teams-section {}
 
+  #teams-section .editable div {
+    border: 1px solid #ddd;
+    padding: 0 4px;
+    margin: 0 -4px;
+  }
+
+    #teams-section .editable div:hover {
+      border-color: #D0462C;
+    }
+
+  #teams-section .editable.required div {
+    border-color: #D0462C;
+  }
+
   #teams-section .selected-tab div.actions {
     width: 100%;
     height: 40px;
@@ -302,6 +321,7 @@ div.selected-tab {
 
   #teams-section .selected-tab div.actions div.button {
     float:right;
+    margin-left: 10px;
   }
 
   #teams-section .selected-tab div.header {
@@ -359,6 +379,73 @@ div.selected-tab {
     #teams-section table.members-list .remove {
       width: 5%;
     }
+
+    #teams-section table.members-list td.add-member-label {
+      height: 32px;
+      line-height: 32px;
+    }
+    
+    #teams-section table.members-list td.add-member {}
+
+      #teams-section table.members-list td.add-member div.add-member-container {
+        display: flex;
+        width: 100%;
+        position: relative;
+      }
+
+        #teams-section table.members-list td.add-member div.add-member-container div.input{
+          flex-grow: 1;
+        }
+
+          #teams-section table.members-list td.add-member div.add-member-container div.input input{
+            width: calc(100% - 20px);
+            height: 27px;
+            font-size: 14px;
+            padding: 1px 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            border-bottom-left-radius: 3px;
+            border-top-left-radius: 3px;
+          }
+
+        #teams-section table.members-list td.add-member div.add-member-container div.button{
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+          height: 31px;
+          flex-basis: auto;
+          line-height: 31px;
+          vertical-align: middle;
+        }
+
+        #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members{
+          position: absolute;
+          top: 31px;
+          border: 1px solid #ddd;
+          width: 99%;
+          margin-top: -1px;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+          #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li{
+            padding: 15px 10px;
+            background-color: white;
+            font-weight: bold;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: auto;
+          }
+
+            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member{
+              cursor: pointer;
+            }
+
+              #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member:hover{
+                background-color: #ddd;
+              }
+
+            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li span{
+              font-weight: normal;
+            }
 
 .section-actions {
   float: right;
@@ -461,4 +548,30 @@ div.selected-tab {
 
 }
 
+#admin-page {}
+
+  #admin-page div.modal-container {
+    position: absolute;
+    z-index: 100;
+    background-color: rgba(200,200,200,0.7);
+    width: 100vw;
+    height: 100vh;
+  }
+
+    #admin-page div.modal-container div.modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      padding: 50px;
+      background-color: white;
+    }
+
+      #admin-page div.modal-container div.modal div.actions{
+        text-align: center;
+      }
+
+        #admin-page div.modal-container div.modal div.actions div.button{
+          margin: 0 5px;
+        }
 
