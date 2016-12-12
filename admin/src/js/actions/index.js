@@ -73,41 +73,6 @@ export function fetchSuggestedMembers (input, callback) {
       })
     }, 500)
   }
-
-  // return function (dispatch, getState) {
-  //   if (query.length > 0) {
-  //     window.setTimeout(() => {
-  //       const members = getState().expeditions
-  //         .get('people')
-  //         .filter((m) => {
-  //           const nameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
-  //           const usernameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
-  //           const membershipCheck = getState().expeditions
-  //             .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
-  //             .includes(m.get('id'))
-  //           return (nameCheck || usernameCheck) && !membershipCheck
-  //         })
-  //       dispatch({
-  //         type: RECEIVE_SUGGESTED_MEMBERS,
-  //         members
-  //       })
-  //     }, 200)
-  //   } else {
-  //     dispatch(clearSuggestedMembers())
-  //   }
-  //   dispatch([
-  //     {
-  //       type: SET_TEAM_PROPERTY,
-  //       key: 'queriedMember',
-  //       value: query
-  //     },
-  //     {
-  //       type: SET_TEAM_PROPERTY,
-  //       key: 'selectedMember',
-  //       value: null
-  //     },
-  //   ])
-  // }
 }
 
 export function clearSuggestedMembers () {

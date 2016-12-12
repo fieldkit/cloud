@@ -86,9 +86,6 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     fetchSuggestedMembers (input, callback) {
       return dispatch(actions.fetchSuggestedMembers(input, callback))
     },
-    clearSuggestedMembers () {
-      return dispatch(actions.clearSuggestedMembers())
-    },
     addMember (id) {
       return dispatch(actions.addMember(id))
     },

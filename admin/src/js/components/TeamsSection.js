@@ -23,11 +23,9 @@ class TeamsSection extends React.Component {
       teams,
       members,
       currentTeam,
-      // currentMember,
       editedTeam,
       suggestedMembers,
       setCurrentTeam,
-      // setCurrentMember,
       addTeam,
       startEditingTeam,
       stopEditingTeam,
@@ -36,7 +34,6 @@ class TeamsSection extends React.Component {
       saveChangesToTeam,
       clearChangesToTeam,
       fetchSuggestedMembers,
-      clearSuggestedMembers,
       addMember,
       removeMember
     } = this.props
@@ -230,27 +227,6 @@ class TeamsSection extends React.Component {
       )
     }
 
-    // const suggestedMembersListItems = (!!suggestedMembers && !!suggestedMembers.size) ? suggestedMembers
-    //   .map((m, i) => {
-    //     return (
-    //       <li 
-    //         key={m.get('id')}
-    //         onClick={() => {
-    //           setTeamProperty('selectedMember', m.get('id'))
-    //         }}
-    //         className="suggested-member"
-    //       >
-    //         {m.get('name')} <span>— {m.get('id')}</span>
-    //       </li>
-    //     )
-    //   }) : !!currentTeam.get('queriedMember') && !currentTeam.get('selectedMember') && document.activeElement === findDOMNode(this.refs.userSearch) ? (
-    //     <li
-    //       className="no-suggestion"
-    //     >
-    //       No other FieldKit user matching for this name
-    //     </li>
-    //   ) : null
-
     const selectedTeam = (
       <div className="team" key={currentTeam.get('id')}>
           { teamActionButtons() }
@@ -316,40 +292,6 @@ class TeamsSection extends React.Component {
                   >
                     Add member
                   </div>
-                  {/*
-                    <div className="input">
-                      <input
-                        type='text'
-                        ref='userSearch'
-                        onChange={(e) => {
-                          fetchSuggestedMembers(e.target.value)
-                        }}
-                        onBlur={(e) => {
-                          // TODO: find better than this dumb hack
-                          // needed because this onBlur is called before recommended users <li>'s onEnter
-                          // Could lead to race condition
-                          window.setTimeout(() => {
-                            clearSuggestedMembers()
-                          }, 200)
-                        }}
-                        value={currentTeam.get('selectedMember') || currentTeam.get('queriedMember') || ''}
-                      />
-                    </div>
-                    <div
-                      className={ "button" + (!!currentTeam.get('selectedMember') ? '' : ' disabled') }
-                      onClick={() => {
-                        if (!!currentTeam.get('selectedMember')) {
-                          startEditingTeam()
-                          addMember(currentTeam.get('selectedMember'))
-                        }
-                      }}setTeamProperty('selectedMember', m.get('id'))
-                    >
-                      Add member
-                    </div>
-                    <ul className="suggested-members">
-                      { suggestedMembersListItems }
-                    </ul>
-                  */}
                 </div>
               </td>
               <td className="add-member-label" colSpan="3" width="50%">
