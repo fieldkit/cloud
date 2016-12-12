@@ -34,6 +34,7 @@ export const REMOVE_CURRENT_TEAM = 'REMOVE_CURRENT_TEAM'
 export const START_EDITING_TEAM = 'START_EDITING_TEAM'
 export const STOP_EDITING_TEAM = 'STOP_EDITING_TEAM'
 export const SET_TEAM_PROPERTY = 'SET_TEAM_PROPERTY'
+export const SET_MEMBER_PROPERTY = 'SET_MEMBER_PROPERTY'
 export const CLEAR_CHANGES_TO_TEAM = 'CLEAR_CHANGES_TO_TEAM'
 export const SAVE_CHANGES_TO_TEAM = 'SAVE_CHANGES_TO_TEAM'
 export const PROMPT_MODAL_CONFIRM_CHANGES = 'PROMPT_MODAL_CONFIRM_CHANGES'
@@ -45,41 +46,32 @@ export const RECEIVE_SUGGESTED_MEMBERS = 'RECEIVE_SUGGESTED_MEMBERS'
 export const SUGGESTED_MEMBERS_ERROR = 'SUGGESTED_MEMBERS_ERROR'
 export const CLEAR_SUGGESTED_MEMBERS = 'CLEAR_SUGGESTED_MEMBERS'
 export const ADD_MEMBER = 'ADD_MEMBER'
+export const REMOVE_MEMBER = 'REMOVE_MEMBER'
 
-export function fetchSuggestedMembers (query) {
+export function fetchSuggestedMembers (input, callback) {
+
   return function (dispatch, getState) {
-    if (query.length > 0) {
-      window.setTimeout(() => {
-        const members = getState().expeditions
-          .get('people')
-          .filter((m) => {
-            const nameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
-            const usernameCheck = m.get('name').toLowerCase().indexOf(query.toLowerCase()) > -1
-            const membershipCheck = getState().expeditions
-              .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
-              .includes(m.get('id'))
-            return (nameCheck || usernameCheck) && !membershipCheck
-          })
-        dispatch({
-          type: RECEIVE_SUGGESTED_MEMBERS,
-          members
+    window.setTimeout(() => {
+      const members = getState().expeditions
+        .get('people')
+        .filter((m) => {
+          const nameCheck = m.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
+          const usernameCheck = m.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
+          const membershipCheck = getState().expeditions
+            .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
+            .has(m.get('id'))
+          return (nameCheck || usernameCheck) && !membershipCheck
         })
-      }, 200)
-    } else {
-      dispatch(clearSuggestedMembers())
-    }
-    dispatch([
-      {
-        type: SET_TEAM_PROPERTY,
-        key: 'queriedMember',
-        value: query
-      },
-      {
-        type: SET_TEAM_PROPERTY,
-        key: 'selectedMember',
-        value: null
-      },
-    ])
+        .map((m) => {
+          return { value: m.get('id'), label: m.get('name') + ' — ' + m.get('id')}
+        })
+        .toArray()
+
+      callback(null, {
+        options: members,
+        complete: true
+      })
+    }, 500)
   }
 }
 
@@ -199,6 +191,17 @@ export function setTeamProperty (key, value) {
   }
 }
 
+export function setMemberProperty (memberID, key, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_MEMBER_PROPERTY,
+      memberID,
+      key,
+      value
+    })
+  }
+}
+
 export function saveChangesToTeam () {
   return function (dispatch, getState) {
     dispatch({
@@ -265,6 +268,15 @@ export function addMember (id) {
   return function (dispatch, getState) {
     dispatch({
       type: ADD_MEMBER,
+      id
+    })
+  }
+}
+
+export function removeMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REMOVE_MEMBER,
       id
     })
   }

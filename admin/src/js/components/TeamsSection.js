@@ -4,72 +4,17 @@ import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
+import Dropdown from 'react-dropdown'
+import Select from 'react-select';
 
 class TeamsSection extends React.Component {
-  // constructor (props) {
-    // super(props)
-    // this.state = {
-    //   ...props
-    // }
-  // }
-
-
-  // @autobind
-  // resetCurrentTeam () {
-  //   this.setState({
-  //     ...this.state,
-  //     currentTeam: {
-  //       name: '',
-  //       editing: false,
-  //       description: '',
-  //       members: []
-  //     }
-  //   })
-  // }
-
-  // @autobind
-  // selectMember (i) {
-  //   this.setState({
-  //     ...this.state,
-  //     selectedMemberIndex: i
-  //   })
-  // }
-
-  // @autobind
-  // unselectMember (i) {
-  //   this.setState({
-  //     ...this.state,
-  //     selectedMemberIndex: -1
-  //   })
-  // }
-
-  // @autobind
-  // onContentEdited (e) {
-  //   const { updateExpedition } = this.props
-  //   updateExpedition(this.state.expedition)
-  // }
-
-  // @autobind
-  // onContentChange (e) {
-  //   this.setState({
-  //     ...this.state,
-  //     expedition: this.state.expedition.setIn(['teams', this.state.selectedTeamIndex, 'description'], e.target.value)
-  //   })
-  // }
-
-  // @autobind
-  // resetChanges () {
-  //   const { updateExpedition } = this.props
-  //   this.setState({
-  //     ...this.state,
-  //     expedition: this.state.initialExpedition
-  //   })
-  //   updateExpedition(this.state.initialExpedition)
-  // }
-
-  // componentWillReceiveProps (nextProps) {
-  //   this.setState(nextProps)
-  // }
+  constructor (props) {
+    super(props)
+    this.state = {
+      addMemberValue: null,
+      inputValues: {}
+    }
+  }
 
   render () {
 
@@ -78,21 +23,24 @@ class TeamsSection extends React.Component {
       teams,
       members,
       currentTeam,
-      currentMember,
       editedTeam,
       suggestedMembers,
       setCurrentTeam,
-      setCurrentMember,
       addTeam,
       startEditingTeam,
       stopEditingTeam,
       setTeamProperty,
+      setMemberProperty,
       saveChangesToTeam,
       clearChangesToTeam,
       fetchSuggestedMembers,
-      clearSuggestedMembers,
-      addMember
+      addMember,
+      removeMember
     } = this.props
+
+    const roleOptions = [
+      'Expedition Leader', 'Team Leader', 'Team Member'
+    ]
 
     const teamTabs = teams
       .map((t, i) => {
@@ -126,7 +74,7 @@ class TeamsSection extends React.Component {
                 if (this.props.teams.get(i).get('name') === '') setTeamProperty('name', 'New Team')
                 stopEditingTeam()
               }}
-              onChange={(e) => { 
+              onChange={(e) => {
                 setTeamProperty('name', e.target.value)
               }}
             />
@@ -134,47 +82,78 @@ class TeamsSection extends React.Component {
         )
       })
 
-     const teamMembers = members
+    const teamMembers = members
       .map((m, i) => {
         const inputs = m.get('inputs')
           .map((d, j) => {
             return <li className="tag" key={j}>{d}</li>
           })
 
-        if (!!currentMember && i !== currentMember.get('id')) {
-          return (
-            <tr key={i} onClick={() => {
-              this.selectMember(i)
-            }}>
-              <td className="name">{m.get('name')}</td>
-              <td className="role">{m.get('role')}</td>
-              <td className="inputs">
-                <ul>
-                  { inputs }
-                </ul>
-              </td>
-              <td className="activity">
-                <svg></svg>
-              </td>
-              <td className="edit">
-                <img src="/src/img/icon-edit-small"/>
-              </td>
-              <td className="remove">  
-                <img src="/src/img/icon-remove-small"/>
-              </td>
-            </tr>
-          )
-        } else {
-          return (
-            <tr key={i} onClick={() => {
-              this.unselectMember()
-            }}>
-              <td className="name" colSpan="6" width="100%">
-                <h2>{m.get('name')}</h2>
-              </td>
-            </tr>
-          )
-        }
+        return (
+          <tbody key={i} onClick={() => {
+            // this.selectMember(i)
+          }}>
+            <td className="name">{m.get('name')}</td>
+            <td className="role">
+              <Dropdown
+              options={roleOptions}
+              onChange={(e) => {
+                startEditingTeam()
+                setMemberProperty(m.get('id'), 'role', e.value)
+              }}
+              value={currentTeam.getIn(['members', m.get('id'), 'role'])}
+              placeholder="Select an option"
+            />
+            </td>
+            <td className="inputs">
+              <Select
+                name="select-inputs"
+                value={this.state.inputValues[m.get('id')]}
+                multi={true}
+                options={
+                  [
+                    { value: 'ambit', label: 'Ambit Tracker' },
+                    { value: 'twitter', label: 'Twitter' },
+                    { value: 'sightings', label: 'Sighting App' }
+                  ]
+                }
+                onChange={(values) => {
+                  this.setState({
+                    ...this.state,
+                    inputValues: {
+                      ...this.state.inputValues,
+                      [m.get('id')]: values
+                    }
+                  })
+                }}
+                clearable={false}
+              />
+            </td>
+            <td className="activity">
+              <svg></svg>
+            </td>
+            <td 
+              className="remove"
+              onClick={() => {
+                startEditingTeam()
+                removeMember(m.get('id'))
+              }}
+            >  
+              <img src="/src/img/icon-remove-small.png"/>
+            </td>
+          </tbody>
+        )
+        // } else {
+        //   return (
+        //     <tbody key={i} onClick={() => {
+        //       this.unselectMember()
+        //     }}>
+        //       <td className="name" colSpan="6" width="100%">
+        //         <h2>{m.get('name')}</h2>
+        //       </td>
+        //     </tbody>
+        //   )
+        // }
       })
 
     const teamActionButtons = () => {
@@ -248,27 +227,6 @@ class TeamsSection extends React.Component {
       )
     }
 
-    const suggestedMembersListItems = (!!suggestedMembers && !!suggestedMembers.size) ? suggestedMembers
-      .map((m, i) => {
-        return (
-          <li 
-            key={m.get('id')}
-            onClick={() => {
-              setTeamProperty('selectedMember', m.get('id'))
-            }}
-            className="suggested-member"
-          >
-            {m.get('name')} <span>— {m.get('id')}</span>
-          </li>
-        )
-      }) : !!currentTeam.get('queriedMember') && !currentTeam.get('selectedMember') && document.activeElement === findDOMNode(this.refs.userSearch) ? (
-        <li
-          className="no-suggestion"
-        >
-          No other FieldKit user matching for this name
-        </li>
-      ) : null
-
     const selectedTeam = (
       <div className="team" key={currentTeam.get('id')}>
           { teamActionButtons() }
@@ -296,37 +254,33 @@ class TeamsSection extends React.Component {
             <svg className="activity column">
             </svg>
           </div>
+          <h5>Members</h5>
           <table className="members-list">
-            <tr>
-              <th className="name">Name</th>
-              <th className="role">Role</th>
-              <th className="inputs">Inputs</th>
-              <th className="activity">Activity</th>
-              <th className="edit"></th>
-              <th className="remove"></th>
-            </tr>
+            {
+              !!members && !!members.size &&
+              <tbody>
+                <td className="name">Name</td>
+                <td className="role">Role</td>
+                <td className="inputs">Inputs</td>
+                <td className="activity">Activity</td>
+                <td className="remove"></td>
+              </tbody>
+            }
             { teamMembers }
-            <tr>
-              <td className="add-member" colSpan="3" with="50%">
+            <tbody>
+              <td className="add-member" colSpan="3" width="50%">
                 <div className="add-member-container">
-                  <div className="input">
-                    <input
-                      type='text'
-                      ref='userSearch'
-                      onChange={(e) => {
-                        fetchSuggestedMembers(e.target.value)
-                      }}
-                      onBlur={(e) => {
-                        // TODO: find better than this dumb hack
-                        // needed because this onBlur is called before recommended users <li>'s onEnter
-                        // Could lead to race condition
-                        window.setTimeout(() => {
-                          clearSuggestedMembers()
-                        }, 200)
-                      }}
-                      value={currentTeam.get('selectedMember') || currentTeam.get('queriedMember') || ''}
-                    />
-                  </div>
+                  <Select.Async
+                    name="add-member"
+                    loadOptions={(input, callback) =>
+                      fetchSuggestedMembers(input, callback)
+                    }
+                    value={ currentTeam.get('selectedMember') }
+                    onChange={(val) => {
+                      setTeamProperty('selectedMember', val.value)
+                    }}
+                    clearable={false}
+                  />
                   <div
                     className={ "button" + (!!currentTeam.get('selectedMember') ? '' : ' disabled') }
                     onClick={() => {
@@ -338,15 +292,12 @@ class TeamsSection extends React.Component {
                   >
                     Add member
                   </div>
-                  <ul className="suggested-members">
-                    { suggestedMembersListItems }
-                  </ul>
                 </div>
               </td>
-              <td className="add-member-label" colSpan="3" with="50%">
+              <td className="add-member-label" colSpan="3" width="50%">
                 Search by username, full name or email address
               </td>
-            </tr>
+            </tbody>
           </table>
       </div>
     ) 

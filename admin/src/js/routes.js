@@ -36,6 +36,8 @@ import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
 import {FKApiClient} from './api/api.js';
 
+import 'react-select/dist/react-select.css';
+
 document.getElementById('root').remove()
 
 

@@ -7,6 +7,7 @@ html, body {
   font-size: 14px;
   margin: 0;
   line-height: 25px;
+  min-width: 1024px;
 }
 
 p {
@@ -100,34 +101,78 @@ div.button.secondary {
     border-color: background-color: #DFDFCF;;
   }
 
+div.Dropdown-root {
+  height: 32px;
+  line-height: 32px;
+  border: 1px solid #bbb;
+  padding: 0 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+  div.Dropdown-control {
+    position: relative;
+  }
+
+    span.Dropdown-arrow {
+      position: absolute;
+      right: 0;
+      top: 40%;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid black;
+    }
+
+  div.Dropdown-menu {
+    padding: 0 5px;
+    width: calc(100% - 10px);
+    margin: -1px 0 0 -6px;
+    background-color: white;
+    border: 1px solid #bbb;
+    z-index: 100;
+    position: absolute;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+    div.Dropdown-option {
+      margin-left: -5px;
+      padding: 0 5px;
+      width: 100%;
+    }
+
+      div.Dropdown-option:hover {
+        background-color: #ddd;
+      }
+
+      div.Dropdown-option:not(:last-child) {
+        border-bottom: 1px solid #bbb;
+      }
+
+
 table {
   border-collapse: collapse;
   line-height: 20px;
   font-size: 13px;
 }
 
-th {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-td {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-th:first-child, td:first-child {
-  padding-left: 0;
-}
-
-tr:last-child th, tr:last-child td {
+tbody:last-child, tbody:last-child td {
   padding-right: 0;
   border-bottom: 0;
 }
+  td {
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    padding: 10px 10px;
+    vertical-align: top;
+  }
+
+    td:first-child {
+      padding-left: 0;
+    }
+
 
 td, th, td *, th * {
   vertical-align: top;
@@ -302,6 +347,7 @@ div.selected-tab {
 
   #teams-section .editable div {
     border: 1px solid #ddd;
+    border-radius: 3px;
     padding: 0 4px;
     margin: 0 -4px;
   }
@@ -337,6 +383,7 @@ div.selected-tab {
       #teams-section .selected-tab div.header .description div {
         padding: 10px;
         border: 1px solid #DFDFCF;
+        border-radius: 3px;
         margin-top: 10px;
       }
 
@@ -352,16 +399,16 @@ div.selected-tab {
   #teams-section table.members-list {
   }
 
-    #teams-section table.members-list tr:not(:first-child) {
-      cursor: pointer;
+    #teams-section table.members-list tbody:not(:first-child) {
+      /*cursor: pointer;*/
     }
 
     #teams-section table.members-list .name {
-      width: 10%;
+      width: 15%;
     }
 
     #teams-section table.members-list .role {
-      width: 10%;
+      width: 20%;
     }
 
     #teams-section table.members-list .inputs {
@@ -369,29 +416,27 @@ div.selected-tab {
     }
 
     #teams-section table.members-list .activity {
-      width: 30%;
-    }
-
-    #teams-section table.members-list .edit {
-      width: 5%;
+      width: 20%;
+      cursor: pointer;
     }
 
     #teams-section table.members-list .remove {
       width: 5%;
-    }
-
-    #teams-section table.members-list td.add-member-label {
-      height: 32px;
-      line-height: 32px;
+      cursor: pointer;
     }
     
     #teams-section table.members-list td.add-member {}
 
       #teams-section table.members-list td.add-member div.add-member-container {
         display: flex;
-        width: 100%;
         position: relative;
+        padding-right: 10px;
       }
+
+        #teams-section table.members-list td.add-member div.Select {
+          flex-grow: 1;
+          padding-right: 10px;
+        }
 
         #teams-section table.members-list td.add-member div.add-member-container div.input{
           flex-grow: 1;
@@ -404,16 +449,14 @@ div.selected-tab {
             padding: 1px 10px;
             font-weight: bold;
             border: 1px solid #ccc;
-            border-bottom-left-radius: 3px;
             border-top-left-radius: 3px;
           }
 
         #teams-section table.members-list td.add-member div.add-member-container div.button{
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          height: 31px;
+          border-radius: 3px;
+          height: 36px;
           flex-basis: auto;
-          line-height: 31px;
+          line-height: 36px;
           vertical-align: middle;
         }
 
@@ -575,3 +618,6 @@ div.selected-tab {
           margin: 0 5px;
         }
 
+div.Select span.Select-arrow {
+  vertical-align: middle;
+}
