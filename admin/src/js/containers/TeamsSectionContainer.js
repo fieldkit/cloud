@@ -8,7 +8,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentTeamID = expeditions.get('currentTeamID')
-  const currentMemberID = expeditions.get('currentMemberID')
+  // const currentMemberID = expeditions.get('currentMemberID')
 
   const expedition = expeditions.getIn(['expeditions', currentExpeditionID])
 
@@ -19,16 +19,16 @@ const mapStateToProps = (state, ownProps) => {
 
   const members = teams.size > 0 ? (expeditions.getIn(['teams', currentTeamID, 'members'])
     .map(m => {
-      return expeditions.getIn(['people', m])
+      return expeditions.getIn(['people', m.get('id')])
     })) : []
 
   const currentTeam = !!teams.size ? teams.find(t => {
     return t.get('id') === currentTeamID
   }) : null
 
-  const currentMember = !!members.size ? members.find(t => {
-    return t.get('id') === currentTeamID
-  }) : null
+  // const currentMember = !!members.size ? members.find(t => {
+  //   return t.get('id') === currentTeamID
+  // }) : null
 
   const editedTeam = expeditions.get('editedTeam')
   const suggestedMembers = expeditions.get('suggestedMembers')
@@ -39,7 +39,7 @@ const mapStateToProps = (state, ownProps) => {
     teams,
     members,
     currentTeam,
-    currentMember,
+    // currentMember,
     editedTeam,
     suggestedMembers,
     // expedition,
@@ -73,6 +73,9 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     },
     setTeamProperty (key, value) {
       return dispatch(actions.setTeamProperty(key, value))
+    },
+    setMemberProperty (memberID, key, value) {
+      return dispatch(actions.setMemberProperty(memberID, key, value))
     },
     saveChangesToTeam () {
       return dispatch(actions.saveChangesToTeam())

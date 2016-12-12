@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
+import Dropdown from 'react-dropdown'
 
 class TeamsSection extends React.Component {
   // constructor (props) {
@@ -78,21 +79,26 @@ class TeamsSection extends React.Component {
       teams,
       members,
       currentTeam,
-      currentMember,
+      // currentMember,
       editedTeam,
       suggestedMembers,
       setCurrentTeam,
-      setCurrentMember,
+      // setCurrentMember,
       addTeam,
       startEditingTeam,
       stopEditingTeam,
       setTeamProperty,
+      setMemberProperty,
       saveChangesToTeam,
       clearChangesToTeam,
       fetchSuggestedMembers,
       clearSuggestedMembers,
       addMember
     } = this.props
+
+    const roleOptions = [
+      'Expedition Leader', 'Team Leader', 'Team Member'
+    ]
 
     const teamTabs = teams
       .map((t, i) => {
@@ -126,7 +132,7 @@ class TeamsSection extends React.Component {
                 if (this.props.teams.get(i).get('name') === '') setTeamProperty('name', 'New Team')
                 stopEditingTeam()
               }}
-              onChange={(e) => { 
+              onChange={(e) => {
                 setTeamProperty('name', e.target.value)
               }}
             />
@@ -134,47 +140,60 @@ class TeamsSection extends React.Component {
         )
       })
 
-     const teamMembers = members
+    const teamMembers = members
       .map((m, i) => {
         const inputs = m.get('inputs')
           .map((d, j) => {
             return <li className="tag" key={j}>{d}</li>
           })
 
-        if (!!currentMember && i !== currentMember.get('id')) {
-          return (
-            <tr key={i} onClick={() => {
-              this.selectMember(i)
-            }}>
-              <td className="name">{m.get('name')}</td>
-              <td className="role">{m.get('role')}</td>
-              <td className="inputs">
-                <ul>
-                  { inputs }
-                </ul>
-              </td>
-              <td className="activity">
-                <svg></svg>
-              </td>
-              <td className="edit">
-                <img src="/src/img/icon-edit-small"/>
-              </td>
-              <td className="remove">  
-                <img src="/src/img/icon-remove-small"/>
-              </td>
-            </tr>
-          )
-        } else {
-          return (
-            <tr key={i} onClick={() => {
-              this.unselectMember()
-            }}>
-              <td className="name" colSpan="6" width="100%">
-                <h2>{m.get('name')}</h2>
-              </td>
-            </tr>
-          )
-        }
+        // if (!!currentMember && i !== currentMember.get('id')) {
+
+        return (
+          <tr key={i} onClick={() => {
+            // this.selectMember(i)
+          }}>
+            <td className="name">{m.get('name')}</td>
+            <td className="role">
+              <Dropdown
+              options={roleOptions}
+              onChange={(e) => {
+                startEditingTeam()
+                setMemberProperty(m.get('id'), 'role', e.value)
+              }}
+              value={currentTeam.getIn(['members', m.get('id'), 'role'])}
+              placeholder="Select an option"
+            />
+            </td>
+            <td className="inputs">
+              <ul>
+                { inputs }
+              </ul>
+            </td>
+            <td className="activity">
+              <svg></svg>
+            </td>
+            <td 
+              className="remove"
+              onClick={() => {
+                console.log('remove')
+              }}
+            >  
+              <img src="/src/img/icon-remove-small.png"/>
+            </td>
+          </tr>
+        )
+        // } else {
+        //   return (
+        //     <tr key={i} onClick={() => {
+        //       this.unselectMember()
+        //     }}>
+        //       <td className="name" colSpan="6" width="100%">
+        //         <h2>{m.get('name')}</h2>
+        //       </td>
+        //     </tr>
+        //   )
+        // }
       })
 
     const teamActionButtons = () => {
@@ -302,7 +321,6 @@ class TeamsSection extends React.Component {
               <th className="role">Role</th>
               <th className="inputs">Inputs</th>
               <th className="activity">Activity</th>
-              <th className="edit"></th>
               <th className="remove"></th>
             </tr>
             { teamMembers }

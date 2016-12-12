@@ -7,6 +7,7 @@ html, body {
   font-size: 14px;
   margin: 0;
   line-height: 25px;
+  min-width: 1024px;
 }
 
 p {
@@ -99,6 +100,57 @@ div.button.secondary {
     background-color: transparent;
     border-color: background-color: #DFDFCF;;
   }
+
+div.Dropdown-root {
+  height: 32px;
+  line-height: 32px;
+  border: 1px solid #bbb;
+  padding: 0 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+  div.Dropdown-control {
+    position: relative;
+  }
+
+    span.Dropdown-arrow {
+      position: absolute;
+      right: 0;
+      top: 40%;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid black;
+    }
+
+  div.Dropdown-menu {
+    padding: 0 5px;
+    width: calc(100% - 10px);
+    margin: -1px 0 0 -6px;
+    background-color: white;
+    border: 1px solid #bbb;
+    z-index: 100;
+    position: absolute;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+    div.Dropdown-option {
+      margin-left: -5px;
+      padding: 0 5px;
+      width: 100%;
+    }
+
+      div.Dropdown-option:hover {
+        background-color: #ddd;
+      }
+
+      div.Dropdown-option:not(:last-child) {
+        border-bottom: 1px solid #bbb;
+      }
+
 
 table {
   border-collapse: collapse;
@@ -302,6 +354,7 @@ div.selected-tab {
 
   #teams-section .editable div {
     border: 1px solid #ddd;
+    border-radius: 3px;
     padding: 0 4px;
     margin: 0 -4px;
   }
@@ -337,6 +390,7 @@ div.selected-tab {
       #teams-section .selected-tab div.header .description div {
         padding: 10px;
         border: 1px solid #DFDFCF;
+        border-radius: 3px;
         margin-top: 10px;
       }
 
@@ -353,15 +407,15 @@ div.selected-tab {
   }
 
     #teams-section table.members-list tr:not(:first-child) {
-      cursor: pointer;
+      /*cursor: pointer;*/
     }
 
     #teams-section table.members-list .name {
-      width: 10%;
+      width: 15%;
     }
 
     #teams-section table.members-list .role {
-      width: 10%;
+      width: 20%;
     }
 
     #teams-section table.members-list .inputs {
@@ -369,20 +423,13 @@ div.selected-tab {
     }
 
     #teams-section table.members-list .activity {
-      width: 30%;
-    }
-
-    #teams-section table.members-list .edit {
-      width: 5%;
+      width: 20%;
+      cursor: pointer;
     }
 
     #teams-section table.members-list .remove {
       width: 5%;
-    }
-
-    #teams-section table.members-list td.add-member-label {
-      height: 32px;
-      line-height: 32px;
+      cursor: pointer;
     }
     
     #teams-section table.members-list td.add-member {}

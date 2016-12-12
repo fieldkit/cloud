@@ -34,6 +34,7 @@ export const REMOVE_CURRENT_TEAM = 'REMOVE_CURRENT_TEAM'
 export const START_EDITING_TEAM = 'START_EDITING_TEAM'
 export const STOP_EDITING_TEAM = 'STOP_EDITING_TEAM'
 export const SET_TEAM_PROPERTY = 'SET_TEAM_PROPERTY'
+export const SET_MEMBER_PROPERTY = 'SET_MEMBER_PROPERTY'
 export const CLEAR_CHANGES_TO_TEAM = 'CLEAR_CHANGES_TO_TEAM'
 export const SAVE_CHANGES_TO_TEAM = 'SAVE_CHANGES_TO_TEAM'
 export const PROMPT_MODAL_CONFIRM_CHANGES = 'PROMPT_MODAL_CONFIRM_CHANGES'
@@ -193,6 +194,17 @@ export function setTeamProperty (key, value) {
   return function (dispatch, getState) {
     dispatch({
       type: SET_TEAM_PROPERTY,
+      key,
+      value
+    })
+  }
+}
+
+export function setMemberProperty (memberID, key, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_MEMBER_PROPERTY,
+      memberID,
       key,
       value
     })

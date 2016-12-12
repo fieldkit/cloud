@@ -46,7 +46,20 @@ export const initialState = I.fromJS({
       id: 'o16-river-team',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
       name: 'river team',
-      members: ['steve', 'jer', 'adjany'],
+      members: {
+        steve: {
+          id: 'steve',
+          role: 'Expedition Leader'
+        },
+        jer: {
+          id: 'jer',
+          role: 'Team Leader'
+        },
+        adjany: {
+          id: 'adjany',
+          role: 'Team Member'
+        }
+      },
       new: false,
       status: 'ready',
       editing: false,
@@ -57,7 +70,20 @@ export const initialState = I.fromJS({
       id: 'o16-ground-team',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus. Donec id dui quis ante congue placerat. Aenean sodales.',
       name: 'ground team',
-      members: ['john', 'shah', 'jer'],
+      members: {
+        steve: {
+          id: 'steve',
+          role: 'Expedition Leader'
+        },
+        jer: {
+          id: 'jer',
+          role: 'Team Leader'
+        },
+        adjany: {
+          id: 'adjany',
+          role: 'Team Member'
+        }
+      },
       new: false,
       status: 'ready',
       editing: false,
@@ -68,7 +94,20 @@ export const initialState = I.fromJS({
       id: 'b16-ground-team',  
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       name: 'ground team',
-      members: ['jer', 'john'],
+      members: {
+        steve: {
+          id: 'steve',
+          role: 'Expedition Leader'
+        },
+        jer: {
+          id: 'jer',
+          role: 'Team Leader'
+        },
+        adjany: {
+          id: 'adjany',
+          role: 'Team Member'
+        }
+      },
       new: false,
       status: 'ready',
       editing: false,
@@ -79,7 +118,20 @@ export const initialState = I.fromJS({
       id: 'c16-river-team',
       description: 'Lorem ipsum dolor sit amet.',
       name: 'river team',
-      members: ['steve', 'jer', 'shah'],
+      members: {
+        steve: {
+          id: 'steve',
+          role: 'Expedition Leader'
+        },
+        jer: {
+          id: 'jer',
+          role: 'Team Leader'
+        },
+        adjany: {
+          id: 'adjany',
+          role: 'Team Member'
+        }
+      },
       new: false,
       status: 'ready',
       editing: false,
@@ -90,7 +142,20 @@ export const initialState = I.fromJS({
       id: 'c16-ground-team',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus.',
       name: 'ground team',
-      members: ['john', 'adjany'],
+      members: {
+        steve: {
+          id: 'steve',
+          role: 'Expedition Leader'
+        },
+        jer: {
+          id: 'jer',
+          role: 'Team Leader'
+        },
+        adjany: {
+          id: 'adjany',
+          role: 'Team Member'
+        }
+      },
       new: false,
       status: 'ready',
       editing: false,
@@ -102,6 +167,7 @@ export const initialState = I.fromJS({
     'jer': {
       id: 'jer',
       name: 'Jer Thorp',
+      role: 'Team Leader',
       teams: [
         'o16-river-team',
         'c16-river-team',
@@ -115,6 +181,7 @@ export const initialState = I.fromJS({
     'steve': {
       id: 'steve',
       name: 'Steve Boyes',
+      role: 'Expedition Leader',
       teams: [
         'o16-river-team',
         'b16-ground-team',
@@ -129,6 +196,7 @@ export const initialState = I.fromJS({
     'shah': {
       id: 'shah',
       name: 'Shah Selbe',
+      role: 'Team Member',
       teams: [
         'o16-river-team',
         'c16-ground-team'
@@ -142,6 +210,7 @@ export const initialState = I.fromJS({
     'adjany': {
       id: 'adjany',
       name: 'Adjany Costa',
+      role: 'Team Member',
       teams: [
         'o16-ground-team',
         'b16-ground-team',
@@ -156,6 +225,7 @@ export const initialState = I.fromJS({
     'john': {
       id: 'john',
       name: 'John Hilton',
+      role: 'Team Leader',
       teams: [
         'o16-river-team',
         'o16-ground-team',
@@ -174,7 +244,7 @@ export const initialState = I.fromJS({
 
 const expeditionReducer = (state = initialState, action) => {
 
-  // console.log('reducer:', action.type, action)
+  console.log('reducer:', action.type, action)
   switch (action.type) {
 
     case actions.SET_CURRENT_EXPEDITION: 
@@ -197,7 +267,7 @@ const expeditionReducer = (state = initialState, action) => {
             id: 'team-' + Date.now(),
             name: 'New Team',
             description: 'Enter a description',
-            members: [],
+            members: {},
             new: true,
             status: 'new'
           })
@@ -264,6 +334,13 @@ const expeditionReducer = (state = initialState, action) => {
       )
     }
 
+    case actions.SET_MEMBER_PROPERTY: {
+      return state.setIn(
+        ['teams', state.get('currentTeamID'), 'members', action.memberID, action.key],
+        action.value
+      )
+    }
+
     case actions.SAVE_CHANGES_TO_TEAM: {
       return state
         .set('editedTeam', null)
@@ -278,11 +355,18 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.CLEAR_CHANGES_TO_TEAM: {
+      let newTeam = state.getIn(['teams', state.get('currentTeamID')])
+      state.getIn(['teams', state.get('currentTeamID')])
+        .forEach((p, i) => {
+          if (state.get('editedTeam').has(i)) {
+            newTeam = newTeam.set(i, state.getIn(['editedTeam', i]))
+          }
+        })
       return state
         .set('editedTeam', null)
         .setIn(
           ['teams', state.get('currentTeamID')],
-          state.get('editedTeam')
+          newTeam
         )
     }
 
@@ -332,10 +416,13 @@ const expeditionReducer = (state = initialState, action) => {
           ['teams', state.get('currentTeamID'), 'selectedMember'], 
           null
         )
-      if (!state.getIn(['teams', state.get('currentTeamID'), 'members']).includes(action.id)) {
+      if (!state.getIn(['teams', state.get('currentTeamID'), 'members']).has(action.id)) {
         newState = newState.setIn(
-          ['teams', state.get('currentTeamID'), 'members'], 
-          state.getIn(['teams', state.get('currentTeamID'), 'members']).push(action.id)
+          ['teams', state.get('currentTeamID'), 'members', action.id], 
+          I.fromJS({
+            id: action.id,
+            role: 'Team Member'
+          })
         )
       }
       return newState        
