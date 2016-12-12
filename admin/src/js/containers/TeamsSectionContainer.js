@@ -83,8 +83,8 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     clearChangesToTeam () {
       return dispatch(actions.clearChangesToTeam())
     },
-    fetchSuggestedMembers (query) {
-      return dispatch(actions.fetchSuggestedMembers(query))
+    fetchSuggestedMembers (input, callback) {
+      return dispatch(actions.fetchSuggestedMembers(input, callback))
     },
     clearSuggestedMembers () {
       return dispatch(actions.clearSuggestedMembers())

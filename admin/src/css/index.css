@@ -158,28 +158,21 @@ table {
   font-size: 13px;
 }
 
-th {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-td {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-th:first-child, td:first-child {
-  padding-left: 0;
-}
-
-tr:last-child th, tr:last-child td {
+tbody:last-child, tbody:last-child td {
   padding-right: 0;
   border-bottom: 0;
 }
+  td {
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    padding: 10px 10px;
+    vertical-align: top;
+  }
+
+    td:first-child {
+      padding-left: 0;
+    }
+
 
 td, th, td *, th * {
   vertical-align: top;
@@ -406,7 +399,7 @@ div.selected-tab {
   #teams-section table.members-list {
   }
 
-    #teams-section table.members-list tr:not(:first-child) {
+    #teams-section table.members-list tbody:not(:first-child) {
       /*cursor: pointer;*/
     }
 
@@ -436,9 +429,14 @@ div.selected-tab {
 
       #teams-section table.members-list td.add-member div.add-member-container {
         display: flex;
-        width: 100%;
         position: relative;
+        padding-right: 10px;
       }
+
+        #teams-section table.members-list td.add-member div.Select {
+          flex-grow: 1;
+          padding-right: 10px;
+        }
 
         #teams-section table.members-list td.add-member div.add-member-container div.input{
           flex-grow: 1;
@@ -451,16 +449,14 @@ div.selected-tab {
             padding: 1px 10px;
             font-weight: bold;
             border: 1px solid #ccc;
-            border-bottom-left-radius: 3px;
             border-top-left-radius: 3px;
           }
 
         #teams-section table.members-list td.add-member div.add-member-container div.button{
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          height: 31px;
+          border-radius: 3px;
+          height: 36px;
           flex-basis: auto;
-          line-height: 31px;
+          line-height: 36px;
           vertical-align: middle;
         }
 
@@ -622,3 +618,6 @@ div.selected-tab {
           margin: 0 5px;
         }
 
+div.Select span.Select-arrow {
+  vertical-align: middle;
+}
