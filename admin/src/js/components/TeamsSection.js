@@ -93,7 +93,8 @@ class TeamsSection extends React.Component {
       clearChangesToTeam,
       fetchSuggestedMembers,
       clearSuggestedMembers,
-      addMember
+      addMember,
+      removeMember
     } = this.props
 
     const roleOptions = [
@@ -176,7 +177,8 @@ class TeamsSection extends React.Component {
             <td 
               className="remove"
               onClick={() => {
-                console.log('remove')
+                startEditingTeam()
+                removeMember(m.get('id'))
               }}
             >  
               <img src="/src/img/icon-remove-small.png"/>

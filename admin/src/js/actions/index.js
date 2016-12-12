@@ -46,6 +46,7 @@ export const RECEIVE_SUGGESTED_MEMBERS = 'RECEIVE_SUGGESTED_MEMBERS'
 export const SUGGESTED_MEMBERS_ERROR = 'SUGGESTED_MEMBERS_ERROR'
 export const CLEAR_SUGGESTED_MEMBERS = 'CLEAR_SUGGESTED_MEMBERS'
 export const ADD_MEMBER = 'ADD_MEMBER'
+export const REMOVE_MEMBER = 'REMOVE_MEMBER'
 
 export function fetchSuggestedMembers (query) {
   return function (dispatch, getState) {
@@ -277,6 +278,15 @@ export function addMember (id) {
   return function (dispatch, getState) {
     dispatch({
       type: ADD_MEMBER,
+      id
+    })
+  }
+}
+
+export function removeMember (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REMOVE_MEMBER,
       id
     })
   }

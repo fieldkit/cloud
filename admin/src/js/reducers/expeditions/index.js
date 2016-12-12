@@ -428,6 +428,13 @@ const expeditionReducer = (state = initialState, action) => {
       return newState        
     }
 
+    case actions.REMOVE_MEMBER: {
+      return state
+        .deleteIn(
+          ['teams', state.get('currentTeamID'), 'members', action.id]
+        )
+    }
+
     default:
       return state
   }

@@ -91,6 +91,9 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     },
     addMember (id) {
       return dispatch(actions.addMember(id))
+    },
+    removeMember (id) {
+      return dispatch(actions.removeMember(id))
     }
 
     // connect: () => {
