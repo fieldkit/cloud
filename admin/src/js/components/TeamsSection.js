@@ -315,14 +315,18 @@ class TeamsSection extends React.Component {
             <svg className="activity column">
             </svg>
           </div>
+          <h5>Members</h5>
           <table className="members-list">
-            <tr>
-              <th className="name">Name</th>
-              <th className="role">Role</th>
-              <th className="inputs">Inputs</th>
-              <th className="activity">Activity</th>
-              <th className="remove"></th>
-            </tr>
+            {
+              !!members && !!members.size &&
+              <tr>
+                <th className="name">Name</th>
+                <th className="role">Role</th>
+                <th className="inputs">Inputs</th>
+                <th className="activity">Activity</th>
+                <th className="remove"></th>
+              </tr>
+            }
             { teamMembers }
             <tr>
               <td className="add-member" colSpan="3" with="50%">
