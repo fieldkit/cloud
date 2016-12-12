@@ -7,7 +7,7 @@ import I from 'Immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select';
 
-class TeamsSection extends React.Component {
+class NewTeamsSection extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -329,9 +329,9 @@ class TeamsSection extends React.Component {
   }
 }
 
-TeamsSection.propTypes = {
+NewTeamsSection.propTypes = {
   expedition: PropTypes.object.isRequired,
   updateExpedition: PropTypes.func.isRequired
 }
 
-export default TeamsSection
+export default NewTeamsSection

@@ -32,6 +32,11 @@ class NavigationPanel extends React.Component {
         <div id="navigation">
           <ul className="expeditions">
             {items}
+            <li className="new-expedition">
+              <Link to={'/admin/new-expedition'}>
+                <h4>New Expedition<span>+</span></h4>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

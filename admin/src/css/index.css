@@ -314,6 +314,13 @@ div.selected-tab {
           font-size: 13px;
         }
 
+          #navigation ul.expeditions li.new-expedition h4 span{
+            border-radius: 3px;
+            padding: 0px 5px 4px;
+            background-color: #D0462C;
+            margin-left: 5px;
+          }
+
         #navigation ul.sections {
           margin-bottom: 20px;
           list-style: none;

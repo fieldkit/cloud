@@ -8,7 +8,6 @@ const mapStateToProps = (state, ownProps) => {
 
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentTeamID = expeditions.get('currentTeamID')
-  // const currentMemberID = expeditions.get('currentMemberID')
 
   const expedition = expeditions.getIn(['expeditions', currentExpeditionID])
 
@@ -25,10 +24,6 @@ const mapStateToProps = (state, ownProps) => {
   const currentTeam = !!teams.size ? teams.find(t => {
     return t.get('id') === currentTeamID
   }) : null
-
-  // const currentMember = !!members.size ? members.find(t => {
-  //   return t.get('id') === currentTeamID
-  // }) : null
 
   const editedTeam = expeditions.get('editedTeam')
   const suggestedMembers = expeditions.get('suggestedMembers')
@@ -92,14 +87,6 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     removeMember (id) {
       return dispatch(actions.removeMember(id))
     }
-
-    // connect: () => {
-    // connect () {
-    //   return dispatch(actions.connect())
-    // },
-    // disconnect () {
-    //   return dispatch(actions.disconnect())
-    // }
   }
 }
 

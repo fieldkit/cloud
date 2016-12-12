@@ -95,10 +95,6 @@ export function initTeamSection () {
       {
         type: SET_CURRENT_TEAM,
         teamID
-      },
-      {
-        type: SET_CURRENT_MEMBER,
-        memberID: null
       }
     ])
   }

@@ -34,6 +34,11 @@ import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
+import NewGeneralSettingsContainer from './containers/NewGeneralSettingsContainer'
+import NewInputsContainer from './containers/NewInputsContainer'
+import NewTeamsContainer from './containers/NewTeamsContainer'
+import NewOutputsContainer from './containers/NewOutputsContainer'
+
 import {FKApiClient} from './api/api.js';
 
 import 'react-select/dist/react-select.css';
@@ -90,8 +95,18 @@ const routes = (
         } 
       }}
     >
+
       <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
+
+      <Route path="new-expedition">
+        <IndexRoute component={NewGeneralSettingsContainer}/>
+        <Route path="general-settings" component={NewGeneralSettingsContainer}/>
+        <Route path="inputs" component={NewInputsContainer}/>
+        <Route path="teams" component={NewTeamsContainer}/>
+        <Route path="outputs" component={NewOutputsContainer}/>
+      </Route>
+
       <Route path=":expeditionID">
         <IndexRoute component={DashboardSection}/>
         <Route path="dashboard" component={DashboardSection}/>
