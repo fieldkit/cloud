@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import NavigationPanel from './NavigationPanel'
 import BreadCrumbs from './BreadCrumbs'
+import Modal from './Modal'
 
 class AdminPage extends React.Component {
   constructor (props) {
@@ -29,11 +30,37 @@ class AdminPage extends React.Component {
 
   render () {
 
-    const { children, params, disconnect, location } = this.props
+    const { 
+      children, 
+      params, 
+      disconnect,
+      location,
+      modal,
+      cancelAction,
+      saveChangesAndResume
+    } = this.props
+
     const { expeditions } = this.state
+
+    const modalProps = {
+      modal,
+      cancelAction,
+      saveChangesAndResume
+    }
+
+    const modalComponent = () => {
+      if (!!modal.get('type')) {
+        return (
+          <Modal {...modalProps} />
+        )
+      } else {
+        return null
+      }
+    }
 
     return (
       <div id="admin-page" className="page">
+        { modalComponent() }
         <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
         <div className="page-content">
           <BreadCrumbs {...location} />
@@ -45,7 +72,9 @@ class AdminPage extends React.Component {
 }
 
 AdminPage.propTypes = {
-  disconnect: PropTypes.func.isRequired
+  disconnect: PropTypes.func.isRequired,
+  saveChangesToTeam: PropTypes.func.isRequired,
+  clearChangesToTeam: PropTypes.func.isRequired
 }
 
 export default AdminPage

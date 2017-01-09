@@ -18,6 +18,10 @@ module.exports = {
       /node_modules\/sinon\//
     ],
     loaders: [
+      { 
+        test: /\.css$/, 
+        loader: "style-loader!css-loader" 
+      },
       {
         test: /\.hbs$/,
         loader: 'handlebars-loader'
@@ -63,6 +67,7 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
+    port: 8000,
     proxy: {
       '/api/v1/*': 'http://localhost:3000'
     },

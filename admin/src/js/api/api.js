@@ -1,7 +1,6 @@
 // @flow
 
 import 'whatwg-fetch';
-import log from 'loglevel';
 
 import {BaseError} from '../common/util';
 import type {PersonResponse} from './types';
@@ -20,7 +19,12 @@ export class APIClient {
   async post(path: string, body?: FormData | string): Promise<Response> {
     const url = new URL(path, this.baseUrl);
 
-    log.info('POST', path, body, body);
+    // const params = Object.keys(body).map(function(k) {
+    //     return encodeURIComponent(k) + '=' + encodeURIComponent(body[k])
+    // }).join('&')
+    // console.log('POST', path, params);
+
+    // console.log('POST', path, body)
 
     let res;
     try {
@@ -30,16 +34,16 @@ export class APIClient {
         body
       });
     } catch (e) {
-      log.error(e);
-      log.error('Threw while POSTing', url.toString());
+      console.log(e);
+      console.log('Threw while POSTing', url.toString());
       throw new APIError('HTTP error');
     }
 
     if (res.status == 401) {
-      log.error('Bad auth while POSTing', url.toString(), await res.text());
+      console.log('Bad auth while POSTing', url.toString(), await res.text());
       throw new AuthenticationError();
     } else if (!res.ok) {
-      log.error('Non-OK response while POSTing', url.toString(), await res.text());
+      console.log('Non-OK response while POSTing', url.toString(), await res.text());
       throw new APIError('HTTP error');
     }
 
@@ -55,7 +59,7 @@ export class APIClient {
       }
     }
 
-    log.info('GET', path, params);
+    console.log('GET', path, params);
 
     let res;
     try {
@@ -64,16 +68,16 @@ export class APIClient {
         credentials: 'include'
       });
     } catch (e) {
-      log.error(e);
-      log.error('Threw while GETing', url.toString());
+      console.log(e);
+      console.log('Threw while GETing', url.toString());
       throw new APIError('HTTP error');
     }
 
     if (res.status == 401) {
-      log.error('Bad auth while GETing', url.toString(), await res.text());
+      console.log('Bad auth while GETing', url.toString(), await res.text());
       throw new AuthenticationError();
     } else if (!res.ok) {
-      log.error('Non-OK response while GETing', url.toString(), await res.text());
+      console.log('Non-OK response while GETing', url.toString(), await res.text());
       throw new APIError('HTTP error');
     }
 
@@ -181,7 +185,7 @@ export class FKApiClient extends APIClient {
 
   async getCurrentPerson(): Promise<PersonResponse> {
     // response has no content, so any non-error means success
-    const res: PersonResponse = await this.getJSON('/api/person/current');
+    const res: PersonResponse = await this.getJSON('http://localhost:8080/api/person/current');
 
     // Also this method acts as a proxy for logging in sometimes...
     this.onLogin();
@@ -189,17 +193,17 @@ export class FKApiClient extends APIClient {
     return res;
   }
 
-  async register(email: string, password: string): Promise<void> {
-    await this.postForm('/api/user/sign-up', { email, password });
+  async register(params: Object): Promise<void> {
+    await this.postForm('http://localhost:8080/api/user/sign-up', params);
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(username: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
-    await this.postForm('/api/user/sign-in', { email, password });
+    await this.postForm('http://localhost:8080/api/user/sign-in', { username, password });
   }
 
   async logout(): Promise<void> {
-    await this.postForm('/api/user/logout');
+    await this.postForm('http://localhost:8080/api/user/logout');
     this.onLogout();
   }
 

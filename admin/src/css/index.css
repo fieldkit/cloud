@@ -7,6 +7,7 @@ html, body {
   font-size: 14px;
   margin: 0;
   line-height: 25px;
+  min-width: 1024px;
 }
 
 p {
@@ -17,6 +18,10 @@ p.intro {
   font-size: 18px;
   line-height: 30px;
   margin-bottom: 40px;
+}
+
+input {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
 }
 
 h1, h2, h3, h4, h5 {
@@ -96,34 +101,78 @@ div.button.secondary {
     border-color: background-color: #DFDFCF;;
   }
 
+div.Dropdown-root {
+  height: 32px;
+  line-height: 32px;
+  border: 1px solid #bbb;
+  padding: 0 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+  div.Dropdown-control {
+    position: relative;
+  }
+
+    span.Dropdown-arrow {
+      position: absolute;
+      right: 0;
+      top: 40%;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid black;
+    }
+
+  div.Dropdown-menu {
+    padding: 0 5px;
+    width: calc(100% - 10px);
+    margin: -1px 0 0 -6px;
+    background-color: white;
+    border: 1px solid #bbb;
+    z-index: 100;
+    position: absolute;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+    div.Dropdown-option {
+      margin-left: -5px;
+      padding: 0 5px;
+      width: 100%;
+    }
+
+      div.Dropdown-option:hover {
+        background-color: #ddd;
+      }
+
+      div.Dropdown-option:not(:last-child) {
+        border-bottom: 1px solid #bbb;
+      }
+
+
 table {
   border-collapse: collapse;
   line-height: 20px;
   font-size: 13px;
 }
 
-th {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-td {
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-  padding: 10px 10px;
-  vertical-align: top;
-}
-
-th:first-child, td:first-child {
-  padding-left: 0;
-}
-
-tr:last-child th, tr:last-child td {
+tbody:last-child, tbody:last-child td {
   padding-right: 0;
   border-bottom: 0;
 }
+  td {
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    padding: 10px 10px;
+    vertical-align: top;
+  }
+
+    td:first-child {
+      padding-left: 0;
+    }
+
 
 td, th, td *, th * {
   vertical-align: top;
@@ -138,9 +187,10 @@ td, th, td *, th * {
   table ul {
     margin: 0;
     padding: 0;
+    list-style: none;
   } 
 
-    table ul li{
+    table ul li.tag{
       display: inline-block;
       background-color: #DFDFCF;
       padding: 0 5px;
@@ -295,6 +345,21 @@ div.selected-tab {
 
 #teams-section {}
 
+  #teams-section .editable div {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 0 4px;
+    margin: 0 -4px;
+  }
+
+    #teams-section .editable div:hover {
+      border-color: #D0462C;
+    }
+
+  #teams-section .editable.required div {
+    border-color: #D0462C;
+  }
+
   #teams-section .selected-tab div.actions {
     width: 100%;
     height: 40px;
@@ -302,6 +367,7 @@ div.selected-tab {
 
   #teams-section .selected-tab div.actions div.button {
     float:right;
+    margin-left: 10px;
   }
 
   #teams-section .selected-tab div.header {
@@ -317,6 +383,7 @@ div.selected-tab {
       #teams-section .selected-tab div.header .description div {
         padding: 10px;
         border: 1px solid #DFDFCF;
+        border-radius: 3px;
         margin-top: 10px;
       }
 
@@ -332,16 +399,16 @@ div.selected-tab {
   #teams-section table.members-list {
   }
 
-    #teams-section table.members-list tr:not(:first-child) {
-      cursor: pointer;
+    #teams-section table.members-list tbody:not(:first-child) {
+      /*cursor: pointer;*/
     }
 
     #teams-section table.members-list .name {
-      width: 10%;
+      width: 15%;
     }
 
     #teams-section table.members-list .role {
-      width: 10%;
+      width: 20%;
     }
 
     #teams-section table.members-list .inputs {
@@ -349,16 +416,79 @@ div.selected-tab {
     }
 
     #teams-section table.members-list .activity {
-      width: 30%;
-    }
-
-    #teams-section table.members-list .edit {
-      width: 5%;
+      width: 20%;
+      cursor: pointer;
     }
 
     #teams-section table.members-list .remove {
       width: 5%;
+      cursor: pointer;
     }
+    
+    #teams-section table.members-list td.add-member {}
+
+      #teams-section table.members-list td.add-member div.add-member-container {
+        display: flex;
+        position: relative;
+        padding-right: 10px;
+      }
+
+        #teams-section table.members-list td.add-member div.Select {
+          flex-grow: 1;
+          padding-right: 10px;
+        }
+
+        #teams-section table.members-list td.add-member div.add-member-container div.input{
+          flex-grow: 1;
+        }
+
+          #teams-section table.members-list td.add-member div.add-member-container div.input input{
+            width: calc(100% - 20px);
+            height: 27px;
+            font-size: 14px;
+            padding: 1px 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            border-top-left-radius: 3px;
+          }
+
+        #teams-section table.members-list td.add-member div.add-member-container div.button{
+          border-radius: 3px;
+          height: 36px;
+          flex-basis: auto;
+          line-height: 36px;
+          vertical-align: middle;
+        }
+
+        #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members{
+          position: absolute;
+          top: 31px;
+          border: 1px solid #ddd;
+          width: 99%;
+          margin-top: -1px;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+          #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li{
+            padding: 15px 10px;
+            background-color: white;
+            font-weight: bold;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: auto;
+          }
+
+            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member{
+              cursor: pointer;
+            }
+
+              #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member:hover{
+                background-color: #ddd;
+              }
+
+            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li span{
+              font-weight: normal;
+            }
 
 .section-actions {
   float: right;
@@ -461,4 +591,33 @@ div.selected-tab {
 
 }
 
+#admin-page {}
 
+  #admin-page div.modal-container {
+    position: absolute;
+    z-index: 100;
+    background-color: rgba(200,200,200,0.7);
+    width: 100vw;
+    height: 100vh;
+  }
+
+    #admin-page div.modal-container div.modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      padding: 50px;
+      background-color: white;
+    }
+
+      #admin-page div.modal-container div.modal div.actions{
+        text-align: center;
+      }
+
+        #admin-page div.modal-container div.modal div.actions div.button{
+          margin: 0 5px;
+        }
+
+div.Select span.Select-arrow {
+  vertical-align: middle;
+}
