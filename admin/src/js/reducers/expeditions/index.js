@@ -9,12 +9,40 @@ export const initialState = I.fromJS({
     nextAction: null,
     nextPath: null
   },
+  currentProjectID: null,
   currentExpeditionID: null,
   currentTeamID: null,
   currentMemberID: [],
   currentDocumentTypeID: null,
   editedTeam: null,
+  projects: {
+    'okavango': {
+      id: 'okavango',
+      name: 'okavango',
+      expeditions: [
+        'okavango_16',
+        'bike_16',
+        'cuito_16'
+      ]
+    },
+    'awesome_adventures': {
+      id: 'awesome_adventures',
+      name: 'Awesome Adventures',
+      expeditions: [
+        'kayak_adventure'
+      ]
+    }
+  },
   expeditions: {
+    'kayak_adventure': {
+      id: 'kayak_adventure',
+      name: 'Kayak Adventure',
+      startDate: new Date('2016-08-17 00:00:00+02:00'),
+      teams: [],
+      selectedDocumentType: {},
+      selectedPreset: null,
+      documentTypes: {}
+    },
     'okavango_16': {
       id: 'okavango_16',
       name: 'Okavango 2016',
@@ -438,6 +466,9 @@ const expeditionReducer = (state = initialState, action) => {
       }
       return newState
     }
+
+    case actions.SET_CURRENT_PROJECT: 
+      return state.set('currentProjectID', action.projectID)
 
     case actions.SET_CURRENT_EXPEDITION: 
       return state.set('currentExpeditionID', action.expeditionID)

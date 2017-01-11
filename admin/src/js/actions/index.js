@@ -129,6 +129,7 @@ TEAM ACTIONS
 
 */
 
+export const SET_CURRENT_PROJECT = 'SET_CURRENT_PROJECT'
 export const SET_CURRENT_EXPEDITION = 'SET_CURRENT_EXPEDITION'
 export const SET_CURRENT_TEAM = 'SET_CURRENT_TEAM'
 export const SET_CURRENT_MEMBER = 'SET_CURRENT_MEMBER'
@@ -191,6 +192,15 @@ export function initTeamSection () {
         teamID
       }
     ])
+  }
+}
+
+export function setCurrentProject (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_PROJECT,
+      projectID: id
+    })
   }
 }
 

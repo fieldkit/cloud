@@ -28,6 +28,8 @@ import EditorSection from './components/EditorSection'
 import IdentitySection from './components/IdentitySection'
 import ProfileSection from './components/ProfileSection'
 
+import NewProjectContainer from './containers/NewProjectContainer'
+
 import AdminPageContainer from './containers/AdminPageContainer'
 import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
@@ -99,34 +101,43 @@ const routes = (
       <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
 
-      <Route 
-        path="new-expedition" 
-        onEnter={() => store.dispatch(actions.initNewExpeditionSection())}
-      >
-        <IndexRoute component={NewGeneralSettingsContainer}/>
-        <Route path="general-settings" component={NewGeneralSettingsContainer}/>
-        <Route path="inputs" component={NewInputsContainer}/>
-        <Route
-          path="teams"
-          component={NewTeamsContainer}
-          onEnter={() => store.dispatch(actions.initNewTeamsSection())}
-        />
-        <Route path="outputs" component={NewOutputsContainer}/>
-      </Route>
+      <Route
+        path="new-project"
+        component={NewProjectContainer}
+      />
 
-      <Route path=":expeditionID" onEnter={(state) => {
-        store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
+      <Route path=":projectID" onEnter={(state) => {
+        store.dispatch(actions.setCurrentProject(state.params.projectID))
       }}>
-        <IndexRoute component={DashboardSectionContainer}/>
-        <Route path="dashboard" component={DashboardSectionContainer}/>
-        <Route path="uploader" component={UploaderSection}/>
-        <Route path="sources" component={SourcesSection}/>
-        <Route path="teams" 
-          component={TeamsSectionContainer} 
-          onEnter={() => store.dispatch(actions.initTeamSection())}
-        />
-        <Route path="editor" component={EditorSection}/>
-        <Route path="identity" component={IdentitySection}/>
+        <Route 
+          path="new-expedition" 
+          onEnter={() => store.dispatch(actions.initNewExpeditionSection())}
+        >
+          <IndexRoute component={NewGeneralSettingsContainer}/>
+          <Route path="general-settings" component={NewGeneralSettingsContainer}/>
+          <Route path="inputs" component={NewInputsContainer}/>
+          <Route
+            path="teams"
+            component={NewTeamsContainer}
+            onEnter={() => store.dispatch(actions.initNewTeamsSection())}
+          />
+          <Route path="outputs" component={NewOutputsContainer}/>
+        </Route>
+
+        <Route path=":expeditionID" onEnter={(state) => {
+          store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
+        }}>
+          <IndexRoute component={DashboardSectionContainer}/>
+          <Route path="dashboard" component={DashboardSectionContainer}/>
+          <Route path="uploader" component={UploaderSection}/>
+          <Route path="sources" component={SourcesSection}/>
+          <Route path="teams" 
+            component={TeamsSectionContainer} 
+            onEnter={() => store.dispatch(actions.initTeamSection())}
+          />
+          <Route path="editor" component={EditorSection}/>
+          <Route path="identity" component={IdentitySection}/>
+        </Route>
       </Route>
     </Route>
   </Route>

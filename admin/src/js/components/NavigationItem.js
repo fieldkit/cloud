@@ -5,29 +5,29 @@ import { Link } from 'react-router'
 class NavigationItem extends React.Component {
 
   render () {
-    const { expedition, active } = this.props
+    const { expedition, active, projectID } = this.props
     return (
       <li className={ active ? 'active' : ''}>
-        <Link to={'/admin/' + expedition.get('id') + '/dashboard'}>
+        <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/dashboard'}>
           <h4>{expedition.get('name')}</h4>
         </Link>
         { 
           active &&
           <ul className="sections">
             <li>
-            <Link to={'/admin/' + expedition.get('id') + '/uploader'}>Upload Data</Link>
+            <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/uploader'}>Upload Data</Link>
             </li>
             <li>
-            <Link to={'/admin/' + expedition.get('id') + '/teams'}>Teams</Link>
+            <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/teams'}>Teams</Link>
             </li>
             <li>
-            <Link to={'/admin/' + expedition.get('id') + '/sources'}>Data Sources</Link>
+            <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/sources'}>Data Sources</Link>
             </li>
             <li>
-            <Link to={'/admin/' + expedition.get('id') + '/editor'}>Data Editor</Link>
+            <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/editor'}>Data Editor</Link>
             </li>
             <li>
-            <Link to={'/admin/' + expedition.get('id') + '/identity'}>Expedition Identity</Link>
+            <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/identity'}>Expedition Identity</Link>
             </li>
           </ul>
         }
