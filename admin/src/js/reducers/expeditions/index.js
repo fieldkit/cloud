@@ -10,8 +10,9 @@ export const initialState = I.fromJS({
     nextPath: null
   },
   currentExpeditionID: null,
-  currentTeamID: [],
+  currentTeamID: null,
   currentMemberID: [],
+  currentDocumentTypeID: null,
   editedTeam: null,
   expeditions: {
     'okavango_16': {
@@ -21,7 +22,14 @@ export const initialState = I.fromJS({
       teams: [
         'o16-river-team',
         'o16-ground-team'
-      ]
+      ],
+      selectedDocumentType: {
+        member: null,
+        social: null,
+        sensor: null
+      },
+      selectedPreset: null,
+      documentTypes: {}
     },
     'bike_16': {
       id: 'bike_16',
@@ -29,7 +37,14 @@ export const initialState = I.fromJS({
       startDate: new Date('2016-06-21 00:00:00+02:00'),
       teams: [
         'b16-ground-team'
-      ]
+      ],
+      selectedDocumentType: {
+        member: null,
+        social: null,
+        sensor: null
+      },
+      selectedPreset: null,
+      documentTypes: {}
     },
     'cuito_16': {
       id: 'cuito_16',
@@ -38,7 +53,44 @@ export const initialState = I.fromJS({
       teams: [
         'c16-river-team',
         'c16-ground-team'
-      ]
+      ],
+      selectedDocumentType: {
+        member: null,
+        social: null,
+        sensor: null
+      },
+      selectedPreset: null,
+      documentTypes: {}
+    }
+  },
+  documentTypes: {
+    'memberGeolocation': {
+      id: 'memberGeolocation',
+      type: 'member',
+      name: 'Member Geolocation',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      inputs: ['Ambit wristband']
+    },
+    'sighting': {
+      id: 'sighting',
+      type: 'member',
+      name: 'Sighting',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      inputs: ['Uploader']
+    },
+    'tweet': {
+      id: 'tweet',
+      type: 'social',
+      name: 'Tweet',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      inputs: ['Twitter account']
+    },
+    'sensorReading': {
+      id: 'sensorReading',
+      type: 'sensor',
+      name: 'Sensor reading',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      inputs: ['Conservify water quality sensor']
     }
   },
   teams: {
@@ -63,7 +115,6 @@ export const initialState = I.fromJS({
       new: false,
       status: 'ready',
       editing: false,
-      queriedMember: null,
       selectedMember: null
     },
     'o16-ground-team': {
@@ -87,7 +138,6 @@ export const initialState = I.fromJS({
       new: false,
       status: 'ready',
       editing: false,
-      queriedMember: null,
       selectedMember: null
     },
     'b16-ground-team': {
@@ -111,7 +161,6 @@ export const initialState = I.fromJS({
       new: false,
       status: 'ready',
       editing: false,
-      queriedMember: null,
       selectedMember: null
     },
     'c16-river-team': {
@@ -135,7 +184,6 @@ export const initialState = I.fromJS({
       new: false,
       status: 'ready',
       editing: false,
-      queriedMember: null,
       selectedMember: null
     },
     'c16-ground-team': {
@@ -159,7 +207,6 @@ export const initialState = I.fromJS({
       new: false,
       status: 'ready',
       editing: false,
-      queriedMember: null,
       selectedMember: null
     },
   },
@@ -246,6 +293,151 @@ const expeditionReducer = (state = initialState, action) => {
 
   console.log('reducer:', action.type, action)
   switch (action.type) {
+
+    case actions.ADD_EXPEDITION: {
+      const expeditionID = 'expedition-' + Date.now()
+      return state
+        .set('currentExpeditionID', expeditionID)
+        .setIn(
+          ['expeditions', expeditionID], 
+          I.fromJS({
+            id: expeditionID,
+            name: 'New Expedition',
+            description: 'Enter a description',
+            startDate: new Date(),
+            teams: [],
+            selectedDocumentType: {
+              member: null,
+              social: null,
+              sensor: null
+            },
+            selectedPreset: null,
+            documentTypes: {}
+          })
+        )
+    }
+
+    case actions.SET_EXPEDITION_PRESET: {
+      switch (action.presetType) {
+        case 'rookie': {
+          return state
+            .setIn(
+              ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
+              action.presetType
+            )
+            .setIn(
+              ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
+              I.fromJS({
+                memberGeolocation: {id: 'memberGeolocation'},
+                sighting: {id: 'sighting'},
+              })
+            )
+            .setIn(
+              ['teams', 'main-team'],
+              I.fromJS({
+                id: 'main-team',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+                name: 'Main Team',
+                members: {
+                  adjany: {
+                    id: 'adjany',
+                    role: 'Team Leader'
+                  }
+                },
+                new: false,
+                status: 'ready',
+                editing: false,
+                selectedMember: null
+              })
+            )
+            .setIn(
+              ['expeditions', state.get('currentExpeditionID'), 'teams'],
+              I.fromJS(['main-team'])
+            )
+            .set('currentTeamID', 'main-team')
+        }
+
+        case 'advanced': {
+          return state
+            .setIn(
+              ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
+              action.presetType
+            )
+            .setIn(
+              ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
+              I.fromJS({
+                memberGeolocation: {id: 'memberGeolocation'},
+                tweet: {id: 'tweet'},
+                sensorReading: {id: 'sensorReading'},
+                sighting: {id: 'sighting'},
+              })
+            )
+            .setIn(
+              ['teams', 'main-team'],
+              I.fromJS({
+                id: 'o16-river-team',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+                name: 'Main Team',
+                members: {
+                  adjany: {
+                    id: 'adjany',
+                    role: 'Team Leader'
+                  }
+                },
+                new: false,
+                status: 'ready',
+                editing: false,
+                selectedMember: null
+              })
+            )
+        }
+
+        case 'pro': {
+          return state
+        }
+      }
+    }
+
+    case actions.ADD_DOCUMENT_TYPE: {
+      let newState = state
+        .setIn(
+          ['expeditions', state.get('currentExpeditionID'), 'selectedDocumentType', action.collectionType], 
+          null
+        )
+      if (!state.getIn(['expeditions', state.get('currentExpeditionID'), 'documentTypes']).has(action.id)) {
+        newState = newState.setIn(
+          ['expeditions', state.get('currentExpeditionID'), 'documentTypes', action.id], 
+          I.fromJS({
+            id: action.id
+          })
+        )
+      }
+      return newState        
+    }
+
+    case actions.REMOVE_DOCUMENT_TYPE: {
+      return state
+        .deleteIn(['expeditions', state.get('currentExpeditionID'), 'documentTypes', action.id])
+    }
+
+    case actions.SET_EXPEDITION_PROPERTY: {
+      let newState = state.setIn(
+        ['expeditions', state.get('currentExpeditionID')].concat(action.keyPath),
+        action.value
+      )
+      if (action.keyPath.length === 1 && action.keyPath[0] === 'id') {
+        newState = newState
+          .setIn(
+            ['expeditions', action.value],
+            newState.getIn(['expeditions', state.get('currentExpeditionID')])
+          )
+          .deleteIn(
+            ['expeditions', state.get('currentExpeditionID')]
+          )
+          .set('currentExpeditionID', action.value)
+      }
+      return newState
+    }
 
     case actions.SET_CURRENT_EXPEDITION: 
       return state.set('currentExpeditionID', action.expeditionID)
@@ -397,10 +589,6 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.FETCH_SUGGESTED_MEMBERS: {
       return state
         .setIn(
-          ['teams', state.get('currentTeamID'), 'queriedMember'], 
-          action.query
-        )
-        .setIn(
           ['teams', state.get('currentTeamID'), 'selectedMember'], 
           null
         )
@@ -408,10 +596,6 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.ADD_MEMBER: {
       let newState = state
-        .setIn(
-          ['teams', state.get('currentTeamID'), 'queriedMember'], 
-          null
-        )
         .setIn(
           ['teams', state.get('currentTeamID'), 'selectedMember'], 
           null

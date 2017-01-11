@@ -5,9 +5,9 @@ import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
 import Dropdown from 'react-dropdown'
-import Select from 'react-select';
+import Select from 'react-select'
 
-class TeamsSection extends React.Component {
+class NewTeamsSection extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -40,13 +40,12 @@ class TeamsSection extends React.Component {
     const roleOptions = [
       'Expedition Leader', 'Team Leader', 'Team Member'
     ]
-
     const teamTabs = teams
       .map((t, i) => {
         let className = 'team-name '
         if (t === currentTeam) className += 'editable active '
         if (currentTeam.get('name') === '') className += 'required '
-
+        console.log('ok', t.get('name'), currentTeam.get('name'))
         return (
           <li 
             className={ className }
@@ -310,8 +309,8 @@ class TeamsSection extends React.Component {
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          {/*sectionActions*/}
-          <h1>Teams</h1>
+          <h1>Add team members to your expedition</h1>
+          <p>process breadcrumbs</p>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
@@ -322,14 +321,18 @@ class TeamsSection extends React.Component {
           <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
-        {/*sectionActions*/}
+        
+        <Link to={'/admin/' + expedition.get('id') }>
+          <div className="button hero">
+            Finalize your expedition!
+          </div>
+        </Link>
       </div>
     )    
   }
 }
 
-TeamsSection.propTypes = {
-  expedition: PropTypes.object.isRequired,
+NewTeamsSection.propTypes = {
 }
 
-export default TeamsSection
+export default NewTeamsSection

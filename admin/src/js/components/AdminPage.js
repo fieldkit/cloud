@@ -37,10 +37,11 @@ class AdminPage extends React.Component {
       location,
       modal,
       cancelAction,
-      saveChangesAndResume
+      saveChangesAndResume,
+      expeditions
     } = this.props
 
-    const { expeditions } = this.state
+    // const { expeditions } = this.state
 
     const modalProps = {
       modal,

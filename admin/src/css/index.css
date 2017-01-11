@@ -258,6 +258,7 @@ div.selected-tab {
       background-color: #DFDFCF;
       display: block;
       padding-bottom: 50px;
+      background-image: url(/src/img/bkg.jpg);
     }
 
       #logo {
@@ -313,6 +314,13 @@ div.selected-tab {
           margin-top: 10px;
           font-size: 13px;
         }
+
+          #navigation ul.expeditions li.new-expedition h4 span{
+            border-radius: 3px;
+            padding: 0px 5px 4px;
+            background-color: #D0462C;
+            margin-left: 5px;
+          }
 
         #navigation ul.sections {
           margin-bottom: 20px;
@@ -396,53 +404,70 @@ div.selected-tab {
         background-color: #DFDFCF;
       }
 
-  #teams-section table.members-list {
+  table.objects-list {
   }
 
-    #teams-section table.members-list tbody:not(:first-child) {
+    table.objects-list tbody:not(:first-child) {
       /*cursor: pointer;*/
     }
 
-    #teams-section table.members-list .name {
+    #teams-section table.objects-list .name {
       width: 15%;
     }
 
-    #teams-section table.members-list .role {
+    #teams-section table.objects-list .role {
       width: 20%;
     }
 
-    #teams-section table.members-list .inputs {
+    #teams-section table.objects-list .inputs {
       width: 20%;
     }
 
-    #teams-section table.members-list .activity {
+    #teams-section table.objects-list .activity {
       width: 20%;
       cursor: pointer;
     }
 
-    #teams-section table.members-list .remove {
+    #teams-section table.objects-list .remove {
+      width: 5%;
+      cursor: pointer;
+    }
+
+    #new-inputs-section table.objects-list .name {
+      width: 25%;
+    }
+
+    #new-inputs-section table.objects-list .description {
+      width: 35%;
+    }
+
+    #new-inputs-section table.objects-list .inputs {
+      width: 35%;
+    }
+
+    #new-inputs-section table.objects-list .remove {
       width: 5%;
       cursor: pointer;
     }
     
-    #teams-section table.members-list td.add-member {}
+    table.objects-list td.add-object {}
 
-      #teams-section table.members-list td.add-member div.add-member-container {
+      table.objects-list td.add-object div.add-object-container {
         display: flex;
         position: relative;
         padding-right: 10px;
       }
 
-        #teams-section table.members-list td.add-member div.Select {
+        table.objects-list td.add-object div.Select {
           flex-grow: 1;
           padding-right: 10px;
         }
 
-        #teams-section table.members-list td.add-member div.add-member-container div.input{
+        table.objects-list td.add-object div.add-object-container div.input{
           flex-grow: 1;
         }
 
-          #teams-section table.members-list td.add-member div.add-member-container div.input input{
+          table.objects-list td.add-object div.add-object-container div.input input{
             width: calc(100% - 20px);
             height: 27px;
             font-size: 14px;
@@ -452,7 +477,7 @@ div.selected-tab {
             border-top-left-radius: 3px;
           }
 
-        #teams-section table.members-list td.add-member div.add-member-container div.button{
+        table.objects-list td.add-object div.add-object-container div.button{
           border-radius: 3px;
           height: 36px;
           flex-basis: auto;
@@ -460,7 +485,7 @@ div.selected-tab {
           vertical-align: middle;
         }
 
-        #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members{
+        table.objects-list td.add-object div.add-object-container ul.suggested-objects{
           position: absolute;
           top: 31px;
           border: 1px solid #ddd;
@@ -470,7 +495,7 @@ div.selected-tab {
           overflow-x: hidden;
         }
 
-          #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li{
+          table.objects-list td.add-object div.add-object-container ul.suggested-objects li{
             padding: 15px 10px;
             background-color: white;
             font-weight: bold;
@@ -478,15 +503,15 @@ div.selected-tab {
             cursor: auto;
           }
 
-            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member{
+            table.objects-list td.add-object div.add-object-container ul.suggested-objects li.suggested-member{
               cursor: pointer;
             }
 
-              #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member:hover{
+              table.objects-list td.add-object div.add-object-container ul.suggested-objects li.suggested-member:hover{
                 background-color: #ddd;
               }
 
-            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li span{
+            table.objects-list td.add-object div.add-object-container ul.suggested-objects li span{
               font-weight: normal;
             }
 
@@ -621,3 +646,22 @@ div.selected-tab {
 div.Select span.Select-arrow {
   vertical-align: middle;
 }
+
+ul.main-input-container {
+  list-style: none;
+  padding: 0;
+}
+
+  ul.main-input-container li{
+    list-style: none;
+    padding: 20px;
+    border: 1px solid #bbb;
+    margin-top: -1px;
+    position: relative;
+    cursor: pointer;
+  }
+
+    ul.main-input-container li.selected{
+      border-color: #D0462C;
+      z-index: 10;
+    }

@@ -19,6 +19,109 @@ export const UPDATE_EXPEDITION = 'UPDATE_EXPEDITION'
 export const EXPEDITION_UPDATED = 'EXPEDITION_UPDATED'
 
 
+/*
+
+EXPEDITION ACTIONS
+
+*/
+
+export const ADD_EXPEDITION = 'ADD_EXPEDITION'
+export const SET_EXPEDITION_PROPERTY = 'SET_EXPEDITION_PROPERTY'
+export const ADD_DOCUMENT_TYPE = 'ADD_DOCUMENT_TYPE'
+export const REMOVE_DOCUMENT_TYPE = 'REMOVE_DOCUMENT_TYPE'
+export const SET_EXPEDITION_PRESET = 'SET_EXPEDITION_PRESET'
+
+export function setExpeditionPreset (presetType) {
+  return function (dispatch, getState) {
+    dispatch ({
+      type: SET_EXPEDITION_PRESET,
+      presetType
+    })
+  }
+}
+
+export function fetchSuggestedDocumentTypes (input, type, callback) {
+
+  return function (dispatch, getState) {
+    window.setTimeout(() => {
+      const documentTypes = getState().expeditions
+        .get('documentTypes')
+        .filter((d) => {
+          const nameCheck = d.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
+          const typeCheck = d.get('type') === type
+          const membershipCheck = getState().expeditions
+            .getIn(['expeditions', getState().expeditions.get('currentExpeditionID'), 'documentTypes'])
+            .has(d.get('id'))
+          return (nameCheck) && !membershipCheck && typeCheck
+        })
+        .map((m) => {
+          return { value: m.get('id'), label: m.get('name')}
+        })
+        .toArray()
+
+      callback(null, {
+        options: documentTypes,
+        complete: true
+      })
+    }, 500)
+  }
+}
+
+export function addDocumentType (id, collectionType) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: ADD_DOCUMENT_TYPE,
+      id,
+      collectionType
+    })
+  }
+}
+
+export function removeDocumentType (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REMOVE_DOCUMENT_TYPE,
+      id
+    })
+  }
+}
+
+export function initNewExpeditionSection () {
+  return function (dispatch, getState) {
+    dispatch(
+      {
+        type: ADD_EXPEDITION
+      }
+    )
+  }
+}
+
+export function setExpeditionProperty (keyPath, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_EXPEDITION_PROPERTY,
+      keyPath,
+      value
+    })
+  }
+}
+
+export function initNewTeamsSection () {
+  return function (dispatch, getState) {
+    const actions = []
+    if (!getState().expeditions.get('currentTeamID')) {
+      dispatch([
+        {
+          type: ADD_TEAM
+        },
+        {
+          type: START_EDITING_TEAM
+        }
+      ])
+    }
+  }
+}
+
 
 /*
 
@@ -44,7 +147,6 @@ export const CLEAR_MODAL = 'CLEAR_MODAL'
 // export const FETCH_SUGGESTED_MEMBERS = 'FETCH_SUGGESTED_MEMBERS'
 export const RECEIVE_SUGGESTED_MEMBERS = 'RECEIVE_SUGGESTED_MEMBERS'
 export const SUGGESTED_MEMBERS_ERROR = 'SUGGESTED_MEMBERS_ERROR'
-export const CLEAR_SUGGESTED_MEMBERS = 'CLEAR_SUGGESTED_MEMBERS'
 export const ADD_MEMBER = 'ADD_MEMBER'
 export const REMOVE_MEMBER = 'REMOVE_MEMBER'
 
@@ -56,7 +158,7 @@ export function fetchSuggestedMembers (input, callback) {
         .get('people')
         .filter((m) => {
           const nameCheck = m.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
-          const usernameCheck = m.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
+          const usernameCheck = m.get('id').toLowerCase().indexOf(input.toLowerCase()) > -1
           const membershipCheck = getState().expeditions
             .getIn(['teams', getState().expeditions.get('currentTeamID'), 'members'])
             .has(m.get('id'))
@@ -75,14 +177,6 @@ export function fetchSuggestedMembers (input, callback) {
   }
 }
 
-export function clearSuggestedMembers () {
-  return function (dispatch, getState) {
-    dispatch({
-      type: CLEAR_SUGGESTED_MEMBERS
-    })
-  }
-}
-
 export function initTeamSection () {
   return function (dispatch, getState) {
     const expeditionID = location.pathname.split('/')[2]
@@ -95,10 +189,6 @@ export function initTeamSection () {
       {
         type: SET_CURRENT_TEAM,
         teamID
-      },
-      {
-        type: SET_CURRENT_MEMBER,
-        memberID: null
       }
     ])
   }
@@ -292,7 +382,7 @@ AUTH ACTIONS
 export function requestSignIn (email, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
-    FKApiClient.get().login(userName, password)
+    FKApiClient.get().login(email, password)
       .then(() => {
         dispatch(loginSuccess())
         browserHistory.push('/admin/okavango_16')
