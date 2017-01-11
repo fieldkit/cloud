@@ -5,7 +5,7 @@ import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
 import Dropdown from 'react-dropdown'
-import Select from 'react-select';
+import Select from 'react-select'
 
 class NewTeamsSection extends React.Component {
   constructor (props) {
@@ -24,7 +24,6 @@ class NewTeamsSection extends React.Component {
       members,
       currentTeam,
       editedTeam,
-      suggestedMembers,
       setCurrentTeam,
       addTeam,
       startEditingTeam,
@@ -41,13 +40,12 @@ class NewTeamsSection extends React.Component {
     const roleOptions = [
       'Expedition Leader', 'Team Leader', 'Team Member'
     ]
-
     const teamTabs = teams
       .map((t, i) => {
         let className = 'team-name '
         if (t === currentTeam) className += 'editable active '
         if (currentTeam.get('name') === '') className += 'required '
-
+        console.log('ok', t.get('name'), currentTeam.get('name'))
         return (
           <li 
             className={ className }
@@ -255,7 +253,7 @@ class NewTeamsSection extends React.Component {
             </svg>
           </div>
           <h5>Members</h5>
-          <table className="members-list">
+          <table className="objects-list">
             {
               !!members && !!members.size &&
               <tbody>
@@ -268,8 +266,8 @@ class NewTeamsSection extends React.Component {
             }
             { teamMembers }
             <tbody>
-              <td className="add-member" colSpan="3" width="50%">
-                <div className="add-member-container">
+              <td className="add-object" colSpan="3" width="50%">
+                <div className="add-object-container">
                   <Select.Async
                     name="add-member"
                     loadOptions={(input, callback) =>
@@ -294,7 +292,7 @@ class NewTeamsSection extends React.Component {
                   </div>
                 </div>
               </td>
-              <td className="add-member-label" colSpan="3" width="50%">
+              <td className="add-object-label" colSpan="3" width="50%">
                 Search by username, full name or email address
               </td>
             </tbody>
@@ -311,8 +309,8 @@ class NewTeamsSection extends React.Component {
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          {/*sectionActions*/}
-          <h1>Teams</h1>
+          <h1>Add team members to your expedition</h1>
+          <p>process breadcrumbs</p>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
@@ -323,15 +321,18 @@ class NewTeamsSection extends React.Component {
           <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
-        {/*sectionActions*/}
+        
+        <Link to={'/admin/' + expedition.get('id') }>
+          <div className="button hero">
+            Finalize your expedition!
+          </div>
+        </Link>
       </div>
     )    
   }
 }
 
 NewTeamsSection.propTypes = {
-  expedition: PropTypes.object.isRequired,
-  updateExpedition: PropTypes.func.isRequired
 }
 
 export default NewTeamsSection

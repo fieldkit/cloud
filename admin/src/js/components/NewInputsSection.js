@@ -5,7 +5,7 @@ import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'Immutable'
 import Dropdown from 'react-dropdown'
-import Select from 'react-select';
+import Select from 'react-select'
 
 class NewInputsSection extends React.Component {
   constructor (props) {
@@ -19,319 +19,263 @@ class NewInputsSection extends React.Component {
   render () {
 
     const { 
-      expedition,
-      teams,
-      members,
-      currentTeam,
-      editedTeam,
-      suggestedMembers,
-      setCurrentTeam,
-      addTeam,
-      startEditingTeam,
-      stopEditingTeam,
-      setTeamProperty,
-      setMemberProperty,
-      saveChangesToTeam,
-      clearChangesToTeam,
-      fetchSuggestedMembers,
-      addMember,
-      removeMember
+      currentExpedition,
+      documentTypes,
+      selectedDocumentType,
+      setExpeditionProperty,
+      fetchSuggestedDocumentTypes,
+      addDocumentType,
+      removeDocumentType
     } = this.props
 
-    const roleOptions = [
-      'Expedition Leader', 'Team Leader', 'Team Member'
-    ]
-
-    const teamTabs = teams
-      .map((t, i) => {
-        let className = 'team-name '
-        if (t === currentTeam) className += 'editable active '
-        if (currentTeam.get('name') === '') className += 'required '
-
-        return (
-          <li 
-            className={ className }
-            key={t.get('id')}
-            onClick={() => { 
-              if (t !== currentTeam) setCurrentTeam(t.get('id'))
-            }}
-          >
-            <ContentEditable
-              html={(() => {
-                return this.props.teams.get(i).get('name')
-                // if (!!t.get('name')) return t.get('name')
-                // else if (t.get('status') === 'new') return 'New Team Name'
-                // else return ''
-              })()}
-              disabled={t !== currentTeam}
-              onClick={(e) => {
-                if (t === currentTeam) {
-                  if (this.props.teams.get(i).get('name') === 'New Team') setTeamProperty('name', '')
-                  startEditingTeam()
-                }
-              }}
-              onBlur={(e) => {
-                if (this.props.teams.get(i).get('name') === '') setTeamProperty('name', 'New Team')
-                stopEditingTeam()
-              }}
-              onChange={(e) => {
-                setTeamProperty('name', e.target.value)
-              }}
-            />
-          </li>
-        )
-      })
-
-    const teamMembers = members
-      .map((m, i) => {
-        const inputs = m.get('inputs')
-          .map((d, j) => {
-            return <li className="tag" key={j}>{d}</li>
-          })
-
-        return (
-          <tbody key={i} onClick={() => {
-            // this.selectMember(i)
-          }}>
-            <td className="name">{m.get('name')}</td>
-            <td className="role">
-              <Dropdown
-              options={roleOptions}
-              onChange={(e) => {
-                startEditingTeam()
-                setMemberProperty(m.get('id'), 'role', e.value)
-              }}
-              value={currentTeam.getIn(['members', m.get('id'), 'role'])}
-              placeholder="Select an option"
-            />
-            </td>
-            <td className="inputs">
-              <Select
-                name="select-inputs"
-                value={this.state.inputValues[m.get('id')]}
-                multi={true}
-                options={
-                  [
-                    { value: 'ambit', label: 'Ambit Tracker' },
-                    { value: 'twitter', label: 'Twitter' },
-                    { value: 'sightings', label: 'Sighting App' }
-                  ]
-                }
-                onChange={(values) => {
-                  this.setState({
-                    ...this.state,
-                    inputValues: {
-                      ...this.state.inputValues,
-                      [m.get('id')]: values
-                    }
-                  })
-                }}
-                clearable={false}
-              />
-            </td>
-            <td className="activity">
-              <svg></svg>
-            </td>
-            <td 
-              className="remove"
-              onClick={() => {
-                startEditingTeam()
-                removeMember(m.get('id'))
-              }}
-            >  
-              <img src="/src/img/icon-remove-small.png"/>
-            </td>
-          </tbody>
-        )
-        // } else {
-        //   return (
-        //     <tbody key={i} onClick={() => {
-        //       this.unselectMember()
-        //     }}>
-        //       <td className="name" colSpan="6" width="100%">
-        //         <h2>{m.get('name')}</h2>
-        //       </td>
-        //     </tbody>
-        //   )
-        // }
-      })
-
-    const teamActionButtons = () => {
-      const actionButtons = []
-
-      if (currentTeam.get('new')) {
-        actionButtons.push(
-          <div
-            className="button secondary"
-            onClick={() => {
-              this.props.removeCurrentTeam()
-            }}
-          >
-            Cancel
-          </div>
-        )
-        actionButtons.push(
-          <div
-            className="button secondary"
-            onClick={() => {
-              this.props.saveChangesToTeam()
-            }}
-          >
-            Save New Team
-          </div>
-        )
-      } else {
-        actionButtons.push(
-          <div
-            className="button secondary"
-            onClick={() => {
-              this.props.removeCurrentTeam()
-            }}
-          >
-            Remove Team
-          </div>
-        )
-
-        if (!!currentTeam && !!editedTeam && 
-            !!editedTeam.find((val, key) => {
-              return currentTeam.get(key) !== val
-            })) {
-          actionButtons.push(
-            <div
-              className="button secondary"
-              onClick={() => {
-                this.props.saveChangesToTeam()
-              }}
-            >
-              Save Changes
-            </div>
-          )
-          if (editedTeam.get('status') !== 'new') {
-            actionButtons.push(
-              <div
-                className="button secondary"
-                onClick={() => {
-                  this.props.clearChangesToTeam()
-                }}
-              >
-                Clear Changes
-              </div>
-            )
-          }
-        }
-      }
-      return (
-        <div className="actions">
-          { actionButtons }
-        </div>
-      )
-    }
-
-    const selectedTeam = (
-      <div className="team" key={currentTeam.get('id')}>
-          { teamActionButtons() }
-          <div className="header">
-            <div className="column description">
-              <h5>Description</h5>
-              <ContentEditable
-                html={(() => {
-                  return currentTeam.get('description')
-                })()}
-                disabled={false}
-                onClick={(e) => {
-                  if (this.props.currentTeam.get('description') === 'Enter a description') setTeamProperty('description', '')
-                  startEditingTeam()
-                }}
-                onBlur={(e) => {
-                  if (this.props.currentTeam.get('description') === '') setTeamProperty('description', 'Enter a description')
-                  stopEditingTeam()
-                }}
-                onChange={(e) => { 
-                  setTeamProperty('description', e.target.value)
-                }}
-              />
-            </div>
-            <svg className="activity column">
-            </svg>
-          </div>
-          <h5>Members</h5>
-          <table className="members-list">
-            {
-              !!members && !!members.size &&
-              <tbody>
-                <td className="name">Name</td>
-                <td className="role">Role</td>
-                <td className="inputs">Inputs</td>
-                <td className="activity">Activity</td>
-                <td className="remove"></td>
-              </tbody>
-            }
-            { teamMembers }
-            <tbody>
-              <td className="add-member" colSpan="3" width="50%">
-                <div className="add-member-container">
-                  <Select.Async
-                    name="add-member"
-                    loadOptions={(input, callback) =>
-                      fetchSuggestedMembers(input, callback)
-                    }
-                    value={ currentTeam.get('selectedMember') }
-                    onChange={(val) => {
-                      setTeamProperty('selectedMember', val.value)
-                    }}
-                    clearable={false}
-                  />
-                  <div
-                    className={ "button" + (!!currentTeam.get('selectedMember') ? '' : ' disabled') }
-                    onClick={() => {
-                      if (!!currentTeam.get('selectedMember')) {
-                        startEditingTeam()
-                        addMember(currentTeam.get('selectedMember'))
-                      }
-                    }}
-                  >
-                    Add member
-                  </div>
-                </div>
-              </td>
-              <td className="add-member-label" colSpan="3" width="50%">
-                Search by username, full name or email address
-              </td>
-            </tbody>
-          </table>
-      </div>
-    ) 
-
-    const selectedTeamContainer = !teams.size ? null : (
-      <div id="selected-team" class="selected-tab">
-        { selectedTeam }
-      </div>
-    )
-
     return (
-      <div id="teams-section" className="section">
+      <div id="new-inputs-section" className="section">
         <div className="section-header">
-          {/*sectionActions*/}
-          <h1>Teams</h1>
+          <h1>Configure document types</h1>
+          <p>process breadcrumbs</p>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
         </p>
 
-        <ul id="teams-tabs" class="tabs">
-          { teamTabs }
-          <li className="team-name add" onClick={() => { addTeam() }}>+</li>
-        </ul>
-        { selectedTeamContainer }
-        {/*sectionActions*/}
+        <h5>Team recorded documents</h5>
+        <p>
+          Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. 
+        </p>
+        <table className="objects-list">
+          {
+            !!documentTypes && !!documentTypes.filter(d => {return d.get('type') === 'member'}).size &&
+            <tbody>
+              <td className="name">Name</td>
+              <td className="description">Description</td>
+              <td className="inputs">Inputs</td>
+              <td className="remove"></td>
+            </tbody>
+          }
+          { 
+            documentTypes
+              .filter(d => {return d.get('type') === 'member'}) 
+              .map((d, i) => {
+                return (
+                  <tbody key={i}>
+                    <td className="name">{d.get('name')}</td>
+                    <td className="description">{d.get('description')}</td>
+                    <td className="inputs">{
+                      d.get('inputs')
+                        .map((input, j) => {
+                          return (
+                            <span key={j}>{input}</span>
+                          )
+                        })
+                    }</td>
+                    <td 
+                      className="remove"
+                      onClick={() => {
+                        removeDocumentType(d.get('id'))
+                      }}
+                    >  
+                      <img src="/src/img/icon-remove-small.png"/>
+                    </td>
+                  </tbody>
+                )
+              })
+          }
+          <tbody>
+            <td className="add-object" colSpan="3" width="50%">
+              <div className="add-object-container">
+                <Select.Async
+                  name="add-documentType"
+                  loadOptions={(input, callback) =>
+                    fetchSuggestedDocumentTypes(input, 'member', callback)
+                  }
+                  value={ currentExpedition.getIn(['selectedDocumentType', 'member']) }
+                  onChange={(val) => {
+                    setExpeditionProperty(['selectedDocumentType', 'member'], val.value)
+                  }}
+                  clearable={false}
+                />
+                <div
+                  className={ "button" + (!!currentExpedition.getIn(['selectedDocumentType', 'member']) ? '' : ' disabled') }
+                  onClick={() => {
+                    if (!!currentExpedition.getIn(['selectedDocumentType', 'member'])) {
+                      addDocumentType(currentExpedition.getIn(['selectedDocumentType', 'member']), 'member')
+                    }
+                  }}
+                >
+                  Add Document Type
+                </div>
+              </div>
+            </td>
+            <td className="add-object-label" colSpan="3" width="50%">
+              Search by document name (e.g tweet, geolocation...)
+            </td>
+          </tbody>
+        </table>
+
+        <h5>Deployed sensor documents</h5>
+        <p>
+          Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. 
+        </p>
+        <table className="objects-list">
+          {
+            !!documentTypes && !!documentTypes.filter(d => {return d.get('type') === 'sensor'}).size &&
+            <tbody>
+              <td className="name">Name</td>
+              <td className="description">Description</td>
+              <td className="inputs">Inputs</td>
+              <td className="remove"></td>
+            </tbody>
+          }
+          { 
+            documentTypes
+              .filter(d => {return d.get('type') === 'sensor'}) 
+              .map((d, i) => {
+                return (
+                  <tbody key={i}>
+                    <td className="name">{d.get('name')}</td>
+                    <td className="description">{d.get('description')}</td>
+                    <td className="inputs">{
+                      d.get('inputs')
+                        .map((input, j) => {
+                          return (
+                            <span key={j}>{input}</span>
+                          )
+                        })
+                    }</td>
+                    <td 
+                      className="remove"
+                      onClick={() => {
+                        removeDocumentType(d.get('id'))
+                      }}
+                    >  
+                      <img src="/src/img/icon-remove-small.png"/>
+                    </td>
+                  </tbody>
+                )
+              })
+          }
+          <tbody>
+            <td className="add-object" colSpan="3" width="50%">
+              <div className="add-object-container">
+                <Select.Async
+                  name="add-documentType"
+                  loadOptions={(input, callback) =>
+                    fetchSuggestedDocumentTypes(input, 'sensor', callback)
+                  }
+                  value={ currentExpedition.getIn(['selectedDocumentType', 'sensor']) }
+                  onChange={(val) => {
+                    setExpeditionProperty(['selectedDocumentType', 'sensor'], val.value)
+                  }}
+                  clearable={false}
+                />
+                <div
+                  className={ "button" + (!!currentExpedition.getIn(['selectedDocumentType', 'sensor']) ? '' : ' disabled') }
+                  onClick={() => {
+                    if (!!currentExpedition.getIn(['selectedDocumentType', 'sensor'])) {
+                      addDocumentType(currentExpedition.getIn(['selectedDocumentType', 'sensor']), 'sensor')
+                    }
+                  }}
+                >
+                  Add Document Type
+                </div>
+              </div>
+            </td>
+            <td className="add-object-label" colSpan="3" width="50%">
+              Search by document name (e.g tweet, geolocation...)
+            </td>
+          </tbody>
+        </table>
+
+        <h5>Social media documents</h5>
+        <p>
+          Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. 
+        </p>
+        <table className="objects-list">
+          {
+            !!documentTypes && !!documentTypes.filter(d => {return d.get('type') === 'social'}).size &&
+            <tbody>
+              <td className="name">Name</td>
+              <td className="description">Description</td>
+              <td className="inputs">Inputs</td>
+              <td className="remove"></td>
+            </tbody>
+          }
+          { 
+            documentTypes
+              .filter(d => {return d.get('type') === 'social'}) 
+              .map((d, i) => {
+                return (
+                  <tbody key={i}>
+                    <td className="name">{d.get('name')}</td>
+                    <td className="description">{d.get('description')}</td>
+                    <td className="inputs">{
+                      d.get('inputs')
+                        .map((input, j) => {
+                          return (
+                            <span key={j}>{input}</span>
+                          )
+                        })
+                    }</td>
+                    <td 
+                      className="remove"
+                      onClick={() => {
+                        removeDocumentType(d.get('id'))
+                      }}
+                    >  
+                      <img src="/src/img/icon-remove-small.png"/>
+                    </td>
+                  </tbody>
+                )
+              })
+          }
+          <tbody>
+            <td className="add-object" colSpan="3" width="50%">
+              <div className="add-object-container">
+                <Select.Async
+                  name="add-documentType"
+                  loadOptions={(input, callback) =>
+                    fetchSuggestedDocumentTypes(input, 'social', callback)
+                  }
+                  value={ currentExpedition.getIn(['selectedDocumentType', 'social']) }
+                  onChange={(val) => {
+                    setExpeditionProperty(['selectedDocumentType', 'social'], val.value)
+                  }}
+                  clearable={false}
+                />
+                <div
+                  className={ "button" + (!!currentExpedition.getIn(['selectedDocumentType', 'social']) ? '' : ' disabled') }
+                  onClick={() => {
+                    if (!!currentExpedition.getIn(['selectedDocumentType', 'social'])) {
+                      addDocumentType(currentExpedition.getIn(['selectedDocumentType', 'social']), 'social')
+                    }
+                  }}
+                >
+                  Add Document Type
+                </div>
+              </div>
+            </td>
+            <td className="add-object-label" colSpan="3" width="50%">
+              Search by document name (e.g tweet, geolocation...)
+            </td>
+          </tbody>
+        </table>
+
+        <p className="status">
+        </p>
+
+        <Link to="/admin/new-expedition/teams">
+          <div className="button hero">
+            Next step: Assemble a team
+          </div>
+        </Link>
+
       </div>
-    )    
+    )
+
   }
 }
 
 NewInputsSection.propTypes = {
-  expedition: PropTypes.object.isRequired,
-  updateExpedition: PropTypes.func.isRequired
 }
 
 export default NewInputsSection

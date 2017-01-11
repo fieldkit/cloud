@@ -22,7 +22,6 @@ import Root from './components/Root'
 import LandingPage from './components/LandingPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
 
-import DashboardSection from './components/DashboardSection'
 import UploaderSection from './components/UploaderSection'
 import SourcesSection from './components/SourcesSection'
 import EditorSection from './components/EditorSection'
@@ -34,6 +33,7 @@ import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
+import DashboardSectionContainer from './containers/DashboardSectionContainer'
 import NewGeneralSettingsContainer from './containers/NewGeneralSettingsContainer'
 import NewInputsContainer from './containers/NewInputsContainer'
 import NewTeamsContainer from './containers/NewTeamsContainer'
@@ -99,17 +99,26 @@ const routes = (
       <IndexRoute component={ProfileSection}/>
       <Route path="profile" component={ProfileSection}/>
 
-      <Route path="new-expedition">
+      <Route 
+        path="new-expedition" 
+        onEnter={() => store.dispatch(actions.initNewExpeditionSection())}
+      >
         <IndexRoute component={NewGeneralSettingsContainer}/>
         <Route path="general-settings" component={NewGeneralSettingsContainer}/>
         <Route path="inputs" component={NewInputsContainer}/>
-        <Route path="teams" component={NewTeamsContainer}/>
+        <Route
+          path="teams"
+          component={NewTeamsContainer}
+          onEnter={() => store.dispatch(actions.initNewTeamsSection())}
+        />
         <Route path="outputs" component={NewOutputsContainer}/>
       </Route>
 
-      <Route path=":expeditionID">
-        <IndexRoute component={DashboardSection}/>
-        <Route path="dashboard" component={DashboardSection}/>
+      <Route path=":expeditionID" onEnter={(state) => {
+        store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
+      }}>
+        <IndexRoute component={DashboardSectionContainer}/>
+        <Route path="dashboard" component={DashboardSectionContainer}/>
         <Route path="uploader" component={UploaderSection}/>
         <Route path="sources" component={SourcesSection}/>
         <Route path="teams" 

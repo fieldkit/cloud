@@ -24,7 +24,6 @@ class TeamsSection extends React.Component {
       members,
       currentTeam,
       editedTeam,
-      suggestedMembers,
       setCurrentTeam,
       addTeam,
       startEditingTeam,
@@ -255,7 +254,7 @@ class TeamsSection extends React.Component {
             </svg>
           </div>
           <h5>Members</h5>
-          <table className="members-list">
+          <table className="objects-list">
             {
               !!members && !!members.size &&
               <tbody>
@@ -268,8 +267,8 @@ class TeamsSection extends React.Component {
             }
             { teamMembers }
             <tbody>
-              <td className="add-member" colSpan="3" width="50%">
-                <div className="add-member-container">
+              <td className="add-object" colSpan="3" width="50%">
+                <div className="add-object-container">
                   <Select.Async
                     name="add-member"
                     loadOptions={(input, callback) =>
@@ -294,7 +293,7 @@ class TeamsSection extends React.Component {
                   </div>
                 </div>
               </td>
-              <td className="add-member-label" colSpan="3" width="50%">
+              <td className="add-object-label" colSpan="3" width="50%">
                 Search by username, full name or email address
               </td>
             </tbody>
@@ -331,7 +330,6 @@ class TeamsSection extends React.Component {
 
 TeamsSection.propTypes = {
   expedition: PropTypes.object.isRequired,
-  updateExpedition: PropTypes.func.isRequired
 }
 
 export default TeamsSection

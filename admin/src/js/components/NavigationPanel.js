@@ -7,9 +7,10 @@ class NavigationPanel extends React.Component {
   render () {
     const { expeditionID, expeditions, disconnect } = this.props
 
-    const items = expeditions.map(expedition => {
-      return <NavigationItem {...expedition} active={expeditionID === expedition.id} key={expedition.id} />
-    })
+    const items = expeditions
+      .map(expedition => {
+        return <NavigationItem expedition={expedition} active={expeditionID === expedition.get('id')} key={expedition.get('id')} />
+      })
 
     return (
       <div id="header">

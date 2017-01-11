@@ -1,6 +1,6 @@
 
 import { connect } from 'react-redux'
-import NewGeneralSettingsSection from '../components/NewGeneralSettingsSection'
+import DashboardSection from '../components/DashboardSection'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
@@ -8,6 +8,8 @@ const mapStateToProps = (state, ownProps) => {
   const expeditions = state.expeditions
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentExpedition = expeditions.getIn(['expeditions', currentExpeditionID])
+
+  console.log(state.expeditions.toJS(), currentExpeditionID, currentExpedition)
 
   return {
     ...ownProps,
@@ -19,9 +21,6 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
     setExpeditionProperty (key, value) {
       return dispatch(actions.setExpeditionProperty(key, value))
-    },
-    setExpeditionPreset (type) {
-      return dispatch(actions.setExpeditionPreset(type))
     }
     // updateExpedition (expedition) {
     //   return dispatch(actions.updateExpedition(expedition))
@@ -29,9 +28,9 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
   }
 }
 
-const NewGeneralSettingsContainer = connect(
+const DashboardSectionContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewGeneralSettingsSection)
+)(DashboardSection)
 
-export default NewGeneralSettingsContainer
+export default DashboardSectionContainer

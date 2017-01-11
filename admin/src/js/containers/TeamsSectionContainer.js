@@ -26,7 +26,6 @@ const mapStateToProps = (state, ownProps) => {
   }) : null
 
   const editedTeam = expeditions.get('editedTeam')
-  const suggestedMembers = expeditions.get('suggestedMembers')
 
   return {
     ...ownProps,
@@ -34,20 +33,12 @@ const mapStateToProps = (state, ownProps) => {
     teams,
     members,
     currentTeam,
-    // currentMember,
     editedTeam,
-    suggestedMembers,
-    // expedition,
-    // currentExpedition: expeditions.getIn('expeditions', currentExpeditionID),
-    // teamsID
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
-    updateExpedition (expedition) {
-      return dispatch(actions.updateExpedition(expedition))
-    },
     addTeam () {
       return dispatch(actions.addTeam())
     },
