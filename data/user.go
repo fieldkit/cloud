@@ -38,15 +38,13 @@ func compareHashAndPassword(hashedPassword []byte, password string) ([]byte, err
 }
 
 type User struct {
-	ID                    id.ID     `bson:"_id" json:"id"`
-	Email                 string    `bson:"email" json:"email"`
-	Username              string    `bson:"username" json:"username"`
-	FirstName             string    `bson:"first_name" json:"first_name,omitempty"`
-	LastName              string    `bson:"last_name" json:"last_name,omitempty"`
-	Password              []byte    `bson:"password" json:"-"`
-	Valid                 bool      `bson:"valid" json:"valid"`
-	ValidationToken       id.ID     `bson:"validation_token" json:"-"`
-	ValidationTokenExpire time.Time `bson:"validation_token_expire" json:"-"`
+	ID        id.ID  `db:"id" json:"-"`
+	Username  string `db:"username" json:"username"`
+	Email     string `db:"email" json:"email"`
+	Password  []byte `db:"password" json:"-"`
+	FirstName string `db:"first_name" json:"first_name,omitempty"`
+	LastName  string `db:"last_name" json:"last_name,omitempty"`
+	Valid     bool   `db:"valid" json:"valid"`
 }
 
 func NewUser(email, username, password string) (*User, error) {
@@ -55,17 +53,10 @@ func NewUser(email, username, password string) (*User, error) {
 		return nil, err
 	}
 
-	validationToken, err := id.New()
-	if err != nil {
-		return nil, err
-	}
-
 	u := &User{
-		ID:                    userID,
-		Email:                 email,
-		Username:              username,
-		ValidationToken:       validationToken,
-		ValidationTokenExpire: time.Now().Add(8 * time.Hour),
+		ID:       userID,
+		Username: username,
+		Email:    email,
 	}
 
 	if err := u.SetPassword(password); err != nil {
@@ -100,4 +91,23 @@ func (u *User) CheckPassword(password string) error {
 	}
 
 	return nil
+}
+
+type ValidationToken struct {
+	ID      id.ID     `db:"id"`
+	UserID  id.ID     `db:"user_id"`
+	Expires time.Time `db:"expires"`
+}
+
+func NewValidationToken(userID id.ID) (*ValidationToken, error) {
+	validationTokenID, err := id.New()
+	if err != nil {
+		return nil, err
+	}
+
+	return &ValidationToken{
+		ID:      validationTokenID,
+		UserID:  userID,
+		Expires: time.Now().Add(8 * time.Hour),
+	}, nil
 }
