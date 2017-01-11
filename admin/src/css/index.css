@@ -255,13 +255,21 @@ div.selected-tab {
     #header {
       width: 18.8%;
       min-height: calc(100vh - 50px);
-      background-color: #DFDFCF;
       display: block;
       padding-bottom: 50px;
-      background-image: url(/src/img/bkg.jpg);
+      position: relative;
     }
 
+      #header div.background {
+        z-index: 0;
+        position: fixed;
+        width: 18.8%;
+        height: 100%;
+        background-image: url(/src/img/bkg.jpg);
+      }
+
       #logo {
+        position: relative;
         display: flex;
         justify-content: space-between;
         padding: 0 1.5vw;
@@ -288,13 +296,21 @@ div.selected-tab {
             #logo a:last-child img {
             }
 
-      #navigation {
+      .project {
         padding: 1.5vw 1.5vw;
         position: relative;
         margin-top: 40px;
       }
 
-        #navigation::before {
+        .project:last-child {
+          padding-bottom: 0;
+        }
+
+        .project:not(:nth-child(3)) {
+          margin-top: 0px;
+        }
+
+        .project::before {
             content: "";
             display: block;
             height: 100%;
@@ -306,45 +322,88 @@ div.selected-tab {
             mix-blend-mode: multiply;
         }
 
-        #navigation ul.expeditions {
+          .project .project-name {
+            position: relative;
+            background-color: rgba(100,0,50,0.3);     
+            padding: 1.5vw;
+            margin: -1.5vw 0 2.5vw -1.5vw;
+            width: 100%;
+          }
+            .project .project-name h3{
+              color: white;
+              font-size: 11px;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 0;
+            }
+
+        .project ul.expeditions {
           position: relative;
           list-style: none;
           padding: 0;
           margin: 0;
           margin-top: 10px;
           font-size: 13px;
+          padding-bottom: 40px;
         }
 
-          #navigation ul.expeditions li.new-expedition h4 span{
-            border-radius: 3px;
-            padding: 0px 5px 4px;
-            background-color: #D0462C;
-            margin-left: 5px;
+          .project ul.expeditions li h4 {
+            font-weight: normal;
           }
 
-        #navigation ul.sections {
+            .project ul.expeditions li.new-expedition {
+              margin-top: 30px;
+            }
+
+              .project ul.expeditions li.new-expedition h4 {
+                border-radius: 3px;
+                background-color: rgba(100,0,50,0.2);  
+                font-size: 13px;
+                font-weight: normal;
+                margin-left: 0;
+                padding: 10px 9px;
+                width: 100%;
+                border: 1px solid rgba(100,0,50,0.8);
+                display: inline;
+                color: rgb(255,220,200);
+              }
+
+/*            .project ul.expeditions li.new-expedition h4 span {
+              border-radius: 3px;
+              padding: 0px 5px 4px;
+              background-color: #D0462C;
+              margin-left: 5px;
+            }*/
+
+        .project ul.sections {
           margin-bottom: 20px;
           list-style: none;
           padding: 0 0 0 10px;
         }
 
-          #navigation ul.sections li {
+          .project ul.sections li {
             margin-bottom: 5px;
           }
-
-          #navigation ul.sections li:first-child {
+/*
+          .project ul.sections li:first-child {
             background-color: #D0462C;
             width: auto;
             display: inline-block;
             padding: 2px 10px;
             margin-left: -10px;
             border-radius: 3px;
-          }
+          }*/
 
 
-        #navigation a {
+        .project a {
           color: white;
         }
+
+          .project ul.sections a {
+            color: rgb(255,220,200);
+            letter-spacing: 0.05em;
+          }
 
       .page .page-content {
         width: 65.6%;

@@ -38,10 +38,9 @@ class AdminPage extends React.Component {
       modal,
       cancelAction,
       saveChangesAndResume,
-      expeditions
+      expeditions,
+      projects
     } = this.props
-
-    // const { expeditions } = this.state
 
     const modalProps = {
       modal,
@@ -62,7 +61,7 @@ class AdminPage extends React.Component {
     return (
       <div id="admin-page" className="page">
         { modalComponent() }
-        <NavigationPanel {...params} expeditions={expeditions} disconnect={disconnect} />
+        <NavigationPanel {...params} expeditions={expeditions} projects={projects} disconnect={disconnect} />
         <div className="page-content">
           <BreadCrumbs {...location} />
           {children}
