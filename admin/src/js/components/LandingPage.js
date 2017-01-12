@@ -1,6 +1,8 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 
+import '../../scss/app.scss'
+
 class LandingPage extends React.Component {
   constructor (props) {
     super(props)
