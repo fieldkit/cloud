@@ -327,6 +327,10 @@ const expeditionReducer = (state = initialState, action) => {
       return state
         .set('currentExpeditionID', expeditionID)
         .setIn(
+          ['projects', state.get('currentProjectID'), 'expeditions'],
+          state.getIn(['projects', state.get('currentProjectID'), 'expeditions']).push(expeditionID)
+        )
+        .setIn(
           ['expeditions', expeditionID], 
           I.fromJS({
             id: expeditionID,
