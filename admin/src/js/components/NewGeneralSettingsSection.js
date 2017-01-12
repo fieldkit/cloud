@@ -17,7 +17,6 @@ class NewGeneralSettingsSection extends React.Component {
   }
 
   render () {
-
     const {
       currentProjectID,
       currentExpedition,
@@ -40,9 +39,18 @@ class NewGeneralSettingsSection extends React.Component {
         </p>
         <div className="columns-container">
           <div className="main-input-container">
-            <input type="text" value={currentExpedition.get('name')} onChange={(e) => {
-              setExpeditionProperty(['name'], e.target.value)
-            }}/>
+            <input 
+              type="text"
+              value={currentExpedition.get('name')}
+              onFocus={(e) => {
+                if (currentExpedition.get('name') === 'New Expedition') {
+                  setExpeditionProperty(['name'], '')
+                }
+              }}
+              onChange={(e) => {
+                setExpeditionProperty(['name'], e.target.value)
+              }}
+            />
             <p className="error"></p>
           </div>
           <p className="input-description">
@@ -51,19 +59,26 @@ class NewGeneralSettingsSection extends React.Component {
         </div>
 
         <p className="input-label">
-          Pick a URL for the visualization page:
+          Your expedition will be available at the following address:
         </p>
-        <div className="columns-container">
-          <div className="main-input-container">
-            <input type="text" value={'fieldkit.org/' + currentExpedition.get('id')} onChange={(e) => {
-              setExpeditionProperty(['id'], e.target.value.slice(13))
-            }}/>
-            <p className="error"></p>
+
+        <p className="intro">
+          {'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id')}
+        </p>
+
+        {/*
+          <div className="columns-container">
+            <div className="main-input-container">
+              <input type="text" value={'fieldkit.org/' + currentExpedition.get('id')} onChange={(e) => {
+                setExpeditionProperty(['id'], e.target.value.slice(13))
+              }}/>
+              <p className="error"></p>
+            </div>
+            <p className="input-description">
+              Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+            </p>
           </div>
-          <p className="input-description">
-            Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
-          </p>
-        </div>
+        */}
 
         <p className="input-label">
           Describe your project:
@@ -73,6 +88,11 @@ class NewGeneralSettingsSection extends React.Component {
             <textarea
               rows="4"
               cols="50"
+              onFocus={(e) => {
+                if (currentExpedition.get('description') === 'Enter a description') {
+                  setExpeditionProperty(['description'], '')
+                }
+              }}
               onChange={e => {
                 setExpeditionProperty(['description'], e.target.value)
               }}
@@ -85,62 +105,64 @@ class NewGeneralSettingsSection extends React.Component {
           </p>
         </div>
 
-        <p className="input-label">
-          Do you have an idea in mind? You can select one of these presets:
-        </p>
-        <div className="columns-container">
-          <ul className="main-input-container">
-            <li
-              className={ currentExpedition.get('selectedPreset') === 'rookie' ? 'selected' : ''}
-              onClick={() => {
-                setExpeditionPreset('rookie')
-              }}
-            >
-              <h2>
-                Rookie expedition
-              </h2>
-              <p>
-                Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
-              </p>
-            </li>
-            <li
-              className={ currentExpedition.get('selectedPreset') === 'advanced' ? 'selected' : ''}
-              onClick={() => {
-                setExpeditionPreset('advanced')
-              }}
-            >
-              <h2>
-                Advanced expedition
-              </h2>
-              <p>
-                Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
-              </p>
-            </li>
-            <li
-              className={ currentExpedition.get('selectedPreset') === 'pro' ? 'selected' : ''}
-              onClick={() => {
-                setExpeditionPreset('pro')
-              }}
-            >
-              <h2>
-                Start from scratch
-              </h2>
-              <p>
-                Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
-              </p>
-            </li>
-          </ul>
-          <p className="input-description">
-            Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+        {/*
+          <p className="input-label">
+            Do you have an idea in mind? You can select one of these presets:
           </p>
-        </div>
+          <div className="columns-container">
+            <ul className="main-input-container">
+              <li
+                className={ currentExpedition.get('selectedPreset') === 'rookie' ? 'selected' : ''}
+                onClick={() => {
+                  setExpeditionPreset('rookie')
+                }}
+              >
+                <h2>
+                  Rookie expedition
+                </h2>
+                <p>
+                  Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+                </p>
+              </li>
+              <li
+                className={ currentExpedition.get('selectedPreset') === 'advanced' ? 'selected' : ''}
+                onClick={() => {
+                  setExpeditionPreset('advanced')
+                }}
+              >
+                <h2>
+                  Advanced expedition
+                </h2>
+                <p>
+                  Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+                </p>
+              </li>
+              <li
+                className={ currentExpedition.get('selectedPreset') === 'pro' ? 'selected' : ''}
+                onClick={() => {
+                  setExpeditionPreset('pro')
+                }}
+              >
+                <h2>
+                  Start from scratch
+                </h2>
+                <p>
+                  Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+                </p>
+              </li>
+            </ul>
+            <p className="input-description">
+              Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien.
+            </p>
+          </div>
+        */}
 
         <p className="status">
         </p>
 
         <Link to={'/admin/' + currentProjectID + '/new-expedition/inputs'}>
           <div className="button hero">
-            Next step: configuring document types
+            Next step: configuring data inputs
           </div>
         </Link>
 

@@ -75,13 +75,15 @@ div.button {
   border-radius: 3px;
   background-color: #D0462C;
   color: white;
-  padding: 0px 8px;
+  padding: 0 8px;
+  height: 36px;
   text-transform: uppercase;
   font-weight: 700;
   font-size: 10px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-align: center;
   cursor: pointer;
+  line-height: 36px;
 }
 
   div.button.disabled {
@@ -476,6 +478,7 @@ div.selected-tab {
       }
 
   table.objects-list {
+    width: 100%;
   }
 
     table.objects-list tbody:not(:first-child) {
@@ -502,6 +505,7 @@ div.selected-tab {
     #teams-section table.objects-list .remove {
       width: 5%;
       cursor: pointer;
+      padding-right: 0;
     }
 
     #new-inputs-section table.objects-list .name {
@@ -516,9 +520,15 @@ div.selected-tab {
       width: 35%;
     }
 
+      #new-inputs-section table.objects-list .inputs li:not(:last-child) {
+        margin-bottom: 20px;
+      }
+
     #new-inputs-section table.objects-list .remove {
       width: 5%;
       cursor: pointer;
+      text-align: right;
+      padding-right: 0;
     }
     
     table.objects-list td.add-object {}
