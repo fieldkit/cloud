@@ -66,6 +66,7 @@
     "fs": "0.0.2",
     "immutable": "^3.8.1",
     "isomorphic-fetch": "^2.2.1",
+    "js-base64": "^2.1.9",
     "json-loader": "^0.5.4",
     "json5": "^0.5.1",
     "json5-loader": "^0.6.0",

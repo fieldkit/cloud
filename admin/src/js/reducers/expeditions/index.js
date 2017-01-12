@@ -41,7 +41,8 @@ export const initialState = I.fromJS({
       teams: [],
       selectedDocumentType: {},
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     },
     'okavango_16': {
       id: 'okavango_16',
@@ -57,7 +58,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     },
     'bike_16': {
       id: 'bike_16',
@@ -72,7 +74,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     },
     'cuito_16': {
       id: 'cuito_16',
@@ -88,7 +91,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     }
   },
   documentTypes: {
@@ -97,6 +101,7 @@ export const initialState = I.fromJS({
       type: 'member',
       name: 'Member Geolocation',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Ambit wristband']
     },
     'sighting': {
@@ -104,6 +109,7 @@ export const initialState = I.fromJS({
       type: 'member',
       name: 'Sighting',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Uploader']
     },
     'tweet': {
@@ -111,14 +117,16 @@ export const initialState = I.fromJS({
       type: 'social',
       name: 'Tweet',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Twitter account']
     },
-    'sensorReading': {
-      id: 'sensorReading',
+    'conservifyModule': {
+      id: 'conservifyModule',
       type: 'sensor',
-      name: 'Sensor reading',
+      name: 'Conservify Module',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      inputs: ['Conservify water quality sensor']
+      setupType: 'token', 
+      inputs: ['']
     }
   },
   teams: {
@@ -344,7 +352,8 @@ const expeditionReducer = (state = initialState, action) => {
               sensor: null
             },
             selectedPreset: null,
-            documentTypes: {}
+            documentTypes: {},
+            token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
           })
         )
     }
