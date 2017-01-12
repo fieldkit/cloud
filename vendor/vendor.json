@@ -3,28 +3,28 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "eBz8je8VaROXaGyKjtxFIhm5gaY=",
+			"checksumSHA1": "U9tvXTtjMb28Yf9vFPWwvlQpyPw=",
 			"path": "github.com/O-C-R/auth/id",
-			"revision": "a3d2273b6cbf2984380430232d115feebfbc6020",
-			"revisionTime": "2016-09-19T16:03:58Z"
+			"revision": "59b363626eab103c3b52c64996124b25c817c6b1",
+			"revisionTime": "2016-12-08T17:59:49Z"
 		},
 		{
 			"checksumSHA1": "NxV/T2+VwHzOljtrj2OywuMrsAU=",
 			"path": "github.com/O-C-R/auth/session",
-			"revision": "177a305222639398abfe022ddd092e9af0f074f2",
-			"revisionTime": "2016-12-01T20:07:15Z"
+			"revision": "59b363626eab103c3b52c64996124b25c817c6b1",
+			"revisionTime": "2016-12-08T17:59:49Z"
 		},
 		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
 			"path": "github.com/garyburd/redigo/internal",
-			"revision": "d7de57ceb51b029d5c5a61e26587f672e2834178",
-			"revisionTime": "2016-11-22T18:32:06Z"
+			"revision": "8c052d82153967815d9093a7e9d3e7fd2e554861",
+			"revisionTime": "2017-01-01T00:10:20Z"
 		},
 		{
-			"checksumSHA1": "6glXtCPWNk5uwBFXXitClu/7J8Y=",
+			"checksumSHA1": "pofHSvosTrIPzQyddaLX5wy0ehI=",
 			"path": "github.com/garyburd/redigo/redis",
-			"revision": "d7de57ceb51b029d5c5a61e26587f672e2834178",
-			"revisionTime": "2016-11-22T18:32:06Z"
+			"revision": "8c052d82153967815d9093a7e9d3e7fd2e554861",
+			"revisionTime": "2017-01-01T00:10:20Z"
 		},
 		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
@@ -33,52 +33,88 @@
 			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
+			"checksumSHA1": "I+GdpjQMP4tAYwF4CAklylRWeYI=",
+			"path": "github.com/gorilla/handlers",
+			"revision": "3a5767ca75ece5f7f1440b1d16975247f8d8b221",
+			"revisionTime": "2016-12-06T05:51:44Z"
+		},
+		{
 			"checksumSHA1": "urMd7A9QPAJYY0GZJL9qBhlUmD8=",
 			"path": "github.com/gorilla/mux",
 			"revision": "757bef944d0f21880861c2dd9c871ca543023cba",
 			"revisionTime": "2016-09-20T23:08:13Z"
 		},
 		{
+			"checksumSHA1": "JnN7V2ff27U0k2Xuc1RJSa520QQ=",
+			"path": "github.com/lib/pq",
+			"revision": "8df6253d1317616f36b0c3740eb30c239a7372cb",
+			"revisionTime": "2017-01-03T19:20:09Z"
+		},
+		{
+			"checksumSHA1": "xppHi82MLqVx1eyQmbhTesAEjx8=",
+			"path": "github.com/lib/pq/oid",
+			"revision": "8df6253d1317616f36b0c3740eb30c239a7372cb",
+			"revisionTime": "2017-01-03T19:20:09Z"
+		},
+		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",
 			"path": "golang.org/x/crypto/bcrypt",
-			"revision": "ede567c8e044a5913dad1d1af3696d9da953104c",
-			"revisionTime": "2016-11-04T19:41:44Z"
+			"revision": "7c6cc321c680f03b9ef0764448e780704f486b51",
+			"revisionTime": "2017-01-09T14:19:37Z"
 		},
 		{
 			"checksumSHA1": "JsJdKXhz87gWenMwBeejTOeNE7k=",
 			"path": "golang.org/x/crypto/blowfish",
-			"revision": "ede567c8e044a5913dad1d1af3696d9da953104c",
-			"revisionTime": "2016-11-04T19:41:44Z"
+			"revision": "7c6cc321c680f03b9ef0764448e780704f486b51",
+			"revisionTime": "2017-01-09T14:19:37Z"
 		},
 		{
-			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
-			"path": "gopkg.in/mgo.v2",
-			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
-			"revisionTime": "2016-08-18T02:01:20Z"
+			"checksumSHA1": "3mZmNDReTOu5bNZsEfA7azZJYKo=",
+			"path": "upper.io/db.v2",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
 		},
 		{
-			"checksumSHA1": "YsB2DChSV9HxdzHaKATllAUKWSI=",
-			"path": "gopkg.in/mgo.v2/bson",
-			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
-			"revisionTime": "2016-08-18T02:01:20Z"
+			"checksumSHA1": "XC0jF/mQj9oXoEepzn4gFQLqwcM=",
+			"path": "upper.io/db.v2/internal/cache",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
 		},
 		{
-			"checksumSHA1": "XQsrqoNT1U0KzLxOFcAZVvqhLfk=",
-			"path": "gopkg.in/mgo.v2/internal/json",
-			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
-			"revisionTime": "2016-08-18T02:01:20Z"
+			"checksumSHA1": "8dZt1RYgzUgPFs0xuEMn14W5aiU=",
+			"path": "upper.io/db.v2/internal/cache/hashstructure",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
 		},
 		{
-			"checksumSHA1": "LEvMCnprte47qdAxWvQ/zRxVF1U=",
-			"path": "gopkg.in/mgo.v2/internal/sasl",
-			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
-			"revisionTime": "2016-08-18T02:01:20Z"
+			"checksumSHA1": "a4NQmsCbvFdvPfLJpxhsfFnE0OI=",
+			"path": "upper.io/db.v2/internal/sqladapter",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
 		},
 		{
-			"checksumSHA1": "+1WDRPaOphSCmRMxVPIPBV4aubc=",
-			"path": "gopkg.in/mgo.v2/internal/scram",
-			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
-			"revisionTime": "2016-08-18T02:01:20Z"
+			"checksumSHA1": "bpDOoMnbo1LaQwjBDzt/LlfSkpE=",
+			"path": "upper.io/db.v2/internal/sqladapter/exql",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
+		},
+		{
+			"checksumSHA1": "9BBZRhHkGs7jb3Yozyyri/+NHCg=",
+			"path": "upper.io/db.v2/lib/reflectx",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
+		},
+		{
+			"checksumSHA1": "tlwanP1OYlD6C1Tz/8O/oqr/Qqs=",
+			"path": "upper.io/db.v2/lib/sqlbuilder",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
+		},
+		{
+			"checksumSHA1": "lkeTFrseXhqEC3QZxU8Z9q6+P9U=",
+			"path": "upper.io/db.v2/postgresql",
+			"revision": "ec8e2bd60a5839b89c0144f6de395e2f6fa75c77",
+			"revisionTime": "2017-01-12T18:56:57Z"
 		}
 	],
 	"rootPath": "github.com/O-C-R/fieldkit"

@@ -53,8 +53,8 @@ func (r *byteReader) Read(p []byte) (int, error) {
 }
 
 type MessageType struct {
-	ID     uint64   `json:id`
-	Fields []string `json:fields`
+	ID     uint64   `json:"id"`
+	Fields []string `json:"fields"`
 }
 
 // FieldkitBinaryReader implements the MessageReader interface.

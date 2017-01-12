@@ -38,7 +38,7 @@ func compareHashAndPassword(hashedPassword []byte, password string) ([]byte, err
 }
 
 type User struct {
-	ID        id.ID  `db:"id" json:"-"`
+	ID        id.ID  `db:"id" json:"id"`
 	Username  string `db:"username" json:"username"`
 	Email     string `db:"email" json:"email"`
 	Password  []byte `db:"password" json:"-"`
