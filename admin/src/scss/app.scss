@@ -1,5 +1,30 @@
-$color : blue;
+@import 'variables';
 
-html {
-	color: $color !important;
+@import 'utils/reset';
+@import 'utils/align';
+
+@import 'components/type';
+@import 'components/button';
+
+@import 'pages/landing';
+
+* {
+	text-rendering: optimizeLegibility;
+	box-sizing: border-box;
+}
+
+html, body {
+	background-color: white;
+	color: $color-dark;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+	font-size: 14px;
+	line-height: 25px;
+	min-width: 1024px;
+	height: 100%;
+	width: 100%;
+}
+
+#fieldkit, #root {
+	height: 100%;
+	width: 100%;
 }

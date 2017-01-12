@@ -13,21 +13,49 @@ class LandingPage extends React.Component {
 
   render () {
     return (
-      <div id="landing-page" className="page">
-        <div 
-          id="auth-panel"
-          style={{
-            position: 'absolute',
-            right: 0
-          }}
-        >
-          <Link to={'/signin'}>Sign in</Link>
-          <Link to={'/signup'}>Sign up</Link>
-        </div>
+      <div id="landing-page" className="page landing-page" style={{'background-image':'url(/src/img/fieldkit-background.jpg)'}}>
+        <nav className="navigation">
+          <ul className="navigation_links">
+            <li className="navigation_item">
+              <a href="" className="navigation_link">About</a>
+            </li> 
+            <li className="navigation_item">
+              <a href="" className="navigation_link">Gallery</a>
+            </li>
+            <li className="navigation_item">
+              <a href="" className="navigation_link">Log in</a>
+            </li>
+            <li className="navigation_item">
+              <a href="" className="navigation_link sign-up">Join us</a>
+            </li>
+          </ul>
+        </nav>
+
         <div className="content">
-          <h1>FieldKit</h1>
-          <Link to={'/signup'}>Get Started</Link>
+          <h1 className="content_title">FieldKit</h1>
+          <p className="content_sub">A one-click open platform for field researchers and explorers</p>
+          <a href="#" className="content_join">Join Us</a>
         </div>
+
+        <footer className="footer">
+          <ul className="footer_logos">
+            <li className="footer_logo">
+              <a href="http://conservify.org/" target="_blank" className="footer_logo_link">
+                <img src="/src/img/conservify_logo.png" alt="" className="footer_logo_img"/>
+              </a>
+            </li>
+            <li className="footer_logo">
+              <a href="http://www.nationalgeographic.com/" target="_blank" className="footer_logo_link">
+                <img src="/src/img/national-geographic-logo.png" alt="" className="footer_logo_img"/>
+              </a>
+            </li>
+            <li className="footer_logo">
+              <a href="https://ocr.nyc/" target="_blank" className="footer_logo_link">
+                <img src="/src/img/ocr_logo.jpg" alt="" className="footer_logo_img"/>
+              </a>
+            </li>
+          </ul>
+        </footer>
       </div>
     )
   }
