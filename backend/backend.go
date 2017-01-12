@@ -174,6 +174,24 @@ func (b *Backend) AddProjectWithOwner(project *data.Project, ownerID id.ID) erro
 	}))
 }
 
+func (b *Backend) ProjectSlugInUse(slug string) (bool, error) {
+	n, err := b.database.Collection("admin.project").Find(db.Cond{"slug": slug}).Count()
+	if err != nil {
+		return false, Err(err)
+	}
+
+	return n > 0, nil
+}
+
+func (b *Backend) Projects() ([]*data.Project, error) {
+	projects := []*data.Project{}
+	if err := b.database.Collection("admin.project").Find().All(&projects); err != nil {
+		return nil, Err(err)
+	}
+
+	return projects, nil
+}
+
 func (b *Backend) ProjectByID(projectID id.ID) (*data.Project, error) {
 	project := &data.Project{}
 	if err := b.database.Collection("admin.project").Find(projectID).One(project); err != nil {
@@ -215,6 +233,15 @@ func (b *Backend) AddExpedition(expedition *data.Expedition) error {
 	return Err(err)
 }
 
+func (b *Backend) ExpeditionSlugInUse(projectID id.ID, slug string) (bool, error) {
+	n, err := b.database.Collection("admin.expedition").Find(db.Cond{"project_id": projectID, "slug": slug}).Count()
+	if err != nil {
+		return false, Err(err)
+	}
+
+	return n > 0, nil
+}
+
 func (b *Backend) ExpeditionByID(expeditionID id.ID) (*data.Expedition, error) {
 	expedition := &data.Expedition{}
 	if err := b.database.Collection("admin.expedition").Find(expeditionID).One(expedition); err != nil {
@@ -222,6 +249,19 @@ func (b *Backend) ExpeditionByID(expeditionID id.ID) (*data.Expedition, error) {
 	}
 
 	return expedition, nil
+}
+
+func (b *Backend) ExpeditionsByProjectSlug(projectSlug string) ([]*data.Expedition, error) {
+	expeditions := []*data.Expedition{}
+	if err := b.database.Iterator(`
+		SELECT e.* FROM admin.expedition AS e
+			JOIN admin.project AS p ON p.id = e.project_id
+				WHERE p.slug = $1
+		`, projectSlug).All(&expeditions); err != nil {
+		return nil, Err(err)
+	}
+
+	return expeditions, nil
 }
 
 func (b *Backend) ExpeditionByProjectSlugAndSlug(projectSlug, slug string) (*data.Expedition, error) {
@@ -239,4 +279,68 @@ func (b *Backend) ExpeditionByProjectSlugAndSlug(projectSlug, slug string) (*dat
 
 func (b *Backend) DeleteExpeditionByID(expeditionID id.ID) error {
 	return Err(b.database.Collection("admin.expedition").Find(expeditionID).Delete())
+}
+
+func (b *Backend) ProjectUserRoleByProjectSlugAndUserID(projectSlug string, userID id.ID) (string, error) {
+	role := ""
+	if err := b.database.Iterator(`
+		SELECT u.role FROM admin.project_user AS u
+			JOIN admin.project AS p ON p.id = u.project_id
+				WHERE p.slug = $1 AND u.user_id = $2
+		`, projectSlug, userID).ScanOne(&role); err != nil {
+		return "", Err(err)
+	}
+
+	return role, nil
+}
+
+func (b *Backend) AddInput(input *data.Input) error {
+	_, err := b.database.Collection("admin.input").Insert(input)
+	return Err(err)
+}
+
+func (b *Backend) InputsByProjectSlugAndExpeditionSlug(projectSlug, expeditionSlug string) ([]*data.Input, error) {
+	inputs := []*data.Input{}
+	if err := b.database.Iterator(`
+		SELECT i.* FROM admin.input AS i
+			JOIN admin.expedition AS e ON e.id = i.expedition_id
+			JOIN admin.project AS p ON p.id = e.project_id
+				WHERE p.slug = $1 AND e.slug = $2
+		`, projectSlug, expeditionSlug).All(&inputs); err != nil {
+		return nil, Err(err)
+	}
+
+	return inputs, nil
+}
+
+func (b *Backend) InputByID(inputID id.ID) (*data.Input, error) {
+	input := &data.Input{}
+	if err := b.database.Collection("admin.input").Find(inputID).One(input); err != nil {
+		return nil, Err(err)
+	}
+
+	return input, nil
+}
+
+func (b *Backend) AddRequest(request *data.Request) error {
+	_, err := b.database.Collection("data.request").Insert(request)
+	return Err(err)
+}
+
+func (b *Backend) AddInvite(invite *data.Invite) error {
+	_, err := b.database.Collection("admin.invite").Insert(invite)
+	return Err(err)
+}
+
+func (b *Backend) InviteByID(inviteID id.ID) (*data.Invite, error) {
+	invite := &data.Invite{}
+	if err := b.database.Collection("admin.invite").Find(inviteID).One(invite); err != nil {
+		return nil, Err(err)
+	}
+
+	return invite, nil
+}
+
+func (b *Backend) DeleteInviteByID(inviteID id.ID) error {
+	return Err(b.database.Collection("admin.invite").Find(inviteID).Delete())
 }

@@ -1,0 +1,8 @@
+#cloud-config
+hostname: "${hostname}"
+coreos:
+  update:
+    reboot-strategy: "reboot"
+  units:
+    - name: "docker.service"
+      command: "start"
