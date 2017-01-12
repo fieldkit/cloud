@@ -7,21 +7,21 @@
 ```
 /api/user/sign-up
 ```
-invite
-email
-password
-username
+* invite
+* email
+* password
+* username
 
 ```
 /api/user/validate
 ```
-token
+* token
 
 ```
 /api/user/sign-in
 ```
-username
-password
+* username
+* password
 
 ```
 /api/user/current
@@ -36,11 +36,11 @@ password
 ```
 /api/projects/add
 ```
-name
+* name
 
 ```
 /api/project/{project}
-``
+```
 
 ### Expedition
 
@@ -51,7 +51,7 @@ name
 ```
 /api/project/{project}/expeditions/add
 ```
-name
+* name
 
 ```
 /api/project/{project}/expedition/{expedition}
@@ -66,7 +66,7 @@ name
 ```
 /api/project/{project}/expedition/{expedition}/inputs/add
 ```
-name
+* name
 
 ```
 /api/project/{project}/expedition/{expedition}/input/{id}
