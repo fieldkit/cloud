@@ -63,13 +63,24 @@ const reducer = combineReducers({
 const store = createStoreWithMiddleware(reducer)
 
 
-function requireAuth(nextState, replace): void {
-  // temporary as we're setting up auth
-  return
-  if (!FKApiClient.get().loggedIn()) {
+function requireAuth(nextState, replace) {
+  
+  // temporarily commented out as we're setting up auth  
+  // if (!FKApiClient.get().loggedIn()) {
+  //   replace({
+  //     pathname: '/signup',
+  //     state: { nextPathname: nextState.location.pathname }
+  //   })
+  // }
+
+  let currentProjectID = store.getState().expeditions.get('currentProjectID')
+  if (!currentProjectID) currentProjectID = store.getState().expeditions.get('projects').toList().get(0).get('id')
+  let currentExpeditionID = store.getState().expeditions.get('currentExpeditionID')
+  if (!currentExpeditionID) currentExpeditionID = store.getState().expeditions.getIn(['projects', currentProjectID, 'expeditions']).get(0)
+  if (!currentExpeditionID) currentExpeditionID = 'new-expedition'
+  if (nextState.location.pathname === '/admin') {
     replace({
-      pathname: '/signup',
-      state: { nextPathname: nextState.location.pathname }
+      pathname: '/admin/' + currentProjectID + '/' + currentExpeditionID
     })
   }
 }
@@ -99,7 +110,10 @@ const routes = (
     >
 
       <IndexRoute component={ProfileSection}/>
-      <Route path="profile" component={ProfileSection}/>
+      <Route 
+        path="profile"
+        component={ProfileSection}
+      />
 
       <Route
         path="new-project"
