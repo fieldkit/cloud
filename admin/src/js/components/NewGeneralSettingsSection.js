@@ -27,8 +27,7 @@ class NewGeneralSettingsSection extends React.Component {
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          <h1>Create a New Expedition</h1>
-          <p>process breadcrumbs</p>
+          <h1>Create a New Expedition (2/2)</h1>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
