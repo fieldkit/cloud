@@ -1,6 +1,7 @@
 
 import * as actions from '../../actions'
 import I from 'immutable'
+import slug from 'slug'
 
 export const initialState = I.fromJS({
   suggestedMembers: null,
@@ -456,16 +457,19 @@ const expeditionReducer = (state = initialState, action) => {
         ['expeditions', state.get('currentExpeditionID')].concat(action.keyPath),
         action.value
       )
-      if (action.keyPath.length === 1 && action.keyPath[0] === 'id') {
+      if (action.keyPath.length === 1 && action.keyPath[0] === 'name') {
+        const lastID = state.get('currentExpeditionID')
+        const id = slug(action.value)
         newState = newState
           .setIn(
-            ['expeditions', action.value],
+            ['expeditions', id],
             newState.getIn(['expeditions', state.get('currentExpeditionID')])
           )
-          .deleteIn(
-            ['expeditions', state.get('currentExpeditionID')]
-          )
-          .set('currentExpeditionID', action.value)
+          .setIn(['expeditions', id, 'id'], id)
+          .set('currentExpeditionID', id)
+        if (lastID !== id) {
+          newState = newState.deleteIn(['expeditions', state.get('currentExpeditionID')])
+        }
       }
       return newState
     }
