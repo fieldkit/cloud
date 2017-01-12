@@ -239,6 +239,7 @@ div.selected-tab {
   width: 100%;
   margin-top: -1px;
   border: 1px solid #999;
+  margin-bottom: 40px;
 }
 
 
@@ -350,6 +351,7 @@ div.selected-tab {
 
           .project ul.expeditions li h4 {
             font-weight: normal;
+            text-transform: capitalize;
           }
 
             .project ul.expeditions li.new-expedition {
@@ -409,6 +411,16 @@ div.selected-tab {
         width: 65.6%;
         padding: 40px 7.8vw;
       }
+
+.section {}
+
+  .section .call-to-action div.button {
+    margin-right: 20px;
+  }
+
+    .section .call-to-action a:not(:first-child) div.button {
+      margin-left: 20px;
+    }
 
 #teams-section {}
 

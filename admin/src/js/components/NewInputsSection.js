@@ -19,6 +19,7 @@ class NewInputsSection extends React.Component {
   render () {
 
     const { 
+      currentProjectID,
       currentExpedition,
       documentTypes,
       selectedDocumentType,
@@ -263,11 +264,23 @@ class NewInputsSection extends React.Component {
         <p className="status">
         </p>
 
-        <Link to="/admin/new-expedition/teams">
-          <div className="button hero">
-            Next step: Assemble a team
+        <p className="intro">
+          Congratulations, you're done creating your first expedition! You can now dive deeper in the settings, or go straight see how your map looks like.
+        </p>
+       
+        <div className="call-to-action"> 
+        <Link to={'/admin/' + currentProjectID + '/' + currentExpedition.get('id') }>
+          <div className="button">
+            Go to the admin dashboard
           </div>
         </Link>
+        or
+        <Link to={'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id') }>
+          <div className="button hero">
+            Go to my map!
+          </div>
+        </Link>
+        </div>
 
       </div>
     )

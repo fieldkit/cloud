@@ -19,6 +19,7 @@ class NewTeamsSection extends React.Component {
   render () {
 
     const { 
+      currentProjectID,
       expedition,
       teams,
       members,
@@ -321,8 +322,8 @@ class NewTeamsSection extends React.Component {
           <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
-        
-        <Link to={'/admin/' + expedition.get('id') }>
+
+        <Link to={'/admin/' + currentProjectID + '/' + expedition.get('id') }>
           <div className="button hero">
             Finalize your expedition!
           </div>

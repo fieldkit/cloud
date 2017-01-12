@@ -78,7 +78,7 @@ function requireAuth(nextState, replace) {
   let currentExpeditionID = store.getState().expeditions.get('currentExpeditionID')
   if (!currentExpeditionID) currentExpeditionID = store.getState().expeditions.getIn(['projects', currentProjectID, 'expeditions']).get(0)
   if (!currentExpeditionID) currentExpeditionID = 'new-expedition'
-  if (nextState.location.pathname === '/admin') {
+  if (nextState.location.pathname === '/admin' || nextState.location.pathname === '/admin/') {
     replace({
       pathname: '/admin/' + currentProjectID + '/' + currentExpeditionID
     })

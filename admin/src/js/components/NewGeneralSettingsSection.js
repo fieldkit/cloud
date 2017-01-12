@@ -18,7 +18,8 @@ class NewGeneralSettingsSection extends React.Component {
 
   render () {
 
-    const { 
+    const {
+      currentProjectID,
       currentExpedition,
       setExpeditionProperty,
       setExpeditionPreset
@@ -137,7 +138,7 @@ class NewGeneralSettingsSection extends React.Component {
         <p className="status">
         </p>
 
-        <Link to="/admin/new-expedition/inputs">
+        <Link to={'/admin/' + currentProjectID + '/new-expedition/inputs'}>
           <div className="button hero">
             Next step: configuring document types
           </div>

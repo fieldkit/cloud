@@ -16,6 +16,12 @@ export const initialState = I.fromJS({
   currentDocumentTypeID: null,
   editedTeam: null,
   projects: {
+    'awesome_adventures': {
+      id: 'awesome_adventures',
+      name: 'Awesome Adventures',
+      expeditions: [
+      ]
+    },
     'okavango': {
       id: 'okavango',
       name: 'okavango',
@@ -23,13 +29,6 @@ export const initialState = I.fromJS({
         'okavango_16',
         'bike_16',
         'cuito_16'
-      ]
-    },
-    'awesome_adventures': {
-      id: 'awesome_adventures',
-      name: 'Awesome Adventures',
-      expeditions: [
-        'kayak_adventure'
       ]
     }
   },
