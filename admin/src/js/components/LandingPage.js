@@ -32,7 +32,7 @@ class LandingPage extends React.Component {
         </nav>
 
         <div className="content">
-          <h1 className="content_title">FieldKit</h1>
+          <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
           <p className="content_sub">A one-click open platform for field researchers and explorers</p>
           <a href="#" className="content_join">Join Us</a>
         </div>
