@@ -5,16 +5,13 @@ import { Link } from 'react-router'
 class NavigationPanel extends React.Component {
 
   render () {
-    const { expeditionID, expeditions, disconnect } = this.props
-
-    const items = expeditions.map(expedition => {
-      return <NavigationItem {...expedition} active={expeditionID === expedition.id} key={expedition.id} />
-    })
+    const { projectID, expeditionID, expeditions, disconnect, projects } = this.props
 
     return (
       <div id="header">
+        <div className="background"/>
         <div id="logo">
-          <Link to="/admin">
+          <Link to={'/admin'}>
             <img src="/src/img/fieldkit-logo.svg" alt="fieldkit logo" />
           </Link>
           <Link to={'/admin/profile'}>
@@ -29,10 +26,50 @@ class NavigationPanel extends React.Component {
           </SignOutButton>
           */}
         </div>
-        <div id="navigation">
-          <ul className="expeditions">
-            {items}
-          </ul>
+        {
+          projects
+            .map(project => {
+              return (
+                <div className="project">
+                  <div className="project-name">
+                    <h3>
+                      { project.get('name') }
+                    </h3>
+                  </div>
+                  <ul className="expeditions">
+                    {
+                      expeditions
+                        .filter(e => {
+                          const projectExpeditions = project.get('expeditions')
+                          return projectExpeditions.includes(e.get('id'))
+                        })
+                        .map(expedition => {
+                          return (
+                            <NavigationItem 
+                              expedition={expedition}
+                              active={expeditionID === expedition.get('id')}
+                              key={expedition.get('id')} 
+                              projectID={projectID}
+                            />
+                          )
+                        })
+                    }
+                    <li className="new-expedition">
+                      <Link to={'/admin/' + projectID + '/new-expedition'}>
+                        <h4>Add New Expedition</h4>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )
+            })
+        }
+        <div className="project">
+          <div className="project-name">
+            <h3>
+              Add New Project
+            </h3>
+          </div>
         </div>
       </div>
     )

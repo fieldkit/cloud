@@ -11,8 +11,15 @@ class DashboardSection extends React.Component {
 
   render () {
 
+    const {
+      currentExpedition
+    } = this.props
+
+    console.log(currentExpedition)
+
     return (
       <div id="dashboard-section" className="section">
+        <h1>{currentExpedition.get('name')}</h1>
         <h2>Dashboard section</h2>
       </div>
     )

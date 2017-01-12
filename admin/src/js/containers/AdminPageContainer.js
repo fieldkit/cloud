@@ -4,9 +4,15 @@ import AdminPage from '../components/AdminPage'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
+
+  const projects = state.expeditions.get('projects')
+  const expeditions = state.expeditions.get('expeditions')
+  const modal = state.expeditions.get('modal')
+
   return {
-    expeditions: state.expeditions.get('expeditions'),
-    modal: state.expeditions.get('modal')
+    expeditions,
+    projects,
+    modal
   }
 }
 

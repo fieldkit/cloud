@@ -75,13 +75,15 @@ div.button {
   border-radius: 3px;
   background-color: #D0462C;
   color: white;
-  padding: 0px 8px;
+  padding: 0 8px;
+  height: 36px;
   text-transform: uppercase;
   font-weight: 700;
   font-size: 10px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-align: center;
   cursor: pointer;
+  line-height: 36px;
 }
 
   div.button.disabled {
@@ -239,6 +241,7 @@ div.selected-tab {
   width: 100%;
   margin-top: -1px;
   border: 1px solid #999;
+  margin-bottom: 40px;
 }
 
 
@@ -255,12 +258,21 @@ div.selected-tab {
     #header {
       width: 18.8%;
       min-height: calc(100vh - 50px);
-      background-color: #DFDFCF;
       display: block;
       padding-bottom: 50px;
+      position: relative;
     }
 
+      #header div.background {
+        z-index: 0;
+        position: fixed;
+        width: 18.8%;
+        height: 100%;
+        background-image: url(/src/img/bkg.jpg);
+      }
+
       #logo {
+        position: relative;
         display: flex;
         justify-content: space-between;
         padding: 0 1.5vw;
@@ -287,13 +299,21 @@ div.selected-tab {
             #logo a:last-child img {
             }
 
-      #navigation {
+      .project {
         padding: 1.5vw 1.5vw;
         position: relative;
         margin-top: 40px;
       }
 
-        #navigation::before {
+        .project:last-child {
+          padding-bottom: 0;
+        }
+
+        .project:not(:nth-child(3)) {
+          margin-top: 0px;
+        }
+
+        .project::before {
             content: "";
             display: block;
             height: 100%;
@@ -305,43 +325,104 @@ div.selected-tab {
             mix-blend-mode: multiply;
         }
 
-        #navigation ul.expeditions {
+          .project .project-name {
+            position: relative;
+            background-color: rgba(100,0,50,0.3);     
+            padding: 1.5vw;
+            margin: -1.5vw 0 2.5vw -1.5vw;
+            width: 100%;
+          }
+            .project .project-name h3{
+              color: white;
+              font-size: 11px;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 0;
+            }
+
+        .project ul.expeditions {
           position: relative;
           list-style: none;
           padding: 0;
           margin: 0;
           margin-top: 10px;
           font-size: 13px;
+          padding-bottom: 40px;
         }
 
-        #navigation ul.sections {
+          .project ul.expeditions li h4 {
+            font-weight: normal;
+            text-transform: capitalize;
+          }
+
+            .project ul.expeditions li.new-expedition {
+              margin-top: 30px;
+            }
+
+              .project ul.expeditions li.new-expedition h4 {
+                border-radius: 3px;
+                background-color: rgba(100,0,50,0.2);  
+                font-size: 13px;
+                font-weight: normal;
+                margin-left: 0;
+                padding: 10px 9px;
+                width: 100%;
+                border: 1px solid rgba(100,0,50,0.8);
+                display: inline;
+                color: rgb(255,220,200);
+              }
+
+/*            .project ul.expeditions li.new-expedition h4 span {
+              border-radius: 3px;
+              padding: 0px 5px 4px;
+              background-color: #D0462C;
+              margin-left: 5px;
+            }*/
+
+        .project ul.sections {
           margin-bottom: 20px;
           list-style: none;
           padding: 0 0 0 10px;
         }
 
-          #navigation ul.sections li {
+          .project ul.sections li {
             margin-bottom: 5px;
           }
-
-          #navigation ul.sections li:first-child {
+/*
+          .project ul.sections li:first-child {
             background-color: #D0462C;
             width: auto;
             display: inline-block;
             padding: 2px 10px;
             margin-left: -10px;
             border-radius: 3px;
-          }
+          }*/
 
 
-        #navigation a {
+        .project a {
           color: white;
         }
+
+          .project ul.sections a {
+            color: rgb(255,220,200);
+            letter-spacing: 0.05em;
+          }
 
       .page .page-content {
         width: 65.6%;
         padding: 40px 7.8vw;
       }
+
+.section {}
+
+  .section .call-to-action div.button {
+    margin-right: 20px;
+  }
+
+    .section .call-to-action a:not(:first-child) div.button {
+      margin-left: 20px;
+    }
 
 #teams-section {}
 
@@ -396,53 +477,78 @@ div.selected-tab {
         background-color: #DFDFCF;
       }
 
-  #teams-section table.members-list {
+  table.objects-list {
+    width: 100%;
   }
 
-    #teams-section table.members-list tbody:not(:first-child) {
+    table.objects-list tbody:not(:first-child) {
       /*cursor: pointer;*/
     }
 
-    #teams-section table.members-list .name {
+    #teams-section table.objects-list .name {
       width: 15%;
     }
 
-    #teams-section table.members-list .role {
+    #teams-section table.objects-list .role {
       width: 20%;
     }
 
-    #teams-section table.members-list .inputs {
+    #teams-section table.objects-list .inputs {
       width: 20%;
     }
 
-    #teams-section table.members-list .activity {
+    #teams-section table.objects-list .activity {
       width: 20%;
       cursor: pointer;
     }
 
-    #teams-section table.members-list .remove {
+    #teams-section table.objects-list .remove {
       width: 5%;
       cursor: pointer;
+      padding-right: 0;
+    }
+
+    #new-inputs-section table.objects-list .name {
+      width: 25%;
+    }
+
+    #new-inputs-section table.objects-list .description {
+      width: 35%;
+    }
+
+    #new-inputs-section table.objects-list .inputs {
+      width: 35%;
+    }
+
+      #new-inputs-section table.objects-list .inputs li:not(:last-child) {
+        margin-bottom: 20px;
+      }
+
+    #new-inputs-section table.objects-list .remove {
+      width: 5%;
+      cursor: pointer;
+      text-align: right;
+      padding-right: 0;
     }
     
-    #teams-section table.members-list td.add-member {}
+    table.objects-list td.add-object {}
 
-      #teams-section table.members-list td.add-member div.add-member-container {
+      table.objects-list td.add-object div.add-object-container {
         display: flex;
         position: relative;
         padding-right: 10px;
       }
 
-        #teams-section table.members-list td.add-member div.Select {
+        table.objects-list td.add-object div.Select {
           flex-grow: 1;
           padding-right: 10px;
         }
 
-        #teams-section table.members-list td.add-member div.add-member-container div.input{
+        table.objects-list td.add-object div.add-object-container div.input{
           flex-grow: 1;
         }
 
-          #teams-section table.members-list td.add-member div.add-member-container div.input input{
+          table.objects-list td.add-object div.add-object-container div.input input{
             width: calc(100% - 20px);
             height: 27px;
             font-size: 14px;
@@ -452,7 +558,7 @@ div.selected-tab {
             border-top-left-radius: 3px;
           }
 
-        #teams-section table.members-list td.add-member div.add-member-container div.button{
+        table.objects-list td.add-object div.add-object-container div.button{
           border-radius: 3px;
           height: 36px;
           flex-basis: auto;
@@ -460,7 +566,7 @@ div.selected-tab {
           vertical-align: middle;
         }
 
-        #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members{
+        table.objects-list td.add-object div.add-object-container ul.suggested-objects{
           position: absolute;
           top: 31px;
           border: 1px solid #ddd;
@@ -470,7 +576,7 @@ div.selected-tab {
           overflow-x: hidden;
         }
 
-          #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li{
+          table.objects-list td.add-object div.add-object-container ul.suggested-objects li{
             padding: 15px 10px;
             background-color: white;
             font-weight: bold;
@@ -478,15 +584,15 @@ div.selected-tab {
             cursor: auto;
           }
 
-            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member{
+            table.objects-list td.add-object div.add-object-container ul.suggested-objects li.suggested-member{
               cursor: pointer;
             }
 
-              #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li.suggested-member:hover{
+              table.objects-list td.add-object div.add-object-container ul.suggested-objects li.suggested-member:hover{
                 background-color: #ddd;
               }
 
-            #teams-section table.members-list td.add-member div.add-member-container ul.suggested-members li span{
+            table.objects-list td.add-object div.add-object-container ul.suggested-objects li span{
               font-weight: normal;
             }
 
@@ -621,3 +727,22 @@ div.selected-tab {
 div.Select span.Select-arrow {
   vertical-align: middle;
 }
+
+ul.main-input-container {
+  list-style: none;
+  padding: 0;
+}
+
+  ul.main-input-container li{
+    list-style: none;
+    padding: 20px;
+    border: 1px solid #bbb;
+    margin-top: -1px;
+    position: relative;
+    cursor: pointer;
+  }
+
+    ul.main-input-container li.selected{
+      border-color: #D0462C;
+      z-index: 10;
+    }
