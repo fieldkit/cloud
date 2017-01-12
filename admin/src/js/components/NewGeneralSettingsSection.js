@@ -40,9 +40,18 @@ class NewGeneralSettingsSection extends React.Component {
         </p>
         <div className="columns-container">
           <div className="main-input-container">
-            <input type="text" value={currentExpedition.get('name')} onChange={(e) => {
-              setExpeditionProperty(['name'], e.target.value)
-            }}/>
+            <input 
+              type="text"
+              value={currentExpedition.get('name')}
+              onFocus={(e) => {
+                if (currentExpedition.get('name') === 'New Expedition') {
+                  setExpeditionProperty(['name'], '')
+                }
+              }}
+              onChange={(e) => {
+                setExpeditionProperty(['name'], e.target.value)
+              }}
+            />
             <p className="error"></p>
           </div>
           <p className="input-description">
