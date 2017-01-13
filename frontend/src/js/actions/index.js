@@ -6,12 +6,22 @@ import { browserHistory } from 'react-router'
 import {FKApiClient} from '../api/api.js'
 
 export const INITIALIZE_EXPEDITION = 'INITIALIZE_EXPEDITION'
+export const SET_VIEWPORT = 'SET_VIEWPORT'
 
 export function initializeExpedition (id) {
   return function (dispatch, getState) {
     dispatch ({
       type: INITIALIZE_EXPEDITION,
       id
+    })
+  }
+}
+
+export function setViewport(viewport) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_VIEWPORT,
+      viewport
     })
   }
 }

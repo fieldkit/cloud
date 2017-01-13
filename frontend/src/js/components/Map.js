@@ -1,6 +1,7 @@
 
 import React, { PropTypes } from 'react'
 import ViewportMercator from 'viewport-mercator-project'
+import I from 'Immutable'
 // import { lerp, parseDate } from '../utils'
 import MapboxGL from 'react-map-gl'
 // import WebGLOverlay from './WebGLOverlay'
@@ -12,35 +13,23 @@ class Map extends React.Component {
     super(props)
     this.state = {
       animate: false,
-      viewport: {
-        latitude: -18.5699229,
-        longitude: 22.115456,
-        zoom: 4,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        startDragLngLat: null,
-        isDragging: false
-      }
     }
   }
 
   render () {
-    const { viewport } = this.state
+    const { viewport, setViewport } = this.props
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
-
-    console.log(viewport)
 
     return (
       <div id="map">
         <MapboxGL
-          latitude={-18.5699229}
-          longitude={22.115456}
-          zoom={4}
-          width={window.innerWidth}
-          height={window.innerHeight}
+          { ...viewport }
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
+          onChangeViewport={viewport => {
+            setViewport(viewport)
+          }}
         >
         </MapboxGL>
       </div>

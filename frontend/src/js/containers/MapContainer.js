@@ -5,14 +5,12 @@ import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
-  const projects = state.expeditions.get('projects')
   const expeditions = state.expeditions.get('expeditions')
-  const modal = state.expeditions.get('modal')
+  const viewport = state.expeditions.get('viewport').toJS()
 
   return {
     expeditions,
-    projects,
-    modal
+    viewport
   }
 }
 
@@ -23,6 +21,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     cancelAction () {
       return dispatch(actions.cancelAction())
+    },
+    setViewport (viewport) {
+      return dispatch(actions.setViewport(viewport))
     }
   }
 }

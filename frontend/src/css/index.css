@@ -102,3 +102,7 @@ div.button.secondary {
     background-color: transparent;
     border-color: background-color: #DFDFCF;;
   }
+
+#map {
+  position: fixed;
+}
