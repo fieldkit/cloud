@@ -7,10 +7,12 @@ const mapStateToProps = (state, ownProps) => {
 
   const expeditions = state.expeditions.get('expeditions')
   const viewport = state.expeditions.get('viewport').toJS()
+  const currentDocuments = state.expeditions.get('currentDocuments')
 
   return {
     expeditions,
-    viewport
+    viewport,
+    currentDocuments
   }
 }
 

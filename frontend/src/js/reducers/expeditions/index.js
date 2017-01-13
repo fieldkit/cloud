@@ -23,6 +23,7 @@ export const initialState = I.fromJS({
     startDragLngLat: null,
     isDragging: false
   },
+  currentDocuments: [],
   documents: {
     'reading-0': {
       id: 'reading-0',
@@ -34,7 +35,7 @@ export const initialState = I.fromJS({
       date: 1484328718000
     },
     'reading-1': {
-      id: 'reading-0',
+      id: 'reading-1',
       type: 'sensor-reading',
       geometry: {
         type: 'Point',
@@ -43,7 +44,7 @@ export const initialState = I.fromJS({
       date: 1484328818000
     },
     'reading-2': {
-      id: 'reading-0',
+      id: 'reading-2',
       type: 'sensor-reading',
       geometry: {
         type: 'Point',
@@ -52,7 +53,7 @@ export const initialState = I.fromJS({
       date: 1484328958000
     },
     'reading-3': {
-      id: 'reading-0',
+      id: 'reading-3',
       type: 'sensor-reading',
       geometry: {
         type: 'Point',
@@ -70,15 +71,18 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.INITIALIZE_EXPEDITION: {
       const position = state.get('documents').toList().get(0).getIn(['geometry', 'coordinates'])
 
-      const startDate = state.get('documents').toList().minBy(d => d.date)
-      const endDate = state.get('documents').toList().maxBy(d => d.date)
+      const startDate = state.get('documents').minBy(d => d.get('date')).get('date')
+      const endDate = state.get('documents').maxBy(d => d.get('date')).get('date')
 
-      console.log(new Date(startDate), new Date(endDate))
+      const currentDocuments = state.get('documents').map(d => d.get('id'))
 
       return state
         .set('currentExpedition', action.id)
         .setIn(['viewport', 'longitude'], position.get(0))
         .setIn(['viewport', 'latitude'], position.get(1))
+        .setIn(['expeditions', action.id, 'startDate'], startDate)
+        .setIn(['expeditions', action.id, 'endDate'], endDate)
+        .set('currentDocuments', currentDocuments)
     }
 
     case actions.SET_VIEWPORT: {

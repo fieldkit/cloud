@@ -6,6 +6,7 @@ import I from 'Immutable'
 import MapboxGL from 'react-map-gl'
 // import WebGLOverlay from './WebGLOverlay'
 // import THREE from '../react-three-renderer/node_modules/three'
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../constants/mapbox.js'
 
 class Map extends React.Component {
 
@@ -17,9 +18,7 @@ class Map extends React.Component {
   }
 
   render () {
-    const { viewport, setViewport } = this.props
-    const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
-    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
+    const { viewport, setViewport, currentDocuments } = this.props
 
     return (
       <div id="map">
