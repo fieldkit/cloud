@@ -68,7 +68,7 @@ export const initialState = I.fromJS({
 
 const expeditionReducer = (state = initialState, action) => {
 
-  console.log('reducer:', action.type, action)
+  // console.log('reducer:', action.type, action)
   switch (action.type) {
     case actions.INITIALIZE_EXPEDITION: {
       const position = state.get('documents').toList().get(0).getIn(['geometry', 'coordinates'])

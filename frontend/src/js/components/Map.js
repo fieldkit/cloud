@@ -14,80 +14,29 @@ class Map extends React.Component {
     super(props)
     this.redrawGLOverlay = this.redrawGLOverlay.bind(this)
     this.mapToScreen = this.mapToScreen.bind(this)
-    // this.renderAmbitGeo = this.renderAmbitGeo.bind(this)
     this.renderSightings = this.renderSightings.bind(this)
-    this.renderMembers = this.renderMembers.bind(this)
   }
 
   redrawGLOverlay ({ unproject } ) {
     const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
     return (particles, paths) => {
-      const { expedition, viewport } = this.props
-      const { geoBounds } = viewport
-      const west = geoBounds[0] + (geoBounds[0] - geoBounds[2]) * 0.25
-      const north = geoBounds[1] + (geoBounds[1] - geoBounds[3]) * 0.25
-      const east = geoBounds[2] + (geoBounds[2] - geoBounds[0]) * 0.25
-      const south = geoBounds[3] + (geoBounds[3] - geoBounds[1]) * 0.25
-      const gb = [west, north, east, south]
-
-      // console.log('aga', particles.sightings)
-
-      const sightings = this.props.currentDocuments
-
       return {
         particles: {
           ...particles,
-          sightings: this.renderSightings(particles.sightings, screenBounds, sightings, gb),
-          // members: this.renderMembers(particles.members, screenBounds, expedition, gb)
-        },
-        // paths: {
-        //   ambitGeo: this.renderAmbitGeo(paths.ambitGeo, screenBounds, expedition, gb)
-        // },
+          sightings: this.renderSightings(particles.sightings, screenBounds, this.props.currentDocuments),
+        }
       }
     }
   }
 
   mapToScreen (p, screenBounds) {
     return [
-      0 + (window.innerWidth - 0) * ((p[0] - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0])),
-      0 + (window.innerHeight - 0) * ((p[1] - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+      window.innerWidth * ((p[0] - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0])),
+      window.innerHeight * ((p[1] - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
     ]
   }
 
-  // renderAmbitGeo (pathGeometry, screenBounds, expedition, gb) {
-  //   const checkGeoBounds = (p, gb) => {
-  //     return p[0] >= gb[0] && p[0] < gb[2] && p[1] >= gb[3] && p[1] < gb[1]
-  //   }
-
-  //   return expedition.currentAmbits.map(route => {
-
-  //     const vertices = route.coordinates
-  //       .filter((p, i) => {
-  //         if (route.coordinates[i - 1] && checkGeoBounds(route.coordinates[i - 1], gb)) return true
-  //         if (checkGeoBounds(route.coordinates[i], gb)) return true
-  //         if (route.coordinates[i + 1] && checkGeoBounds(route.coordinates[i + 1], gb)) return true
-  //         return false
-  //       })
-  //       .map(p => {
-  //         return this.mapToScreen(p, screenBounds)
-  //       })
-  //       .map((p, i) => {
-  //         return new THREE.Vector3(p[0], p[1], 0)
-  //       })
-
-  //     var lastVertex = vertices[vertices.length - 1].clone()
-  //     for (let i = vertices.length; i < 200; i ++) {
-  //       vertices[i] = lastVertex
-  //     }
-
-  //     return {
-  //       color: route.color,
-  //       vertices
-  //     }
-  //   })
-  // }
-
-  renderSightings (particleGeometry, screenBounds, sightings, gb) {
+  renderSightings (particleGeometry, screenBounds, sightings) {
     sightings.toList().forEach((sighting, i) => {
       const position = sighting.getIn(['geometry', 'coordinates'])
       const radius = 10
@@ -117,21 +66,6 @@ class Map extends React.Component {
     particleGeometry.data = sightings
     return particleGeometry
   }
-
-  renderMembers (geometry, screenBounds, expedition, gb) {
-    if (!this.state.members) return geometry
-    const members = Object.keys(this.state.members).map(name => {
-      const member = this.state.members[name]
-      const position = this.mapToScreen(member.coordinates, screenBounds)
-      return {
-        name,
-        position
-      }
-    })
-    return members
-  }
-
-
 
   render () {
     const { viewport, setViewport, currentDocuments } = this.props

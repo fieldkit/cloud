@@ -51,60 +51,48 @@ export default class WebGLOverlay extends Component {
     }
 
     this.state = {
+      initialRender: false,
       paths,
       particles,
       render () {},
       sightingTexture: new THREE.TextureLoader().load('src/img/sighting.png'),
       mousePosition: [0, 0],
     }
-
-    this.onMouseMove = this.onMouseMove.bind(this)
-    this.onMouseOut = this.onMouseOut.bind(this)
-    this.onClick = this.onClick.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { unproject } = ViewportMercator(nextProps)
-    const render = nextProps.redraw({ unproject })
 
-    if (!render) {
+    if (
+      this.props.latitude !== nextProps.latitude ||
+      this.props.longitude !== nextProps.longitude ||
+      this.props.zoom !== nextProps.zoom ||
+      this.props.width !== nextProps.width ||
+      this.props.height !== nextProps.height
+      ) {
+      const { unproject } = ViewportMercator(nextProps)
+      const render = nextProps.redraw({ unproject })
+      const { particles, paths } = render(this.state.particles, this.state.paths)
       this.setState({
         ...this.state,
-        particles: null
+        particles,
+        paths,
+        render
       })
-      return
     }
-
-    const { particles, paths } = render(this.state.particles, this.state.paths)
-
-    this.setState({
-      ...this.state,
-      particles,
-      paths,
-      render
-    })
   }
 
-  onMouseMove (event) {
-    this.setState({
-      ...this.state,
-      mousePosition: [event.pageX, event.pageY]
-    })
+  shouldComponentUpdate (nextProps) {
+    return !this.state.initialRender
   }
 
-  onMouseOut (event) {
+  componentWillUpdate (nextProps) {
+  }  
+
+  componentDidUpdate () {
     this.setState({
       ...this.state,
-      mousePosition: [0, 0]
+      initialRender: true
     })
-  }
-
-  onClick (event) {
-    // const { show360Picture } = this.props
-    // const { particles } = this.state
-    // if (this.state.hoveredPicture > -1) {
-    //   show360Picture(this.state.particles.pictures360.data[this.state.hoveredPicture])
-    // }
   }
 
   render () {
