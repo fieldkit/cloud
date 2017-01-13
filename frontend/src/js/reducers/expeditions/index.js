@@ -2,6 +2,7 @@
 import * as actions from '../../actions'
 import I from 'immutable'
 import slug from 'slug'
+import ViewportMercator from 'viewport-mercator-project'
 
 export const initialState = I.fromJS({
   currentPage: 'map',
@@ -21,7 +22,8 @@ export const initialState = I.fromJS({
     width: window.innerWidth,
     height: window.innerHeight,
     startDragLngLat: null,
-    isDragging: false
+    isDragging: false,
+    geoBounds: [0, 0, 0, 0]
   },
   currentDocuments: [],
   documents: {
@@ -70,12 +72,9 @@ const expeditionReducer = (state = initialState, action) => {
   switch (action.type) {
     case actions.INITIALIZE_EXPEDITION: {
       const position = state.get('documents').toList().get(0).getIn(['geometry', 'coordinates'])
-
       const startDate = state.get('documents').minBy(d => d.get('date')).get('date')
       const endDate = state.get('documents').maxBy(d => d.get('date')).get('date')
-
       const currentDocuments = state.get('documents').map(d => d.get('id'))
-
       return state
         .set('currentExpedition', action.id)
         .setIn(['viewport', 'longitude'], position.get(0))
@@ -86,8 +85,14 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.SET_VIEWPORT: {
+      const { unproject } = ViewportMercator({ ...action.viewport })
+      const nw = unproject([0, 0])
+      const se = unproject([window.innerWidth, window.innerHeight])
+      const geoBounds = [nw[0], nw[1], se[0], se[1]]
       return state
-        .set('viewport', state.get('viewport').merge(action.viewport))
+        .setIn(['viewport', 'geoBounds'], geoBounds)
+        .set('viewport', state.get('viewport')
+          .merge(action.viewport))
     }
   }
   return state
