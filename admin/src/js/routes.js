@@ -66,12 +66,12 @@ const store = createStoreWithMiddleware(reducer)
 function requireAuth(nextState, replace) {
   
   // temporarily commented out as we're setting up auth  
-  // if (!FKApiClient.get().loggedIn()) {
-  //   replace({
-  //     pathname: '/signup',
-  //     state: { nextPathname: nextState.location.pathname }
-  //   })
-  // }
+  if (!FKApiClient.get().loggedIn()) {
+    replace({
+      pathname: '/signin',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
 
   let currentProjectID = store.getState().expeditions.get('currentProjectID')
   if (!currentProjectID) currentProjectID = store.getState().expeditions.get('projects').toList().get(0).get('id')
@@ -171,5 +171,5 @@ var render = function () {
   )
 }
 
-FKApiClient.setup('http://localhost:3000' || '', onLogout);
+FKApiClient.setup('http://localhost:8080' || '', onLogout);
 render()

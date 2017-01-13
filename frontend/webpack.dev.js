@@ -10,7 +10,10 @@ module.exports = {
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',
-      'sinon': 'sinon/pkg/sinon'
+      'sinon': 'sinon/pkg/sinon',
+      'gl-matrix': path.resolve('./node_modules/gl-matrix/dist/gl-matrix.js'),
+      'mapbox-gl/js/geo/transform': path.join(__dirname, "/node_modules/mapbox-gl/js/geo/transform"),
+      'mapbox-gl': path.join(__dirname, "/node_modules/mapbox-gl/dist/mapbox-gl.js")
     }
   },
   module: {
@@ -57,13 +60,11 @@ module.exports = {
         loader: 'file?name=fonts/[name].[ext]'
       }
     ],
-    postLoaders: [
-      {
-        include: /node_modules\/mapbox-gl-shaders/,
-        loader: 'transform',
-        query: 'brfs'
-      }
-    ]
+    postLoaders: [{
+      include: /node_modules\/mapbox-gl/,
+      loader: 'transform-loader',
+      query: 'brfs',
+    }]
   },
   devServer: {
     host: '0.0.0.0',

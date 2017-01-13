@@ -1,6 +1,6 @@
 
 import { connect } from 'react-redux'
-import AdminPage from '../components/AdminPage'
+import Map from '../components/Map'
 import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
@@ -27,9 +27,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-const AdminPageContainer = connect(
+const MapContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(AdminPage)
+)(Map)
 
-export default AdminPageContainer
+export default MapContainer

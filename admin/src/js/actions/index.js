@@ -395,7 +395,12 @@ export function requestSignIn (email, password) {
     FKApiClient.get().login(email, password)
       .then(() => {
         dispatch(loginSuccess())
-        browserHistory.push('/admin/okavango_16')
+        console.log('getting projects')
+        FKApiClient.get().getProjects()
+          .then(res => {
+            console.log('aga', res)
+          })
+        browserHistory.push('/admin')
       })
       .catch(error => {
         console.log('signin error:', error)
@@ -435,16 +440,15 @@ export function loginError (message) {
   }
 }
 
-export function requestSignUp (email, userName, firstName, lastName, password) {
+export function requestSignUp (email, username, password, invite) {
   return function (dispatch, getState) {
     dispatch(signupRequest())
 
     const params = {
       'email': email,
-      'username': userName,
-      'first_name': firstName,
-      'last_name': lastName,
-      'password': password
+      'username': username,
+      'password': password,
+      'invite': invite
     }
 
     FKApiClient.get().register(params)

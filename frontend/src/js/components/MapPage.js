@@ -1,23 +1,26 @@
 
-// import React, { PropTypes } from 'react'
-import React from 'react'
-import NotificationPanelContainer from '../containers/NotificationPanelContainer'
-import ControlPanelContainer from '../containers/ControlPanelContainer.js'
+import React, { PropTypes } from 'react'
 
 class MapPage extends React.Component {
 
+  constructor (props) {
+    super(props)
+    this.state = {
+    }
+  }
+
   render () {
-    var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
     return (
-      <div className='page' id="mapPage" style={height}>
-        <ControlPanelContainer/>
-        <NotificationPanelContainer/>
+      <div id="map-page" className="page">
+        hello world
       </div>
     )
   }
+
 }
 
-// MapPage.propTypes = {
-//   active : PropTypes.bool.isRequired
-// }
+MapPage.propTypes = {
+
+}
+
 export default MapPage

@@ -207,4 +207,9 @@ export class FKApiClient extends APIClient {
     this.onLogout();
   }
 
+  async getProjects () {
+    const res = await this.getJSON('http://localhost:8080/api/projects')
+    return res
+  }
+
 }
