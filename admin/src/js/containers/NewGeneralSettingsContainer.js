@@ -6,11 +6,13 @@ import * as actions from '../actions'
 const mapStateToProps = (state, ownProps) => {
 
   const expeditions = state.expeditions
+  const currentProjectID = expeditions.get('currentProjectID')
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentExpedition = expeditions.getIn(['expeditions', currentExpeditionID])
 
   return {
     ...ownProps,
+    currentProjectID,
     currentExpedition
   }
 }

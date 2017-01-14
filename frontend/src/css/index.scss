@@ -1,0 +1,109 @@
+
+html, body {
+  background-color: white;
+  padding: 0;
+  color: black;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+  font-size: 14px;
+  margin: 0;
+  line-height: 25px;
+  min-width: 1024px;
+}
+
+p {
+  margin-top: 0;
+}
+
+p.intro {
+  font-size: 18px;
+  line-height: 30px;
+  margin-bottom: 40px;
+}
+
+input {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 0;
+}
+
+h1 {
+  color: #D0462C;
+  font-weight: 100;
+  font-size: 48px;
+  line-height: 60px;
+}
+
+h2 {
+  color: black;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 40px;
+}
+
+h3 {
+  color: black;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+h5 {
+  color: black;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+div.button {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: #D0462C;
+  color: white;
+  padding: 0 8px;
+  height: 36px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  cursor: pointer;
+  line-height: 36px;
+}
+
+  div.button.disabled {
+    background-color: #DFDFCF;
+    cursor: auto;
+  }
+
+div.button.secondary {
+  background-color: transparent;
+  border: 1px solid #D0462C;
+  color: #D0462C;
+  border-radius: 3px;
+}
+
+  div.button.secondary.disabled {
+    background-color: transparent;
+    border-color: none;
+    background-color: #DFDFCF;
+  }
+
+#map {
+  position: fixed;
+}

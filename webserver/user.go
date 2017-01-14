@@ -17,32 +17,32 @@ import (
 )
 
 const (
-	CookieName = "fieldkit"
+	CookieName             = "fieldkit"
+	EmailValidationSubject = "Fieldkit account"
 )
 
 var (
 	emailRegexp, usernameRegexp *regexp.Regexp
 	InvalidUserError            = errors.New("invalid user")
+	InvalidValidationTokenError = errors.New("invalid validation token")
 )
 
 func init() {
 	emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	usernameRegexp = regexp.MustCompile(`^[a-zA-Z\d][\w-]+[a-zA-Z\d]$`)
+	usernameRegexp = regexp.MustCompile(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
 }
-
-const (
-	EmailValidationSubject = "Fieldkit account"
-)
 
 func UserValidateHandler(c *config.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		token := id.ID{}
-		if err := token.UnmarshalText([]byte(req.FormValue("token"))); err != nil {
+		validationTokenID := id.ID{}
+		if err := validationTokenID.UnmarshalText([]byte(req.FormValue("token"))); err != nil {
 			Error(w, err, 400)
 			return
 		}
 
-		user, err := c.Backend.UserByValidationToken(token)
+		fmt.Printf("%#v,%#v,%#v\n", req.FormValue("token"), len([]byte(req.FormValue("token"))), validationTokenID)
+
+		validationToken, err := c.Backend.ValidationTokenByID(validationTokenID)
 		if err == backend.NotFoundError {
 			Error(w, err, 401)
 			return
@@ -53,13 +53,23 @@ func UserValidateHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		if time.Now().After(user.ValidationTokenExpire) {
+		if time.Now().After(validationToken.Expires) {
+			Error(w, InvalidValidationTokenError, 401)
+			return
+		}
+
+		err = c.Backend.SetUserValidByID(validationToken.UserID, true)
+		if err == backend.NotFoundError {
 			Error(w, err, 401)
 			return
 		}
 
-		user.Valid = true
-		if err := c.Backend.UpdateUser(user); err != nil {
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		if err := c.Backend.DeleteValidationTokenByID(validationTokenID); err != nil {
 			Error(w, err, 500)
 			return
 		}
@@ -68,40 +78,90 @@ func UserValidateHandler(c *config.Config) http.Handler {
 	})
 }
 
+func validateInvite(c *config.Config, errs data.Errors, inviteFormValue string) (*data.Invite, error) {
+	inviteID := id.ID{}
+	if err := inviteID.UnmarshalText([]byte(inviteFormValue)); err != nil {
+		errs.Error("invite", "invalid invite")
+		return nil, nil
+	}
+
+	invite, err := c.Backend.InviteByID(inviteID)
+	if err == backend.NotFoundError {
+		errs.Error("invite", "invalid Invite")
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if time.Now().After(invite.Expires) {
+		errs.Error("invite", "invalid Invite")
+		return nil, nil
+	}
+
+	return invite, nil
+}
+
+func validateEmail(c *config.Config, errs data.Errors, emailFormValue string) error {
+	if !emailRegexp.MatchString(emailFormValue) {
+		errs.Error("email", "invalid Email")
+		return nil
+	}
+
+	emailInUse, err := c.Backend.UserEmailInUse(emailFormValue)
+	if err != nil {
+		return err
+	}
+
+	if emailInUse {
+		errs.Error("email", "Email in use")
+	}
+
+	return nil
+}
+
+func validateUsername(c *config.Config, errs data.Errors, usernameFormValue string) error {
+	if !usernameRegexp.MatchString(usernameFormValue) {
+		errs.Error("username", "invalid Username")
+		return nil
+	}
+
+	usernameInUse, err := c.Backend.UserUsernameInUse(usernameFormValue)
+	if err != nil {
+		return err
+	}
+
+	if usernameInUse {
+		errs.Error("username", "Username in use")
+	}
+
+	return nil
+}
+
 func UserSignUpHandler(c *config.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		errs := data.NewErrors()
 
+		// Validate the invite.
+		invite, err := validateInvite(c, errs, req.FormValue("invite"))
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
 		// Validate the user's email.
 		email := req.FormValue("email")
-		if !emailRegexp.MatchString(email) {
-			errs.Error("email", "invalid Email")
-		} else {
-			emailInUse, err := c.Backend.UserEmailInUse(email)
-			if err != nil {
-				Error(w, err, 500)
-				return
-			}
-
-			if emailInUse {
-				errs.Error("email", "Email in use")
-			}
+		if err := validateEmail(c, errs, email); err != nil {
+			Error(w, err, 500)
+			return
 		}
 
 		// Validate the user's username.
 		username := req.FormValue("username")
-		if !usernameRegexp.MatchString(username) {
-			errs.Error("username", "invalid Username")
-		} else {
-			usernameInUse, err := c.Backend.UserUsernameInUse(username)
-			if err != nil {
-				Error(w, err, 500)
-				return
-			}
-
-			if usernameInUse {
-				errs.Error("username", "Username in use")
-			}
+		if err := validateUsername(c, errs, username); err != nil {
+			Error(w, err, 500)
+			return
 		}
 
 		if len(errs) > 0 {
@@ -122,9 +182,25 @@ func UserSignUpHandler(c *config.Config) http.Handler {
 			return
 		}
 
+		validationToken, err := data.NewValidationToken(user.ID)
+		if err != nil {
+			WriteJSONStatusCode(w, errs, 500)
+			return
+		}
+
+		if err := c.Backend.AddValidationToken(validationToken); err != nil {
+			WriteJSONStatusCode(w, errs, 500)
+			return
+		}
+
 		// Send an email with a validation URL.
-		message := fmt.Sprintf("Validation URL\nhttps://fieldkit.org/api/user/validate?token=%s", user.ValidationToken.String())
+		message := fmt.Sprintf("Validation URL\nhttps://fieldkit.org/api/user/validate?token=%s", validationToken.ID.String())
 		if err := c.Emailer.SendEmail(user.Email, EmailValidationSubject, message); err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		if err := c.Backend.DeleteInviteByID(invite.ID); err != nil {
 			Error(w, err, 500)
 			return
 		}

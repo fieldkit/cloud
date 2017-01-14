@@ -1,5 +1,9 @@
 .git
 .gitignore
 admin/
+docker-compose.yml
 README.md
+run.sh
+schema
+terraform
 vendor/vendor.json

@@ -3,9 +3,12 @@ import {findDOMNode} from 'react-dom'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
-import I from 'Immutable'
+import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
+
+import iconRemoveSmall from '../../img/icon-remove-small.png'
+
 
 class NewTeamsSection extends React.Component {
   constructor (props) {
@@ -19,6 +22,7 @@ class NewTeamsSection extends React.Component {
   render () {
 
     const { 
+      currentProjectID,
       expedition,
       teams,
       members,
@@ -137,7 +141,7 @@ class NewTeamsSection extends React.Component {
                 removeMember(m.get('id'))
               }}
             >  
-              <img src="/src/img/icon-remove-small.png"/>
+              <img src={iconRemoveSmall}/>
             </td>
           </tbody>
         )
@@ -321,8 +325,8 @@ class NewTeamsSection extends React.Component {
           <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
-        
-        <Link to={'/admin/' + expedition.get('id') }>
+
+        <Link to={'/admin/' + currentProjectID + '/' + expedition.get('id') }>
           <div className="button hero">
             Finalize your expedition!
           </div>

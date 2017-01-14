@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "scripts": {
     "start": "webpack-dev-server --inline --hot --config webpack.dev.js",
-    "build": "NODE_ENV=production webpack"
+    "build": "NODE_ENV=production webpack",
+    "dll": "webpack --inline --config webpack.dll.js"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",
@@ -34,12 +35,13 @@
     "handlebars": "^4.0.5",
     "handlebars-loader": "^1.4.0",
     "html-webpack-plugin": "^2.22.0",
+    "image-webpack-loader": "^3.1.0",
     "jshint": "^2.9.2",
     "jshint-loader": "^0.8.3",
     "livereactload": "^2.2.4",
     "load-grunt-tasks": "^3.5.0",
     "node-libs-browser": "^1.0.0",
-    "node-sass": "^4.2.0",
+    "node-sass": "^4.3.0",
     "react": "^15.2.1",
     "react-dom": "^15.2.1",
     "react-proxy": "^1.1.8",
@@ -50,6 +52,7 @@
     "watchify": "^3.7.0",
     "webpack": "^1.13.1",
     "webpack-build": "^1.0.1",
+    "webpack-cleanup-plugin": "^0.4.1",
     "webpack-vendor-chunk-plugin": "^1.0.0"
   },
   "dependencies": {
@@ -69,6 +72,7 @@
     "fs": "0.0.2",
     "immutable": "^3.8.1",
     "isomorphic-fetch": "^2.2.1",
+    "js-base64": "^2.1.9",
     "json-loader": "^0.5.4",
     "json5": "^0.5.1",
     "json5-loader": "^0.6.0",
@@ -97,6 +101,7 @@
     "redux-logger": "^2.6.1",
     "redux-multi": "^0.1.12",
     "redux-thunk": "^2.1.0",
+    "slug": "^0.9.1",
     "style-loader": "0.13.1",
     "three": "0.79.0",
     "url-loader": "0.5.7",

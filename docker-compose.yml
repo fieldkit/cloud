@@ -6,9 +6,16 @@ services:
       - "8080:8080"
     depends_on:
       - redis
-      - mongo
-    command: fieldkit -a :8080 -backend-url mongodb://mongo/fieldkit -session-store-address redis:6379
+      - postgres
+    command: fieldkit -a :8080 -backend-url postgres://fieldkit:password@postgres/fieldkit?sslmode=disable -session-store-address redis:6379 --invite
+    restart: always
   redis:
     image: redis:alpine
-  mongo:
-    image: mongo
+  postgres:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=fieldkit
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fieldkit
+    volumes:
+      - ./schema:/docker-entrypoint-initdb.d/:ro

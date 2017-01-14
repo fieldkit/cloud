@@ -1,6 +1,7 @@
 
 import * as actions from '../../actions'
 import I from 'immutable'
+import slug from 'slug'
 
 export const initialState = I.fromJS({
   suggestedMembers: null,
@@ -9,12 +10,40 @@ export const initialState = I.fromJS({
     nextAction: null,
     nextPath: null
   },
+  currentProjectID: null,
   currentExpeditionID: null,
   currentTeamID: null,
   currentMemberID: [],
   currentDocumentTypeID: null,
   editedTeam: null,
+  projects: {
+    'awesome_adventures': {
+      id: 'awesome_adventures',
+      name: 'Awesome Adventures',
+      expeditions: [
+      ]
+    },
+    'okavango': {
+      id: 'okavango',
+      name: 'okavango',
+      expeditions: [
+        'okavango_16',
+        'bike_16',
+        'cuito_16'
+      ]
+    }
+  },
   expeditions: {
+    'kayak_adventure': {
+      id: 'kayak_adventure',
+      name: 'Kayak Adventure',
+      startDate: new Date('2016-08-17 00:00:00+02:00'),
+      teams: [],
+      selectedDocumentType: {},
+      selectedPreset: null,
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+    },
     'okavango_16': {
       id: 'okavango_16',
       name: 'Okavango 2016',
@@ -29,7 +58,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     },
     'bike_16': {
       id: 'bike_16',
@@ -44,7 +74,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     },
     'cuito_16': {
       id: 'cuito_16',
@@ -60,7 +91,8 @@ export const initialState = I.fromJS({
         sensor: null
       },
       selectedPreset: null,
-      documentTypes: {}
+      documentTypes: {},
+      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
     }
   },
   documentTypes: {
@@ -69,6 +101,7 @@ export const initialState = I.fromJS({
       type: 'member',
       name: 'Member Geolocation',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Ambit wristband']
     },
     'sighting': {
@@ -76,6 +109,7 @@ export const initialState = I.fromJS({
       type: 'member',
       name: 'Sighting',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Uploader']
     },
     'tweet': {
@@ -83,14 +117,16 @@ export const initialState = I.fromJS({
       type: 'social',
       name: 'Tweet',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      setupType: 'token', 
       inputs: ['Twitter account']
     },
-    'sensorReading': {
-      id: 'sensorReading',
+    'conservifyModule': {
+      id: 'conservifyModule',
       type: 'sensor',
-      name: 'Sensor reading',
+      name: 'Conservify Module',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      inputs: ['Conservify water quality sensor']
+      setupType: 'token', 
+      inputs: ['']
     }
   },
   teams: {
@@ -299,6 +335,10 @@ const expeditionReducer = (state = initialState, action) => {
       return state
         .set('currentExpeditionID', expeditionID)
         .setIn(
+          ['projects', state.get('currentProjectID'), 'expeditions'],
+          state.getIn(['projects', state.get('currentProjectID'), 'expeditions']).push(expeditionID)
+        )
+        .setIn(
           ['expeditions', expeditionID], 
           I.fromJS({
             id: expeditionID,
@@ -312,7 +352,8 @@ const expeditionReducer = (state = initialState, action) => {
               sensor: null
             },
             selectedPreset: null,
-            documentTypes: {}
+            documentTypes: {},
+            token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
           })
         )
     }
@@ -425,19 +466,25 @@ const expeditionReducer = (state = initialState, action) => {
         ['expeditions', state.get('currentExpeditionID')].concat(action.keyPath),
         action.value
       )
-      if (action.keyPath.length === 1 && action.keyPath[0] === 'id') {
+      if (action.keyPath.length === 1 && action.keyPath[0] === 'name') {
+        const lastID = state.get('currentExpeditionID')
+        const id = slug(action.value)
         newState = newState
           .setIn(
-            ['expeditions', action.value],
+            ['expeditions', id],
             newState.getIn(['expeditions', state.get('currentExpeditionID')])
           )
-          .deleteIn(
-            ['expeditions', state.get('currentExpeditionID')]
-          )
-          .set('currentExpeditionID', action.value)
+          .setIn(['expeditions', id, 'id'], id)
+          .set('currentExpeditionID', id)
+        if (lastID !== id) {
+          newState = newState.deleteIn(['expeditions', state.get('currentExpeditionID')])
+        }
       }
       return newState
     }
+
+    case actions.SET_CURRENT_PROJECT: 
+      return state.set('currentProjectID', action.projectID)
 
     case actions.SET_CURRENT_EXPEDITION: 
       return state.set('currentExpeditionID', action.expeditionID)

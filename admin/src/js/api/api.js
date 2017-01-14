@@ -148,6 +148,7 @@ export class FKApiClient extends APIClient {
   }
 
   onLogin() {
+    console.log('ONLOGIN')
     localStorage.setItem(LOGGED_IN_KEY, 'loggedIn');
   }
 
@@ -205,6 +206,11 @@ export class FKApiClient extends APIClient {
   async logout(): Promise<void> {
     await this.postForm('http://localhost:8080/api/user/logout');
     this.onLogout();
+  }
+
+  async getProjects () {
+    const res = await this.getJSON('http://localhost:8080/api/projects')
+    return res
   }
 
 }
