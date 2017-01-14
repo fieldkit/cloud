@@ -2,9 +2,16 @@
 
 @import 'utils/reset';
 @import 'utils/align';
+@import 'utils/font-awesome/font-awesome.scss';
+@import 'utils/gridle_config';
 
 @import 'components/type';
+@import 'components/panel';
+@import 'components/label';
+@import 'components/form-group';
 @import 'components/button';
+@import 'components/input';
+@import 'components/signup';
 
 @import 'pages/landing';
 

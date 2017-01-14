@@ -32,6 +32,10 @@
 	}
 }
 
+a.btn:hover {
+	color: white !important;
+}
+
 .btn-secondary {
 	background-color: transparent;
 	border: 1px solid $color-accent;
@@ -45,6 +49,10 @@
 			background-color: transparent;
 		}	
 	}
+}
+
+a.btn-secondary:hover {
+	color: $color-accent !important;
 }
 
 .btn-lg {

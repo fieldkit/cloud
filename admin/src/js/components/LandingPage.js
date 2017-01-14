@@ -1,6 +1,8 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 
+import Signup from './Signup'
+
 import '../../scss/app.scss'
 
 class LandingPage extends React.Component {
@@ -11,9 +13,17 @@ class LandingPage extends React.Component {
     }
   }
 
+  setSlidedState(value, ev) {
+    ev.preventDefault()
+    console.log("state")
+    this.setState({
+      slided : value
+    })
+  }
+
   render () {
     return (
-      <div id="landing-page" className="page landing-page" style={{'background-image':'url(/src/img/fieldkit-background.jpg)'}}>
+      <div id="landing-page" className={"page landing-page " + (this.state.slided ? "slided" : "")} style={{'background-image':'url(/src/img/fieldkit-background.png)'}}>
         <nav className="navigation">
           <ul className="navigation_links">
             <li className="navigation_item">
@@ -26,15 +36,28 @@ class LandingPage extends React.Component {
               <a href="" className="navigation_link">Log in</a>
             </li>
             <li className="navigation_item">
-              <a href="" className="navigation_link sign-up">Join us</a>
+              <a onClick={this.setSlidedState.bind(this, true)} href="#" className="navigation_link sign-up">Join us</a>
             </li>
           </ul>
         </nav>
 
-        <div className="content">
-          <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
-          <p className="content_sub">A one-click open platform for field researchers and explorers</p>
-          <a href="#" className="content_join">Join Us</a>
+        {(this.state.slided &&
+          <a href="#"><i className="slide-back fa fa-long-arrow-up" onClick={this.setSlidedState.bind(this, false)} aria-hidden="true"></i></a>
+        )}
+
+        <div className="slide">
+          <div className="content">
+            <img src="/src/img/national-geographic-logo-long.png" alt="" className="content_nat"/>
+            <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
+            <p className="content_sub">A one-click open platform for field researchers and explorers</p>
+            <a onClick={this.setSlidedState.bind(this, true)} href="#" className="content_join">Join Us</a>
+          </div>
+        </div>
+
+        <div className="slide">
+          <div className="content">
+            <Signup />
+          </div>
         </div>
 
         <footer className="footer">
@@ -42,11 +65,6 @@ class LandingPage extends React.Component {
             <li className="footer_logo">
               <a href="http://conservify.org/" target="_blank" className="footer_logo_link">
                 <img src="/src/img/conservify_logo.png" alt="" className="footer_logo_img"/>
-              </a>
-            </li>
-            <li className="footer_logo">
-              <a href="http://www.nationalgeographic.com/" target="_blank" className="footer_logo_link">
-                <img src="/src/img/national-geographic-logo.png" alt="" className="footer_logo_img"/>
               </a>
             </li>
             <li className="footer_logo">

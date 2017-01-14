@@ -60,4 +60,11 @@ h5, .h5 {
 
 a {
   text-decoration: none;
+  color: inherit;
+
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: $color-accent !important;
 }
