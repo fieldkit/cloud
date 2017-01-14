@@ -5,7 +5,7 @@ import I from 'Immutable'
 // import { lerp, parseDate } from '../utils'
 import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
-import THREE from '../react-three-renderer/node_modules/three'
+import THREE from '../../vendors/react-three-renderer/node_modules/three'
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../constants/mapbox.js'
 
 class Map extends React.Component {

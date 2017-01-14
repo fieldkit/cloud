@@ -23,7 +23,7 @@ module.exports = {
     loaders: [
       { 
         test: /\.css$/, 
-        loader: "style-loader!css-loader" 
+        loader: 'style-loader!css-loader' 
       },
       {
         test: /\.hbs$/,
@@ -32,11 +32,6 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json-loader'
-      }, {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        include: path.resolve('./src/node_modules/mapbox-gl-shaders/index.js'),
-        loader: 'transform/cacheable?brfs'
       },
       {
         test: /\.jsx?$/,
@@ -59,18 +54,13 @@ module.exports = {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
         loader: 'file?name=fonts/[name].[ext]'
       }
-    ],
-    postLoaders: [{
-      include: /node_modules\/mapbox-gl/,
-      loader: 'transform-loader',
-      query: 'brfs',
-    }]
+    ]
   },
   devServer: {
     host: '0.0.0.0',
     port: 8000,
     proxy: {
-      '/api/v1/*': 'http://localhost:3000'
+      '/api/v1/*': 'http://localhost:8080'
     },
     historyApiFallback: true
   },
@@ -88,7 +78,7 @@ module.exports = {
       manifest: require('./src/js/dll/vendor-manifest.json')
     }),
     new HtmlWebpackPlugin({
-      'title': 'INTO THE OKAVANGO',
+      'title': 'FIELDKIT',
       'filename': 'index.html',
       'template': 'src/templates/index.hbs',
       'hash': true,

@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-import THREE from '../react-three-renderer/node_modules/three'
-import React3 from '../react-three-renderer'
+import THREE from '../../vendors/react-three-renderer/node_modules/three'
+import React3 from '../../vendors/react-three-renderer'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
