@@ -89,6 +89,7 @@ class Map extends React.Component {
   render () {
     const { viewport, setViewport, currentDocuments, currentDate } = this.props
 
+
     return (
       <div id="map">
         <MapboxGL

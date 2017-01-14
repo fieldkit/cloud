@@ -1,0 +1,26 @@
+@import 'variables';
+
+@import 'utils/reset';
+@import 'utils/align';
+@import 'utils/font-awesome/font-awesome.scss';
+
+@import 'components/type';
+@import 'components/button';
+@import 'components/map';
+
+@import 'pages/mapPage';
+
+* {
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+
+html, body {
+  color: $color-dark;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+  font-size: 14px;
+  line-height: 25px;
+  min-width: 1024px;
+  width: 100%;
+  height: 100%;
+}
