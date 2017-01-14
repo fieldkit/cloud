@@ -1,31 +1,22 @@
 import React, {PropTypes} from 'react'
-import { Link } from 'react-router'
+import { browserHistory, Link } from 'react-router'
 
 import Signup from './Signup'
+import Signin from './Signin'
 
 import '../../scss/app.scss'
 
 class LandingPage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-
-    }
-  }
-
-  setSlidedState(value, ev) {
-    ev.preventDefault()
-    this.setState({
-      slided : value
-    })
-  }
 
   render () {
 
-    const { requestSignUp } = this.props
+    const { 
+      requestSignUp,
+      requestSignIn
+    } = this.props
 
     return (
-      <div id="landing-page" className={"page landing-page " + (this.state.slided ? "slided" : "")} style={{'backgroundImage':'url(/src/img/fieldkit-background.png)'}}>
+      <div id="landing-page" className={"page landing-page " + (this.props.location.pathname === '/' ? '' : 'slided')} style={{'backgroundImage':'url(/src/img/fieldkit-background.png)'}}>
         <nav className="navigation">
           <ul className="navigation_links">
             <li className="navigation_item">
@@ -35,16 +26,31 @@ class LandingPage extends React.Component {
               <a href="" className="navigation_link">Gallery</a>
             </li>
             <li className="navigation_item">
-              <a href="" className="navigation_link">Log in</a>
+              <Link
+                to={'/signin'}
+                className="navigation_link"
+              >
+                Log in
+              </Link>
             </li>
             <li className="navigation_item">
-              <a onClick={this.setSlidedState.bind(this, true)} href="#" className="navigation_link sign-up">Join us</a>
+              <Link
+                to={'/signup'}
+                className="navigation_link sign-up"
+              >
+                Join us
+              </Link>
             </li>
           </ul>
         </nav>
 
-        {(this.state.slided &&
-          <a href="#"><i className="slide-back fa fa-long-arrow-up" onClick={this.setSlidedState.bind(this, false)} aria-hidden="true"></i></a>
+        {(this.props.location.pathname !== '/' &&
+          <Link to={'/'}>
+            <i 
+              className="slide-back fa fa-long-arrow-up"
+              aria-hidden="true"
+            ></i>
+          </Link>
         )}
 
         <div className="slide">
@@ -52,13 +58,25 @@ class LandingPage extends React.Component {
             <img src="/src/img/national-geographic-logo-long.png" alt="" className="content_nat"/>
             <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
             <p className="content_sub">A one-click open platform for field researchers and explorers</p>
-            <a onClick={this.setSlidedState.bind(this, true)} href="#" className="content_join">Join Us</a>
+            <Link 
+              to={'/signup'}
+              className="content_join"
+            >
+              Join Us
+            </Link>
           </div>
         </div>
 
         <div className="slide">
           <div className="content">
-            <Signup requestSignUp={requestSignUp} />
+            {
+              this.props.location.pathname === '/signup' && 
+              <Signup requestSignUp={requestSignUp} />
+            }
+            {
+              this.props.location.pathname === '/signin' && 
+              <Signin requestSignIn={requestSignIn} />
+            }
           </div>
         </div>
 

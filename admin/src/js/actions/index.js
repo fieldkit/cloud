@@ -389,10 +389,11 @@ AUTH ACTIONS
 
 */
 
-export function requestSignIn (email, password) {
+export function requestSignIn (username, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
-    FKApiClient.get().login(email, password)
+    console.log('requesting sign in ', username, password)
+    FKApiClient.get().login(username, password)
       .then(() => {
         FKApiClient.get().onLogin()
         dispatch(loginSuccess())

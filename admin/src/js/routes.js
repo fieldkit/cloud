@@ -93,11 +93,10 @@ function onLogout () {
 const routes = (
   <Route path="/" component={Root}>
     <IndexRoute component={LandingPageContainer}/>
-    {/*
-      <Route path="signup" component={SignUpPageContainer}/>
-      <Route path="signin" component={SignInPageContainer}/>
-      <Route path="forgot" component={ForgotPasswordPage}/>
-    */}
+    <Route component={LandingPageContainer}>
+      <Route path="signup"/>
+      <Route path="signin"/>
+    </Route>
     <Route path="admin" 
       component={AdminPageContainer} 
       onEnter={requireAuth}
