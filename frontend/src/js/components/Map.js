@@ -1,7 +1,7 @@
 
 import React, { PropTypes } from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-import I from 'Immutable'
+import I from 'immutable'
 // import { lerp, parseDate } from '../utils'
 import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'

@@ -3,6 +3,8 @@
 
 */
 
+import '../css/index.scss'
+
 import 'babel-polyfill'
 
 import React from 'react'

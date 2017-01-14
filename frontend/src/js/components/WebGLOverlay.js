@@ -2,6 +2,7 @@ import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
 import THREE from '../../vendors/react-three-renderer/node_modules/three'
 import React3 from '../../vendors/react-three-renderer'
+import sightingTexture from '../../img/sighting.png'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
@@ -55,7 +56,7 @@ export default class WebGLOverlay extends Component {
       paths,
       particles,
       render () {},
-      sightingTexture: new THREE.TextureLoader().load('src/img/sighting.png'),
+      sightingTexture: new THREE.TextureLoader().load(sightingTexture),
       mousePosition: [0, 0],
     }
   }

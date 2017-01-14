@@ -3,7 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
   entry: {
-    vendor: [path.join(__dirname, 'src', 'js', 'vendors.js')]
+    vendor: [path.join(__dirname, 'src', 'vendors', 'vendors.js')]
   },
   resolve: {
     alias: {
@@ -15,7 +15,7 @@ module.exports = {
     }
   },
   output: {
-    path: path.join(__dirname, 'dist', 'dll'),
+    path: path.join(__dirname, 'src', 'vendors', 'dll'),
     filename: 'dll.[name].js',
     library: '[name]'
   },
@@ -27,6 +27,17 @@ module.exports = {
       { 
         test: /\.css$/, 
         loader: 'style-loader!css-loader' 
+      },
+      {
+        test: /\.scss$/,
+        loaders: ["style-loader", "css-loader", "sass-loader"]
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loaders: [
+          'file?hash=sha512&digest=hex&name=[hash].[ext]',
+          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+        ]
       },
       {
         test: /\.hbs$/,
@@ -50,10 +61,6 @@ module.exports = {
         }
       },
       {
-        test: /\.styl$/,
-        loader: 'style-loader!css-loader!stylus-loader'
-      },
-      {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
         loader: 'file?name=fonts/[name].[ext]'
       }
@@ -61,9 +68,9 @@ module.exports = {
   },
   plugins: [
     new webpack.DllPlugin({
-      path: path.join(__dirname, 'dll', '[name]-manifest.json'),
+      path: path.join(__dirname, 'src', 'vendors', 'dll', '[name]-manifest.json'),
       name: '[name]',
-      context: path.resolve(__dirname, 'src', 'js')
+      context: path.resolve(__dirname, 'src', 'vendors')
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin()

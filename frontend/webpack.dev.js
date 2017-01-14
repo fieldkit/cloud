@@ -26,6 +26,17 @@ module.exports = {
         loader: 'style-loader!css-loader' 
       },
       {
+        test: /\.scss$/,
+        loaders: ["style-loader", "css-loader", "sass-loader"]
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loaders: [
+          'file?hash=sha512&digest=hex&name=[hash].[ext]',
+          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+        ]
+      },
+      {
         test: /\.hbs$/,
         loader: 'handlebars-loader'
       },
@@ -47,10 +58,6 @@ module.exports = {
         }
       },
       {
-        test: /\.styl$/,
-        loader: 'style-loader!css-loader!stylus-loader'
-      },
-      {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
         loader: 'file?name=fonts/[name].[ext]'
       }
@@ -65,23 +72,19 @@ module.exports = {
     historyApiFallback: true
   },
   output: {
-    path: path.join(__dirname),
+    path: path.join(__dirname, 'dist'),
     filename: '[name].[hash].js'
-  },
-  stylus: {
-    use: [require('nib')()],
-    import: ['~nib/lib/nib/index.styl']
   },
   plugins: [
     new webpack.DllReferencePlugin({
       context: path.join(__dirname),
-      manifest: require('./src/js/dll/vendor-manifest.json')
+      manifest: require('./src/vendors/dll/vendor-manifest.json')
     }),
     new HtmlWebpackPlugin({
-      'title': 'FIELDKIT',
-      'filename': 'index.html',
-      'template': 'src/templates/index.hbs',
-      'hash': true,
+      title: 'FIELDKIT',
+      filename: 'index.html',
+      template: 'src/templates/index.hbs',
+      hash: true,
       inject: false
     })
   ]
