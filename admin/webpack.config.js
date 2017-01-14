@@ -1,11 +1,19 @@
 var webpack = require('webpack')
 var path = require('path')
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var WebpackCleanupPlugin = require('webpack-cleanup-plugin');
+
+function isExternal(module) {
+  var userRequest = module.userRequest;
+  if (typeof userRequest !== 'string') {
+    return false
+  }
+  return userRequest.indexOf('node_modules') >= 0
+}
 
 module.exports = {
-  cache: true,
-  context: path.join(__dirname, ''),
-  devtool: 'eval',
+  context: path.join(__dirname),
+  devtool: null,
   entry: ['./src/js/routes.js'],
   resolve: {
     alias: {
@@ -63,22 +71,31 @@ module.exports = {
       }
     ]
   },
-  devServer: {
-    host: '0.0.0.0',
-    port: 8000,
-    proxy: {
-      '/api/v1/*': 'http://localhost:8080'
-    },
-    historyApiFallback: true
-  },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: '[name].[hash].js'
+    filename: '[name].[chunkhash].js'
   },
   plugins: [
-    new webpack.DllReferencePlugin({
-      context: path.join(__dirname),
-      manifest: require('./src/vendors/dll/vendor-manifest.json')
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors',
+      minChunks: function(module) {
+        return isExternal(module);
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({ 
+      minimize: true,
+      comments: false,
+      mangle: false,
+      sourcemap: false 
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': (function(){
+          return JSON.stringify(process.env.NODE_ENV)
+        })()
+      }
     }),
     new HtmlWebpackPlugin({
       title: 'FIELDKIT',
@@ -86,6 +103,7 @@ module.exports = {
       template: 'src/templates/index.hbs',
       hash: true,
       inject: false
-    })
+    }),
+    new WebpackCleanupPlugin()
   ]
 }
