@@ -1,4 +1,13 @@
 
+export function map (val, domain1, domain2, range1, range2) {
+  if (domain1 === domain2) return range1
+  return (val - domain1) / (domain2 - domain1) * (range2 - range1) + range1
+}
+
+export function constrain (val, min, max) {
+  return Math.min(Math.max(min, val), max)
+}
+
 export function dateToString (d, short) {
   var month = d.getUTCMonth() + 1
   var day = d.getUTCDate()

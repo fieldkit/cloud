@@ -7,6 +7,7 @@ import {FKApiClient} from '../api/api.js'
 
 export const INITIALIZE_EXPEDITION = 'INITIALIZE_EXPEDITION'
 export const SET_VIEWPORT = 'SET_VIEWPORT'
+export const UPDATE_DATE = 'UPDATE_DATE'
 
 export function initializeExpedition (id) {
   return function (dispatch, getState) {
@@ -22,6 +23,15 @@ export function setViewport(viewport) {
     dispatch({
       type: SET_VIEWPORT,
       viewport
+    })
+  }
+}
+
+export function updateDate (date) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: UPDATE_DATE,
+      date
     })
   }
 }

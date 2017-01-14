@@ -11,11 +11,15 @@ const mapStateToProps = (state, ownProps) => {
     .filter(d => {
       return state.expeditions.get('currentDocuments').includes(d.get('id'))
     })
+  const currentDate = state.expeditions.get('currentDate')
+  const playbackMode = state.expeditions.get('playbackMode')
 
   return {
     expeditions,
     viewport,
-    currentDocuments
+    currentDocuments, 
+    currentDate,
+    playbackMode
   }
 }
 
@@ -29,6 +33,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     setViewport (viewport) {
       return dispatch(actions.setViewport(viewport))
+    },
+    updateDate (date) {
+      return dispatch(actions.updateDate(date))
     }
   }
 }

@@ -15,6 +15,25 @@ class Map extends React.Component {
     this.redrawGLOverlay = this.redrawGLOverlay.bind(this)
     this.mapToScreen = this.mapToScreen.bind(this)
     this.renderSightings = this.renderSightings.bind(this)
+    this.tick = this.tick.bind(this)
+  }
+
+  tick () {
+    const { currentDate, playbackMode, updateDate } = this.props
+    const framesPerSecond = 60
+    const dateDelta = 
+      (playbackMode === 'forward' ? 100000 :
+      playbackMode === 'fastForward' ? 1000000 :
+      playbackMode === 'backward' ? -100000 :
+      playbackMode === 'fastBackward' ? -1000000 : 
+      0) / framesPerSecond
+    const nextDate = Math.round(currentDate + dateDelta)
+    updateDate(nextDate)
+    requestAnimationFrame(this.tick)
+  }
+
+  componentDidMount () {
+    requestAnimationFrame(this.tick)
   }
 
   redrawGLOverlay ({ unproject } ) {
@@ -68,7 +87,7 @@ class Map extends React.Component {
   }
 
   render () {
-    const { viewport, setViewport, currentDocuments } = this.props
+    const { viewport, setViewport, currentDocuments, currentDate } = this.props
 
     return (
       <div id="map">
