@@ -1,0 +1,31 @@
+@import 'variables';
+
+@import 'utils/reset';
+@import 'utils/align';
+@import 'utils/font-awesome/font-awesome.scss';
+@import 'utils/gridle_config';
+
+@import 'components/type';
+@import 'components/panel';
+@import 'components/label';
+@import 'components/form-group';
+@import 'components/button';
+@import 'components/input';
+@import 'components/signup';
+@import 'components/signin';
+
+@import 'pages/landing';
+
+* {
+	text-rendering: optimizeLegibility;
+	box-sizing: border-box;
+}
+
+html, body {
+	background-color: white;
+	color: $color-dark;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+	font-size: 14px;
+	line-height: 25px;
+	min-width: 1024px;
+}

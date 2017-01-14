@@ -14,7 +14,7 @@ class SignInPage extends React.Component {
   @autobind
   onSubmit (event) {
     event.preventDefault()
-    this.props.requestSignIn(this.refs.userName.value, this.refs.password.value)
+    this.props.requestSignIn(this.refs.username.value, this.refs.password.value)
     return false
   }
 
@@ -39,7 +39,7 @@ class SignInPage extends React.Component {
         <div className="content">
           <h1>Sign in</h1>
           <form>
-            <input type='text' ref='userName' className="form-control" placeholder='Username'/>
+            <input type='text' ref='username' className="form-control" placeholder='Username'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
             <button onClick={this.onSubmit} className="btn btn-primary">
               Login
