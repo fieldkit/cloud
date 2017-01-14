@@ -19,9 +19,9 @@ class SignUpPage extends React.Component {
     this.props.requestSignUp(
       this.refs.email.value, 
       this.refs.userName.value,
-      this.refs.firstName.value,
-      this.refs.lastName.value,
-      this.refs.password.value
+      this.refs.password.value,
+      this.refs.invite.value,
+      this.refs.projectName.value
     )
     return false
   }
@@ -50,11 +50,11 @@ class SignUpPage extends React.Component {
         <div className="content">
           <h1>Sign up</h1>
           <form>
+            <input type='text' ref='invite' className="form-control" placeholder='Invite'/>
             <input type='text' ref='email' className="form-control" placeholder='Email'/>
             <input type='text' ref='userName' className="form-control" placeholder='User Name'/>
-            <input type='text' ref='firstName' className="form-control" placeholder='First Name'/>
-            <input type='text' ref='lastName' className="form-control" placeholder='Last Name'/>
             <input type='password' ref='password' className="form-control" placeholder='Password'/>
+            <input type='text' ref='projectName' className="form-control" placeholder='Project Name'/>
             <button onClick={this.onSubmit} className="btn btn-primary">
               Sign Up
             </button>
