@@ -21,7 +21,6 @@ import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import Root from './components/Root'
-import LandingPage from './components/LandingPage'
 import ForgotPasswordPage from './components/ForgotPasswordPage'
 
 import UploaderSection from './components/UploaderSection'
@@ -32,6 +31,7 @@ import ProfileSection from './components/ProfileSection'
 
 import NewProjectContainer from './containers/NewProjectContainer'
 
+import LandingPageContainer from './containers/LandingPageContainer'
 import AdminPageContainer from './containers/AdminPageContainer'
 import SignUpPageContainer from './containers/SignUpPageContainer'
 import SignInPageContainer from './containers/SignInPageContainer'
@@ -92,10 +92,12 @@ function onLogout () {
 
 const routes = (
   <Route path="/" component={Root}>
-    <IndexRoute component={LandingPage}/>
-    <Route path="signup" component={SignUpPageContainer}/>
-    <Route path="signin" component={SignInPageContainer}/>
-    <Route path="forgot" component={ForgotPasswordPage}/>
+    <IndexRoute component={LandingPageContainer}/>
+    {/*
+      <Route path="signup" component={SignUpPageContainer}/>
+      <Route path="signin" component={SignInPageContainer}/>
+      <Route path="forgot" component={ForgotPasswordPage}/>
+    */}
     <Route path="admin" 
       component={AdminPageContainer} 
       onEnter={requireAuth}

@@ -15,15 +15,17 @@ class LandingPage extends React.Component {
 
   setSlidedState(value, ev) {
     ev.preventDefault()
-    console.log("state")
     this.setState({
       slided : value
     })
   }
 
   render () {
+
+    const { requestSignUp } = this.props
+
     return (
-      <div id="landing-page" className={"page landing-page " + (this.state.slided ? "slided" : "")} style={{'background-image':'url(/src/img/fieldkit-background.png)'}}>
+      <div id="landing-page" className={"page landing-page " + (this.state.slided ? "slided" : "")} style={{'backgroundImage':'url(/src/img/fieldkit-background.png)'}}>
         <nav className="navigation">
           <ul className="navigation_links">
             <li className="navigation_item">
@@ -56,7 +58,7 @@ class LandingPage extends React.Component {
 
         <div className="slide">
           <div className="content">
-            <Signup />
+            <Signup requestSignUp={requestSignUp} />
           </div>
         </div>
 

@@ -1,6 +1,29 @@
-import React from 'react'
+import React, {PropTypes} from 'react'
+import { Link } from 'react-router'
+import { signupUser } from '../actions'
+import { browserHistory } from 'react-router'
+import {FKApiClient} from '../api/api.js';
 
 export default class Signup extends React.Component {
+
+	constructor (props) {
+		super(props)
+		this.state = {}
+		this.onSubmit = this.onSubmit.bind(this)
+	} 
+
+	onSubmit (event) {
+    event.preventDefault()
+    this.props.requestSignUp(
+      this.refs.email.value, 
+      this.refs.username.value,
+      this.refs.password.value,
+      this.refs.invite.value,
+      this.refs.projectName.value
+    )
+    return false
+  }
+
 	render() {
 		return (
 			<div className="signup">
@@ -8,26 +31,31 @@ export default class Signup extends React.Component {
 					<h1 className="signup_title">Join us</h1>	
 				</header>
 
-				<form onSubmit={(ev) => ev.preventDefault()} className="signup_form">
+				<form onSubmit={this.onSubmit} className="signup_form">
 					<div className="signup_content">
 						<div className="signup_group">
 							<label for="email" className="signup_label">E-mail</label>
-							<input id="email" name="email" className="signup_input" type="email" placeholder="e-mail" />
+							<input ref="email" id="email" name="email" className="signup_input" type="email" placeholder="kayak-connoisseur@email.com" />
 						</div>
 
 						<div className="signup_group">
 							<label for="username" className="signup_label">Username</label>
-							<input id="username" name="username" className="signup_input" type="text" placeholder="username" />
+							<input ref="username" id="username" name="username" className="signup_input" type="text" placeholder="kayak-connoisseur" />
 						</div>
 
 						<div className="signup_group">
 							<label for="password" className="signup_label">Password</label>
-							<input id="password" name="password" className="signup_input" type="password" placeholder="password" />
+							<input ref="password" id="password" name="password" className="signup_input" type="password" placeholder="correct horse battery staple" />
 						</div>
 
 						<div className="signup_group">
 							<label for="project" className="signup_label">Project's Name</label>
-							<input id="project" name="project" className="signup_input" type="text"  placeholder="project's name"/>
+							<input ref="projectName" id="project" name="project" className="signup_input" type="text"  placeholder="My Kayak Adventure"/>
+						</div>
+
+						<div className="signup_group">
+							<label for="invite" className="signup_label">Invitation token</label>
+							<input ref="invite" id="invite" name="invite" className="signup_input" type="text"  placeholder="E3NANDTJ3YXM5LNMGNZTF2373LAFTOCC"/>
 						</div>
 					</div>
 

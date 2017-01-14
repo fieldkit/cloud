@@ -2,8 +2,6 @@ import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import { signupUser, errorMessage } from '../actions'
-import { browserHistory } from 'react-router'
-import {FKApiClient} from '../api/api.js';
 
 class SignUpPage extends React.Component {
   constructor (props) {
