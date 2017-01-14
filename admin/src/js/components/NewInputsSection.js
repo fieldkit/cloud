@@ -3,10 +3,13 @@ import {findDOMNode} from 'react-dom'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
-import I from 'Immutable'
+import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 import { Base64 } from 'js-base64'
+
+import iconRemoveSmall from '../../img/icon-remove-small.png'
+
 
 class NewInputsSection extends React.Component {
   constructor (props) {
@@ -92,7 +95,7 @@ class NewInputsSection extends React.Component {
                         removeDocumentType(d.get('id'))
                       }}
                     >  
-                      <img src="/src/img/icon-remove-small.png"/>
+                      <img src={iconRemoveSmall}/>
                     </td>
                   </tbody>
                 )

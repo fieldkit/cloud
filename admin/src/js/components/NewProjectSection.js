@@ -3,7 +3,7 @@ import {findDOMNode} from 'react-dom'
 import { Link } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
-import I from 'Immutable'
+import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 
