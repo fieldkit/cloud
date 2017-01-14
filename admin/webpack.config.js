@@ -101,6 +101,7 @@ module.exports = {
       title: 'FIELDKIT',
       filename: 'index.html',
       template: 'src/templates/index.hbs',
+      'production': true,
       hash: true,
       inject: false
     }),

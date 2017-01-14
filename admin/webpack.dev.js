@@ -10,10 +10,7 @@ module.exports = {
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',
-      'sinon': 'sinon/pkg/sinon',
-      'gl-matrix': path.resolve('./node_modules/gl-matrix/dist/gl-matrix.js'),
-      'mapbox-gl/js/geo/transform': path.join(__dirname, "/node_modules/mapbox-gl/js/geo/transform"),
-      'mapbox-gl': path.join(__dirname, "/node_modules/mapbox-gl/dist/mapbox-gl.js")
+      'sinon': 'sinon/pkg/sinon'
     }
   },
   module: {
@@ -23,7 +20,7 @@ module.exports = {
     loaders: [
       { 
         test: /\.css$/, 
-        loader: 'style-loader!css-loader' 
+        loader: "style-loader!css-loader" 
       },
       {
         test: /\.scss$/,
@@ -43,6 +40,11 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json-loader'
+      }, {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        include: path.resolve('./src/node_modules/mapbox-gl-shaders/index.js'),
+        loader: 'transform/cacheable?brfs'
       },
       {
         test: /\.jsx?$/,
@@ -58,8 +60,19 @@ module.exports = {
         }
       },
       {
+        test: /\.styl$/,
+        loader: 'style-loader!css-loader!stylus-loader'
+      },
+      {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
         loader: 'file?name=fonts/[name].[ext]'
+      }
+    ],
+    postLoaders: [
+      {
+        include: /node_modules\/mapbox-gl-shaders/,
+        loader: 'transform',
+        query: 'brfs'
       }
     ]
   },
@@ -67,24 +80,29 @@ module.exports = {
     host: '0.0.0.0',
     port: 8000,
     proxy: {
-      '/api/v1/*': 'http://localhost:8080'
+      '/api/v1/*': 'http://localhost:3000'
     },
     historyApiFallback: true
   },
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname),
     filename: '[name].[hash].js'
+  },
+  stylus: {
+    use: [require('nib')()],
+    import: ['~nib/lib/nib/index.styl']
   },
   plugins: [
     new webpack.DllReferencePlugin({
       context: path.join(__dirname),
-      manifest: require('./src/vendors/dll/vendor-manifest.json')
+      manifest: require('./src/js/dll/vendor-manifest.json')
     }),
     new HtmlWebpackPlugin({
-      title: 'FIELDKIT',
-      filename: 'index.html',
-      template: 'src/templates/index.hbs',
-      hash: true,
+      'title': 'INTO THE OKAVANGO',
+      'production': false,
+      'filename': 'index.html',
+      'template': 'src/templates/index.hbs',
+      'hash': true,
       inject: false
     })
   ]

@@ -148,6 +148,7 @@ export class FKApiClient extends APIClient {
   }
 
   onLogin() {
+    console.log('ONLOGIN')
     localStorage.setItem(LOGGED_IN_KEY, 'loggedIn');
   }
 

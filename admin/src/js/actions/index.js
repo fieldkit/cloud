@@ -394,12 +394,8 @@ export function requestSignIn (email, password) {
     dispatch(loginRequest())
     FKApiClient.get().login(email, password)
       .then(() => {
+        FKApiClient.get().onLogin()
         dispatch(loginSuccess())
-        console.log('getting projects')
-        FKApiClient.get().getProjects()
-          .then(res => {
-            console.log('aga', res)
-          })
         browserHistory.push('/admin')
       })
       .catch(error => {

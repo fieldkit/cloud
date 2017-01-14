@@ -65,9 +65,7 @@ const reducer = combineReducers({
 const store = createStoreWithMiddleware(reducer)
 
 
-function requireAuth(nextState, replace) {
-  
-  // temporarily commented out as we're setting up auth  
+function requireAuth(nextState, replace) {  
   if (!FKApiClient.get().loggedIn()) {
     replace({
       pathname: '/signin',
