@@ -71,3 +71,48 @@
 ```
 /api/project/{project}/expedition/{expedition}/input/{id}
 ```
+
+## Frontend
+
+### Visualization App
+From `/frontend`
+
+#### install
+```
+npm install
+npm run-script dll
+```
+
+#### develop
+```
+npm start
+```
+Runs on localhost:8000
+
+#### build
+```
+npm run-script dist
+```
+Builds app in `/frontend/dist`
+
+### Admin App
+From `/admin`
+
+#### install
+```
+npm install
+npm run-script dll
+```
+
+#### develop
+```
+npm start
+```
+Runs on localhost:8000
+
+#### build
+```
+npm run-script dist
+```
+Builds app in `/admin/dist`
+
