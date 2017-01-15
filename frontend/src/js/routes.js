@@ -2,7 +2,6 @@
 /*
 
   TODO:
-  path
   what if no expedition selected
   reading texture
   member marker
@@ -11,6 +10,8 @@
   css styling
   drag and zoom interactions
   webGLOverlay rendering optimization
+  path linewidth
+  window resize
 
 */
 
@@ -57,6 +58,15 @@ const store = createStoreWithMiddleware(reducer)
 
 const routes = (
   <Route path="/" component={Root}>
+    <IndexRoute onEnter={(nextState, replace) => {
+      if (nextState.location.pathname === '/') {
+        const expeditionID = store.getState().expeditions.get('expeditions').toList().get(0).get('id')
+        replace({
+          pathname: '/' + expeditionID,
+          state: { nextPathname: nextState.location.pathname }
+        })
+      }
+    }} />
     <Route path=":expeditionID" onEnter={(state) => {
       store.dispatch(actions.initializeExpedition(state.params.expeditionID))
     }}>
