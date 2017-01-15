@@ -2,19 +2,20 @@
 /*
 
   TODO:
+  notifications
+  
   reading texture
   member marker
-  notifications
+  webGLOverlay rendering optimization
+  path linewidth
+  
   identity
   css styling
   drag and zoom interactions
-  webGLOverlay rendering optimization
-  path linewidth
   window resize
 
 */
 
-// import '../css/index.scss'
 import '../scss/app.scss'
 
 import 'babel-polyfill'
