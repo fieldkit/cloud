@@ -117,7 +117,7 @@ const expeditionReducer = (state = initialState, action) => {
 
       const previousDocuments = documents
         .filter(d => {
-          return d.get('date') <= action.date
+          return d.get('date') <= nextDate
         })
       const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
         nextDate < startDate ? documents.first() :
@@ -125,7 +125,7 @@ const expeditionReducer = (state = initialState, action) => {
 
       const nextDocuments = documents
         .filter(d => {
-          return d.get('date') > action.date
+          return d.get('date') > nextDate
         })
       const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
         nextDate < startDate ? documents.first() :
@@ -138,6 +138,11 @@ const expeditionReducer = (state = initialState, action) => {
         .set('currentDate', nextDate)
         .setIn(['viewport', 'longitude'], longitude)
         .setIn(['viewport', 'latitude'], latitude)
+    }
+
+    case actions.SELECT_PLAYBACK_MODE: {
+      return state
+        .set('playbackMode', action.mode)
     }
   }
   return state

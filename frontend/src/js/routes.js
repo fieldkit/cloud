@@ -2,8 +2,10 @@
 /*
 
   TODO:
-  playback
+  playback controls
   timeline
+  path
+  member marker
   notifications
   identity
 
