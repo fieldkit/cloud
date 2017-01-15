@@ -144,6 +144,7 @@ const expeditionReducer = (state = initialState, action) => {
       return state
         .set('playbackMode', action.mode)
     }
+    
   }
   return state
 }

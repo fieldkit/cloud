@@ -19,11 +19,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    saveChangesAndResume () {
-      return dispatch(actions.saveChangesAndResume())
-    },
-    cancelAction () {
-      return dispatch(actions.cancelAction())
+    updateDate (date) {
+      return dispatch(actions.updateDate(date))
     }
   }
 }

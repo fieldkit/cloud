@@ -9,6 +9,7 @@ export const INITIALIZE_EXPEDITION = 'INITIALIZE_EXPEDITION'
 export const SET_VIEWPORT = 'SET_VIEWPORT'
 export const UPDATE_DATE = 'UPDATE_DATE'
 export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
+export const JUMP_TO = 'JUMP_TO'
 
 export function initializeExpedition (id) {
   return function (dispatch, getState) {

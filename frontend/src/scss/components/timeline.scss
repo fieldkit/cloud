@@ -8,5 +8,10 @@
   & svg {
     width: 100%;
     height: 100%;
+
+    & rect {
+      transition: width 0.2s, x 0.2s;
+    }
+
   }
 }
