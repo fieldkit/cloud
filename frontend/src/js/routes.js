@@ -2,7 +2,6 @@
 /*
 
   TODO:
-  what if no expedition selected
   reading texture
   member marker
   notifications
@@ -33,7 +32,7 @@ import expeditionReducer from './reducers/expeditions'
 import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
-import Root from './components/Root'
+import RootContainer from './containers/RootContainer'
 
 import MapPageContainer from './containers/MapPageContainer'
 
@@ -57,7 +56,7 @@ const store = createStoreWithMiddleware(reducer)
 
 
 const routes = (
-  <Route path="/" component={Root}>
+  <Route path="/" component={RootContainer}>
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
         const expeditionID = store.getState().expeditions.get('expeditions').toList().get(0).get('id')
@@ -68,7 +67,7 @@ const routes = (
       }
     }} />
     <Route path=":expeditionID" onEnter={(state) => {
-      store.dispatch(actions.initializeExpedition(state.params.expeditionID))
+      store.dispatch(actions.requestExpedition(state.params.expeditionID))
     }}>
       <IndexRoute component={MapPageContainer} />
       <Route path="map" component={MapPageContainer}/>

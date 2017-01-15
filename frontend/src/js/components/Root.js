@@ -5,14 +5,39 @@ import MapContainer from '../containers/MapContainer'
 
 export default class Root extends React.Component {
   render () {
+
+    const { expeditionFetching, documentsFetching } = this.props
+
     return (
       <div className="root">
-        <MapContainer/>
-        <div className="root_content">
-          <HeaderContainer/>
-          <TimelineContainer/>
-          { this.props.children }
-        </div>
+        { !expeditionFetching && !documentsFetching &&
+          <div>
+            <MapContainer/>
+            <div className="root_content">
+              <HeaderContainer/>
+              <TimelineContainer/>
+              { this.props.children }
+            </div>
+          </div>
+        }
+        { expeditionFetching &&
+          <div
+            style={{
+              color: 'black'
+            }}
+          >
+            fetching expedition...
+          </div>
+        }
+        { documentsFetching &&
+          <div
+            style={{
+              color: 'black'
+            }}
+          >
+            fetching documents...
+          </div>
+        }
       </div>
     )
   }
