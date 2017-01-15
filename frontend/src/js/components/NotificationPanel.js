@@ -18,16 +18,16 @@ class NotificationPanel extends React.Component {
     return (
       <div className="notification-panel">
         <ReactCSSTransitionGroup
-          transitionName="post-transition"
-          transitionEnter={false}
+          transitionName="transition"
+          transitionEnter={true}
           transitionEnterTimeout={500}
-          transitionLeave={false}
+          transitionLeave={true}
           transitionLeaveTimeout={500}
         >
           {
             currentDocuments
               .filter(d => {
-                return true
+                return Math.abs(d.get('date') - currentDate + 100000) < 200000
               })
               .sort((d1, d2) => {
                 return d2.get('date') > d1.get('date')
@@ -35,10 +35,11 @@ class NotificationPanel extends React.Component {
               .map(d => {
                 return (
                   <div class="notification-panel_post">
-                    <div className="notification-panel_post_icon">
+                    <div className="notification-panel_post_content">
+                      <div className="notification-panel_post_content_icon"></div>
+                      <div>{d.get('id')}</div>
+                      <div>{d.get('date')}</div>
                     </div>
-                    <div>{d.get('id')}</div>
-                    <div>{d.get('date')}</div>
                   </div>
                 )
               })
