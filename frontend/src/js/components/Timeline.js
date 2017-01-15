@@ -19,7 +19,7 @@ class Timeline extends React.Component {
     const lineWidth = 0.01388888889 * window.innerWidth
     const lineHeight = 0.02487562189 * window.innerHeight
     const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
-    const w = mouseOver >= 0 && mouseOver < h ? lineWidth : 5
+    const w = mouseOver >= 0 && mouseOver < h ? lineWidth / 2 : 4
     const rad = lineWidth / 2
     const x = lineWidth - w / 2
     const y = lineHeight
@@ -68,12 +68,15 @@ class Timeline extends React.Component {
             height={ h * progress }
             fill="#D0462C"
           />
-          <circle
-            cx={ x + w / 2 }
-            cy={ y + h * progress }
-            r={ rad }
-            fill="#D0462C"
-          />
+          { 
+            mouseOver >= 0 && mouseOver < h &&
+            <circle
+              cx={ x + w / 2 }
+              cy={ y + h * progress }
+              r={ rad }
+              fill="#D0462C"
+            />
+          }
           { 
             mouseOver >= 0 && mouseOver < h &&
             <rect

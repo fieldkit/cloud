@@ -2,13 +2,15 @@
 /*
 
   TODO:
-  timeline
   path
+  what if no expedition selected
+  reading texture
   member marker
   notifications
   identity
   css styling
   drag and zoom interactions
+  webGLOverlay rendering optimization
 
 */
 
