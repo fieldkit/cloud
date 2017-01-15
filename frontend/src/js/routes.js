@@ -2,12 +2,13 @@
 /*
 
   TODO:
-  playback controls
   timeline
   path
   member marker
   notifications
   identity
+  css styling
+  drag and zoom interactions
 
 */
 
