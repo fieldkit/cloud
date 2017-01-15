@@ -1,0 +1,13 @@
+
+.control-panel {
+  width: $line-width * 10;
+
+  &_playback-selector {
+    display: flex;
+    justify-content: space-between;
+
+      &_button {
+        cursor: pointer;
+      }
+  }
+}

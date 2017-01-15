@@ -1,5 +1,6 @@
 
 import React, { PropTypes } from 'react'
+import ControlPanelContainer from '../containers/ControlPanelContainer'
 
 class MapPage extends React.Component {
 
@@ -11,8 +12,10 @@ class MapPage extends React.Component {
 
   render () {
     return (
-      <div id="map-page" className="page">
-        hello world
+      <div className="map-page page">
+        <div className="page_content">
+          <ControlPanelContainer/>
+        </div>
       </div>
     )
   }

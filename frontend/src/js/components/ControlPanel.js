@@ -1,44 +1,64 @@
 
-import React, {PropTypes} from 'react'
-import YearSelector from './YearSelector'
-import DateSelector from './DateSelector'
-import PlaybackSelector from './PlaybackSelector'
-import FocusSelector from './FocusSelector'
-import ZoomSelector from './ZoomSelector'
-import LayoutSelector from './LayoutSelector'
+import React, { PropTypes } from 'react'
+import { dateToString } from '../utils.js'
 
-const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange, viewport}) => {
-  if (!expeditionID) return <div className="controlPanel"></div>
+class ControlPanel extends React.Component {
 
-  // {pathName === '/map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/> : null}
-  // {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/> : null}
-      // <YearSelector expeditions={expeditions} expeditionID={expeditionID} onYearChange={onYearChange}/>
+  constructor (props) {
+    super(props)
+    this.state = {
+    }
+  }
 
-  return (
-    <div className="controlPanel">
-      <DateSelector expeditions={expeditions} expeditionID={expeditionID} currentDate={currentDate} />
-      {location.pathname.indexOf('/map') > -1 && <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/>}
-      {location.pathname.indexOf('/map') > -1 && window.innerWidth > 768 && <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/>}
-    </div>
-  )
+  render () {
+
+    const { currentDate, selectPlaybackMode } = this.props
+
+    return (
+      <div className="control-panel">
+        <div className="control-panel_date-counter">
+          { dateToString(new Date(currentDate)) }
+        </div>
+        <ul className="control-panel_playback-selector">
+          <li
+            className="control-panel_playback-selector_button"
+            onClick={ () => selectPlaybackMode('fastBackward') }
+          >
+            fb
+          </li>
+          <li
+            className="control-panel_playback-selector_button"
+            onClick={ () => selectPlaybackMode('backward') }
+          >
+            b
+          </li>
+          <li
+            className="control-panel_playback-selector_button"
+            onClick={ () => selectPlaybackMode('pause') }
+          >
+            p
+          </li>
+          <li
+            className="control-panel_playback-selector_button"
+            onClick={ () => selectPlaybackMode('forward') }
+          >
+            f
+          </li>
+          <li
+            className="control-panel_playback-selector_button"
+            onClick={ () => selectPlaybackMode('fastForward') }
+          >
+            ff
+          </li>
+        </ul>
+      </div>
+    )
+  }
+
 }
 
 ControlPanel.propTypes = {
-  expeditionID: PropTypes.string,
-  expeditions: PropTypes.object,
-  currentDate: PropTypes.object,
-  playback: PropTypes.string,
-  mainFocus: PropTypes.string,
-  secondaryFocus: PropTypes.string,
-  zoom: PropTypes.number,
-  layout: PropTypes.string,
-  onYearChange: PropTypes.func.isRequired,
-  onPlaybackChange: PropTypes.func.isRequired,
-  onMainFocusChange: PropTypes.func.isRequired,
-  onSecondaryFocusChange: PropTypes.func.isRequired,
-  onZoomChange: PropTypes.func.isRequired,
-  onLayoutChange: PropTypes.func.isRequired,
-  viewPort: PropTypes.object
+
 }
 
 export default ControlPanel

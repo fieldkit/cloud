@@ -3,22 +3,26 @@ import * as actions from '../../actions'
 import I from 'immutable'
 import slug from 'slug'
 import ViewportMercator from 'viewport-mercator-project'
+import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
   currentPage: 'map',
   currentExpedition: '',
+  playbackMode: 'pause',
+  currentDate: new Date(),
   expeditions: {
     'okavango': {
       id: 'okavango',
       name: 'Okavango',
       startDate: new Date(0),
-      endDate: new Date()
+      endDate: new Date(),
+      focusType: 'sensor-reading'
     }
   },
   viewport: {
     latitude: -18.5699229,
     longitude: 22.115456,
-    zoom: 4,
+    zoom: 10,
     width: window.innerWidth,
     height: window.innerHeight,
     startDragLngLat: null,
@@ -82,6 +86,8 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['expeditions', action.id, 'startDate'], startDate)
         .setIn(['expeditions', action.id, 'endDate'], endDate)
         .set('currentDocuments', currentDocuments)
+        .set('currentDate', startDate)
+        .set('playbackMode', 'forward')
     }
 
     case actions.SET_VIEWPORT: {
@@ -94,6 +100,51 @@ const expeditionReducer = (state = initialState, action) => {
         .set('viewport', state.get('viewport')
           .merge(action.viewport))
     }
+
+    case actions.UPDATE_DATE: {
+      const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
+      const startDate = expedition.get('startDate')
+      const endDate = expedition.get('endDate')
+      const nextDate = constrain(action.date, startDate, endDate)
+
+      const documents = state.get('documents')
+        .filter(d => {
+          return state.get('currentDocuments').includes(d.get('id'))
+        })
+        .sort((d1, d2) => {
+          return d2.get('date') < d1.get('date')
+        })
+
+      const previousDocuments = documents
+        .filter(d => {
+          return d.get('date') <= nextDate
+        })
+      const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
+        nextDate < startDate ? documents.first() :
+        nextDate >= endDate ? documents.last() : null
+
+      const nextDocuments = documents
+        .filter(d => {
+          return d.get('date') > nextDate
+        })
+      const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
+        nextDate < startDate ? documents.first() :
+        nextDate >= endDate ? documents.last() : null
+
+      const longitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
+      const latitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
+
+      return state
+        .set('currentDate', nextDate)
+        .setIn(['viewport', 'longitude'], longitude)
+        .setIn(['viewport', 'latitude'], latitude)
+    }
+
+    case actions.SELECT_PLAYBACK_MODE: {
+      return state
+        .set('playbackMode', action.mode)
+    }
+    
   }
   return state
 }

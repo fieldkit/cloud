@@ -7,6 +7,9 @@ import {FKApiClient} from '../api/api.js'
 
 export const INITIALIZE_EXPEDITION = 'INITIALIZE_EXPEDITION'
 export const SET_VIEWPORT = 'SET_VIEWPORT'
+export const UPDATE_DATE = 'UPDATE_DATE'
+export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
+export const JUMP_TO = 'JUMP_TO'
 
 export function initializeExpedition (id) {
   return function (dispatch, getState) {
@@ -22,6 +25,24 @@ export function setViewport(viewport) {
     dispatch({
       type: SET_VIEWPORT,
       viewport
+    })
+  }
+}
+
+export function updateDate (date) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: UPDATE_DATE,
+      date
+    })
+  }
+}
+
+export function selectPlaybackMode (mode) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SELECT_PLAYBACK_MODE,
+      mode
     })
   }
 }

@@ -1,0 +1,15 @@
+
+.navigation {
+  flex-basis: $line-width * 8;
+  display: flex;
+
+  &_link {
+    flex-grow: 1;
+    color: white;
+    text-align: center;
+
+      &:not(.active) {
+        opacity: 0.5;
+      }
+  }
+}

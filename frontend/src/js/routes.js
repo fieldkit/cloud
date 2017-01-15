@@ -1,9 +1,21 @@
 
 /*
 
+  TODO:
+  path
+  what if no expedition selected
+  reading texture
+  member marker
+  notifications
+  identity
+  css styling
+  drag and zoom interactions
+  webGLOverlay rendering optimization
+
 */
 
-import '../css/index.scss'
+// import '../css/index.scss'
+import '../scss/app.scss'
 
 import 'babel-polyfill'
 

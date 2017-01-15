@@ -82,19 +82,19 @@ export default class WebGLOverlay extends Component {
     }
   }
 
-  shouldComponentUpdate (nextProps) {
-    return !this.state.initialRender
-  }
+  // shouldComponentUpdate (nextProps) {
+  //   return !this.state.initialRender
+  // }
 
-  componentWillUpdate (nextProps) {
-  }  
+  // componentWillUpdate (nextProps) {
+  // }  
 
-  componentDidUpdate () {
-    this.setState({
-      ...this.state,
-      initialRender: true
-    })
-  }
+  // componentDidUpdate () {
+  //   this.setState({
+  //     ...this.state,
+  //     initialRender: true
+  //   })
+  // }
 
   render () {
     const { project } = ViewportMercator(this.props)
@@ -142,25 +142,7 @@ export default class WebGLOverlay extends Component {
     //     }
     //   })
 
-    // const lines = paths.ambitGeo.map((p, i) => {
-
-    //   return (
-    //     <line key={i}>
-    //       <geometry
-    //         vertices={p.vertices}
-    //         dynamic={true}
-    //       >
-    //       </geometry>
-    //       <lineBasicMaterial
-    //         linewidth={2}
-    //         opacity={0.7}
-    //         transparent={true}
-    //         color={p.color}
-    //       >
-    //       </lineBasicMaterial>
-    //     </line>
-    //   )
-    // })
+    // console.log('wooop', paths.ambitGeo)
 
     return (
       <div>
@@ -197,7 +179,27 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 { ...cameraProps }
               />
-              {/* lines */}
+              {
+                paths &&
+                // paths.ambitGeo.map((p, i) => {
+                  // return (
+                    <line>
+                      <geometry
+                        vertices={paths.ambitGeo}
+                        dynamic={true}
+                      >
+                      </geometry>
+                      <lineBasicMaterial
+                        linewidth={10}
+                        opacity={0.7}
+                        transparent={false}
+                        color={new THREE.Color('#ffffff')}
+                      >
+                      </lineBasicMaterial>
+                    </line>
+                  // )
+                // }) 
+              }
               { particles &&
                 <points>
                   <bufferGeometry
