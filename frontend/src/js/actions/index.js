@@ -32,7 +32,7 @@ export function requestExpedition (id) {
       }
       dispatch(initializeExpedition(id, res))
       dispatch(requestDocuments(id))
-    }, 1000)
+    }, 500)
   }
 }
 
@@ -95,7 +95,7 @@ export function requestDocuments (id) {
         }
       }
       dispatch(initializeDocuments(id, I.fromJS(res)))
-    }, 1000)
+    }, 500)
   }
 }
 
