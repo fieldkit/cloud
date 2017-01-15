@@ -5,14 +5,15 @@ import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
-  const projects = state.expeditions.get('projects')
-  const expeditions = state.expeditions.get('expeditions')
-  const modal = state.expeditions.get('modal')
+  const currentDate = state.expeditions.get('currentDate')
+  const currentExpedition = state.expeditions.get('currentExpedition')
+  const startDate = state.expeditions.getIn(['expeditions', currentExpedition, 'startDate'])
+  const endDate = state.expeditions.getIn(['expeditions', currentExpedition, 'endDate'])
 
   return {
-    expeditions,
-    projects,
-    modal
+    currentDate,
+    startDate,
+    endDate
   }
 }
 
