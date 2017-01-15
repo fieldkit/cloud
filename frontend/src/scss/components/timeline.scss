@@ -1,0 +1,8 @@
+#timeline {
+  position: absolute;
+  width: $line-width * 2;
+  height: (100vh - $line-height * 4);
+  top: $line-height * 2;
+  left: $line-width;
+  background-color: blue;
+}

@@ -12,7 +12,9 @@ class MapPage extends React.Component {
   render () {
     return (
       <div id="map-page" className="page">
-        hello world
+        <div className="page_content">
+          hello world
+        </div>
       </div>
     )
   }

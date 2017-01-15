@@ -22,7 +22,7 @@ export const initialState = I.fromJS({
   viewport: {
     latitude: -18.5699229,
     longitude: 22.115456,
-    zoom: 4,
+    zoom: 10,
     width: window.innerWidth,
     height: window.innerHeight,
     startDragLngLat: null,
