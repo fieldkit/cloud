@@ -13,6 +13,12 @@ export default class WebGLOverlay extends Component {
     }
 
     const particles = {
+      focus: {
+        count: 1,
+        position: new THREE.BufferAttribute(new Float32Array(1 * 3), 3),
+        color: new THREE.BufferAttribute(new Float32Array(1 * 4), 4),
+        index: new THREE.BufferAttribute(new Float32Array(1 * 1), 1)
+      },
       sightings: {
         count: 1000,
         position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
@@ -142,7 +148,7 @@ export default class WebGLOverlay extends Component {
     //     }
     //   })
 
-    // console.log('wooop', paths.ambitGeo)
+    console.log('wooop', particles.focus.position)
 
     return (
       <div>
@@ -206,6 +212,23 @@ export default class WebGLOverlay extends Component {
                     position={particles.sightings.position}
                     index={particles.sightings.index}
                     color={particles.sightings.color}
+                  />
+                  <shaderMaterial
+                    vertexShader={particles.sightings.vertexShader}
+                    fragmentShader={particles.sightings.fragmentShader}
+                    uniforms={
+                      {texture: { type: 't', value: this.state.sightingTexture }}
+                    }
+                  >
+                  </shaderMaterial>
+                </points>
+              }
+              { particles &&
+                <points>
+                  <bufferGeometry
+                    position={particles.focus.position}
+                    index={particles.focus.index}
+                    color={particles.focus.color}
                   />
                   <shaderMaterial
                     vertexShader={particles.sightings.vertexShader}

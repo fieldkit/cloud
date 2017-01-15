@@ -15,6 +15,7 @@ class Map extends React.Component {
     this.redrawGLOverlay = this.redrawGLOverlay.bind(this)
     this.mapToScreen = this.mapToScreen.bind(this)
     this.renderSightings = this.renderSightings.bind(this)
+    this.renderFocus = this.renderFocus.bind(this)
     this.renderAmbitGeo = this.renderAmbitGeo.bind(this)
     this.tick = this.tick.bind(this)
   }
@@ -44,6 +45,7 @@ class Map extends React.Component {
         particles: {
           ...particles,
           sightings: this.renderSightings(particles.sightings, screenBounds, this.props.currentDocuments),
+          focus: this.renderFocus(particles.focus, screenBounds)
         },
         paths: {
           ...paths,
@@ -88,6 +90,22 @@ class Map extends React.Component {
     particleGeometry.position.needsUpdate = true
     particleGeometry.color.needsUpdate = true
     particleGeometry.data = sightings
+    return particleGeometry
+  }
+
+  renderFocus (particleGeometry, screenBounds) {
+    const { viewport } = this.props
+    const radius = 15
+    const coords = this.mapToScreen([viewport.longitude, viewport.latitude], screenBounds)
+    particleGeometry.position.array[0] = coords[0]
+    particleGeometry.position.array[1] = coords[1]
+    particleGeometry.position.array[2] = radius
+    particleGeometry.color.array[0] = 255
+    particleGeometry.color.array[1] = 255
+    particleGeometry.color.array[2] = 255
+    particleGeometry.color.array[3] = 1
+    particleGeometry.position.needsUpdate = true
+    particleGeometry.color.needsUpdate = true
     return particleGeometry
   }
 

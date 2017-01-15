@@ -2,18 +2,17 @@
 /*
 
   TODO:
-  notifications
-  
-  reading texture
   member marker
-  webGLOverlay rendering optimization
-  path linewidth
-  
+  reading texture
+  lightbox
+
   identity
   css styling
   drag and zoom interactions
   window resize
 
+  webGLOverlay rendering optimization
+  path linewidth
 */
 
 import '../scss/app.scss'
