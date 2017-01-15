@@ -148,8 +148,6 @@ export default class WebGLOverlay extends Component {
     //     }
     //   })
 
-    console.log('wooop', particles.focus.position)
-
     return (
       <div>
         <div
