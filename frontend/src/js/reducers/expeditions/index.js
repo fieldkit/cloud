@@ -10,15 +10,7 @@ export const initialState = I.fromJS({
   currentExpedition: '',
   playbackMode: 'pause',
   currentDate: new Date(),
-  expeditions: {
-    'okavango': {
-      id: 'okavango',
-      name: 'Okavango',
-      startDate: new Date(0),
-      endDate: new Date(),
-      focusType: 'sensor-reading'
-    }
-  },
+  expeditions: {},
   viewport: {
     latitude: -18.5699229,
     longitude: 22.115456,
@@ -72,22 +64,30 @@ export const initialState = I.fromJS({
 
 const expeditionReducer = (state = initialState, action) => {
 
-  // console.log('reducer:', action.type, action)
+  if (action.type !== actions.UPDATE_DATE) console.log('reducer:', action.type, action)
   switch (action.type) {
-    case actions.INITIALIZE_EXPEDITION: {
-      const position = state.get('documents').toList().get(0).getIn(['geometry', 'coordinates'])
-      const startDate = state.get('documents').minBy(d => d.get('date')).get('date')
-      const endDate = state.get('documents').maxBy(d => d.get('date')).get('date')
-      const currentDocuments = state.get('documents').map(d => d.get('id'))
+
+    case actions.REQUEST_EXPEDITION: {
       return state
         .set('currentExpedition', action.id)
+        .setIn(['expeditions', action.id, 'expeditionFetching'], true)
+    }
+
+    case actions.INITIALIZE_EXPEDITION: {
+      return state
+        .setIn(['expeditions', action.id], action.data)
+        .set('currentDate', action.data.get('startDate'))
+        .set('playbackMode', 'forward')
+    }
+
+    case actions.INITIALIZE_DOCUMENTS: {
+      const position = action.data.toList().get(0).getIn(['geometry', 'coordinates'])
+      const currentDocuments = action.data.map(d => d.get('id'))
+      return state
         .setIn(['viewport', 'longitude'], position.get(0))
         .setIn(['viewport', 'latitude'], position.get(1))
-        .setIn(['expeditions', action.id, 'startDate'], startDate)
-        .setIn(['expeditions', action.id, 'endDate'], endDate)
+        .setIn(['expeditions', state.get('currentExpedition'), 'documentsFetching'], false)
         .set('currentDocuments', currentDocuments)
-        .set('currentDate', startDate)
-        .set('playbackMode', 'forward')
     }
 
     case actions.SET_VIEWPORT: {
