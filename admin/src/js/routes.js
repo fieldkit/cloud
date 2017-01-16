@@ -172,5 +172,5 @@ var render = function () {
   )
 }
 
-FKApiClient.setup('http://localhost:8080' || '', onLogout);
+FKApiClient.setup('https://fieldkit.org:8080' || '', onLogout);
 render()

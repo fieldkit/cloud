@@ -186,7 +186,7 @@ export class FKApiClient extends APIClient {
 
   async getCurrentPerson(): Promise<PersonResponse> {
     // response has no content, so any non-error means success
-    const res: PersonResponse = await this.getJSON('http://localhost:8080/api/person/current');
+    const res: PersonResponse = await this.getJSON('https://fieldkit.org:8080/api/person/current');
 
     // Also this method acts as a proxy for logging in sometimes...
     this.onLogin();
@@ -195,21 +195,21 @@ export class FKApiClient extends APIClient {
   }
 
   async register(params: Object): Promise<void> {
-    await this.postForm('http://localhost:8080/api/user/sign-up', params);
+    await this.postForm('https://fieldkit.org:8080/api/user/sign-up', params);
   }
 
   async login(username: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
-    await this.postForm('http://localhost:8080/api/user/sign-in', { username, password });
+    await this.postForm('https://fieldkit.org:8080/api/user/sign-in', { username, password });
   }
 
   async logout(): Promise<void> {
-    await this.postForm('http://localhost:8080/api/user/logout');
+    await this.postForm('https://fieldkit.org:8080/api/user/logout');
     this.onLogout();
   }
 
   async getProjects () {
-    const res = await this.getJSON('http://localhost:8080/api/projects')
+    const res = await this.getJSON('https://fieldkit.org:8080/api/projects')
     return res
   }
 
