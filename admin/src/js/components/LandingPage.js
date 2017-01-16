@@ -6,6 +6,12 @@ import Signin from './Signin'
 
 import '../../scss/app.scss'
 
+import fieldkitBackground from '../../img/fieldkit-background.png'
+import fieldkitLogoRed from '../../img/fieldkit-logo-red.png'
+import nationalGeographicLogoLong from '../../img/national-geographic-logo-long.png'
+import conservifyLogo from '../../img/conservify_logo.png'
+import ocrLogo from '../../img/ocr_logo.jpg'
+
 class LandingPage extends React.Component {
 
   render () {
@@ -16,7 +22,7 @@ class LandingPage extends React.Component {
     } = this.props
 
     return (
-      <div id="landing-page" className={"page landing-page " + (this.props.location.pathname === '/' ? '' : 'slided')} style={{'backgroundImage':'url(/src/img/fieldkit-background.png)'}}>
+      <div id="landing-page" className={"page landing-page " + (this.props.location.pathname === '/' ? '' : 'slided')} style={{'backgroundImage':'url(' + fieldkitBackground + ')'}}>
 
         {(this.props.location.pathname !== '/' &&
           <Link to={'/'}>
@@ -29,8 +35,8 @@ class LandingPage extends React.Component {
 
         <div className="slide">
           <div className="content">
-            <img src="/src/img/national-geographic-logo-long.png" alt="" className="content_nat"/>
-            <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
+            <img src={nationalGeographicLogoLong} alt="" className="content_nat"/>
+            <h1 className="content_title"><img className="content_title_img" src={fieldkitLogoRed} alt="fieldkit"/></h1>
             <p className="content_sub">A one-click open platform for field researchers and explorers</p>
             {/*
               <Link 
@@ -60,12 +66,12 @@ class LandingPage extends React.Component {
           <ul className="footer_logos">
             <li className="footer_logo">
               <a href="http://conservify.org/" target="_blank" className="footer_logo_link">
-                <img src="/src/img/conservify_logo.png" alt="" className="footer_logo_img"/>
+                <img src={conservifyLogo} alt="" className="footer_logo_img"/>
               </a>
             </li>
             <li className="footer_logo">
               <a href="https://ocr.nyc/" target="_blank" className="footer_logo_link">
-                <img src="/src/img/ocr_logo.jpg" alt="" className="footer_logo_img"/>
+                <img src={ocrLogo} alt="" className="footer_logo_img"/>
               </a>
             </li>
           </ul>
