@@ -4,6 +4,7 @@ import fetch from 'whatwg-fetch'
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 import {FKApiClient} from '../api/api.js'
+import I from 'immutable'
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
@@ -383,11 +384,178 @@ export function removeMember (id) {
 }
 
 
+
+/*
+
+DATA ACTIONS
+
+*/
+
+
+export const REQUEST_PROJECTS = 'REQUEST_PROJECTS'
+export const RECEIVE_PROJECTS = 'RECEIVE_PROJECTS'
+export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
+export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
+export const SUBMIT_GENERAL_SETTINGS = 'SUBMIT_GENERAL_SETTINGS'
+
+export function requestProjects () {
+  return function (dispatch, getState) {
+    FKApiClient.get().getProjects()
+      .then(res => {
+        console.log('projects received:', res)
+        if (!res) {
+          dispatch(createProject ('new project'))
+        } else {
+          const projectMap = {}
+          res.forEach(p => {
+            projectMap[p.slug] = p
+          })
+          const projects = I.fromJS(projectMap)
+            .map(p => {
+              return p.merge(I.fromJS({expeditions: []}))
+            })
+          dispatch(receiveProjects(projects))
+
+        }
+      })
+  }
+}
+
+export function createProject (name) {
+  return function (dispatch, getState) {
+    FKApiClient.get().createProjects(name)
+      .then(res => {
+        console.log('project created', res)
+        const projectMap = {}
+        [res].forEach(p => {
+          projectMap[p.slug] = p
+        })
+        const projects = I.fromJS(projectMap)
+          .map(p => {
+            return p.merge(I.fromJS({expeditions: []}))
+          })
+        dispatch(receiveProjects(projects))
+      })
+  }
+}
+
+export function receiveProjects (projects) {
+  return function (dispatch, getState) {
+    const projectID = projects.toList().getIn([0, 'slug'])
+    dispatch([
+      {
+        type: RECEIVE_PROJECTS,
+        projects
+      },
+      {
+        type: SET_CURRENT_PROJECT,
+        projectID: projectID
+      }
+    ])
+    browserHistory.push('/admin/' + projects.toList().getIn([0, 'slug']))
+  }
+}
+
+export function requestExpeditions () {
+  return function (dispatch, getState) {
+    const projectID = getState().expeditions.get('currentProjectID')
+    FKApiClient.get().getExpeditions(projectID)
+      .then(res => {
+        console.log('expeditions received:', res)
+        if (!res) {
+          browserHistory.push('/admin/' + projectID + '/new-expedition')
+        } else {
+          const expeditionMap = {}
+          res.forEach(e => {
+            expeditionMap[e.slug] = e
+          })
+          const expeditions = I.fromJS(expeditionMap)
+            .map(e => {
+              return e.merge(I.fromJS({
+                id: e.get('slug'),
+                token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn',
+                selectedDocumentType: {},
+                documentTypes: {},              
+              }))
+            })
+          dispatch(receiveExpeditions(projectID, expeditions, false))
+        }
+      })
+  }
+}
+
+export function submitGeneralSettings () {
+  return function (dispatch, getState) {
+    const projectID = getState().expeditions.get('currentProjectID')
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    const expeditionName = getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
+    FKApiClient.get().postGeneralSettings(projectID, expeditionName)
+      .then(res => {
+        console.log('expeditions successfully saved:', res)
+        if (!res) {
+          // error
+          console.log('error with expedition creation')
+        } else {
+          const expeditions = I.fromJS({
+            [res.slug]: {
+              id: res.slug,
+              name: res.name,
+              token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn',
+              selectedDocumentType: {},
+              documentTypes: {},
+            }
+          })
+          dispatch(receiveExpeditions(projectID, expeditions, false))
+          browserHistory.push('/admin/' + projectID + '/new-expedition/inputs')
+        }
+      })
+  }
+}
+
+export function submitInputs () {
+  return function (dispatch, getState) {
+
+    const projectID = getState().expeditions.get('currentProjectID')
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    const inputName = getState().expeditions.getIn(['expeditions', expeditionID, 'documentTypes']).toList().get(0).get('id')
+    console.log('sending expedition', projectID, expeditionID, inputName)
+    FKApiClient.get().postInputs(projectID, expeditionID, inputName)
+      .then(res => {
+        console.log('server response:', res)
+        if (!res) {
+          // error
+          console.log('error with input registration')
+        } else {
+          console.log('success')
+          browserHistory.push('/admin/' + projectID + '/new-expedition/confirmation')
+        }
+      })
+  }
+}
+
+export function receiveExpeditions (projectID, expeditions, updateCurrentExpedition) {
+  return function (dispatch, getState) {
+    dispatch(
+      {
+        type: RECEIVE_EXPEDITIONS,
+        projectID,
+        expeditions
+      }
+    )
+    if (updateCurrentExpedition) {
+      const expeditionID = expeditions.toList().getIn([0, 'id'])
+      dispatch(setCurrentExpedition(expeditionID))
+    }
+  }
+}
+
+
 /*
 
 AUTH ACTIONS
 
 */
+
 
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {

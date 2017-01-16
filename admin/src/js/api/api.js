@@ -200,6 +200,7 @@ export class FKApiClient extends APIClient {
 
   async login(username: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
+
     await this.postForm('https://fieldkit.org/api/user/sign-in', { username, password });
   }
 
@@ -210,6 +211,26 @@ export class FKApiClient extends APIClient {
 
   async getProjects () {
     const res = await this.getJSON('https://fieldkit.org/api/projects')
+    return res
+  }
+
+  async createProjects (name) {
+    const res = await this.getJSON('https://fieldkit.org/api/projects/add?name=' + name)
+    return res
+  }
+
+  async getExpeditions (projectID) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expeditions')
+    return res
+  }
+
+  async postGeneralSettings (projectID, expeditionName) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expeditions/add?name=' + expeditionName)
+    return res
+  }
+
+  async postInputs (projectID, expeditionID, inputName) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
     return res
   }
 
