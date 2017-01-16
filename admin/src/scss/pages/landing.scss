@@ -58,7 +58,7 @@
 		@include gridle_row();
 
 		height: 100vh;
-		display: flex;
+		display: flex !important;
 		align-items: center;
 
 		transition: transform 0.6s ease-in-out;
