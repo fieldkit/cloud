@@ -13,6 +13,7 @@
   broken image links
   display profile information
   signup form error feedback
+  change the map endpoints on ItO to call the API with https
 
 */
 
@@ -184,5 +185,5 @@ var render = function () {
   )
 }
 
-FKApiClient.setup('https://fieldkit.org' || '', onLogout);
+FKApiClient.setup('https://fieldkit.org');
 render()
