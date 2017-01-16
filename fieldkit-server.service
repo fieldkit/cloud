@@ -1,0 +1,20 @@
+[Unit]
+Description=fieldkit-server
+
+[Service]
+ExecStartPre=-/usr/bin/docker kill fieldkit-server
+ExecStartPre=-/usr/bin/docker rm fieldkit-server
+ExecStart=/usr/bin/docker run \
+  --name=fieldkit-server \
+  --rm \
+  --read-only \
+  --env-file=/etc/fieldkit-server/fieldkit-server.env \
+  -v /usr/share/ca-certificates/:/etc/ssl/certs:ro \
+  -p 80:80 \
+  ocrnyc/fieldkit
+ExecStop=/usr/bin/docker stop fieldkit-server
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

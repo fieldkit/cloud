@@ -1,7 +1,9 @@
 .git
 .gitignore
 admin/
+build.bash
 docker-compose.yml
+postgres-init.sh
 README.md
 run.sh
 schema
