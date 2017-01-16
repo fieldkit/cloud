@@ -1,5 +1,12 @@
 
 /*
+  load projects
+  fix id issue
+  new project call
+  new sighting call
+  mailing list form
+  broken image links
+  display profile information
 
 */
 
@@ -72,6 +79,8 @@ function requireAuth(nextState, replace) {
       state: { nextPathname: nextState.location.pathname }
     })
   }
+
+  store.dispatch(actions.requestProjects())
 
   let currentProjectID = store.getState().expeditions.get('currentProjectID')
   if (!currentProjectID) currentProjectID = store.getState().expeditions.get('projects').toList().get(0).get('id')

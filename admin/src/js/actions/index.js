@@ -383,11 +383,32 @@ export function removeMember (id) {
 }
 
 
+
+/*
+
+DATA ACTIONS
+
+*/
+
+
+export const REQUEST_PROJECTS = 'REQUEST_PROJECTS'
+
+export function requestProjects () {
+  return function (dispatch, getState) {
+    FKApiClient.get().getProjects()
+      .then(res => {
+        console.log('aga', res)
+      })
+  }
+}
+
+
 /*
 
 AUTH ACTIONS
 
 */
+
 
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {
