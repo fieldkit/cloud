@@ -185,5 +185,5 @@ var render = function () {
   )
 }
 
-FKApiClient.setup('https://fieldkit.org');
+FKApiClient.setup('https://fieldkit.org')
 render()
