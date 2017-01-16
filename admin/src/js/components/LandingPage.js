@@ -17,32 +17,6 @@ class LandingPage extends React.Component {
 
     return (
       <div id="landing-page" className={"page landing-page " + (this.props.location.pathname === '/' ? '' : 'slided')} style={{'backgroundImage':'url(/src/img/fieldkit-background.png)'}}>
-        <nav className="navigation">
-          <ul className="navigation_links">
-            <li className="navigation_item">
-              <a href="" className="navigation_link">About</a>
-            </li> 
-            <li className="navigation_item">
-              <a href="" className="navigation_link">Gallery</a>
-            </li>
-            <li className="navigation_item">
-              <Link
-                to={'/signin'}
-                className="navigation_link"
-              >
-                Log in
-              </Link>
-            </li>
-            <li className="navigation_item">
-              <Link
-                to={'/signup'}
-                className="navigation_link sign-up"
-              >
-                Join us
-              </Link>
-            </li>
-          </ul>
-        </nav>
 
         {(this.props.location.pathname !== '/' &&
           <Link to={'/'}>
@@ -58,12 +32,14 @@ class LandingPage extends React.Component {
             <img src="/src/img/national-geographic-logo-long.png" alt="" className="content_nat"/>
             <h1 className="content_title"><img className="content_title_img" src="/src/img/fieldkit-logo-red.svg" alt="fieldkit"/></h1>
             <p className="content_sub">A one-click open platform for field researchers and explorers</p>
-            <Link 
-              to={'/signup'}
-              className="content_join"
-            >
-              Join Us
-            </Link>
+            {/*
+              <Link 
+                to={'/signup'}
+                className="content_join"
+              >
+                Join Us
+              </Link>
+            */}
           </div>
         </div>
 
@@ -98,6 +74,7 @@ class LandingPage extends React.Component {
     )
   }
 }
+
 
 LandingPage.propTypes = {
 

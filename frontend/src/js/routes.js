@@ -7,6 +7,7 @@
 
   drag and zoom interactions
   webGLOverlay rendering optimization
+  favicon
   path linewidth
   change Map shouldComponentUpdate to allow update when reaching end of timeline
 */
