@@ -95,6 +95,8 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/project/{project}/expeditions", AuthHandler(c, AuthProjectHandler(c, ExpeditionsHandler(c))))
 	api.Handle("/api/project/{project}/expeditions/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAddHandler(c))))
 	api.Handle("/api/project/{project}/expedition/{expedition}", AuthHandler(c, AuthProjectHandler(c, ExpeditionHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}/tokens", AuthHandler(c, AuthProjectHandler(c, ExpeditionAuthTokensHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}/tokens/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAuthTokenAddHandler(c))))
 
 	api.Handle("/api/project/{project}/expedition/{expedition}/inputs", AuthHandler(c, AuthProjectHandler(c, InputsHandler(c))))
 	api.Handle("/api/project/{project}/expedition/{expedition}/inputs/add", AuthHandler(c, AuthProjectHandler(c, InputAddHandler(c))))
