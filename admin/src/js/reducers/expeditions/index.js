@@ -16,110 +16,94 @@ export const initialState = I.fromJS({
   currentMemberID: [],
   currentDocumentTypeID: null,
   editedTeam: null,
-  projects: {
-    'awesome_adventures': {
-      id: 'awesome_adventures',
-      name: 'Awesome Adventures',
-      expeditions: [
-      ]
-    },
-    'okavango': {
-      id: 'okavango',
-      name: 'okavango',
-      expeditions: [
-        'okavango_16',
-        'bike_16',
-        'cuito_16'
-      ]
-    }
-  },
+  projects: {},
   expeditions: {
-    'kayak_adventure': {
-      id: 'kayak_adventure',
-      name: 'Kayak Adventure',
-      startDate: new Date('2016-08-17 00:00:00+02:00'),
-      teams: [],
-      selectedDocumentType: {},
-      selectedPreset: null,
-      documentTypes: {},
-      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    },
-    'okavango_16': {
-      id: 'okavango_16',
-      name: 'Okavango 2016',
-      startDate: new Date('2016-08-17 00:00:00+02:00'),
-      teams: [
-        'o16-river-team',
-        'o16-ground-team'
-      ],
-      selectedDocumentType: {
-        member: null,
-        social: null,
-        sensor: null
-      },
-      selectedPreset: null,
-      documentTypes: {},
-      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    },
-    'bike_16': {
-      id: 'bike_16',
-      name: 'Bike Angola 2016',
-      startDate: new Date('2016-06-21 00:00:00+02:00'),
-      teams: [
-        'b16-ground-team'
-      ],
-      selectedDocumentType: {
-        member: null,
-        social: null,
-        sensor: null
-      },
-      selectedPreset: null,
-      documentTypes: {},
-      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    },
-    'cuito_16': {
-      id: 'cuito_16',
-      name: 'Cuito River 2016',
-      startDate: new Date('2016-02-06 00:00:00+02:00'),
-      teams: [
-        'c16-river-team',
-        'c16-ground-team'
-      ],
-      selectedDocumentType: {
-        member: null,
-        social: null,
-        sensor: null
-      },
-      selectedPreset: null,
-      documentTypes: {},
-      token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    }
+    // 'kayak_adventure': {
+    //   id: 'kayak_adventure',
+    //   name: 'Kayak Adventure',
+    //   startDate: new Date('2016-08-17 00:00:00+02:00'),
+    //   teams: [],
+    //   selectedDocumentType: {},
+    //   selectedPreset: null,
+    //   documentTypes: {},
+    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+    // },
+    // 'okavango_16': {
+    //   id: 'okavango_16',
+    //   name: 'Okavango 2016',
+    //   startDate: new Date('2016-08-17 00:00:00+02:00'),
+    //   teams: [
+    //     'o16-river-team',
+    //     'o16-ground-team'
+    //   ],
+    //   selectedDocumentType: {
+    //     member: null,
+    //     social: null,
+    //     sensor: null
+    //   },
+    //   selectedPreset: null,
+    //   documentTypes: {},
+    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+    // },
+    // 'bike_16': {
+    //   id: 'bike_16',
+    //   name: 'Bike Angola 2016',
+    //   startDate: new Date('2016-06-21 00:00:00+02:00'),
+    //   teams: [
+    //     'b16-ground-team'
+    //   ],
+    //   selectedDocumentType: {
+    //     member: null,
+    //     social: null,
+    //     sensor: null
+    //   },
+    //   selectedPreset: null,
+    //   documentTypes: {},
+    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+    // },
+    // 'cuito_16': {
+    //   id: 'cuito_16',
+    //   name: 'Cuito River 2016',
+    //   startDate: new Date('2016-02-06 00:00:00+02:00'),
+    //   teams: [
+    //     'c16-river-team',
+    //     'c16-ground-team'
+    //   ],
+    //   selectedDocumentType: {
+    //     member: null,
+    //     social: null,
+    //     sensor: null
+    //   },
+    //   selectedPreset: null,
+    //   documentTypes: {},
+    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+    // }
   },
   documentTypes: {
-    'memberGeolocation': {
-      id: 'memberGeolocation',
-      type: 'member',
-      name: 'Member Geolocation',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      setupType: 'token', 
-      inputs: ['Ambit wristband']
-    },
-    'sighting': {
-      id: 'sighting',
-      type: 'member',
-      name: 'Sighting',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      setupType: 'token', 
-      inputs: ['Uploader']
-    },
-    'tweet': {
-      id: 'tweet',
-      type: 'social',
-      name: 'Tweet',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      setupType: 'token', 
-      inputs: ['Twitter account']
-    },
+    // 'memberGeolocation': {
+    //   id: 'memberGeolocation',
+    //   type: 'member',
+    //   name: 'Member Geolocation',
+    //   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+    //   setupType: 'token', 
+    //   inputs: ['Ambit wristband']
+    // },
+    // 'sighting': {
+    //   id: 'sighting',
+    //   type: 'member',
+    //   name: 'Sighting',
+    //   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+    //   setupType: 'token', 
+    //   inputs: ['Uploader']
+    // },
+    // 'tweet': {
+    //   id: 'tweet',
+    //   type: 'social',
+    //   name: 'Tweet',
+    //   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+    //   setupType: 'token', 
+    //   inputs: ['Twitter account']
+    // },
     'conservifyModule': {
       id: 'conservifyModule',
       type: 'sensor',
@@ -130,198 +114,198 @@ export const initialState = I.fromJS({
     }
   },
   teams: {
-    'o16-river-team': {
-      id: 'o16-river-team',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      name: 'river team',
-      members: {
-        steve: {
-          id: 'steve',
-          role: 'Expedition Leader'
-        },
-        jer: {
-          id: 'jer',
-          role: 'Team Leader'
-        },
-        adjany: {
-          id: 'adjany',
-          role: 'Team Member'
-        }
-      },
-      new: false,
-      status: 'ready',
-      editing: false,
-      selectedMember: null
-    },
-    'o16-ground-team': {
-      id: 'o16-ground-team',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus. Donec id dui quis ante congue placerat. Aenean sodales.',
-      name: 'ground team',
-      members: {
-        steve: {
-          id: 'steve',
-          role: 'Expedition Leader'
-        },
-        jer: {
-          id: 'jer',
-          role: 'Team Leader'
-        },
-        adjany: {
-          id: 'adjany',
-          role: 'Team Member'
-        }
-      },
-      new: false,
-      status: 'ready',
-      editing: false,
-      selectedMember: null
-    },
-    'b16-ground-team': {
-      id: 'b16-ground-team',  
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      name: 'ground team',
-      members: {
-        steve: {
-          id: 'steve',
-          role: 'Expedition Leader'
-        },
-        jer: {
-          id: 'jer',
-          role: 'Team Leader'
-        },
-        adjany: {
-          id: 'adjany',
-          role: 'Team Member'
-        }
-      },
-      new: false,
-      status: 'ready',
-      editing: false,
-      selectedMember: null
-    },
-    'c16-river-team': {
-      id: 'c16-river-team',
-      description: 'Lorem ipsum dolor sit amet.',
-      name: 'river team',
-      members: {
-        steve: {
-          id: 'steve',
-          role: 'Expedition Leader'
-        },
-        jer: {
-          id: 'jer',
-          role: 'Team Leader'
-        },
-        adjany: {
-          id: 'adjany',
-          role: 'Team Member'
-        }
-      },
-      new: false,
-      status: 'ready',
-      editing: false,
-      selectedMember: null
-    },
-    'c16-ground-team': {
-      id: 'c16-ground-team',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus.',
-      name: 'ground team',
-      members: {
-        steve: {
-          id: 'steve',
-          role: 'Expedition Leader'
-        },
-        jer: {
-          id: 'jer',
-          role: 'Team Leader'
-        },
-        adjany: {
-          id: 'adjany',
-          role: 'Team Member'
-        }
-      },
-      new: false,
-      status: 'ready',
-      editing: false,
-      selectedMember: null
-    },
+  //   'o16-river-team': {
+  //     id: 'o16-river-team',
+  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+  //     name: 'river team',
+  //     members: {
+  //       steve: {
+  //         id: 'steve',
+  //         role: 'Expedition Leader'
+  //       },
+  //       jer: {
+  //         id: 'jer',
+  //         role: 'Team Leader'
+  //       },
+  //       adjany: {
+  //         id: 'adjany',
+  //         role: 'Team Member'
+  //       }
+  //     },
+  //     new: false,
+  //     status: 'ready',
+  //     editing: false,
+  //     selectedMember: null
+  //   },
+  //   'o16-ground-team': {
+  //     id: 'o16-ground-team',
+  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus. Donec id dui quis ante congue placerat. Aenean sodales.',
+  //     name: 'ground team',
+  //     members: {
+  //       steve: {
+  //         id: 'steve',
+  //         role: 'Expedition Leader'
+  //       },
+  //       jer: {
+  //         id: 'jer',
+  //         role: 'Team Leader'
+  //       },
+  //       adjany: {
+  //         id: 'adjany',
+  //         role: 'Team Member'
+  //       }
+  //     },
+  //     new: false,
+  //     status: 'ready',
+  //     editing: false,
+  //     selectedMember: null
+  //   },
+  //   'b16-ground-team': {
+  //     id: 'b16-ground-team',  
+  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  //     name: 'ground team',
+  //     members: {
+  //       steve: {
+  //         id: 'steve',
+  //         role: 'Expedition Leader'
+  //       },
+  //       jer: {
+  //         id: 'jer',
+  //         role: 'Team Leader'
+  //       },
+  //       adjany: {
+  //         id: 'adjany',
+  //         role: 'Team Member'
+  //       }
+  //     },
+  //     new: false,
+  //     status: 'ready',
+  //     editing: false,
+  //     selectedMember: null
+  //   },
+  //   'c16-river-team': {
+  //     id: 'c16-river-team',
+  //     description: 'Lorem ipsum dolor sit amet.',
+  //     name: 'river team',
+  //     members: {
+  //       steve: {
+  //         id: 'steve',
+  //         role: 'Expedition Leader'
+  //       },
+  //       jer: {
+  //         id: 'jer',
+  //         role: 'Team Leader'
+  //       },
+  //       adjany: {
+  //         id: 'adjany',
+  //         role: 'Team Member'
+  //       }
+  //     },
+  //     new: false,
+  //     status: 'ready',
+  //     editing: false,
+  //     selectedMember: null
+  //   },
+  //   'c16-ground-team': {
+  //     id: 'c16-ground-team',
+  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus.',
+  //     name: 'ground team',
+  //     members: {
+  //       steve: {
+  //         id: 'steve',
+  //         role: 'Expedition Leader'
+  //       },
+  //       jer: {
+  //         id: 'jer',
+  //         role: 'Team Leader'
+  //       },
+  //       adjany: {
+  //         id: 'adjany',
+  //         role: 'Team Member'
+  //       }
+  //     },
+  //     new: false,
+  //     status: 'ready',
+  //     editing: false,
+  //     selectedMember: null
+  //   },
   },
   people: {
-    'jer': {
-      id: 'jer',
-      name: 'Jer Thorp',
-      role: 'Team Leader',
-      teams: [
-        'o16-river-team',
-        'c16-river-team',
-      ],
-      inputs: [
-        'ambit',
-        'sightings',
-        'twitter',
-      ]
-    },
-    'steve': {
-      id: 'steve',
-      name: 'Steve Boyes',
-      role: 'Expedition Leader',
-      teams: [
-        'o16-river-team',
-        'b16-ground-team',
-        'c16-river-team',
-      ],
-      inputs: [
-        'ambit',
-        'sightings',
-        'twitter',
-      ]
-    },
-    'shah': {
-      id: 'shah',
-      name: 'Shah Selbe',
-      role: 'Team Member',
-      teams: [
-        'o16-river-team',
-        'c16-ground-team'
-      ],
-      inputs: [
-        'ambit',
-        'sightings',
-        'twitter',
-      ]
-    },
-    'adjany': {
-      id: 'adjany',
-      name: 'Adjany Costa',
-      role: 'Team Member',
-      teams: [
-        'o16-ground-team',
-        'b16-ground-team',
-        'c16-ground-team'
-      ],
-      inputs: [
-        'ambit',
-        'sightings',
-        'twitter',
-      ]
-    },
-    'john': {
-      id: 'john',
-      name: 'John Hilton',
-      role: 'Team Leader',
-      teams: [
-        'o16-river-team',
-        'o16-ground-team',
-        'b16-ground-team',
-        'c16-river-team',
-        'c16-ground-team'
-      ],
-      inputs: [
-        'ambit',
-        'sightings',
-        'twitter',
-      ]
-    }
+    // 'jer': {
+    //   id: 'jer',
+    //   name: 'Jer Thorp',
+    //   role: 'Team Leader',
+    //   teams: [
+    //     'o16-river-team',
+    //     'c16-river-team',
+    //   ],
+    //   inputs: [
+    //     'ambit',
+    //     'sightings',
+    //     'twitter',
+    //   ]
+    // },
+    // 'steve': {
+    //   id: 'steve',
+    //   name: 'Steve Boyes',
+    //   role: 'Expedition Leader',
+    //   teams: [
+    //     'o16-river-team',
+    //     'b16-ground-team',
+    //     'c16-river-team',
+    //   ],
+    //   inputs: [
+    //     'ambit',
+    //     'sightings',
+    //     'twitter',
+    //   ]
+    // },
+    // 'shah': {
+    //   id: 'shah',
+    //   name: 'Shah Selbe',
+    //   role: 'Team Member',
+    //   teams: [
+    //     'o16-river-team',
+    //     'c16-ground-team'
+    //   ],
+    //   inputs: [
+    //     'ambit',
+    //     'sightings',
+    //     'twitter',
+    //   ]
+    // },
+    // 'adjany': {
+    //   id: 'adjany',
+    //   name: 'Adjany Costa',
+    //   role: 'Team Member',
+    //   teams: [
+    //     'o16-ground-team',
+    //     'b16-ground-team',
+    //     'c16-ground-team'
+    //   ],
+    //   inputs: [
+    //     'ambit',
+    //     'sightings',
+    //     'twitter',
+    //   ]
+    // },
+    // 'john': {
+    //   id: 'john',
+    //   name: 'John Hilton',
+    //   role: 'Team Leader',
+    //   teams: [
+    //     'o16-river-team',
+    //     'o16-ground-team',
+    //     'b16-ground-team',
+    //     'c16-river-team',
+    //     'c16-ground-team'
+    //   ],
+    //   inputs: [
+    //     'ambit',
+    //     'sightings',
+    //     'twitter',
+    //   ]
+    // }
   }
 })
 
@@ -329,6 +313,18 @@ const expeditionReducer = (state = initialState, action) => {
 
   console.log('reducer:', action.type, action)
   switch (action.type) {
+
+    case actions.RECEIVE_PROJECTS: {
+      return state
+        .set('projects', action.projects)
+    }
+
+    case actions.RECEIVE_EXPEDITIONS: {
+      const newExpeditions = state.get('expeditions').merge(action.expeditions)
+      return state
+        .set('expeditions', newExpeditions)
+        .setIn(['projects', state.get('currentProjectID'), 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
+    }
 
     case actions.ADD_EXPEDITION: {
       const expeditionID = 'expedition-' + Date.now()
@@ -466,7 +462,7 @@ const expeditionReducer = (state = initialState, action) => {
         ['expeditions', state.get('currentExpeditionID')].concat(action.keyPath),
         action.value
       )
-      if (action.keyPath.length === 1 && action.keyPath[0] === 'name') {
+      if (action.keyPath.length === 1 && action.keyPath[0] === 'name' && !!action.value) {
         const lastID = state.get('currentExpeditionID')
         const id = slug(action.value)
         newState = newState
@@ -476,10 +472,17 @@ const expeditionReducer = (state = initialState, action) => {
           )
           .setIn(['expeditions', id, 'id'], id)
           .set('currentExpeditionID', id)
+          .setIn(
+            ['projects', state.get('currentProjectID'), 'expeditions'],
+            state.getIn(['projects', state.get('currentProjectID'), 'expeditions'])
+              .pop()
+              .push(id)
+          )
         if (lastID !== id) {
           newState = newState.deleteIn(['expeditions', state.get('currentExpeditionID')])
         }
       }
+      console.log(newState.toJS())
       return newState
     }
 

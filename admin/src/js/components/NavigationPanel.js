@@ -10,6 +10,8 @@ class NavigationPanel extends React.Component {
   render () {
     const { projectID, expeditionID, expeditions, disconnect, projects } = this.props
 
+
+
     return (
       <div id="header">
         <div className="background"/>
