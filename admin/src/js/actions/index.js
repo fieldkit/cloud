@@ -426,7 +426,7 @@ export function createProject (name) {
     FKApiClient.get().createProjects(name)
       .then(res => {
         console.log('project created', res)
-        const projectMap = {}
+        const projectMap = {};
         [res].forEach(p => {
           projectMap[p.slug] = p
         })
