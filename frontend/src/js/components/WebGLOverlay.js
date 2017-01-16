@@ -2,23 +2,14 @@ import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
 import THREE from '../../vendors/react-three-renderer/node_modules/three'
 import React3 from '../../vendors/react-three-renderer'
-import sightingTexture from '../../img/sighting.png'
+import sightingTexturePath from '../../img/sighting.png'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
 
-    const paths = {
-      ambitGeo: []
-    }
-
-    const particles = {
-      sightings: {
-        count: 1000,
-        position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
-        color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
-        index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
-        data: [],
+    const shaders = {
+      particles: {
         vertexShader: [
           'attribute vec4 color;',
           'varying vec4 vColor;',
@@ -45,61 +36,74 @@ export default class WebGLOverlay extends Component {
       }
     }
 
-    for (var k in particles) {
-      for (var i = 0; i < particles[k].count; i++) {
-        particles[k].index.array[i] = i
+    const bufferGeometries = {
+      focusParticles: {
+        count: 1,
+        position: new THREE.BufferAttribute(new Float32Array(1 * 3), 3),
+        color: new THREE.BufferAttribute(new Float32Array(1 * 4), 4),
+        index: new THREE.BufferAttribute(new Uint16Array(1 * 1), 1)
+      },
+      readingParticles: {
+        count: 1000,
+        position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+        color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
+        index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1)
+      }
+    }
+    for (let k in bufferGeometries) {
+      for (let i = 0; i < bufferGeometries[k].count; i++) {
+        bufferGeometries[k].index.array[i] = i
       }
     }
 
+    const sightingTexture = new THREE.TextureLoader().load(sightingTexturePath)
+
     this.state = {
-      initialRender: false,
-      paths,
-      particles,
-      render () {},
-      sightingTexture: new THREE.TextureLoader().load(sightingTexture),
-      mousePosition: [0, 0],
+      shaders,
+      sightingTexture,
+      bufferGeometries
     }
   }
 
   componentWillReceiveProps (nextProps) {
+    const { bufferGeometries } = this.state
+    const {
+      focusParticles,
+      readingParticles,
+    } = nextProps
 
-    if (
-      this.props.latitude !== nextProps.latitude ||
-      this.props.longitude !== nextProps.longitude ||
-      this.props.zoom !== nextProps.zoom ||
-      this.props.width !== nextProps.width ||
-      this.props.height !== nextProps.height
-      ) {
-      const { unproject } = ViewportMercator(nextProps)
-      const render = nextProps.redraw({ unproject })
-      const { particles, paths } = render(this.state.particles, this.state.paths)
-      this.setState({
-        ...this.state,
-        particles,
-        paths,
-        render
-      })
-    }
+    bufferGeometries.focusParticles.position.array = focusParticles.position
+    bufferGeometries.focusParticles.position.needsUpdate = true
+    bufferGeometries.focusParticles.color.array = focusParticles.color
+    bufferGeometries.focusParticles.color.needsUpdate = true
+    
+    bufferGeometries.readingParticles.position.array = readingParticles.position
+    bufferGeometries.readingParticles.position.needsUpdate = true
+    bufferGeometries.readingParticles.color.array = readingParticles.color
+    bufferGeometries.readingParticles.color.needsUpdate = true
+
+    this.setState({
+      ...this.state,
+      bufferGeometries
+    })
   }
-
-  // shouldComponentUpdate (nextProps) {
-  //   return !this.state.initialRender
-  // }
-
-  // componentWillUpdate (nextProps) {
-  // }  
-
-  // componentDidUpdate () {
-  //   this.setState({
-  //     ...this.state,
-  //     initialRender: true
-  //   })
-  // }
 
   render () {
     const { project } = ViewportMercator(this.props)
-    const { width, height, longitude, latitude } = this.props
-    const { particles, paths } = this.state
+
+    const { 
+      width,
+      height,
+      longitude,
+      latitude,
+      readingPath
+    } = this.props
+
+    const { 
+      bufferGeometries,
+      shaders,
+      sightingTexture
+     } = this.state
 
     const point = project([longitude, latitude])
     const startPoint = project([this.state.longitude, this.state.latitude])
@@ -116,56 +120,9 @@ export default class WebGLOverlay extends Component {
       lookAt: new THREE.Vector3(left, top, 0)
     }
 
-    // const sightingLabels = particles.sightings.data
-    //   .map((p, i) => {
-    //     var x = particles.sightings.position.array[i * 3 + 0]
-    //     var y = particles.sightings.position.array[i * 3 + 1]
-    //     if (x >= window.innerWidth / 3 && x < 2 * window.innerWidth / 3 && y >= window.innerHeight / 3 && y < 2 * window.innerHeight / 3) {
-    //       return (
-    //         <div
-    //           key={i}
-    //           className={'sighting-label'}
-    //           style={{
-    //             left: x,
-    //             top: y
-    //           }}
-    //         >
-    //           <div
-    //             className="arrow-box"
-    //           >
-    //             {p.count + ' ' + p.name}
-    //           </div>
-    //         </div>
-    //       )
-    //     } else {
-    //       return null
-    //     }
-    //   })
-
-    // console.log('wooop', paths.ambitGeo)
-
     return (
       <div>
-        <div
-          className={'hitbox'}
-          onMouseMove={this.onMouseMove}
-          onMouseOut={this.onMouseOut}
-          onClick={this.onClick}
-        >
-        </div>
-        <div
-          id="html-renderer"
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%'
-          }}
-        >
-         {/*sightingLabels*/}
-         {/*memberMarkers*/}
-        </div>
-        <div id="three-renderer"
-        >
+        <div id="three-renderer">
           <React3
             mainCamera="camera"
             width={width}
@@ -180,39 +137,60 @@ export default class WebGLOverlay extends Component {
                 { ...cameraProps }
               />
               {
-                paths &&
-                // paths.ambitGeo.map((p, i) => {
-                  // return (
-                    <line>
-                      <geometry
-                        vertices={paths.ambitGeo}
-                        dynamic={true}
-                      >
-                      </geometry>
-                      <lineBasicMaterial
-                        linewidth={10}
-                        opacity={0.7}
-                        transparent={false}
-                        color={new THREE.Color('#ffffff')}
-                      >
-                      </lineBasicMaterial>
-                    </line>
-                  // )
-                // }) 
+                !!readingPath &&
+                <line>
+                  <geometry
+                    vertices={readingPath}
+                    dynamic={true}
+                  >
+                  </geometry>
+                  <lineBasicMaterial
+                    linewidth={10}
+                    opacity={0.7}
+                    transparent={false}
+                    color={new THREE.Color('#ffffff')}
+                  >
+                  </lineBasicMaterial>
+                </line>
               }
-              { particles &&
+              { 
+                !!bufferGeometries.readingParticles &&
                 <points>
                   <bufferGeometry
-                    position={particles.sightings.position}
-                    index={particles.sightings.index}
-                    color={particles.sightings.color}
+                    position={ bufferGeometries.readingParticles.position }
+                    color={ bufferGeometries.readingParticles.color }
+                    index={ bufferGeometries.readingParticles.index }
                   />
                   <shaderMaterial
-                    vertexShader={particles.sightings.vertexShader}
-                    fragmentShader={particles.sightings.fragmentShader}
-                    uniforms={
-                      {texture: { type: 't', value: this.state.sightingTexture }}
-                    }
+                    vertexShader={ shaders.particles.vertexShader}
+                    fragmentShader={ shaders.particles.fragmentShader}
+                    uniforms={{
+                      texture: { 
+                        type: 't',
+                        value: sightingTexture 
+                      }
+                    }}
+                  >
+                  </shaderMaterial>
+                </points>
+              }
+              { 
+                !!bufferGeometries.focusParticles &&
+                <points>
+                  <bufferGeometry
+                    position={ bufferGeometries.focusParticles.position }
+                    color={ bufferGeometries.focusParticles.color }
+                    index={ bufferGeometries.focusParticles.index }
+                  />
+                  <shaderMaterial
+                    vertexShader={ shaders.particles.vertexShader}
+                    fragmentShader={ shaders.particles.fragmentShader}
+                    uniforms={{
+                      texture: { 
+                        type: 't',
+                        value: sightingTexture 
+                      }
+                    }}
                   >
                   </shaderMaterial>
                 </points>
@@ -223,8 +201,6 @@ export default class WebGLOverlay extends Component {
       </div>
     )
   }
-
 }
 
-WebGLOverlay.propTypes = {
-}
+WebGLOverlay.propTypes = {}

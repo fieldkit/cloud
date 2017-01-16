@@ -17,11 +17,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    saveChangesAndResume () {
-      return dispatch(actions.saveChangesAndResume())
-    },
-    cancelAction () {
-      return dispatch(actions.cancelAction())
+    setMousePosition (x, y) {
+      return dispatch(actions.setMousePosition(x, y))
     }
   }
 }
