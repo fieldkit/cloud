@@ -2,16 +2,13 @@
 /*
 
   TODO:
-  lightbox
-  reading texture
-
-  identity
-  css styling
-  drag and zoom interactions
+  styling
   window resize
 
+  drag and zoom interactions
   webGLOverlay rendering optimization
   path linewidth
+  change Map shouldComponentUpdate to allow update when reaching end of timeline
 */
 
 import '../scss/app.scss'

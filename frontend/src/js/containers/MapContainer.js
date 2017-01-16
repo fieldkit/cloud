@@ -15,6 +15,9 @@ const mapStateToProps = (state, ownProps) => {
     })
   const currentDate = state.expeditions.get('currentDate')
   const playbackMode = state.expeditions.get('playbackMode')
+  const mousePosition = state.expeditions.get('mousePosition')
+  let focusedDocument = null
+  let focusDistance = 25
 
   // 
   // MAP BUFFER GEOMETRIES
@@ -64,6 +67,14 @@ const mapStateToProps = (state, ownProps) => {
     readingParticles.color[i * 4 + 3] = 1
 
     readingPath[i] = new THREE.Vector3(x, y, 0)
+
+    const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
+    if (distanceToMouse < focusDistance) {
+      focusDistance = distanceToMouse
+      focusedDocument = sighting
+        .set('x', x)
+        .set('y', y)
+    }
   })
 
   // clear up unused particles
@@ -79,7 +90,8 @@ const mapStateToProps = (state, ownProps) => {
     playbackMode,
     focusParticles,
     readingParticles,
-    readingPath
+    readingPath,
+    focusedDocument
   }
 }
 

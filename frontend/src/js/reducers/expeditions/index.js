@@ -10,6 +10,7 @@ export const initialState = I.fromJS({
   currentExpedition: '',
   playbackMode: 'pause',
   currentDate: new Date(),
+  mousePosition: [-1, -1],
   expeditions: {},
   viewport: {
     latitude: -18.5699229,
@@ -64,7 +65,9 @@ export const initialState = I.fromJS({
 
 const expeditionReducer = (state = initialState, action) => {
 
-  if (action.type !== actions.UPDATE_DATE) console.log('reducer:', action.type, action)
+  if (action.type !== actions.UPDATE_DATE && action.type !== actions.SET_MOUSE_POSITION ) {
+    console.log('reducer:', action.type, action)
+  }
   switch (action.type) {
 
     case actions.REQUEST_EXPEDITION: {
@@ -143,6 +146,12 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.SELECT_PLAYBACK_MODE: {
       return state
         .set('playbackMode', action.mode)
+    }
+
+    case actions.SET_MOUSE_POSITION: {
+      return state
+        .setIn(['mousePosition', 0], action.x)
+        .setIn(['mousePosition', 1], action.y)
     }
     
   }

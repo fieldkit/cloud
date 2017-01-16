@@ -1,12 +1,8 @@
 
 import React, { PropTypes } from 'react'
-import ViewportMercator from 'viewport-mercator-project'
-import I from 'immutable'
-// import { lerp, parseDate } from '../utils'
 import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
 import DOMOverlay from './DOMOverlay'
-import THREE from '../../vendors/react-three-renderer/node_modules/three'
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../constants/mapbox.js'
 
 class Map extends React.Component {
@@ -34,13 +30,19 @@ class Map extends React.Component {
     requestAnimationFrame(this.tick)
   }
 
+  shouldComponentUpdate (nextProps) {
+    return this.props.currentDate !== nextProps.currentDate ||
+      nextProps.playbackMode === 'pause'      
+  }
+
   render () {
     const {
       viewport,
       setViewport,
       focusParticles,
       readingParticles,
-      readingPath
+      readingPath,
+      focusedDocument
     } = this.props
 
     return (
@@ -61,22 +63,15 @@ class Map extends React.Component {
             readingParticles={ readingParticles }
             readingPath={ readingPath }
           />
-          {/*
-            <DOMOverlay
-              { ...viewport }
-              startDragLngLat={[0, 0]}
-              redraw={this.redrawDOMOverlay}
-            />
-          */}
+          <DOMOverlay
+            focusedDocument={ focusedDocument }
+          />
         </MapboxGL>
       </div>
     )
   }
-
 }
 
-Map.propTypes = {
-
-}
+Map.propTypes = {}
 
 export default Map
