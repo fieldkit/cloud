@@ -66,7 +66,30 @@ func InputAddHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		input, err := data.NewInput(expedition.ID)
+		errs := data.NewErrors()
+
+		// Validate the input name.
+		name, slug := data.Name(req.FormValue("name"))
+		if name == "" || slug == "" {
+			errs.Error("name", "invalid Name")
+		} else {
+			slugInUse, err := c.Backend.InputSlugInUse(expedition.ID, slug)
+			if err != nil {
+				Error(w, err, 500)
+				return
+			}
+
+			if slugInUse {
+				errs.Error("name", "Name in use")
+			}
+		}
+
+		if len(errs) > 0 {
+			WriteJSONStatusCode(w, errs, 400)
+			return
+		}
+
+		input, err := data.NewInput(expedition.ID, name, slug)
 		if err != nil {
 			Error(w, err, 500)
 			return

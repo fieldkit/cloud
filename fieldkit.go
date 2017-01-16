@@ -16,12 +16,13 @@ import (
 )
 
 var flagConfig struct {
-	addr                 string
-	backendURL           string
-	backendTLS           bool
-	sessionStoreAddr     string
-	sessionStorePassword string
-	invite               bool
+	addr                    string
+	backendURL              string
+	backendTLS              bool
+	sessionStoreAddr        string
+	sessionStorePassword    string
+	adminPath, frontendPath string
+	invite                  bool
 }
 
 func init() {
@@ -29,6 +30,8 @@ func init() {
 	flag.StringVar(&flagConfig.backendURL, "backend-url", "postgres://localhost/fieldkit?sslmode=disable", "PostgreSQL URL")
 	flag.StringVar(&flagConfig.sessionStoreAddr, "session-store-address", "localhost:6379", "redis session store address")
 	flag.StringVar(&flagConfig.sessionStorePassword, "session-store-password", "", "redis session store password")
+	flag.StringVar(&flagConfig.adminPath, "admin", "", "admin path")
+	flag.StringVar(&flagConfig.frontendPath, "frontend", "", "frontend path")
 	flag.BoolVar(&flagConfig.invite, "invite", false, "add a new invite and quit")
 }
 
@@ -81,6 +84,8 @@ func main() {
 		Backend:      b,
 		Emailer:      emailer,
 		SessionStore: sessionStore,
+		AdminPath:    flagConfig.adminPath,
+		FrontendPath: flagConfig.frontendPath,
 	}
 
 	server, err := webserver.NewWebserver(c)

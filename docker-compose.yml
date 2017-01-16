@@ -1,6 +1,6 @@
 version: '2'
 services:
-  web:
+  api:
     build: .
     ports:
       - "8080:8080"
@@ -9,6 +9,13 @@ services:
       - postgres
     command: fieldkit -a :8080 -backend-url postgres://fieldkit:password@postgres/fieldkit?sslmode=disable -session-store-address redis:6379 --invite
     restart: always
+  frontend:
+    build: ./admin
+    ports:
+      - "8000:8000"
+    depends_on:
+      - api
+    command: npm start
   redis:
     image: redis:alpine
   postgres:

@@ -15,6 +15,12 @@
 			"revisionTime": "2016-12-08T17:59:49Z"
 		},
 		{
+			"checksumSHA1": "HV+n83IYABchl0tUDa8CctybR7c=",
+			"path": "github.com/O-C-R/singlepage",
+			"revision": "6ced795e8097c06efaf5e3e9ba2159648d8de726",
+			"revisionTime": "2016-09-19T16:11:51Z"
+		},
+		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
 			"path": "github.com/garyburd/redigo/internal",
 			"revision": "8c052d82153967815d9093a7e9d3e7fd2e554861",

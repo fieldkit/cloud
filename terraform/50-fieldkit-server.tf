@@ -6,8 +6,8 @@ data "template_file" "fieldkit-server-a" {
 }
 
 resource "aws_instance" "fieldkit-server-a" {
-  ami = "ami-4d795c5a"
-  instance_type = "t2.medium"
+  ami = "ami-3b7f9e2d"
+  instance_type = "m4.large"
   subnet_id = "${aws_subnet.fieldkit-a.id}"
   associate_public_ip_address = true
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.fieldkit-server.id}"]
@@ -31,9 +31,9 @@ resource "aws_route53_record" "fieldkit-server-a" {
   records = ["${aws_instance.fieldkit-server-a.public_ip}"]
 }
 
-resource "aws_elb" "fieldkit" {
+resource "aws_elb" "fieldkit-server" {
   name = "fieldkit"
-  subnets = ["${aws_subnet.fieldkit-a.id}", "${aws_subnet.fieldkit-c.id}", "${aws_subnet.fieldkit-d.id}", "${aws_subnet.fieldkit-e.id}"]
+  subnets = ["${aws_subnet.fieldkit-a.id}", "${aws_subnet.fieldkit-b.id}", "${aws_subnet.fieldkit-c.id}", "${aws_subnet.fieldkit-e.id}"]
   security_groups = ["${aws_security_group.fieldkit-server-elb.id}"]
   
   listener {
@@ -48,7 +48,7 @@ resource "aws_elb" "fieldkit" {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:80/"
+    target = "HTTP:80/status"
     interval = 30
   }
 
@@ -56,6 +56,18 @@ resource "aws_elb" "fieldkit" {
   cross_zone_load_balancing = true
 
   tags {
-    Name = "fieldkit"
+    Name = "fieldkit-server"
+  }
+}
+
+resource "aws_route53_record" "fieldkit-server" {
+  zone_id = "Z116TCZ3RT5Z2K"
+  name = "fieldkit-server.aws.fieldkit.org"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.fieldkit-server.dns_name}"
+    zone_id = "${aws_elb.fieldkit-server.zone_id}"
+    evaluate_target_health = true
   }
 }

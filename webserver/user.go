@@ -74,7 +74,7 @@ func UserValidateHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		http.Redirect(w, req, "/", 302)
+		http.Redirect(w, req, "/signin", 302)
 	})
 }
 

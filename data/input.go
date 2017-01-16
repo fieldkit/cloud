@@ -5,11 +5,13 @@ import (
 )
 
 type Input struct {
-	ID           id.ID `db:"id" json:"id"`
-	ExpeditionID id.ID `db:"expedition_id" json:"expedition_id"`
+	ID           id.ID  `db:"id" json:"id"`
+	ExpeditionID id.ID  `db:"expedition_id" json:"expedition_id"`
+	Name         string `db:"name" json:"name"`
+	Slug         string `db:"slug" json:"slug"`
 }
 
-func NewInput(expeditionID id.ID) (*Input, error) {
+func NewInput(expeditionID id.ID, name, slug string) (*Input, error) {
 	inputID, err := id.New()
 	if err != nil {
 		return nil, err
@@ -18,6 +20,8 @@ func NewInput(expeditionID id.ID) (*Input, error) {
 	return &Input{
 		ID:           inputID,
 		ExpeditionID: expeditionID,
+		Name:         name,
+		Slug:         slug,
 	}, nil
 }
 

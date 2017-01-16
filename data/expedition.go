@@ -24,3 +24,20 @@ func NewExpedition(projectID id.ID, name, slug string) (*Expedition, error) {
 		Slug:      slug,
 	}, nil
 }
+
+type AuthToken struct {
+	ID           id.ID `db:"id"`
+	ExpeditionID id.ID `db:"expedition_id"`
+}
+
+func NewAuthToken(expeditionID id.ID) (*AuthToken, error) {
+	authTokenID, err := id.New()
+	if err != nil {
+		return nil, err
+	}
+
+	return &AuthToken{
+		ID:           authTokenID,
+		ExpeditionID: expeditionID,
+	}, nil
+}
