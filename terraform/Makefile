@@ -7,6 +7,6 @@ terraform.tfplan:
 	terraform plan -out=terraform.tfplan
 
 clean:
-	rm terraform.tfplan
+	rm -rf terraform.tfplan
 
 .PHONY: all apply clean
