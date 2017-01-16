@@ -254,6 +254,7 @@ func UserSignInHandler(c *config.Config) http.Handler {
 			Domain:   req.URL.Host,
 			HttpOnly: true,
 			Secure:   req.TLS != nil,
+			Path:     "/",
 		}
 
 		http.SetCookie(w, cookie)
