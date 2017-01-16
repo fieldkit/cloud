@@ -21,7 +21,8 @@ class NewGeneralSettingsSection extends React.Component {
       currentProjectID,
       currentExpedition,
       setExpeditionProperty,
-      setExpeditionPreset
+      setExpeditionPreset,
+      submitGeneralSettings
     } = this.props
 
     return (
@@ -159,11 +160,14 @@ class NewGeneralSettingsSection extends React.Component {
         <p className="status">
         </p>
 
-        <Link to={'/admin/' + currentProjectID + '/new-expedition/inputs'}>
+        <a href="#" onClick={(e) => {
+          e.preventDefault()
+          submitGeneralSettings()
+        }}>
           <div className="button hero">
             Next step: configuring data inputs
           </div>
-        </Link>
+        </a>
 
       </div>
     )

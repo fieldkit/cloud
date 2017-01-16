@@ -43,10 +43,10 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     },
     removeDocumentType (id) {
       return dispatch(actions.removeDocumentType(id))
+    },
+    submitInputs () {
+      return dispatch(actions.submitInputs())
     }
-    // updateExpedition (expedition) {
-    //   return dispatch(actions.updateExpedition(expedition))
-    // },
   }
 }
 

@@ -30,7 +30,8 @@ class NewInputsSection extends React.Component {
       setExpeditionProperty,
       fetchSuggestedDocumentTypes,
       addDocumentType,
-      removeDocumentType
+      removeDocumentType,
+      submitInputs
     } = this.props
 
     return (
@@ -136,23 +137,14 @@ class NewInputsSection extends React.Component {
         <p className="status">
         </p>
 
-        <p className="intro">
-          Congratulations, you're done creating your first expedition! You can now dive deeper in the settings, or go straight see how your map looks like.
-        </p>
-       
-        <div className="call-to-action"> 
-        <Link to={'/admin/' + currentProjectID + '/' + currentExpedition.get('id') }>
-          <div className="button">
-            Go to the admin dashboard
-          </div>
-        </Link>
-        or
-        <Link to={'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id') }>
+        <a href="#" onClick={(e) => {
+          e.preventDefault()
+          submitInputs()
+        }}>
           <div className="button hero">
-            Go to my map!
+            Next step: configuring data inputs
           </div>
-        </Link>
-        </div>
+        </a>
 
       </div>
     )
