@@ -87,3 +87,33 @@ func ExpeditionAddHandler(c *config.Config) http.Handler {
 		WriteJSON(w, expedition)
 	})
 }
+
+func ExpeditionAuthTokenAddHandler(c *config.Config) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		expedition, err := c.Backend.ExpeditionByProjectSlugAndSlug(vars["project"], vars["expedition"])
+		if err == backend.NotFoundError {
+			Error(w, err, 404)
+			return
+		}
+
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		authToken, err := data.NewAuthToken(expedition.ID)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		if err := c.Backend.AddAuthToken(authToken); err != nil {
+			WriteJSONStatusCode(w, err, 500)
+			return
+		}
+
+		WriteJSON(w, authToken)
+	})
+}

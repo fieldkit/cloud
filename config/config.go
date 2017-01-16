@@ -12,4 +12,6 @@ type Config struct {
 	Backend      *backend.Backend
 	Emailer      email.Emailer
 	SessionStore *session.SessionStore
+	AdminPath    string
+	FrontendPath string
 }

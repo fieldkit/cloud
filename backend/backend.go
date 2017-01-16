@@ -344,3 +344,30 @@ func (b *Backend) InviteByID(inviteID id.ID) (*data.Invite, error) {
 func (b *Backend) DeleteInviteByID(inviteID id.ID) error {
 	return Err(b.database.Collection("admin.invite").Find(inviteID).Delete())
 }
+
+func (b *Backend) AddAuthToken(authToken *data.AuthToken) error {
+	_, err := b.database.Collection("admin.expedition_auth_token").Insert(authToken)
+	return Err(err)
+}
+
+func (b *Backend) AuthTokenByID(authTokenID id.ID) (*data.AuthToken, error) {
+	authToken := &data.AuthToken{}
+	if err := b.database.Collection("admin.expedition_auth_token").Find(authTokenID).One(authToken); err != nil {
+		return nil, Err(err)
+	}
+
+	return authToken, nil
+}
+
+func (b *Backend) DeleteAuthTokenByID(authTokenID id.ID) error {
+	return Err(b.database.Collection("admin.expedition_auth_token").Find(authTokenID).Delete())
+}
+
+func (b *Backend) InputSlugInUse(expeditionID id.ID, slug string) (bool, error) {
+	n, err := b.database.Collection("admin.input").Find(db.Cond{"expedition_id": expeditionID, "slug": slug}).Count()
+	if err != nil {
+		return false, Err(err)
+	}
+
+	return n > 0, nil
+}

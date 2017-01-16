@@ -81,6 +81,17 @@ CREATE INDEX ON admin.expedition (name);
 CREATE UNIQUE INDEX ON admin.expedition (project_id, slug);
 
 
+-- expedition token
+
+DROP TABLE IF EXISTS admin.expedition_auth_token CASCADE;
+CREATE TABLE admin.expedition_auth_token (
+	id bytea PRIMARY KEY,
+	expedition_id bytea REFERENCES admin.expedition (id) NOT NULL
+);
+
+CREATE UNIQUE INDEX ON admin.expedition_auth_token (expedition_id);
+
+
 -- team
 
 DROP TABLE IF EXISTS admin.team CASCADE;
@@ -112,10 +123,13 @@ CREATE UNIQUE INDEX ON admin.team_user (team_id, user_id);
 DROP TABLE IF EXISTS admin.input CASCADE;
 CREATE TABLE admin.input (
 	id bytea PRIMARY KEY,
-	expedition_id bytea REFERENCES admin.expedition (id) NOT NULL
+	expedition_id bytea REFERENCES admin.expedition (id) NOT NULL,
+	name varchar(80) NOT NULL,
+	slug varchar(80) NOT NULL
 );
 
 CREATE INDEX ON admin.input (expedition_id);
+CREATE UNIQUE INDEX ON admin.input (expedition_id, slug);
 
 
 -- request

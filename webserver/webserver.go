@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
+	"github.com/O-C-R/singlepage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
@@ -79,26 +81,64 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 		fmt.Fprint(w, "ok")
 	})
 
-	api := router.PathPrefix("/api").Subrouter()
+	api := mux.NewRouter()
 
-	api.Handle("/user/sign-up", UserSignUpHandler(c))
-	api.Handle("/user/validate", UserValidateHandler(c))
-	api.Handle("/user/sign-in", UserSignInHandler(c))
-	api.Handle("/user/current", AuthHandler(c, UserCurrentHandler(c)))
+	api.Handle("/api/user/sign-up", UserSignUpHandler(c))
+	api.Handle("/api/user/validate", UserValidateHandler(c))
+	api.Handle("/api/user/sign-in", UserSignInHandler(c))
+	api.Handle("/api/user/current", AuthHandler(c, UserCurrentHandler(c)))
 
-	api.Handle("/projects", AuthHandler(c, ProjectsHandler(c)))
-	api.Handle("/projects/add", AuthHandler(c, ProjectAddHandler(c)))
-	api.Handle("/project/{project}", AuthHandler(c, ProjectHandler(c)))
+	api.Handle("/api/projects", AuthHandler(c, ProjectsHandler(c)))
+	api.Handle("/api/projects/add", AuthHandler(c, ProjectAddHandler(c)))
+	api.Handle("/api/project/{project}", AuthHandler(c, ProjectHandler(c)))
 
-	api.Handle("/project/{project}/expeditions", AuthHandler(c, AuthProjectHandler(c, ExpeditionsHandler(c))))
-	api.Handle("/project/{project}/expeditions/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAddHandler(c))))
-	api.Handle("/project/{project}/expedition/{expedition}", AuthHandler(c, AuthProjectHandler(c, ExpeditionHandler(c))))
+	api.Handle("/api/project/{project}/expeditions", AuthHandler(c, AuthProjectHandler(c, ExpeditionsHandler(c))))
+	api.Handle("/api/project/{project}/expeditions/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAddHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}", AuthHandler(c, AuthProjectHandler(c, ExpeditionHandler(c))))
 
-	api.Handle("/project/{project}/expedition/{expedition}/inputs", AuthHandler(c, AuthProjectHandler(c, InputsHandler(c))))
-	api.Handle("/project/{project}/expedition/{expedition}/inputs/add", AuthHandler(c, AuthProjectHandler(c, InputAddHandler(c))))
-	api.Handle("/project/{project}/expedition/{expedition}/input/{id}", AuthHandler(c, AuthProjectHandler(c, InputHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}/inputs", AuthHandler(c, AuthProjectHandler(c, InputsHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}/inputs/add", AuthHandler(c, AuthProjectHandler(c, InputAddHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}/input/{id}", AuthHandler(c, AuthProjectHandler(c, InputHandler(c))))
 
 	api.Handle("/input/{id}/{format:(?:fieldkit|csv|json)}/{source:(?:direct)}", InputRequestHandler(c))
+
+	router.Host("fieldkit.org").PathPrefix("/api").Handler(handlers.CompressHandler(api))
+
+	if c.AdminPath != "" {
+		application, err := regexp.Compile(`^/.*$`)
+		if err != nil {
+			return nil, err
+		}
+
+		longtermCache, err := regexp.Compile(`\.(?:(?:eot|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
+		if err != nil {
+			return nil, err
+		}
+
+		router.Host("fieldkit.org").Handler(singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root:          http.Dir(c.AdminPath),
+			Application:   application,
+			LongtermCache: longtermCache,
+		}))
+	}
+
+	if c.FrontendPath != "" {
+		application, err := regexp.Compile(`^/.*$`)
+		if err != nil {
+			return nil, err
+		}
+
+		longtermCache, err := regexp.Compile(`\.(?:(?:eot|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
+		if err != nil {
+			return nil, err
+		}
+
+		router.Host("{project}.fieldkit.org").Handler(singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root:          http.Dir(c.FrontendPath),
+			Application:   application,
+			LongtermCache: longtermCache,
+		}))
+	}
 
 	handler := http.Handler(router)
 	handler = ConfigHandler(handler, c)
