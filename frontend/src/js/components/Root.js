@@ -4,12 +4,29 @@ import HeaderContainer from '../containers/HeaderContainer'
 import MapContainer from '../containers/MapContainer'
 
 export default class Root extends React.Component {
-  render () {
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
 
-    const { expeditionFetching, documentsFetching } = this.props
+  render () {
+    const {
+      expeditionFetching,
+      documentsFetching
+    } = this.props
 
     return (
-      <div className="root">
+      <div
+        className="root"
+        onMouseMove={ (e) => {
+          const x = e.nativeEvent.clientX
+          const y = e.nativeEvent.clientY
+          this.props.setMousePosition(x, y)
+        }}
+        onMouseOut={ () => {
+          this.props.setMousePosition(-1, -1)
+        }}
+      >
         { !expeditionFetching && !documentsFetching &&
           <div>
             <MapContainer/>

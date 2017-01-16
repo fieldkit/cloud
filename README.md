@@ -91,7 +91,7 @@ Runs on localhost:8000
 
 #### build
 ```
-npm run-script dist
+npm run-script build
 ```
 Builds app in `/frontend/dist`
 
@@ -112,7 +112,7 @@ Runs on localhost:8000
 
 #### build
 ```
-npm run-script dist
+npm run-script build
 ```
 Builds app in `/admin/dist`
 

@@ -2,19 +2,15 @@
 /*
 
   TODO:
-  reading texture
-  member marker
-  notifications
-  identity
-  css styling
+  styling
+  window resize
+
   drag and zoom interactions
   webGLOverlay rendering optimization
   path linewidth
-  window resize
-
+  change Map shouldComponentUpdate to allow update when reaching end of timeline
 */
 
-// import '../css/index.scss'
 import '../scss/app.scss'
 
 import 'babel-polyfill'

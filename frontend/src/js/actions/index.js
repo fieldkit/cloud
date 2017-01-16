@@ -15,6 +15,7 @@ export const SET_VIEWPORT = 'SET_VIEWPORT'
 export const UPDATE_DATE = 'UPDATE_DATE'
 export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
 export const JUMP_TO = 'JUMP_TO'
+export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 
 export function requestExpedition (id) {
   return function (dispatch, getState) {
@@ -32,7 +33,7 @@ export function requestExpedition (id) {
       }
       dispatch(initializeExpedition(id, res))
       dispatch(requestDocuments(id))
-    }, 1000)
+    }, 500)
   }
 }
 
@@ -95,7 +96,7 @@ export function requestDocuments (id) {
         }
       }
       dispatch(initializeDocuments(id, I.fromJS(res)))
-    }, 1000)
+    }, 500)
   }
 }
 
@@ -132,6 +133,16 @@ export function selectPlaybackMode (mode) {
     dispatch({
       type: SELECT_PLAYBACK_MODE,
       mode
+    })
+  }
+}
+
+export function setMousePosition (x, y) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_MOUSE_POSITION,
+      x,
+      y
     })
   }
 }

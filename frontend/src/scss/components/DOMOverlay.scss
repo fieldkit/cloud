@@ -1,0 +1,55 @@
+
+.dom-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+
+  &_popup {
+    opacity: 1;
+    transform: translate(-50%, -110%);
+    position: absolute;
+    width: $line-width * 18;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+
+    &.transition-enter {
+      opacity: 0.01;
+      transform: translate(-50%, -120%);
+      &-active {
+        opacity: 1;
+        transform: translate(-50%, -110%);
+      }
+    }
+
+    &.transition-leave {
+      opacity: 1;
+      transform: translate(-50%, -110%);
+      &-active {
+        opacity: 0.01;
+        transform: translate(-50%, -120%);
+      }
+    }
+    
+    &_content {
+      color: $color-dark;
+      background-color: white;
+      border-radius: 3px;
+      padding: $line-width;
+      padding-right: $line-width * 4;
+
+      &_icon {
+        position: absolute;
+        right: $line-width;
+        width: $line-width * 2;
+        height: $line-width * 2;
+        background-color: $color-accent;
+      }
+    }
+
+
+  }
+
+}

@@ -1,5 +1,6 @@
 
 .control-panel {
+  position: absolute;
   width: $line-width * 10;
 
   &_playback-selector {

@@ -1,8 +1,11 @@
 .header {
   display: flex;
   justify-content: space-between;
+  height: $line-height * 3;
 
   &_title {
     flex-grow: 1;
+    line-height: 36px;
+    margin-bottom: 12px;
   }
 }
