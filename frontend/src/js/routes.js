@@ -2,9 +2,8 @@
 /*
 
   TODO:
-  member marker
-  reading texture
   lightbox
+  reading texture
 
   identity
   css styling

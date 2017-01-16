@@ -2,6 +2,8 @@
 import { connect } from 'react-redux'
 import Map from '../components/Map'
 import * as actions from '../actions'
+import THREE from '../../vendors/react-three-renderer/node_modules/three'
+import ViewportMercator from 'viewport-mercator-project'
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -14,12 +16,70 @@ const mapStateToProps = (state, ownProps) => {
   const currentDate = state.expeditions.get('currentDate')
   const playbackMode = state.expeditions.get('playbackMode')
 
+  // 
+  // MAP BUFFER GEOMETRIES
+  // 
+
+  const particleCount = 1000
+  const pathVertexCount = 200
+  const { unproject } = ViewportMercator(viewport)
+  const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
+  
+  // Focus particles
+  const focusParticles = {
+    position: new Float32Array(3),
+    color: new Float32Array(4)
+  }
+  const radius = 15
+  const x = window.innerWidth * ((viewport.longitude - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+  const y = window.innerHeight * ((viewport.latitude - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+  focusParticles.position[0] = x
+  focusParticles.position[1] = y
+  focusParticles.position[2] = radius
+  focusParticles.color[0] = 255
+  focusParticles.color[1] = 255
+  focusParticles.color[2] = 255
+  focusParticles.color[3] = 1
+
+  // Readings particles and path
+  const readingParticles = {
+    position: new Float32Array(particleCount * 3),
+    color: new Float32Array(particleCount * 4)
+  }
+  const readingPath = new Array(pathVertexCount)
+
+  currentDocuments.toList().forEach((sighting, i) => {
+    const position = sighting.getIn(['geometry', 'coordinates'])
+    const radius = 15
+    const x = window.innerWidth * ((sighting.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+    const y = window.innerHeight * ((sighting.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+    const color = new THREE.Color('#ffffff')
+    
+    readingParticles.position[i * 3 + 0] = x
+    readingParticles.position[i * 3 + 1] = y
+    readingParticles.position[i * 3 + 2] = radius
+    readingParticles.color[i * 4 + 0] = color.r
+    readingParticles.color[i * 4 + 1] = color.g
+    readingParticles.color[i * 4 + 2] = color.b
+    readingParticles.color[i * 4 + 3] = 1
+
+    readingPath[i] = new THREE.Vector3(x, y, 0)
+  })
+
+  // clear up unused particles
+  readingParticles.position.fill(0, currentDocuments.size * 3, pathVertexCount * 3)
+  readingParticles.color.fill(0, currentDocuments.size * 4, pathVertexCount * 4)
+  readingPath.fill(readingPath[currentDocuments.size - 1], currentDocuments.size, pathVertexCount)
+
   return {
     expeditions,
     viewport,
     currentDocuments, 
     currentDate,
-    playbackMode
+    playbackMode,
+    focusParticles,
+    readingParticles,
+    readingPath
   }
 }
 
