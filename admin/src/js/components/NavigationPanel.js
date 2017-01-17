@@ -11,14 +11,14 @@ class NavigationPanel extends React.Component {
   render () {
     const { projectID, expeditionID, expeditions, disconnect, projects } = this.props
 
-    console.log('AGA', projects.toJS())
+    console.log('AGA', backgroundImage)
 
     return (
       <div id="header">
         <div
           className="background"
           style={{
-            backgroundImage: 'url(' + { backgroundImage } + ')'
+            backgroundImage: 'url(\'' + backgroundImage + '\')'
           }}
         />
         <div id="logo">
