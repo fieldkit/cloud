@@ -92,5 +92,5 @@ var render = function () {
 // function onLogout () {
 //   // todo
 // }
-// FKApiClient.setup('http://localhost:3000' || '', onLogout);
+FKApiClient.setup('https://fieldkit.org')
 render()
