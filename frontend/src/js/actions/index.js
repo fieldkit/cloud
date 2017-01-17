@@ -17,54 +17,61 @@ export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
 export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 
-export function requestExpedition (id) {
-  return function (dispatch, getState) {
-    dispatch({
-      type: REQUEST_EXPEDITION,
-      id
-    })
-    setTimeout(() => {
-      const res = {
-        id: 'okavango',
-        name: 'Okavango',
-        focusType: 'sensor-reading',
-        startDate: 1484328718000,
-        endDate: 1484329258000
-      }
-      dispatch(initializeExpedition(id, res))
-      dispatch(requestDocuments(id))
-    }, 500)
-  }
-}
-
-
-// export function requestExpeditions () {
+// export function requestExpedition (id) {
 //   return function (dispatch, getState) {
-//     const projectID = location.hostname.split('.')[0]
-//     FKApiClient.get().getExpeditions(projectID)
-//       .then(res => {
-//         console.log('expeditions received:', res)
-//         if (!res) {
-//           browserHistory.push('/admin/' + projectID + '/new-expedition')
-//         } else {
-//           const expeditionMap = {}
-//           res.forEach(e => {
-//             expeditionMap[e.slug] = e
-//           })
-//           const expeditions = I.fromJS(expeditionMap)
-//             .map(e => {
-//               return e.merge(I.fromJS({
-//                 id: e.get('slug'),
-//                 token: '',
-//                 selectedDocumentType: {},
-//                 documentTypes: {},              
-//               }))
-//             })
-//           dispatch(receiveExpeditions(projectID, expeditions, false))
-//         }
-//       })
+//     dispatch({
+//       type: REQUEST_EXPEDITION,
+//       id
+//     })
+//     setTimeout(() => {
+//       const res = {
+//         id: 'okavango',
+//         name: 'Okavango',
+//         focusType: 'sensor-reading',
+//         startDate: 1484328718000,
+//         endDate: 1484329258000
+//       }
+//       dispatch(initializeExpedition(id, res))
+//       dispatch(requestDocuments(id))
+//     }, 500)
 //   }
 // }
+
+
+export function requestExpeditions () {
+  return function (dispatch, getState) {
+    const projectID = location.hostname.split('.')[0]
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    FKApiClient.get().getExpedition(projectID, expeditionID)
+      .then(res => {
+        console.log('expeditions received:', res)
+        if (!res) {
+          console.log('error getting expedition')
+        } else {
+          console.log('expedition properly received')
+
+          // {"name":"ian test","slug":"ian-test"}
+
+          
+
+          // const expeditionMap = {}
+          // res.forEach(e => {
+          //   expeditionMap[e.slug] = e
+          // })
+          // const expeditions = I.fromJS(expeditionMap)
+          //   .map(e => {
+          //     return e.merge(I.fromJS({
+          //       id: e.get('slug'),
+          //       token: '',
+          //       selectedDocumentType: {},
+          //       documentTypes: {},              
+          //     }))
+          //   })
+          // dispatch(receiveExpeditions(projectID, expeditions, false))
+        }
+      })
+  }
+}
 
 export function initializeExpedition (id, data) {
   return function (dispatch, getState) {

@@ -419,7 +419,7 @@ export function requestProjects () {
       .then(res => {
         console.log('projects received:', res)
         if (!res) {
-          dispatch(createProject ('new project'))
+          dispatch(createProject ('new project ' + Math.floor(Math.random() * 1000000)))
         } else {
           const projectMap = {}
           res.forEach(p => {
