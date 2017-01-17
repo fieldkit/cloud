@@ -63,18 +63,6 @@ func ConfigHandler(handler http.Handler, c *config.Config) http.Handler {
 	})
 }
 
-// func FormHandler(handler http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-// 		vars := mux.Vars(req)
-// 		if req.Header.Get("content-type") == "application/json" {
-// 			if err := json.NewDecoder(req.Body).Decode(vars); err != nil {
-// 				Error(w, err, 400)
-// 			}
-// 		}
-
-// 	})
-// }
-
 func NewWebserver(c *config.Config) (*http.Server, error) {
 	router := mux.NewRouter()
 	router.HandleFunc("/status", func(w http.ResponseWriter, req *http.Request) {
@@ -107,7 +95,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 
 	api.Handle("/api/input/{id}/{format:(?:fieldkit|csv|json)}/{source:(?:direct|rockblock)}", InputRequestHandler(c))
 
-	router.Host("fieldkit.org").PathPrefix("/api").Handler(handlers.CompressHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	router.PathPrefix("/api").Handler(handlers.CompressHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("cache-control", "no-store")
 		api.ServeHTTP(w, req)
 	})))
@@ -152,7 +140,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	handler = ConfigHandler(handler, c)
 	handler = handlers.CORS(
 		handlers.AllowCredentials(),
-		handlers.AllowedOrigins([]string{"http://localhost:8000", "https://fieldkit.org"}),
+		handlers.AllowedOrigins([]string{"http://localhost:8081", "https://fieldkit.org", "https://*.fieldkit.org"}),
 	)(handler)
 
 	server := &http.Server{
