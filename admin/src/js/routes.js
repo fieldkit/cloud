@@ -2,15 +2,13 @@
 /*
 
   CHANGE API URL BEFORE BUILD
-
-  expedition token
   
-  mailing list form
   broken image links
   indicate navigation state
+  
   display profile information
   signup form error feedback
-  
+
   change the map endpoints on ItO to call the API with https
 
 */

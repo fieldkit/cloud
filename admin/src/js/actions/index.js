@@ -474,7 +474,7 @@ export function requestExpeditions () {
             .map(e => {
               return e.merge(I.fromJS({
                 id: e.get('slug'),
-                token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn',
+                token: '',
                 selectedDocumentType: {},
                 documentTypes: {},              
               }))
@@ -576,7 +576,6 @@ AUTH ACTIONS
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
-    console.log('requesting sign in ', username, password)
     FKApiClient.get().login(username, password)
       .then(() => {
         FKApiClient.get().onLogin()

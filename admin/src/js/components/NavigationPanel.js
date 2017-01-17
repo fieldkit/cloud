@@ -2,8 +2,9 @@ import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
 import { Link } from 'react-router'
 
-import fieldkitLogo from '../../img/fieldkit-logo.svg'
+import fieldkitLogo from '../../img/fieldkit-logo.png'
 import profileButton from '../../img/profile-button.png'
+import backgroundMap from '../../img/bkg.jpg'
 
 class NavigationPanel extends React.Component {
 
@@ -14,7 +15,12 @@ class NavigationPanel extends React.Component {
 
     return (
       <div id="header">
-        <div className="background"/>
+        <div
+          className="background"
+          style={{
+            backgroundImage: 'url(' + { backgroundMap } + ')'
+          }}
+        />
         <div id="logo">
           <Link to={'/admin'}>
             <img src={fieldkitLogo} alt="fieldkit logo" />

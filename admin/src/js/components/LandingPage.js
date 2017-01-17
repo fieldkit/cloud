@@ -50,7 +50,7 @@ class LandingPage extends React.Component {
                     }} 
                     aria-hidden="true"
                   >
-                    <input type="text" name="b_bedac4d8c1a0840ba87f528cd_24d0f362c7" tabindex="-1" value=""/>
+                    <input type="text" name="b_bedac4d8c1a0840ba87f528cd_24d0f362c7" tabIndex="-1" value=""/>
                   </div>
                   <div class="clear">
                     <input type="submit" value="Get notified when we launch" name="subscribe" id="mc-embedded-subscribe" class="button"/>
