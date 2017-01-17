@@ -186,7 +186,7 @@ export class FKApiClient extends APIClient {
 
   async getCurrentPerson(): Promise<PersonResponse> {
     // response has no content, so any non-error means success
-    const res: PersonResponse = await this.getJSON('https://fieldkit.org/api/person/current');
+    const res: PersonResponse = await this.getJSON('http:/localhost:8080/api/person/current');
 
     // Also this method acts as a proxy for logging in sometimes...
     this.onLogin();
@@ -195,52 +195,52 @@ export class FKApiClient extends APIClient {
   }
 
   async register(params: Object): Promise<void> {
-    await this.postForm('https://fieldkit.org/api/user/sign-up', params);
+    await this.postForm('http:/localhost:8080/api/user/sign-up', params);
   }
 
   async login(username: string, password: string): Promise<void> {
     // response has no content, so any non-error means success
 
-    await this.postForm('https://fieldkit.org/api/user/sign-in', { username, password });
+    await this.postForm('http:/localhost:8080/api/user/sign-in', { username, password });
   }
 
   async logout(): Promise<void> {
-    await this.postForm('https://fieldkit.org/api/user/logout');
+    await this.postForm('http:/localhost:8080/api/user/logout');
     this.onLogout();
   }
 
   async getProjects () {
-    const res = await this.getJSON('https://fieldkit.org/api/projects')
+    const res = await this.getJSON('http:/localhost:8080/api/projects')
     return res
   }
 
   async createProjects (name) {
-    const res = await this.getJSON('https://fieldkit.org/api/projects/add?name=' + name)
+    const res = await this.getJSON('http:/localhost:8080/api/projects/add?name=' + name)
     return res
   }
 
   async getExpeditions (projectID) {
-    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expeditions')
+    const res = await this.getJSON('http:/localhost:8080/api/project/' + projectID + '/expeditions')
     return res
   }
 
   async postGeneralSettings (projectID, expeditionName) {
-    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expeditions/add?name=' + expeditionName)
+    const res = await this.getJSON('http:/localhost:8080/api/project/' + projectID + '/expeditions/add?name=' + expeditionName)
     return res
   }
 
   async postInputs (projectID, expeditionID, inputName) {
-    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
+    const res = await this.getJSON('http:/localhost:8080/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
     return res
   }
 
   async addExpeditionToken (projectID, expeditionID) {
-    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/tokens/add')
+    const res = await this.getJSON('http:/localhost:8080/api/project/' + projectID + '/expedition/' + expeditionID + '/tokens/add')
     return res
   }
 
   async addInput (projectID, expeditionID, inputName) {
-    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
+    const res = await this.getJSON('http:/localhost:8080/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
     return res
   }
 

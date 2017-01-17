@@ -127,6 +127,12 @@ const routes = (
         component={ProfileSection}
       />
 
+      <Route 
+        path="new-project" 
+        component={NewProjectContainer}
+        onEnter={() => store.dispatch(actions.initNewProjectSection())}
+      />
+
       <Route path=":projectID" onEnter={(state) => {
         store.dispatch(actions.requestExpeditions())
       }}>

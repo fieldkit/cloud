@@ -331,6 +331,42 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['expeditions', action.expeditionID, 'token'], action.token)
     }
 
+    case actions.ADD_PROJECT: {
+      const projectID = 'project-' + Date.now()
+      return state
+        .set('currentProjectID', projectID)
+        .setIn(
+          ['projects', projectID], 
+          I.fromJS({
+            id: projectID,
+            name: 'New Project',
+            expeditions: []
+          })
+        )
+    }
+
+    case actions.SET_PROJECT_PROPERTY: {
+      let newState = state.setIn(
+        ['projects', state.get('currentProjectID')].concat(action.keyPath),
+        action.value
+      )
+      if (action.keyPath.length === 1 && action.keyPath[0] === 'name' && !!action.value) {
+        const lastID = state.get('currentProjectID')
+        const id = slug(action.value)
+        newState = newState
+          .setIn(
+            ['projects', id],
+            newState.getIn(['projects', state.get('currentProjectID')])
+          )
+          .setIn(['projects', id, 'id'], id)
+          .set('currentProjectID', id)
+        if (lastID !== id) {
+          newState = newState.deleteIn(['projects', state.get('currentProjectID')])
+        }
+      }
+      return newState
+    }
+
     case actions.ADD_EXPEDITION: {
       const expeditionID = 'expedition-' + Date.now()
       return state
@@ -489,7 +525,6 @@ const expeditionReducer = (state = initialState, action) => {
           newState = newState.deleteIn(['expeditions', state.get('currentExpeditionID')])
         }
       }
-      console.log(newState.toJS())
       return newState
     }
 
