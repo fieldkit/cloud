@@ -19,9 +19,6 @@ class NavigationPanel extends React.Component {
           <Link to={'/admin'}>
             <img src={fieldkitLogo} alt="fieldkit logo" />
           </Link>
-          <Link to={'/admin/profile'}>
-            <img src={profileButton} />
-          </Link> 
           {/*
           <SignOutButton
             endpoint={'localhost:3000/signout'}
