@@ -38,6 +38,27 @@ class LandingPage extends React.Component {
             <img src={nationalGeographicLogoLong} alt="" className="content_nat"/>
             <h1 className="content_title"><img className="content_title_img" src={fieldkitLogoRed} alt="fieldkit"/></h1>
             <p className="content_sub">A one-click open platform for field researchers and explorers</p>
+
+            <div id="mc_embed_signup">
+            <form action="//nyc.us14.list-manage.com/subscribe/post?u=bedac4d8c1a0840ba87f528cd&amp;id=24d0f362c7" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" noValidate>
+                <div id="mc_embed_signup_scroll">              
+                  <input type="email" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required/>
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      left: '-5000px'
+                    }} 
+                    aria-hidden="true"
+                  >
+                    <input type="text" name="b_bedac4d8c1a0840ba87f528cd_24d0f362c7" tabIndex="-1" value=""/>
+                  </div>
+                  <div class="clear">
+                    <input type="submit" value="Get notified when we launch" name="subscribe" id="mc-embedded-subscribe" class="button"/>
+                  </div>
+                </div>
+            </form>
+            </div>
+
             {/*
               <Link 
                 to={'/signup'}

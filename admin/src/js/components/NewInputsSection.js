@@ -75,7 +75,9 @@ class NewInputsSection extends React.Component {
                                 </li>
                                 <li>
                                   <a 
-                                    href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(currentExpedition.get('token'))}
+                                    href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(
+                                      'https://fieldkit.org/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + currentExpedition.get('token')
+                                    )}
                                     download="config.txt"
                                   >
                                     <div className="button">Download config file</div>
@@ -137,14 +139,11 @@ class NewInputsSection extends React.Component {
         <p className="status">
         </p>
 
-        <a href="#" onClick={(e) => {
-          e.preventDefault()
-          submitInputs()
-        }}>
+        <Link to={'/admin/' + currentProjectID + '/new-expedition/confirmation'}>
           <div className="button hero">
-            Next step: configuring data inputs
+            Next step: finalize your expedition
           </div>
-        </a>
+        </Link>
 
       </div>
     )

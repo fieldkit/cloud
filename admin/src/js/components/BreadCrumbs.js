@@ -14,9 +14,7 @@ class BreadCrumbs extends React.Component {
       })
 
     return (
-      <p id="breadcrumbs">
-        test1 / test2 / test3
-      </p>
+      <div></div>
     )
   }
 

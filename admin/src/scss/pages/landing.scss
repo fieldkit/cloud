@@ -138,7 +138,8 @@
 		position: absolute;
 		right: 0;
 		left: 0;
-		bottom: 0;
+		top: 100vh;
+    transform: translate(0,-100%);
 		z-index: 10;
 
 		padding: 0 100px;

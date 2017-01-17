@@ -70,11 +70,24 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
 
 export function addDocumentType (id, collectionType) {
   return function (dispatch, getState) {
-    dispatch({
-      type: ADD_DOCUMENT_TYPE,
-      id,
-      collectionType
-    })
+    const projectID = getState().expeditions.get('currentProjectID')
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    FKApiClient.get().addInput(projectID, expeditionID, id)
+      .then(res => {
+        console.log('server response:', res)
+        if (!res) {
+          console.log('adding input, error')
+        } else {
+          console.log('input successfully added')
+          // {"id":"LIHQVRPTV7UXRDXMG7F36IRFQ7AIEZBD","expedition_id":"JF55GNWOT4GC3FDPWWX5NT5RWFFJPKRZ","name":"sensor","slug":"sensor"}
+          dispatch({
+            type: ADD_DOCUMENT_TYPE,
+            id,
+            collectionType,
+            token: res.id
+          })
+        }
+      })
   }
 }
 
@@ -397,6 +410,8 @@ export const RECEIVE_PROJECTS = 'RECEIVE_PROJECTS'
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 export const SUBMIT_GENERAL_SETTINGS = 'SUBMIT_GENERAL_SETTINGS'
+export const RECEIVE_TOKEN = 'RECEIVE_TOKEN'
+export const RECEIVE_INPUT = 'RECEIVE_INPUT'
 
 export function requestProjects () {
   return function (dispatch, getState) {
@@ -473,7 +488,7 @@ export function requestExpeditions () {
             .map(e => {
               return e.merge(I.fromJS({
                 id: e.get('slug'),
-                token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn',
+                token: '',
                 selectedDocumentType: {},
                 documentTypes: {},              
               }))
@@ -500,13 +515,28 @@ export function submitGeneralSettings () {
             [res.slug]: {
               id: res.slug,
               name: res.name,
-              token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn',
+              token: '',
               selectedDocumentType: {},
               documentTypes: {},
             }
           })
           dispatch(receiveExpeditions(projectID, expeditions, false))
-          browserHistory.push('/admin/' + projectID + '/new-expedition/inputs')
+          FKApiClient.get().addExpeditionToken(projectID, expeditionID)
+            .then(res => {
+              console.log('server response:', res)
+              if(!res) {
+                console.log('no response')
+              } else {
+                console.log('storing token')
+                // {"ID":"B6XFKIV772JO2SZOHNK57AUQ6LL3PBV4","ExpeditionID":"LRRUHSZIYTM4XZVMYKVGSIQ5UVMYLNPF"}
+                dispatch({
+                  type: RECEIVE_TOKEN,
+                  expeditionID,
+                  token: res.ExpeditionID
+                })
+                browserHistory.push('/admin/' + projectID + '/new-expedition/inputs')
+              }
+            })
         }
       })
   }
@@ -560,7 +590,6 @@ AUTH ACTIONS
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {
     dispatch(loginRequest())
-    console.log('requesting sign in ', username, password)
     FKApiClient.get().login(username, password)
       .then(() => {
         FKApiClient.get().onLogin()
