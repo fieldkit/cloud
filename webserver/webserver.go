@@ -77,7 +77,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/user/sign-in", UserSignInHandler(c))
 	api.Handle("/api/user/current", AuthHandler(c, UserCurrentHandler(c)))
 
-	api.Handle("/api/projects", ProjectsHandler(c))
+	api.Handle("/api/projects", AuthHandler(c, ProjectsHandler(c)))
 	api.Handle("/api/projects/add", AuthHandler(c, ProjectAddHandler(c)))
 	api.Handle("/api/project/{project}", ProjectHandler(c))
 
@@ -92,6 +92,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/project/{project}/expedition/{expedition}/input/{id}", AuthHandler(c, AuthProjectHandler(c, InputHandler(c))))
 
 	api.Handle("/api/project/{project}/expedition/{expedition}/documents", DocumentsHandler(c))
+	api.Handle("/api/project/{project}/expedition/{expedition}/documents/data", DocumentDataHandler(c))
 
 	api.Handle("/api/input/{id}/{format:(?:fieldkit|csv|json)}/{source:(?:direct|rockblock)}", InputRequestHandler(c))
 

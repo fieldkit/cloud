@@ -9,6 +9,7 @@ import (
 
 	"github.com/O-C-R/auth/id"
 	"github.com/O-C-R/fieldkit/data"
+	"github.com/O-C-R/fieldkit/data/jsondocument"
 )
 
 var (
@@ -186,6 +187,19 @@ func (b *Backend) ProjectSlugInUse(slug string) (bool, error) {
 func (b *Backend) Projects() ([]*data.Project, error) {
 	projects := []*data.Project{}
 	if err := b.database.Collection("admin.project").Find().All(&projects); err != nil {
+		return nil, Err(err)
+	}
+
+	return projects, nil
+}
+
+func (b *Backend) ProjectsByUserID(userID id.ID) ([]*data.Project, error) {
+	projects := []*data.Project{}
+	if err := b.database.Iterator(`
+		SELECT p.* FROM admin.project AS p
+			JOIN admin.project_user AS u ON u.project_id = p.id
+				WHERE u.user_id = $1
+		`, userID).All(&projects); err != nil {
 		return nil, Err(err)
 	}
 
@@ -418,9 +432,24 @@ func (b *Backend) DocumentsByProjectSlugAndExpeditionSlug(projectSlug, expeditio
 			JOIN admin.expedition AS e ON e.id = i.expedition_id
 			JOIN admin.project AS p ON p.id = e.project_id
 				WHERE p.slug = $1 AND e.slug = $2
+				ORDER BY d.data#>'{date}'
 		`, projectSlug, expeditionSlug).All(&documents); err != nil {
 		return nil, Err(err)
 	}
 
 	return documents, nil
+}
+
+func (b *Backend) DocumentDataByProjectSlugAndExpeditionSlug(projectSlug, expeditionSlug string) ([]*jsondocument.Document, error) {
+	documents, err := b.DocumentsByProjectSlugAndExpeditionSlug(projectSlug, expeditionSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*jsondocument.Document, len(documents))
+	for i, document := range documents {
+		data[i] = document.Data
+	}
+
+	return data, nil
 }

@@ -11,7 +11,13 @@ import (
 
 func ProjectsHandler(c *config.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		projects, err := c.Backend.Projects()
+		userID, valid := ContextUserID(req.Context())
+		if !valid {
+			Error(w, InvalidUserError, 500)
+			return
+		}
+
+		projects, err := c.Backend.ProjectsByUserID(userID)
 		if err != nil {
 			Error(w, err, 500)
 			return
