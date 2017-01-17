@@ -136,23 +136,7 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 { ...cameraProps }
               />
-              {
-                !!readingPath &&
-                <line>
-                  <geometry
-                    vertices={readingPath}
-                    dynamic={true}
-                  >
-                  </geometry>
-                  <lineBasicMaterial
-                    linewidth={10}
-                    opacity={0.7}
-                    transparent={false}
-                    color={new THREE.Color('#ffffff')}
-                  >
-                  </lineBasicMaterial>
-                </line>
-              }
+              
               { 
                 !!bufferGeometries.readingParticles &&
                 <points>
