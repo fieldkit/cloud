@@ -175,6 +175,7 @@ func UserSignUpHandler(c *config.Config) http.Handler {
 			return
 		}
 
+		user.Valid = true
 		user.FirstName = strings.TrimSpace(req.FormValue("first_name"))
 		user.LastName = strings.TrimSpace(req.FormValue("last_name"))
 		if err := c.Backend.AddUser(user); err != nil {
