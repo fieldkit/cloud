@@ -130,6 +130,42 @@ export function requestExpedition (expeditionID) {
   }
 }
 
+
+export function requestExpeditions () {
+  return function (dispatch, getState) {
+    const projectID = location.hostname.split('.')[0]
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    FKApiClient.get().getExpedition(projectID, expeditionID)
+      .then(res => {
+        console.log('expeditions received:', res)
+        if (!res) {
+          console.log('error getting expedition')
+        } else {
+          console.log('expedition properly received')
+
+          // {"name":"ian test","slug":"ian-test"}
+
+          
+
+          // const expeditionMap = {}
+          // res.forEach(e => {
+          //   expeditionMap[e.slug] = e
+          // })
+          // const expeditions = I.fromJS(expeditionMap)
+          //   .map(e => {
+          //     return e.merge(I.fromJS({
+          //       id: e.get('slug'),
+          //       token: '',
+          //       selectedDocumentType: {},
+          //       documentTypes: {},              
+          //     }))
+          //   })
+          // dispatch(receiveExpeditions(projectID, expeditions, false))
+        }
+      })
+  }
+}
+
 export function initializeExpedition (id, data) {
   return function (dispatch, getState) {
     dispatch({

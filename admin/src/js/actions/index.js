@@ -421,6 +421,7 @@ export function requestProjects () {
         if (!res) {
           console.log('NO PROJECT!')
           // dispatch(createProject ('new project'))
+          // dispatch(createProject ('new project ' + Math.floor(Math.random() * 1000000)))
         } else {
           const projectMap = {}
           res.forEach(p => {
