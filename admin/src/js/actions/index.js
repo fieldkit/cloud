@@ -26,7 +26,9 @@ EXPEDITION ACTIONS
 
 */
 
+export const ADD_PROJECT = 'ADD_PROJECT'
 export const ADD_EXPEDITION = 'ADD_EXPEDITION'
+export const SET_PROJECT_PROPERTY = 'SET_PROJECT_PROPERTY'
 export const SET_EXPEDITION_PROPERTY = 'SET_EXPEDITION_PROPERTY'
 export const ADD_DOCUMENT_TYPE = 'ADD_DOCUMENT_TYPE'
 export const REMOVE_DOCUMENT_TYPE = 'REMOVE_DOCUMENT_TYPE'
@@ -100,6 +102,16 @@ export function removeDocumentType (id) {
   }
 }
 
+export function initNewProjectSection () {
+  return function (dispatch, getState) {
+    dispatch(
+      {
+        type: ADD_PROJECT
+      }
+    )
+  }
+}
+
 export function initNewExpeditionSection () {
   return function (dispatch, getState) {
     dispatch(
@@ -114,6 +126,16 @@ export function setExpeditionProperty (keyPath, value) {
   return function (dispatch, getState) {
     dispatch({
       type: SET_EXPEDITION_PROPERTY,
+      keyPath,
+      value
+    })
+  }
+}
+
+export function setProjectProperty (keyPath, value) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_PROJECT_PROPERTY,
       keyPath,
       value
     })
@@ -419,9 +441,6 @@ export function requestProjects () {
       .then(res => {
         console.log('projects received:', res)
         if (!res) {
-          console.log('NO PROJECT!')
-          // dispatch(createProject ('new project'))
-          // dispatch(createProject ('new project ' + Math.floor(Math.random() * 1000000)))
         } else {
           const projectMap = {}
           res.forEach(p => {
@@ -440,6 +459,7 @@ export function requestProjects () {
 
 export function createProject (name) {
   return function (dispatch, getState) {
+    const currentProjectID = getState().expeditions.get('currentProjectID')
     FKApiClient.get().createProjects(name)
       .then(res => {
         console.log('project created', res)
@@ -451,7 +471,12 @@ export function createProject (name) {
           .map(p => {
             return p.merge(I.fromJS({expeditions: []}))
           })
-        dispatch(receiveProjects(projects))
+        // dispatch(receiveProjects(projects))
+        dispatch({
+          type: SET_CURRENT_PROJECT,
+          projectID: currentProjectID
+        })
+        browserHistory.push('/admin/' + currentProjectID)
       })
   }
 }
@@ -469,7 +494,6 @@ export function receiveProjects (projects) {
         projectID: projectID
       }
     ])
-    browserHistory.push('/admin/' + projects.toList().getIn([0, 'slug']))
   }
 }
 
@@ -651,22 +675,7 @@ export function requestSignUp (email, username, password, invite, project) {
     FKApiClient.get().register(params)
       .then(() => {
         dispatch(signupSuccess())
-
-        FKApiClient.get().createProjects(project)
-          .then(res => {
-            console.log('project created', res)
-            const projectMap = {};
-            [res].forEach(p => {
-              projectMap[p.slug] = p
-            })
-            const projects = I.fromJS(projectMap)
-              .map(p => {
-                return p.merge(I.fromJS({expeditions: []}))
-              })
-            dispatch(receiveProjects(projects))
-            browserHistory.push('/signin')
-          })
-        
+        browserHistory.push('/signin')
       })
       .catch(error => {
         console.log('signup error:', error)

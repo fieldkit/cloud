@@ -49,11 +49,6 @@ export default class Signup extends React.Component {
 						</div>
 
 						<div className="signup_group">
-							<label for="project" className="signup_label">Project's Name</label>
-							<input ref="projectName" id="project" name="project" className="signup_input" type="text"  placeholder="My Kayak Adventure"/>
-						</div>
-
-						<div className="signup_group">
 							<label for="invite" className="signup_label">Invitation token</label>
 							<input ref="invite" id="invite" name="invite" className="signup_input" type="text"  placeholder="E3NANDTJ3YXM5LNMGNZTF2373LAFTOCC"/>
 						</div>

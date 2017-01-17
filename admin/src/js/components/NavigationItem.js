@@ -9,7 +9,7 @@ class NavigationItem extends React.Component {
     return (
       <li className={ active ? 'active' : ''}>
         <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/dashboard'}>
-          <h4>{expedition.get('name')}</h4>
+          <h4>{expedition.get('name') || 'New Expedition' }</h4>
         </Link>
         { 
           active &&
