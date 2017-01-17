@@ -558,7 +558,7 @@ export function submitGeneralSettings () {
                 dispatch({
                   type: RECEIVE_TOKEN,
                   expeditionID,
-                  token: res.ExpeditionID
+                  token: res.ID
                 })
                 browserHistory.push('/admin/' + projectID + '/new-expedition/inputs')
               }
