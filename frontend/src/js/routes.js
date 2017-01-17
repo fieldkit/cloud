@@ -2,6 +2,10 @@
 /*
 
   TODO:
+  Request expeditions
+  Reroute callback
+
+
   styling
   window resize
 
@@ -56,7 +60,9 @@ const routes = (
   <Route path="/" component={RootContainer}>
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
-        const expeditionID = store.getState().expeditions.get('expeditions').toList().get(0).get('id')
+        // console.log('aga', store.getState().expeditions.get('expeditions').toJS())
+        // const expeditionID = store.getState().expeditions.get('expeditions').toList().get(0).get('id')
+        const expeditionID = 'okavango'
         replace({
           pathname: '/' + expeditionID,
           state: { nextPathname: nextState.location.pathname }
