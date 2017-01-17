@@ -221,11 +221,10 @@ func InputRequestHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		documentData.SetDocument("/Geometry/type", jsondocument.String("Point"))
-		documentData.SetDocument("/Geometry/coordinates/0", documentDataLat)
-		documentData.SetDocument("/Geometry/coordinates/1", documentDataLon)
-
-		documentData.SetDocument("/type", jsondocument.String("sensor-reading"))
+		documentData.SetDocument("/type", jsondocument.String("Feature"))
+		documentData.SetDocument("/geometry/type", jsondocument.String("Point"))
+		documentData.SetDocument("/geometry/coordinates/0", documentDataLat)
+		documentData.SetDocument("/geometry/coordinates/1", documentDataLon)
 
 		document, err := data.NewDocument(messageMessage.ID, request.ID, inputID)
 		if err != nil {
@@ -254,5 +253,18 @@ func DocumentsHandler(c *config.Config) http.Handler {
 		}
 
 		WriteJSON(w, documents)
+	})
+}
+
+func DocumentDataHandler(c *config.Config) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		data, err := c.Backend.DocumentDataByProjectSlugAndExpeditionSlug(vars["project"], vars["expedition"])
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		WriteJSON(w, data)
 	})
 }
