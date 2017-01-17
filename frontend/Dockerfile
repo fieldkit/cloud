@@ -6,4 +6,4 @@ ADD webpack.* /usr/app/
 ADD src/vendors /usr/app/src/vendors
 RUN npm run-script dll
 COPY . /usr/app/
-RUN npm run-script build
+# RUN npm run-script build
