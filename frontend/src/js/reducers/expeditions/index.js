@@ -84,6 +84,7 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.INITIALIZE_DOCUMENTS: {
+      console.log('INIT', action.data.toJS())
       const position = action.data.toList().get(0).getIn(['geometry', 'coordinates'])
       const currentDocuments = action.data.map(d => d.get('id'))
       return state
