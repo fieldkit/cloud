@@ -234,4 +234,9 @@ export class FKApiClient extends APIClient {
     return res
   }
 
+  async addExpeditionToken (projectID, expeditionID) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/tokens/add')
+    return res
+  }
+
 }

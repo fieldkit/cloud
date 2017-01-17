@@ -326,6 +326,11 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['projects', state.get('currentProjectID'), 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
     }
 
+    case actions.RECEIVE_TOKEN: {
+      return state
+        .setIn(['expeditions', action.expeditionID, 'token'], action.token)
+    }
+
     case actions.ADD_EXPEDITION: {
       const expeditionID = 'expedition-' + Date.now()
       return state
