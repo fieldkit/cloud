@@ -47,10 +47,11 @@ export function requestExpedition (expeditionID) {
     })
 
     let projectID = location.hostname.split('.')[0]
-    if (projectID === 'localhost') projectID = 'new-project'
+    if (projectID === 'localhost') projectID = 'demo'
     console.log('getting expedition')
-    FKApiClient.get().getExpedition(projectID, expeditionID)
-      .then(resExpedition => {
+    // FKApiClient.get().getExpedition(projectID, expeditionID)
+      // .then(resExpedition => {
+      const resExpedition = {"name":"demoExpedition","slug":"demoexpedition"}
         console.log('expedition received:', resExpedition)
         if (!resExpedition) {
           console.log('error getting expedition')
@@ -60,14 +61,14 @@ export function requestExpedition (expeditionID) {
           // {"name":"ian test","slug":"ian-test"}
 
 
-          FKApiClient.get().getDocuments(projectID, expeditionID)
-            .then(resDocuments => {
-              console.log('documents received:', resExpedition)
-              if (!resExpedition) {
+          // FKApiClient.get().getDocuments(projectID, expeditionID)
+            // .then(resDocuments => {
+                const resDocuments = [{"id":"GIUJ2WATF2HRCWBEKI34FUAVFZ4S7OHE","message_id":"PGMOCCWTIHR527UKISQ4EV4JYG55DJDU","request_id":"DZKYM26OJL2ENEQ5DG6VLDHMIXMTXQN2","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.90714645385742,-77.04476165771484],"type":"Point"},"date":1.484660606e+09,"type":"Feature"}},{"id":"J65LGHQM22QMVAZMYA2S4IEVZAQSZR4W","message_id":"VLGTLUGTCF7QVT6TOOEN3AFJHATXQVAH","request_id":"KDYJEKGJS3ZH5NDX5IFCR7LVHQNLIFNP","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.99214553833008,-76.80714416503906],"type":"Point"},"date":1.484611955e+09,"type":"Feature"}},{"id":"PI5KOJMYQPMA6VPUEPYGNUB2K3MULR45","message_id":"XGYLMLC5HHQE7LR3RG43LV5M4ER75C25","request_id":"53OTLO72IIXCTMN55PKUH3ZNCMTOD5KM","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.90659713745117,-77.04178619384766],"type":"Point"},"date":1.484660868e+09,"type":"Feature"}},{"id":"UDTRVNZGAYTWEVJLJWV6NYG4SRFVGT4Z","message_id":"NLAJGOVGZQMCADGQEVD5JTXV3HAPBHR2","request_id":"SVYSPQGB37YPFNHI4U2COZEENV4O4ZEG","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.904422760009766,-77.04060363769531],"type":"Point"},"date":1.484661089e+09,"type":"Feature"}},{"id":"W6CTJG6AGPNFLJATQRSISBWUIDE7GEQR","message_id":"QUL6V5QSLHJ2Y5CGKYUSC3NM3APHQCBD","request_id":"3KGKE44IVXRQOJKZERTSU5EHO44GTT4U","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"date":1.484665769e+09,"geometry":{"coordinates":[38.903324127197266,-77.03483581542969],"type":"Point"},"type":"Feature"}},{"id":"4HNYNXJVQYGCB6OEQVGH3AK6TKUQGZPS","message_id":"2TB3BCSU5Y6K2J3MTZ6NPZFFWTGLJOUK","request_id":"RXYNJ6IUP5FEAGXH5EAHUZMSOTPLPYI6","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.90373611450195,-77.03819274902344],"type":"Point"},"date":1.484661273e+09,"type":"Feature"}}]
+              console.log('documents received:', resDocuments)
+              if (!resDocuments) {
                 console.log('error getting documents')
               } else {
                 console.log('documents properly received')
-                resDocuments = [{"id":"J65LGHQM22QMVAZMYA2S4IEVZAQSZR4W","message_id":"VLGTLUGTCF7QVT6TOOEN3AFJHATXQVAH","request_id":"KDYJEKGJS3ZH5NDX5IFCR7LVHQNLIFNP","input_id":"SCX6732QLCM7VVKUR3EBFPCF2MDJ5JPV","data":{"Geometry":{"coordinates":[38.99214553833008,-76.80714416503906],"type":"Point"},"date":1.484611955e+09,"type":"sensor-reading"}}]
                 // const documents = resDocuments.map(d => {
                 //   d.data = d.data * 1000
                 //   return d
@@ -95,8 +96,6 @@ export function requestExpedition (expeditionID) {
                   endDate
                 })
 
-                console.log('EXPEDITION DATA', expeditionData.toJS())
-
                 dispatch([
                   {
                     type: INITIALIZE_EXPEDITION,
@@ -109,7 +108,7 @@ export function requestExpedition (expeditionID) {
                   }
                 ])
               }
-            })
+            // })
 
           // const expeditionMap = {}
           // res.forEach(e => {
@@ -126,7 +125,7 @@ export function requestExpedition (expeditionID) {
           //   })
           // dispatch(receiveExpeditions(projectID, expeditions, false))
         }
-      })
+      // }) 
   }
 }
 

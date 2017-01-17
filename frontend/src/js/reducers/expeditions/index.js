@@ -15,7 +15,7 @@ export const initialState = I.fromJS({
   viewport: {
     latitude: -18.5699229,
     longitude: 22.115456,
-    zoom: 10,
+    zoom: 15,
     width: window.innerWidth,
     height: window.innerHeight,
     startDragLngLat: null,
@@ -84,14 +84,15 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.INITIALIZE_DOCUMENTS: {
-      console.log('INIT', action.data.toJS())
       const position = action.data.toList().get(0).getIn(['geometry', 'coordinates'])
-      const currentDocuments = action.data.map(d => d.get('id'))
-      return state
+      const currentDocuments = action.data.map(d => d.get('id')).toList()
+      const newState = state
         .setIn(['viewport', 'longitude'], position.get(0))
         .setIn(['viewport', 'latitude'], position.get(1))
         .setIn(['expeditions', state.get('currentExpedition'), 'documentsFetching'], false)
+        .set('documents', action.data)
         .set('currentDocuments', currentDocuments)
+      return newState
     }
 
     case actions.SET_VIEWPORT: {
@@ -135,8 +136,8 @@ const expeditionReducer = (state = initialState, action) => {
         nextDate < startDate ? documents.first() :
         nextDate >= endDate ? documents.last() : null
 
-      const longitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
-      const latitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
+      const longitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
+      const latitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
 
       return state
         .set('currentDate', nextDate)

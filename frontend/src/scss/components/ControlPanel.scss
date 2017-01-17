@@ -2,6 +2,9 @@
 .control-panel {
   position: absolute;
   width: $line-width * 10;
+  padding: 20px;
+  background-color: white;
+  color: black;
 
   &_playback-selector {
     display: flex;
@@ -9,6 +12,10 @@
 
       &_button {
         cursor: pointer;
+        border: black 1px solid;
+        width: 100%;
+        display: block;
+        text-align: center;
       }
   }
 }
