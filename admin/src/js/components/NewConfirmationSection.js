@@ -36,11 +36,11 @@ class NewConfirmationSection extends React.Component {
           </div>
         </Link>
         or
-        <Link to={'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id') }>
+        <a href={'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id') }>
           <div className="button hero">
             Go to my map!
           </div>
-        </Link>
+        </a>
         </div>
 
       </div>

@@ -139,14 +139,11 @@ class NewInputsSection extends React.Component {
         <p className="status">
         </p>
 
-        <a href="#" onClick={(e) => {
-          e.preventDefault()
-          submitInputs()
-        }}>
+        <Link to={'/admin/' + currentProjectID + '/new-expedition/confirmation'}>
           <div className="button hero">
-            Next step: configuring data inputs
+            Next step: finalize your expedition
           </div>
-        </a>
+        </Link>
 
       </div>
     )
