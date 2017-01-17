@@ -747,3 +747,23 @@ ul.main-input-container {
       border-color: #D0462C;
       z-index: 10;
     }
+
+#mc_embed_signup {
+  background-color: transparent;
+}
+
+  #mc_embed_signup input.email {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  #mc_embed_signup input.button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+    #mc_embed_signup_scroll {
+      width: 100%;
+      display: flex;
+    }
+

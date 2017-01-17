@@ -4,16 +4,13 @@
   CHANGE API URL BEFORE BUILD
 
   expedition token
-  indicate navigation state
-  project creation flow
-  load projects
-  fix id issue
-  new project call
-  new sighting call
+  
   mailing list form
   broken image links
+  indicate navigation state
   display profile information
   signup form error feedback
+  
   change the map endpoints on ItO to call the API with https
 
 */
