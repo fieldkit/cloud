@@ -55,7 +55,6 @@ class Map extends React.Component {
             setViewport(viewport)
           }}
         >
-        {/*
           <WebGLOverlay
             { ...viewport }
             startDragLngLat={[0, 0]}
@@ -67,7 +66,6 @@ class Map extends React.Component {
           <DOMOverlay
             focusedDocument={ focusedDocument }
           />
-        */}
         </MapboxGL>
       </div>
     )
