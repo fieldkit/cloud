@@ -172,7 +172,7 @@ CREATE TABLE data.message (
 	request_id bytea NOT NULL,
 	input_id bytea NOT NULL,
 	FOREIGN KEY (request_id, input_id) REFERENCES data.request (id, input_id),
-	data jsonb NOT NULL
+	data jsonb 
 );
 
 CREATE UNIQUE INDEX ON data.message (id, request_id, input_id);
@@ -189,7 +189,7 @@ CREATE TABLE data.document (
 	request_id bytea NOT NULL,
 	input_id bytea NOT NULL,
 	FOREIGN KEY (message_id, request_id, input_id) REFERENCES data.message (id, request_id, input_id),
-	data jsonb NOT NULL
+	data jsonb 
 );
 
-CREATE UNIQUE INDEX ON data.message (id, message_id, request_id, input_id);
+CREATE UNIQUE INDEX ON data.document (id, message_id, request_id, input_id);
