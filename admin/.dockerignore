@@ -1,4 +1,5 @@
 .DS_Store
 .gitignore
+build
 build.bash
 node_modules
