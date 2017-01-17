@@ -18,8 +18,7 @@ export default class Signup extends React.Component {
       this.refs.email.value, 
       this.refs.username.value,
       this.refs.password.value,
-      this.refs.invite.value,
-      this.refs.projectName.value
+      this.refs.invite.value
     )
     return false
   }

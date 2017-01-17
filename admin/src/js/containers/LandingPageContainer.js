@@ -10,8 +10,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    requestSignUp (email, username, password, invite, project) {
-      dispatch(actions.requestSignUp(email, username, password, invite, project))
+    requestSignUp (email, username, password, invite) {
+      dispatch(actions.requestSignUp(email, username, password, invite))
     },
     requestSignIn (username, password) {
       dispatch(actions.requestSignIn(username, password))
