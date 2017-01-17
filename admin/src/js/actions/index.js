@@ -660,7 +660,7 @@ export function loginError (message) {
   }
 }
 
-export function requestSignUp (email, username, password, invite, project) {
+export function requestSignUp (email, username, password, invite) {
   return function (dispatch, getState) {
     dispatch(signupRequest())
 
@@ -669,7 +669,6 @@ export function requestSignUp (email, username, password, invite, project) {
       'username': username,
       'password': password,
       'invite': invite,
-      'project': project
     }
 
     FKApiClient.get().register(params)
