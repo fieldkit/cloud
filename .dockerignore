@@ -1,6 +1,7 @@
 .git
 .gitignore
 admin/
+build
 build.bash
 docker-compose.yml
 postgres-init.sh

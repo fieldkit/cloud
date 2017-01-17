@@ -2,6 +2,7 @@ package jsondocument
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"regexp"
@@ -15,6 +16,7 @@ var (
 	jsonPointerReferenceError = errors.New("JSON pointer reference error")
 	jsonDelimiterError        = errors.New("unknown JSON delimiter")
 	jsonTypeError             = errors.New("unexpected JSON type")
+	invalidJSONError          = errors.New("invalid JSON")
 )
 
 func init() {
@@ -282,4 +284,17 @@ func (d *Document) Document(pointer string) (*Document, error) {
 	}
 
 	return document, nil
+}
+
+func (d *Document) Value() (driver.Value, error) {
+	return d.MarshalJSON()
+}
+
+func (d *Document) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return invalidJSONError
+	}
+
+	return d.UnmarshalJSON(data)
 }

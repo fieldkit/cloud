@@ -132,6 +132,18 @@ CREATE INDEX ON admin.input (expedition_id);
 CREATE UNIQUE INDEX ON admin.input (expedition_id, slug);
 
 
+-- input message type
+
+DROP TABLE IF EXISTS admin.input_message_type CASCADE;
+CREATE TABLE admin.input_message_type (
+	id integer,
+	input_id bytea REFERENCES admin.input (id) NOT NULL,
+	fields varchar(80)[] NOT NULL
+);
+
+CREATE UNIQUE INDEX ON admin.input_message_type (id, input_id);
+
+
 -- request
 
 CREATE SCHEMA IF NOT EXISTS data;
@@ -141,7 +153,7 @@ CREATE TYPE format_type AS ENUM ('fieldkit', 'csv', 'json');
 
 DROP TABLE IF EXISTS data.request CASCADE;
 CREATE TABLE data.request (
-	id bytea,
+	id bytea NOT NULL,
 	input_id bytea REFERENCES admin.input (id) NOT NULL,
 	format format_type NOT NULL,
 	checksum bytea NOT NULL,
@@ -150,3 +162,34 @@ CREATE TABLE data.request (
 
 CREATE INDEX ON data.request (input_id);
 CREATE UNIQUE INDEX ON data.request (id, input_id);
+
+
+-- message
+
+DROP TABLE IF EXISTS data.message CASCADE;
+CREATE TABLE data.message (
+	id bytea NOT NULL,
+	request_id bytea NOT NULL,
+	input_id bytea NOT NULL,
+	FOREIGN KEY (request_id, input_id) REFERENCES data.request (id, input_id),
+	data jsonb NOT NULL
+);
+
+CREATE UNIQUE INDEX ON data.message (id, request_id, input_id);
+
+
+
+
+-- message
+
+DROP TABLE IF EXISTS data.document CASCADE;
+CREATE TABLE data.document (
+	id bytea NOT NULL,
+	message_id bytea NOT NULL,
+	request_id bytea NOT NULL,
+	input_id bytea NOT NULL,
+	FOREIGN KEY (message_id, request_id, input_id) REFERENCES data.message (id, request_id, input_id),
+	data jsonb NOT NULL
+);
+
+CREATE UNIQUE INDEX ON data.message (id, message_id, request_id, input_id);
