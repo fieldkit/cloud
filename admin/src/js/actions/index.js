@@ -70,11 +70,24 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
 
 export function addDocumentType (id, collectionType) {
   return function (dispatch, getState) {
-    dispatch({
-      type: ADD_DOCUMENT_TYPE,
-      id,
-      collectionType
-    })
+    const projectID = getState().expeditions.get('currentProjectID')
+    const expeditionID = getState().expeditions.get('currentExpeditionID')
+    FKApiClient.get().addInput(projectID, expeditionID, id)
+      .then(res => {
+        console.log('server response:', res)
+        if (!res) {
+          console.log('adding input, error')
+        } else {
+          console.log('input successfully added')
+          // {"id":"LIHQVRPTV7UXRDXMG7F36IRFQ7AIEZBD","expedition_id":"JF55GNWOT4GC3FDPWWX5NT5RWFFJPKRZ","name":"sensor","slug":"sensor"}
+          dispatch({
+            type: ADD_DOCUMENT_TYPE,
+            id,
+            collectionType,
+            token: res.id
+          })
+        }
+      })
   }
 }
 
@@ -398,6 +411,7 @@ export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 export const SUBMIT_GENERAL_SETTINGS = 'SUBMIT_GENERAL_SETTINGS'
 export const RECEIVE_TOKEN = 'RECEIVE_TOKEN'
+export const RECEIVE_INPUT = 'RECEIVE_INPUT'
 
 export function requestProjects () {
   return function (dispatch, getState) {

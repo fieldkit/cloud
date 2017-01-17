@@ -454,7 +454,9 @@ const expeditionReducer = (state = initialState, action) => {
           })
         )
       }
-      return newState        
+      newState = newState
+        .setIn(['documentTypes', action.id, 'token'], action.token)
+      return newState
     }
 
     case actions.REMOVE_DOCUMENT_TYPE: {

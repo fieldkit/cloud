@@ -75,7 +75,9 @@ class NewInputsSection extends React.Component {
                                 </li>
                                 <li>
                                   <a 
-                                    href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(currentExpedition.get('token'))}
+                                    href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(
+                                      'https://fieldkit.org/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + currentExpedition.get('token')
+                                    )}
                                     download="config.txt"
                                   >
                                     <div className="button">Download config file</div>
