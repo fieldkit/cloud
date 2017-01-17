@@ -39,9 +39,9 @@ const mapStateToProps = (state, ownProps) => {
   focusParticles.position[0] = x
   focusParticles.position[1] = y
   focusParticles.position[2] = radius
-  focusParticles.color[0] = 255
-  focusParticles.color[1] = 255
-  focusParticles.color[2] = 255
+  focusParticles.color[0] = 242/255
+  focusParticles.color[1] = 76/255
+  focusParticles.color[2] = 45/255
   focusParticles.color[3] = 1
 
   // Readings particles and path
@@ -54,8 +54,8 @@ const mapStateToProps = (state, ownProps) => {
   currentDocuments.toList().forEach((sighting, i) => {
     const position = sighting.getIn(['geometry', 'coordinates'])
     const radius = 15
-    const x = window.innerWidth * ((sighting.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
-    const y = window.innerHeight * ((sighting.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+    const x = window.innerWidth * ((sighting.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+    const y = window.innerHeight * ((sighting.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
     const color = new THREE.Color('#ffffff')
     
     readingParticles.position[i * 3 + 0] = x
