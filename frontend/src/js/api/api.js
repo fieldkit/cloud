@@ -207,4 +207,14 @@ export class FKApiClient extends APIClient {
     this.onLogout();
   }
 
+  async getExpedition (projectID, expeditionID) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID)
+    return res
+  }
+
+  async getDocuments (projectID, expeditionID) {
+    const res = await this.getJSON('https://fieldkit.org/api/project/' + projectID + '/expedition/' + expeditionID + '/documents')
+    return res
+  }
+
 }

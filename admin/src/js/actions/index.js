@@ -419,7 +419,8 @@ export function requestProjects () {
       .then(res => {
         console.log('projects received:', res)
         if (!res) {
-          dispatch(createProject ('new project'))
+          console.log('NO PROJECT!')
+          // dispatch(createProject ('new project'))
         } else {
           const projectMap = {}
           res.forEach(p => {
@@ -649,7 +650,22 @@ export function requestSignUp (email, username, password, invite, project) {
     FKApiClient.get().register(params)
       .then(() => {
         dispatch(signupSuccess())
-        browserHistory.push('/signin')
+
+        FKApiClient.get().createProjects(project)
+          .then(res => {
+            console.log('project created', res)
+            const projectMap = {};
+            [res].forEach(p => {
+              projectMap[p.slug] = p
+            })
+            const projects = I.fromJS(projectMap)
+              .map(p => {
+                return p.merge(I.fromJS({expeditions: []}))
+              })
+            dispatch(receiveProjects(projects))
+            browserHistory.push('/signin')
+          })
+        
       })
       .catch(error => {
         console.log('signup error:', error)
