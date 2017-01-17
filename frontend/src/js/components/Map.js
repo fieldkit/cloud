@@ -16,10 +16,10 @@ class Map extends React.Component {
     const { currentDate, playbackMode, updateDate } = this.props
     const framesPerSecond = 60
     const dateDelta = 
-      (playbackMode === 'forward' ? 100000 :
-      playbackMode === 'fastForward' ? 1000000 :
-      playbackMode === 'backward' ? -100000 :
-      playbackMode === 'fastBackward' ? -1000000 : 
+      (playbackMode === 'forward' ? 500000 :
+      playbackMode === 'fastForward' ? 5000000 :
+      playbackMode === 'backward' ? -500000 :
+      playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
     updateDate(nextDate)

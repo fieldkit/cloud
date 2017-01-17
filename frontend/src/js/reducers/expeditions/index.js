@@ -117,7 +117,7 @@ const expeditionReducer = (state = initialState, action) => {
           return state.get('currentDocuments').includes(d.get('id'))
         })
         .sort((d1, d2) => {
-          return d2.get('date') < d1.get('date')
+          return d1.get('date') - d2.get('date')
         })
 
       const previousDocuments = documents
