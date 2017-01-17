@@ -385,3 +385,17 @@ func (b *Backend) AuthTokensByProjectSlugAndExpeditionSlug(projectSlug, expediti
 
 	return authTokens, nil
 }
+
+func (b *Backend) AuthTokenByInputIDAndID(inputID, authTokenID id.ID) (*data.AuthToken, error) {
+	authToken := &data.AuthToken{}
+	if err := b.database.Iterator(`
+		SELECT a.* FROM admin.expedition_auth_token AS a
+			JOIN admin.expedition AS e ON e.id = a.expedition_id
+			JOIN admin.input AS i ON i.expedition_id = e.id
+				WHERE i.id = $1 AND a.id = $2
+		`, inputID, authTokenID).One(authToken); err != nil {
+		return nil, Err(err)
+	}
+
+	return authToken, nil
+}

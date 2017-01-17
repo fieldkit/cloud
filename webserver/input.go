@@ -114,14 +114,20 @@ func InputRequestHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		input, err := c.Backend.InputByID(inputID)
-		if err == backend.NotFoundError {
+		tokenID := id.ID{}
+		if err := tokenID.UnmarshalText([]byte(req.FormValue("token"))); err != nil {
 			Error(w, err, 404)
 			return
 		}
 
+		_, err := c.Backend.AuthTokenByInputIDAndID(inputID, tokenID)
 		if err != nil {
 			Error(w, err, 500)
+			return
+		}
+
+		if err == backend.NotFoundError {
+			Error(w, err, 404)
 			return
 		}
 
@@ -145,7 +151,7 @@ func InputRequestHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		request, err := data.NewRequest(input.ID)
+		request, err := data.NewRequest(inputID)
 		if err != nil {
 			Error(w, err, 500)
 			return
