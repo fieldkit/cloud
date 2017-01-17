@@ -78,6 +78,7 @@ func ConfigHandler(handler http.Handler, c *config.Config) http.Handler {
 func NewWebserver(c *config.Config) (*http.Server, error) {
 	router := mux.NewRouter()
 	router.HandleFunc("/status", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("cache-control", "no-store")
 		fmt.Fprint(w, "ok")
 	})
 
@@ -88,13 +89,13 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/user/sign-in", UserSignInHandler(c))
 	api.Handle("/api/user/current", AuthHandler(c, UserCurrentHandler(c)))
 
-	api.Handle("/api/projects", AuthHandler(c, ProjectsHandler(c)))
+	api.Handle("/api/projects", ProjectsHandler(c))
 	api.Handle("/api/projects/add", AuthHandler(c, ProjectAddHandler(c)))
-	api.Handle("/api/project/{project}", AuthHandler(c, ProjectHandler(c)))
+	api.Handle("/api/project/{project}", ProjectHandler(c))
 
-	api.Handle("/api/project/{project}/expeditions", AuthHandler(c, AuthProjectHandler(c, ExpeditionsHandler(c))))
+	api.Handle("/api/project/{project}/expeditions", ExpeditionsHandler(c))
 	api.Handle("/api/project/{project}/expeditions/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAddHandler(c))))
-	api.Handle("/api/project/{project}/expedition/{expedition}", AuthHandler(c, AuthProjectHandler(c, ExpeditionHandler(c))))
+	api.Handle("/api/project/{project}/expedition/{expedition}", ExpeditionHandler(c))
 	api.Handle("/api/project/{project}/expedition/{expedition}/tokens", AuthHandler(c, AuthProjectHandler(c, ExpeditionAuthTokensHandler(c))))
 	api.Handle("/api/project/{project}/expedition/{expedition}/tokens/add", AuthHandler(c, AuthProjectHandler(c, ExpeditionAuthTokenAddHandler(c))))
 
@@ -102,9 +103,14 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/project/{project}/expedition/{expedition}/inputs/add", AuthHandler(c, AuthProjectHandler(c, InputAddHandler(c))))
 	api.Handle("/api/project/{project}/expedition/{expedition}/input/{id}", AuthHandler(c, AuthProjectHandler(c, InputHandler(c))))
 
-	api.Handle("/api/input/{id}/{format:(?:fieldkit|csv|json)}/{source:(?:direct)}", InputRequestHandler(c))
+	api.Handle("/api/project/{project}/expedition/{expedition}/documents", DocumentsHandler(c))
 
-	router.Host("fieldkit.org").PathPrefix("/api").Handler(handlers.CompressHandler(api))
+	api.Handle("/api/input/{id}/{format:(?:fieldkit|csv|json)}/{source:(?:direct|rockblock)}", InputRequestHandler(c))
+
+	router.Host("fieldkit.org").PathPrefix("/api").Handler(handlers.CompressHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("cache-control", "no-store")
+		api.ServeHTTP(w, req)
+	})))
 
 	if c.AdminPath != "" {
 		application, err := regexp.Compile(`^/.*$`)

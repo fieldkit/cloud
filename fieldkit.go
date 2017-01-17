@@ -12,6 +12,7 @@ import (
 	"github.com/O-C-R/fieldkit/config"
 	"github.com/O-C-R/fieldkit/data"
 	"github.com/O-C-R/fieldkit/email"
+	"github.com/O-C-R/fieldkit/queue"
 	"github.com/O-C-R/fieldkit/webserver"
 )
 
@@ -66,6 +67,8 @@ func main() {
 
 	emailer := email.NewEmailer()
 
+	q := queue.NewQueue()
+
 	getenvString(&flagConfig.sessionStoreAddr, "SESSION_STORE_ADDR")
 	getenvString(&flagConfig.sessionStorePassword, "SESSION_STORE_PASSWORD")
 	sessionStoreOptions := session.SessionStoreOptions{
@@ -83,6 +86,7 @@ func main() {
 		Addr:         flagConfig.addr,
 		Backend:      b,
 		Emailer:      emailer,
+		Queue:        q,
 		SessionStore: sessionStore,
 		AdminPath:    flagConfig.adminPath,
 		FrontendPath: flagConfig.frontendPath,

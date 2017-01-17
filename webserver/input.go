@@ -1,7 +1,9 @@
 package webserver
 
 import (
+	"bytes"
 	"crypto/sha1"
+	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +14,8 @@ import (
 	"github.com/O-C-R/fieldkit/backend"
 	"github.com/O-C-R/fieldkit/config"
 	"github.com/O-C-R/fieldkit/data"
+	"github.com/O-C-R/fieldkit/data/jsondocument"
+	"github.com/O-C-R/fieldkit/data/message"
 )
 
 func InputsHandler(c *config.Config) http.Handler {
@@ -135,6 +139,16 @@ func InputRequestHandler(c *config.Config) http.Handler {
 		switch vars["source"] {
 		case "direct":
 			reader = req.Body
+		case "rockblock":
+			req.FormValue("data")
+
+			data, err := hex.DecodeString(req.FormValue("data"))
+			if err != nil {
+				Error(w, err, 400)
+				return
+			}
+
+			reader = bytes.NewReader(data)
 		}
 
 		hash := sha1.New()
@@ -165,6 +179,80 @@ func InputRequestHandler(c *config.Config) http.Handler {
 			return
 		}
 
-		WriteJSON(w, request)
+		messageReader := message.NewFieldkitBinaryReader(bytes.NewReader(requestData))
+		messageDocument, err := messageReader.ReadMessage()
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		messageMessage, err := data.NewMessage(request.ID, inputID)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		messageMessage.Data = messageDocument
+		if err := c.Backend.AddMessage(messageMessage); err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		documentData := jsondocument.Null()
+
+		// time, lat, lon, alt, temp, humidity, battery, uptime
+		documentDataTime, err := messageDocument.ArrayIndex(1)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		documentData.SetDocument("/date", documentDataTime)
+
+		documentDataLat, err := messageDocument.ArrayIndex(2)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		documentDataLon, err := messageDocument.ArrayIndex(3)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		documentData.SetDocument("/Geometry/type", jsondocument.String("Point"))
+		documentData.SetDocument("/Geometry/coordinates/0", documentDataLat)
+		documentData.SetDocument("/Geometry/coordinates/1", documentDataLon)
+
+		documentData.SetDocument("/type", jsondocument.String("sensor-reading"))
+
+		document, err := data.NewDocument(messageMessage.ID, request.ID, inputID)
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		document.Data = documentData
+		if err := c.Backend.AddDocument(document); err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		w.Header().Set("cache-control", "no-store")
+		WriteJSON(w, documentData)
+	})
+}
+
+func DocumentsHandler(c *config.Config) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		documents, err := c.Backend.DocumentsByProjectSlugAndExpeditionSlug(vars["project"], vars["expedition"])
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		WriteJSON(w, documents)
 	})
 }

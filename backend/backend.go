@@ -399,3 +399,28 @@ func (b *Backend) AuthTokenByInputIDAndID(inputID, authTokenID id.ID) (*data.Aut
 
 	return authToken, nil
 }
+
+func (b *Backend) AddMessage(message *data.Message) error {
+	_, err := b.database.Collection("data.message").Insert(message)
+	return Err(err)
+}
+
+func (b *Backend) AddDocument(document *data.Document) error {
+	_, err := b.database.Collection("data.document").Insert(document)
+	return Err(err)
+}
+
+func (b *Backend) DocumentsByProjectSlugAndExpeditionSlug(projectSlug, expeditionSlug string) ([]*data.Document, error) {
+	documents := []*data.Document{}
+	if err := b.database.Iterator(`
+		SELECT d.* FROM data.document AS d
+			JOIN admin.input AS i ON i.id = d.input_id
+			JOIN admin.expedition AS e ON e.id = i.expedition_id
+			JOIN admin.project AS p ON p.id = e.project_id
+				WHERE p.slug = $1 AND e.slug = $2
+		`, projectSlug, expeditionSlug).All(&documents); err != nil {
+		return nil, Err(err)
+	}
+
+	return documents, nil
+}

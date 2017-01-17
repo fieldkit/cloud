@@ -271,6 +271,7 @@ func ContextUserID(ctx context.Context) (id.ID, bool) {
 
 func AuthHandler(c *config.Config, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("cache-control", "no-store")
 		cookie, err := req.Cookie(CookieName)
 		if err == http.ErrNoCookie {
 			Error(w, err, 401)

@@ -2,6 +2,7 @@ package message
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +16,21 @@ const (
 	UvarintField = "uvarint"
 	Float32Field = "float32"
 	Float64Field = "float64"
+
+	// Demo
+	demoFieldkitBinaryMessageTypeJSON = `{
+	"id": 1,
+	"fields": [
+		"uvarint",
+		"float32",
+		"float32",
+		"float32",
+		"float32",
+		"float32",
+		"float32",
+		"float32"
+	]
+}`
 )
 
 var (
@@ -64,10 +80,21 @@ type FieldkitBinaryReader struct {
 }
 
 func NewFieldkitBinaryReader(r io.Reader) *FieldkitBinaryReader {
-	return &FieldkitBinaryReader{
+	reader := &FieldkitBinaryReader{
 		reader:       newByteReader(r),
 		messageTypes: make(map[uint64][]string),
 	}
+
+	messageType := &MessageType{}
+	if err := json.Unmarshal([]byte(demoFieldkitBinaryMessageTypeJSON), messageType); err != nil {
+		panic(err)
+	}
+
+	if err := reader.AddMessageType(messageType); err != nil {
+		panic(err)
+	}
+
+	return reader
 }
 
 // AddMessageType registers a MessageType
@@ -94,7 +121,7 @@ func (m *FieldkitBinaryReader) ReadMessage() (*jsondocument.Document, error) {
 
 	fields, ok := m.messageTypes[id]
 	if !ok {
-		return nil, fieldkitBinaryUnknownMessageTypeError
+		return nil, fmt.Errorf("unknown message type, %d", id)
 	}
 
 	message := jsondocument.Array()
