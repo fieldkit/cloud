@@ -23,7 +23,7 @@ class NavigationPanel extends React.Component {
         />
         <div id="logo">
           <Link to={'/admin'}>
-            <img src={fieldkitLogo} alt="fieldkit logo" />
+            <img src={'/' + fieldkitLogo} alt="fieldkit logo" />
           </Link>
           {/*
           <SignOutButton
