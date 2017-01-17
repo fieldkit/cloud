@@ -13,8 +13,8 @@ export const initialState = I.fromJS({
   mousePosition: [-1, -1],
   expeditions: {},
   viewport: {
-    latitude: -18.5699229,
-    longitude: 22.115456,
+    latitude: 0,
+    longitude: 0,
     zoom: 15,
     width: window.innerWidth,
     height: window.innerHeight,
@@ -104,6 +104,11 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['viewport', 'geoBounds'], geoBounds)
         .set('viewport', state.get('viewport')
           .merge(action.viewport))
+    }
+
+    case actions.SET_ZOOM: {
+      return state
+        .setIn(['viewport', 'zoom'], action.zoom)
     }
 
     case actions.UPDATE_DATE: {
