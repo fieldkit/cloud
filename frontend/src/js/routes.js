@@ -30,7 +30,6 @@ import { batchedSubscribe } from 'redux-batched-subscribe'
 
 import * as actions from './actions'
 import expeditionReducer from './reducers/expeditions'
-import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import RootContainer from './containers/RootContainer'
@@ -49,7 +48,6 @@ const createStoreWithMiddleware = applyMiddleware(
 //   fn => fn()
 // )(createStoreWithMiddleware)
 const reducer = combineReducers({
-  auth: authReducer,
   expeditions: expeditionReducer,
   // routing: routerReducer
 })
