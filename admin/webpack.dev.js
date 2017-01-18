@@ -88,17 +88,6 @@ module.exports = {
   devServer: {
     host: '0.0.0.0',
     port: 8081,
-    // proxy: {
-      // '/api': 'https://fieldkit.org/api',
-      // '/api': {
-      //   changeOrigin: true,
-      //   target: {
-      //     host: "localhost",
-      //     protocol: 'http:',
-      //     port: 8080
-      //   },
-      // }
-    // },
     historyApiFallback: true
   },
   output: {

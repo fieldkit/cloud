@@ -37,7 +37,7 @@ import RootContainer from './containers/RootContainer'
 
 import MapPageContainer from './containers/MapPageContainer'
 
-import {FKApiClient} from './api/api.js';
+import { FKApiClient } from './api/api.js';
 
 document.getElementById('root').remove()
 
@@ -89,8 +89,11 @@ var render = function () {
   )
 }
 
-// function onLogout () {
-//   // todo
-// }
-FKApiClient.setup('https://fieldkit.org')
+function onLogout () {
+  // todo
+}
+
+const APIServerURL = location.hostname === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+FKApiClient.setup(APIServerURL, onLogout)
+
 render()

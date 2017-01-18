@@ -187,5 +187,10 @@ var render = function () {
   )
 }
 
-FKApiClient.setup('https://fieldkit.org')
+function onLogout () {
+  // todo
+}
+const APIServerURL = location.hostname === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+FKApiClient.setup(APIServerURL, onLogout)
+
 render()
