@@ -35,8 +35,8 @@ class LandingPage extends React.Component {
 
         <div className="slide">
           <div className="content">
-            <img src={nationalGeographicLogoLong} alt="" className="content_nat"/>
-            <h1 className="content_title"><img className="content_title_img" src={fieldkitLogoRed} alt="fieldkit"/></h1>
+            <img src={'/' + nationalGeographicLogoLong} alt="" className="content_nat"/>
+            <h1 className="content_title"><img className="content_title_img" src={'/' + fieldkitLogoRed} alt="fieldkit"/></h1>
             <p className="content_sub">A one-click open platform for field researchers and explorers</p>
 
             <div id="mc_embed_signup">
@@ -87,12 +87,12 @@ class LandingPage extends React.Component {
           <ul className="footer_logos">
             <li className="footer_logo">
               <a href="http://conservify.org/" target="_blank" className="footer_logo_link">
-                <img src={conservifyLogo} alt="" className="footer_logo_img"/>
+                <img src={'/' + conservifyLogo} alt="" className="footer_logo_img"/>
               </a>
             </li>
             <li className="footer_logo">
               <a href="https://ocr.nyc/" target="_blank" className="footer_logo_link">
-                <img src={ocrLogo} alt="" className="footer_logo_img"/>
+                <img src={'/' + ocrLogo} alt="" className="footer_logo_img"/>
               </a>
             </li>
           </ul>

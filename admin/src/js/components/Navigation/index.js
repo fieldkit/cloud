@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
 import { Link } from 'react-router'
 
-import fieldkitLogo from '../../../img/fieldkit-logo.png'
+import fieldkitLogo from '../../../img/fieldkit-logo.svg'
 import profileButton from '../../../img/profile-button.png'
 import backgroundImage from '../../../img/bkg.jpg'
 

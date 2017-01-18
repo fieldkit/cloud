@@ -98,7 +98,7 @@ class NewInputsSection extends React.Component {
                         removeDocumentType(d.get('id'))
                       }}
                     >  
-                      <img src={iconRemoveSmall}/>
+                      <img src={'/' + iconRemoveSmall}/>
                     </td>
                   </tbody>
                 )

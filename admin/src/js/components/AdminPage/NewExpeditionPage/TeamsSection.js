@@ -141,7 +141,7 @@ class NewTeamsSection extends React.Component {
                 removeMember(m.get('id'))
               }}
             >  
-              <img src={iconRemoveSmall}/>
+              <img src={'/' + iconRemoveSmall}/>
             </td>
           </tbody>
         )
