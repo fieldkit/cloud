@@ -14,7 +14,7 @@ function isExternal(module) {
 module.exports = {
   context: path.join(__dirname),
   devtool: null,
-  entry: ['./src/js/routes.js'],
+  entry: ['./src/js/index.js'],
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',

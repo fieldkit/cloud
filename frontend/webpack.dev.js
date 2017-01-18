@@ -6,7 +6,7 @@ module.exports = {
   cache: true,
   context: path.join(__dirname, ''),
   devtool: 'eval',
-  entry: ['./src/js/routes.js'],
+  entry: ['./src/js/index.js'],
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',

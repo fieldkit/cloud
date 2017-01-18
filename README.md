@@ -80,18 +80,18 @@ From `/frontend`
 #### install
 ```
 npm install
-npm run-script dll
+npm run dll
 ```
 
 #### develop
 ```
 npm start
 ```
-Runs on localhost:8000
+Runs on localhost:8081
 
 #### build
 ```
-npm run-script build
+npm run build
 ```
 Builds app in `/frontend/dist`
 
@@ -101,18 +101,18 @@ From `/admin`
 #### install
 ```
 npm install
-npm run-script dll
+npm run dll
 ```
 
 #### develop
 ```
 npm start
 ```
-Runs on localhost:8000
+Runs on localhost:8081
 
 #### build
 ```
-npm run-script build
+npm run build
 ```
 Builds app in `/admin/dist`
 
