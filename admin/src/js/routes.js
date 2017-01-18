@@ -14,6 +14,7 @@
 */
 
 import '../css/index.scss'
+import 'react-select/dist/react-select.css';
 
 import 'babel-polyfill'
 
@@ -43,21 +44,17 @@ import NewProjectContainer from './containers/NewProjectContainer'
 
 import LandingPageContainer from './containers/LandingPageContainer'
 import AdminPageContainer from './containers/AdminPageContainer'
-import SignUpPageContainer from './containers/SignUpPageContainer'
-import SignInPageContainer from './containers/SignInPageContainer'
 import TeamsSectionContainer from './containers/TeamsSectionContainer'
 
 import DashboardSectionContainer from './containers/DashboardSectionContainer'
 import NewGeneralSettingsContainer from './containers/NewGeneralSettingsContainer'
 import NewInputsContainer from './containers/NewInputsContainer'
 import NewConfirmationContainer from './containers/NewConfirmationContainer'
-
 // import NewTeamsContainer from './containers/NewTeamsContainer'
 // import NewOutputsContainer from './containers/NewOutputsContainer'
 
 import {FKApiClient} from './api/api.js';
 
-import 'react-select/dist/react-select.css';
 
 document.getElementById('root').remove()
 
@@ -72,7 +69,6 @@ const createStoreWithMiddleware = applyMiddleware(
 const reducer = combineReducers({
   auth: authReducer,
   expeditions: expeditionReducer,
-  // routing: routerReducer
 })
 const store = createStoreWithMiddleware(reducer)
 
@@ -84,19 +80,7 @@ function requestProjects(nextState, replace) {
       state: { nextPathname: nextState.location.pathname }
     })
   }
-
   store.dispatch(actions.requestProjects())
-
-  // let currentProjectID = store.getState().expeditions.get('currentProjectID')
-  // if (!currentProjectID) currentProjectID = store.getState().expeditions.get('projects').toList().get(0).get('id')
-  // let currentExpeditionID = store.getState().expeditions.get('currentExpeditionID')
-  // if (!currentExpeditionID) currentExpeditionID = store.getState().expeditions.getIn(['projects', currentProjectID, 'expeditions']).get(0)
-  // if (!currentExpeditionID) currentExpeditionID = 'new-expedition'
-  // if (nextState.location.pathname === '/admin' || nextState.location.pathname === '/admin/') {
-  //   replace({
-  //     pathname: '/admin/' + currentProjectID + '/' + currentExpeditionID
-  //   })
-  // }
 }
 
 
@@ -172,9 +156,6 @@ const routes = (
     </Route>
   </Route>
 )
-
-
-// const history = syncHistoryWithStore(browserHistory, store)
 
 var render = function () {
   ReactDOM.render(

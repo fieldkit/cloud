@@ -2,7 +2,7 @@
 
 import 'whatwg-fetch';
 
-import {BaseError} from '../common/util';
+import {BaseError} from '../utils.js';
 import type {PersonResponse} from './types';
 
 export class APIError extends BaseError {};
