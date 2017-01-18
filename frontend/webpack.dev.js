@@ -59,13 +59,18 @@ module.exports = {
       },
       {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
-        loader: 'file?name=fonts/[name].[ext]'
+        loader: 'file?name=fonts/[name].[ext]',
+        include: [
+            path.join(__dirname, 'src', 'fonts')
+        ]
       },
       {
-        test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
-        loader: 'file?name=fonts/[name].[ext]'
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, 
+        loader: 'file-loader?mimetype=image/svg+xml',
+        include: [
+            path.join(__dirname, 'src', 'fonts')
+        ]
       },
-      {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?mimetype=image/svg+xml'},
       {test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader?mimetype=application/font-woff"},
       {test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader?mimetype=application/font-woff"},
       {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader?mimetype=application/octet-stream"},

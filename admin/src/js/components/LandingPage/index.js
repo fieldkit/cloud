@@ -7,7 +7,7 @@ import Signin from './Signin'
 import '../../../scss/app.scss'
 
 import fieldkitBackground from '../../../img/fieldkit-background.png'
-import fieldkitLogoRed from '../../../img/fieldkit-logo-red.png'
+import fieldkitLogoRed from '../../../img/fieldkit-logo-red.svg'
 import nationalGeographicLogoLong from '../../../img/national-geographic-logo-long.png'
 import conservifyLogo from '../../../img/conservify_logo.png'
 import ocrLogo from '../../../img/ocr_logo.jpg'
