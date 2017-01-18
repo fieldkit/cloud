@@ -2,7 +2,7 @@
 import { connect } from 'react-redux'
 import Map from '../components/Map'
 import * as actions from '../actions'
-import THREE from '../../vendors/react-three-renderer/node_modules/three'
+import { Vector3, Color } from 'three'
 import ViewportMercator from 'viewport-mercator-project'
 
 const mapStateToProps = (state, ownProps) => {
@@ -56,7 +56,7 @@ const mapStateToProps = (state, ownProps) => {
     const radius = 15
     const x = window.innerWidth * ((sighting.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
     const y = window.innerHeight * ((sighting.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-    const color = new THREE.Color('#ffffff')
+    const color = new Color('#ffffff')
     
     readingParticles.position[i * 3 + 0] = x
     readingParticles.position[i * 3 + 1] = y
@@ -66,7 +66,7 @@ const mapStateToProps = (state, ownProps) => {
     readingParticles.color[i * 4 + 2] = color.b
     readingParticles.color[i * 4 + 3] = 1
 
-    readingPath[i] = new THREE.Vector3(x, y, 0)
+    readingPath[i] = new Vector3(x, y, 0)
 
     const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
     if (distanceToMouse < focusDistance) {

@@ -1,8 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-import THREE from '../../vendors/react-three-renderer/node_modules/three'
-import React3 from '../../vendors/react-three-renderer'
 import sightingTexturePath from '../../img/sighting.png'
+import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
+import React3 from 'react-three-renderer'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
@@ -39,15 +39,15 @@ export default class WebGLOverlay extends Component {
     const bufferGeometries = {
       focusParticles: {
         count: 1,
-        position: new THREE.BufferAttribute(new Float32Array(1 * 3), 3),
-        color: new THREE.BufferAttribute(new Float32Array(1 * 4), 4),
-        index: new THREE.BufferAttribute(new Uint16Array(1 * 1), 1)
+        position: new BufferAttribute(new Float32Array(1 * 3), 3),
+        color: new BufferAttribute(new Float32Array(1 * 4), 4),
+        index: new BufferAttribute(new Uint16Array(1 * 1), 1)
       },
       readingParticles: {
         count: 1000,
-        position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
-        color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
-        index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1)
+        position: new BufferAttribute(new Float32Array(1000 * 3), 3),
+        color: new BufferAttribute(new Float32Array(1000 * 4), 4),
+        index: new BufferAttribute(new Uint16Array(1000 * 1), 1)
       }
     }
     for (let k in bufferGeometries) {
@@ -56,7 +56,7 @@ export default class WebGLOverlay extends Component {
       }
     }
 
-    const sightingTexture = new THREE.TextureLoader().load(sightingTexturePath)
+    const sightingTexture = new TextureLoader().load(sightingTexturePath)
 
     this.state = {
       shaders,
@@ -116,8 +116,8 @@ export default class WebGLOverlay extends Component {
       bottom: height,
       near: 1,
       far: 5000,
-      position: new THREE.Vector3(left, top, 600),
-      lookAt: new THREE.Vector3(left, top, 0)
+      position: new Vector3(left, top, 600),
+      lookAt: new Vector3(left, top, 0)
     }
 
     return (
@@ -148,7 +148,7 @@ export default class WebGLOverlay extends Component {
                     linewidth={10}
                     opacity={0.7}
                     transparent={false}
-                    color={new THREE.Color('#ffffff')}
+                    color={new Color('#ffffff')}
                   >
                   </lineBasicMaterial>
                 </line>

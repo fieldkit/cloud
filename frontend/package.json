@@ -95,7 +95,7 @@
     "react-router-redux-params": "^1.0.1",
     "react-select": "^1.0.0-rc.2",
     "react-state-animation": "^0.1.0",
-    "react-three-renderer": "^2.3.3",
+    "react-three-renderer": "^3.0.2",
     "redux": "^3.5.2",
     "redux-auth": "0.0.5-beta5",
     "redux-batched-subscribe": "^0.1.6",
