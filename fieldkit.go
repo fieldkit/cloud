@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -52,17 +53,18 @@ func main() {
 	}
 
 	if flagConfig.invite {
-		invite, err := data.NewInvite()
-		if err != nil {
-			log.Fatal(err)
-		}
+		for i := 0; i < 10; i++ {
+			invite, err := data.NewInvite()
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		time.Sleep(time.Second)
-		if err := b.AddInvite(invite); err != nil {
-			log.Fatal(err)
-		}
+			if err := b.AddInvite(invite); err != nil {
+				log.Fatal(err)
+			}
 
-		log.Println(invite.ID)
+			fmt.Println(invite.ID)
+		}
 	}
 
 	emailer := email.NewEmailer()
