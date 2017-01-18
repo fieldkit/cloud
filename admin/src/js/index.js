@@ -1,18 +1,4 @@
 
-/*
-
-  CHANGE API URL BEFORE BUILD
-  
-  broken image links
-  indicate navigation state
-  
-  display profile information
-  signup form error feedback
-
-  change the map endpoints on ItO to call the API with https
-
-*/
-
 import '../css/index.scss'
 import 'react-select/dist/react-select.css';
 
@@ -32,26 +18,20 @@ import authReducer from './reducers/auth'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import Root from './components/Root'
-import ForgotPasswordPage from './components/ForgotPasswordPage'
+import ProfileSection from './components/AdminPage/ProfileSection'
+import UploaderSection from './components/AdminPage/ExpeditionPage/UploaderSection'
+import SourcesSection from './components/AdminPage/ExpeditionPage/SourcesSection'
+import EditorSection from './components/AdminPage/ExpeditionPage/EditorSection'
+import IdentitySection from './components/AdminPage/ExpeditionPage/IdentitySection'
 
-import UploaderSection from './components/UploaderSection'
-import SourcesSection from './components/SourcesSection'
-import EditorSection from './components/EditorSection'
-import IdentitySection from './components/IdentitySection'
-import ProfileSection from './components/ProfileSection'
-
-import NewProjectContainer from './containers/NewProjectContainer'
-
-import LandingPageContainer from './containers/LandingPageContainer'
-import AdminPageContainer from './containers/AdminPageContainer'
-import TeamsSectionContainer from './containers/TeamsSectionContainer'
-
-import DashboardSectionContainer from './containers/DashboardSectionContainer'
-import NewGeneralSettingsContainer from './containers/NewGeneralSettingsContainer'
-import NewInputsContainer from './containers/NewInputsContainer'
-import NewConfirmationContainer from './containers/NewConfirmationContainer'
-// import NewTeamsContainer from './containers/NewTeamsContainer'
-// import NewOutputsContainer from './containers/NewOutputsContainer'
+import LandingPageContainer from './containers/LandingPage'
+import AdminPageContainer from './containers/AdminPage'
+import NewProjectContainer from './containers/AdminPage/NewProjectPage'
+import NewGeneralSettingsContainer from './containers/AdminPage/NewExpeditionPage'
+import NewInputsContainer from './containers/AdminPage/NewExpeditionPage/InputsSection'
+import NewConfirmationContainer from './containers/AdminPage/NewExpeditionPage/ConfirmationSection'
+import TeamsSectionContainer from './containers/AdminPage/ExpeditionPage/TeamsSection'
+import DashboardSectionContainer from './containers/AdminPage/ExpeditionPage'
 
 import {FKApiClient} from './api/api.js';
 

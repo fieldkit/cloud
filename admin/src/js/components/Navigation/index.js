@@ -2,16 +2,14 @@ import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
 import { Link } from 'react-router'
 
-import fieldkitLogo from '../../img/fieldkit-logo.png'
-import profileButton from '../../img/profile-button.png'
-import backgroundImage from '../../img/bkg.jpg'
+import fieldkitLogo from '../../../img/fieldkit-logo.png'
+import profileButton from '../../../img/profile-button.png'
+import backgroundImage from '../../../img/bkg.jpg'
 
-class NavigationPanel extends React.Component {
+class Navigation extends React.Component {
 
   render () {
     const { projectID, expeditionID, expeditions, disconnect, projects } = this.props
-
-    console.log('AGA', backgroundImage)
 
     return (
       <div id="header">
@@ -88,8 +86,8 @@ class NavigationPanel extends React.Component {
   }
 }
 
-NavigationPanel.propTypes = {
+Navigation.propTypes = {
   disconnect: PropTypes.func.isRequired
 }
 
-export default NavigationPanel
+export default Navigation

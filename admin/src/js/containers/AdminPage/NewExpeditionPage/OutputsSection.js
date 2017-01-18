@@ -1,34 +1,36 @@
 
 import { connect } from 'react-redux'
-import NewConfirmationSection from '../components/NewConfirmationSection'
-import * as actions from '../actions'
-
+import NewOutputsSection from '../../../components/NewOutputsSection'
+import * as actions from '../../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
   const expeditions = state.expeditions
-  const currentProjectID = expeditions.get('currentProjectID')
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentExpedition = expeditions.getIn(['expeditions', currentExpeditionID])
 
+  console.log(currentExpeditionID)
+
   return {
     ...ownProps,
-    currentProjectID,
-    currentExpedition,
+    currentExpedition
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
+    setExpeditionProperty (keyPath, value) {
+      return dispatch(actions.setExpeditionProperty(keyPath, value))
+    },
     // updateExpedition (expedition) {
     //   return dispatch(actions.updateExpedition(expedition))
     // },
   }
 }
 
-const NewConfirmationContainer = connect(
+const NewOutputsContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewConfirmationSection)
+)(NewOutputsSection)
 
-export default NewConfirmationContainer
+export default NewOutputsContainer

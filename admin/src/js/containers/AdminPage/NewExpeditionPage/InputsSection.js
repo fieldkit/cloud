@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import NewInputsSection from '../components/NewInputsSection'
-import * as actions from '../actions'
+import NewInputsSection from '../../../components/AdminPage/NewExpeditionPage/InputsSection'
+import * as actions from '../../../actions'
 
 
 const mapStateToProps = (state, ownProps) => {

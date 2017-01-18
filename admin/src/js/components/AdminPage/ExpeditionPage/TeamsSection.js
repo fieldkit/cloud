@@ -1,16 +1,13 @@
 import React, {PropTypes} from 'react'
-import {findDOMNode} from 'react-dom'
 import { Link } from 'react-router'
-import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'immutable'
 import Dropdown from 'react-dropdown'
-import Select from 'react-select'
+import Select from 'react-select';
 
-import iconRemoveSmall from '../../img/icon-remove-small.png'
+import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
-
-class NewTeamsSection extends React.Component {
+class TeamsSection extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -22,7 +19,6 @@ class NewTeamsSection extends React.Component {
   render () {
 
     const { 
-      currentProjectID,
       expedition,
       teams,
       members,
@@ -44,12 +40,13 @@ class NewTeamsSection extends React.Component {
     const roleOptions = [
       'Expedition Leader', 'Team Leader', 'Team Member'
     ]
+
     const teamTabs = teams
       .map((t, i) => {
         let className = 'team-name '
         if (t === currentTeam) className += 'editable active '
         if (currentTeam.get('name') === '') className += 'required '
-        console.log('ok', t.get('name'), currentTeam.get('name'))
+
         return (
           <li 
             className={ className }
@@ -313,8 +310,8 @@ class NewTeamsSection extends React.Component {
     return (
       <div id="teams-section" className="section">
         <div className="section-header">
-          <h1>Add team members to your expedition</h1>
-          <p>process breadcrumbs</p>
+          {/*sectionActions*/}
+          <h1>Teams</h1>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
@@ -325,18 +322,14 @@ class NewTeamsSection extends React.Component {
           <li className="team-name add" onClick={() => { addTeam() }}>+</li>
         </ul>
         { selectedTeamContainer }
-
-        <Link to={'/admin/' + currentProjectID + '/' + expedition.get('id') }>
-          <div className="button hero">
-            Finalize your expedition!
-          </div>
-        </Link>
+        {/*sectionActions*/}
       </div>
     )    
   }
 }
 
-NewTeamsSection.propTypes = {
+TeamsSection.propTypes = {
+  expedition: PropTypes.object.isRequired,
 }
 
-export default NewTeamsSection
+export default TeamsSection

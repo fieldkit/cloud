@@ -1,20 +1,16 @@
 
 import { connect } from 'react-redux'
-import NewTeamsSection from '../components/NewTeamsSection'
-import * as actions from '../actions'
+import TeamsSection from '../../../components/AdminPage/ExpeditionPage/TeamsSection'
+import * as actions from '../../../actions'
 
 const mapStateToProps = (state, ownProps) => {
-  
   const expeditions = state.expeditions
-  
-  const currentProjectID = expeditions.get('currentProjectID')
+
   const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentTeamID = expeditions.get('currentTeamID')
 
-
   const expedition = expeditions.getIn(['expeditions', currentExpeditionID])
 
-  
   const teams = expeditions.getIn(['expeditions', currentExpeditionID, 'teams'])
     .map(t => {
       return expeditions.getIn(['teams', t]) 
@@ -25,7 +21,9 @@ const mapStateToProps = (state, ownProps) => {
       return expeditions.getIn(['people', m.get('id')])
     })) : []
 
-  const currentTeam = expeditions.getIn(['teams', currentTeamID])
+  const currentTeam = !!teams.size ? teams.find(t => {
+    return t.get('id') === currentTeamID
+  }) : null
 
   const editedTeam = expeditions.get('editedTeam')
 
@@ -83,9 +81,9 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
   }
 }
 
-const NewTeamsContainer = connect(
+const TeamsSectionContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewTeamsSection)
+)(TeamsSection)
 
-export default NewTeamsContainer
+export default TeamsSectionContainer

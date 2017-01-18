@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import AdminPage from '../components/AdminPage'
-import * as actions from '../actions'
+import AdminPage from '../../components/AdminPage'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 

@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import DashboardSection from '../components/DashboardSection'
-import * as actions from '../actions'
+import DashboardSection from '../../../components/AdminPage/ExpeditionPage'
+import * as actions from '../../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 

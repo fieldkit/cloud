@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import LandingPage from '../components/LandingPage'
-import * as actions from '../actions'
+import LandingPage from '../../components/LandingPage'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
   return {

@@ -8,7 +8,7 @@ import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 import { Base64 } from 'js-base64'
 
-import iconRemoveSmall from '../../img/icon-remove-small.png'
+import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
 
 class NewInputsSection extends React.Component {

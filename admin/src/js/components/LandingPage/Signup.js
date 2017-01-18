@@ -1,8 +1,5 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
-import { signupUser } from '../actions'
-import { browserHistory } from 'react-router'
-import {FKApiClient} from '../api/api.js';
 
 export default class Signup extends React.Component {
 

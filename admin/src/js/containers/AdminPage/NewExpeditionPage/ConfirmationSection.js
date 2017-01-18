@@ -1,7 +1,8 @@
 
 import { connect } from 'react-redux'
-import NewGeneralSettingsSection from '../components/NewGeneralSettingsSection'
-import * as actions from '../actions'
+import NewConfirmationSection from '../../../components/AdminPage/NewExpeditionPage/ConfirmationSection'
+import * as actions from '../../../actions'
+
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -13,30 +14,21 @@ const mapStateToProps = (state, ownProps) => {
   return {
     ...ownProps,
     currentProjectID,
-    currentExpedition
+    currentExpedition,
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
-    setExpeditionProperty (key, value) {
-      return dispatch(actions.setExpeditionProperty(key, value))
-    },
-    setExpeditionPreset (type) {
-      return dispatch(actions.setExpeditionPreset(type))
-    },
-    submitGeneralSettings () {
-      return dispatch(actions.submitGeneralSettings())
-    }
     // updateExpedition (expedition) {
     //   return dispatch(actions.updateExpedition(expedition))
     // },
   }
 }
 
-const NewGeneralSettingsContainer = connect(
+const NewConfirmationContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewGeneralSettingsSection)
+)(NewConfirmationSection)
 
-export default NewGeneralSettingsContainer
+export default NewConfirmationContainer

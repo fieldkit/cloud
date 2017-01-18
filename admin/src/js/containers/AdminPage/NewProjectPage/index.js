@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import NewProjectSection from '../components/NewProjectSection'
-import * as actions from '../actions'
+import NewProjectPage from '../../../components/AdminPage/NewProjectPage'
+import * as actions from '../../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -30,6 +30,6 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
 const NewProjectContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewProjectSection)
+)(NewProjectPage)
 
 export default NewProjectContainer

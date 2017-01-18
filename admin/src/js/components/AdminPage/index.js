@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
-import NavigationPanel from './NavigationPanel'
+import Navigation from '../Navigation'
 import BreadCrumbs from './BreadCrumbs'
 import Modal from './Modal'
 
@@ -61,7 +61,7 @@ class AdminPage extends React.Component {
     return (
       <div id="admin-page" className="page">
         { modalComponent() }
-        <NavigationPanel {...params} expeditions={expeditions} projects={projects} disconnect={disconnect} />
+        <Navigation {...params} expeditions={expeditions} projects={projects} disconnect={disconnect} />
         <div className="page-content">
           <BreadCrumbs {...location} />
           {children}
