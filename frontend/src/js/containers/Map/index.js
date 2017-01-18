@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import Map from '../components/Map'
-import * as actions from '../actions'
+import Map from '../../components/Map'
+import * as actions from '../../actions'
 import { Vector3, Color } from 'three'
 import ViewportMercator from 'viewport-mercator-project'
 

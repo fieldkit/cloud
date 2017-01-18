@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
-import TimelineContainer from '../containers/TimelineContainer'
-import HeaderContainer from '../containers/HeaderContainer'
-import MapContainer from '../containers/MapContainer'
+import TimelineContainer from '../../containers/common/TimelineContainer'
+import HeaderContainer from '../../containers/Root/HeaderContainer'
+import MapContainer from '../../containers/Map'
 
 export default class Root extends React.Component {
   constructor (props) {

@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import Timeline from '../components/Timeline'
-import * as actions from '../actions'
+import Timeline from '../../components/common/Timeline'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 

@@ -1,19 +1,16 @@
 
 import { connect } from 'react-redux'
-import NotificationPanel from '../components/NotificationPanel'
-import * as actions from '../actions'
+import ControlPanel from '../../components/common/ControlPanel'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
+  // const currentExpeditionID = state.expeditions.get('currentExpedition')
+  // const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
   const currentDate = state.expeditions.get('currentDate')
-  const currentDocuments = state.expeditions.get('documents')
-    .filter(d => {
-      return state.expeditions.get('currentDocuments').includes(d.get('id'))
-    })
 
   return {
-    currentDate,
-    currentDocuments
+    currentDate
   }
 }
 
@@ -28,9 +25,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-const NotificationPanelContainer = connect(
+const ControlPanelContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NotificationPanel)
+)(ControlPanel)
 
-export default NotificationPanelContainer
+export default ControlPanelContainer

@@ -1,7 +1,7 @@
 
 import React, { PropTypes } from 'react'
-import ControlPanelContainer from '../containers/ControlPanelContainer'
-import NotificationPanelContainer from '../containers/NotificationPanelContainer'
+import ControlPanelContainer from '../../containers/common/ControlPanelContainer'
+import NotificationPanelContainer from '../../containers/MapPage/NotificationPanelContainer'
 
 class MapPage extends React.Component {
 

@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react'
-import { map, constrain } from '../utils.js'
+import { map, constrain } from '../../utils.js'
 
 class Timeline extends React.Component {
 

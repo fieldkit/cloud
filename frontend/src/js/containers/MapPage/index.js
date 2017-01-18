@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import MapPage from '../components/MapPage'
-import * as actions from '../actions'
+import MapPage from '../../components/MapPage'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 

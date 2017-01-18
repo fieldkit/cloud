@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react'
 import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
 import DOMOverlay from './DOMOverlay'
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../constants/mapbox.js'
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../constants/mapbox.js'
 
 class Map extends React.Component {
 

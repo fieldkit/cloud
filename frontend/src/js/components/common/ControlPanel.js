@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react'
-import { dateToString } from '../utils.js'
+import { dateToString } from '../../utils.js'
 
 class ControlPanel extends React.Component {
 

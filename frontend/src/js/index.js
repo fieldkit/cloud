@@ -32,9 +32,9 @@ import * as actions from './actions'
 import expeditionReducer from './reducers/expeditions'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
-import RootContainer from './containers/RootContainer'
+import RootContainer from './containers/Root'
 
-import MapPageContainer from './containers/MapPageContainer'
+import MapPageContainer from './containers/MapPage'
 
 import { FKApiClient } from './api/api.js';
 

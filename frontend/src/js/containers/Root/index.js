@@ -1,7 +1,7 @@
 
 import { connect } from 'react-redux'
-import Root from '../components/Root'
-import * as actions from '../actions'
+import Root from '../../components/Root'
+import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 

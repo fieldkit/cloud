@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react'
-import { dateToString } from '../utils.js'
+import { dateToString } from '../../utils.js'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 class NotificationPanel extends React.Component {

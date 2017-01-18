@@ -1,6 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-import sightingTexturePath from '../../img/sighting.png'
+import sightingTexturePath from '../../../img/sighting.png'
 import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
 import React3 from 'react-three-renderer'
 
