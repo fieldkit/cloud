@@ -1,21 +1,24 @@
-@import 'variables';
 
 @import 'utils/reset';
 @import 'utils/align';
 @import 'utils/font-awesome/font-awesome.scss';
 
-@import 'components/type';
-@import 'components/button';
-@import 'components/page';
-@import 'components/map';
-@import 'components/timeline';
-@import 'components/Navigation';
-@import 'components/Header';
-@import 'components/ControlPanel';
-@import 'components/NotificationPanel';
-@import 'components/DOMOverlay';
+@import 'common/variables';
+@import 'common/type';
+@import 'common/page';
 
-@import 'pages/mapPage';
+@import 'common/ControlPanel';
+@import 'common/Timeline';
+
+@import 'Root/Root';
+@import 'Root/Header';
+@import 'Root/Navigation';
+
+@import 'Map/Map';
+@import 'Map/DOMOverlay';
+
+@import 'MapPage/MapPage';
+@import 'MapPage/NotificationPanel';
 
 * {
   text-rendering: optimizeLegibility;
@@ -36,15 +39,4 @@ html, body {
   width: 100%;
   height: 100%;
   position: relative;
-}
-
-.root {
-  width: 100%;
-  height: 100%;
-  position: relative;
-
-  &_content {
-    padding: $line-height * 2 $line-width 0 $line-width * 5;
-  }
-
 }
