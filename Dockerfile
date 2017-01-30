@@ -1,4 +1,4 @@
-FROM golang:1.7.4-alpine
+FROM golang:1.7.5-alpine
 ENV CGO_ENABLED=0
 ADD . /go/src/github.com/O-C-R/fieldkit
 WORKDIR /go/src/github.com/O-C-R/fieldkit
