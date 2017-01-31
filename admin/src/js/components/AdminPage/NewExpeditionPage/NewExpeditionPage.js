@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react'
 import {findDOMNode} from 'react-dom'
-import { Link } from 'react-router'
+import { Link, browserHistory } from 'react-router'
 import autobind from 'autobind-decorator'
 import ContentEditable from 'react-contenteditable'
 import I from 'immutable'

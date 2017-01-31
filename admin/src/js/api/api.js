@@ -28,7 +28,6 @@ class FKApiClient {
     return localStorage.getItem(SIGNED_IN_KEY) != null
   }
 
-
   async get(path, params) {
     try {
       const url = new URL(path, this.baseUrl)
@@ -46,6 +45,10 @@ class FKApiClient {
       } catch (e) {
         console.log('Threw while GETing', url.toString(), e)
         throw new APIError('HTTP error')
+      }
+      if (res.status == 404) {
+        console.log('not found', url.toString(), await res.text())
+        throw new APIError('not found')
       }
       if (res.status == 401) {
         console.log('Bad auth while GETing', url.toString(), await res.text())
@@ -102,13 +105,11 @@ class FKApiClient {
 
   async postForm(path, body) {
     const data = new FormData()
-
     if (body) {
       for (const key in body) {
         data.append(key, body[key])
       }
     }
-
     const res = await this.post(path, data)
     return res.text()
   }
