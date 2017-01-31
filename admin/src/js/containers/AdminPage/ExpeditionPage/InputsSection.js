@@ -1,6 +1,6 @@
 
 import { connect } from 'react-redux'
-import NewInputsSection from '../../../components/AdminPage/NewExpeditionPage/InputsSection'
+import NewInputsSection from '../../../components/AdminPage/ExpeditionPage/InputsSection'
 import * as actions from '../../../actions'
 
 

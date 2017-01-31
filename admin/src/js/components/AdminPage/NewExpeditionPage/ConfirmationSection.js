@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import I from 'immutable'
+import { browserHistory } from 'react-router'
 
 
 class NewConfirmationSection extends React.Component {
@@ -15,8 +16,9 @@ class NewConfirmationSection extends React.Component {
   render () {
 
     const { 
-      currentProjectID,
-      currentExpedition
+      projectID,
+      expedition,
+      saveExpedition
     } = this.props
 
     return (
@@ -30,13 +32,21 @@ class NewConfirmationSection extends React.Component {
         </p>
        
         <div className="call-to-action"> 
-        <Link to={'/admin/' + currentProjectID + '/' + currentExpedition.get('id') }>
+        <Link 
+          to={'/admin/' + projectID + '/' + expedition.get('id') }
+          onClick={saveExpedition}
+        >
           <div className="button">
             Go to the admin dashboard
           </div>
         </Link>
         or
-        <a href={'https://' + currentProjectID + '.fieldkit.org/' + currentExpedition.get('id') }>
+        {/*<a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id') }>*/}
+        <a href="#" onClick={(e) => {
+          e.preventDefault()
+          saveExpedition()
+          browserHistory.push('https://' + projectID + '.fieldkit.org/' + expedition.get('id'))
+        }}>
           <div className="button hero">
             Go to my map!
           </div>

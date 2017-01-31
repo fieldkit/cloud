@@ -7,22 +7,21 @@ import * as actions from '../../../actions'
 const mapStateToProps = (state, ownProps) => {
 
   const expeditions = state.expeditions
-  const currentProjectID = expeditions.get('currentProjectID')
-  const currentExpeditionID = expeditions.get('currentExpeditionID')
-  const currentExpedition = expeditions.getIn(['expeditions', currentExpeditionID])
+  const projectID = expeditions.get('currentProjectID')
+  const expedition = expeditions.get('newExpedition')
 
   return {
     ...ownProps,
-    currentProjectID,
-    currentExpedition,
+    projectID,
+    expedition,
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
-    // updateExpedition (expedition) {
-    //   return dispatch(actions.updateExpedition(expedition))
-    // },
+    saveExpedition () {
+      return dispatch(actions.saveExpedition())
+    },
   }
 }
 

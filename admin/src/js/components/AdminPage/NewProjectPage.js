@@ -5,6 +5,7 @@ import ContentEditable from 'react-contenteditable'
 import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
+import slug from 'slug'
 
 class NewProjectSection extends React.Component {
   constructor (props) {
@@ -18,10 +19,9 @@ class NewProjectSection extends React.Component {
   render () {
 
     const { 
-      currentProjectID,
-      currentProject,
+      project,
       setProjectProperty,
-      createProject
+      saveProject
     } = this.props
 
     return (
@@ -37,9 +37,9 @@ class NewProjectSection extends React.Component {
           <div className="main-input-container">
             <input 
               type="text"
-              value={!!currentProject ? currentProject.get('name') : 'New Project'}
+              value={!!project ? project.get('name') : 'New Project'}
               onFocus={(e) => {
-                if (!!currentProject ? currentProject.get('name') === 'New Project' : 'New Project') {
+                if (!!project ? project.get('name') === 'New Project' : 'New Project') {
                   setProjectProperty(['name'], '')
                 }
               }}
@@ -59,7 +59,7 @@ class NewProjectSection extends React.Component {
 
         <a href="#" onClick={(e) => {
           e.preventDefault()
-          createProject(currentProject.get('name'))
+          saveProject(slug(project.get('name')), project.get('name'))
         }}>
           <div className="button hero">
             Create this project

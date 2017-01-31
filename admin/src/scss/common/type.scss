@@ -1,0 +1,75 @@
+p, .p {
+  margin-top: 0;
+}
+
+p.intro, .p.intro {
+  font-size: 18px;
+  line-height: 30px;
+  margin-bottom: 40px;
+}
+
+input, .input {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue";
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 0;
+}
+
+.h1, .h2, .h3, .h4, .h5 {
+  margin-top: 0;
+}
+
+h1, .h1 {
+  color: #D0462C;
+  font-weight: 100;
+  font-size: 48px;
+  line-height: 60px;
+}
+
+h2, .h2 {
+  color: black;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 40px;
+}
+
+h3, .h3 {
+  color: black;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+h4, .h4 {
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+h5, .h5 {
+  color: black;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: $color-accent !important;
+}
+
+
+
+
+

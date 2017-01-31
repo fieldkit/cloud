@@ -8,14 +8,13 @@ const mapStateToProps = (state, ownProps) => {
   const expeditions = state.expeditions
   
   const currentProjectID = expeditions.get('currentProjectID')
-  const currentExpeditionID = expeditions.get('currentExpeditionID')
   const currentTeamID = expeditions.get('currentTeamID')
 
 
-  const expedition = expeditions.getIn(['expeditions', currentExpeditionID])
+  const expedition = expeditions.get('newExpedition')
 
   
-  const teams = expeditions.getIn(['expeditions', currentExpeditionID, 'teams'])
+  const teams = expedition.get('teams')
     .map(t => {
       return expeditions.getIn(['teams', t]) 
     })

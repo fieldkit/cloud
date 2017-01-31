@@ -19,21 +19,19 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 
 import Root from './components/Root'
 import ProfileSection from './components/AdminPage/ProfileSection'
-import UploaderSection from './components/AdminPage/ExpeditionPage/UploaderSection'
-import SourcesSection from './components/AdminPage/ExpeditionPage/SourcesSection'
-import EditorSection from './components/AdminPage/ExpeditionPage/EditorSection'
-import IdentitySection from './components/AdminPage/ExpeditionPage/IdentitySection'
 
-import LandingPageContainer from './containers/LandingPage'
-import AdminPageContainer from './containers/AdminPage'
-import NewProjectContainer from './containers/AdminPage/NewProjectPage'
-import NewGeneralSettingsContainer from './containers/AdminPage/NewExpeditionPage'
+import LandingPageContainer from './containers/LandingPage/LandingPage'
+import AdminPageContainer from './containers/AdminPage/AdminPage'
+import NewProjectContainer from './containers/AdminPage/NewProjectPage/NewProjectPage'
+import NewGeneralSettingsContainer from './containers/AdminPage/NewExpeditionPage/NewExpeditionPage'
 import NewInputsContainer from './containers/AdminPage/NewExpeditionPage/InputsSection'
 import NewConfirmationContainer from './containers/AdminPage/NewExpeditionPage/ConfirmationSection'
-import TeamsSectionContainer from './containers/AdminPage/ExpeditionPage/TeamsSection'
-import DashboardSectionContainer from './containers/AdminPage/ExpeditionPage'
 
-import {FKApiClient} from './api/api.js';
+import ExpeditionPageContainer from './containers/AdminPage/ExpeditionPage/ExpeditionPage'
+import GeneralSettingsContainer from './containers/AdminPage/ExpeditionPage/GeneralSettingsSection'
+import InputsContainer from './containers/AdminPage/ExpeditionPage/InputsSection'
+
+import FKApiClient from './api/api.js';
 
 
 document.getElementById('root').remove()
@@ -53,17 +51,14 @@ const reducer = combineReducers({
 const store = createStoreWithMiddleware(reducer)
 
 
-function requestProjects(nextState, replace) {  
-  if (!FKApiClient.get().loggedIn()) {
+function checkAuthentication(nextState, replace) {  
+  if (!FKApiClient.loggedIn()) {
     replace({
       pathname: '/signin',
       state: { nextPathname: nextState.location.pathname }
     })
-  }
-  store.dispatch(actions.requestProjects())
+  } 
 }
-
-
 
 const routes = (
   <Route path="/" component={Root}>
@@ -74,7 +69,12 @@ const routes = (
     </Route>
     <Route path="admin" 
       component={AdminPageContainer} 
-      onEnter={requestProjects}
+      onEnter={(nextState, replace) => {
+        checkAuthentication(nextState, replace)
+        store.dispatch(actions.requestProjects(() => {
+          browserHistory.push('/admin/new-project')
+        }))
+      }}
       onChange={(prevState, nextState, replace) => {
         const previousSection = prevState.location.pathname.split('/')[3]
         const nextSection = nextState.location.pathname.split('/')[3]
@@ -94,43 +94,40 @@ const routes = (
       <Route 
         path="new-project" 
         component={NewProjectContainer}
-        onEnter={() => store.dispatch(actions.initNewProjectSection())}
+        onEnter={() => store.dispatch(actions.newProject())}
       />
 
       <Route path=":projectID" onEnter={(state) => {
-        store.dispatch(actions.requestExpeditions())
+        store.dispatch(actions.setCurrentProject(state.params.projectID))
+        store.dispatch(actions.requestExpeditions(() => {
+          browserHistory.push('/admin/' + state.params.projectID + '/new-expedition')
+        }))
       }}>
+
         <Route 
           path="new-expedition" 
-          onEnter={() => store.dispatch(actions.initNewExpeditionSection())}
+          onEnter={() => {
+            store.dispatch(actions.newExpedition())
+          }}
         >
           <IndexRoute component={NewGeneralSettingsContainer}/>
           <Route path="general-settings" component={NewGeneralSettingsContainer}/>
           <Route path="inputs" component={NewInputsContainer}/>
           <Route path="confirmation" component={NewConfirmationContainer}/>
-          {/*
-          <Route
-            path="teams"
-            component={NewTeamsContainer}
-            onEnter={() => store.dispatch(actions.initNewTeamsSection())}
-          />
-          <Route path="outputs" component={NewOutputsContainer}/>
-          */}
         </Route>
 
-        <Route path=":expeditionID" onEnter={(state) => {
-          store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
-        }}>
-          <IndexRoute component={DashboardSectionContainer}/>
-          <Route path="dashboard" component={DashboardSectionContainer}/>
-          <Route path="uploader" component={UploaderSection}/>
-          <Route path="sources" component={SourcesSection}/>
-          <Route path="teams" 
-            component={TeamsSectionContainer} 
-            onEnter={() => store.dispatch(actions.initTeamSection())}
-          />
-          <Route path="editor" component={EditorSection}/>
-          <Route path="identity" component={IdentitySection}/>
+        <Route path=":expeditionID" 
+          onLeave={() => {
+            store.dispatch(actions.setCurrentExpedition(null))
+          }}
+          onEnter={(state) => {
+            store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
+          }}
+        >
+          <IndexRoute component={ExpeditionPageContainer}/>
+          <Route path="dashboard" component={ExpeditionPageContainer}/>
+          <Route path="general-settings" component={GeneralSettingsContainer}/>
+          <Route path="inputs" component={InputsContainer}/>
         </Route>
       </Route>
     </Route>
@@ -151,7 +148,5 @@ var render = function () {
 function onLogout () {
   // todo
 }
-const APIServerURL = location.hostname === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
-FKApiClient.setup(APIServerURL, onLogout)
 
 render()
