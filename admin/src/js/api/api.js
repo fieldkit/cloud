@@ -3,7 +3,7 @@ import 'whatwg-fetch'
 import {BaseError} from '../utils.js'
 class APIError extends BaseError {}
 class AuthenticationError extends APIError {}
-const LOGGED_IN_KEY = 'loggedIn'
+const SIGNED_IN_KEY = 'signedIn'
 
 class FKApiClient {
   constructor(baseUrl) {
@@ -11,21 +11,21 @@ class FKApiClient {
   }
 
   onAuthError(e) {
-    if (this.loggedIn) {
-      this.onLogout()
+    if (this.signedIn) {
+      this.onSignOut()
     }
   }
 
-  onLogin() {
-    localStorage.setItem(LOGGED_IN_KEY, 'loggedIn')
+  onSignIn() {
+    localStorage.setItem(SIGNED_IN_KEY, 'signedIn')
   }
 
-  onLogout() {
-    localStorage.removeItem(LOGGED_IN_KEY)
+  onSignOut() {
+    localStorage.removeItem(SIGNED_IN_KEY)
   }
 
-  loggedIn() {
-    return localStorage.getItem(LOGGED_IN_KEY) != null
+  signedIn() {
+    return localStorage.getItem(SIGNED_IN_KEY) != null
   }
 
 
@@ -113,17 +113,17 @@ class FKApiClient {
     return res.text()
   }
 
-  async register(params) {
+  async signUp(params) {
     await this.postForm('/api/user/sign-up', params)
   }
 
-  async login(username, password) {
+  async signIn(username, password) {
     await this.postForm('/api/user/sign-in', { username, password })
   }
 
-  async logout() {
-    await this.postForm('/api/user/logout')
-    this.onLogout()
+  async signOut() {
+    await this.postForm('/api/user/sign-out')
+    this.onSignOut()
   }
 
   async getProjects () {

@@ -52,12 +52,12 @@ const store = createStoreWithMiddleware(reducer)
 
 
 function checkAuthentication(nextState, replace) {  
-  if (!FKApiClient.loggedIn()) {
-    replace({
-      pathname: '/signin',
-      state: { nextPathname: nextState.location.pathname }
-    })
-  } 
+  // if (!FKApiClient.signedIn()) {
+  //   replace({
+  //     pathname: '/signin',
+  //     state: { nextPathname: nextState.location.pathname }
+  //   })
+  // } 
 }
 
 const routes = (
@@ -143,10 +143,6 @@ var render = function () {
     ),
     document.getElementById('fieldkit')
   )
-}
-
-function onLogout () {
-  // todo
 }
 
 render()
