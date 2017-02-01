@@ -28,6 +28,7 @@ var flagConfig struct {
 	sessionStorePassword    string
 	adminPath, frontendPath string
 	invite                  bool
+	emailer                 string
 }
 
 func init() {
@@ -38,6 +39,7 @@ func init() {
 	flag.StringVar(&flagConfig.adminPath, "admin", "", "admin path")
 	flag.StringVar(&flagConfig.frontendPath, "frontend", "", "frontend path")
 	flag.BoolVar(&flagConfig.invite, "invite", false, "add a new invite and quit")
+	flag.StringVar(&flagConfig.emailer, "emailer", "default", "emailer: default, aws")
 }
 
 func getenvString(p *string, key string) {
@@ -83,7 +85,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	emailer := email.NewAWSSESEmailer(ses.New(s), "admin@fieldkit.org")
+	var emailer email.Emailer
+	switch flagConfig.emailer {
+	case "default":
+		emailer = email.NewEmailer()
+	case "aws":
+		emailer = email.NewAWSSESEmailer(ses.New(s), "admin@fieldkit.org")
+	default:
+		log.Fatal("invalid emailer")
+	}
 
 	q := queue.NewQueue()
 
