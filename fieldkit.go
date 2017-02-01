@@ -89,7 +89,7 @@ func main() {
 
 	getenvString(&flagConfig.sessionStoreAddr, "SESSION_STORE_ADDR")
 	getenvString(&flagConfig.sessionStorePassword, "SESSION_STORE_PASSWORD")
-	sessionStoreOptions := authSession.SessionStoreOptions{
+	sessionStoreOptions := session.SessionStoreOptions{
 		Addr:            flagConfig.sessionStoreAddr,
 		Password:        flagConfig.sessionStorePassword,
 		SessionDuration: time.Hour * 72,

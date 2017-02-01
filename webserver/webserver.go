@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/O-C-R/singlepage"
 	"github.com/gorilla/handlers"
@@ -102,12 +103,12 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	})))
 
 	if c.AdminPath != "" {
-		application, err := regexp.Compile(`^/.*$`)
+		application, err := regexp.Compile(`^(?:/|/[[:alnum:]]+(-[[:alnum:]]+)*)+$`)
 		if err != nil {
 			return nil, err
 		}
 
-		longtermCache, err := regexp.Compile(`\.(?:(?:eot|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
+		longtermCache, err := regexp.Compile(`\.(?:(?:eot|jpg|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
 		if err != nil {
 			return nil, err
 		}
@@ -120,12 +121,12 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	}
 
 	if c.FrontendPath != "" {
-		application, err := regexp.Compile(`^/.*$`)
+		application, err := regexp.Compile(`^(?:/|/[[:alnum:]]+(-[[:alnum:]]+)*)+$`)
 		if err != nil {
 			return nil, err
 		}
 
-		longtermCache, err := regexp.Compile(`\.(?:(?:eot|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
+		longtermCache, err := regexp.Compile(`\.(?:(?:eot|jpg|png|ttf|woff|woff2)|(?:css|js|svg)(?:.gz))$`)
 		if err != nil {
 			return nil, err
 		}
@@ -141,7 +142,15 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	handler = ConfigHandler(handler, c)
 	handler = handlers.CORS(
 		handlers.AllowCredentials(),
-		handlers.AllowedOrigins([]string{"http://localhost:8081", "https://fieldkit.org", "https://*.fieldkit.org"}),
+		handlers.AllowedOriginValidator(func(origin string) bool {
+			originComponents := strings.Split(origin, ":")
+			if originComponents[0] == "fieldkit.org" || strings.HasSuffix(originComponents[0], ".fieldkit.org") ||
+				originComponents[0] == "localhost" || strings.HasSuffix(originComponents[0], ".localhost") {
+				return true
+			}
+
+			return false
+		}),
 	)(handler)
 
 	server := &http.Server{
