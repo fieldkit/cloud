@@ -1,0 +1,23 @@
+
+    #new-inputs-section table.objects-list .name {
+      width: 25%;
+    }
+
+    #new-inputs-section table.objects-list .description {
+      width: 35%;
+    }
+
+    #new-inputs-section table.objects-list .inputs {
+      width: 35%;
+    }
+
+      #new-inputs-section table.objects-list .inputs li:not(:last-child) {
+        margin-bottom: 20px;
+      }
+
+    #new-inputs-section table.objects-list .remove {
+      width: 5%;
+      cursor: pointer;
+      text-align: right;
+      padding-right: 0;
+    }

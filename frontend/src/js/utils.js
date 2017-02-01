@@ -1,4 +1,20 @@
 
+export class BaseError {
+  name: string;
+  message: string;
+  stack: ?string;
+
+  constructor(message: string = 'Error') {
+    this.name = this.constructor.name;
+    this.message = message;
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor);
+    } else {
+      this.stack = (new Error(message)).stack;
+    }
+  }
+}
+
 export function map (val, domain1, domain2, range1, range2) {
   if (domain1 === domain2) return range1
   return (val - domain1) / (domain2 - domain1) * (range2 - range1) + range1

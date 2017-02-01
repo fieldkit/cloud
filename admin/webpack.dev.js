@@ -6,7 +6,7 @@ module.exports = {
   cache: true,
   context: path.join(__dirname, ''),
   devtool: 'eval',
-  entry: ['./src/js/routes.js'],
+  entry: ['./src/js/index.js'],
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',
@@ -65,12 +65,17 @@ module.exports = {
       },
       {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
-        loader: 'file?name=fonts/[name].[ext]'
+        loader: 'file?name=fonts/[name].[ext]',
+        include: [
+            path.join(__dirname, 'src', 'fonts')
+        ]
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, 
         loader: 'file-loader?mimetype=image/svg+xml',
-        exclude: /img/,
+        include: [
+            path.join(__dirname, 'src', 'fonts')
+        ]
       },
       {test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader?mimetype=application/font-woff"},
       {test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader?mimetype=application/font-woff"},
@@ -88,17 +93,6 @@ module.exports = {
   devServer: {
     host: '0.0.0.0',
     port: 8081,
-    // proxy: {
-      // '/api': 'https://fieldkit.org/api',
-      // '/api': {
-      //   changeOrigin: true,
-      //   target: {
-      //     host: "localhost",
-      //     protocol: 'http:',
-      //     port: 8080
-      //   },
-      // }
-    // },
     historyApiFallback: true
   },
   output: {

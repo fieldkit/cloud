@@ -12,15 +12,15 @@ export const initialState = I.fromJS({
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actions.LOGIN_REQUEST:
+    case actions.SIGNIN_REQUEST:
       return state
         .set('signInFetching', true)
         .set('signInError', null)
-    case actions.LOGIN_SUCCESS:
+    case actions.SIGNIN_SUCCESS:
       return state
         .set('signInFetching', false)
         .set('signInError', null)
-    case actions.LOGIN_ERROR:
+    case actions.SIGNIN_ERROR:
       return state
         .set('signInFetching', false)
         .set('signInError', action.message)

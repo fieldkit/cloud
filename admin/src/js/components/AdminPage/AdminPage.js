@@ -1,0 +1,61 @@
+import React, {PropTypes, Children} from 'react'
+import { Link } from 'react-router'
+import Navigation from '../Navigation/Navigation'
+import BreadCrumbs from './BreadCrumbs'
+import Modal from './Modal'
+
+class AdminPage extends React.Component {
+
+  render () {
+
+    const { 
+      params,
+      error,
+      location,
+      modal,
+      cancelAction,
+      saveChangesAndResume,
+      expeditions,
+      projects,
+      requestSignOut
+    } = this.props
+
+    const modalProps = {
+      modal,
+      cancelAction,
+      saveChangesAndResume
+    }
+
+    const children = Children.map(this.props.children,
+      (child) => React.cloneElement(child, {
+        error: error
+      })
+    )
+
+    const modalComponent = () => {
+      if (!!modal.get('type')) {
+        return (
+          <Modal {...modalProps} />
+        )
+      } else {
+        return null
+      }
+    }
+
+    return (
+      <div id="admin-page" className="page">
+        { modalComponent() }
+        <Navigation {...params} expeditions={expeditions} projects={projects} requestSignOut={requestSignOut}/>
+        <div className="page-content">
+          <BreadCrumbs {...location} />
+          {children}
+        </div>
+      </div>
+    )
+  }
+}
+
+AdminPage.propTypes = {
+}
+
+export default AdminPage

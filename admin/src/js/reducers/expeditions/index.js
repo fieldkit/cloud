@@ -4,81 +4,23 @@ import I from 'immutable'
 import slug from 'slug'
 
 export const initialState = I.fromJS({
+  error: null,
   suggestedMembers: null,
   modal: {
     type: null,
     nextAction: null,
     nextPath: null
   },
-  currentProjectID: null,
-  currentExpeditionID: null,
+  newProject: null,
+  newExpedition: null,
+  // currentProjectID: null,
+  // currentExpeditionID: null,
   currentTeamID: null,
   currentMemberID: [],
   currentDocumentTypeID: null,
   editedTeam: null,
-  projects: {},
-  expeditions: {
-    // 'kayak_adventure': {
-    //   id: 'kayak_adventure',
-    //   name: 'Kayak Adventure',
-    //   startDate: new Date('2016-08-17 00:00:00+02:00'),
-    //   teams: [],
-    //   selectedDocumentType: {},
-    //   selectedPreset: null,
-    //   documentTypes: {},
-    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    // },
-    // 'okavango_16': {
-    //   id: 'okavango_16',
-    //   name: 'Okavango 2016',
-    //   startDate: new Date('2016-08-17 00:00:00+02:00'),
-    //   teams: [
-    //     'o16-river-team',
-    //     'o16-ground-team'
-    //   ],
-    //   selectedDocumentType: {
-    //     member: null,
-    //     social: null,
-    //     sensor: null
-    //   },
-    //   selectedPreset: null,
-    //   documentTypes: {},
-    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    // },
-    // 'bike_16': {
-    //   id: 'bike_16',
-    //   name: 'Bike Angola 2016',
-    //   startDate: new Date('2016-06-21 00:00:00+02:00'),
-    //   teams: [
-    //     'b16-ground-team'
-    //   ],
-    //   selectedDocumentType: {
-    //     member: null,
-    //     social: null,
-    //     sensor: null
-    //   },
-    //   selectedPreset: null,
-    //   documentTypes: {},
-    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    // },
-    // 'cuito_16': {
-    //   id: 'cuito_16',
-    //   name: 'Cuito River 2016',
-    //   startDate: new Date('2016-02-06 00:00:00+02:00'),
-    //   teams: [
-    //     'c16-river-team',
-    //     'c16-ground-team'
-    //   ],
-    //   selectedDocumentType: {
-    //     member: null,
-    //     social: null,
-    //     sensor: null
-    //   },
-    //   selectedPreset: null,
-    //   documentTypes: {},
-    //   token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
-    // }
-  },
+  projects: null,
+  expeditions: null,
   documentTypes: {
     // 'memberGeolocation': {
     //   id: 'memberGeolocation',
@@ -314,29 +256,34 @@ const expeditionReducer = (state = initialState, action) => {
   console.log('reducer:', action.type, action)
   switch (action.type) {
 
+    case actions.SET_ERROR: {
+      return state
+        .set('error', action.error)
+    }
+
     case actions.RECEIVE_PROJECTS: {
       return state
         .set('projects', action.projects)
     }
 
     case actions.RECEIVE_EXPEDITIONS: {
-      const newExpeditions = state.get('expeditions').merge(action.expeditions)
+      const expeditions = state.get('expeditions') || I.Map()
+      const newExpeditions = expeditions.merge(action.expeditions)
       return state
         .set('expeditions', newExpeditions)
-        .setIn(['projects', state.get('currentProjectID'), 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
+        .setIn(['newProject', 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
     }
 
     case actions.RECEIVE_TOKEN: {
       return state
-        .setIn(['expeditions', action.expeditionID, 'token'], action.token)
+        .setIn(['newExpedition', 'token'], action.token)
     }
 
-    case actions.ADD_PROJECT: {
+    case actions.NEW_PROJECT: {
       const projectID = 'project-' + Date.now()
       return state
-        .set('currentProjectID', projectID)
-        .setIn(
-          ['projects', projectID], 
+        .set(
+          'newProject', 
           I.fromJS({
             id: projectID,
             name: 'New Project',
@@ -346,37 +293,32 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.SET_PROJECT_PROPERTY: {
-      let newState = state.setIn(
-        ['projects', state.get('currentProjectID')].concat(action.keyPath),
+      const newState = state.setIn(
+        ['newProject'].concat(action.keyPath),
         action.value
       )
-      if (action.keyPath.length === 1 && action.keyPath[0] === 'name' && !!action.value) {
-        const lastID = state.get('currentProjectID')
-        const id = slug(action.value)
-        newState = newState
-          .setIn(
-            ['projects', id],
-            newState.getIn(['projects', state.get('currentProjectID')])
-          )
-          .setIn(['projects', id, 'id'], id)
-          .set('currentProjectID', id)
-        if (lastID !== id) {
-          newState = newState.deleteIn(['projects', state.get('currentProjectID')])
-        }
+      if (!!action.keyPath && action.keyPath.length === 1 && action.keyPath[0] === 'name') {
+        return newState
+          .setIn(['newProject', 'id'], slug(action.value))
+      } else {
+        return newState 
       }
-      return newState
     }
 
-    case actions.ADD_EXPEDITION: {
+    case actions.SAVE_PROJECT: {
+      return state
+        .setIn(
+          ['projects', action.id],
+          state.get('newProject')
+            .set('id', action.id)
+        )
+    }
+
+    case actions.NEW_EXPEDITION: {
       const expeditionID = 'expedition-' + Date.now()
       return state
-        .set('currentExpeditionID', expeditionID)
-        .setIn(
-          ['projects', state.get('currentProjectID'), 'expeditions'],
-          state.getIn(['projects', state.get('currentProjectID'), 'expeditions']).push(expeditionID)
-        )
-        .setIn(
-          ['expeditions', expeditionID], 
+        .set(
+          'newExpedition', 
           I.fromJS({
             id: expeditionID,
             name: 'New Expedition',
@@ -390,101 +332,20 @@ const expeditionReducer = (state = initialState, action) => {
             },
             selectedPreset: null,
             documentTypes: {},
-            token: 'd0sid0239ud29h2ijbe109eudsoijdo2109u2wdlkn'
+            token: ''
           })
         )
-    }
-
-    case actions.SET_EXPEDITION_PRESET: {
-      switch (action.presetType) {
-        case 'rookie': {
-          return state
-            .setIn(
-              ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
-              action.presetType
-            )
-            .setIn(
-              ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
-              I.fromJS({
-                memberGeolocation: {id: 'memberGeolocation'},
-                sighting: {id: 'sighting'},
-              })
-            )
-            .setIn(
-              ['teams', 'main-team'],
-              I.fromJS({
-                id: 'main-team',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-                name: 'Main Team',
-                members: {
-                  adjany: {
-                    id: 'adjany',
-                    role: 'Team Leader'
-                  }
-                },
-                new: false,
-                status: 'ready',
-                editing: false,
-                selectedMember: null
-              })
-            )
-            .setIn(
-              ['expeditions', state.get('currentExpeditionID'), 'teams'],
-              I.fromJS(['main-team'])
-            )
-            .set('currentTeamID', 'main-team')
-        }
-
-        case 'advanced': {
-          return state
-            .setIn(
-              ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
-              action.presetType
-            )
-            .setIn(
-              ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
-              I.fromJS({
-                memberGeolocation: {id: 'memberGeolocation'},
-                tweet: {id: 'tweet'},
-                sensorReading: {id: 'sensorReading'},
-                sighting: {id: 'sighting'},
-              })
-            )
-            .setIn(
-              ['teams', 'main-team'],
-              I.fromJS({
-                id: 'o16-river-team',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-                name: 'Main Team',
-                members: {
-                  adjany: {
-                    id: 'adjany',
-                    role: 'Team Leader'
-                  }
-                },
-                new: false,
-                status: 'ready',
-                editing: false,
-                selectedMember: null
-              })
-            )
-        }
-
-        case 'pro': {
-          return state
-        }
-      }
     }
 
     case actions.ADD_DOCUMENT_TYPE: {
       let newState = state
         .setIn(
-          ['expeditions', state.get('currentExpeditionID'), 'selectedDocumentType', action.collectionType], 
+          ['newExpedition', 'selectedDocumentType', action.collectionType], 
           null
         )
-      if (!state.getIn(['expeditions', state.get('currentExpeditionID'), 'documentTypes']).has(action.id)) {
+      if (!state.getIn(['newExpedition', 'documentTypes']).has(action.id)) {
         newState = newState.setIn(
-          ['expeditions', state.get('currentExpeditionID'), 'documentTypes', action.id], 
+          ['newExpedition', 'documentTypes', action.id], 
           I.fromJS({
             id: action.id
           })
@@ -497,93 +358,44 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.REMOVE_DOCUMENT_TYPE: {
       return state
-        .deleteIn(['expeditions', state.get('currentExpeditionID'), 'documentTypes', action.id])
+        .deleteIn(['newExpedition', 'documentTypes', action.id])
     }
 
     case actions.SET_EXPEDITION_PROPERTY: {
-      let newState = state.setIn(
-        ['expeditions', state.get('currentExpeditionID')].concat(action.keyPath),
+      const newState = state.setIn(
+        ['newExpedition'].concat(action.keyPath),
         action.value
       )
-      if (action.keyPath.length === 1 && action.keyPath[0] === 'name' && !!action.value) {
-        const lastID = state.get('currentExpeditionID')
-        const id = slug(action.value)
-        newState = newState
-          .setIn(
-            ['expeditions', id],
-            newState.getIn(['expeditions', state.get('currentExpeditionID')])
-          )
-          .setIn(['expeditions', id, 'id'], id)
-          .set('currentExpeditionID', id)
-          .setIn(
-            ['projects', state.get('currentProjectID'), 'expeditions'],
-            state.getIn(['projects', state.get('currentProjectID'), 'expeditions'])
-              .pop()
-              .push(id)
-          )
-        if (lastID !== id) {
-          newState = newState.deleteIn(['expeditions', state.get('currentExpeditionID')])
-        }
+      if (!!action.keyPath && action.keyPath.length === 1 && action.keyPath[0] === 'name') {
+        return newState
+          .setIn(['newExpedition', 'id'], slug(action.value))
+      } else {
+        return newState 
       }
-      return newState
     }
 
-    case actions.SET_CURRENT_PROJECT: 
-      return state.set('currentProjectID', action.projectID)
+    case actions.SAVE_EXPEDITION: {
+      const expedition = state.get('newExpedition')
+      return state.setIn(['expeditions', expedition.get('id')], expedition)
+        .set('newExpedition', null)
+        // .set('currentExpeditionID', expedition.get('id'))
+    }
 
-    case actions.SET_CURRENT_EXPEDITION: 
-      return state.set('currentExpeditionID', action.expeditionID)
+    case actions.SET_CURRENT_PROJECT: {
+      return state.set('newProject', state.getIn(['projects', action.projectID]))
+    }
+
+    case actions.SET_CURRENT_EXPEDITION: {
+      const expedition = state.getIn(['expeditions', action.expeditionID])
+      return state
+        .set('newExpedition', expedition)
+    }
 
     case actions.SET_CURRENT_TEAM:
       return state.set('currentTeamID', action.teamID)
 
     case actions.SET_CURRENT_MEMBER:
       return state.set('currentMemberID', action.memberID)
-
-    case actions.ADD_TEAM: {
-      const expeditionID = state.get('currentExpeditionID')
-      const teamID = 'team-' + Date.now()
-      return state
-        .set('currentTeamID', teamID)
-        .setIn(
-          ['teams', teamID], 
-          I.fromJS({
-            id: 'team-' + Date.now(),
-            name: 'New Team',
-            description: 'Enter a description',
-            members: {},
-            new: true,
-            status: 'new'
-          })
-        )
-        .setIn(
-          ['expeditions', expeditionID, 'teams'], 
-          state.getIn(['expeditions', expeditionID, 'teams']).push(teamID)
-        )
-    }
-
-    case actions.REMOVE_CURRENT_TEAM: {
-      const expeditionID = state.get('currentExpeditionID')
-      const teamID = state.get('currentTeamID')
-      return state
-        .deleteIn(['teams', teamID])
-        .deleteIn(['expeditions', expeditionID, 'teams', 
-          state.getIn(['expeditions', expeditionID, 'teams'])
-            .findIndex(function(id) {
-              return id === teamID
-            })
-          ]
-        )
-        .set(
-          'currentTeamID', 
-          state.getIn(['expeditions', expeditionID, 'teams'])
-            .filter(t => {
-              return t !== teamID 
-            })
-            .first()
-        )
-        .set('editedTeam', null)
-    }
 
     case actions.START_EDITING_TEAM: {
       if (!state.get('editedTeam')) {
