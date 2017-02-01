@@ -286,7 +286,7 @@ const expeditionReducer = (state = initialState, action) => {
           'newProject', 
           I.fromJS({
             id: projectID,
-            name: 'New Project',
+            name: 'Project Name',
             expeditions: []
           })
         )
@@ -321,7 +321,7 @@ const expeditionReducer = (state = initialState, action) => {
           'newExpedition', 
           I.fromJS({
             id: expeditionID,
-            name: 'New Expedition',
+            name: 'Expedition Name',
             description: 'Enter a description',
             startDate: new Date(),
             teams: [],

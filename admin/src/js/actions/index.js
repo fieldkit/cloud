@@ -107,6 +107,12 @@ export function saveProject (id, name) {
         })
         browserHistory.push('/admin/' + id)
       })
+      .catch(error => {
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
+      })
   }
 }
 

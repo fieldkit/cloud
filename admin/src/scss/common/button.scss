@@ -23,9 +23,11 @@
 		background-color: darken($color-accent, 5%);
 	}
 
-	.disabled {
+	&.disabled {
 		background-color: $color-disabled;
+		border: 1px solid darken($color-disabled, 5%);
 		cursor: auto;
+		pointer-events: none;
 
 		&:hover {
 			background-color: $color-disabled;
@@ -45,6 +47,7 @@ a.button:hover {
 	.disabled {
 		background-color: transparent;
 		border-color: $color-disabled;
+		pointer-events: none;
 		
 		&:hover {
 			background-color: transparent;

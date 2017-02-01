@@ -19,52 +19,97 @@ class NewProjectSection extends React.Component {
   render () {
 
     const { 
+      projects,
       project,
+      errors,
       setProjectProperty,
       saveProject
     } = this.props
 
+    const projectName = project.get('name')
+
     return (
       <div id="teams-section" className="section">
-        <div className="section-header">
-          <h1>Create a New Project</h1>
-        </div>
+        
+        <h1 className="section_title">Create a New Project</h1>
 
-        <p className="input-label">
-          Pick a name for your project:
-        </p>
-        <div className="columns-container">
-          <div className="main-input-container">
-            <input 
-              type="text"
-              value={!!project ? project.get('name') : 'New Project'}
-              onFocus={(e) => {
-                if (!!project ? project.get('name') === 'New Project' : 'New Project') {
-                  setProjectProperty(['name'], '')
-                }
-              }}
-              onChange={(e) => {
-                setProjectProperty(['name'], e.target.value)
-              }}
-            />
-            <p className="error"></p>
+        { 
+          !!projects && projects.size === 0 &&
+          <div className="section_notification">
+            <span className="section_notification_icon"></span>
+            Before getting started, we need you to create your first project.
           </div>
-          <p className="input-description">
-            You will be able to change this name later if necessary.
-          </p>
-        </div>
+        }
 
-        <p className="status">
-        </p>
+        <div className="section_form_group">
+          <p className="section_form_label">
+            Pick a name for your project:
+          </p>
+          <div className="section_columns">
+            <div
+              style={{
+                flexBasis: 'calc(66.66% - 1.5625vw)'
+              }}
+            >
+              <input 
+                type="text"
+                className={
+                  'section_form_text_lg' +
+                  (!!projectName && projectName.toLowerCase() !== 'project name' ? '' : ' default')
+                }
+                value={projectName}
+                onFocus={(e) => {
+                  if (projectName === 'Project Name') {
+                    setProjectProperty(['name'], '')
+                  }
+                }}
+                onChange={(e) => {
+                  setProjectProperty(['name'], e.target.value)
+                }}
+              />
+              <p className="error"></p>
+            </div>
+            <div
+              className="section_form_description"
+              style={{
+                flexBasis: 'calc(33.33% - 1.5625vw)'
+              }}
+            >
+              <div>You can change this later if you want.</div>
+            </div>
+          </div>
+          {
+            !!errors && !!errors.get && !!errors.get('name') &&
+            errors.get('name').map((error, i) => {
+              return (
+                <p 
+                  key={'errors-name-' + i}
+                  className="errors"
+                >
+                  {error}
+                </p>
+              )
+            })
+          }
+        </div>
 
         <a href="#" onClick={(e) => {
           e.preventDefault()
-          saveProject(slug(project.get('name')), project.get('name'))
+          if (!!projectName && projectName.toLowerCase() !== 'Project Name') {
+            saveProject(slug(projectName), projectName)
+          }
         }}>
-          <div className="button hero">
-            Create this project
+          <div className={'button hero ' + (!!projectName && projectName.toLowerCase() !== 'project name' ? '' : 'disabled')}>
+            Save this project
           </div>
         </a>
+
+        {
+          !!errors &&
+          <p className="errors">
+            We found one or multiple errors. Please check your information above or try again later.
+          </p>
+        }
 
       </div>
     )
