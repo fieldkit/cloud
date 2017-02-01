@@ -24,7 +24,7 @@ class GeneralSettingsSection extends React.Component {
       setExpeditionProperty,
       setExpeditionPreset,
       saveGeneralSettings,
-      error
+      errors
     } = this.props
 
     console.log('aga rendering', expedition)
@@ -56,14 +56,14 @@ class GeneralSettingsSection extends React.Component {
               }}
             />
             {
-              !!error && !!error.get('name') &&
-              error.get('name').map((error, i) => {
+              !!errors && !!errors.get('name') &&
+              errors.get('name').map((errors, i) => {
                 return (
                   <p 
-                    key={'error-' + i}
-                    className="error"
+                    key={'errors-' + i}
+                    className="errors"
                   >
-                    {error}
+                    {errors}
                   </p>
                 )
               })
@@ -83,8 +83,8 @@ class GeneralSettingsSection extends React.Component {
         </p>
 
         {
-          !!error &&
-          <p className="error">
+          !!errors &&
+          <p className="errors">
             We found one or multiple errors. Please check your information above or try again later.
           </p>
         }

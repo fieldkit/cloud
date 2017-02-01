@@ -4,7 +4,7 @@ import I from 'immutable'
 import slug from 'slug'
 
 export const initialState = I.fromJS({
-  error: null,
+  errors: null,
   suggestedMembers: null,
   modal: {
     type: null,
@@ -258,7 +258,7 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.SET_ERROR: {
       return state
-        .set('error', action.error)
+        .set('errors', action.errors)
     }
 
     case actions.RECEIVE_PROJECTS: {

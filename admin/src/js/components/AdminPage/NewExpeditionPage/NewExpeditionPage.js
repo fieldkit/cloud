@@ -24,7 +24,7 @@ class NewGeneralSettingsSection extends React.Component {
       setExpeditionProperty,
       setExpeditionPreset,
       saveGeneralSettings,
-      error
+      errors
     } = this.props
 
     return (
@@ -54,12 +54,12 @@ class NewGeneralSettingsSection extends React.Component {
               }}
             />
             {
-              !!error && !!error.get('name') &&
-              error.get('name').map((error, i) => {
+              !!errors && !!errors.get('name') &&
+              errors.get('name').map((error, i) => {
                 return (
                   <p 
-                    key={'error-' + i}
-                    className="error"
+                    key={'errors-' + i}
+                    className="errors"
                   >
                     {error}
                   </p>
@@ -81,8 +81,8 @@ class NewGeneralSettingsSection extends React.Component {
         </p>
 
         {
-          !!error &&
-          <p className="error">
+          !!errors &&
+          <p className="errors">
             We found one or multiple errors. Please check your information above or try again later.
           </p>
         }

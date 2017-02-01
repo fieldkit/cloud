@@ -219,7 +219,7 @@ export function saveGeneralSettings (callback) {
                   },
                   {
                     type: SET_ERROR,
-                    error: null
+                    errors: null
                   },
                 ])
                 if (!!callback) callback()
@@ -230,7 +230,7 @@ export function saveGeneralSettings (callback) {
       .catch(error => {
         dispatch({
           type: SET_ERROR,
-          error: I.fromJS(error.message)
+          errors: I.fromJS(error.message)
         })
       })
   }
@@ -255,7 +255,7 @@ export function submitInputs () {
           browserHistory.push('/admin/' + projectID + '/new-expedition/confirmation')
           dispatch({
             type: SET_ERROR,
-            error: null
+            errors: null
           })
         }
       })
@@ -336,13 +336,10 @@ AUTH ACTIONS
 
 export const SIGNIN_REQUEST = 'SIGNIN_REQUEST'
 export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS'
-export const SIGNIN_ERROR = 'SIGNIN_ERROR'
 export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
-export const SIGNUP_ERROR = 'SIGNUP_ERROR'
 export const SIGNOUT_REQUEST = 'SIGNOUT_REQUEST'
 export const SIGNOUT_SUCCESS = 'SIGNOUT_SUCCESS'
-export const SIGNOUT_ERROR = 'SIGNOUT_ERROR'
 
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {
@@ -364,20 +361,20 @@ export function requestSignIn (username, password) {
             case 429:
               dispatch({
                 type: SET_ERROR,
-                error: I.fromJS('Try again later.')
+                errors: I.fromJS('Try again later.')
               })
               break
             case 401:
               dispatch({
                 type: SET_ERROR,
-                error: I.fromJS('Username or password incorrect.')
+                errors: I.fromJS('Username or password incorrect.')
               })
               break
           }
         } else {
           dispatch({
             type: SET_ERROR,
-            error: I.fromJS('A server error occured')
+            errors: I.fromJS('A server error occured')
           })
         }
       })
@@ -403,21 +400,10 @@ export function requestSignUp (email, username, password, invite) {
         browserHistory.push('/signin')
       })
       .catch(error => {
-        console.log('signup error:', error)
-        if (error.response && error.response.status === 400) {
-          error.response.json()
-            .then(message => {
-              dispatch({
-                type: SIGNUP_ERROR,
-                message
-              })
-            })
-        } else {
-          dispatch({
-            type: SIGNUP_ERROR,
-            message: 'A server error occurred.'
-          })
-        }
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
       })
   }
 }
@@ -435,21 +421,10 @@ export function requestSignOut () {
         browserHistory.push('/')
       })
       .catch(error => {
-        console.log('signout error:', error)
-        if (error.response && error.response.status === 400) {
-          error.response.json()
-            .then(message => {
-              dispatch({
-                type: SIGNOUT_ERROR,
-                message
-              })
-            })
-        } else {
-          dispatch({
-            type: SIGNOUT_ERROR,
-            message: 'A server error occurred.'
-          })
-        }
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
       })
   }
 }
