@@ -9,6 +9,21 @@ data "aws_iam_policy_document" "fieldkit-server" {
       "${aws_sqs_queue.fieldkit.arn}",
     ]
   }
+  statement {
+    actions = [
+      "ses:SendEmail",
+    ]
+    resources = [
+      "*",
+    ]
+    condition {
+      test = "StringEquals"
+      variable = "ses:FromAddress"
+      values = [
+        "admin@fieldkit.org",
+      ]
+    }
+  }
 }
 
 resource "aws_iam_role" "fieldkit-server" {

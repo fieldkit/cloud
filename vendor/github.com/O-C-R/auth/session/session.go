@@ -37,7 +37,6 @@ return ok
 
 var (
 	RateLimitExceededError = errors.New("rate limit exceeded")
-	NotFoundError          = errors.New("not found")
 	redisError             = errors.New("redis error")
 	tokenBucketScript      = redis.NewScript(1, tokenBucket)
 )
@@ -108,10 +107,6 @@ func (r *SessionStore) Session(sessionID id.ID, session interface{}) error {
 	defer conn.Close()
 
 	reply, err := redis.Bytes(conn.Do("GET", sessionKey(sessionID)))
-	if err == redis.ErrNil {
-		return NotFoundError
-	}
-
 	if err != nil {
 		return err
 	}

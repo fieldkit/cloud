@@ -8,6 +8,9 @@ import (
 	"time"
 
 	"github.com/O-C-R/auth/session"
+	"github.com/aws/aws-sdk-go/aws"
+	awsSession "github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ses"
 
 	"github.com/O-C-R/fieldkit/backend"
 	"github.com/O-C-R/fieldkit/config"
@@ -67,13 +70,26 @@ func main() {
 		}
 	}
 
-	emailer := email.NewEmailer()
+	awsSessionOptions := awsSession.Options{
+		Profile: "fieldkit",
+		Config: aws.Config{
+			Region: aws.String("us-east-1"),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+	}
+
+	s, err := awsSession.NewSessionWithOptions(awsSessionOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	emailer := email.NewAWSSESEmailer(ses.New(s), "admin@fieldkit.org")
 
 	q := queue.NewQueue()
 
 	getenvString(&flagConfig.sessionStoreAddr, "SESSION_STORE_ADDR")
 	getenvString(&flagConfig.sessionStorePassword, "SESSION_STORE_PASSWORD")
-	sessionStoreOptions := session.SessionStoreOptions{
+	sessionStoreOptions := authSession.SessionStoreOptions{
 		Addr:            flagConfig.sessionStoreAddr,
 		Password:        flagConfig.sessionStorePassword,
 		SessionDuration: time.Hour * 72,
