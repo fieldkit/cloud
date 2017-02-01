@@ -77,6 +77,7 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	api.Handle("/api/user/sign-up", UserSignUpHandler(c))
 	api.Handle("/api/user/validate", UserValidateHandler(c))
 	api.Handle("/api/user/sign-in", UserSignInHandler(c))
+	api.Handle("/api/user/sign-out", UserSignOutHandler(c))
 	api.Handle("/api/user/current", AuthHandler(c, UserCurrentHandler(c)))
 
 	api.Handle("/api/projects", AuthHandler(c, ProjectsHandler(c)))

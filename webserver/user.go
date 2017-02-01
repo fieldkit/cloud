@@ -256,8 +256,39 @@ func UserSignInHandler(c *config.Config) http.Handler {
 			HttpOnly: true,
 			Secure:   req.TLS != nil,
 			Path:     "/",
+			MaxAge:   int((time.Hour * 72).Seconds()),
 		}
 
+		http.SetCookie(w, cookie)
+		w.WriteHeader(204)
+	})
+}
+
+func UserSignOutHandler(c *config.Config) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		cookie, err := req.Cookie(CookieName)
+		if err == http.ErrNoCookie {
+			Error(w, err, 401)
+			return
+		}
+
+		if err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		sessionID := id.ID{}
+		if err := sessionID.UnmarshalText([]byte(cookie.Value)); err != nil {
+			Error(w, err, 401)
+			return
+		}
+
+		if err := c.SessionStore.DeleteSession(sessionID); err != nil {
+			Error(w, err, 500)
+			return
+		}
+
+		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
 		w.WriteHeader(204)
 	})
