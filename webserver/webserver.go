@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -143,9 +144,15 @@ func NewWebserver(c *config.Config) (*http.Server, error) {
 	handler = handlers.CORS(
 		handlers.AllowCredentials(),
 		handlers.AllowedOriginValidator(func(origin string) bool {
-			originComponents := strings.Split(origin, ":")
-			if originComponents[0] == "fieldkit.org" || strings.HasSuffix(originComponents[0], ".fieldkit.org") ||
-				originComponents[0] == "localhost" || strings.HasSuffix(originComponents[0], ".localhost") {
+			originURL, err := url.Parse(origin)
+			if err != nil {
+				log.Println(err)
+				return false
+			}
+
+			originURLHostComponents := strings.Split(originURL.Host, ":")
+			if originURLHostComponents[0] == "fieldkit.org" || strings.HasSuffix(originURLHostComponents[0], ".fieldkit.org") ||
+				originURLHostComponents[0] == "localhost" || strings.HasSuffix(originURLHostComponents[0], ".localhost") {
 				return true
 			}
 
