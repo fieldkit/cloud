@@ -157,7 +157,7 @@ export function setExpeditionProperty (keyPath, value) {
 
 export function requestExpeditions (callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.get('currentProjectID')
+    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     FKApiClient.getExpeditions(projectID)
       .then(res => {
         console.log('expeditions received:', res)
@@ -194,7 +194,7 @@ export function requestExpeditions (callback) {
 
 export function saveGeneralSettings (callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.get('currentProjectID')
+    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     const expedition = getState().expeditions.get('newExpedition')
     const expeditionName = expedition.get('name')
     const expeditionID = expedition.get('id')
@@ -239,7 +239,7 @@ export function saveGeneralSettings (callback) {
 export function submitInputs () {
   return function (dispatch, getState) {
 
-    const projectID = getState().expeditions.get('currentProjectID')
+    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     const expedition = getState().expeditions.get('newExpedition')
     const expeditionID = expedition.get('id')
     const inputName = expedition.get('documentTypes').toList().get(0).get('id')
@@ -290,7 +290,7 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
 
 export function addDocumentType (id, collectionType) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.get('currentProjectID')
+    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     const expedition = getState().expeditions.get('newExpedition')
     const expeditionID = expedition.get('id')
     FKApiClient.addInput(projectID, expeditionID, id)
@@ -395,7 +395,7 @@ export function requestSignUp (email, username, password, invite) {
       'password': password,
       'invite': invite,
     }
-    FKApiClient.register(params)
+    FKApiClient.signUp(params)
       .then(() => {
         dispatch({
           type: SIGNUP_SUCCESS

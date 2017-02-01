@@ -1,20 +1,4 @@
 
-/*
-
-  TODO:
-  Request expeditions
-  Reroute callback
-
-
-  styling
-  window resize
-
-  drag and zoom interactions
-  webGLOverlay rendering optimization
-  favicon
-  path linewidth
-  change Map shouldComponentUpdate to allow update when reaching end of timeline
-*/
 
 import '../scss/app.scss'
 
@@ -36,7 +20,7 @@ import RootContainer from './containers/Root'
 
 import MapPageContainer from './containers/MapPage'
 
-import { FKApiClient } from './api/api.js';
+import FKApiClient from './api/api.js'
 
 document.getElementById('root').remove()
 
@@ -86,12 +70,5 @@ var render = function () {
     document.getElementById('fieldkit')
   )
 }
-
-function onLogout () {
-  // todo
-}
-
-const APIServerURL = location.hostname === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
-FKApiClient.setup(APIServerURL, onLogout)
 
 render()

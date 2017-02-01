@@ -13,7 +13,7 @@ export const initialState = I.fromJS({
   },
   newProject: null,
   newExpedition: null,
-  currentProjectID: null,
+  // currentProjectID: null,
   // currentExpeditionID: null,
   currentTeamID: null,
   currentMemberID: [],
@@ -257,9 +257,8 @@ const expeditionReducer = (state = initialState, action) => {
   switch (action.type) {
 
     case actions.SET_ERROR: {
-      console.log('TO BE IMPLEMENTED')
       return state
-        // .set('error', action.error)
+        .set('error', action.error)
     }
 
     case actions.RECEIVE_PROJECTS: {
@@ -272,7 +271,7 @@ const expeditionReducer = (state = initialState, action) => {
       const newExpeditions = expeditions.merge(action.expeditions)
       return state
         .set('expeditions', newExpeditions)
-        .setIn(['projects', state.get('currentProjectID'), 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
+        .setIn(['newProject', 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
     }
 
     case actions.RECEIVE_TOKEN: {
@@ -313,8 +312,6 @@ const expeditionReducer = (state = initialState, action) => {
           state.get('newProject')
             .set('id', action.id)
         )
-        .delete('newProject')
-        .set('currentProjectID', action.id)
     }
 
     case actions.NEW_EXPEDITION: {
@@ -338,88 +335,6 @@ const expeditionReducer = (state = initialState, action) => {
             token: ''
           })
         )
-    }
-
-    case actions.SET_EXPEDITION_PRESET: {
-      console.log('TO BE IMPLEMENTED')
-      // switch (action.presetType) {
-      //   case 'rookie': {
-      //     return state
-      //       .setIn(
-      //         ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
-      //         action.presetType
-      //       )
-      //       .setIn(
-      //         ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
-      //         I.fromJS({
-      //           memberGeolocation: {id: 'memberGeolocation'},
-      //           sighting: {id: 'sighting'},
-      //         })
-      //       )
-      //       .setIn(
-      //         ['teams', 'main-team'],
-      //         I.fromJS({
-      //           id: 'main-team',
-      //           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      //           name: 'Main Team',
-      //           members: {
-      //             adjany: {
-      //               id: 'adjany',
-      //               role: 'Team Leader'
-      //             }
-      //           },
-      //           new: false,
-      //           status: 'ready',
-      //           editing: false,
-      //           selectedMember: null
-      //         })
-      //       )
-      //       .setIn(
-      //         ['expeditions', state.get('currentExpeditionID'), 'teams'],
-      //         I.fromJS(['main-team'])
-      //       )
-      //       .set('currentTeamID', 'main-team')
-      //   }
-
-      //   case 'advanced': {
-      //     return state
-      //       .setIn(
-      //         ['expeditions', state.get('currentExpeditionID'), 'selectedPreset'],
-      //         action.presetType
-      //       )
-      //       .setIn(
-      //         ['expeditions', state.get('currentExpeditionID'), 'documentTypes'],
-      //         I.fromJS({
-      //           memberGeolocation: {id: 'memberGeolocation'},
-      //           tweet: {id: 'tweet'},
-      //           sensorReading: {id: 'sensorReading'},
-      //           sighting: {id: 'sighting'},
-      //         })
-      //       )
-      //       .setIn(
-      //         ['teams', 'main-team'],
-      //         I.fromJS({
-      //           id: 'o16-river-team',
-      //           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-      //           name: 'Main Team',
-      //           members: {
-      //             adjany: {
-      //               id: 'adjany',
-      //               role: 'Team Leader'
-      //             }
-      //           },
-      //           new: false,
-      //           status: 'ready',
-      //           editing: false,
-      //           selectedMember: null
-      //         })
-      //       )
-      //   }
-
-      //   case 'pro': {
-      //     return state
-      //   }
-      // }
     }
 
     case actions.ADD_DOCUMENT_TYPE: {
@@ -459,14 +374,16 @@ const expeditionReducer = (state = initialState, action) => {
       }
     }
 
-    case actions.SAVE_EXPEDITION:
+    case actions.SAVE_EXPEDITION: {
       const expedition = state.get('newExpedition')
       return state.setIn(['expeditions', expedition.get('id')], expedition)
         .set('newExpedition', null)
         // .set('currentExpeditionID', expedition.get('id'))
+    }
 
-    case actions.SET_CURRENT_PROJECT: 
-      return state.set('currentProjectID', action.projectID)
+    case actions.SET_CURRENT_PROJECT: {
+      return state.set('newProject', state.getIn(['projects', action.projectID]))
+    }
 
     case actions.SET_CURRENT_EXPEDITION: {
       const expedition = state.getIn(['expeditions', action.expeditionID])
@@ -479,53 +396,6 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.SET_CURRENT_MEMBER:
       return state.set('currentMemberID', action.memberID)
-
-    case actions.ADD_TEAM: {
-      console.log('TO BE IMPLEMENTED')
-      // const expeditionID = state.get('currentExpeditionID')
-      // const teamID = 'team-' + Date.now()
-      // return state
-      //   .set('currentTeamID', teamID)
-      //   .setIn(
-      //     ['teams', teamID], 
-      //     I.fromJS({
-      //       id: 'team-' + Date.now(),
-      //       name: 'New Team',
-      //       description: 'Enter a description',
-      //       members: {},
-      //       new: true,
-      //       status: 'new'
-      //     })
-      //   )
-      //   .setIn(
-      //     ['expeditions', expeditionID, 'teams'], 
-      //     state.getIn(['expeditions', expeditionID, 'teams']).push(teamID)
-      //   )
-    }
-
-    case actions.REMOVE_CURRENT_TEAM: {
-      console.log('TO BE IMPLEMENTED')
-      // const expeditionID = state.get('currentExpeditionID')
-      // const teamID = state.get('currentTeamID')
-      // return state
-      //   .deleteIn(['teams', teamID])
-      //   .deleteIn(['expeditions', expeditionID, 'teams', 
-      //     state.getIn(['expeditions', expeditionID, 'teams'])
-      //       .findIndex(function(id) {
-      //         return id === teamID
-      //       })
-      //     ]
-      //   )
-      //   .set(
-      //     'currentTeamID', 
-      //     state.getIn(['expeditions', expeditionID, 'teams'])
-      //       .filter(t => {
-      //         return t !== teamID 
-      //       })
-      //       .first()
-      //   )
-      //   .set('editedTeam', null)
-    }
 
     case actions.START_EDITING_TEAM: {
       if (!state.get('editedTeam')) {

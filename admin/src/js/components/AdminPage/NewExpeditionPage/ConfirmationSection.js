@@ -41,12 +41,14 @@ class NewConfirmationSection extends React.Component {
           </div>
         </Link>
         or
-        {/*<a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id') }>*/}
-        <a href="#" onClick={(e) => {
-          e.preventDefault()
-          saveExpedition()
-          browserHistory.push('https://' + projectID + '.fieldkit.org/' + expedition.get('id'))
-        }}>
+        <a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id') }>
+        {/*
+          <a href="#" onClick={(e) => {
+            e.preventDefault()
+            saveExpedition()
+            browserHistory.push('https://' + projectID + '.fieldkit.org/' + expedition.get('id'))
+          }}>
+        */}
           <div className="button hero">
             Go to my map!
           </div>

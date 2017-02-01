@@ -3,7 +3,6 @@ import '../css/index.scss'
 import 'react-select/dist/react-select.css';
 
 import 'babel-polyfill'
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
@@ -19,31 +18,24 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 
 import Root from './components/Root'
 import ProfileSection from './components/AdminPage/ProfileSection'
-
 import LandingPageContainer from './containers/LandingPage/LandingPage'
 import AdminPageContainer from './containers/AdminPage/AdminPage'
 import NewProjectContainer from './containers/AdminPage/NewProjectPage/NewProjectPage'
 import NewGeneralSettingsContainer from './containers/AdminPage/NewExpeditionPage/NewExpeditionPage'
 import NewInputsContainer from './containers/AdminPage/NewExpeditionPage/InputsSection'
 import NewConfirmationContainer from './containers/AdminPage/NewExpeditionPage/ConfirmationSection'
-
 import ExpeditionPageContainer from './containers/AdminPage/ExpeditionPage/ExpeditionPage'
 import GeneralSettingsContainer from './containers/AdminPage/ExpeditionPage/GeneralSettingsSection'
 import InputsContainer from './containers/AdminPage/ExpeditionPage/InputsSection'
 
-import FKApiClient from './api/api.js';
-
+import FKApiClient from './api/api.js'
 
 document.getElementById('root').remove()
-
 
 const createStoreWithMiddleware = applyMiddleware(
   thunkMiddleware,
   multiMiddleware,
 )(createStore)
-// const createStoreWithBatching = batchedSubscribe(
-//   fn => fn()
-// )(createStoreWithMiddleware)
 const reducer = combineReducers({
   auth: authReducer,
   expeditions: expeditionReducer,
@@ -52,12 +44,12 @@ const store = createStoreWithMiddleware(reducer)
 
 
 function checkAuthentication(nextState, replace) {  
-  // if (!FKApiClient.signedIn()) {
-  //   replace({
-  //     pathname: '/signin',
-  //     state: { nextPathname: nextState.location.pathname }
-  //   })
-  // } 
+  if (!FKApiClient.signedIn()) {
+    replace({
+      pathname: '/signin',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  } 
 }
 
 const routes = (

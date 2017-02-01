@@ -102,7 +102,7 @@ module.exports = {
       minimize: true,
       comments: false,
       mangle: false,
-      sourcemap: false 
+      sourcemap: false
     }),
     new webpack.DefinePlugin({
       'process.env': {
