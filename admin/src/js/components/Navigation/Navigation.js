@@ -6,6 +6,7 @@ import fieldkitLogo from '../../../img/fieldkit-logo.svg'
 import profileButton from '../../../img/profile-button.png'
 import backgroundImage from '../../../img/bkg.jpg'
 import linkImage from '../../../img/link.svg'
+import { protocol, hostname } from '../../constants/APIBaseURL'
 
 class Navigation extends React.Component {
 
@@ -106,7 +107,7 @@ class Navigation extends React.Component {
                         <Link to={'/admin/' + projectID + '/' + expedition.get('id')}>
                           <h4>
                             { expedition.get('name') } 
-                            <a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id')}>
+                            <a href={ protocol + projectID + '.' + hostname + '/' + expedition.get('id')}>
                               <span
                                 style={{
                                   backgroundImage: 'url(\'/' + linkImage + '\')'

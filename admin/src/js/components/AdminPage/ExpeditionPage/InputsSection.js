@@ -7,6 +7,7 @@ import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 import { Base64 } from 'js-base64'
+import { protocol, hostname } from '../../../constants/APIBaseURL'
 
 import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
@@ -76,7 +77,7 @@ class NewInputsSection extends React.Component {
                                 <li>
                                   <a 
                                     href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(
-                                      'https://fieldkit.org/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + expedition.get('token')
+                                      protocol + hostname + '/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + expedition.get('token')
                                     )}
                                     download="config.txt"
                                   >

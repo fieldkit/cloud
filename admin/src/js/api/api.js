@@ -1,14 +1,12 @@
 
 import 'whatwg-fetch'
 import {BaseError} from '../utils.js'
+import { protocol, hostname } from '../constants/APIBaseURL'
 class APIError extends BaseError {}
 class AuthenticationError extends APIError {}
 const SIGNED_IN_KEY = 'signedIn'
 
 class FKApiClient {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl
-  }
 
   onAuthError(e) {
     if (this.signedIn) {
@@ -30,7 +28,7 @@ class FKApiClient {
 
   async get(path, params) {
     try {
-      const url = new URL(path, this.baseUrl)
+      const url = new URL(path, protocol + hostname)
       if (params) {
         for (const key in params) {
           url.searchParams.set(key, params[key])
@@ -74,7 +72,7 @@ class FKApiClient {
 
   async post(path, body) {
     try {
-      const url = new URL(path, this.baseUrl)
+      const url = new URL(path, protocol + hostname)
       let res
       try {
         res = await fetch(url.toString(), {
@@ -163,5 +161,4 @@ class FKApiClient {
   }
 }
 
-const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
-export default new FKApiClient(hostname)
+export default new FKApiClient()

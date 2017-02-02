@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react'
 import { Link } from 'react-router'
 import I from 'immutable'
 import { browserHistory } from 'react-router'
+import { protocol, hostname } from '../../../constants/APIBaseURL'
 
 
 class NewConfirmationSection extends React.Component {
@@ -41,7 +42,7 @@ class NewConfirmationSection extends React.Component {
           </div>
         </Link>
         or
-        <a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id') }>
+        <a href={ protocol + projectID + '.' + hostname + '/' + expedition.get('id') }>
         {/*
           <a href="#" onClick={(e) => {
             e.preventDefault()

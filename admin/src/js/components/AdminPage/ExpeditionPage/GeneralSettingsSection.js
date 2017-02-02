@@ -7,6 +7,7 @@ import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 import slug from 'slug'
+import { protocol, hostname } from '../../../constants/APIBaseURL'
 
 class GeneralSettingsSection extends React.Component {
   constructor (props) {
@@ -79,7 +80,7 @@ class GeneralSettingsSection extends React.Component {
         </p>
 
         <p className="intro">
-          {'https://' + projectID + '.fieldkit.org/' + slug(expedition.get('name'))}
+          { protocol + projectID + '.' + hostname + '/' + slug(expedition.get('name'))}
         </p>
 
         {
