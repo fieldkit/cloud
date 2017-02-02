@@ -29,12 +29,11 @@ class NewGeneralSettingsSection extends React.Component {
     } = this.props
 
     const expeditionName = expedition.get('name')
-    console.log('agalol', expeditionName)
 
     return (
       <div id="teams-section" className="section">
         
-        <h1 className="section_title">Create a New Expedition (1/2)</h1>
+        <h1 className="section_title">Create a New Expedition <span>(1/2)</span></h1>
         
         { 
           !!expeditions && expeditions.size === 0 &&

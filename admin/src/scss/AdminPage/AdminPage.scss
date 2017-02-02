@@ -10,6 +10,13 @@
 
   & .section {
 
+    &_title {
+
+      & span {
+        font-size: 18px;
+      }
+    }
+
     &_columns {
       display: flex;
       justify-content: space-between;

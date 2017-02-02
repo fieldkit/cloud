@@ -54,26 +54,29 @@ class Navigation extends React.Component {
             }}
           >
             <ul className="side-bar_navigation_slider_projects">
-              <li className="side-bar_navigation_slider_projects_title">Projects</li>
+              <li className="side-bar_navigation_slider_sub-navigation">
+                {
+                  !!projects &&
+                  <Link to={'/admin/new-project'}>
+                    <li className="side-bar_navigation_slider_sub-navigation_button">
+                      New Project <span>+</span>
+                    </li>
+                  </Link>
+                }
+              </li>
               {
                 !!projects &&
                 projects.map(project => {
                   return (
                     <Link to={'/admin/' + project.get('id')}>
                       <li className="side-bar_navigation_slider_projects_project">
-                        { project.get('name') }
+                        <h4>
+                          { project.get('name') }
+                        </h4>
                       </li>
                     </Link>
                   )
                 })
-              }
-              {
-                !!projects &&
-                <Link to={'/admin/new-project'}>
-                  <li className="side-bar_navigation_slider_projects_new-project">
-                    New Project <span>+</span>
-                  </li>
-                </Link>
               }
               {
                 !projects &&
@@ -83,12 +86,19 @@ class Navigation extends React.Component {
             {
               !!projects && !!projectID && !!expeditions &&
               <ul className="side-bar_navigation_slider_expeditions">
-                <Link to={'/admin'}>
-                  <li className="side-bar_navigation_slider_expeditions_title">
-                    <span></span>
-                    Projects
-                  </li>
-                </Link>
+                <li className="side-bar_navigation_slider_sub-navigation">
+                  <Link to={'/admin'}>
+                    <div className="side-bar_navigation_slider_sub-navigation_button">
+                      <span></span>
+                      Projects
+                    </div>
+                  </Link>
+                  <Link to={'/admin/' + projectID + '/new-expedition'}>
+                    <div className="side-bar_navigation_slider_sub-navigation_button">
+                      New Expedition +
+                    </div>
+                  </Link>
+                </li>
                 {
                   expeditions.map(expedition => {
                     return (
@@ -124,11 +134,6 @@ class Navigation extends React.Component {
                     )
                   })
                 }
-                <Link to={'/admin/' + projectID + '/new-expedition'}>
-                  <li className="side-bar_navigation_slider_expeditions_new-expedition">
-                    New Expedition <span>+</span>
-                  </li>
-                </Link>
               </ul>
             }
             {

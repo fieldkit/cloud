@@ -43,11 +43,11 @@ const reducer = combineReducers({
 const store = createStoreWithMiddleware(reducer)
 
 
-function checkAuthentication(nextState, replace) {  
+function checkAuthentication(state, replace) {  
   if (!FKApiClient.signedIn()) {
     replace({
       pathname: '/signin',
-      state: { nextPathname: nextState.location.pathname }
+      state: { nextPathname: state.location.pathname }
     })
   } 
 }
@@ -61,19 +61,25 @@ const routes = (
     </Route>
     <Route path="admin" 
       component={AdminPageContainer} 
-      onEnter={(nextState, replace) => {
-        checkAuthentication(nextState, replace)
-        store.dispatch(actions.requestProjects(() => {
-          browserHistory.push('/admin/new-project')
+      onEnter={(state, replace) => {
+        checkAuthentication(state, replace)
+        store.dispatch(actions.requestProjects((projects) => {
+          // browserHistory.push('/admin/new-project')
+          const projectID = state.params.projectID
+          if (projects.size === 0) {
+            browserHistory.push('/admin/new-project')
+          } else {
+            if (!projectID) {
+              browserHistory.push('/admin/' + projects.first().get('id'))
+            } else {
+              if (projects.some(p => p.get('id') === projectID)) {
+                store.dispatch(actions.setCurrentProject(projectID))
+              } else {
+                browserHistory.push('/admin/' + projects.first().get('id'))
+              }
+            }
+          }
         }))
-      }}
-      onChange={(prevState, nextState, replace) => {
-        const previousSection = prevState.location.pathname.split('/')[3]
-        const nextSection = nextState.location.pathname.split('/')[3]
-        if (previousSection === 'teams' && nextSection !== 'teams' && !!store.getState().expeditions.get('editedTeam')) {
-          store.dispatch(actions.promptModalConfirmChanges(nextState.location.pathname))
-          replace(prevState.location.pathname)
-        } 
       }}
     >
 
@@ -90,9 +96,23 @@ const routes = (
       />
 
       <Route path=":projectID" onEnter={(state) => {
-        store.dispatch(actions.setCurrentProject(state.params.projectID))
-        store.dispatch(actions.requestExpeditions(() => {
-          browserHistory.push('/admin/' + state.params.projectID + '/new-expedition')
+        const projectID = state.params.projectID
+        const expeditionID = state.params.expeditionID
+        store.dispatch(actions.setCurrentProject(projectID))
+        store.dispatch(actions.requestExpeditions(projectID, (expeditions) => {
+          if (expeditions.size === 0) {
+            browserHistory.push('/admin/' + projectID + '/new-expedition')
+          } else {
+            if (!expeditionID) {
+              browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
+            } else {
+              if (expeditions.some(e => e.get('id') === expeditionID)) {
+                store.dispatch(actions.setCurrentExpedition(expeditionID))
+              } else {
+                browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
+              }
+            }
+          }
         }))
       }}>
 

@@ -38,11 +38,12 @@ export function requestProjects (callback) {
       .then(res => {
         console.log('projects received:', res)
         if (!res) {
+          const projects = I.Map()
           dispatch({
             type: RECEIVE_PROJECTS,
-            projects: I.Map()
+            projects
           })
-          if (callback) callback()
+          if (callback) callback(projects)
         } else {
           const projectMap = {}
           res.forEach(p => {
@@ -64,6 +65,7 @@ export function requestProjects (callback) {
               projectID: projects.toList().getIn([0, 'slug'])
             }
           ])
+          if (callback) callback(projects)
         }
       })
   }
@@ -161,19 +163,19 @@ export function setExpeditionProperty (keyPath, value) {
   }
 }
 
-export function requestExpeditions (callback) {
+export function requestExpeditions (projectID, callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     FKApiClient.getExpeditions(projectID)
       .then(res => {
         console.log('expeditions received:', res)
         if (!res) {
+          const expeditions = I.Map()
           dispatch({
             type: RECEIVE_EXPEDITIONS,
             projectID,
-            expeditions: I.Map()
+            expeditions
           })
-          if (callback) callback()
+          if (callback) callback(expeditions)
         } else {
           const expeditionMap = {}
           res.forEach(e => {
@@ -193,6 +195,7 @@ export function requestExpeditions (callback) {
             projectID,
             expeditions
           })
+          if (callback) callback(expeditions)
         }
       })
   }
