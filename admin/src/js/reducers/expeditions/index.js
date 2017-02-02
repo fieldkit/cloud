@@ -4,6 +4,7 @@ import I from 'immutable'
 import slug from 'slug'
 
 export const initialState = I.fromJS({
+  breadcrumbs: ['', '', ''],
   errors: null,
   suggestedMembers: null,
   modal: {
@@ -256,6 +257,11 @@ const expeditionReducer = (state = initialState, action) => {
   console.log('reducer:', action.type, action)
   switch (action.type) {
 
+    case actions.SET_BREADCRUMBS: {
+      return state
+        .setIn(['breadcrumbs', action.level], action.value)
+    }
+
     case actions.SET_ERROR: {
       return state
         .set('errors', action.errors)
@@ -267,11 +273,9 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.RECEIVE_EXPEDITIONS: {
-      const expeditions = state.get('expeditions') || I.Map()
-      const newExpeditions = expeditions.merge(action.expeditions)
       return state
-        .set('expeditions', newExpeditions)
-        .setIn(['newProject', 'expeditions'], newExpeditions.map(e => e.get('id')).toList())
+        .set('expeditions', action.expeditions)
+        .setIn(['newProject', 'expeditions'], action.expeditions.map(e => e.get('id')).toList())
     }
 
     case actions.RECEIVE_TOKEN: {

@@ -7,7 +7,25 @@ import FKApiClient from '../api/api.js'
 import I from 'immutable'
 import slug from 'slug'
 
+/*
+
+COMMON ACTIONS
+
+*/
+
 export const SET_ERROR = 'SET_ERROR'
+export const SET_BREADCRUMBS = 'SET_BREADCRUMBS'
+
+export function setBreadcrumbs(level, value) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: SET_BREADCRUMBS,
+      level,
+      value
+    })
+  }
+}
+
 
 /*
 

@@ -17,6 +17,7 @@ class AdminPage extends React.Component {
       saveChangesAndResume,
       expeditions,
       projects,
+      breadcrumbs,
       requestSignOut
     } = this.props
 
@@ -47,7 +48,7 @@ class AdminPage extends React.Component {
         { modalComponent() }
         <Navigation {...params} expeditions={expeditions} projects={projects} requestSignOut={requestSignOut}/>
         <div className="page-content">
-          <BreadCrumbs {...location} />
+          <BreadCrumbs {...location} breadcrumbs={breadcrumbs} />
           {children}
         </div>
       </div>

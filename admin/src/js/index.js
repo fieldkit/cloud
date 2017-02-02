@@ -64,7 +64,6 @@ const routes = (
       onEnter={(state, replace) => {
         checkAuthentication(state, replace)
         store.dispatch(actions.requestProjects((projects) => {
-          // browserHistory.push('/admin/new-project')
           const projectID = state.params.projectID
           if (projects.size === 0) {
             browserHistory.push('/admin/new-project')
@@ -92,7 +91,9 @@ const routes = (
       <Route 
         path="new-project" 
         component={NewProjectContainer}
-        onEnter={() => store.dispatch(actions.newProject())}
+        onEnter={() => {
+          store.dispatch(actions.newProject())
+        }}
       />
 
       <Route path=":projectID" onEnter={(state) => {

@@ -8,6 +8,28 @@
 
   display: flex;
 
+  & .bread-crumbs {
+
+    &_level {
+      display: inline;
+
+      &:not(:first-child){
+        margin-left: $line-width;
+
+        &:before{
+          content: "";
+          display: inline-block;
+          width: 0;
+          height: 0;
+          margin-right: $line-width;
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-left: 6px solid $color-accent;
+        }
+      }
+    }
+  }
+
   & .section {
 
     &_title {

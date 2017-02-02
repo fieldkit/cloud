@@ -28,8 +28,6 @@ class GeneralSettingsSection extends React.Component {
       errors
     } = this.props
 
-    console.log('aga rendering', expedition)
-
     return (
       <div id="teams-section" className="section">
         <div className="section-header">

@@ -20,7 +20,7 @@ class NewInputsSection extends React.Component {
       inputValues: {}
     }
   }
-
+  
   render () {
 
     const { 
