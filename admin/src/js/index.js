@@ -61,9 +61,10 @@ const routes = (
     </Route>
     <Route path="admin" 
       component={AdminPageContainer} 
-      onEnter={(state, replace) => {
+      onEnter={(state, replace, callback) => {
         checkAuthentication(state, replace)
         store.dispatch(actions.requestProjects((projects) => {
+          callback()
           const projectID = state.params.projectID
           if (projects.size === 0) {
             browserHistory.push('/admin/new-project')
@@ -93,40 +94,77 @@ const routes = (
         component={NewProjectContainer}
         onEnter={() => {
           store.dispatch(actions.newProject())
+          store.dispatch(actions.setBreadcrumbs(0, 'New Project', '/new-project'))
         }}
       />
 
-      <Route path=":projectID" onEnter={(state) => {
+      <Route path=":projectID" onEnter={(state, replace, callback) => {
+        if (!FKApiClient.signedIn()) {
+          replace({
+            pathname: '/signin',
+            state: { nextPathname: state.location.pathname }
+          })
+        } 
         const projectID = state.params.projectID
-        const expeditionID = state.params.expeditionID
+        const projectName = store.getState().expeditions.getIn(['projects', projectID, 'name'])
+        let expeditionID = state.params.expeditionID
         store.dispatch(actions.setCurrentProject(projectID))
+        store.dispatch(actions.setBreadcrumbs(0, 'Project: ' + projectName, '/admin/' + projectID))
         store.dispatch(actions.requestExpeditions(projectID, (expeditions) => {
+          callback()
           if (expeditions.size === 0) {
             browserHistory.push('/admin/' + projectID + '/new-expedition')
+            store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + projectID + '/new-expedition'))
           } else {
+            let expeditionName = ''
             if (!expeditionID) {
-              browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
+              expeditionID = expeditions.first().get('id')
+              expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
+              browserHistory.push('/admin/' + projectID + '/' + expeditionID)
             } else {
               if (expeditions.some(e => e.get('id') === expeditionID)) {
+                expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
                 store.dispatch(actions.setCurrentExpedition(expeditionID))
               } else {
+                expeditionID = expeditions.first().get('id')
+                expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
                 browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
               }
             }
+            store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + projectID + '/' + expeditionID))
           }
         }))
       }}>
 
         <Route 
           path="new-expedition" 
-          onEnter={() => {
+          onEnter={(state) => {
             store.dispatch(actions.newExpedition())
+            store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + state.params.projectID + '/new-expedition'))
           }}
         >
           <IndexRoute component={NewGeneralSettingsContainer}/>
-          <Route path="general-settings" component={NewGeneralSettingsContainer}/>
-          <Route path="inputs" component={NewInputsContainer}/>
-          <Route path="confirmation" component={NewConfirmationContainer}/>
+          <Route 
+            path="general-settings"
+            component={NewGeneralSettingsContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(2, 'General Settings', '/admin/' + state.params.projectID + '/new-expedition/general-settings'))
+            }}
+          />
+          <Route 
+            path="inputs"
+            component={NewInputsContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(2, 'Input Setup', '/admin/' + state.params.projectID + '/new-expedition/inputs'))
+            }}
+          />
+          <Route 
+            path="confirmation"
+            component={NewConfirmationContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(2, 'Confirmation', '/admin/' + state.params.projectID + '/new-expedition/confirmation'))
+            }}
+          />
         </Route>
 
         <Route path=":expeditionID" 
@@ -134,13 +172,34 @@ const routes = (
             store.dispatch(actions.setCurrentExpedition(null))
           }}
           onEnter={(state) => {
-            store.dispatch(actions.setCurrentExpedition(state.params.expeditionID))
+            const expeditionID = state.params.expeditionID
+            const expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
+            store.dispatch(actions.setCurrentExpedition(expeditionID))
+            store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + state.params.projectID + '/' + expeditionID))
           }}
         >
           <IndexRoute component={ExpeditionPageContainer}/>
-          <Route path="dashboard" component={ExpeditionPageContainer}/>
-          <Route path="general-settings" component={GeneralSettingsContainer}/>
-          <Route path="inputs" component={InputsContainer}/>
+          <Route
+            path="dashboard"
+            component={ExpeditionPageContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + state.params.projectID + '/' + expeditionID))
+            }}
+          />
+          <Route
+            path="general-settings"
+            component={GeneralSettingsContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(2, 'General Settings', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/general-settings'))
+            }}
+          />
+          <Route
+            path="inputs"
+            component={InputsContainer}
+            onEnter={(state) => {
+              store.dispatch(actions.setBreadcrumbs(2, 'Input Setup', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/inputs'))
+            }}
+          />
         </Route>
       </Route>
     </Route>

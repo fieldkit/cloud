@@ -4,7 +4,7 @@ import I from 'immutable'
 import slug from 'slug'
 
 export const initialState = I.fromJS({
-  breadcrumbs: ['', '', ''],
+  breadcrumbs: [null, null, null],
   errors: null,
   suggestedMembers: null,
   modal: {
@@ -258,8 +258,12 @@ const expeditionReducer = (state = initialState, action) => {
   switch (action.type) {
 
     case actions.SET_BREADCRUMBS: {
-      return state
-        .setIn(['breadcrumbs', action.level], action.value)
+      let newState = state
+        .setIn(['breadcrumbs', action.level], I.fromJS({name: action.name, url: action.url}))
+      for (let i = action.level + 1; i < 3; i ++) {
+        newState.setIn(['breadcrumbs', i], null)
+      }
+      return newState
     }
 
     case actions.SET_ERROR: {
@@ -382,7 +386,6 @@ const expeditionReducer = (state = initialState, action) => {
       const expedition = state.get('newExpedition')
       return state.setIn(['expeditions', expedition.get('id')], expedition)
         .set('newExpedition', null)
-        // .set('currentExpeditionID', expedition.get('id'))
     }
 
     case actions.SET_CURRENT_PROJECT: {

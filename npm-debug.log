@@ -1,16 +1,15 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/Cellar/node/6.1.0/bin/node',
+1 verbose cli [ '/usr/local/Cellar/node/7.5.0/bin/node',
 1 verbose cli   '/usr/local/bin/npm',
 1 verbose cli   'start' ]
-2 info using npm@3.8.6
-3 info using node@v6.1.0
+2 info using npm@4.1.2
+3 info using node@v7.5.0
 4 verbose stack Error: ENOENT: no such file or directory, open '/Users/ian/Documents/GitHub/fieldkit/package.json'
-4 verbose stack     at Error (native)
 5 verbose cwd /Users/ian/Documents/GitHub/fieldkit
 6 error Darwin 16.1.0
-7 error argv "/usr/local/Cellar/node/6.1.0/bin/node" "/usr/local/bin/npm" "start"
-8 error node v6.1.0
-9 error npm  v3.8.6
+7 error argv "/usr/local/Cellar/node/7.5.0/bin/node" "/usr/local/bin/npm" "start"
+8 error node v7.5.0
+9 error npm  v4.1.2
 10 error path /Users/ian/Documents/GitHub/fieldkit/package.json
 11 error code ENOENT
 12 error errno -2

@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react'
+import { Link } from 'react-router'
 
 class BreadCrumbs extends React.Component {
 
@@ -8,26 +9,28 @@ class BreadCrumbs extends React.Component {
       breadcrumbs
     } = this.props
 
-    console.log('LOOOL', breadcrumbs)
-
-    const levels = breadcrumbs
-      .filter((l, i) => {
-        return i < pathname.split('/').length - 2
-      })
-      .map((l, i) => {
-        return (
-          <li
-            key={i}
-            className="bread-crumbs_level"
-          >
-            { l }
-          </li>
-        )
-      })
+    const breadCrumbsLength = breadcrumbs.filter(l => { return !!l }).size
 
     return (
       <ul className="bread-crumbs">
-        { levels }
+        { 
+          breadcrumbs
+            .filter((l, i) => {
+              return !!l && i < breadCrumbsLength - i
+            })
+            .map((l, i) => {
+              return (
+                <li
+                  key={ 'breadcrumb-' + i }
+                  className="bread-crumbs_level"
+                >
+                  <Link to={ l.get('url') }>
+                    { l.get('name') }
+                  </Link>
+                </li>
+              )
+            })
+        }
       </ul>
     )
 

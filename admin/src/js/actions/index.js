@@ -16,12 +16,13 @@ COMMON ACTIONS
 export const SET_ERROR = 'SET_ERROR'
 export const SET_BREADCRUMBS = 'SET_BREADCRUMBS'
 
-export function setBreadcrumbs(level, value) {
+export function setBreadcrumbs(level, name, url) {
   return function(dispatch, getState) {
     dispatch({
       type: SET_BREADCRUMBS,
       level,
-      value
+      name,
+      url
     })
   }
 }
@@ -57,10 +58,16 @@ export function requestProjects (callback) {
         console.log('projects received:', res)
         if (!res) {
           const projects = I.Map()
-          dispatch({
-            type: RECEIVE_PROJECTS,
-            projects
-          })
+          dispatch([
+            {
+              type: RECEIVE_PROJECTS,
+              projects
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
           if (callback) callback(projects)
         } else {
           const projectMap = {}
@@ -81,6 +88,10 @@ export function requestProjects (callback) {
             {
               type: SET_CURRENT_PROJECT,
               projectID: projects.toList().getIn([0, 'slug'])
+            },
+            {
+              type: SET_ERROR,
+              errors: null
             }
           ])
           if (callback) callback(projects)
@@ -113,14 +124,6 @@ export function saveProject (id, name) {
     FKApiClient.createProjects(name)
       .then(res => {
         console.log('project created', res)
-        const projectMap = {};
-        [res].forEach(p => {
-          projectMap[p.slug] = p
-        })
-        const projects = I.fromJS(projectMap)
-          .map(p => {
-            return p.merge(I.fromJS({expeditions: []}))
-          })
         dispatch({
           type: SAVE_PROJECT,
           id
@@ -154,6 +157,7 @@ export const RECEIVE_TOKEN = 'RECEIVE_TOKEN'
 
 export function newExpedition () {
   return function (dispatch, getState) {
+    console.log('wat? newexp')
     dispatch(
       {
         type: NEW_EXPEDITION
@@ -188,11 +192,17 @@ export function requestExpeditions (projectID, callback) {
         console.log('expeditions received:', res)
         if (!res) {
           const expeditions = I.Map()
-          dispatch({
-            type: RECEIVE_EXPEDITIONS,
-            projectID,
-            expeditions
-          })
+          dispatch([
+            {
+              type: RECEIVE_EXPEDITIONS,
+              projectID,
+              expeditions
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
           if (callback) callback(expeditions)
         } else {
           const expeditionMap = {}
@@ -208,11 +218,17 @@ export function requestExpeditions (projectID, callback) {
                 documentTypes: {},              
               }))
             })
-          dispatch({
-            type: RECEIVE_EXPEDITIONS,
-            projectID,
-            expeditions
-          })
+          dispatch([
+            {
+              type: RECEIVE_EXPEDITIONS,
+              projectID,
+              expeditions
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
           if (callback) callback(expeditions)
         }
       })
@@ -232,6 +248,15 @@ export function saveGeneralSettings (callback) {
           // error
           console.log('error with expedition creation')
         } else {
+
+          console.log('aga DISPATCHING')
+          dispatch({
+            type: SET_EXPEDITION_PROPERTY,
+            keyPath: ['id'],
+            value: expeditionID
+          })
+          console.log('aga DISPATCHED')
+
           FKApiClient.addExpeditionToken(projectID, expeditionID)
             .then(res => {
               console.log('server response:', res)
@@ -247,8 +272,9 @@ export function saveGeneralSettings (callback) {
                   {
                     type: SET_ERROR,
                     errors: null
-                  },
+                  }
                 ])
+                console.log('agawatlol', getState().expeditions.toJS())
                 if (!!callback) callback()
               }
             })
@@ -320,6 +346,7 @@ export function addDocumentType (id, collectionType) {
     const projectID = getState().expeditions.getIn(['newProject', 'id'])
     const expedition = getState().expeditions.get('newExpedition')
     const expeditionID = expedition.get('id')
+    console.log('agagagalol', expedition.toJS(), expeditionID)
     FKApiClient.addInput(projectID, expeditionID, id)
       .then(res => {
         console.log('server response:', res)

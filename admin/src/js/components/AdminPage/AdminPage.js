@@ -29,7 +29,7 @@ class AdminPage extends React.Component {
 
     const children = Children.map(this.props.children,
       (child) => React.cloneElement(child, {
-        errors: errors
+        errors
       })
     )
 
