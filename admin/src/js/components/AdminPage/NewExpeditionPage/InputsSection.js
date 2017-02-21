@@ -12,27 +12,18 @@ import { protocol, hostname } from '../../../constants/APIBaseURL'
 import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
 
-class NewInputsSection extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      addMemberValue: null,
-      inputValues: {}
-    }
-  }
-  
+class NewInputsSection extends React.Component {  
   render () {
-
     const { 
       projectID,
       expedition,
       documentTypes,
+      errors,
       selectedDocumentType,
       setExpeditionProperty,
       fetchSuggestedDocumentTypes,
       addDocumentType,
-      removeDocumentType,
-      submitInputs
+      removeDocumentType
     } = this.props
 
     return (
@@ -136,9 +127,19 @@ class NewInputsSection extends React.Component {
             </td>
           </tbody>
         </table>
-
-        <p className="status">
-        </p>
+        {
+          !!errors && !!errors.get && !!errors.get('name') &&
+          errors.get('name').map((error, i) => {
+            return (
+              <p 
+                key={'errors-name-' + i}
+                className="errors"
+              >
+                {error}
+              </p>
+            )
+          })
+        }
 
         <Link to={'/admin/' + projectID + '/new-expedition/confirmation'}>
           <div className="button hero">
@@ -146,9 +147,14 @@ class NewInputsSection extends React.Component {
           </div>
         </Link>
 
+        {
+          !!errors &&
+          <p className="errors">
+            We found one or multiple errors. Please check the information above or try again later.
+          </p>
+        }
       </div>
     )
-
   }
 }
 

@@ -107,7 +107,7 @@ class NewProjectSection extends React.Component {
         {
           !!errors &&
           <p className="errors">
-            We found one or multiple errors. Please check your information above or try again later.
+            We found one or multiple errors. Please check the information above or try again later.
           </p>
         }
 

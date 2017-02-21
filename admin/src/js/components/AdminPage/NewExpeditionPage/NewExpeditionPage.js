@@ -10,14 +10,6 @@ import slug from 'slug'
 import { protocol, hostname } from '../../../constants/APIBaseURL'
 
 class NewGeneralSettingsSection extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      addMemberValue: null,
-      inputValues: {}
-    }
-  }
-
   render () {
     const {
       projectID,
@@ -32,8 +24,7 @@ class NewGeneralSettingsSection extends React.Component {
     const expeditionName = expedition.get('name')
 
     return (
-      <div id="teams-section" className="section">
-        
+      <div className="section">
         <h1 className="section_title">Create a New Expedition <span>(1/2)</span></h1>
         
         { 
@@ -127,11 +118,8 @@ class NewGeneralSettingsSection extends React.Component {
             We found one or multiple errors. Please check your information above or try again later.
           </p>
         }
-
       </div>
-
     )
-
   }
 }
 

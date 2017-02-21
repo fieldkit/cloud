@@ -34,24 +34,6 @@ class BreadCrumbs extends React.Component {
       </ul>
     )
 
-      /*
-      <Route path="profile"/>
-
-      <Route path="new-project"/>
-
-      <Route path=":projectID">
-        <Route path="new-expedition">
-          <Route path="general-settings" component={NewGeneralSettingsContainer}/>
-          <Route path="inputs" component={NewInputsContainer}/>
-          <Route path="confirmation" component={NewConfirmationContainer}/>
-        </Route>
-        <Route path=":expeditionID">
-          <Route path="dashboard" component={ExpeditionPageContainer}/>
-          <Route path="general-settings" component={GeneralSettingsContainer}/>
-          <Route path="inputs" component={InputsContainer}/>
-        </Route>
-      </Route>
-    */
 
     return (
       <div></div>

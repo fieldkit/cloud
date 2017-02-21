@@ -21,8 +21,10 @@ export function setBreadcrumbs(level, name, url) {
     dispatch({
       type: SET_BREADCRUMBS,
       level,
-      name,
-      url
+      value: !!name ? I.fromJS({
+        name,
+        url
+      }) : null
     })
   }
 }
@@ -237,8 +239,8 @@ export function requestExpeditions (projectID, callback) {
 
 export function saveGeneralSettings (callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionName = expedition.get('name')
     const expeditionID = expedition.get('id')
     FKApiClient.postGeneralSettings(projectID, expeditionName)
@@ -292,8 +294,8 @@ export function saveGeneralSettings (callback) {
 export function submitInputs () {
   return function (dispatch, getState) {
 
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
     const inputName = expedition.get('documentTypes').toList().get(0).get('id')
     console.log('sending input', projectID, expeditionID, inputName)
@@ -324,7 +326,7 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
           const nameCheck = d.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
           const typeCheck = d.get('type') === type
           const membershipCheck = getState().expeditions
-            .getIn(['newExpedition', 'documentTypes'])
+            .getIn(['currentExpedition', 'documentTypes'])
             .has(d.get('id'))
           return (nameCheck) && !membershipCheck && typeCheck
         })
@@ -343,8 +345,8 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
 
 export function addDocumentType (id, collectionType) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
     console.log('agagagalol', expedition.toJS(), expeditionID)
     FKApiClient.addInput(projectID, expeditionID, id)

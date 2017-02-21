@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const expeditions = state.expeditions
   const projects = expeditions.get('projects')
-  const project = expeditions.get('newProject')
+  const project = expeditions.get('currentProject')
 
   return {
     ...ownProps,

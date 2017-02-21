@@ -85,7 +85,12 @@ const routes = (
       }}
     >
 
-      <IndexRoute component={ProfileSection}/>
+      <IndexRoute
+        component={ProfileSection}
+        onEnter={(state) => {
+          store.dispatch(actions.setBreadcrumbs(0, null))
+        }}
+      />
       <Route 
         path="profile"
         component={ProfileSection}
@@ -100,48 +105,53 @@ const routes = (
         }}
       />
 
-      <Route path=":projectID" onEnter={(state, replace, callback) => {
-        if (!FKApiClient.signedIn()) {
-          replace({
-            pathname: '/signin',
-            state: { nextPathname: state.location.pathname }
-          })
-        } 
-        const projectID = state.params.projectID
-        const projectName = store.getState().expeditions.getIn(['projects', projectID, 'name'])
-        let expeditionID = state.params.expeditionID
-        store.dispatch(actions.setCurrentProject(projectID))
-        store.dispatch(actions.setBreadcrumbs(0, 'Project: ' + projectName, '/admin/' + projectID))
-        store.dispatch(actions.requestExpeditions(projectID, (expeditions) => {
-          callback()
-          if (expeditions.size === 0) {
-            browserHistory.push('/admin/' + projectID + '/new-expedition')
-            store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + projectID + '/new-expedition'))
-          } else {
-            let expeditionName = ''
-            if (!expeditionID) {
-              expeditionID = expeditions.first().get('id')
-              expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
-              browserHistory.push('/admin/' + projectID + '/' + expeditionID)
+      <Route
+        path=":projectID"
+        onEnter={(state, replace, callback) => {
+          const projectID = state.params.projectID
+          const projectName = store.getState().expeditions.getIn(['projects', projectID, 'name'])
+          let expeditionID = state.params.expeditionID
+          store.dispatch(actions.setCurrentProject(projectID))
+          store.dispatch(actions.setBreadcrumbs(0, 'Project: ' + projectName, '/admin/' + projectID))
+          store.dispatch(actions.requestExpeditions(projectID, (expeditions) => {
+            callback()
+            if (expeditions.size === 0) {
+              browserHistory.push('/admin/' + projectID + '/new-expedition')
+              store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + projectID + '/new-expedition'))
             } else {
-              if (expeditions.some(e => e.get('id') === expeditionID)) {
-                expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
-                store.dispatch(actions.setCurrentExpedition(expeditionID))
-              } else {
+              let expeditionName = ''
+              if (!expeditionID) {
                 expeditionID = expeditions.first().get('id')
                 expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
-                browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
+                browserHistory.push('/admin/' + projectID + '/' + expeditionID)
+              } else {
+                if (expeditions.some(e => e.get('id') === expeditionID)) {
+                  expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
+                  store.dispatch(actions.setCurrentExpedition(expeditionID))
+                } else {
+                  expeditionID = expeditions.first().get('id')
+                  expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
+                  browserHistory.push('/admin/' + projectID + '/' + expeditions.first().get('id'))
+                }
               }
+              store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + projectID + '/' + expeditionID))
             }
-            store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + projectID + '/' + expeditionID))
-          }
-        }))
-      }}>
+          }))
+        }}
+        onChange={(state) => {
+          const projectID = state.params.projectID
+          const projectName = store.getState().expeditions.getIn(['projects', projectID, 'name'])
+          store.dispatch(actions.setBreadcrumbs(0, 'Project: ' + projectName, '/admin/' + projectID))
+        }}
+      >
 
         <Route 
           path="new-expedition" 
           onEnter={(state) => {
             store.dispatch(actions.newExpedition())
+            store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + state.params.projectID + '/new-expedition'))
+          }}
+          onChange={(state) => {
             store.dispatch(actions.setBreadcrumbs(1, 'New Expedition', '/admin/' + state.params.projectID + '/new-expedition'))
           }}
         >
@@ -177,6 +187,11 @@ const routes = (
             const expeditionID = state.params.expeditionID
             const expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
             store.dispatch(actions.setCurrentExpedition(expeditionID))
+            store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + state.params.projectID + '/' + expeditionID))
+          }}
+          onChange={(state) => {
+            const expeditionID = state.params.expeditionID
+            const expeditionName = store.getState().expeditions.getIn(['expeditions', expeditionID, 'name'])
             store.dispatch(actions.setBreadcrumbs(1, 'Expedition: ' + expeditionName, '/admin/' + state.params.projectID + '/' + expeditionID))
           }}
         >

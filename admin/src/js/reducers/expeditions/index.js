@@ -13,10 +13,8 @@ export const initialState = I.fromJS({
     nextAction: null,
     nextPath: null
   },
-  newProject: null,
-  newExpedition: null,
-  // currentProjectID: null,
-  // currentExpeditionID: null,
+  currentProject: null,
+  currentExpedition: null,
   currentTeamID: null,
   currentMemberID: [],
   currentDocumentTypeID: null,
@@ -56,200 +54,6 @@ export const initialState = I.fromJS({
       setupType: 'token', 
       inputs: ['']
     }
-  },
-  teams: {
-  //   'o16-river-team': {
-  //     id: 'o16-river-team',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
-  //     name: 'river team',
-  //     members: {
-  //       steve: {
-  //         id: 'steve',
-  //         role: 'Expedition Leader'
-  //       },
-  //       jer: {
-  //         id: 'jer',
-  //         role: 'Team Leader'
-  //       },
-  //       adjany: {
-  //         id: 'adjany',
-  //         role: 'Team Member'
-  //       }
-  //     },
-  //     new: false,
-  //     status: 'ready',
-  //     editing: false,
-  //     selectedMember: null
-  //   },
-  //   'o16-ground-team': {
-  //     id: 'o16-ground-team',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus. Donec id dui quis ante congue placerat. Aenean sodales.',
-  //     name: 'ground team',
-  //     members: {
-  //       steve: {
-  //         id: 'steve',
-  //         role: 'Expedition Leader'
-  //       },
-  //       jer: {
-  //         id: 'jer',
-  //         role: 'Team Leader'
-  //       },
-  //       adjany: {
-  //         id: 'adjany',
-  //         role: 'Team Member'
-  //       }
-  //     },
-  //     new: false,
-  //     status: 'ready',
-  //     editing: false,
-  //     selectedMember: null
-  //   },
-  //   'b16-ground-team': {
-  //     id: 'b16-ground-team',  
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  //     name: 'ground team',
-  //     members: {
-  //       steve: {
-  //         id: 'steve',
-  //         role: 'Expedition Leader'
-  //       },
-  //       jer: {
-  //         id: 'jer',
-  //         role: 'Team Leader'
-  //       },
-  //       adjany: {
-  //         id: 'adjany',
-  //         role: 'Team Member'
-  //       }
-  //     },
-  //     new: false,
-  //     status: 'ready',
-  //     editing: false,
-  //     selectedMember: null
-  //   },
-  //   'c16-river-team': {
-  //     id: 'c16-river-team',
-  //     description: 'Lorem ipsum dolor sit amet.',
-  //     name: 'river team',
-  //     members: {
-  //       steve: {
-  //         id: 'steve',
-  //         role: 'Expedition Leader'
-  //       },
-  //       jer: {
-  //         id: 'jer',
-  //         role: 'Team Leader'
-  //       },
-  //       adjany: {
-  //         id: 'adjany',
-  //         role: 'Team Member'
-  //       }
-  //     },
-  //     new: false,
-  //     status: 'ready',
-  //     editing: false,
-  //     selectedMember: null
-  //   },
-  //   'c16-ground-team': {
-  //     id: 'c16-ground-team',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at pellentesque ipsum, sit amet convallis lacus.',
-  //     name: 'ground team',
-  //     members: {
-  //       steve: {
-  //         id: 'steve',
-  //         role: 'Expedition Leader'
-  //       },
-  //       jer: {
-  //         id: 'jer',
-  //         role: 'Team Leader'
-  //       },
-  //       adjany: {
-  //         id: 'adjany',
-  //         role: 'Team Member'
-  //       }
-  //     },
-  //     new: false,
-  //     status: 'ready',
-  //     editing: false,
-  //     selectedMember: null
-  //   },
-  },
-  people: {
-    // 'jer': {
-    //   id: 'jer',
-    //   name: 'Jer Thorp',
-    //   role: 'Team Leader',
-    //   teams: [
-    //     'o16-river-team',
-    //     'c16-river-team',
-    //   ],
-    //   inputs: [
-    //     'ambit',
-    //     'sightings',
-    //     'twitter',
-    //   ]
-    // },
-    // 'steve': {
-    //   id: 'steve',
-    //   name: 'Steve Boyes',
-    //   role: 'Expedition Leader',
-    //   teams: [
-    //     'o16-river-team',
-    //     'b16-ground-team',
-    //     'c16-river-team',
-    //   ],
-    //   inputs: [
-    //     'ambit',
-    //     'sightings',
-    //     'twitter',
-    //   ]
-    // },
-    // 'shah': {
-    //   id: 'shah',
-    //   name: 'Shah Selbe',
-    //   role: 'Team Member',
-    //   teams: [
-    //     'o16-river-team',
-    //     'c16-ground-team'
-    //   ],
-    //   inputs: [
-    //     'ambit',
-    //     'sightings',
-    //     'twitter',
-    //   ]
-    // },
-    // 'adjany': {
-    //   id: 'adjany',
-    //   name: 'Adjany Costa',
-    //   role: 'Team Member',
-    //   teams: [
-    //     'o16-ground-team',
-    //     'b16-ground-team',
-    //     'c16-ground-team'
-    //   ],
-    //   inputs: [
-    //     'ambit',
-    //     'sightings',
-    //     'twitter',
-    //   ]
-    // },
-    // 'john': {
-    //   id: 'john',
-    //   name: 'John Hilton',
-    //   role: 'Team Leader',
-    //   teams: [
-    //     'o16-river-team',
-    //     'o16-ground-team',
-    //     'b16-ground-team',
-    //     'c16-river-team',
-    //     'c16-ground-team'
-    //   ],
-    //   inputs: [
-    //     'ambit',
-    //     'sightings',
-    //     'twitter',
-    //   ]
-    // }
   }
 })
 
@@ -264,9 +68,9 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.SET_BREADCRUMBS: {
       let newState = state
-        .setIn(['breadcrumbs', action.level], I.fromJS({name: action.name, url: action.url}))
+        .setIn(['breadcrumbs', action.level], action.value)
       for (let i = action.level + 1; i < 3; i ++) {
-        newState.setIn(['breadcrumbs', i], null)
+        newState = newState.setIn(['breadcrumbs', i], null)
       }
       return newState
     }
@@ -284,19 +88,19 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.RECEIVE_EXPEDITIONS: {
       return state
         .set('expeditions', action.expeditions)
-        .setIn(['newProject', 'expeditions'], action.expeditions.map(e => e.get('id')).toList())
+        .setIn(['currentProject', 'expeditions'], action.expeditions.map(e => e.get('id')).toList())
     }
 
     case actions.RECEIVE_TOKEN: {
       return state
-        .setIn(['newExpedition', 'token'], action.token)
+        .setIn(['currentExpedition', 'token'], action.token)
     }
 
     case actions.NEW_PROJECT: {
       const projectID = 'project-' + Date.now()
       return state
         .set(
-          'newProject', 
+          'currentProject', 
           I.fromJS({
             id: projectID,
             name: 'Project Name',
@@ -307,12 +111,12 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.SET_PROJECT_PROPERTY: {
       const newState = state.setIn(
-        ['newProject'].concat(action.keyPath),
+        ['currentProject'].concat(action.keyPath),
         action.value
       )
       if (!!action.keyPath && action.keyPath.length === 1 && action.keyPath[0] === 'name') {
         return newState
-          .setIn(['newProject', 'id'], slug(action.value))
+          .setIn(['currentProject', 'id'], slug(action.value))
       } else {
         return newState 
       }
@@ -322,7 +126,7 @@ const expeditionReducer = (state = initialState, action) => {
       return state
         .setIn(
           ['projects', action.id],
-          state.get('newProject')
+          state.get('currentProject')
             .set('id', action.id)
         )
     }
@@ -331,7 +135,7 @@ const expeditionReducer = (state = initialState, action) => {
       const expeditionID = 'expedition-' + Date.now()
       return state
         .set(
-          'newExpedition', 
+          'currentExpedition', 
           I.fromJS({
             id: expeditionID,
             name: 'Expedition Name',
@@ -353,12 +157,12 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.ADD_DOCUMENT_TYPE: {
       let newState = state
         .setIn(
-          ['newExpedition', 'selectedDocumentType', action.collectionType], 
+          ['currentExpedition', 'selectedDocumentType', action.collectionType], 
           null
         )
-      if (!state.getIn(['newExpedition', 'documentTypes']).has(action.id)) {
+      if (!state.getIn(['currentExpedition', 'documentTypes']).has(action.id)) {
         newState = newState.setIn(
-          ['newExpedition', 'documentTypes', action.id], 
+          ['currentExpedition', 'documentTypes', action.id], 
           I.fromJS({
             id: action.id
           })
@@ -371,36 +175,36 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.REMOVE_DOCUMENT_TYPE: {
       return state
-        .deleteIn(['newExpedition', 'documentTypes', action.id])
+        .deleteIn(['currentExpedition', 'documentTypes', action.id])
     }
 
     case actions.SET_EXPEDITION_PROPERTY: {
       const newState = state.setIn(
-        ['newExpedition'].concat(action.keyPath),
+        ['currentExpedition'].concat(action.keyPath),
         action.value
       )
       if (!!action.keyPath && action.keyPath.length === 1 && action.keyPath[0] === 'name') {
         return newState
-          .setIn(['newExpedition', 'id'], slug(action.value))
+          .setIn(['currentExpedition', 'id'], slug(action.value))
       } else {
         return newState 
       }
     }
 
     case actions.SAVE_EXPEDITION: {
-      const expedition = state.get('newExpedition')
+      const expedition = state.get('currentExpedition')
       return state.setIn(['expeditions', expedition.get('id')], expedition)
-        .set('newExpedition', null)
+        .set('currentExpedition', null)
     }
 
     case actions.SET_CURRENT_PROJECT: {
-      return state.set('newProject', state.getIn(['projects', action.projectID]))
+      return state.set('currentProject', state.getIn(['projects', action.projectID]))
     }
 
     case actions.SET_CURRENT_EXPEDITION: {
       const expedition = state.getIn(['expeditions', action.expeditionID])
       return state
-        .set('newExpedition', expedition)
+        .set('currentExpedition', expedition)
     }
 
     case actions.SET_CURRENT_TEAM:

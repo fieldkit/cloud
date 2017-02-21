@@ -13,16 +13,7 @@ import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
 
 class NewInputsSection extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      addMemberValue: null,
-      inputValues: {}
-    }
-  }
-
   render () {
-
     const { 
       projectID,
       expedition,
@@ -136,19 +127,31 @@ class NewInputsSection extends React.Component {
             </td>
           </tbody>
         </table>
+        {
+          !!errors && !!errors.get && !!errors.get('name') &&
+          errors.get('name').map((error, i) => {
+            return (
+              <p 
+                key={'errors-name-' + i}
+                className="errors"
+              >
+                {error}
+              </p>
+            )
+          })
+        }
 
-        <p className="status">
-        </p>
+        <div className="status">
+        </div>
 
-        <Link to={'/admin/' + projectID + '/new-expedition/confirmation'}>
-          <div className="button hero">
-            Next step: finalize your expedition
-          </div>
-        </Link>
-
+        {
+          !!errors &&
+          <p className="errors">
+            We found one or multiple errors. Please check the information above or try again later.
+          </p>
+        }
       </div>
     )
-
   }
 }
 

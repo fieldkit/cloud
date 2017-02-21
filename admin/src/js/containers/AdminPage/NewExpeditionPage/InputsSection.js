@@ -3,12 +3,10 @@ import { connect } from 'react-redux'
 import NewInputsSection from '../../../components/AdminPage/NewExpeditionPage/InputsSection'
 import * as actions from '../../../actions'
 
-
 const mapStateToProps = (state, ownProps) => {
-
   const expeditions = state.expeditions
-  const projectID = expeditions.getIn(['newProject', 'id'])
-  const expedition = expeditions.get('newExpedition')
+  const projectID = expeditions.getIn(['currentProject', 'id'])
+  const expedition = expeditions.get('currentExpedition')
   const documentTypes = expedition.get('documentTypes')
     .map(t => {
       return expeditions.getIn(['documentTypes', t.get('id')]) 
