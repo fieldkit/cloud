@@ -394,6 +394,28 @@ export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
 export const SIGNOUT_REQUEST = 'SIGNOUT_REQUEST'
 export const SIGNOUT_SUCCESS = 'SIGNOUT_SUCCESS'
+export const RECEIVE_USER = 'RECEIVE_USER'
+
+export function requestUser (callback) {
+  return function (dispatch, getState) {
+    FKApiClient.getUser()
+      .then(res => {
+        const user = I.fromJS({
+          username: res.username,
+          email: res.email
+        })
+        dispatch({
+          type: RECEIVE_USER,
+          user
+        })
+        callback(null, user)
+      })
+      .catch(err => {
+        console.log('Error getting user:', err)
+        callback(err, null)
+      })
+  }
+}
 
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {

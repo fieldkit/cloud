@@ -4,6 +4,7 @@ import I from 'immutable'
 import slug from 'slug'
 
 export const initialState = I.fromJS({
+  user: null,
   breadcrumbs: [null, null, null],
   errors: null,
   suggestedMembers: null,
@@ -256,6 +257,10 @@ const expeditionReducer = (state = initialState, action) => {
 
   console.log('reducer:', action.type, action)
   switch (action.type) {
+
+    case actions.RECEIVE_USER: {
+      return state.set('user', action.user)
+    }
 
     case actions.SET_BREADCRUMBS: {
       let newState = state

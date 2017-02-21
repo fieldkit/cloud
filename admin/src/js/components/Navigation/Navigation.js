@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-// import NavigationItem from './NavigationItem'
 import { Link } from 'react-router'
 
 import fieldkitLogo from '../../../img/fieldkit-logo.svg'
@@ -12,6 +11,7 @@ class Navigation extends React.Component {
 
   render () {
     const { 
+      user,
       projectID,
       expeditionID,
       expeditions,
@@ -36,7 +36,12 @@ class Navigation extends React.Component {
         <div className="side-bar_navigation">
           <ul className="side-bar_navigation_profile">
             <Link to={'/admin'}>
-              <li>Ian Ardouin-Fumat</li>
+              <li>
+                {
+                  !!user && 
+                  user.get('username')
+                }
+              </li>
             </Link>
             <a
               href="#"

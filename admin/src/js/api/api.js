@@ -125,6 +125,11 @@ class FKApiClient {
     this.onSignOut()
   }
 
+  async getUser() {
+    const res = await this.getJSON('/api/user/current')
+    return res
+  }
+
   async getProjects () {
     const res = await this.getJSON('/api/projects')
     return res

@@ -63,22 +63,24 @@ const routes = (
       component={AdminPageContainer} 
       onEnter={(state, replace, callback) => {
         checkAuthentication(state, replace)
-        store.dispatch(actions.requestProjects((projects) => {
-          callback()
-          const projectID = state.params.projectID
-          if (projects.size === 0) {
-            browserHistory.push('/admin/new-project')
-          } else {
-            if (!projectID) {
-              browserHistory.push('/admin/' + projects.first().get('id'))
+        store.dispatch(actions.requestUser((user) => {
+          store.dispatch(actions.requestProjects((projects) => {
+            callback()
+            const projectID = state.params.projectID
+            if (projects.size === 0) {
+              browserHistory.push('/admin/new-project')
             } else {
-              if (projects.some(p => p.get('id') === projectID)) {
-                store.dispatch(actions.setCurrentProject(projectID))
-              } else {
+              if (!projectID) {
                 browserHistory.push('/admin/' + projects.first().get('id'))
+              } else {
+                if (projects.some(p => p.get('id') === projectID)) {
+                  store.dispatch(actions.setCurrentProject(projectID))
+                } else {
+                  browserHistory.push('/admin/' + projects.first().get('id'))
+                }
               }
             }
-          }
+          }))
         }))
       }}
     >
