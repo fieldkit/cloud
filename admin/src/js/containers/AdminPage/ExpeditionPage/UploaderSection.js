@@ -1,11 +1,9 @@
 
 import { connect } from 'react-redux'
-import NewConfirmationSection from '../../../components/AdminPage/NewExpeditionPage/ConfirmationSection'
+import UploaderSection from '../../../components/AdminPage/ExpeditionPage/UploaderSection'
 import * as actions from '../../../actions'
 
-
 const mapStateToProps = (state, ownProps) => {
-
   const expeditions = state.expeditions
   const projectID = expeditions.getIn(['currentProject', 'id'])
   const expedition = expeditions.get('currentExpedition')
@@ -19,15 +17,15 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps, state) => {
   return {
-    saveExpedition () {
-      return dispatch(actions.saveExpedition())
-    },
+    setExpeditionProperty (keyPath, value) {
+      return dispatch(actions.setExpeditionProperty(keyPath, value))
+    }
   }
 }
 
-const NewConfirmationContainer = connect(
+const UploaderContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewConfirmationSection)
+)(UploaderSection)
 
-export default NewConfirmationContainer
+export default UploaderContainer

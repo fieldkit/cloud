@@ -1,16 +1,17 @@
 import React, { PropTypes } from 'react'
-// import NavigationItem from './NavigationItem'
 import { Link } from 'react-router'
 
 import fieldkitLogo from '../../../img/fieldkit-logo.svg'
 import profileButton from '../../../img/profile-button.png'
 import backgroundImage from '../../../img/bkg.jpg'
 import linkImage from '../../../img/link.svg'
+import { protocol, hostname } from '../../constants/APIBaseURL'
 
 class Navigation extends React.Component {
 
   render () {
     const { 
+      user,
       projectID,
       expeditionID,
       expeditions,
@@ -35,7 +36,12 @@ class Navigation extends React.Component {
         <div className="side-bar_navigation">
           <ul className="side-bar_navigation_profile">
             <Link to={'/admin'}>
-              <li>Ian Ardouin-Fumat</li>
+              <li>
+                {
+                  !!user && 
+                  user.get('username')
+                }
+              </li>
             </Link>
             <a
               href="#"
@@ -54,26 +60,29 @@ class Navigation extends React.Component {
             }}
           >
             <ul className="side-bar_navigation_slider_projects">
-              <li className="side-bar_navigation_slider_projects_title">Projects</li>
+              <li className="side-bar_navigation_slider_sub-navigation">
+                {
+                  !!projects &&
+                  <Link to={'/admin/new-project'}>
+                    <li className="side-bar_navigation_slider_sub-navigation_button">
+                      New Project <span>+</span>
+                    </li>
+                  </Link>
+                }
+              </li>
               {
                 !!projects &&
                 projects.map(project => {
                   return (
                     <Link to={'/admin/' + project.get('id')}>
                       <li className="side-bar_navigation_slider_projects_project">
-                        { project.get('name') }
+                        <h4>
+                          { project.get('name') }
+                        </h4>
                       </li>
                     </Link>
                   )
                 })
-              }
-              {
-                !!projects &&
-                <Link to={'/admin/new-project'}>
-                  <li className="side-bar_navigation_slider_projects_new-project">
-                    New Project <span>+</span>
-                  </li>
-                </Link>
               }
               {
                 !projects &&
@@ -83,12 +92,19 @@ class Navigation extends React.Component {
             {
               !!projects && !!projectID && !!expeditions &&
               <ul className="side-bar_navigation_slider_expeditions">
-                <Link to={'/admin'}>
-                  <li className="side-bar_navigation_slider_expeditions_title">
-                    <span></span>
-                    Projects
-                  </li>
-                </Link>
+                <li className="side-bar_navigation_slider_sub-navigation">
+                  <Link to={'/admin'}>
+                    <div className="side-bar_navigation_slider_sub-navigation_button">
+                      <span></span>
+                      Projects
+                    </div>
+                  </Link>
+                  <Link to={'/admin/' + projectID + '/new-expedition'}>
+                    <div className="side-bar_navigation_slider_sub-navigation_button">
+                      New Expedition +
+                    </div>
+                  </Link>
+                </li>
                 {
                   expeditions.map(expedition => {
                     return (
@@ -96,7 +112,7 @@ class Navigation extends React.Component {
                         <Link to={'/admin/' + projectID + '/' + expedition.get('id')}>
                           <h4>
                             { expedition.get('name') } 
-                            <a href={'https://' + projectID + '.fieldkit.org/' + expedition.get('id')}>
+                            <a href={ protocol + projectID + '.' + hostname + '/' + expedition.get('id')}>
                               <span
                                 style={{
                                   backgroundImage: 'url(\'/' + linkImage + '\')'
@@ -115,7 +131,22 @@ class Navigation extends React.Component {
                             </li>
                             <li>
                               <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/inputs'}>
-                                Data inputs
+                                Data Inputs
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/uploader'}>
+                                Data Uploader
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/teams'}>
+                                Teams
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/theme'}>
+                                Theme
                               </Link>
                             </li>
                           </ul>
@@ -124,11 +155,6 @@ class Navigation extends React.Component {
                     )
                   })
                 }
-                <Link to={'/admin/' + projectID + '/new-expedition'}>
-                  <li className="side-bar_navigation_slider_expeditions_new-expedition">
-                    New Expedition <span>+</span>
-                  </li>
-                </Link>
               </ul>
             }
             {

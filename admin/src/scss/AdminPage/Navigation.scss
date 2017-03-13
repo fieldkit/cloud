@@ -44,7 +44,7 @@
     &_navigation {
 
       position: relative;
-      margin-top: 40px;
+      margin-top: $line-height * 4;
       width: 100%;
       color: white;
       transition: height 0.2s;
@@ -79,6 +79,37 @@
         width: 200%;
         transition: margin-left 0.4s;
 
+        &_sub-navigation {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          margin-bottom: $line-height;
+
+          &_button{
+            border: 1px solid white;
+            border: 1px solid white;
+            padding: 0 5px;
+            border-radius: 3px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+
+        &_sub-navigation a:first-child div:before {
+          content: "";
+          display: inline-block;
+          width: 0;
+          height: 0;
+          margin-right: 5px;
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-right: 6px solid white;
+        }
+
         &_projects {
           position: relative;
           flex-basis: 50%;
@@ -92,25 +123,33 @@
           &_project {
             cursor: pointer;
             text-transform: capitalize;
-            text-transform: capitalize;
-            font-size: 16px;
-            line-height: 40px;
-            font-weight: bold;
-            letter-spacing: 0.05em;
+
+            & h4 {
+              font-size: 18px;
+              letter-spacing: 0.05em;
+              margin-bottom: 0;
+              font-weight: normal;
+              line-height: $line-height * 2;
+              position: relative;
+            }
           }
 
-          &_new-project span {
-            background-color: white;
-            width: $line-width;
-            height: $line-width;
-            display: inline-block;
-            color: $color-accent;
-            vertical-align: text-bottom;
-            text-align: center;
-            line-height: $line-width / 1.2;
-            border-radius: $line-width / 2;
-            margin-left: $line-width / 2;
-            font-weight: bold;
+          &_new-project {
+            margin-top: $line-height / 2;
+
+            & span {
+              background-color: white;
+              width: $line-width;
+              height: $line-width;
+              display: inline-block;
+              color: $color-accent;
+              vertical-align: text-bottom;
+              text-align: center;
+              line-height: $line-width / 1.2;
+              border-radius: $line-width / 2;
+              margin-left: $line-width / 2;
+              font-weight: bold;
+            }
           }
         }
 
@@ -122,6 +161,7 @@
           &_title {
             opacity: 0.5;
             text-transform: capitalize;
+            margin-bottom: $line-height / 2;
 
             & span {
               display: inline-block;
@@ -141,32 +181,33 @@
           &_expedition {
             cursor: pointer;
             text-transform: capitalize;
-            cursor: pointer;
-            text-transform: capitalize;
-            margin-top: $line-width;
+            margin-bottom: $line-height;
 
             & h4 {
-              font-size: 16px;
-              font-weight: bold;
+              font-size: 18px;
               letter-spacing: 0.05em;
-              font-weight: bold;
-              margin-bottom: $line-height / 2;
+              margin-bottom: 0;
+              font-weight: normal;
+              width: calc(100% - 30px);
+              line-height: $line-height * 2;
+              position: relative;
 
               & span {
                 display: inline-block;
                 position: absolute;
                 width: $line-width;
                 height: $line-width;
-                right: $line-width;
-                background-repeat: none;
+                max-width: 16px;
+                max-height: 16px;
+                background-size: contain;
+                top: 10px;
+                right: -30px;
               }
             }
 
           }
 
           &_new-expedition {
-            margin-top: $line-width;
-            margin-bottom: $line-width;
 
             & span {
               background-color: white;

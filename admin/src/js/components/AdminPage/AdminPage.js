@@ -10,13 +10,15 @@ class AdminPage extends React.Component {
 
     const { 
       params,
-      error,
+      errors,
       location,
       modal,
       cancelAction,
       saveChangesAndResume,
       expeditions,
       projects,
+      breadcrumbs,
+      user,
       requestSignOut
     } = this.props
 
@@ -28,14 +30,14 @@ class AdminPage extends React.Component {
 
     const children = Children.map(this.props.children,
       (child) => React.cloneElement(child, {
-        error: error
+        errors
       })
     )
 
     const modalComponent = () => {
       if (!!modal.get('type')) {
         return (
-          <Modal {...modalProps} />
+          <Modal { ...modalProps } />
         )
       } else {
         return null
@@ -45,10 +47,19 @@ class AdminPage extends React.Component {
     return (
       <div id="admin-page" className="page">
         { modalComponent() }
-        <Navigation {...params} expeditions={expeditions} projects={projects} requestSignOut={requestSignOut}/>
+        <Navigation 
+          { ...params }
+          expeditions={ expeditions }
+          projects={ projects }
+          requestSignOut={ requestSignOut }
+          user={ user }
+        />
         <div className="page-content">
-          <BreadCrumbs {...location} />
-          {children}
+          <BreadCrumbs 
+            { ...location }
+            breadcrumbs={ breadcrumbs }
+          />
+          { children }
         </div>
       </div>
     )
