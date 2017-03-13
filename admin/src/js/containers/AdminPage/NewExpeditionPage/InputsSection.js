@@ -7,16 +7,16 @@ const mapStateToProps = (state, ownProps) => {
   const expeditions = state.expeditions
   const projectID = expeditions.getIn(['currentProject', 'id'])
   const expedition = expeditions.get('currentExpedition')
-  const documentTypes = expedition.get('documentTypes')
-    .map(t => {
-      return expeditions.getIn(['documentTypes', t.get('id')]) 
+  const inputs = expeditions.get('inputs')
+    .filter(t => {
+      return expedition.get('inputs').includes(t.get('id'))
     })
 
   return {
     ...ownProps,
     projectID,
     expedition,
-    documentTypes
+    inputs
   }
 }
 
@@ -25,14 +25,14 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
     setExpeditionProperty (keyPath, value) {
       return dispatch(actions.setExpeditionProperty(keyPath, value))
     },
-    fetchSuggestedDocumentTypes (input, type, callback) {
-      return dispatch(actions.fetchSuggestedDocumentTypes(input, type, callback))
+    fetchSuggestedInputs (input, type, callback) {
+      return dispatch(actions.fetchSuggestedInputs(input, type, callback))
     },
-    addDocumentType (id, type) {
-      return dispatch(actions.addDocumentType(id, type))
+    addInput (id, type) {
+      return dispatch(actions.addInput(id, type))
     },
-    removeDocumentType (id) {
-      return dispatch(actions.removeDocumentType(id))
+    removeInput (id) {
+      return dispatch(actions.removeInput(id))
     },
     submitInputs () {
       return dispatch(actions.submitInputs())

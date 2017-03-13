@@ -154,8 +154,8 @@ export const SET_EXPEDITION_PROPERTY = 'SET_EXPEDITION_PROPERTY'
 export const SAVE_EXPEDITION = 'SAVE_EXPEDITION'
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
-export const ADD_DOCUMENT_TYPE = 'ADD_DOCUMENT_TYPE'
-export const REMOVE_DOCUMENT_TYPE = 'REMOVE_DOCUMENT_TYPE'
+export const ADD_INPUT = 'ADD_INPUT'
+export const REMOVE_INPUT = 'REMOVE_INPUT'
 export const RECEIVE_TOKEN = 'RECEIVE_TOKEN'
 
 export function newExpedition () {
@@ -217,8 +217,8 @@ export function requestExpeditions (projectID, callback) {
               return e.merge(I.fromJS({
                 id: e.get('slug'),
                 token: '',
-                selectedDocumentType: {},
-                documentTypes: {},              
+                inputs: [
+                ]
               }))
             })
           dispatch([
@@ -252,15 +252,11 @@ export function saveGeneralSettings (callback) {
           // error
           console.log('error with expedition creation')
         } else {
-
-          console.log('aga DISPATCHING')
           dispatch({
             type: SET_EXPEDITION_PROPERTY,
             keyPath: ['id'],
             value: expeditionID
           })
-          console.log('aga DISPATCHED')
-
           FKApiClient.addExpeditionToken(projectID, expeditionID)
             .then(res => {
               console.log('server response:', res)
@@ -278,7 +274,6 @@ export function saveGeneralSettings (callback) {
                     errors: null
                   }
                 ])
-                console.log('agawatlol', getState().expeditions.toJS())
                 if (!!callback) callback()
               }
             })
@@ -300,7 +295,8 @@ export function submitInputs () {
     const projectID = getState().expeditions.getIn(['currentProject', 'id'])
     const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
-    const inputName = expedition.get('documentTypes').toList().get(0).get('id')
+    // TODO: submit multiple inputs
+    const inputName = expedition.get('inputs').toList().get(0).get('id')
     console.log('sending input', projectID, expeditionID, inputName)
     FKApiClient.postInputs(projectID, expeditionID, inputName)
       .then(res => {
@@ -321,16 +317,16 @@ export function submitInputs () {
   }
 }
 
-export function fetchSuggestedDocumentTypes (input, type, callback) {
+export function fetchSuggestedInputs (input, type, callback) {
   return function (dispatch, getState) {
     window.setTimeout(() => {
-      const documentTypes = getState().expeditions
-        .get('documentTypes')
+      const inputs = getState().expeditions
+        .get('inputs')
         .filter((d) => {
           const nameCheck = d.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
           const typeCheck = d.get('type') === type
           const membershipCheck = getState().expeditions
-            .getIn(['currentExpedition', 'documentTypes'])
+            .getIn(['currentExpedition', 'inputs'])
             .has(d.get('id'))
           return (nameCheck) && !membershipCheck && typeCheck
         })
@@ -340,14 +336,14 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
         .toArray()
 
       callback(null, {
-        options: documentTypes,
+        options: inputs,
         complete: true
       })
     }, 500)
   }
 }
 
-export function addDocumentType (id, collectionType) {
+export function addInput (id, collectionType) {
   return function (dispatch, getState) {
     const projectID = getState().expeditions.getIn(['currentProject', 'id'])
     const expedition = getState().expeditions.get('currentExpedition')
@@ -360,7 +356,7 @@ export function addDocumentType (id, collectionType) {
         } else {
           console.log('input successfully added')
           dispatch({
-            type: ADD_DOCUMENT_TYPE,
+            type: ADD_INPUT,
             id,
             collectionType,
             token: res.id
@@ -371,10 +367,10 @@ export function addDocumentType (id, collectionType) {
   }
 }
 
-export function removeDocumentType (id) {
+export function removeInput (id) {
   return function (dispatch, getState) {
     dispatch({
-      type: REMOVE_DOCUMENT_TYPE,
+      type: REMOVE_INPUT,
       id
     })
   }
@@ -530,16 +526,9 @@ export function initInputPage (callback) {
     const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
     FKApiClient.getInputs(projectID, expeditionID)
       .then((res) => {
-        const inputMap = {}
-        res.forEach(i => {
-          inputMap[i.slug] = i
+        const inputs = I.fromJS(res).map((i) => {
+          return i.get('slug')
         })
-        const inputs = I.fromJS(inputMap)
-          .map(i => {
-            return i
-              .set('id', i.get('slug'))
-              .set('name', i.get('name'))
-          })
         dispatch({
           type: RECEIVE_INPUTS,
           expeditionID,

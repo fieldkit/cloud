@@ -12,24 +12,24 @@ import { protocol, hostname } from '../../../constants/APIBaseURL'
 import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
 
-class NewInputsSection extends React.Component {
+class NewInputsSection extends React.Component {  
   render () {
     const { 
       projectID,
       expedition,
-      documentTypes,
+      inputs,
       errors,
-      selectedDocumentType,
+      selectedInput,
       setExpeditionProperty,
-      fetchSuggestedDocumentTypes,
-      addDocumentType,
-      removeDocumentType
+      fetchSuggestedInputs,
+      addInput,
+      removeInput
     } = this.props
 
     return (
       <div id="new-inputs-section" className="section">
         <div className="section-header">
-          <h1>Set up your devices (2/2)</h1>
+          <h1>Set up your devices</h1>
         </div>
         <p className="intro">
           Etiam eu purus in urna volutpat ornare. Etiam pretium ante non egestas dapibus. Mauris pretium, nunc non lacinia finibus, dui lectus molestie nulla, quis ultricies libero orci a sapien. Praesent bibendum leo vitae felis pellentesque, sit amet mattis nisi mattis.
@@ -41,7 +41,7 @@ class NewInputsSection extends React.Component {
         </p>
         <table className="objects-list">
           {
-            !!documentTypes && !!documentTypes.filter(d => {return d.get('type') === 'sensor'}).size &&
+            !!inputs && !!inputs.filter(d => {return d.get('type') === 'sensor'}).size &&
             <tbody>
               <td className="name">Name</td>
               <td className="description">Description</td>
@@ -50,7 +50,7 @@ class NewInputsSection extends React.Component {
             </tbody>
           }
           { 
-            documentTypes
+            inputs
               .filter(d => {return d.get('type') === 'sensor'}) 
               .map((d, i) => {
                 return (
@@ -90,7 +90,7 @@ class NewInputsSection extends React.Component {
                     <td 
                       className="remove"
                       onClick={() => {
-                        removeDocumentType(d.get('id'))
+                        removeInput(d.get('id'))
                       }}
                     >  
                       <img src={'/' + iconRemoveSmall}/>
@@ -105,19 +105,19 @@ class NewInputsSection extends React.Component {
                 <Select.Async
                   name="add-documentType"
                   loadOptions={(input, callback) =>
-                    fetchSuggestedDocumentTypes(input, 'sensor', callback)
+                    fetchSuggestedInputs(input, 'sensor', callback)
                   }
-                  value={ expedition.getIn(['selectedDocumentType', 'sensor']) }
+                  value={ expedition.getIn(['selectedInput', 'sensor']) }
                   onChange={(val) => {
-                    setExpeditionProperty(['selectedDocumentType', 'sensor'], val.value)
+                    setExpeditionProperty(['selectedInput', 'sensor'], val.value)
                   }}
                   clearable={false}
                 />
                 <div
-                  className={ "button" + (!!expedition.getIn(['selectedDocumentType', 'sensor']) ? '' : ' disabled') }
+                  className={ "button" + (!!expedition.getIn(['selectedInput', 'sensor']) ? '' : ' disabled') }
                   onClick={() => {
-                    if (!!expedition.getIn(['selectedDocumentType', 'sensor'])) {
-                      addDocumentType(expedition.getIn(['selectedDocumentType', 'sensor']), 'sensor')
+                    if (!!expedition.getIn(['selectedInput', 'sensor'])) {
+                      addInput(expedition.getIn(['selectedInput', 'sensor']), 'sensor')
                     }
                   }}
                 >
