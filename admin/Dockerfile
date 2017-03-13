@@ -1,7 +1,8 @@
-FROM node:7.4.0
+FROM node:7.5.0
 WORKDIR /usr/app
-COPY ./package.json /usr/app/
-RUN npm install
+RUN npm install -g yarn
+COPY ./package.json ./yarn.lock /usr/app/
+RUN yarn install
 COPY webpack.* /usr/app/
 COPY src/vendors /usr/app/src/vendors
 RUN npm run-script dll
