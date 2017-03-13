@@ -50,6 +50,7 @@ class FKApiClient {
       }
       if (res.status == 401) {
         console.log('Bad auth while GETing', url.toString(), await res.text())
+        this.onAuthError()
         throw new AuthenticationError()
       } else if (!res.ok) {
         const err = await res.json()
@@ -86,6 +87,7 @@ class FKApiClient {
       }
       if (res.status == 401) {
         console.log('Bad auth while POSTing', url.toString(), await res.text())
+        this.onAuthError()
         throw new AuthenticationError()
       } else if (!res.ok) {
         const err = await res.json()
@@ -162,6 +164,11 @@ class FKApiClient {
 
   async addInput (projectID, expeditionID, inputName) {
     const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
+    return res
+  }
+
+  async getInputs (projectID, expeditionID) {
+    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs')
     return res
   }
 }

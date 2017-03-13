@@ -8,6 +8,9 @@ const mapStateToProps = (state, ownProps) => {
   const projectID = expeditions.getIn(['currentProject', 'id'])
   const expedition = expeditions.get('currentExpedition')
   const documentTypes = expedition.get('documentTypes')
+    .filter(t => {
+      return !!expeditions.getIn(['documentTypes', t.get('id')]) 
+    })
     .map(t => {
       return expeditions.getIn(['documentTypes', t.get('id')]) 
     })

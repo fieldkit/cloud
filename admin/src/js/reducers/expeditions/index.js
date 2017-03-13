@@ -46,8 +46,8 @@ export const initialState = I.fromJS({
     //   setupType: 'token', 
     //   inputs: ['Twitter account']
     // },
-    'conservifyModule': {
-      id: 'conservifyModule',
+    'conservifymodule': {
+      id: 'conservifymodule',
       type: 'sensor',
       name: 'Conservify Module',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
@@ -176,6 +176,21 @@ const expeditionReducer = (state = initialState, action) => {
     case actions.REMOVE_DOCUMENT_TYPE: {
       return state
         .deleteIn(['currentExpedition', 'documentTypes', action.id])
+    }
+
+    case actions.RECEIVE_INPUTS: {
+      let newState = state
+      action.inputs.forEach((i) => {
+        newState = newState
+          .setIn(
+            ['currentExpedition', 'documentTypes', i.get('id')], 
+            I.fromJS({
+              id: i.get('id')
+            })
+          )
+      })
+      console.log('aga', newState.toJS())
+      return newState
     }
 
     case actions.SET_EXPEDITION_PROPERTY: {

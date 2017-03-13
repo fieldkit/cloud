@@ -18,12 +18,12 @@ class NewInputsSection extends React.Component {
       projectID,
       expedition,
       documentTypes,
+      errors,
       selectedDocumentType,
       setExpeditionProperty,
       fetchSuggestedDocumentTypes,
       addDocumentType,
-      removeDocumentType,
-      submitInputs
+      removeDocumentType
     } = this.props
 
     return (
@@ -76,7 +76,10 @@ class NewInputsSection extends React.Component {
                                   </a>
                                 </li>
                                 <li>
-                                  2. Initialize your device. You're done!
+                                  2. Insert the SD card into your Conservify device.
+                                </li>
+                                <li>
+                                  3. Initialize your device. You're done!
                                 </li>
                               </ul>
                             )

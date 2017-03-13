@@ -213,8 +213,11 @@ const routes = (
           <Route
             path="inputs"
             component={InputsContainer}
-            onEnter={(state) => {
-              store.dispatch(actions.setBreadcrumbs(2, 'Input Setup', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/inputs'))
+            onEnter={(state, replace, callback) => {
+              store.dispatch(actions.initInputPage(() => {
+                store.dispatch(actions.setBreadcrumbs(2, 'Input Setup', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/inputs'))
+                callback()
+              }))
             }}
           />
         </Route>

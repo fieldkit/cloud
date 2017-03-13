@@ -99,6 +99,7 @@ export function requestProjects (callback) {
           if (callback) callback(projects)
         }
       })
+      .catch(err => {})
   }
 }
 
@@ -234,6 +235,7 @@ export function requestExpeditions (projectID, callback) {
           if (callback) callback(expeditions)
         }
       })
+      .catch(err => {})
   }
 }
 
@@ -280,6 +282,7 @@ export function saveGeneralSettings (callback) {
                 if (!!callback) callback()
               }
             })
+            .catch(err => {})
         }
       })
       .catch(error => {
@@ -314,6 +317,7 @@ export function submitInputs () {
           })
         }
       })
+      .catch(err => {})
   }
 }
 
@@ -348,7 +352,6 @@ export function addDocumentType (id, collectionType) {
     const projectID = getState().expeditions.getIn(['currentProject', 'id'])
     const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
-    console.log('agagagalol', expedition.toJS(), expeditionID)
     FKApiClient.addInput(projectID, expeditionID, id)
       .then(res => {
         console.log('server response:', res)
@@ -364,6 +367,7 @@ export function addDocumentType (id, collectionType) {
           })
         }
       })
+      .catch(err => {})
   }
 }
 
@@ -506,3 +510,43 @@ export function requestSignOut () {
       })
   }
 }
+
+
+/*
+
+INPUT PAGE ACTIONS
+
+*/
+
+export const REQUEST_INPUTS = 'REQUEST_INPUTS'
+export const RECEIVE_INPUTS = 'RECEIVE_INPUTS'
+
+export function initInputPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_INPUTS
+    })
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    FKApiClient.getInputs(projectID, expeditionID)
+      .then((res) => {
+        const inputMap = {}
+        res.forEach(i => {
+          inputMap[i.slug] = i
+        })
+        const inputs = I.fromJS(inputMap)
+          .map(i => {
+            return i
+              .set('id', i.get('slug'))
+              .set('name', i.get('name'))
+          })
+        dispatch({
+          type: RECEIVE_INPUTS,
+          expeditionID,
+          inputs
+        })
+        callback()
+      })
+  }
+}
+
