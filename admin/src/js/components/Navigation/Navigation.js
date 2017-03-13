@@ -131,7 +131,22 @@ class Navigation extends React.Component {
                             </li>
                             <li>
                               <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/inputs'}>
-                                Data inputs
+                                Data Inputs
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/uploader'}>
+                                Data Uploader
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/teams'}>
+                                Teams
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to={'/admin/' + projectID + '/' + expedition.get('id') + '/theme'}>
+                                Theme
                               </Link>
                             </li>
                           </ul>

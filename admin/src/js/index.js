@@ -27,6 +27,9 @@ import NewConfirmationContainer from './containers/AdminPage/NewExpeditionPage/C
 import ExpeditionPageContainer from './containers/AdminPage/ExpeditionPage/ExpeditionPage'
 import GeneralSettingsContainer from './containers/AdminPage/ExpeditionPage/GeneralSettingsSection'
 import InputsContainer from './containers/AdminPage/ExpeditionPage/InputsSection'
+import TeamsContainer from './containers/AdminPage/ExpeditionPage/TeamsSection'
+import UploaderContainer from './containers/AdminPage/ExpeditionPage/UploaderSection'
+import ThemeContainer from './containers/AdminPage/ExpeditionPage/ThemeSection'
 
 import FKApiClient from './api/api.js'
 
@@ -214,8 +217,38 @@ const routes = (
             path="inputs"
             component={InputsContainer}
             onEnter={(state, replace, callback) => {
-              store.dispatch(actions.initInputPage(() => {
-                store.dispatch(actions.setBreadcrumbs(2, 'Input Setup', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/inputs'))
+              store.dispatch(actions.initInputsPage(() => {
+                store.dispatch(actions.setBreadcrumbs(2, 'Inputs Settings', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/inputs'))
+                callback()
+              }))
+            }}
+          />
+          <Route
+            path="teams"
+            component={TeamsContainer}
+            onEnter={(state, replace, callback) => {
+              store.dispatch(actions.initTeamsPage(() => {
+                store.dispatch(actions.setBreadcrumbs(2, 'Teams Settings', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/teams'))
+                callback()
+              }))
+            }}
+          />
+          <Route
+            path="uploader"
+            component={UploaderContainer}
+            onEnter={(state, replace, callback) => {
+              store.dispatch(actions.initUploaderPage(() => {
+                store.dispatch(actions.setBreadcrumbs(2, 'Data Uploader', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/uploader'))
+                callback()
+              }))
+            }}
+          />
+          <Route
+            path="theme"
+            component={ThemeContainer}
+            onEnter={(state, replace, callback) => {
+              store.dispatch(actions.initThemePage(() => {
+                store.dispatch(actions.setBreadcrumbs(2, 'Theme Settings', '/admin/' + state.params.projectID + '/' + state.params.expeditionID + '/theme'))
                 callback()
               }))
             }}

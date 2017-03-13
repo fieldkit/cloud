@@ -1,6 +1,6 @@
 
 import { connect } from 'react-redux'
-import NewInputsSection from '../../../components/AdminPage/ExpeditionPage/InputsSection'
+import InputsSection from '../../../components/AdminPage/ExpeditionPage/InputsSection'
 import * as actions from '../../../actions'
 
 const mapStateToProps = (state, ownProps) => {
@@ -40,9 +40,9 @@ const mapDispatchToProps = (dispatch, ownProps, state) => {
   }
 }
 
-const NewInputsContainer = connect(
+const InputsContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewInputsSection)
+)(InputsSection)
 
-export default NewInputsContainer
+export default InputsContainer

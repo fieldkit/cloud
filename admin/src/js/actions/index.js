@@ -510,14 +510,14 @@ export function requestSignOut () {
 
 /*
 
-INPUT PAGE ACTIONS
+INPUTS PAGE ACTIONS
 
 */
 
 export const REQUEST_INPUTS = 'REQUEST_INPUTS'
 export const RECEIVE_INPUTS = 'RECEIVE_INPUTS'
 
-export function initInputPage (callback) {
+export function initInputsPage (callback) {
   return function (dispatch, getState) {
     dispatch({
       type: REQUEST_INPUTS
@@ -536,6 +536,102 @@ export function initInputPage (callback) {
         })
         callback()
       })
+  }
+}
+
+
+/*
+
+TEAMS PAGE ACTIONS
+
+*/
+
+export const REQUEST_TEAMS = 'REQUEST_TEAMS'
+export const RECEIVE_TEAMS = 'RECEIVE_TEAMS'
+
+export function initTeamsPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_TEAMS
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
+  }
+}
+
+
+/*
+
+TEAMS PAGE ACTIONS
+
+*/
+
+export const REQUEST_UPLOADERS = 'REQUEST_UPLOADERS'
+export const RECEIVE_UPLOADERS = 'RECEIVE_UPLOADERS'
+
+export function initUploaderPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_UPLOADERS
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
+  }
+}
+
+
+/*
+
+THEMES PAGE ACTIONS
+
+*/
+
+export const REQUEST_THEME = 'REQUEST_THEME'
+export const RECEIVE_THEME = 'RECEIVE_THEME'
+
+export function initThemePage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_THEME
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
   }
 }
 
