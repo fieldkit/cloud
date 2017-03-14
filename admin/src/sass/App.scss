@@ -22,3 +22,116 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+//-------------------- RESPONSIVE --------------------//
+
+@mixin for-phone-down {
+  @media (max-width: 600px) { @content; }
+}
+
+@mixin for-tablet-portrait-down {
+  @media (max-width: 900px) { @content; }
+}
+
+@mixin for-tablet-landscape-down {
+  @media (max-width: 1200px) { @content; }
+}
+
+@mixin for-desktop-down {
+  @media (max-width: 1799px) { @content; }
+}
+
+@mixin for-big-desktop-only {
+  @media (min-width: 1800px) { @content; }
+}
+
+//---------------------- LAYOUT ----------------------//
+$col-gutter: 30px;
+$baseline-height: 13px;
+
+// Columns
+.column {
+  display: inline-block;
+  vertical-align: top;
+  &:not(:first-child) {
+    margin-left: $col-gutter;
+  }
+}
+@mixin one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
+@mixin two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
+@mixin three-columns  { width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
+@mixin four-columns   { width: 100%; }
+
+// Main 
+@mixin content-width {
+  width: 834px;
+  margin: auto;
+  @include for-tablet-portrait-down {
+    width: calc(100% - #{$col-gutter}*2);
+  } 
+}
+
+//---------------------- COLOR -----------------------//
+$color-1: #263238;
+$color-2: #37474F;
+$color-3: #455A64;
+
+
+//-------------------- TYPOGRAPHY --------------------//
+
+// Variables
+// $font-serif: 'Merriweather', serif;
+$font-sans: Helvetica, Arial, sans-serif;
+
+// Styles
+@mixin type-h1 {
+  font-size: 36px;
+  line-height: 39px;
+  font-family: $font-sans;
+
+  @include for-phone-down {
+    // font-size: 21px;
+    // line-height: 26px;          
+  } 
+}
+@mixin type-h2 {
+  font-size: 21px;
+  line-height: 26px;
+  font-family: $font-sans;
+  font-weight: bold;
+
+  @include for-phone-down {
+    // font-size: 16px;
+    // line-height: 21px;
+  }
+}
+@mixin type-h3 {
+  font-size: 21px;
+  line-height: 26px;
+  font-family: $font-sans;
+  font-weight: 900;
+}
+@mixin type-h4 {
+  font-size: 21px;
+  line-height: 26px;
+  font-family: $font-sans;
+  font-weight: 900;
+}
+@mixin type-intro {
+  font-size: 16px;
+  line-height: 26px;
+  font-family: $font-sans;
+}
+@mixin type-body {
+  font-size: 16px;
+  line-height: 26px;
+  font-family: $font-sans;
+}
+@mixin type-small {
+  font-size: 13px;
+  line-height: 16px;
+  font-family: $font-sans;
+}
+
+// Reseting presets
+p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
