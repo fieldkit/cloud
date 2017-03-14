@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
+    "flow-bin": "^0.41.0",
     "node-sass": "^4.5.0",
     "react-scripts": "0.9.5"
   },
@@ -19,7 +20,13 @@
     "build": "yarn sass-build && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
+    "flow": "flow",
+    "lint": "eslint src",
     "sass-watch": "chokidar 'src/sass/**/*.scss' --initial -c 'yarn run sass-build'",
     "sass-build": "node-sass --recursive src/sass --output src/css --source-map true"
-  }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "homepage": "/admin"
 }
