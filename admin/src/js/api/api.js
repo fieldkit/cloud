@@ -1,6 +1,6 @@
 // @flow weak
 
-import {AuthAPIClient, APIError, AuthenticationError} from './base-api';
+import {AuthAPIClient, APIError} from './base-api';
 
 let apiClientInstance;
 export class FKApiClient extends AuthAPIClient {

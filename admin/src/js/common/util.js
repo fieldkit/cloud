@@ -15,3 +15,5 @@ export class BaseError {
     }
   }
 }
+
+export type ErrorMap = { [key: string]: string[] };

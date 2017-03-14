@@ -1,7 +1,7 @@
 // @flow
 
 import 'whatwg-fetch'
-import {BaseError} from '../common/utils.js'
+import {BaseError} from '../common/util'
 import log from 'loglevel';
 
 export class APIError extends BaseError {
