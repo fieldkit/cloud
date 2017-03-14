@@ -1,123 +1,23 @@
 // @flow weak
 
-import 'whatwg-fetch'
-import {BaseError} from '../common/utils.js'
+import {AuthAPIClient, APIError, AuthenticationError} from './base-api';
 
-class APIError extends BaseError {}
-class AuthenticationError extends APIError {}
-
-let API_HOST = 'https://fieldkit.org';
-if (process.env.NODE_ENV === 'development') {
-  API_HOST = 'http://localhost:3000';
-}
-
-const SIGNED_IN_KEY = 'signedIn';
-
-class FKApiClient {
-  onAuthError(e) {
-    if (this.signedIn) {
-      this.onSignOut()
+let apiClientInstance;
+export class FKApiClient extends AuthAPIClient {
+  static setup(baseUrl: string, unauthorizedHandler: () => void): FKApiClient {
+    if (!apiClientInstance) {
+      apiClientInstance = new FKApiClient(baseUrl, unauthorizedHandler);
     }
+
+    return apiClientInstance;
   }
 
-  onSignIn() {
-    localStorage.setItem(SIGNED_IN_KEY, 'signedIn')
-  }
-
-  onSignOut() {
-    localStorage.removeItem(SIGNED_IN_KEY)
-  }
-
-  signedIn() {
-    return localStorage.getItem(SIGNED_IN_KEY) != null
-  }
-
-  async get(path, params) {
-    try {
-      const url = new URL(path, API_HOST)
-      if (params) {
-        for (const key in params) {
-          url.searchParams.set(key, params[key])
-        }
-      }
-      let res
-      try {
-        res = await fetch(url.toString(), {
-          method: 'GET',
-          credentials: 'include'
-        })
-      } catch (e) {
-        console.log('Threw while GETing', url.toString(), e)
-        throw new APIError('HTTP error')
-      }
-      if (res.status == 404) {
-        console.log('not found', url.toString(), await res.text())
-        throw new APIError('not found')
-      }
-      if (res.status == 401) {
-        console.log('Bad auth while GETing', url.toString(), await res.text())
-        this.onAuthError()
-        throw new AuthenticationError()
-      } else if (!res.ok) {
-        const err = await res.json()
-        console.log('Non-OK response while GETing', url.toString(), err)
-        throw new APIError(err)
-      }
-      return res
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e)
-      }
-      throw e
+  static get(): FKApiClient {
+    if (!apiClientInstance) {
+      throw new APIError('API has not been set up!');
     }
-  }
 
-  async getJSON(path: string, params?: Object): Promise<any> {
-    const res = await this.get(path, params)
-    return res.json()
-  }
-
-  async post(path, body) {
-    try {
-      const url = new URL(path, API_HOST)
-      let res
-      try {
-        res = await fetch(url.toString(), {
-          method: 'POST',
-          credentials: 'include',
-          body
-        })
-      } catch (e) {
-        console.log('Threw while POSTing', url.toString(), e)
-        throw new APIError('HTTP error')
-      }
-      if (res.status == 401) {
-        console.log('Bad auth while POSTing', url.toString(), await res.text())
-        this.onAuthError()
-        throw new AuthenticationError()
-      } else if (!res.ok) {
-        const err = await res.json()
-        console.log('Non-OK response while POSTing', url.toString(), err)
-        throw new APIError(err)
-      }
-      return res
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e)
-      }
-      throw e
-    }
-  }
-
-  async postForm(path, body) {
-    const data = new FormData()
-    if (body) {
-      for (const key in body) {
-        data.append(key, body[key])
-      }
-    }
-    const res = await this.post(path, data)
-    return res.text()
+    return apiClientInstance;
   }
 
   async signUp(params) {
@@ -130,53 +30,51 @@ class FKApiClient {
 
   async signOut() {
     await this.postForm('/api/user/sign-out')
-    this.onSignOut()
+    this.onSignout()
   }
 
   async getUser() {
-    const res = await this.getJSON('/api/user/current')
+    const res = await this.postJSON('/api/user/current')
     return res
   }
 
   async getProjects () {
-    const res = await this.getJSON('/api/projects')
+    const res = await this.postJSON('/api/projects')
     return res
   }
 
   async createProjects (name) {
-    const res = await this.getJSON('/api/projects/add?name=' + name)
+    const res = await this.postJSON('/api/projects/add', { name })
     return res
   }
 
   async getExpeditions (projectID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expeditions')
+    const res = await this.getJSON(`/api/project/${projectID}/expeditions`)
     return res
   }
 
-  async postGeneralSettings (projectID, expeditionName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expeditions/add?name=' + expeditionName)
+  async postGeneralSettings (projectID, name) {
+    const res = await this.postJSON(`/api/project/${projectID}/expeditions/add`, { name })
     return res
   }
 
-  async postInputs (projectID, expeditionID, inputName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
+  async postInputs (projectID, expeditionID, name) {
+    const res = await this.postJSON(`/api/project/${projectID}/expedition/${expeditionID}/inputs/add`, { name })
     return res
   }
 
   async addExpeditionToken (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/tokens/add')
+    const res = await this.postJSON(`/api/project/${projectID}/expedition/${expeditionID}/tokens/add`)
     return res
   }
 
-  async addInput(projectID, expeditionID, inputName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
+  async addInput(projectID, expeditionID, name) {
+    const res = await this.postJSON(`/api/project/${projectID}/expedition/${expeditionID}/inputs/add`, { name })
     return res
   }
 
   async getInputs(projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs')
+    const res = await this.getJSON(`/api/project/${projectID}/expedition/${expeditionID}/inputs`)
     return res
   }
 }
-
-export default new FKApiClient()
