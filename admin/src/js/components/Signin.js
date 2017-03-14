@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 
+import { errorsFor } from '../common/util';
 import type { ErrorMap } from '../common/util';
 
 type Props = {
@@ -41,14 +42,12 @@ export class Signin extends Component {
             <div className="group">
               <label htmlFor="username">Username</label>
               <input ref="username" id="username" name="username" type="username" placeholder="" />
-              { this.state.errors && this.state.errors['username'] &&
-                this.state.errors['username'].map((error, i) =>  <p key={'errors-username-' + i} className="error">{error}</p>) }
+              { errorsFor(this.state.errors, 'username') }
             </div>
             <div className="group">
               <label htmlFor="password">Password</label>
               <input ref="password" id="password" name="password" type="password" placeholder="" />
-              { this.state.errors && this.state.errors['password'] &&
-                this.state.errors['password'].map((error, i) =>  <p key={'errors-password-' + i} className="error">{error}</p>) }
+              { errorsFor(this.state.errors, 'password') }
             </div>
           </div>
           <footer>

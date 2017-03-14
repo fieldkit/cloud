@@ -8,6 +8,7 @@ import '../css/App.css';
 
 import { Landing } from './components/Landing';
 import { Signin } from './components/Signin';
+import { Signup } from './components/Signup';
 
 import type { ErrorMap } from './common/util';
 
@@ -24,10 +25,17 @@ export class App extends Component {
   }
 
   onLogout() {
+    // TODO: redirect
     console.log('Logged out!');
   }
 
+  requestSignUp(email: string, username: string, password: string, invite: string): Promise<?ErrorMap> {
+    // TODO: redirect on success
+    return FKApiClient.get().signUp(email, username, password, invite);
+  }
+
   requestSignIn(username: string, password: string): Promise<?ErrorMap> {
+    // TODO: redirect on success
     return FKApiClient.get().signIn(username, password);
   }
 
@@ -38,6 +46,9 @@ export class App extends Component {
           <Route exact={true} path="/" component={Landing} />
           <Route path="/signin" render={() =>
             <Signin requestSignIn={this.requestSignIn.bind(this)} />
+          }/>
+        <Route path="/signup" render={() =>
+            <Signup requestSignUp={this.requestSignUp.bind(this)} />
           }/>
         </div>
       </Router>

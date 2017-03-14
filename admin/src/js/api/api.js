@@ -2,6 +2,8 @@
 
 import {AuthAPIClient, APIError} from './base-api';
 
+import type { ErrorMap } from '../common/util';
+
 let apiClientInstance;
 export class FKApiClient extends AuthAPIClient {
   static setup(baseUrl: string, unauthorizedHandler: () => void): FKApiClient {
@@ -20,12 +22,25 @@ export class FKApiClient extends AuthAPIClient {
     return apiClientInstance;
   }
 
-  async signUp(params) {
-    await this.postForm('/api/user/sign-up', params)
+  async postFormWithJSONErrors(endpoint: string, values: Object): Promise<?ErrorMap> {
+    try {
+      await this.postForm(endpoint, values);
+      return null;
+    } catch (e) {
+      if (e instanceof APIError) {
+        return JSON.parse(e.body);
+      } else {
+        return { error: e.msg };
+      }
+    }
   }
 
-  async signIn(username, password) {
-    await this.postForm('/api/user/sign-in', { username, password })
+  signUp(email: string, username: string, password: string, invite: string): Promise<?ErrorMap> {
+    return this.postFormWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
+  }
+
+  signIn(username, password): Promise<?ErrorMap> {
+    return this.postFormWithJSONErrors('/api/user/sign-in', { username, password });
   }
 
   async signOut() {

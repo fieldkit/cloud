@@ -1,4 +1,5 @@
 // @flow
+import React from 'react';
 
 export class BaseError {
   name: string;
@@ -17,3 +18,9 @@ export class BaseError {
 }
 
 export type ErrorMap = { [key: string]: string[] };
+
+export function errorsFor(errors: ?ErrorMap, key: string) {
+  if (errors && errors[key]) {
+    return errors[key].map((error, i) =>  <p key={`errors-${key}-${i}`} className="error">{error}</p>);
+  }
+}
