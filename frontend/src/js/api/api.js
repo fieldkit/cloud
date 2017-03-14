@@ -107,5 +107,6 @@ class FKApiClient {
   }
 }
 
-const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+// const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+const hostname = 'https://fieldkit.org'
 export default new FKApiClient(hostname)
