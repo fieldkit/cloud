@@ -68,7 +68,7 @@ $baseline-height: 13px;
   margin: auto;
   @include for-tablet-portrait-down {
     width: calc(100% - #{$col-gutter}*2);
-  } 
+  }
 }
 
 //---------------------- COLOR -----------------------//
@@ -86,7 +86,7 @@ $font-sans: Helvetica, Arial, sans-serif;
 // Styles
 @mixin type-h1 {
   font-size: 36px;
-  line-height: 39px;
+  line-height: $baseline-height*4;
   font-family: $font-sans;
 
   @include for-phone-down {
@@ -95,8 +95,8 @@ $font-sans: Helvetica, Arial, sans-serif;
   } 
 }
 @mixin type-h2 {
-  font-size: 21px;
-  line-height: 26px;
+  font-size: 30px;
+  line-height: $baseline-height*3;
   font-family: $font-sans;
   font-weight: bold;
 
@@ -106,30 +106,32 @@ $font-sans: Helvetica, Arial, sans-serif;
   }
 }
 @mixin type-h3 {
-  font-size: 21px;
-  line-height: 26px;
+  font-size: 16px;
+  line-height: $baseline-height*2;
   font-family: $font-sans;
-  font-weight: 900;
+  // font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 @mixin type-h4 {
-  font-size: 21px;
-  line-height: 26px;
+  font-size: 16px;
+  line-height: $baseline-height*2;
   font-family: $font-sans;
-  font-weight: 900;
+  font-weight: bold;
 }
 @mixin type-intro {
   font-size: 16px;
-  line-height: 26px;
+  line-height: $baseline-height*2;
   font-family: $font-sans;
 }
 @mixin type-body {
   font-size: 16px;
-  line-height: 26px;
+  line-height: $baseline-height*1.5;
   font-family: $font-sans;
 }
 @mixin type-small {
-  font-size: 13px;
-  line-height: 16px;
+  font-size: 10px;
+  line-height: $baseline-height*1.5;
   font-family: $font-sans;
 }
 
