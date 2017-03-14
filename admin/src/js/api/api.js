@@ -39,8 +39,14 @@ export class FKApiClient extends AuthAPIClient {
     return this.postFormWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
   }
 
-  signIn(username, password): Promise<?ErrorMap> {
-    return this.postFormWithJSONErrors('/api/user/sign-in', { username, password });
+  async signIn(username, password): Promise<?ErrorMap> {
+    const errors = await this.postFormWithJSONErrors('/api/user/sign-in', { username, password });
+    if (errors) {
+      return errors;
+    } else {
+      this.onSignin();
+      return null;
+    }
   }
 
   async signOut() {

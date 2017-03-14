@@ -1,20 +1,39 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { FKApiClient } from './api/api';
-import '../css/App.css';
-
-import { Landing } from './components/Landing';
-import { Signin } from './components/Signin';
-import { Signup } from './components/Signup';
-
 import type { ErrorMap } from './common/util';
 
+import { Landing } from './components/Landing';
+import { Signin } from './components/unauth/Signin';
+import { Signup } from './components/unauth/Signup';
+import { Home } from './components/Home';
+
+import '../css/App.css';
+
+const PrivateRoute = ({ component, ...rest }) => (
+  <Route {...rest} render={props => (
+    FKApiClient.get().signedIn() ? (
+      React.createElement(component, props)
+    ) : (
+      <Redirect to={{
+        pathname: '/signin',
+        state: { from: props.location }
+      }}/>
+    )
+  )}/>
+)
+
 export class App extends Component {
+  state: {
+    redirectTo: ?string;
+  }
+
   constructor(props) {
     super(props);
+    this.state = { redirectTo: null };
 
     let API_HOST = 'https://fieldkit.org';
     if (process.env.NODE_ENV === 'development') {
@@ -24,33 +43,27 @@ export class App extends Component {
     FKApiClient.setup(API_HOST, this.onLogout.bind(this));
   }
 
+  async signOut() {
+    await FKApiClient.get().signOut();
+    // TODO: how to redirect?
+  }
+
   onLogout() {
-    // TODO: redirect
-    console.log('Logged out!');
-  }
-
-  requestSignUp(email: string, username: string, password: string, invite: string): Promise<?ErrorMap> {
-    // TODO: redirect on success
-    return FKApiClient.get().signUp(email, username, password, invite);
-  }
-
-  requestSignIn(username: string, password: string): Promise<?ErrorMap> {
-    // TODO: redirect on success
-    return FKApiClient.get().signIn(username, password);
+    // TODO: how to handle this?
   }
 
   render() {
     return (
       <Router>
-        <div>
-          <Route exact={true} path="/" component={Landing} />
-          <Route path="/signin" render={() =>
-            <Signin requestSignIn={this.requestSignIn.bind(this)} />
-          }/>
-        <Route path="/signup" render={() =>
-            <Signup requestSignUp={this.requestSignUp.bind(this)} />
-          }/>
-        </div>
+        <Switch>
+          <Route exact path="/" component={Landing} />
+
+          <Route exact path="/signin" component={Signin} />
+          <Route exact path="/signup" component={Signup} />
+          <Route exact path="/signout" render={() => this.signOut()} />
+
+          <PrivateRoute path="/app" component={Home} />
+        </Switch>
       </Router>
     );
   }
