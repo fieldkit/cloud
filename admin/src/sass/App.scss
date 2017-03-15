@@ -1,48 +1,48 @@
 .App {
-  text-align: center;
+	text-align: center;
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+	animation: App-logo-spin infinite 20s linear;
+	height: 80px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+	background-color: #222;
+	height: 150px;
+	padding: 20px;
+	color: white;
 }
 
 .App-intro {
-  font-size: large;
+	font-size: large;
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
 }
 
 //-------------------- RESPONSIVE --------------------//
 
 @mixin for-phone-down {
-  @media (max-width: 600px) { @content; }
+	@media (max-width: 600px) { @content; }
 }
 
 @mixin for-tablet-portrait-down {
-  @media (max-width: 900px) { @content; }
+	@media (max-width: 900px) { @content; }
 }
 
 @mixin for-tablet-landscape-down {
-  @media (max-width: 1200px) { @content; }
+	@media (max-width: 1200px) { @content; }
 }
 
 @mixin for-desktop-down {
-  @media (max-width: 1799px) { @content; }
+	@media (max-width: 1799px) { @content; }
 }
 
 @mixin for-big-desktop-only {
-  @media (min-width: 1800px) { @content; }
+	@media (min-width: 1800px) { @content; }
 }
 
 //---------------------- LAYOUT ----------------------//
@@ -51,11 +51,11 @@ $baseline-height: 13px;
 
 // Columns
 .column {
-  display: inline-block;
-  vertical-align: top;
-  &:not(:first-child) {
-    margin-left: $col-gutter;
-  }
+	display: inline-block;
+	vertical-align: top;
+	&:not(:first-child) {
+		margin-left: $col-gutter;
+	}
 }
 @mixin one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
 @mixin two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
@@ -64,17 +64,20 @@ $baseline-height: 13px;
 
 // Main 
 @mixin content-width {
-  width: 834px;
-  margin: auto;
-  @include for-tablet-portrait-down {
-    width: calc(100% - #{$col-gutter}*2);
-  }
+	width: 834px;
+	margin: auto;
+	@include for-tablet-portrait-down {
+		width: calc(100% - #{$col-gutter}*2);
+	}
 }
 
 //---------------------- COLOR -----------------------//
-$color-1: #263238;
-$color-2: #37474F;
-$color-3: #455A64;
+$color-1: rgb(194, 38, 0);
+$color-2: rgb(223, 37, 13);
+$color-3: rgb(236, 17, 52);
+$color-4: rgb(249, 189, 82);
+$color-5: rgb(255, 229, 169);
+$color-6: rgb(223, 223, 107);
 
 
 //-------------------- TYPOGRAPHY --------------------//
@@ -85,55 +88,108 @@ $font-sans: Helvetica, Arial, sans-serif;
 
 // Styles
 @mixin type-h1 {
-  font-size: 36px;
-  line-height: $baseline-height*4;
-  font-family: $font-sans;
+	font-size: 36px;
+	line-height: $baseline-height*4;
+	font-family: $font-sans;
 
-  @include for-phone-down {
-    // font-size: 21px;
-    // line-height: 26px;          
-  } 
+	@include for-phone-down {
+		// font-size: 21px;
+		// line-height: 26px;          
+	} 
 }
+
 @mixin type-h2 {
-  font-size: 30px;
-  line-height: $baseline-height*3;
-  font-family: $font-sans;
-  font-weight: bold;
+	font-size: 30px;
+	line-height: $baseline-height*3;
+	font-family: $font-sans;
+	font-weight: bold;
 
-  @include for-phone-down {
-    // font-size: 16px;
-    // line-height: 21px;
-  }
+	@include for-phone-down {
+		// font-size: 16px;
+		// line-height: 21px;
+	}
 }
+
 @mixin type-h3 {
-  font-size: 16px;
-  line-height: $baseline-height*2;
-  font-family: $font-sans;
-  // font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+	font-size: 16px;
+	line-height: $baseline-height*2;
+	font-family: $font-sans;
+	// font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 2px;
 }
+
 @mixin type-h4 {
-  font-size: 16px;
-  line-height: $baseline-height*2;
-  font-family: $font-sans;
-  font-weight: bold;
+	font-size: 16px;
+	line-height: $baseline-height*2;
+	font-family: $font-sans;
+	font-weight: bold;
 }
+
 @mixin type-intro {
-  font-size: 16px;
-  line-height: $baseline-height*2;
-  font-family: $font-sans;
+	font-size: 16px;
+	line-height: $baseline-height*2;
+	font-family: $font-sans;
 }
+
 @mixin type-body {
-  font-size: 16px;
-  line-height: $baseline-height*1.5;
-  font-family: $font-sans;
+	font-size: 16px;
+	line-height: $baseline-height*1.5;
+	font-family: $font-sans;
 }
+
 @mixin type-small {
-  font-size: 10px;
-  line-height: $baseline-height*1.5;
-  font-family: $font-sans;
+	font-size: 10px;
+	line-height: $baseline-height*1.5;
+	font-family: $font-sans;
+}
+
+@mixin type-button {
+	font-size: 10px;
+	line-height: $baseline-height*2.5;
+	font-family: $font-sans;
+	font-weight: bold;
+	text-transform: uppercase;
 }
 
 // Reseting presets
 p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
+
+
+//-------------------- INTERACTION --------------------//
+@mixin button-primary {
+	color: white;
+	background-color: $color-2;
+	border-radius: 3px;
+	@include type-button;
+
+	&:hover {
+
+	}
+
+	&:active {
+
+	}
+
+	&:disabled {
+		background-color: $color-6;
+	}
+}
+
+@mixin button-secondary {
+	color: $color-2;
+	background-color: white;
+	border: 2px solid $color-2; 
+	border-radius: 3px;
+	@include type-button;
+
+	&:hover {
+
+	}
+	&:active {
+		
+	}
+	&:disabled {
+		
+	}	
+}
