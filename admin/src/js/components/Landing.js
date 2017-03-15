@@ -36,12 +36,6 @@ export class Landing extends Component {
               </div>
             </div>
           </div>
-
-          <div className="slide">
-            <div className="content">
-
-            </div>
-          </div>
         </div>
 
         <footer>
