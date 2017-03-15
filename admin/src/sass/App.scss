@@ -1,10 +1,3 @@
-/*---------- GLOBAL ----------*/
-* {
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;         /* Opera/IE 8+ */;
-}
-
 @import 'utils/reset';
 
 .App {
@@ -58,7 +51,7 @@
 $col-gutter: 30px;
 $baseline-height: 13px;
 $elements-margin: 13px;
-$elements-padding: 12px;
+$elements-padding: 13px;
 
 // Columns
 .column {
@@ -216,11 +209,13 @@ $font-sans: Helvetica, Arial, sans-serif;
 
 @mixin form {
 	display: inline-block;
+	padding: 0 $elements-padding;
 	color: $gray-2;
 	background-color: white;
-	border: 2px solid $gray-2; 
+	border: 1px solid $gray-2; 
 	border-radius: 3px;
 	@include type-body;
+	line-height: $baseline-height*2.5;
 
 	&:not(:first-child) {
 		margin-left: $elements-margin;
@@ -231,8 +226,12 @@ $font-sans: Helvetica, Arial, sans-serif;
 	}
 
 	&:disabled {
+		// color: $gray-3;
+	}
+
+	&::placeholder {
 		color: $gray-3;
-	}		
+	}
 }
 
 //-------------------- ALIGN --------------------//
@@ -256,6 +255,16 @@ $font-sans: Helvetica, Arial, sans-serif;
 }
 
 //-------------------- STYLES --------------------//
+* {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */;
+}
+
+*:focus {
+	outline: none;
+}
+
 html, body {
 	color: $gray-2;
 	@include type-body;
@@ -265,6 +274,6 @@ input[type="submit"], button {
 	@include button();
 }
 
-input[type="text"], input[type="email"] {
+input[type="text"], input[type="email"], input[type="password"] {
 	@include form;
 }
