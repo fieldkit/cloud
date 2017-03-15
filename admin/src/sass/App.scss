@@ -1,3 +1,12 @@
+/*---------- GLOBAL ----------*/
+* {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */;
+}
+
+@import 'utils/reset';
+
 .App {
 	text-align: center;
 }
@@ -48,6 +57,8 @@
 //---------------------- LAYOUT ----------------------//
 $col-gutter: 30px;
 $baseline-height: 13px;
+$elements-margin: 13px;
+$elements-padding: 12px;
 
 // Columns
 .column {
@@ -152,67 +163,108 @@ $font-sans: Helvetica, Arial, sans-serif;
 	font-family: $font-sans;
 	font-weight: bold;
 	text-transform: uppercase;
+	letter-spacing: 1px;
 }
-
-// Reseting presets
-p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
 
 
 //-------------------- INTERACTION --------------------//
-@mixin button-primary {
-	color: white;
-	background-color: $color-2;
+@mixin button ($primary: true){
+	display: inline-block;
+	padding: 0 $elements-padding;
 	border-radius: 3px;
+	border: 2px solid $color-2;
 	@include type-button;
 
-	&:hover {
-		background-color: $color-1;
+	&:not(:first-child) {
+		margin-left: $elements-margin;
 	}
 
-	&:active {
+	@if $primary {
+		color: white;
+		background-color: $color-2;
+		border-style: none;
 
-	}
+		&:hover {
+			background-color: $color-1;
+		}
 
-	&:disabled {
-		background-color: $color-6;
-	}
-}
+		&:active {
 
-@mixin button-secondary {
-	color: $color-2;
-	background-color: white;
-	border: 2px solid $color-2; 
-	border-radius: 3px;
-	@include type-button;
+		}
 
-	&:hover {
-		border-color: $color-1;
+		&:disabled {
+			background-color: $color-6;
+		}
+
+	} @else {
+		color: $color-2;
+		background-color: white;
+
+		&:hover {
+			border-color: $color-1;
+		}
+
+		&:active {
+			
+		}
+
+		&:disabled {
+			
+		}
 	}
-	&:active {
-		
-	}
-	&:disabled {
-		
-	}	
 }
 
 @mixin form {
+	display: inline-block;
 	color: $gray-2;
 	background-color: white;
 	border: 2px solid $gray-2; 
 	border-radius: 3px;
-	@include type-button;
+	@include type-body;
+
+	&:not(:first-child) {
+		margin-left: $elements-margin;
+	}
 
 	&:focus {
 		border-color: $gray-1;
 	}
+
 	&:disabled {
 		color: $gray-3;
 	}		
+}
+
+//-------------------- ALIGN --------------------//
+.alignXY {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.alignX {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.alignY {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
 //-------------------- STYLES --------------------//
 html, body {
 	color: $gray-2;
 	@include type-body;
+}
+
+input[type="submit"], button {
+	@include button();
+}
+
+input[type="text"], input[type="email"] {
+	@include form;
 }
