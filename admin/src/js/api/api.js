@@ -53,9 +53,9 @@ export class FKApiClient extends AuthAPIClient {
     return apiClientInstance;
   }
 
-  async execWithJSONErrors(cb: () => Promise<any>, parseJSON = false): Promise<FKAPIResponse> {
+  async execWithJSONErrors(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse> {
     try {
-      const res = await cb();
+      const res = await p;
       if (res) {
         if (parseJSON) {
           return { type: 'ok', payload: JSON.parse(res) };
@@ -75,15 +75,15 @@ export class FKApiClient extends AuthAPIClient {
   }
 
   postFormWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(() => this.postForm(endpoint, values), true);
+    return this.execWithJSONErrors(this.postForm(endpoint, values), true);
   }
 
   postJSONWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(() => this.postJSON(endpoint, values));
+    return this.execWithJSONErrors(this.postJSON(endpoint, values));
   }
 
   getWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(() => this.getJSON(endpoint, values));
+    return this.execWithJSONErrors(this.getJSON(endpoint, values));
   }
 
   signUp(email: string, username: string, password: string, invite: string): Promise<FKAPIResponse> {
