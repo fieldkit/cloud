@@ -116,16 +116,15 @@ export class FKApiClient extends AuthAPIClient {
   }
 
   createProject(name, description): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors('/api/projects/add', { name, description })
+    return this.postFormWithJSONErrors('/api/projects/add', { name, description })
   }
 
   getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse> {
     return this.getWithJSONErrors(`/api/project/${projectSlug}/expeditions`)
   }
 
-  async postGeneralSettings (projectID, name) {
-    const res = await this.postJSON(`/api/project/${projectID}/expeditions/add`, { name })
-    return res
+  async createExpedition(projectID: string, name: string, description: string): Promise<FKAPIResponse> {
+    return this.postFormWithJSONErrors(`/api/project/${projectID}/expeditions/add`, { name, description })
   }
 
   async postInputs (projectID, expeditionID, name) {

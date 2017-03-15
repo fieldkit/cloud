@@ -34,8 +34,12 @@ export class Project extends Component {
     this.loadData();
   }
 
+  projectSlug() {
+    return this.props.match.params.projectSlug;
+  }
+
   async loadData() {
-    const projectSlug = this.props.match.params.projectSlug;
+    const projectSlug = this.projectSlug();
 
     const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
     if (projectRes.type === 'ok') {
@@ -49,7 +53,23 @@ export class Project extends Component {
   }
 
   async onExpeditionCreate(name: string, description: string) {
+    const { project } = this.state;
+    if (!project) {
+      // TODO: handle error
+      return;
+    }
 
+    // TODO: swap this in when the backend is ready
+    // const projectId = project.id;
+    const projectId = this.projectSlug();
+
+    const expeditionRes = await FKApiClient.get().createExpedition(projectId, name, description);
+    if (expeditionRes.type === 'ok') {
+      await this.loadData();
+      this.props.history.push(`/projects/${this.projectSlug()}`);
+    } else {
+      return expeditionRes.errors;
+    }
   }
 
   async onProjectSave(name: string, description: string) {
@@ -66,7 +86,7 @@ export class Project extends Component {
 
   render () {
     const { project } = this.state;
-    const projectSlug = this.props.match.params.projectSlug;
+    const projectSlug = this.projectSlug();
 
     return (
       <div className="project">
