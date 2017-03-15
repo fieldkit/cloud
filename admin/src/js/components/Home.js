@@ -10,7 +10,6 @@ import { FKApiClient } from '../api/api';
 import '../../css/home.css'
 
 type Props = {
-  newProjectModal?: boolean;
   match: Object;
   location: Object;
   history: Object;
@@ -53,9 +52,8 @@ export class Home extends Component {
     return (
       <div className="main">
         <Route path="/new-project" render={() =>
-          <ReactModal
-            isOpen={true}
-            contentLabel="New project form">
+          <ReactModal isOpen={true} contentLabel="New project form">
+            <h1>Create a new project</h1>
             <ProjectForm
               onCancel={() => this.props.history.push("/")}
               onSave={this.onProjectCreate.bind(this)} />
@@ -63,7 +61,7 @@ export class Home extends Component {
 
         <div id="projects">
         { this.state.projects.map((p, i) =>
-          <div key={`project-${i}`} className="project">
+          <div key={`project-${i}`} className="project-item">
             {JSON.stringify(p)}
           </div> )}
         { this.state.projects.length == 0 &&

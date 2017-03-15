@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import slug from 'slug';
 
 export class BaseError {
   name: string;
@@ -23,4 +24,8 @@ export function errorsFor(errors: ?ErrorMap, key: string) {
   if (errors && errors[key]) {
     return errors[key].map((error, i) =>  <p key={`errors-${key}-${i}`} className="error">{error}</p>);
   }
+}
+
+export function slugify(input: string): string {
+  return slug(input).toLowerCase();
 }

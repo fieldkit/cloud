@@ -8,7 +8,9 @@ import { FKApiClient } from './api/api';
 import { Landing } from './components/Landing';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
+
 import { Home } from './components/Home';
+import { Project } from './components/Project';
 
 import '../css/App.css';
 
@@ -56,6 +58,7 @@ export class App extends Component {
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
 
+          <PrivateRoute path="/projects/:projectSlug" component={Project} />
           <PrivateRoute path="/" component={Home} />
         </Switch>
       </Router>

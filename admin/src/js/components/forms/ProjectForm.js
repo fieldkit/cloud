@@ -1,15 +1,13 @@
 // @flow weak
 
 import React, { Component } from 'react'
-import slug from 'slug';
 
 import { FormContainer } from '../containers/FormContainer';
-import { errorsFor } from '../../common/util';
+import { errorsFor, slugify } from '../../common/util';
 import type { ErrorMap } from '../../common/util';
 
 type Props = {
   name?: string,
-  path?: string,
   description?: string,
 
   cancelText?: string;
@@ -30,13 +28,20 @@ export class ProjectForm extends Component {
 
   constructor(props: Props) {
     super(props)
+    const name = this.props.name || '';
     this.state = {
-      name: this.props.name || '',
-      path: this.props.path || '',
+      name,
+      path: slugify(name),
       description: this.props.description || '',
       saveDisabled: false,
       errors: null
     }
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    const name = nextProps.name || '';
+    const description = nextProps.description || '';
+    this.setState({ name, path: slugify(name), description });
   }
 
   async save() {
@@ -50,7 +55,7 @@ export class ProjectForm extends Component {
     const v = event.target.value;
     this.setState({
       name: v,
-      path: slug(v).toLowerCase()
+      path: slugify(v)
     });
   }
 
@@ -70,10 +75,8 @@ export class ProjectForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <h1>Create a new project</h1>
-
         <div className="form_group">
-          <label htmlFor="name">Pick a name for your project:</label>
+          <label htmlFor="name">Name:</label>
           <input type="text" name="name" className='lg' value={this.state.name} onChange={this.handleNameChange.bind(this)} />
           { errorsFor(this.state.errors, 'name') }
         </div>
@@ -88,7 +91,7 @@ export class ProjectForm extends Component {
         </div>
 
         <div className="form_group">
-          <label htmlFor="description">Enter a description for your project:</label>
+          <label htmlFor="description">Description:</label>
           <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'description') }
         </div>

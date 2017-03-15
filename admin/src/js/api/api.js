@@ -53,11 +53,15 @@ export class FKApiClient extends AuthAPIClient {
     return apiClientInstance;
   }
 
-  async postWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
+  async execWithJSONErrors(cb: () => Promise<any>, parseJSON = false): Promise<FKAPIResponse> {
     try {
-      const res = await this.postForm(endpoint, values);
+      const res = await cb();
       if (res) {
-        return { type: 'ok', payload: JSON.parse(res) };
+        if (parseJSON) {
+          return { type: 'ok', payload: JSON.parse(res) };
+        } else {
+          return { type: 'ok', payload: res };
+        }
       } else {
         return { type: 'ok' }
       }
@@ -70,12 +74,24 @@ export class FKApiClient extends AuthAPIClient {
     }
   }
 
+  postFormWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
+    return this.execWithJSONErrors(() => this.postForm(endpoint, values), true);
+  }
+
+  postJSONWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
+    return this.execWithJSONErrors(() => this.postJSON(endpoint, values));
+  }
+
+  getWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
+    return this.execWithJSONErrors(() => this.getJSON(endpoint, values));
+  }
+
   signUp(email: string, username: string, password: string, invite: string): Promise<FKAPIResponse> {
-    return this.postWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
+    return this.postFormWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
   }
 
   async signIn(username, password): Promise<FKAPIResponse> {
-    const response = await this.postWithJSONErrors('/api/user/sign-in', { username, password });
+    const response = await this.postFormWithJSONErrors('/api/user/sign-in', { username, password });
     if (response.type === 'ok') {
       this.onSignin();
     }
@@ -88,20 +104,23 @@ export class FKApiClient extends AuthAPIClient {
   }
 
   getUser(): Promise<FKAPIResponse> {
-    return this.postWithJSONErrors('/api/user/current')
+    return this.getWithJSONErrors('/api/user/current')
   }
 
   getProjects(): Promise<FKAPIResponse> {
-    return this.postWithJSONErrors('/api/projects')
+    return this.getWithJSONErrors('/api/projects')
+  }
+
+  getProjectBySlug(slug: string): Promise<FKAPIResponse> {
+    return this.getWithJSONErrors(`/api/project/${slug}`)
   }
 
   createProject(name, description): Promise<FKAPIResponse> {
-    return this.postWithJSONErrors('/api/projects/add', { name, description })
+    return this.postJSONWithJSONErrors('/api/projects/add', { name, description })
   }
 
-  async getExpeditions (projectID) {
-    const res = await this.getJSON(`/api/project/${projectID}/expeditions`)
-    return res
+  getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse> {
+    return this.getWithJSONErrors(`/api/project/${projectSlug}/expeditions`)
   }
 
   async postGeneralSettings (projectID, name) {
