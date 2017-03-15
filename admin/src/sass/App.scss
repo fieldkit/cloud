@@ -78,7 +78,9 @@ $color-3: rgb(236, 17, 52);
 $color-4: rgb(249, 189, 82);
 $color-5: rgb(255, 229, 169);
 $color-6: rgb(223, 223, 107);
-
+$gray-1: rgb(50, 50, 50);
+$gray-2: rgb(74, 74, 74);
+$gray-3: rgb(170, 170, 170);
 
 //-------------------- TYPOGRAPHY --------------------//
 
@@ -164,7 +166,7 @@ p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
 	@include type-button;
 
 	&:hover {
-
+		background-color: $color-1;
 	}
 
 	&:active {
@@ -184,7 +186,7 @@ p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
 	@include type-button;
 
 	&:hover {
-
+		border-color: $color-1;
 	}
 	&:active {
 		
@@ -192,4 +194,25 @@ p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; border: 0; }
 	&:disabled {
 		
 	}	
+}
+
+@mixin form {
+	color: $gray-2;
+	background-color: white;
+	border: 2px solid $gray-2; 
+	border-radius: 3px;
+	@include type-button;
+
+	&:focus {
+		border-color: $gray-1;
+	}
+	&:disabled {
+		color: $gray-3;
+	}		
+}
+
+//-------------------- STYLES --------------------//
+html, body {
+	color: $gray-2;
+	@include type-body;
 }
