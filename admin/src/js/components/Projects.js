@@ -51,7 +51,9 @@ export class Projects extends Component {
 
   render () {
     return (
-      <MainContainer>
+      <MainContainer
+        breadcrumbs={[{ url: '/', text: 'Projects'}]}
+      >
         <div className="projects">
           <Route path="/new-project" render={() =>
             <ReactModal isOpen={true} contentLabel="New project form">
@@ -66,7 +68,7 @@ export class Projects extends Component {
             <div key={`project-${i}`} className="project-item">
               <Link to={`/projects/${p.slug}`}>{p.name}</Link>
             </div> )}
-          { this.state.projects.length == 0 &&
+          { this.state.projects.length === 0 &&
             <span className="empty">No projects!</span> }
           </div>
 
