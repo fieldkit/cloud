@@ -7,6 +7,7 @@ import { errorsFor, slugify } from '../../common/util';
 import type { ErrorMap } from '../../common/util';
 
 type Props = {
+  projectSlug: string,
   name?: string,
   description?: string,
 
@@ -16,7 +17,7 @@ type Props = {
   onSave: (n: string, d: string) => Promise<?ErrorMap>;
 }
 
-export class ProjectForm extends Component {
+export class ProjectExpeditionForm extends Component {
   props: Props;
   state: {
     name: string,
@@ -27,12 +28,13 @@ export class ProjectForm extends Component {
   };
 
   constructor(props: Props) {
-    super(props)
-    const name = this.props.name || '';
+    super(props);
+    const name = props.name || '';
+    const description = props.description || '';
     this.state = {
       name,
       path: slugify(name),
-      description: this.props.description || '',
+      description,
       saveDisabled: false,
       errors: null
     }
@@ -51,7 +53,7 @@ export class ProjectForm extends Component {
     }
   }
 
-  handleNameChange(event) {
+  handleExpeditionNameChange(event) {
     const v = event.target.value;
     this.setState({
       name: v,
@@ -64,10 +66,12 @@ export class ProjectForm extends Component {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    this.setState({ [name]: value });
+    this.setState({
+      [name]: value
+    });
   }
 
-  render() {
+  render () {
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -75,27 +79,21 @@ export class ProjectForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <div className="form_group">
-          <label htmlFor="name">Name:</label>
-          <input type="text" name="name" className='lg' value={this.state.name} onChange={this.handleNameChange.bind(this)} />
+        <div className="form-group">
+          <label htmlFor="name">Pick a name for this new expedition:</label>
+          <input type="text" name="name" className="text_lg" value={this.state.name} onChange={this.handleExpeditionNameChange.bind(this)} />
+          <div className="hint">You can change this later if you want.</div>
           { errorsFor(this.state.errors, 'name') }
         </div>
 
         <div className="url-preview">
-          <p className="label">Your project will be available at the following address:</p>
+          <p className="label">Your expedition will be available at the following address:</p>
           <p className="url">
             {/* TODO: replace with something that handles alternative domains */}
-            {`https://${this.state.path}.fieldkit.org/`}
+            {`https://${this.props.projectSlug}.fieldkit.org/${this.state.path}`}
           </p>
-          { errorsFor(this.state.errors, 'path') }
-        </div>
-
-        <div className="form_group">
-          <label htmlFor="description">Description:</label>
-          <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(this.state.errors, 'description') }
         </div>
       </FormContainer>
-    );
+    )
   }
 }

@@ -4,12 +4,13 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { FKApiClient } from './api/api';
-import type { ErrorMap } from './common/util';
 
 import { Landing } from './components/Landing';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
-import { Home } from './components/Home';
+
+import { Projects } from './components/Projects';
+import { Project } from './components/Project';
 
 import '../css/App.css';
 
@@ -19,7 +20,7 @@ const PrivateRoute = ({ component, ...rest }) => (
       React.createElement(component, props)
     ) : (
       <Redirect to={{
-        pathname: '/signin',
+        pathname: '/landing',
         state: { from: props.location }
       }}/>
     )
@@ -27,42 +28,38 @@ const PrivateRoute = ({ component, ...rest }) => (
 )
 
 export class App extends Component {
-  state: {
-    redirectTo: ?string;
-  }
-
   constructor(props) {
     super(props);
-    this.state = { redirectTo: null };
 
     let API_HOST = 'https://fieldkit.org';
     if (process.env.NODE_ENV === 'development') {
       API_HOST = 'http://localhost:8080';
     }
 
-    FKApiClient.setup(API_HOST, this.onLogout.bind(this));
+    FKApiClient.setup(API_HOST, this.onUnauthorizedAccess.bind(this));
   }
 
-  async signOut() {
-    await FKApiClient.get().signOut();
-    // TODO: how to redirect?
+  signOut() {
+    FKApiClient.get().signOut();
+    return <Redirect to="/landing" />;
   }
 
-  onLogout() {
-    // TODO: how to handle this?
+  onUnauthorizedAccess() {
+    this.forceUpdate();
   }
 
   render() {
     return (
       <Router>
         <Switch>
-          <Route exact path="/" component={Landing} />
+          <Route exact path="/landing" component={Landing} />
 
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
 
-          <PrivateRoute path="/app" component={Home} />
+          <PrivateRoute path="/projects/:projectSlug" component={Project} />
+          <PrivateRoute path="/" component={Projects} />
         </Switch>
       </Router>
     );

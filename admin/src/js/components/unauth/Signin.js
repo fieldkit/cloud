@@ -33,20 +33,20 @@ export class Signin extends Component {
 
   async onSubmit(event) {
     event.preventDefault()
-    const errors = await FKApiClient.get().signIn(this.refs.username.value, this.refs.password.value);
-    if (errors) {
-      this.setState({ errors });
+    const response = await FKApiClient.get().signIn(this.refs.username.value, this.refs.password.value);
+    if (response.type === 'err') {
+      this.setState({ errors: response.errors });
     } else {
-      this.setState({ errors: null, redirectToReferrer: true });
+      this.setState({ redirectToReferrer: true });
     }
   }
 
   render() {
     if (this.state.redirectToReferrer) {
       let from = this.props.location.state || '/';
-      if (from === '/signin') { from = '/app' };
+      if (from === '/signin') { from = '/' };
 
-      return <Redirect to={from}/>;
+      return <Redirect to={from} />;
     }
 
     return (

@@ -13,12 +13,6 @@ docker run --rm --name fieldkit-build -v `pwd`/build:/build fieldkit-build cp /g
 
 cp -r build/fieldkit docker/
 
-./admin/build.bash
-cp -r admin/build docker/admin
-
-./frontend/build.bash
-cp -r frontend/build docker/frontend
-
 cd docker
 docker build -t ocrnyc/fieldkit .
 docker push ocrnyc/fieldkit

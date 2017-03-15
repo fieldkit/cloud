@@ -1,6 +1,7 @@
 .git
 .gitignore
 admin/
+admin-archive/
 build
 build.bash
 docker-compose.yml
