@@ -62,7 +62,7 @@ export class Home extends Component {
         <div id="projects">
         { this.state.projects.map((p, i) =>
           <div key={`project-${i}`} className="project-item">
-            {JSON.stringify(p)}
+            <Link to={`/projects/${p.slug}`}>{p.name}</Link>
           </div> )}
         { this.state.projects.length == 0 &&
           <span className="empty">No projects!</span> }
