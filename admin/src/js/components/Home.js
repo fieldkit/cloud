@@ -5,6 +5,7 @@ import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
 import { ProjectForm } from './forms/ProjectForm';
+import { FKApiClient } from '../api/api';
 
 import '../../css/home.css'
 
@@ -17,25 +18,59 @@ type Props = {
 
 export class Home extends Component {
   props: Props;
+  state: {
+    projects: Object[]
+  }
 
-  onSave() {
-    // TODO: really save
-    this.props.history.push("/app")
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      projects: []
+    };
+
+    this.loadData();
+  }
+
+  async loadData() {
+    const projectsRes = await FKApiClient.get().getProjects();
+    if (projectsRes.type === 'ok') {
+      this.setState({ projects: projectsRes.payload })
+    }
+  }
+
+  async onProjectCreate(name: string, description: string) {
+    const project = await FKApiClient.get().createProject(name, description);
+    if (project.type === 'ok') {
+      await this.loadData();
+      this.props.history.push("/");
+    } else {
+      return project.errors;
+    }
   }
 
   render () {
     return (
       <div className="main">
-        <Route path="/app/new-project" render={() =>
+        <Route path="/new-project" render={() =>
           <ReactModal
             isOpen={true}
-            contentLabel="Minimal Modal Example">
+            contentLabel="New project form">
             <ProjectForm
-              onCancel={() => this.props.history.push("/app")}
-              onSave={this.onSave.bind(this)} />
+              onCancel={() => this.props.history.push("/")}
+              onSave={this.onProjectCreate.bind(this)} />
           </ReactModal> } />
 
-        <Link to="/app/new-project">Show new project modal</Link>
+        <div id="projects">
+        { this.state.projects.map((p, i) =>
+          <div key={`project-${i}`} className="project">
+            {JSON.stringify(p)}
+          </div> )}
+        { this.state.projects.length == 0 &&
+          <span className="empty">No projects!</span> }
+        </div>
+
+        <Link to="/new-project">Show new project modal</Link>
       </div>
     )
   }

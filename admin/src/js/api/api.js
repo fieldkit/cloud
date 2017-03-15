@@ -4,14 +4,45 @@ import {AuthAPIClient, APIError} from './base-api';
 
 import type { ErrorMap } from '../common/util';
 
+export type FKAPIResponse = {
+  type: 'ok' | 'err';
+  payload?: any;
+  errors?: ErrorMap;
+  raw?: string;
+}
+
 let apiClientInstance;
 export class FKApiClient extends AuthAPIClient {
-  static setup(baseUrl: string, unauthorizedHandler: () => void): FKApiClient {
+  signinCb: ?() => void;
+  signoutCb: ?() => void;
+
+  static setup(
+    baseUrl: string,
+    unauthorizedHandler: () => void,
+    { onSignin, onSignout }: { onSignin?: () => void, onSignout?: () => void } = {}
+  ): FKApiClient
+  {
     if (!apiClientInstance) {
       apiClientInstance = new FKApiClient(baseUrl, unauthorizedHandler);
+      apiClientInstance.signinCb = onSignin;
+      apiClientInstance.signoutCb = onSignout;
     }
 
     return apiClientInstance;
+  }
+
+  onSignin() {
+    super.onSignin();
+    if (this.signinCb) {
+      this.signinCb();
+    }
+  }
+
+  onSignout() {
+    super.onSignout();
+    if (this.signoutCb) {
+      this.signoutCb();
+    }
   }
 
   static get(): FKApiClient {
@@ -22,51 +53,50 @@ export class FKApiClient extends AuthAPIClient {
     return apiClientInstance;
   }
 
-  async postFormWithJSONErrors(endpoint: string, values: Object): Promise<?ErrorMap> {
+  async postWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
     try {
-      await this.postForm(endpoint, values);
-      return null;
+      const res = await this.postForm(endpoint, values);
+      if (res) {
+        return { type: 'ok', payload: JSON.parse(res) };
+      } else {
+        return { type: 'ok' }
+      }
     } catch (e) {
       if (e instanceof APIError) {
-        return JSON.parse(e.body);
+        return { type: 'err', errors: JSON.parse(e.body) };
       } else {
-        return { error: e.msg };
+        return { type: 'err', raw: e.body };
       }
     }
   }
 
-  signUp(email: string, username: string, password: string, invite: string): Promise<?ErrorMap> {
-    return this.postFormWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
+  signUp(email: string, username: string, password: string, invite: string): Promise<FKAPIResponse> {
+    return this.postWithJSONErrors('/api/user/sign-up', { email, username, password, invite });
   }
 
-  async signIn(username, password): Promise<?ErrorMap> {
-    const errors = await this.postFormWithJSONErrors('/api/user/sign-in', { username, password });
-    if (errors) {
-      return errors;
-    } else {
+  async signIn(username, password): Promise<FKAPIResponse> {
+    const response = await this.postWithJSONErrors('/api/user/sign-in', { username, password });
+    if (response.type === 'ok') {
       this.onSignin();
-      return null;
     }
+    return response;
   }
 
-  async signOut() {
+  async signOut(): Promise<void> {
     await this.postForm('/api/user/sign-out')
-    this.onSignout()
+    this.onSignout();
   }
 
-  async getUser() {
-    const res = await this.postJSON('/api/user/current')
-    return res
+  getUser(): Promise<FKAPIResponse> {
+    return this.postWithJSONErrors('/api/user/current')
   }
 
-  async getProjects () {
-    const res = await this.postJSON('/api/projects')
-    return res
+  getProjects(): Promise<FKAPIResponse> {
+    return this.postWithJSONErrors('/api/projects')
   }
 
-  async createProjects (name) {
-    const res = await this.postJSON('/api/projects/add', { name })
-    return res
+  createProject(name, description): Promise<FKAPIResponse> {
+    return this.postWithJSONErrors('/api/projects/add', { name, description })
   }
 
   async getExpeditions (projectID) {

@@ -15,7 +15,7 @@ type Props = {
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (n: string, p: string, d: string) => Promise<?ErrorMap>;
+  onSave: (n: string, d: string) => Promise<?ErrorMap>;
 }
 
 export class ProjectForm extends Component {
@@ -40,11 +40,7 @@ export class ProjectForm extends Component {
   }
 
   async save() {
-    const errors = await this.props.onSave(
-      this.state.name,
-      this.state.path,
-      this.state.description
-    );
+    const errors = await this.props.onSave(this.state.name, this.state.description);
     if (errors) {
       this.setState({ errors });
     }
@@ -85,17 +81,14 @@ export class ProjectForm extends Component {
         <div className="url-preview">
           <p className="label">Your project will be available at the following address:</p>
           <p className="url">
-            {/*
-              TODO: replace with something that handles alternative domains
-              TODO: handle the ability to change this
-            */}
+            {/* TODO: replace with something that handles alternative domains */}
             {`https://${this.state.path}.fieldkit.org/`}
           </p>
           { errorsFor(this.state.errors, 'path') }
         </div>
 
         <div className="form_group">
-          <label htmlFor="description">Pick a name for your project:</label>
+          <label htmlFor="description">Enter a description for your project:</label>
           <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'description') }
         </div>

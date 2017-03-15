@@ -27,22 +27,22 @@ export class Signup extends Component {
 
   async onSubmit(event) {
     event.preventDefault()
-    const errors = await FKApiClient.get().signUp(
+    const response = await FKApiClient.get().signUp(
       this.refs.email.value,
       this.refs.username.value,
       this.refs.password.value,
       this.refs.invite.value
     );
-    if (errors) {
-      this.setState({ errors });
+    if (response.type === 'err') {
+      this.setState({ errors: response.errors });
     } else {
-      this.setState({ errors: null, redirectToApp: true });
+      this.setState({ redirectToApp: true });
     }
   }
 
   render() {
     if (this.state.redirectToApp) {
-      return <Redirect to="/app"/>;
+      return <Redirect to="/" />;
     }
 
     return (
