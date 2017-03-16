@@ -75,8 +75,8 @@ export class ProjectForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <div className="form_group">
-          <label htmlFor="name">Name:</label>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
           <input type="text" name="name" className='lg' value={this.state.name} onChange={this.handleNameChange.bind(this)} />
           { errorsFor(this.state.errors, 'name') }
         </div>
@@ -90,8 +90,8 @@ export class ProjectForm extends Component {
           { errorsFor(this.state.errors, 'path') }
         </div>
 
-        <div className="form_group">
-          <label htmlFor="description">Description:</label>
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
           <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'description') }
         </div>

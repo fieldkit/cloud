@@ -13,6 +13,7 @@ import { Projects } from './components/Projects';
 import { Project } from './components/Project';
 
 import { Expedition } from './components/Expedition';
+import { Teams } from './components/Teams';
 
 import '../css/App.css';
 
@@ -54,8 +55,8 @@ export class App extends Component {
     return (
       <Router>
         <Switch>
+          <Route exact path="/teams" component={Teams} />        
           <Route exact path="/landing" component={Landing} />
-
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />

@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
-import ReactModal from 'react-modal';
 
 import { MainContainer } from './containers/MainContainer';
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
@@ -35,6 +34,7 @@ export class Expedition extends Component {
 
 	expeditionSlug() {
 		return this.props.match.params.expeditionSlug;
+		this.props.match
 	}
 
 	projectSlug() {
@@ -77,11 +77,13 @@ export class Expedition extends Component {
 								]}
 			>
 				<div className="expedition">
-				<ProjectExpeditionForm 
-					name={expedition ? expedition.name : undefined}
-					description={expedition ? expedition.description : undefined}
-					onSave={this.onExpeditionSave.bind(this)}
-				/>
+					<h1>Expedition Settings</h1>
+					<ProjectExpeditionForm 
+						name={expedition ? expedition.name : undefined}
+						projectSlug={projectSlug}
+						description={expedition ? expedition.description : undefined}
+						onSave={this.onExpeditionSave.bind(this)}
+					/>
 				</div>
 			</MainContainer>
 		)

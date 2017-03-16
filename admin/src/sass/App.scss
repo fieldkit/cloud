@@ -25,8 +25,8 @@
 //---------------------- LAYOUT ----------------------//
 $col-gutter: 30px;
 $baseline-height: 13px;
-$elements-margin: 13px;
-$elements-padding: 13px;
+$elements-margin: $baseline-height;
+$elements-padding: $baseline-height;
 
 // Columns
 .column {
@@ -72,6 +72,7 @@ $font-sans: Helvetica, Arial, sans-serif;
 	font-size: 36px;
 	line-height: $baseline-height*4;
 	font-family: $font-sans;
+	font-weight: light;
 
 	@include for-phone-down {
 		// font-size: 21px;
@@ -113,10 +114,15 @@ $font-sans: Helvetica, Arial, sans-serif;
 	font-family: $font-sans;
 }
 
-@mixin type-body {
+@mixin type-body-1 {
 	font-size: 16px;
 	line-height: $baseline-height*1.5;
 	font-family: $font-sans;
+}
+
+@mixin type-body-2 {
+	@include type-body-1;
+	font-weight: bold;
 }
 
 @mixin type-small {
@@ -143,14 +149,17 @@ $font-sans: Helvetica, Arial, sans-serif;
 	border: 2px solid $color-2;
 	@include type-button;
 
-	&:not(:first-child) {
-		margin-left: $elements-margin;
+	&:not(:last-child) {
+		margin-right: $elements-margin;
 	}
+
+	// &:not(:first-child) {
+	// 	margin-left: $elements-margin;
+	// }
 
 	@if $primary {
 		color: white;
 		background-color: $color-2;
-		border-style: none;
 
 		&:hover {
 			background-color: $color-1;
@@ -184,20 +193,24 @@ $font-sans: Helvetica, Arial, sans-serif;
 
 @mixin form {
 	display: inline-block;
-	padding: 0 $elements-padding;
+	padding: 0 $elements-padding/2;
 	color: $gray-2;
 	background-color: white;
-	border: 1px solid $gray-2; 
+	border: 2px solid $gray-3; 
 	border-radius: 3px;
-	@include type-body;
+	@include type-body-1;
 	line-height: $baseline-height*2.5;
 
-	&:not(:first-child) {
-		margin-left: $elements-margin;
+	&:not(:last-child) {
+		margin-right: $elements-margin;
 	}
 
+	// &:not(:first-child) {
+	// 	margin-left: $elements-margin;
+	// }
+
 	&:focus {
-		border-color: $gray-1;
+		border-color: $gray-2;
 	}
 
 	&:disabled {
@@ -242,13 +255,53 @@ $font-sans: Helvetica, Arial, sans-serif;
 
 html, body {
 	color: $gray-2;
-	@include type-body;
+	@include type-body-1;
 }
 
-input[type="submit"], button {
+button {
+	// Primary button
+	&:not(.bt-icon){
+		@include button();
+	}
+
+	// Secondary button
+	&.cancel {
+		@include button(false);	
+	}
+
+	// Icon button
+	&.bt-icon {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		border: none;
+		background-color: Transparent;
+		background-repeat: none;
+
+		&.edit 		{ background-image: url('../img/icons/icon-edit-small.png'); }
+		&.remove 	{ background-image: url('../img/icons/icon-remove-small.png'); }
+	}	
+}
+
+input[type="submit"] {
 	@include button();
 }
 
 input[type="text"], input[type="email"], input[type="password"], input[type="username"] {
 	@include form;
+}
+
+label {
+	@include type-body-2;
+	display: block;
+	margin-bottom: $baseline-height/2;
+}
+
+.form-group, .url-preview {
+	display: block;
+	margin-bottom: $baseline-height*1.5;
+}
+
+h1 {
+	@include type-h1;
 }

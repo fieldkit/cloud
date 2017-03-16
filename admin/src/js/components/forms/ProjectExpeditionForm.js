@@ -93,7 +93,7 @@ export class ProjectExpeditionForm extends Component {
           </p>
         </div>
 
-        <div className="form_group">
+        <div className="form-group">
           <label htmlFor="description">Description</label>
           <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'description') }
