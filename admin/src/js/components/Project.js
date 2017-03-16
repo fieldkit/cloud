@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
+import { MainContainer } from './containers/MainContainer';
 import { ProjectForm } from './forms/ProjectForm';
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
 import { FKApiClient } from '../api/api';
@@ -89,32 +90,36 @@ export class Project extends Component {
     const projectSlug = this.projectSlug();
 
     return (
-      <div className="project">
-        <Route path="/projects/:projectSlug/new-expedition" render={() =>
-          <ReactModal isOpen={true} contentLabel="New expedition form">
-            <h1>Create a new expedition</h1>
-            <ProjectExpeditionForm
-              projectSlug={projectSlug}
-              onCancel={() => this.props.history.push(`/projects/${projectSlug}`)}
-              onSave={this.onExpeditionCreate.bind(this)} />
-          </ReactModal> } />
+      <MainContainer
+        breadcrumbs={[{ url: '/', text: 'Projects'},{ url: `/projects/${projectSlug}`, text: project ? project.name : 'Current Project' }]}
+      >
+        <div className="project">
+          <Route path="/projects/:projectSlug/new-expedition" render={() =>
+            <ReactModal isOpen={true} contentLabel="New expedition form">
+              <h1>Create a new expedition</h1>
+              <ProjectExpeditionForm
+                projectSlug={projectSlug}
+                onCancel={() => this.props.history.push(`/projects/${projectSlug}`)}
+                onSave={this.onExpeditionCreate.bind(this)} />
+            </ReactModal> } />
 
-        <div id="expeditions">
-          { this.state.expeditions.map((e, i) =>
-            <div key={`expedition-${i}`} className="expedition-item">
-              {JSON.stringify(e)}
-            </div> )}
-          { this.state.expeditions.length == 0 &&
-            <span className="empty">No expeditions!</span> }
+          <div id="expeditions">
+            { this.state.expeditions.map((e, i) =>
+              <div key={`expedition-${i}`} className="expedition-item">
+                {JSON.stringify(e)}
+              </div> )}
+            { this.state.expeditions.length === 0 &&
+              <span className="empty">No expeditions!</span> }
+          </div>
+          <Link to={`/projects/${projectSlug}/new-expedition`}>Show new expedition modal</Link>
+
+          <h2>Edit project</h2>
+          <ProjectForm
+            name={project ? project.name : undefined}
+            description={project ? project.description : undefined}
+            onSave={this.onProjectSave.bind(this)} />
         </div>
-        <Link to={`/projects/${projectSlug}/new-expedition`}>Show new expedition modal</Link>
-
-        <h2>Edit project</h2>
-        <ProjectForm
-          name={project ? project.name : undefined}
-          description={project ? project.description : undefined}
-          onSave={this.onProjectSave.bind(this)} />
-      </div>
+      </MainContainer>
     )
   }
 }
