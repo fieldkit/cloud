@@ -153,3 +153,36 @@ func (c *Client) NewListExpeditionRequest(ctx context.Context, path string) (*ht
 	}
 	return req, nil
 }
+
+// ListIDExpeditionPath computes a request path to the list id action of expedition.
+func ListIDExpeditionPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s/expeditions", param0)
+}
+
+// List a project's expeditions
+func (c *Client) ListIDExpedition(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListIDExpeditionRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListIDExpeditionRequest create the request corresponding to the list id action endpoint of the expedition resource.
+func (c *Client) NewListIDExpeditionRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}

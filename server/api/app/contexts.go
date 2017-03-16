@@ -186,6 +186,47 @@ func (ctx *ListExpeditionContext) BadRequest() error {
 	return nil
 }
 
+// ListIDExpeditionContext provides the expedition list id action context.
+type ListIDExpeditionContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewListIDExpeditionContext parses the incoming request URL and body, performs validations and creates the
+// context used by the expedition controller list id action.
+func NewListIDExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDExpeditionContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDExpeditionContext) OK(r *Expeditions) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expeditions+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDExpeditionContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddProjectContext provides the project add action context.
 type AddProjectContext struct {
 	context.Context
@@ -541,6 +582,47 @@ func (ctx *ListTeamContext) OK(r *Teams) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDTeamContext provides the team list id action context.
+type ListIDTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListIDTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller list id action.
+func NewListIDTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDTeamContext) OK(r *Teams) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.teams+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDTeamContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

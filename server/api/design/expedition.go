@@ -107,4 +107,16 @@ var _ = Resource("expedition", func() {
 			Media(Expeditions)
 		})
 	})
+
+	Action("list id", func() {
+		Routing(GET("projects/:project_id/expeditions"))
+		Description("List a project's expeditions")
+		Params(func() {
+			Param("project_id", Integer)
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Expeditions)
+		})
+	})
 })

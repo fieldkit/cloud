@@ -32,6 +32,7 @@ type ExpeditionController interface {
 	Get(*GetExpeditionContext) error
 	GetID(*GetIDExpeditionContext) error
 	List(*ListExpeditionContext) error
+	ListID(*ListIDExpeditionContext) error
 }
 
 // MountExpeditionController "mounts" a Expedition resource controller on the given service.
@@ -42,6 +43,7 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -116,6 +118,23 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 	h = handleExpeditionOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions", ctrl.MuxHandler("List", h, nil))
 	service.LogInfo("mount", "ctrl", "Expedition", "action", "List", "route", "GET /projects/@/:project/expeditions", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDExpeditionContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleExpeditionOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project_id/expeditions", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "ListID", "route", "GET /projects/:project_id/expeditions", "security", "jwt")
 }
 
 // handleExpeditionOrigin applies the CORS response headers corresponding to the origin.
@@ -460,6 +479,7 @@ type TeamController interface {
 	Get(*GetTeamContext) error
 	GetID(*GetIDTeamContext) error
 	List(*ListTeamContext) error
+	ListID(*ListIDTeamContext) error
 }
 
 // MountTeamController "mounts" a Team resource controller on the given service.
@@ -470,6 +490,7 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/teams/:team_id", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -544,6 +565,23 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	h = handleTeamOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/teams", ctrl.MuxHandler("List", h, nil))
 	service.LogInfo("mount", "ctrl", "Team", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/teams", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("GET", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Team", "action", "ListID", "route", "GET /expeditions/:expedition_id/teams", "security", "jwt")
 }
 
 // handleTeamOrigin applies the CORS response headers corresponding to the origin.

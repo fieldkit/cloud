@@ -86,3 +86,12 @@ func (c *ExpeditionController) List(ctx *app.ListExpeditionContext) error {
 
 	return ctx.OK(ExpeditionsType(expeditions))
 }
+
+func (c *ExpeditionController) ListID(ctx *app.ListIDExpeditionContext) error {
+	expeditions := []*data.Expedition{}
+	if err := c.options.Database.SelectContext(ctx, &expeditions, "SELECT * FROM fieldkit.expedition WHERE project_id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	return ctx.OK(ExpeditionsType(expeditions))
+}
