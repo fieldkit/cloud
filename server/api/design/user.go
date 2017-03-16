@@ -61,7 +61,15 @@ var _ = Resource("user", func() {
 			})
 		})
 		Response(Unauthorized)
-		Response(BadRequest, ErrorMedia)
+		Response(BadRequest)
+	})
+
+	Action("logout", func() {
+		Routing(POST("logout"))
+		Description("Creates a valid JWT given login credentials.")
+		NoSecurity()
+		Response(NoContent)
+		Response(BadRequest)
 	})
 
 	Action("refresh", func() {

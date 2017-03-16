@@ -353,6 +353,7 @@ type UserController interface {
 	GetCurrent(*GetCurrentUserContext) error
 	List(*ListUserContext) error
 	Login(*LoginUserContext) error
+	Logout(*LogoutUserContext) error
 	Refresh(*RefreshUserContext) error
 }
 
@@ -364,6 +365,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/user/:username", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/users", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -460,6 +462,22 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/login", ctrl.MuxHandler("Login", h, unmarshalLoginUserPayload))
 	service.LogInfo("mount", "ctrl", "User", "action", "Login", "route", "POST /login")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewLogoutUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Logout(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/logout", ctrl.MuxHandler("Logout", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "Logout", "route", "POST /logout")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

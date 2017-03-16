@@ -142,6 +142,24 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	return ctx.NoContent()
 }
 
+func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context") // internal error
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return fmt.Errorf("JWT claims error") // internal error
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.refresh_token WHERE user_id = $1", claims["sub"]); err != nil {
+		return err
+	}
+
+	return ctx.NoContent()
+}
+
 // SignUp runs the sign-up action.
 func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	now := time.Now()

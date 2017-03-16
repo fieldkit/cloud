@@ -359,14 +359,45 @@ func (ctx *LoginUserContext) NoContent() error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *LoginUserContext) BadRequest(r error) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
-	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+func (ctx *LoginUserContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
 }
 
 // Unauthorized sends a HTTP response with status code 401.
 func (ctx *LoginUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// LogoutUserContext provides the user logout action context.
+type LogoutUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewLogoutUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller logout action.
+func NewLogoutUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*LogoutUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := LogoutUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *LogoutUserContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *LogoutUserContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
 

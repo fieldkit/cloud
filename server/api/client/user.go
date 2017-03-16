@@ -180,6 +180,35 @@ func (c *Client) NewLoginUserRequest(ctx context.Context, path string, payload *
 	return req, nil
 }
 
+// LogoutUserPath computes a request path to the logout action of user.
+func LogoutUserPath() string {
+
+	return fmt.Sprintf("/logout")
+}
+
+// Creates a valid JWT given login credentials.
+func (c *Client) LogoutUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewLogoutUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewLogoutUserRequest create the request corresponding to the logout action endpoint of the user resource.
+func (c *Client) NewLogoutUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // RefreshUserPayload is the user refresh action payload.
 type RefreshUserPayload struct {
 	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`

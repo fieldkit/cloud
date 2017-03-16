@@ -265,10 +265,3 @@ func (c *Client) DecodeUsers(resp *http.Response) (*Users, error) {
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
-
-// DecodeErrorResponse decodes the ErrorResponse instance encoded in resp body.
-func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, error) {
-	var decoded goa.ErrorResponse
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
