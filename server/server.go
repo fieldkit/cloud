@@ -103,12 +103,13 @@ func main() {
 		panic(err)
 	}
 
+	service.Use(gzip.Middleware(6))
 	app.UseJWTMiddleware(service, jwtMiddleware)
 	service.Use(middleware.RequestID())
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
-	service.Use(gzip.Middleware(6))
+	// service.Use(gzip.Middleware(6))
 
 	database, err := sqlxcache.Open("postgres", flagConfig.backendURL)
 	if err != nil {
