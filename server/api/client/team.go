@@ -13,14 +13,14 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // AddTeamPath computes a request path to the add action of team.
-func AddTeamPath(project string, expedition string) string {
-	param0 := project
-	param1 := expedition
+func AddTeamPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/projects/%s/expeditions/%s/team", param0, param1)
+	return fmt.Sprintf("/expeditions/%s/team", param0)
 }
 
 // Add a team
@@ -60,7 +60,7 @@ func GetTeamPath(project string, expedition string, team string) string {
 	param1 := expedition
 	param2 := team
 
-	return fmt.Sprintf("/projects/%s/expeditions/%s/teams/%s", param0, param1, param2)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams/@/%s", param0, param1, param2)
 }
 
 // Add a team
@@ -89,12 +89,45 @@ func (c *Client) NewGetTeamRequest(ctx context.Context, path string) (*http.Requ
 	return req, nil
 }
 
+// GetIDTeamPath computes a request path to the get id action of team.
+func GetIDTeamPath(teamID int) string {
+	param0 := strconv.Itoa(teamID)
+
+	return fmt.Sprintf("/teams/%s", param0)
+}
+
+// Add a team
+func (c *Client) GetIDTeam(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetIDTeamRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetIDTeamRequest create the request corresponding to the get id action endpoint of the team resource.
+func (c *Client) NewGetIDTeamRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
 // ListTeamPath computes a request path to the list action of team.
 func ListTeamPath(project string, expedition string) string {
 	param0 := project
 	param1 := expedition
 
-	return fmt.Sprintf("/projects/%s/expeditions/%s/teams", param0, param1)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams", param0, param1)
 }
 
 // List a project's teams

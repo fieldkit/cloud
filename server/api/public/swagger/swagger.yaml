@@ -388,6 +388,71 @@ info:
   title: Fieldkit API
   version: ""
 paths:
+  /expeditions/{expedition_id}:
+    get:
+      description: |-
+        Add a expedition
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#get id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.expedition+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expedition'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id expedition
+      tags:
+      - expedition
+  /expeditions/{expedition_id}/team:
+    post:
+      description: |-
+        Add a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#add
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddTeamPayload'
+      produces:
+      - application/vnd.app.team+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Team'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add team
+      tags:
+      - team
   /login:
     post:
       description: Creates a valid JWT given login credentials.
@@ -491,7 +556,7 @@ paths:
       summary: list project
       tags:
       - project
-  /projects/{project}:
+  /projects/@/{project}:
     get:
       description: |-
         Get a project
@@ -523,44 +588,7 @@ paths:
       summary: get project
       tags:
       - project
-  /projects/{project}/expedition:
-    post:
-      description: |-
-        Add a expedition
-
-        Required security scopes:
-          * `api:access`
-      operationId: expedition#add
-      parameters:
-      - description: Project slug
-        in: path
-        name: project
-        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
-        required: true
-        type: string
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddExpeditionPayload'
-      produces:
-      - application/vnd.app.expedition+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Expedition'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add expedition
-      tags:
-      - expedition
-  /projects/{project}/expeditions:
+  /projects/@/{project}/expeditions:
     get:
       description: |-
         List a project's expeditions
@@ -592,7 +620,7 @@ paths:
       summary: list expedition
       tags:
       - expedition
-  /projects/{project}/expeditions/{expedition}:
+  /projects/@/{project}/expeditions/@/{expedition}:
     get:
       description: |-
         Add a expedition
@@ -630,48 +658,7 @@ paths:
       summary: get expedition
       tags:
       - expedition
-  /projects/{project}/expeditions/{expedition}/team:
-    post:
-      description: |-
-        Add a team
-
-        Required security scopes:
-          * `api:access`
-      operationId: team#add
-      parameters:
-      - in: path
-        name: expedition
-        required: true
-        type: string
-      - description: Project slug
-        in: path
-        name: project
-        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
-        required: true
-        type: string
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddTeamPayload'
-      produces:
-      - application/vnd.app.team+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Team'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add team
-      tags:
-      - team
-  /projects/{project}/expeditions/{expedition}/teams:
+  /projects/@/{project}/expeditions/@/{expedition}/teams:
     get:
       description: |-
         List a project's teams
@@ -707,7 +694,7 @@ paths:
       summary: list team
       tags:
       - team
-  /projects/{project}/expeditions/{expedition}/teams/{team}:
+  /projects/@/{project}/expeditions/@/{expedition}/teams/@/{team}:
     get:
       description: |-
         Add a team
@@ -749,6 +736,71 @@ paths:
       summary: get team
       tags:
       - team
+  /projects/{project_id}:
+    get:
+      description: |-
+        Get a project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#get id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.project+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id project
+      tags:
+      - project
+  /projects/{project_id}/expedition:
+    post:
+      description: |-
+        Add a expedition
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#add
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddExpeditionPayload'
+      produces:
+      - application/vnd.app.expedition+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expedition'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add expedition
+      tags:
+      - expedition
   /refresh:
     post:
       description: Creates a valid JWT given a refresh token.
@@ -795,6 +847,36 @@ paths:
       schemes:
       - https
       summary: Download api/public/swagger/swagger.yaml
+  /teams/{team_id}:
+    get:
+      description: |-
+        Add a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#get id
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.team+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Team'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id team
+      tags:
+      - team
   /user:
     get:
       description: |-

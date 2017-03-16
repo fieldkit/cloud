@@ -11,6 +11,7 @@ import (
 	"github.com/goadesign/goa"
 	"golang.org/x/net/context"
 	"net/http"
+	"strconv"
 )
 
 // AddExpeditionContext provides the expedition add action context.
@@ -18,8 +19,8 @@ type AddExpeditionContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Project string
-	Payload *AddExpeditionPayload
+	ProjectID int
+	Payload   *AddExpeditionPayload
 }
 
 // NewAddExpeditionContext parses the incoming request URL and body, performs validations and creates the
@@ -31,12 +32,13 @@ func NewAddExpeditionContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -99,6 +101,47 @@ func (ctx *GetExpeditionContext) OK(r *Expedition) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *GetExpeditionContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetIDExpeditionContext provides the expedition get id action context.
+type GetIDExpeditionContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewGetIDExpeditionContext parses the incoming request URL and body, performs validations and creates the
+// context used by the expedition controller get id action.
+func NewGetIDExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDExpeditionContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDExpeditionContext) OK(r *Expedition) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDExpeditionContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -215,6 +258,47 @@ func (ctx *GetProjectContext) BadRequest() error {
 	return nil
 }
 
+// GetIDProjectContext provides the project get id action context.
+type GetIDProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewGetIDProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller get id action.
+func NewGetIDProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDProjectContext) OK(r *Project) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListProjectContext provides the project list action context.
 type ListProjectContext struct {
 	context.Context
@@ -282,9 +366,8 @@ type AddTeamContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Expedition string
-	Project    string
-	Payload    *AddTeamPayload
+	ExpeditionID int
+	Payload      *AddTeamPayload
 }
 
 // NewAddTeamContext parses the incoming request URL and body, performs validations and creates the
@@ -296,17 +379,13 @@ func NewAddTeamContext(ctx context.Context, r *http.Request, service *goa.Servic
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpedition := req.Params["expedition"]
-	if len(paramExpedition) > 0 {
-		rawExpedition := paramExpedition[0]
-		rctx.Expedition = rawExpedition
-	}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -375,6 +454,47 @@ func (ctx *GetTeamContext) OK(r *Team) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *GetTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetIDTeamContext provides the team get id action context.
+type GetIDTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+}
+
+// NewGetIDTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller get id action.
+func NewGetIDTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDTeamContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

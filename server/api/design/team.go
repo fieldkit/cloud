@@ -50,13 +50,10 @@ var _ = Resource("team", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("projects/:project/expeditions/:expedition/team"))
+		Routing(POST("expeditions/:expedition_id/team"))
 		Description("Add a team")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
+			Param("expedition_id", Integer)
 		})
 		Payload(AddTeamPayload)
 		Response(BadRequest)
@@ -66,7 +63,7 @@ var _ = Resource("team", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/:project/expeditions/:expedition/teams/:team"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team"))
 		Description("Add a team")
 		Params(func() {
 			Param("project", String, func() {
@@ -84,8 +81,20 @@ var _ = Resource("team", func() {
 		})
 	})
 
+	Action("get id", func() {
+		Routing(GET("teams/:team_id"))
+		Description("Add a team")
+		Params(func() {
+			Param("team_id", Integer)
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Team)
+		})
+	})
+
 	Action("list", func() {
-		Routing(GET("projects/:project/expeditions/:expedition/teams"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams"))
 		Description("List a project's teams")
 		Params(func() {
 			Param("project", String, func() {
