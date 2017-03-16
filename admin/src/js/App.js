@@ -12,6 +12,8 @@ import { Signup } from './components/unauth/Signup';
 import { Projects } from './components/Projects';
 import { Project } from './components/Project';
 
+import { Expedition } from './components/Expedition';
+
 import '../css/App.css';
 
 const PrivateRoute = ({ component, ...rest }) => (
@@ -57,7 +59,7 @@ export class App extends Component {
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
-          {/*<PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Expedition} />*/}
+          <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Expedition} />
           <PrivateRoute path="/projects/:projectSlug" component={Project} />
           <PrivateRoute path="/" component={Projects} />
 
