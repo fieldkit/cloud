@@ -18,9 +18,9 @@ resource "aws_security_group" "ssh" {
   }
 }
 
-resource "aws_security_group" "fieldkit-server-elb" {
-  name = "fieldkit-server-elb"
-  description = "fieldkit-server-elb"
+resource "aws_security_group" "fieldkit-server-alb" {
+  name = "fieldkit-server-alb"
+  description = "fieldkit-server-alb"
   vpc_id = "${aws_vpc.fieldkit.id}"
 
   ingress {
@@ -47,7 +47,7 @@ resource "aws_security_group" "fieldkit-server" {
       from_port = 80
       to_port = 80
       protocol = "tcp"
-      security_groups = ["${aws_security_group.fieldkit-server-elb.id}"]
+      security_groups = ["${aws_security_group.fieldkit-server-alb.id}"]
   }
 
   egress {

@@ -1,0 +1,681 @@
+consumes:
+- application/json
+definitions:
+  AddExpeditionPayload:
+    example:
+      description: Provident earum sit enim sapiente assumenda.
+      name: Dolores dolores et.
+      slug: ukk5y3b7yo
+    properties:
+      description:
+        example: Provident earum sit enim sapiente assumenda.
+        type: string
+      name:
+        example: Dolores dolores et.
+        type: string
+      slug:
+        example: ukk5y3b7yo
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - name
+    - slug
+    - description
+    title: AddExpeditionPayload
+    type: object
+  AddProjectPayload:
+    example:
+      description: Amet amet reiciendis odit sapiente.
+      name: Expedita qui eum.
+      slug: 8p9r0nc6t9
+    properties:
+      description:
+        example: Amet amet reiciendis odit sapiente.
+        type: string
+      name:
+        example: Expedita qui eum.
+        type: string
+      slug:
+        example: 8p9r0nc6t9
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - name
+    - slug
+    - description
+    title: AddProjectPayload
+    type: object
+  AddUserPayload:
+    example:
+      email: cornell@volkman.net
+      invite_token: Eligendi ut voluptatem et ratione.
+      password: 7qrfgzslj0
+      username: ddkn54othh
+    properties:
+      email:
+        example: cornell@volkman.net
+        format: email
+        type: string
+      invite_token:
+        example: Eligendi ut voluptatem et ratione.
+        type: string
+      password:
+        example: 7qrfgzslj0
+        minLength: 10
+        type: string
+      username:
+        example: ddkn54othh
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - email
+    - username
+    - password
+    - invite_token
+    title: AddUserPayload
+    type: object
+  Expedition:
+    description: Expedition media type (default view)
+    example:
+      description: Perspiciatis natus possimus labore.
+      id: 5.794513e+18
+      name: Porro quaerat in qui.
+      slug: mnbeadap0f
+    properties:
+      description:
+        example: Perspiciatis natus possimus labore.
+        type: string
+      id:
+        example: 5.794513e+18
+        format: int64
+        type: integer
+      name:
+        example: Porro quaerat in qui.
+        type: string
+      slug:
+        example: mnbeadap0f
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - id
+    - name
+    - slug
+    - description
+    title: 'Mediatype identifier: application/vnd.app.expedition+json; view=default'
+    type: object
+  ExpeditionCollection:
+    description: ExpeditionCollection is the media type for an array of Expedition
+      (default view)
+    example:
+    - description: Perspiciatis natus possimus labore.
+      id: 5.794513e+18
+      name: Porro quaerat in qui.
+      slug: mnbeadap0f
+    items:
+      $ref: '#/definitions/Expedition'
+    title: 'Mediatype identifier: application/vnd.app.expedition+json; type=collection;
+      view=default'
+    type: array
+  Expeditions:
+    description: Expeditions media type (default view)
+    example:
+      expeditions:
+      - description: Perspiciatis natus possimus labore.
+        id: 5.794513e+18
+        name: Porro quaerat in qui.
+        slug: mnbeadap0f
+      - description: Perspiciatis natus possimus labore.
+        id: 5.794513e+18
+        name: Porro quaerat in qui.
+        slug: mnbeadap0f
+      - description: Perspiciatis natus possimus labore.
+        id: 5.794513e+18
+        name: Porro quaerat in qui.
+        slug: mnbeadap0f
+    properties:
+      expeditions:
+        $ref: '#/definitions/ExpeditionCollection'
+    required:
+    - expeditions
+    title: 'Mediatype identifier: application/vnd.app.expeditions+json; view=default'
+    type: object
+  Project:
+    description: Project media type (default view)
+    example:
+      description: Inventore voluptas.
+      id: 3.0773821e+18
+      name: Nihil sit.
+      slug: n2552fo50o
+    properties:
+      description:
+        example: Inventore voluptas.
+        type: string
+      id:
+        example: 3.0773821e+18
+        format: int64
+        type: integer
+      name:
+        example: Nihil sit.
+        type: string
+      slug:
+        example: n2552fo50o
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - id
+    - name
+    - slug
+    - description
+    title: 'Mediatype identifier: application/vnd.app.project+json; view=default'
+    type: object
+  ProjectCollection:
+    description: ProjectCollection is the media type for an array of Project (default
+      view)
+    example:
+    - description: Inventore voluptas.
+      id: 3.0773821e+18
+      name: Nihil sit.
+      slug: n2552fo50o
+    - description: Inventore voluptas.
+      id: 3.0773821e+18
+      name: Nihil sit.
+      slug: n2552fo50o
+    - description: Inventore voluptas.
+      id: 3.0773821e+18
+      name: Nihil sit.
+      slug: n2552fo50o
+    items:
+      $ref: '#/definitions/Project'
+    title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
+      view=default'
+    type: array
+  Projects:
+    description: Projects media type (default view)
+    example:
+      projects:
+      - description: Inventore voluptas.
+        id: 3.0773821e+18
+        name: Nihil sit.
+        slug: n2552fo50o
+    properties:
+      projects:
+        $ref: '#/definitions/ProjectCollection'
+    required:
+    - projects
+    title: 'Mediatype identifier: application/vnd.app.projects+json; view=default'
+    type: object
+  RefreshUserPayload:
+    example:
+      refresh_token: Dolores sit qui perspiciatis.
+    properties:
+      refresh_token:
+        example: Dolores sit qui perspiciatis.
+        type: string
+    required:
+    - refresh_token
+    title: RefreshUserPayload
+    type: object
+  User:
+    description: User media type (default view)
+    example:
+      id: 2.436628e+18
+      username: axgi4xylmr
+    properties:
+      id:
+        example: 2.436628e+18
+        format: int64
+        type: integer
+      username:
+        example: axgi4xylmr
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - id
+    - username
+    title: 'Mediatype identifier: application/vnd.app.user+json; view=default'
+    type: object
+  UserCollection:
+    description: UserCollection is the media type for an array of User (default view)
+    example:
+    - id: 2.436628e+18
+      username: axgi4xylmr
+    - id: 2.436628e+18
+      username: axgi4xylmr
+    - id: 2.436628e+18
+      username: axgi4xylmr
+    items:
+      $ref: '#/definitions/User'
+    title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
+      view=default'
+    type: array
+  Users:
+    description: Users media type (default view)
+    example:
+      users:
+      - id: 2.436628e+18
+        username: axgi4xylmr
+    properties:
+      users:
+        $ref: '#/definitions/UserCollection'
+    required:
+    - users
+    title: 'Mediatype identifier: application/vnd.app.users+json; view=default'
+    type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
+host: api.data.fieldkit.org
+info:
+  description: A one-click open platform for field researchers and explorers.
+  title: Fieldkit API
+  version: ""
+paths:
+  /login:
+    post:
+      description: Creates a valid JWT given login credentials.
+      operationId: user#login
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddUserPayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+      schemes:
+      - https
+      summary: login user
+      tags:
+      - user
+  /project:
+    post:
+      description: |-
+        Add a project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#add
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddProjectPayload'
+      produces:
+      - application/vnd.app.project+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add project
+      tags:
+      - project
+  /project/{project}/expedition:
+    post:
+      description: |-
+        Add a expedition
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#add
+      parameters:
+      - in: path
+        name: project
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddExpeditionPayload'
+      produces:
+      - application/vnd.app.expedition+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expedition'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add expedition
+      tags:
+      - expedition
+  /project/{project}/expeditions:
+    get:
+      description: |-
+        List a project's expeditions
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#list project
+      parameters:
+      - in: path
+        name: project
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.expeditions+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expeditions'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list project expedition
+      tags:
+      - expedition
+  /projects:
+    get:
+      description: |-
+        List projects
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#list
+      produces:
+      - application/vnd.app.projects+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Projects'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list project
+      tags:
+      - project
+  /projects/{project}:
+    get:
+      description: |-
+        Get a project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#get
+      parameters:
+      - in: path
+        name: project
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.project+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get project
+      tags:
+      - project
+  /refresh:
+    post:
+      description: Creates a valid JWT given a refresh token.
+      operationId: user#refresh
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/RefreshUserPayload'
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+        "401":
+          description: Unauthorized
+      schemes:
+      - https
+      summary: refresh user
+      tags:
+      - user
+  /swagger.json:
+    get:
+      operationId: swagger#/swagger.json
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - https
+      summary: Download api/public/swagger/swagger.json
+  /swagger.yaml:
+    get:
+      operationId: swagger#/swagger.yaml
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - https
+      summary: Download api/public/swagger/swagger.yaml
+  /user:
+    get:
+      description: |-
+        Get the authenticated user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get current
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get current user
+      tags:
+      - user
+    post:
+      description: Add a user
+      operationId: user#add
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddUserPayload'
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: add user
+      tags:
+      - user
+  /user/{username}:
+    get:
+      description: |-
+        Get a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get
+      parameters:
+      - in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get user
+      tags:
+      - user
+  /user/projects:
+    get:
+      description: |-
+        List the authenticated user's projects
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#list current
+      produces:
+      - application/vnd.app.projects+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Projects'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list current project
+      tags:
+      - project
+  /users:
+    get:
+      description: |-
+        List users
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#list
+      produces:
+      - application/vnd.app.users+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Users'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list user
+      tags:
+      - user
+produces:
+- application/json
+responses:
+  BadRequest:
+    description: Bad Request
+  Unauthorized:
+    description: Unauthorized
+schemes:
+- https
+securityDefinitions:
+  jwt:
+    description: |2-
+
+
+      **Security Scopes**:
+        * `api:access`: API access
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

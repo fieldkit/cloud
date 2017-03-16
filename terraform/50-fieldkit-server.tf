@@ -31,43 +31,60 @@ resource "aws_route53_record" "fieldkit-server-a" {
   records = ["${aws_instance.fieldkit-server-a.public_ip}"]
 }
 
-resource "aws_elb" "fieldkit-server" {
-  name = "fieldkit"
+resource "aws_alb" "fieldkit-server" {
+  name = "fieldkit-server"
+  internal = false
+  security_groups = ["${aws_security_group.fieldkit-server-alb.id}"]
   subnets = ["${aws_subnet.fieldkit-a.id}", "${aws_subnet.fieldkit-b.id}", "${aws_subnet.fieldkit-c.id}", "${aws_subnet.fieldkit-e.id}"]
-  security_groups = ["${aws_security_group.fieldkit-server-elb.id}"]
-  
-  listener {
-    instance_port = 80
-    instance_protocol = "http"
-    lb_port = 443
-    lb_protocol = "https"
-    ssl_certificate_id = "arn:aws:acm:us-east-1:582827299311:certificate/4a280325-b065-450b-b021-8862b52a7d3e"
-  }
-
-  health_check {
-    healthy_threshold = 2
-    unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/status"
-    interval = 30
-  }
-
-  instances = ["${aws_instance.fieldkit-server-a.id}"]
-  cross_zone_load_balancing = true
 
   tags {
     Name = "fieldkit-server"
   }
 }
 
-resource "aws_route53_record" "fieldkit-server" {
-  zone_id = "Z116TCZ3RT5Z2K"
-  name = "fieldkit-server.aws.fieldkit.org"
-  type = "A"
+resource "aws_alb_listener" "fieldkit-server" {
+  load_balancer_arn = "${aws_alb.fieldkit-server.arn}"
+  port = "443"
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = "arn:aws:acm:us-east-1:582827299311:certificate/4a280325-b065-450b-b021-8862b52a7d3e"
 
+  default_action {
+    target_group_arn = "${aws_alb_target_group.fieldkit-server.arn}"
+    type = "forward"
+  }
+}
+
+resource "aws_alb_target_group" "fieldkit-server" {
+  name     = "fieldkit-server"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.fieldkit.id}"
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    port = 80
+    path = "/status"
+    interval = 5
+  }
+}
+
+resource "aws_alb_target_group_attachment" "fieldkit-server-a" {
+  target_group_arn = "${aws_alb_target_group.fieldkit-server.arn}"
+  target_id = "${aws_instance.fieldkit-server-a.id}"
+  port = 80
+}
+
+resource "aws_route53_record" "api-data" {
+  zone_id = "Z116TCZ3RT5Z2K"
+  name = "api.data.fieldkit.org"
+  type = "A"
+  
   alias {
-    name = "${aws_elb.fieldkit-server.dns_name}"
-    zone_id = "${aws_elb.fieldkit-server.zone_id}"
-    evaluate_target_health = true
+    name = "${aws_alb.fieldkit-server.dns_name}"
+    zone_id = "${aws_alb.fieldkit-server.zone_id}"
+    evaluate_target_health = false
   }
 }
