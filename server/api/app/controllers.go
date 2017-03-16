@@ -475,9 +475,10 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 		}
 		return ctrl.Logout(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/logout", ctrl.MuxHandler("Logout", h, nil))
-	service.LogInfo("mount", "ctrl", "User", "action", "Logout", "route", "POST /logout")
+	service.LogInfo("mount", "ctrl", "User", "action", "Logout", "route", "POST /logout", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

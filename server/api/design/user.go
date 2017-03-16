@@ -67,7 +67,6 @@ var _ = Resource("user", func() {
 	Action("logout", func() {
 		Routing(POST("logout"))
 		Description("Creates a valid JWT given login credentials.")
-		NoSecurity()
 		Response(NoContent)
 		Response(BadRequest)
 	})

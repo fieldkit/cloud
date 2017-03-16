@@ -153,7 +153,12 @@ func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
 		return fmt.Errorf("JWT claims error") // internal error
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.refresh_token WHERE user_id = $1", claims["sub"]); err != nil {
+	refreshToken := data.Token{}
+	if err := refreshToken.UnmarshalText([]byte(claims["refresh_token"].(string))); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.refresh_token WHERE token = $1", refreshToken); err != nil {
 		return err
 	}
 

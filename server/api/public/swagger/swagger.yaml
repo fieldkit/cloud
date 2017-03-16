@@ -301,7 +301,11 @@ paths:
       - user
   /logout:
     post:
-      description: Creates a valid JWT given login credentials.
+      description: |-
+        Creates a valid JWT given login credentials.
+
+        Required security scopes:
+          * `api:access`
       operationId: user#logout
       responses:
         "204":
@@ -310,6 +314,9 @@ paths:
           description: Bad Request
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: logout user
       tags:
       - user
