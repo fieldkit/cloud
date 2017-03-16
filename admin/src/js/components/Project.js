@@ -12,114 +12,114 @@ import { FKApiClient } from '../api/api';
 import '../../css/home.css'
 
 type Props = {
-  match: Object;
-  location: Object;
-  history: Object;
+	match: Object;
+	location: Object;
+	history: Object;
 }
 
 export class Project extends Component {
-  props: Props;
-  state: {
-    project: ?Object,
-    expeditions: Object[]
-  }
+	props: Props;
+	state: {
+		project: ?Object,
+		expeditions: Object[]
+	}
 
-  constructor(props: Props) {
-    super(props);
+	constructor(props: Props) {
+		super(props);
 
-    this.state = {
-      project: null,
-      expeditions: []
-    };
+		this.state = {
+			project: null,
+			expeditions: []
+		};
 
-    this.loadData();
-  }
+		this.loadData();
+	}
 
-  projectSlug() {
-    return this.props.match.params.projectSlug;
-  }
+	projectSlug() {
+		return this.props.match.params.projectSlug;
+	}
 
-  async loadData() {
-    const projectSlug = this.projectSlug();
+	async loadData() {
+		const projectSlug = this.projectSlug();
 
-    const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-    if (projectRes.type === 'ok') {
-      this.setState({ project: projectRes.payload })
-    }
+		const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
+		if (projectRes.type === 'ok') {
+			this.setState({ project: projectRes.payload })
+		}
 
-    const expeditionsRes = await FKApiClient.get().getExpeditionsByProjectSlug(projectSlug);
-    if (expeditionsRes.type === 'ok') {
-      this.setState({ expeditions: expeditionsRes.payload || [] })
-    }
-  }
+		const expeditionsRes = await FKApiClient.get().getExpeditionsByProjectSlug(projectSlug);
+		if (expeditionsRes.type === 'ok') {
+			this.setState({ expeditions: expeditionsRes.payload || [] })
+		}
+	}
 
-  async onExpeditionCreate(name: string, description: string) {
-    const { project } = this.state;
-    if (!project) {
-      // TODO: handle error
-      return;
-    }
+	async onExpeditionCreate(name: string, description: string) {
+		const { project } = this.state;
+		if (!project) {
+			// TODO: handle error
+			return;
+		}
 
-    // TODO: swap this in when the backend is ready
-    // const projectId = project.id;
-    const projectId = this.projectSlug();
+		// TODO: swap this in when the backend is ready
+		// const projectId = project.id;
+		const projectId = this.projectSlug();
 
-    const expeditionRes = await FKApiClient.get().createExpedition(projectId, name, description);
-    if (expeditionRes.type === 'ok') {
-      await this.loadData();
-      this.props.history.push(`/projects/${this.projectSlug()}`);
-    } else {
-      return expeditionRes.errors;
-    }
-  }
+		const expeditionRes = await FKApiClient.get().createExpedition(projectId, name, description);
+		if (expeditionRes.type === 'ok') {
+			await this.loadData();
+			this.props.history.push(`/projects/${this.projectSlug()}`);
+		} else {
+			return expeditionRes.errors;
+		}
+	}
 
-  async onProjectSave(name: string, description: string) {
-    // TODO: this isn't implemented on the backend yet!
+	async onProjectSave(name: string, description: string) {
+		// TODO: this isn't implemented on the backend yet!
 
-    // const project = await FKApiClient.get().saveProject(slug, description);
-    // if (project.type === 'ok') {
-    //   await this.loadData();
-    //   this.props.history.push("/");
-    // } else {
-    //   return project.errors;
-    // }
-  }
+		// const project = await FKApiClient.get().saveProject(slug, description);
+		// if (project.type === 'ok') {
+		//   await this.loadData();
+		//   this.props.history.push("/");
+		// } else {
+		//   return project.errors;
+		// }
+	}
 
-  render () {
-    const { project } = this.state;
-    const projectSlug = this.projectSlug();
+	render () {
+		const { project } = this.state;
+		const projectSlug = this.projectSlug();
 
-    return (
-      <MainContainer
-        breadcrumbs={[{ url: '/', text: 'Projects'},{ url: `/projects/${projectSlug}`, text: project ? project.name : 'Current Project' }]}
-      >
-        <div className="project">
-          <Route path="/projects/:projectSlug/new-expedition" render={() =>
-            <ReactModal isOpen={true} contentLabel="New expedition form">
-              <h1>Create a new expedition</h1>
-              <ProjectExpeditionForm
-                projectSlug={projectSlug}
-                onCancel={() => this.props.history.push(`/projects/${projectSlug}`)}
-                onSave={this.onExpeditionCreate.bind(this)} />
-            </ReactModal> } />
+		return (
+			<MainContainer
+				breadcrumbs={[{ url: '/', text: 'Projects'},{ url: `/projects/${projectSlug}`, text: project ? project.name : 'Current Project' }]}
+			>
+				<div className="project">
+					<Route path="/projects/:projectSlug/new-expedition" render={() =>
+						<ReactModal isOpen={true} contentLabel="New expedition form">
+							<h1>Create a new expedition</h1>
+							<ProjectExpeditionForm
+								projectSlug={projectSlug}
+								onCancel={() => this.props.history.push(`/projects/${projectSlug}`)}
+								onSave={this.onExpeditionCreate.bind(this)} />
+						</ReactModal> } />
 
-          <div id="expeditions">
-            { this.state.expeditions.map((e, i) =>
-              <div key={`expedition-${i}`} className="expedition-item">
-                {JSON.stringify(e)}
-              </div> )}
-            { this.state.expeditions.length === 0 &&
-              <span className="empty">No expeditions!</span> }
-          </div>
-          <Link to={`/projects/${projectSlug}/new-expedition`}>Show new expedition modal</Link>
+					<div id="expeditions">
+						{ this.state.expeditions.map((e, i) =>
+							<div key={`expedition-${i}`} className="expedition-item">
+								{JSON.stringify(e)}
+							</div> )}
+						{ this.state.expeditions.length === 0 &&
+							<span className="empty">No expeditions!</span> }
+					</div>
+					<Link to={`/projects/${projectSlug}/new-expedition`}>Show new expedition modal</Link>
 
-          <h2>Edit project</h2>
-          <ProjectForm
-            name={project ? project.name : undefined}
-            description={project ? project.description : undefined}
-            onSave={this.onProjectSave.bind(this)} />
-        </div>
-      </MainContainer>
-    )
-  }
+					<h2>Edit project</h2>
+					<ProjectForm
+						name={project ? project.name : undefined}
+						description={project ? project.description : undefined}
+						onSave={this.onProjectSave.bind(this)} />
+				</div>
+			</MainContainer>
+		)
+	}
 }

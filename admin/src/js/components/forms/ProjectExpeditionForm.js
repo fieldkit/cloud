@@ -80,9 +80,8 @@ export class ProjectExpeditionForm extends Component {
         cancelText={this.props.cancelText}>
 
         <div className="form-group">
-          <label htmlFor="name">Pick a name for this new expedition:</label>
+          <label htmlFor="name">Name</label>
           <input type="text" name="name" className="text_lg" value={this.state.name} onChange={this.handleExpeditionNameChange.bind(this)} />
-          <div className="hint">You can change this later if you want.</div>
           { errorsFor(this.state.errors, 'name') }
         </div>
 
@@ -93,6 +92,12 @@ export class ProjectExpeditionForm extends Component {
             {`https://${this.props.projectSlug}.fieldkit.org/${this.state.path}`}
           </p>
         </div>
+
+        <div className="form_group">
+          <label htmlFor="description">Description</label>
+          <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
+          { errorsFor(this.state.errors, 'description') }
+        </div>        
       </FormContainer>
     )
   }

@@ -57,6 +57,10 @@ export class Expedition extends Component {
 			});
 			this.setState({ expedition: expedition })
 		}
+	}
+
+	async onExpeditionSave(name: string, description: string) {
+		// TODO: this isn't implemented on the backend yet!
 	}	
 
 	render() {
@@ -73,10 +77,11 @@ export class Expedition extends Component {
 								]}
 			>
 				<div className="expedition">
-					{/* <ProjectExpeditionForm
-						name={expedition ? expedition.name : undefined}
-						description={expedition ? expedition.description : undefined}
-						onSave={this.onExpeditionSave.bind(this)} /> */}
+				<ProjectExpeditionForm 
+					name={expedition ? expedition.name : undefined}
+					description={expedition ? expedition.description : undefined}
+					onSave={this.onExpeditionSave.bind(this)}
+				/>
 				</div>
 			</MainContainer>
 		)
