@@ -18,7 +18,8 @@ class LandingPage extends React.Component {
 
     const { 
       requestSignUp,
-      requestSignIn
+      requestSignIn,
+      errors
     } = this.props
 
     return (
@@ -75,11 +76,17 @@ class LandingPage extends React.Component {
             <div className="content">
               {
                 this.props.location.pathname === '/signup' && 
-                <Signup requestSignUp={requestSignUp} />
+                <Signup
+                  requestSignUp={requestSignUp}
+                  errors={errors}
+                />
               }
               {
                 this.props.location.pathname === '/signin' && 
-                <Signin requestSignIn={requestSignIn} />
+                <Signin
+                  requestSignIn={requestSignIn}
+                  errors={errors}
+                />
               }
             </div>
           </div>

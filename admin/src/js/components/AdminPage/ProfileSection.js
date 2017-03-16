@@ -8,7 +8,7 @@ class ProfileSection extends React.Component {
 
     }
   }
-
+  
   render () {
 
     return (

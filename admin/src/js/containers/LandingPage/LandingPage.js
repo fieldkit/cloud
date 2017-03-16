@@ -4,7 +4,9 @@ import LandingPage from '../../components/LandingPage/LandingPage'
 import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
+  const errors = state.expeditions.get('errors')
   return {
+    errors
   }
 }
 

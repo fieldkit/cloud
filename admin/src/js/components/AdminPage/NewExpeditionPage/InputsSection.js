@@ -7,31 +7,23 @@ import I from 'immutable'
 import Dropdown from 'react-dropdown'
 import Select from 'react-select'
 import { Base64 } from 'js-base64'
+import { protocol, hostname } from '../../../constants/APIBaseURL'
 
 import iconRemoveSmall from '../../../../img/icon-remove-small.png'
 
 
-class NewInputsSection extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      addMemberValue: null,
-      inputValues: {}
-    }
-  }
-
+class NewInputsSection extends React.Component {  
   render () {
-
     const { 
       projectID,
       expedition,
-      documentTypes,
-      selectedDocumentType,
+      inputs,
+      errors,
+      selectedInput,
       setExpeditionProperty,
-      fetchSuggestedDocumentTypes,
-      addDocumentType,
-      removeDocumentType,
-      submitInputs
+      fetchSuggestedInputs,
+      addInput,
+      removeInput
     } = this.props
 
     return (
@@ -49,7 +41,7 @@ class NewInputsSection extends React.Component {
         </p>
         <table className="objects-list">
           {
-            !!documentTypes && !!documentTypes.filter(d => {return d.get('type') === 'sensor'}).size &&
+            !!inputs && !!inputs.filter(d => {return d.get('type') === 'sensor'}).size &&
             <tbody>
               <td className="name">Name</td>
               <td className="description">Description</td>
@@ -58,7 +50,7 @@ class NewInputsSection extends React.Component {
             </tbody>
           }
           { 
-            documentTypes
+            inputs
               .filter(d => {return d.get('type') === 'sensor'}) 
               .map((d, i) => {
                 return (
@@ -76,7 +68,7 @@ class NewInputsSection extends React.Component {
                                 <li>
                                   <a 
                                     href={'data:application/octet-stream;charset=utf-16le;base64,' + Base64.encode(
-                                      'https://fieldkit.org/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + expedition.get('token')
+                                      protocol + hostname + '/api/input/' + d.get('token') + '/fieldkit/rockblock?token=' + expedition.get('token')
                                     )}
                                     download="config.txt"
                                   >
@@ -84,7 +76,10 @@ class NewInputsSection extends React.Component {
                                   </a>
                                 </li>
                                 <li>
-                                  2. Initialize your device. You're done!
+                                  2. Insert the SD card into your Conservify device.
+                                </li>
+                                <li>
+                                  3. Initialize your device. You're done!
                                 </li>
                               </ul>
                             )
@@ -95,7 +90,7 @@ class NewInputsSection extends React.Component {
                     <td 
                       className="remove"
                       onClick={() => {
-                        removeDocumentType(d.get('id'))
+                        removeInput(d.get('id'))
                       }}
                     >  
                       <img src={'/' + iconRemoveSmall}/>
@@ -110,19 +105,19 @@ class NewInputsSection extends React.Component {
                 <Select.Async
                   name="add-documentType"
                   loadOptions={(input, callback) =>
-                    fetchSuggestedDocumentTypes(input, 'sensor', callback)
+                    fetchSuggestedInputs(input, 'sensor', callback)
                   }
-                  value={ expedition.getIn(['selectedDocumentType', 'sensor']) }
+                  value={ expedition.getIn(['selectedInput', 'sensor']) }
                   onChange={(val) => {
-                    setExpeditionProperty(['selectedDocumentType', 'sensor'], val.value)
+                    setExpeditionProperty(['selectedInput', 'sensor'], val.value)
                   }}
                   clearable={false}
                 />
                 <div
-                  className={ "button" + (!!expedition.getIn(['selectedDocumentType', 'sensor']) ? '' : ' disabled') }
+                  className={ "button" + (!!expedition.getIn(['selectedInput', 'sensor']) ? '' : ' disabled') }
                   onClick={() => {
-                    if (!!expedition.getIn(['selectedDocumentType', 'sensor'])) {
-                      addDocumentType(expedition.getIn(['selectedDocumentType', 'sensor']), 'sensor')
+                    if (!!expedition.getIn(['selectedInput', 'sensor'])) {
+                      addInput(expedition.getIn(['selectedInput', 'sensor']), 'sensor')
                     }
                   }}
                 >
@@ -135,9 +130,19 @@ class NewInputsSection extends React.Component {
             </td>
           </tbody>
         </table>
-
-        <p className="status">
-        </p>
+        {
+          !!errors && !!errors.get && !!errors.get('name') &&
+          errors.get('name').map((error, i) => {
+            return (
+              <p 
+                key={'errors-name-' + i}
+                className="errors"
+              >
+                {error}
+              </p>
+            )
+          })
+        }
 
         <Link to={'/admin/' + projectID + '/new-expedition/confirmation'}>
           <div className="button hero">
@@ -145,9 +150,14 @@ class NewInputsSection extends React.Component {
           </div>
         </Link>
 
+        {
+          !!errors &&
+          <p className="errors">
+            We found one or multiple errors. Please check the information above or try again later.
+          </p>
+        }
       </div>
     )
-
   }
 }
 

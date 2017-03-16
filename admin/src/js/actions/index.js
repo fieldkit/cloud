@@ -7,7 +7,28 @@ import FKApiClient from '../api/api.js'
 import I from 'immutable'
 import slug from 'slug'
 
+/*
+
+COMMON ACTIONS
+
+*/
+
 export const SET_ERROR = 'SET_ERROR'
+export const SET_BREADCRUMBS = 'SET_BREADCRUMBS'
+
+export function setBreadcrumbs(level, name, url) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: SET_BREADCRUMBS,
+      level,
+      value: !!name ? I.fromJS({
+        name,
+        url
+      }) : null
+    })
+  }
+}
+
 
 /*
 
@@ -38,11 +59,18 @@ export function requestProjects (callback) {
       .then(res => {
         console.log('projects received:', res)
         if (!res) {
-          dispatch({
-            type: RECEIVE_PROJECTS,
-            projects: I.Map()
-          })
-          if (callback) callback()
+          const projects = I.Map()
+          dispatch([
+            {
+              type: RECEIVE_PROJECTS,
+              projects
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
+          if (callback) callback(projects)
         } else {
           const projectMap = {}
           res.forEach(p => {
@@ -62,10 +90,16 @@ export function requestProjects (callback) {
             {
               type: SET_CURRENT_PROJECT,
               projectID: projects.toList().getIn([0, 'slug'])
+            },
+            {
+              type: SET_ERROR,
+              errors: null
             }
           ])
+          if (callback) callback(projects)
         }
       })
+      .catch(err => {})
   }
 }
 
@@ -93,19 +127,17 @@ export function saveProject (id, name) {
     FKApiClient.createProjects(name)
       .then(res => {
         console.log('project created', res)
-        const projectMap = {};
-        [res].forEach(p => {
-          projectMap[p.slug] = p
-        })
-        const projects = I.fromJS(projectMap)
-          .map(p => {
-            return p.merge(I.fromJS({expeditions: []}))
-          })
         dispatch({
           type: SAVE_PROJECT,
           id
         })
         browserHistory.push('/admin/' + id)
+      })
+      .catch(error => {
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
       })
   }
 }
@@ -122,12 +154,13 @@ export const SET_EXPEDITION_PROPERTY = 'SET_EXPEDITION_PROPERTY'
 export const SAVE_EXPEDITION = 'SAVE_EXPEDITION'
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
-export const ADD_DOCUMENT_TYPE = 'ADD_DOCUMENT_TYPE'
-export const REMOVE_DOCUMENT_TYPE = 'REMOVE_DOCUMENT_TYPE'
+export const ADD_INPUT = 'ADD_INPUT'
+export const REMOVE_INPUT = 'REMOVE_INPUT'
 export const RECEIVE_TOKEN = 'RECEIVE_TOKEN'
 
 export function newExpedition () {
   return function (dispatch, getState) {
+    console.log('wat? newexp')
     dispatch(
       {
         type: NEW_EXPEDITION
@@ -155,19 +188,25 @@ export function setExpeditionProperty (keyPath, value) {
   }
 }
 
-export function requestExpeditions (callback) {
+export function requestExpeditions (projectID, callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
     FKApiClient.getExpeditions(projectID)
       .then(res => {
         console.log('expeditions received:', res)
         if (!res) {
-          dispatch({
-            type: RECEIVE_EXPEDITIONS,
-            projectID,
-            expeditions: I.Map()
-          })
-          if (callback) callback()
+          const expeditions = I.Map()
+          dispatch([
+            {
+              type: RECEIVE_EXPEDITIONS,
+              projectID,
+              expeditions
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
+          if (callback) callback(expeditions)
         } else {
           const expeditionMap = {}
           res.forEach(e => {
@@ -178,24 +217,32 @@ export function requestExpeditions (callback) {
               return e.merge(I.fromJS({
                 id: e.get('slug'),
                 token: '',
-                selectedDocumentType: {},
-                documentTypes: {},              
+                inputs: [
+                ]
               }))
             })
-          dispatch({
-            type: RECEIVE_EXPEDITIONS,
-            projectID,
-            expeditions
-          })
+          dispatch([
+            {
+              type: RECEIVE_EXPEDITIONS,
+              projectID,
+              expeditions
+            },
+            {
+              type: SET_ERROR,
+              errors: null
+            }
+          ])
+          if (callback) callback(expeditions)
         }
       })
+      .catch(err => {})
   }
 }
 
 export function saveGeneralSettings (callback) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionName = expedition.get('name')
     const expeditionID = expedition.get('id')
     FKApiClient.postGeneralSettings(projectID, expeditionName)
@@ -205,6 +252,11 @@ export function saveGeneralSettings (callback) {
           // error
           console.log('error with expedition creation')
         } else {
+          dispatch({
+            type: SET_EXPEDITION_PROPERTY,
+            keyPath: ['id'],
+            value: expeditionID
+          })
           FKApiClient.addExpeditionToken(projectID, expeditionID)
             .then(res => {
               console.log('server response:', res)
@@ -219,18 +271,19 @@ export function saveGeneralSettings (callback) {
                   },
                   {
                     type: SET_ERROR,
-                    error: null
-                  },
+                    errors: null
+                  }
                 ])
                 if (!!callback) callback()
               }
             })
+            .catch(err => {})
         }
       })
       .catch(error => {
         dispatch({
           type: SET_ERROR,
-          error: I.fromJS(error.message)
+          errors: I.fromJS(error.message)
         })
       })
   }
@@ -239,10 +292,11 @@ export function saveGeneralSettings (callback) {
 export function submitInputs () {
   return function (dispatch, getState) {
 
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
-    const inputName = expedition.get('documentTypes').toList().get(0).get('id')
+    // TODO: submit multiple inputs
+    const inputName = expedition.get('inputs').toList().get(0).get('id')
     console.log('sending input', projectID, expeditionID, inputName)
     FKApiClient.postInputs(projectID, expeditionID, inputName)
       .then(res => {
@@ -255,23 +309,24 @@ export function submitInputs () {
           browserHistory.push('/admin/' + projectID + '/new-expedition/confirmation')
           dispatch({
             type: SET_ERROR,
-            error: null
+            errors: null
           })
         }
       })
+      .catch(err => {})
   }
 }
 
-export function fetchSuggestedDocumentTypes (input, type, callback) {
+export function fetchSuggestedInputs (input, type, callback) {
   return function (dispatch, getState) {
     window.setTimeout(() => {
-      const documentTypes = getState().expeditions
-        .get('documentTypes')
+      const inputs = getState().expeditions
+        .get('inputs')
         .filter((d) => {
           const nameCheck = d.get('name').toLowerCase().indexOf(input.toLowerCase()) > -1
           const typeCheck = d.get('type') === type
           const membershipCheck = getState().expeditions
-            .getIn(['newExpedition', 'documentTypes'])
+            .getIn(['currentExpedition', 'inputs'])
             .has(d.get('id'))
           return (nameCheck) && !membershipCheck && typeCheck
         })
@@ -281,17 +336,17 @@ export function fetchSuggestedDocumentTypes (input, type, callback) {
         .toArray()
 
       callback(null, {
-        options: documentTypes,
+        options: inputs,
         complete: true
       })
     }, 500)
   }
 }
 
-export function addDocumentType (id, collectionType) {
+export function addInput (id, collectionType) {
   return function (dispatch, getState) {
-    const projectID = getState().expeditions.getIn(['newProject', 'id'])
-    const expedition = getState().expeditions.get('newExpedition')
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expedition = getState().expeditions.get('currentExpedition')
     const expeditionID = expedition.get('id')
     FKApiClient.addInput(projectID, expeditionID, id)
       .then(res => {
@@ -301,20 +356,21 @@ export function addDocumentType (id, collectionType) {
         } else {
           console.log('input successfully added')
           dispatch({
-            type: ADD_DOCUMENT_TYPE,
+            type: ADD_INPUT,
             id,
             collectionType,
             token: res.id
           })
         }
       })
+      .catch(err => {})
   }
 }
 
-export function removeDocumentType (id) {
+export function removeInput (id) {
   return function (dispatch, getState) {
     dispatch({
-      type: REMOVE_DOCUMENT_TYPE,
+      type: REMOVE_INPUT,
       id
     })
   }
@@ -336,13 +392,32 @@ AUTH ACTIONS
 
 export const SIGNIN_REQUEST = 'SIGNIN_REQUEST'
 export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS'
-export const SIGNIN_ERROR = 'SIGNIN_ERROR'
 export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
-export const SIGNUP_ERROR = 'SIGNUP_ERROR'
 export const SIGNOUT_REQUEST = 'SIGNOUT_REQUEST'
 export const SIGNOUT_SUCCESS = 'SIGNOUT_SUCCESS'
-export const SIGNOUT_ERROR = 'SIGNOUT_ERROR'
+export const RECEIVE_USER = 'RECEIVE_USER'
+
+export function requestUser (callback) {
+  return function (dispatch, getState) {
+    FKApiClient.getUser()
+      .then(res => {
+        const user = I.fromJS({
+          username: res.username,
+          email: res.email
+        })
+        dispatch({
+          type: RECEIVE_USER,
+          user
+        })
+        callback(null, user)
+      })
+      .catch(err => {
+        console.log('Error getting user:', err)
+        callback(err, null)
+      })
+  }
+}
 
 export function requestSignIn (username, password) {
   return function (dispatch, getState) {
@@ -364,20 +439,20 @@ export function requestSignIn (username, password) {
             case 429:
               dispatch({
                 type: SET_ERROR,
-                error: I.fromJS('Try again later.')
+                errors: I.fromJS('Try again later.')
               })
               break
             case 401:
               dispatch({
                 type: SET_ERROR,
-                error: I.fromJS('Username or password incorrect.')
+                errors: I.fromJS('Username or password incorrect.')
               })
               break
           }
         } else {
           dispatch({
             type: SET_ERROR,
-            error: I.fromJS('A server error occured')
+            errors: I.fromJS('A server error occured')
           })
         }
       })
@@ -403,21 +478,10 @@ export function requestSignUp (email, username, password, invite) {
         browserHistory.push('/signin')
       })
       .catch(error => {
-        console.log('signup error:', error)
-        if (error.response && error.response.status === 400) {
-          error.response.json()
-            .then(message => {
-              dispatch({
-                type: SIGNUP_ERROR,
-                message
-              })
-            })
-        } else {
-          dispatch({
-            type: SIGNUP_ERROR,
-            message: 'A server error occurred.'
-          })
-        }
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
       })
   }
 }
@@ -435,21 +499,139 @@ export function requestSignOut () {
         browserHistory.push('/')
       })
       .catch(error => {
-        console.log('signout error:', error)
-        if (error.response && error.response.status === 400) {
-          error.response.json()
-            .then(message => {
-              dispatch({
-                type: SIGNOUT_ERROR,
-                message
-              })
-            })
-        } else {
-          dispatch({
-            type: SIGNOUT_ERROR,
-            message: 'A server error occurred.'
-          })
-        }
+        dispatch({
+          type: SET_ERROR,
+          errors: I.fromJS(error.message)
+        })
       })
   }
 }
+
+
+/*
+
+INPUTS PAGE ACTIONS
+
+*/
+
+export const REQUEST_INPUTS = 'REQUEST_INPUTS'
+export const RECEIVE_INPUTS = 'RECEIVE_INPUTS'
+
+export function initInputsPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_INPUTS
+    })
+    const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    FKApiClient.getInputs(projectID, expeditionID)
+      .then((res) => {
+        const inputs = I.fromJS(res).map((i) => {
+          return i.get('slug')
+        })
+        dispatch({
+          type: RECEIVE_INPUTS,
+          expeditionID,
+          inputs
+        })
+        callback()
+      })
+  }
+}
+
+
+/*
+
+TEAMS PAGE ACTIONS
+
+*/
+
+export const REQUEST_TEAMS = 'REQUEST_TEAMS'
+export const RECEIVE_TEAMS = 'RECEIVE_TEAMS'
+
+export function initTeamsPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_TEAMS
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
+  }
+}
+
+
+/*
+
+TEAMS PAGE ACTIONS
+
+*/
+
+export const REQUEST_UPLOADERS = 'REQUEST_UPLOADERS'
+export const RECEIVE_UPLOADERS = 'RECEIVE_UPLOADERS'
+
+export function initUploaderPage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_UPLOADERS
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
+  }
+}
+
+
+/*
+
+THEMES PAGE ACTIONS
+
+*/
+
+export const REQUEST_THEME = 'REQUEST_THEME'
+export const RECEIVE_THEME = 'RECEIVE_THEME'
+
+export function initThemePage (callback) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: REQUEST_THEME
+    })
+    // const projectID = getState().expeditions.getIn(['currentProject', 'id'])
+    // const expeditionID = getState().expeditions.getIn(['currentExpedition', 'id'])
+    // FKApiClient.getInputs(projectID, expeditionID)
+    //   .then((res) => {
+    //     const inputs = I.fromJS(res).map((i) => {
+    //       return i.get('slug')
+    //     })
+    //     dispatch({
+    //       type: RECEIVE_INPUTS,
+    //       expeditionID,
+    //       inputs
+    //     })
+        callback()
+      // })
+  }
+}
+
