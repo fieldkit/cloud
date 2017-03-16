@@ -5,7 +5,7 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var AddProjectPayload = Type("AddProjectPayload", func() {
+var AddTeamPayload = Type("AddTeamPayload", func() {
 	Attribute("name", String)
 	Attribute("slug", String, func() {
 		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
@@ -15,9 +15,9 @@ var AddProjectPayload = Type("AddProjectPayload", func() {
 	Required("name", "slug", "description")
 })
 
-var Project = MediaType("application/vnd.app.project+json", func() {
-	TypeName("Project")
-	Reference(AddProjectPayload)
+var Team = MediaType("application/vnd.app.team+json", func() {
+	TypeName("Team")
+	Reference(AddTeamPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("name")
@@ -33,35 +33,60 @@ var Project = MediaType("application/vnd.app.project+json", func() {
 	})
 })
 
-var Projects = MediaType("application/vnd.app.projects+json", func() {
-	TypeName("Projects")
+var Teams = MediaType("application/vnd.app.teams+json", func() {
+	TypeName("Teams")
 	Attributes(func() {
-		Attribute("projects", CollectionOf(Project))
-		Required("projects")
+		Attribute("teams", CollectionOf(Team))
+		Required("teams")
 	})
 	View("default", func() {
-		Attribute("projects")
+		Attribute("teams")
 	})
 })
 
-var _ = Resource("project", func() {
+var _ = Resource("team", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
 	})
 
 	Action("add", func() {
-		Routing(POST("project"))
-		Description("Add a project")
-		Payload(AddProjectPayload)
+		Routing(POST("projects/:project/expeditions/:expedition/team"))
+		Description("Add a team")
+		Params(func() {
+			Param("project", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+		})
+		Payload(AddTeamPayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Project)
+			Media(Team)
 		})
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/:project"))
-		Description("Get a project")
+		Routing(GET("projects/:project/expeditions/:expedition/teams/:team"))
+		Description("Add a team")
+		Params(func() {
+			Param("project", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+			Param("team", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Team)
+		})
+	})
+
+	Action("list", func() {
+		Routing(GET("projects/:project/expeditions/:expedition/teams"))
+		Description("List a project's teams")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
@@ -70,25 +95,7 @@ var _ = Resource("project", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Project)
-		})
-	})
-
-	Action("list", func() {
-		Routing(GET("projects"))
-		Description("List projects")
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Projects)
-		})
-	})
-
-	Action("list current", func() {
-		Routing(GET("user/projects"))
-		Description("List the authenticated user's projects")
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Projects)
+			Media(Teams)
 		})
 	})
 })

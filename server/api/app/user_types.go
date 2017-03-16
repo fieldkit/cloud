@@ -158,6 +158,79 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addTeamPayload user type.
+type addTeamPayload struct {
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug        *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+}
+
+// Validate validates the addTeamPayload type instance.
+func (ut *addTeamPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if ut.Slug == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if ut.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ut.Slug != nil {
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Slug); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, *ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	if ut.Slug != nil {
+		if utf8.RuneCountInString(*ut.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, *ut.Slug, utf8.RuneCountInString(*ut.Slug), 40, false))
+		}
+	}
+	return
+}
+
+// Publicize creates AddTeamPayload from addTeamPayload
+func (ut *addTeamPayload) Publicize() *AddTeamPayload {
+	var pub AddTeamPayload
+	if ut.Description != nil {
+		pub.Description = *ut.Description
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.Slug != nil {
+		pub.Slug = *ut.Slug
+	}
+	return &pub
+}
+
+// AddTeamPayload user type.
+type AddTeamPayload struct {
+	Description string `form:"description" json:"description" xml:"description"`
+	Name        string `form:"name" json:"name" xml:"name"`
+	Slug        string `form:"slug" json:"slug" xml:"slug"`
+}
+
+// Validate validates the AddTeamPayload type instance.
+func (ut *AddTeamPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if ut.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if ut.Description == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(ut.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, ut.Slug, utf8.RuneCountInString(ut.Slug), 40, false))
+	}
+	return
+}
+
 // addUserPayload user type.
 type addUserPayload struct {
 	Email       *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`

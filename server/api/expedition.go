@@ -52,7 +52,7 @@ func (c *ExpeditionController) Add(ctx *app.AddExpeditionContext) error {
 		Description: ctx.Payload.Description,
 	}
 
-	if err := c.options.Database.SelectContext(ctx, &expedition.ProjectID, "SELECT id FROM fieldkit.project WHERE slug = $1", ctx.Project); err != nil {
+	if err := c.options.Database.GetContext(ctx, &expedition.ProjectID, "SELECT id FROM fieldkit.project WHERE slug = $1", ctx.Project); err != nil {
 		return err
 	}
 
@@ -63,25 +63,16 @@ func (c *ExpeditionController) Add(ctx *app.AddExpeditionContext) error {
 	return ctx.OK(ExpeditionType(expedition))
 }
 
-// func (c *ExpeditionController) Get(ctx *app.GetExpeditionContext) error {
-// 	expedition := &data.Expedition{}
-// 	if err := c.options.Database.GetContext(ctx, expedition, "SELECT * FROM fieldkit.expedition WHERE slug = $1", ctx.Expedition); err != nil {
-// 		return err
-// 	}
+func (c *ExpeditionController) Get(ctx *app.GetExpeditionContext) error {
+	expedition := &data.Expedition{}
+	if err := c.options.Database.GetContext(ctx, expedition, "SELECT e.* FROM fieldkit.expedition AS e JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Expedition); err != nil {
+		return err
+	}
 
-// 	return ctx.OK(ExpeditionType(expedition))
-// }
+	return ctx.OK(ExpeditionType(expedition))
+}
 
-// func (c *ExpeditionController) List(ctx *app.ListExpeditionContext) error {
-// 	expeditions := []*data.Expedition{}
-// 	if err := c.options.Database.SelectContext(ctx, &expeditions, "SELECT * FROM fieldkit.expedition"); err != nil {
-// 		return err
-// 	}
-
-// 	return ctx.OK(ExpeditionsType(expeditions))
-// }
-
-func (c *ExpeditionController) ListProject(ctx *app.ListProjectExpeditionContext) error {
+func (c *ExpeditionController) List(ctx *app.ListExpeditionContext) error {
 	expeditions := []*data.Expedition{}
 	if err := c.options.Database.SelectContext(ctx, &expeditions, "SELECT e.* FROM fieldkit.expedition AS e JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1", ctx.Project); err != nil {
 		return err

@@ -35,6 +35,9 @@ func NewAddExpeditionContext(ctx context.Context, r *http.Request, service *goa.
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
 	}
 	return &rctx, err
 }
@@ -51,39 +54,91 @@ func (ctx *AddExpeditionContext) BadRequest() error {
 	return nil
 }
 
-// ListProjectExpeditionContext provides the expedition list project action context.
-type ListProjectExpeditionContext struct {
+// GetExpeditionContext provides the expedition get action context.
+type GetExpeditionContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewGetExpeditionContext parses the incoming request URL and body, performs validations and creates the
+// context used by the expedition controller get action.
+func NewGetExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetExpeditionContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetExpeditionContext) OK(r *Expedition) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetExpeditionContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListExpeditionContext provides the expedition list action context.
+type ListExpeditionContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	Project string
 }
 
-// NewListProjectExpeditionContext parses the incoming request URL and body, performs validations and creates the
-// context used by the expedition controller list project action.
-func NewListProjectExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListProjectExpeditionContext, error) {
+// NewListExpeditionContext parses the incoming request URL and body, performs validations and creates the
+// context used by the expedition controller list action.
+func NewListExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListExpeditionContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := ListProjectExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := ListExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListProjectExpeditionContext) OK(r *Expeditions) error {
+func (ctx *ListExpeditionContext) OK(r *Expeditions) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expeditions+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ListProjectExpeditionContext) BadRequest() error {
+func (ctx *ListExpeditionContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -141,6 +196,9 @@ func NewGetProjectContext(ctx context.Context, r *http.Request, service *goa.Ser
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
 	}
 	return &rctx, err
 }
@@ -215,6 +273,154 @@ func (ctx *ListCurrentProjectContext) OK(r *Projects) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListCurrentProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// AddTeamContext provides the team add action context.
+type AddTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+	Payload    *AddTeamPayload
+}
+
+// NewAddTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller add action.
+func NewAddTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetTeamContext provides the team get action context.
+type GetTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+	Team       string
+}
+
+// NewGetTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller get action.
+func NewGetTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramTeam := req.Params["team"]
+	if len(paramTeam) > 0 {
+		rawTeam := paramTeam[0]
+		rctx.Team = rawTeam
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListTeamContext provides the team list action context.
+type ListTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller list action.
+func NewListTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListTeamContext) OK(r *Teams) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.teams+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListTeamContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

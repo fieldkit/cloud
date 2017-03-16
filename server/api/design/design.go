@@ -17,6 +17,7 @@ var _ = API("fieldkit", func() {
 	Scheme("https")
 	Origin("https://fieldkit.org", cors)
 	Origin("https://*.fieldkit.org", cors)
+	Origin("http://localhost:3000", cors)
 	Consumes("application/json")
 	Produces("application/json")
 })

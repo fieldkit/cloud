@@ -50,8 +50,14 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("project/:project/expedition"))
+		Routing(POST("projects/:project/expedition"))
 		Description("Add a expedition")
+		Params(func() {
+			Param("project", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+		})
 		Payload(AddExpeditionPayload)
 		Response(BadRequest)
 		Response(OK, func() {
@@ -59,27 +65,34 @@ var _ = Resource("expedition", func() {
 		})
 	})
 
-	// Action("get", func() {
-	// 	Routing(GET("expeditions/:expedition"))
-	// 	Description("Get a expedition")
-	// 	Response(BadRequest)
-	// 	Response(OK, func() {
-	// 		Media(Expedition)
-	// 	})
-	// })
+	Action("get", func() {
+		Routing(GET("projects/:project/expeditions/:expedition"))
+		Description("Add a expedition")
+		Params(func() {
+			Param("project", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+			Param("expedition", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Expedition slug")
+			})
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Expedition)
+		})
+	})
 
-	// Action("list", func() {
-	// 	Routing(GET("expeditions"))
-	// 	Description("List expeditions")
-	// 	Response(BadRequest)
-	// 	Response(OK, func() {
-	// 		Media(Expeditions)
-	// 	})
-	// })
-
-	Action("list project", func() {
-		Routing(GET("project/:project/expeditions"))
+	Action("list", func() {
+		Routing(GET("projects/:project/expeditions"))
 		Description("List a project's expeditions")
+		Params(func() {
+			Param("project", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Project slug")
+			})
+		})
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Expeditions)
