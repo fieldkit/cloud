@@ -33,13 +33,13 @@ export class Projects extends Component {
 
   async loadData() {
     const projectsRes = await FKApiClient.get().getProjects();
-    if (projectsRes.type === 'ok') {
-      this.setState({ projects: projectsRes.payload })
+    if (projectsRes.type === 'ok' && projectsRes.payload) {
+      this.setState({ projects: projectsRes.payload.projects })
     }
   }
 
-  async onProjectCreate(name: string, description: string) {
-    const project = await FKApiClient.get().createProject(name, description);
+  async onProjectCreate(name: string, slug: string, description: string) {
+    const project = await FKApiClient.get().createProject({ name, slug, description });
     if (project.type === 'ok') {
       await this.loadData();
       this.props.history.push("/");

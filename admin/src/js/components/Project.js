@@ -11,6 +11,9 @@ import { FKApiClient } from '../api/api';
 import '../../css/home.css'
 
 type Props = {
+  project: Object;
+  onProjectUpdate: (newSlug: ?string) => void;
+
   match: Object;
   location: Object;
   history: Object;
@@ -19,7 +22,6 @@ type Props = {
 export class Project extends Component {
   props: Props;
   state: {
-    project: ?Object,
     expeditions: Object[]
   }
 
@@ -34,59 +36,46 @@ export class Project extends Component {
     this.loadData();
   }
 
-  projectSlug() {
-    return this.props.match.params.projectSlug;
-  }
-
   async loadData() {
-    const projectSlug = this.projectSlug();
-
-    const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-    if (projectRes.type === 'ok') {
-      this.setState({ project: projectRes.payload })
-    }
-
-    const expeditionsRes = await FKApiClient.get().getExpeditionsByProjectSlug(projectSlug);
-    if (expeditionsRes.type === 'ok') {
-      this.setState({ expeditions: expeditionsRes.payload || [] })
+    const expeditionsRes = await FKApiClient.get().getExpeditionsByProjectSlug(this.props.project.slug);
+    if (expeditionsRes.type === 'ok' && expeditionsRes.payload) {
+      this.setState({ expeditions: expeditionsRes.payload.expeditions || [] })
     }
   }
 
-  async onExpeditionCreate(name: string, description: string) {
-    const { project } = this.state;
-    if (!project) {
-      // TODO: handle error
-      return;
-    }
+  async onExpeditionCreate(name: string, slug: string, description: string) {
+    const { project } = this.props;
 
-    // TODO: swap this in when the backend is ready
-    // const projectId = project.id;
-    const projectId = this.projectSlug();
-
-    const expeditionRes = await FKApiClient.get().createExpedition(projectId, name, description);
+    const expeditionRes = await FKApiClient.get().createExpedition(project.id, { name, slug, description });
     if (expeditionRes.type === 'ok') {
       await this.loadData();
-      this.props.history.push(`/projects/${this.projectSlug()}`);
+      this.props.history.push(`/projects/${project.slug}`);
     } else {
       return expeditionRes.errors;
     }
   }
 
-  async onProjectSave(name: string, description: string) {
+  async onProjectSave(name: string, slug: string, description: string) {
     // TODO: this isn't implemented on the backend yet!
 
-    // const project = await FKApiClient.get().saveProject(slug, description);
-    // if (project.type === 'ok') {
-    //   await this.loadData();
-    //   this.props.history.push("/");
-    // } else {
-    //   return project.errors;
-    // }
+    const project = await FKApiClient.get().updateProject(this.props.project.id, { name, slug, description });
+    if (project.type === 'ok') {
+      await this.loadData();
+      this.props.history.push("/");
+    } else {
+      return project.errors;
+    }
+
+    if (slug != this.props.project.slug) {
+      this.props.onProjectUpdate(slug);
+    } else {
+      this.props.onProjectUpdate();
+    }
   }
 
   render () {
-    const { project } = this.state;
-    const projectSlug = this.projectSlug();
+    const { project } = this.props;
+    const projectSlug = project.slug;
 
     return (
       <div className="project">

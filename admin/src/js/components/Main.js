@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react'
-import { Switch, Route, Link, NavLink } from 'react-router-dom';
+import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 
 import { FKApiClient } from '../api/api';
 
@@ -22,6 +22,7 @@ export class Main extends Component {
   props: Props;
   state: {
     loading: boolean,
+    redirectTo: ?string,
     user: ?Object,
     project: ?Object,
     expedition: ?Object
@@ -32,14 +33,17 @@ export class Main extends Component {
 
     this.state = {
       loading: true,
+      redirectTo: null,
       user: null,
       project: null,
       expedition: null
     }
 
-    this.loadUser();
-    this.loadProject();
-    this.loadExpedition();
+    Promise.all([
+      this.loadUser(),
+      this.loadProject(),
+      this.loadExpedition()
+    ]).then(() => this.setState({ loading: false }));
   }
 
   projectSlug(): ?string {
@@ -52,8 +56,8 @@ export class Main extends Component {
 
   async loadUser() {
     const userRes = await FKApiClient.get().getUser();
-    if (userRes.type == 'ok') {
-      this.setState({ user: userRes.payload });
+    if (userRes.type == 'ok' && userRes.payload) {
+      this.setState({ user: userRes.payload.user });
     }
   }
 
@@ -61,7 +65,8 @@ export class Main extends Component {
     const projectSlug = this.projectSlug();
     if (projectSlug) {
       const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type == 'ok') {
+      console.log(projectRes);
+      if (projectRes.type == 'ok' && projectRes.payload) {
         this.setState({ project: projectRes.payload });
       }
     }
@@ -72,17 +77,25 @@ export class Main extends Component {
     const expeditionSlug = this.expeditionSlug();
     if (projectSlug && expeditionSlug) {
       const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
-      if (expRes.type == 'ok') {
+      if (expRes.type == 'ok' && expRes.payload) {
         this.setState({ expedition: expRes.payload });
       }
     }
   }
 
-  async onProjectUpdate() {
-    
+  onProjectUpdate(newSlug: ?string = null) {
+    if (newSlug) {
+      this.setState({ redirectTo: `/projects/${newSlug}`})
+    } else {
+      this.loadProject();
+    }
   }
 
   render() {
+    if (this.state.redirectTo) {
+      return <Redirect to={this.state.redirectTo} />;
+    }
+
     const projectSlug = this.projectSlug();
     const expeditionSlug = this.expeditionSlug();
 
@@ -90,6 +103,18 @@ export class Main extends Component {
       project,
       expedition
     } = this.state;
+
+    const breadcrumbs = [];
+    if (project) {
+      breadcrumbs.push(
+        <Link to={`/projects/${project.slug}`}>{project.name}</Link>
+      );
+      if (expedition) {
+        breadcrumbs.push(
+          <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
+        );
+      }
+    }
 
     return (
       <div className="main">
@@ -124,7 +149,7 @@ export class Main extends Component {
         <div className="right">
           <div className="nav">
             <div className="breadcrumbs">
-              {/* TODO: breadcrumbs */}
+              { breadcrumbs.length > 0 && breadcrumbs.reduce((prev, curr) => [prev, ' / ', curr]) }
             </div>
             <div className="profile-image">
               <img src={placeholderImage} alt="profile" />
@@ -133,7 +158,18 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
-              <Route path="/projects/:projectSlug" render={props => <Project project={project} {...props} />} />
+              <Route path="/projects/:projectSlug" render={props => {
+                if (project) {
+                  return (
+                    <Project
+                      project={project}
+                      onProjectUpdate={this.onProjectUpdate.bind(this)}
+                      {...props} />
+                  )
+                } else {
+                  return <div></div>
+                }
+              }} />
               <Route path="/" render={props => <Projects {...props} />} />
             </Switch>
           </div>
