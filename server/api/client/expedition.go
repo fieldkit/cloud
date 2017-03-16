@@ -13,11 +13,12 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // AddExpeditionPath computes a request path to the add action of expedition.
-func AddExpeditionPath(project string) string {
-	param0 := project
+func AddExpeditionPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
 
 	return fmt.Sprintf("/projects/%s/expedition", param0)
 }
@@ -58,7 +59,7 @@ func GetExpeditionPath(project string, expedition string) string {
 	param0 := project
 	param1 := expedition
 
-	return fmt.Sprintf("/projects/%s/expeditions/%s", param0, param1)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s", param0, param1)
 }
 
 // Add a expedition
@@ -87,11 +88,44 @@ func (c *Client) NewGetExpeditionRequest(ctx context.Context, path string) (*htt
 	return req, nil
 }
 
+// GetIDExpeditionPath computes a request path to the get id action of expedition.
+func GetIDExpeditionPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
+
+	return fmt.Sprintf("/expeditions/%s", param0)
+}
+
+// Add a expedition
+func (c *Client) GetIDExpedition(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetIDExpeditionRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetIDExpeditionRequest create the request corresponding to the get id action endpoint of the expedition resource.
+func (c *Client) NewGetIDExpeditionRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
 // ListExpeditionPath computes a request path to the list action of expedition.
 func ListExpeditionPath(project string) string {
 	param0 := project
 
-	return fmt.Sprintf("/projects/%s/expeditions", param0)
+	return fmt.Sprintf("/projects/@/%s/expeditions", param0)
 }
 
 // List a project's expeditions

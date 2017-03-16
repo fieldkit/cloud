@@ -7,6 +7,7 @@ import (
 
 var cors = func() {
 	Headers("Authorization")
+	Expose("Authorization")
 	Methods("GET", "OPTIONS", "POST")
 }
 

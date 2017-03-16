@@ -86,6 +86,15 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 	return ctx.OK(ProjectType(project))
 }
 
+func (c *ProjectController) GetID(ctx *app.GetIDProjectContext) error {
+	project := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, project, "SELECT * FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectType(project))
+}
+
 func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT * FROM fieldkit.project"); err != nil {

@@ -60,13 +60,25 @@ var _ = Resource("project", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/:project"))
+		Routing(GET("projects/@/:project"))
 		Description("Get a project")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
 			})
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Project)
+		})
+	})
+
+	Action("get id", func() {
+		Routing(GET("projects/:project_id"))
+		Description("Get a project")
+		Params(func() {
+			Param("project_id", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
