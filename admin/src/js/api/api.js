@@ -123,6 +123,10 @@ export class FKApiClient extends AuthAPIClient {
     return this.getWithJSONErrors(`/api/project/${projectSlug}/expeditions`)
   }
 
+  getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse> {
+    return this.getWithJSONErrors(`/api/project/${projectSlug}/expedition/${expeditionSlug}`)
+  }
+
   async createExpedition(projectID: string, name: string, description: string): Promise<FKAPIResponse> {
     return this.postFormWithJSONErrors(`/api/project/${projectID}/expeditions/add`, { name, description })
   }
