@@ -71,7 +71,7 @@ func (c *TeamController) Get(ctx *app.GetTeamContext) error {
 
 func (c *TeamController) GetID(ctx *app.GetIDTeamContext) error {
 	team := &data.Team{}
-	if err := c.options.Database.GetContext(ctx, team, "SELECT * FROM fieldkit.team id = $1", ctx.TeamID); err != nil {
+	if err := c.options.Database.GetContext(ctx, team, "SELECT * FROM fieldkit.team WHERE id = $1", ctx.TeamID); err != nil {
 		return err
 	}
 
