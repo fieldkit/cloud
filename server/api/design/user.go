@@ -20,6 +20,17 @@ var AddUserPayload = Type("AddUserPayload", func() {
 	Required("email", "username", "password", "invite_token")
 })
 
+var LoginPayload = Type("LoginPayload", func() {
+	Attribute("username", String, func() {
+		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+		MaxLength(40)
+	})
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
+	Required("username", "password")
+})
+
 var User = MediaType("application/vnd.app.user+json", func() {
 	TypeName("User")
 	Reference(AddUserPayload)
@@ -54,7 +65,7 @@ var _ = Resource("user", func() {
 		Routing(POST("login"))
 		Description("Creates a valid JWT given login credentials.")
 		NoSecurity()
-		Payload(AddUserPayload)
+		Payload(LoginPayload)
 		Response(NoContent, func() {
 			Headers(func() {
 				Header("Authorization", String, "Generated JWT")

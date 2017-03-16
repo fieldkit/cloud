@@ -158,6 +158,25 @@ definitions:
     - expeditions
     title: 'Mediatype identifier: application/vnd.app.expeditions+json; view=default'
     type: object
+  LoginPayload:
+    example:
+      password: tbwjv73wy8
+      username: r3k1msmhgb
+    properties:
+      password:
+        example: tbwjv73wy8
+        minLength: 10
+        type: string
+      username:
+        example: r3k1msmhgb
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - username
+    - password
+    title: LoginPayload
+    type: object
   Project:
     description: Project media type (default view)
     example:
@@ -221,10 +240,6 @@ definitions:
         id: 3.0773821e+18
         name: Nihil sit.
         slug: n2552fo50o
-      - description: Inventore voluptas.
-        id: 3.0773821e+18
-        name: Nihil sit.
-        slug: n2552fo50o
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -234,10 +249,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Rerum rerum et quia ut incidunt consequatur.
+      refresh_token: Ducimus autem.
     properties:
       refresh_token:
-        example: Rerum rerum et quia ut incidunt consequatur.
+        example: Ducimus autem.
         type: string
     required:
     - refresh_token
@@ -301,6 +316,14 @@ definitions:
         id: 1.3719604e+18
         name: Debitis ducimus.
         slug: hxwu5kh0we
+      - description: Ut voluptatum ducimus perspiciatis quasi error.
+        id: 1.3719604e+18
+        name: Debitis ducimus.
+        slug: hxwu5kh0we
+      - description: Ut voluptatum ducimus perspiciatis quasi error.
+        id: 1.3719604e+18
+        name: Debitis ducimus.
+        slug: hxwu5kh0we
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -350,6 +373,8 @@ definitions:
         username: ukk5y3b7yo
       - id: 7.9396906e+18
         username: ukk5y3b7yo
+      - id: 7.9396906e+18
+        username: ukk5y3b7yo
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -372,7 +397,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/AddUserPayload'
+          $ref: '#/definitions/LoginPayload'
       responses:
         "204":
           description: No Content

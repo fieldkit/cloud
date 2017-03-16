@@ -153,7 +153,7 @@ func LoginUserPath() string {
 }
 
 // Creates a valid JWT given login credentials.
-func (c *Client) LoginUser(ctx context.Context, path string, payload *AddUserPayload) (*http.Response, error) {
+func (c *Client) LoginUser(ctx context.Context, path string, payload *LoginPayload) (*http.Response, error) {
 	req, err := c.NewLoginUserRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func (c *Client) LoginUser(ctx context.Context, path string, payload *AddUserPay
 }
 
 // NewLoginUserRequest create the request corresponding to the login action endpoint of the user resource.
-func (c *Client) NewLoginUserRequest(ctx context.Context, path string, payload *AddUserPayload) (*http.Request, error) {
+func (c *Client) NewLoginUserRequest(ctx context.Context, path string, payload *LoginPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {

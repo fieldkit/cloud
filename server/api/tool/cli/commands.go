@@ -355,10 +355,8 @@ Payload example:
 Payload example:
 
 {
-   "email": "dameon@bechtelar.biz",
-   "invite_token": "Dolores quia id exercitationem aliquam error et.",
-   "password": "hfdgbyyauo",
-   "username": "52dmi76cin"
+   "password": "tbwjv73wy8",
+   "username": "r3k1msmhgb"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp15.Run(c, args) },
 	}
@@ -393,7 +391,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Rerum rerum et quia ut incidunt consequatur."
+   "refresh_token": "Ducimus autem."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp17.Run(c, args) },
 	}
@@ -1019,7 +1017,7 @@ func (cmd *LoginUserCommand) Run(c *client.Client, args []string) error {
 	} else {
 		path = "/login"
 	}
-	var payload client.AddUserPayload
+	var payload client.LoginPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {

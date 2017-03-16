@@ -543,7 +543,7 @@ type LoginUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *AddUserPayload
+	Payload *LoginPayload
 }
 
 // NewLoginUserContext parses the incoming request URL and body, performs validations and creates the

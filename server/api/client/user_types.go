@@ -330,3 +330,73 @@ func (ut *AddUserPayload) Validate() (err error) {
 	}
 	return
 }
+
+// loginPayload user type.
+type loginPayload struct {
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+}
+
+// Validate validates the loginPayload type instance.
+func (ut *loginPayload) Validate() (err error) {
+	if ut.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	if ut.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "password"))
+	}
+	if ut.Password != nil {
+		if utf8.RuneCountInString(*ut.Password) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 10, true))
+		}
+	}
+	if ut.Username != nil {
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	if ut.Username != nil {
+		if utf8.RuneCountInString(*ut.Username) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, *ut.Username, utf8.RuneCountInString(*ut.Username), 40, false))
+		}
+	}
+	return
+}
+
+// Publicize creates LoginPayload from loginPayload
+func (ut *loginPayload) Publicize() *LoginPayload {
+	var pub LoginPayload
+	if ut.Password != nil {
+		pub.Password = *ut.Password
+	}
+	if ut.Username != nil {
+		pub.Username = *ut.Username
+	}
+	return &pub
+}
+
+// LoginPayload user type.
+type LoginPayload struct {
+	Password string `form:"password" json:"password" xml:"password"`
+	Username string `form:"username" json:"username" xml:"username"`
+}
+
+// Validate validates the LoginPayload type instance.
+func (ut *LoginPayload) Validate() (err error) {
+	if ut.Username == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	if ut.Password == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "password"))
+	}
+	if utf8.RuneCountInString(ut.Password) < 10 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(ut.Username) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
+	}
+	return
+}
