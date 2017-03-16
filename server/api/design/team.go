@@ -95,12 +95,24 @@ var _ = Resource("team", func() {
 
 	Action("list", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams"))
-		Description("List a project's teams")
+		Description("List an expedition's teams")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
 			})
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Teams)
+		})
+	})
+
+	Action("list id", func() {
+		Routing(GET("expeditions/:expedition_id/teams"))
+		Description("List an expedition's teams")
+		Params(func() {
+			Param("expedition_id", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

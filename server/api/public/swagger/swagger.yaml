@@ -453,6 +453,36 @@ paths:
       summary: add team
       tags:
       - team
+  /expeditions/{expedition_id}/teams:
+    get:
+      description: |-
+        List an expedition's teams
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.teams+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Teams'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id team
+      tags:
+      - team
   /login:
     post:
       description: Creates a valid JWT given login credentials.
@@ -661,7 +691,7 @@ paths:
   /projects/@/{project}/expeditions/@/{expedition}/teams:
     get:
       description: |-
-        List a project's teams
+        List an expedition's teams
 
         Required security scopes:
           * `api:access`
@@ -799,6 +829,36 @@ paths:
       - jwt:
         - api:access
       summary: add expedition
+      tags:
+      - expedition
+  /projects/{project_id}/expeditions:
+    get:
+      description: |-
+        List a project's expeditions
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#list id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.expeditions+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expeditions'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id expedition
       tags:
       - expedition
   /refresh:

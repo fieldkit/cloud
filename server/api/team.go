@@ -86,3 +86,12 @@ func (c *TeamController) List(ctx *app.ListTeamContext) error {
 
 	return ctx.OK(TeamsType(teams))
 }
+
+func (c *TeamController) ListID(ctx *app.ListIDTeamContext) error {
+	teams := []*data.Team{}
+	if err := c.options.Database.SelectContext(ctx, &teams, "SELECT * FROM fieldkit.team WHERE expedition_id = $1", ctx.ExpeditionID); err != nil {
+		return err
+	}
+
+	return ctx.OK(TeamsType(teams))
+}

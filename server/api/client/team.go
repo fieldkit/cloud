@@ -130,7 +130,7 @@ func ListTeamPath(project string, expedition string) string {
 	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams", param0, param1)
 }
 
-// List a project's teams
+// List an expedition's teams
 func (c *Client) ListTeam(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListTeamRequest(ctx, path)
 	if err != nil {
@@ -141,6 +141,39 @@ func (c *Client) ListTeam(ctx context.Context, path string) (*http.Response, err
 
 // NewListTeamRequest create the request corresponding to the list action endpoint of the team resource.
 func (c *Client) NewListTeamRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// ListIDTeamPath computes a request path to the list id action of team.
+func ListIDTeamPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
+
+	return fmt.Sprintf("/expeditions/%s/teams", param0)
+}
+
+// List an expedition's teams
+func (c *Client) ListIDTeam(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListIDTeamRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListIDTeamRequest create the request corresponding to the list id action endpoint of the team resource.
+func (c *Client) NewListIDTeamRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
