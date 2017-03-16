@@ -24,7 +24,7 @@
 
 //---------------------- LAYOUT ----------------------//
 $col-gutter: 30px;
-$baseline-height: 13px;
+$baseline-height: 12px;
 $elements-margin: $baseline-height;
 $elements-padding: $baseline-height;
 
@@ -60,6 +60,7 @@ $color-6: rgb(223, 223, 107);
 $gray-1: rgb(50, 50, 50);
 $gray-2: rgb(74, 74, 74);
 $gray-3: rgb(170, 170, 170);
+$gray-4: rgb(236, 236, 236);
 
 //-------------------- TYPOGRAPHY --------------------//
 
@@ -126,7 +127,7 @@ $font-sans: Helvetica, Arial, sans-serif;
 }
 
 @mixin type-small {
-	font-size: 10px;
+	font-size: 12px;
 	line-height: $baseline-height*1.5;
 	font-family: $font-sans;
 }
@@ -256,6 +257,23 @@ $font-sans: Helvetica, Arial, sans-serif;
 html, body {
 	color: $gray-2;
 	@include type-body-1;
+	text-align: left;
+}
+
+h1 {
+	@include type-h1;
+}
+
+h2 {
+	@include type-h2;
+}
+
+h3 {
+	@include type-h3;
+}
+
+h4 {
+	@include type-h4;
 }
 
 button {
@@ -302,6 +320,74 @@ label {
 	margin-bottom: $baseline-height*1.5;
 }
 
-h1 {
-	@include type-h1;
+table {
+	thead, tbody {
+		tr {
+			th, td {
+				vertical-align: middle;
+			}
+		}
+	}
 }
+
+.teams-table, .data-sources-table {
+	text-align: left;
+	margin-bottom: $baseline-height*1.5;
+
+	tbody {
+		tr {
+			td {
+				@include type-h4;
+			}
+		}
+	}
+}
+
+.teams-table {
+
+	.members-table {
+
+		// width: 100%;
+		width: 900px;
+		margin-bottom: $baseline-height*1.5;
+
+		th, tr {
+			height: $baseline-height*4;
+		}
+
+		thead {
+			background-color: $gray-4;
+			tr {
+				border-bottom: 1px solid $gray-3;				
+				th:first-child {
+					border-top-left-radius: 3px;
+				}
+				th:last-child {
+					border-top-right-radius: 3px;
+				}
+			}
+		}
+
+		tbody {
+			tr {
+				td{
+					&:first-child {
+						width: calc(44px + #{$elements-padding});
+					}
+					&:not(:first-child){
+						border-top: 1px solid $gray-3;
+						@include type-small;
+					}					
+					.user-avatar {
+						width: 40px;
+						height: 40px;
+						border-radius: 22px;
+						background-color: $gray-3;
+						margin: 4px 0;
+					}
+				}
+			}
+		}
+	}
+}
+

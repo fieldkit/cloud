@@ -4,13 +4,12 @@ import { MembersTable } from './shared/MembersTable';
 export class TeamRow extends Component {	
 	render() {
 		return (
-
 			<tr>
 				<td>
 					{this.props.name}
-					<MembersTable>
+					<MembersTable members={this.props.members}>
 					</MembersTable>
-					<button>Add Members</button>					
+					<button>Add Members</button>
 				</td>
 			</tr>
 		)
@@ -47,10 +46,10 @@ export class TeamsTable extends Component {
 	render() {
 		const rows = [];
 		this.state.teams.forEach(function(team) {
-			rows.push(<TeamRow name={team.name} />);
+			rows.push(<TeamRow name={team.name} members={team.members} />);
 		});
 		return (
-			<table>
+			<table className="teams-table">
 				<tbody>{rows}</tbody>
 			</table>
 		)
@@ -60,8 +59,12 @@ export class TeamsTable extends Component {
 export class Teams extends Component {
 	render() {
 		return (
-			<TeamsTable>
-			</TeamsTable>
+			<div className="teams">
+				<h1>Teams</h1>
+				<TeamsTable>
+				</TeamsTable>
+				<button>Add Team</button>
+			</div>
 		)
 	}
 }
