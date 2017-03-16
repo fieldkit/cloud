@@ -138,6 +138,11 @@ func main() {
 		Database: database,
 	})
 	app.MountExpeditionController(service, c4)
+	// Mount "team" controller
+	c5 := api.NewTeamController(service, api.TeamControllerOptions{
+		Database: database,
+	})
+	app.MountTeamController(service, c5)
 
 	// Start service
 	if err := service.ListenAndServe(flagConfig.addr); err != nil {

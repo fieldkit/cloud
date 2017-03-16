@@ -29,15 +29,17 @@ func initService(service *goa.Service) {
 type ExpeditionController interface {
 	goa.Muxer
 	Add(*AddExpeditionContext) error
-	ListProject(*ListProjectExpeditionContext) error
+	Get(*GetExpeditionContext) error
+	List(*ListExpeditionContext) error
 }
 
 // MountExpeditionController "mounts" a Expedition resource controller on the given service.
 func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/project/:project/expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/project/:project/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project/expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project/expeditions/:expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -59,8 +61,8 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleExpeditionOrigin(h)
-	service.Mux.Handle("POST", "/project/:project/expedition", ctrl.MuxHandler("Add", h, unmarshalAddExpeditionPayload))
-	service.LogInfo("mount", "ctrl", "Expedition", "action", "Add", "route", "POST /project/:project/expedition", "security", "jwt")
+	service.Mux.Handle("POST", "/projects/:project/expedition", ctrl.MuxHandler("Add", h, unmarshalAddExpeditionPayload))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "Add", "route", "POST /projects/:project/expedition", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -68,16 +70,33 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 			return err
 		}
 		// Build the context
-		rctx, err := NewListProjectExpeditionContext(ctx, req, service)
+		rctx, err := NewGetExpeditionContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.ListProject(rctx)
+		return ctrl.Get(rctx)
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleExpeditionOrigin(h)
-	service.Mux.Handle("GET", "/project/:project/expeditions", ctrl.MuxHandler("ListProject", h, nil))
-	service.LogInfo("mount", "ctrl", "Expedition", "action", "ListProject", "route", "GET /project/:project/expeditions", "security", "jwt")
+	service.Mux.Handle("GET", "/projects/:project/expeditions/:expedition", ctrl.MuxHandler("Get", h, nil))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "Get", "route", "GET /projects/:project/expeditions/:expedition", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListExpeditionContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleExpeditionOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project/expeditions", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "List", "route", "GET /projects/:project/expeditions", "security", "jwt")
 }
 
 // handleExpeditionOrigin applies the CORS response headers corresponding to the origin.
@@ -343,6 +362,131 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// TeamController is the controller interface for the Team actions.
+type TeamController interface {
+	goa.Muxer
+	Add(*AddTeamContext) error
+	Get(*GetTeamContext) error
+	List(*ListTeamContext) error
+}
+
+// MountTeamController "mounts" a Team resource controller on the given service.
+func MountTeamController(service *goa.Service, ctrl TeamController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/projects/:project/expeditions/:expedition/team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project/expeditions/:expedition/teams/:team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project/expeditions/:expedition/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddTeamPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("POST", "/projects/:project/expeditions/:expedition/team", ctrl.MuxHandler("Add", h, unmarshalAddTeamPayload))
+	service.LogInfo("mount", "ctrl", "Team", "action", "Add", "route", "POST /projects/:project/expeditions/:expedition/team", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Get(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project/expeditions/:expedition/teams/:team", ctrl.MuxHandler("Get", h, nil))
+	service.LogInfo("mount", "ctrl", "Team", "action", "Get", "route", "GET /projects/:project/expeditions/:expedition/teams/:team", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project/expeditions/:expedition/teams", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Team", "action", "List", "route", "GET /projects/:project/expeditions/:expedition/teams", "security", "jwt")
+}
+
+// handleTeamOrigin applies the CORS response headers corresponding to the origin.
+func handleTeamOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Allow-Credentials", "true")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Allow-Credentials", "true")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddTeamPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddTeamPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addTeamPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // UserController is the controller interface for the User actions.

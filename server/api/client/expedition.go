@@ -19,7 +19,7 @@ import (
 func AddExpeditionPath(project string) string {
 	param0 := project
 
-	return fmt.Sprintf("/project/%s/expedition", param0)
+	return fmt.Sprintf("/projects/%s/expedition", param0)
 }
 
 // Add a expedition
@@ -53,24 +53,58 @@ func (c *Client) NewAddExpeditionRequest(ctx context.Context, path string, paylo
 	return req, nil
 }
 
-// ListProjectExpeditionPath computes a request path to the list project action of expedition.
-func ListProjectExpeditionPath(project string) string {
+// GetExpeditionPath computes a request path to the get action of expedition.
+func GetExpeditionPath(project string, expedition string) string {
 	param0 := project
+	param1 := expedition
 
-	return fmt.Sprintf("/project/%s/expeditions", param0)
+	return fmt.Sprintf("/projects/%s/expeditions/%s", param0, param1)
 }
 
-// List a project's expeditions
-func (c *Client) ListProjectExpedition(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListProjectExpeditionRequest(ctx, path)
+// Add a expedition
+func (c *Client) GetExpedition(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetExpeditionRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewListProjectExpeditionRequest create the request corresponding to the list project action endpoint of the expedition resource.
-func (c *Client) NewListProjectExpeditionRequest(ctx context.Context, path string) (*http.Request, error) {
+// NewGetExpeditionRequest create the request corresponding to the get action endpoint of the expedition resource.
+func (c *Client) NewGetExpeditionRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// ListExpeditionPath computes a request path to the list action of expedition.
+func ListExpeditionPath(project string) string {
+	param0 := project
+
+	return fmt.Sprintf("/projects/%s/expeditions", param0)
+}
+
+// List a project's expeditions
+func (c *Client) ListExpedition(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListExpeditionRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListExpeditionRequest create the request corresponding to the list action endpoint of the expedition resource.
+func (c *Client) NewListExpeditionRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

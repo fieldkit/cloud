@@ -187,6 +187,93 @@ func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 	return &decoded, err
 }
 
+// Team media type (default view)
+//
+// Identifier: application/vnd.app.team+json; view=default
+type Team struct {
+	Description string `form:"description" json:"description" xml:"description"`
+	ID          int    `form:"id" json:"id" xml:"id"`
+	Name        string `form:"name" json:"name" xml:"name"`
+	Slug        string `form:"slug" json:"slug" xml:"slug"`
+}
+
+// Validate validates the Team media type instance.
+func (mt *Team) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if mt.Description == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(mt.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+	}
+	return
+}
+
+// DecodeTeam decodes the Team instance encoded in resp body.
+func (c *Client) DecodeTeam(resp *http.Response) (*Team, error) {
+	var decoded Team
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// TeamCollection is the media type for an array of Team (default view)
+//
+// Identifier: application/vnd.app.team+json; type=collection; view=default
+type TeamCollection []*Team
+
+// Validate validates the TeamCollection media type instance.
+func (mt TeamCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeTeamCollection decodes the TeamCollection instance encoded in resp body.
+func (c *Client) DecodeTeamCollection(resp *http.Response) (TeamCollection, error) {
+	var decoded TeamCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Teams media type (default view)
+//
+// Identifier: application/vnd.app.teams+json; view=default
+type Teams struct {
+	Teams TeamCollection `form:"teams" json:"teams" xml:"teams"`
+}
+
+// Validate validates the Teams media type instance.
+func (mt *Teams) Validate() (err error) {
+	if mt.Teams == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "teams"))
+	}
+	if err2 := mt.Teams.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeTeams decodes the Teams instance encoded in resp body.
+func (c *Client) DecodeTeams(resp *http.Response) (*Teams, error) {
+	var decoded Teams
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // User media type (default view)
 //
 // Identifier: application/vnd.app.user+json; view=default

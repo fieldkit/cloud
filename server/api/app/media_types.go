@@ -144,6 +144,72 @@ func (mt *Projects) Validate() (err error) {
 	return
 }
 
+// Team media type (default view)
+//
+// Identifier: application/vnd.app.team+json; view=default
+type Team struct {
+	Description string `form:"description" json:"description" xml:"description"`
+	ID          int    `form:"id" json:"id" xml:"id"`
+	Name        string `form:"name" json:"name" xml:"name"`
+	Slug        string `form:"slug" json:"slug" xml:"slug"`
+}
+
+// Validate validates the Team media type instance.
+func (mt *Team) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if mt.Description == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(mt.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+	}
+	return
+}
+
+// TeamCollection is the media type for an array of Team (default view)
+//
+// Identifier: application/vnd.app.team+json; type=collection; view=default
+type TeamCollection []*Team
+
+// Validate validates the TeamCollection media type instance.
+func (mt TeamCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Teams media type (default view)
+//
+// Identifier: application/vnd.app.teams+json; view=default
+type Teams struct {
+	Teams TeamCollection `form:"teams" json:"teams" xml:"teams"`
+}
+
+// Validate validates the Teams media type instance.
+func (mt *Teams) Validate() (err error) {
+	if mt.Teams == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "teams"))
+	}
+	if err2 := mt.Teams.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // User media type (default view)
 //
 // Identifier: application/vnd.app.user+json; view=default
