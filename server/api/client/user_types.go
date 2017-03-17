@@ -12,6 +12,33 @@ import (
 	"unicode/utf8"
 )
 
+// addAdministratorPayload user type.
+type addAdministratorPayload struct {
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the addAdministratorPayload type instance.
+func (ut *addAdministratorPayload) Validate() (err error) {
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "user_id"))
+	}
+	return
+}
+
+// Publicize creates AddAdministratorPayload from addAdministratorPayload
+func (ut *addAdministratorPayload) Publicize() *AddAdministratorPayload {
+	var pub AddAdministratorPayload
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
+	return &pub
+}
+
+// AddAdministratorPayload user type.
+type AddAdministratorPayload struct {
+	UserID int `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
 // addExpeditionPayload user type.
 type addExpeditionPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`

@@ -12,6 +12,52 @@ import (
 	"unicode/utf8"
 )
 
+// ProjectAdministrator media type (default view)
+//
+// Identifier: application/vnd.app.administrator+json; view=default
+type ProjectAdministrator struct {
+	ProjectID int `form:"project_id" json:"project_id" xml:"project_id"`
+	UserID    int `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
+// Validate validates the ProjectAdministrator media type instance.
+func (mt *ProjectAdministrator) Validate() (err error) {
+
+	return
+}
+
+// ProjectAdministratorCollection is the media type for an array of ProjectAdministrator (default view)
+//
+// Identifier: application/vnd.app.administrator+json; type=collection; view=default
+type ProjectAdministratorCollection []*ProjectAdministrator
+
+// Validate validates the ProjectAdministratorCollection media type instance.
+func (mt ProjectAdministratorCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ProjectAdministrators media type (default view)
+//
+// Identifier: application/vnd.app.administrators+json; view=default
+type ProjectAdministrators struct {
+	Administrators ProjectAdministratorCollection `form:"administrators" json:"administrators" xml:"administrators"`
+}
+
+// Validate validates the ProjectAdministrators media type instance.
+func (mt *ProjectAdministrators) Validate() (err error) {
+	if mt.Administrators == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "administrators"))
+	}
+	return
+}
+
 // Expedition media type (default view)
 //
 // Identifier: application/vnd.app.expedition+json; view=default

@@ -13,6 +13,73 @@ import (
 	"unicode/utf8"
 )
 
+// ProjectAdministrator media type (default view)
+//
+// Identifier: application/vnd.app.administrator+json; view=default
+type ProjectAdministrator struct {
+	ProjectID int `form:"project_id" json:"project_id" xml:"project_id"`
+	UserID    int `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
+// Validate validates the ProjectAdministrator media type instance.
+func (mt *ProjectAdministrator) Validate() (err error) {
+
+	return
+}
+
+// DecodeProjectAdministrator decodes the ProjectAdministrator instance encoded in resp body.
+func (c *Client) DecodeProjectAdministrator(resp *http.Response) (*ProjectAdministrator, error) {
+	var decoded ProjectAdministrator
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// ProjectAdministratorCollection is the media type for an array of ProjectAdministrator (default view)
+//
+// Identifier: application/vnd.app.administrator+json; type=collection; view=default
+type ProjectAdministratorCollection []*ProjectAdministrator
+
+// Validate validates the ProjectAdministratorCollection media type instance.
+func (mt ProjectAdministratorCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeProjectAdministratorCollection decodes the ProjectAdministratorCollection instance encoded in resp body.
+func (c *Client) DecodeProjectAdministratorCollection(resp *http.Response) (ProjectAdministratorCollection, error) {
+	var decoded ProjectAdministratorCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// ProjectAdministrators media type (default view)
+//
+// Identifier: application/vnd.app.administrators+json; view=default
+type ProjectAdministrators struct {
+	Administrators ProjectAdministratorCollection `form:"administrators" json:"administrators" xml:"administrators"`
+}
+
+// Validate validates the ProjectAdministrators media type instance.
+func (mt *ProjectAdministrators) Validate() (err error) {
+	if mt.Administrators == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "administrators"))
+	}
+	return
+}
+
+// DecodeProjectAdministrators decodes the ProjectAdministrators instance encoded in resp body.
+func (c *Client) DecodeProjectAdministrators(resp *http.Response) (*ProjectAdministrators, error) {
+	var decoded ProjectAdministrators
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Expedition media type (default view)
 //
 // Identifier: application/vnd.app.expedition+json; view=default
