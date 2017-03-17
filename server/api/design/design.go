@@ -1,14 +1,13 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
 var cors = func() {
 	Headers("Authorization")
 	Expose("Authorization")
-	Methods("GET", "OPTIONS", "POST")
+	Methods("GET", "OPTIONS", "POST", "DELETE")
 }
 
 var _ = API("fieldkit", func() {
