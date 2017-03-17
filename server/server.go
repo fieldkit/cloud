@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"flag"
+	"fmt"
 	"io"
 
 	"github.com/O-C-R/fieldkit/server/api"
@@ -58,6 +59,8 @@ func main() {
 		if !ok {
 			return errInvalidRequest(message, keyvals...)
 		}
+
+		fmt.Println(keyvals)
 
 		if keyval, ok := keyvals[0].(string); !ok || keyval != "attribute" {
 			return errInvalidRequest(message, keyvals...)
@@ -145,6 +148,24 @@ func main() {
 		Database: database,
 	})
 	app.MountTeamController(service, c5)
+
+	// Mount "member" controller
+	c6 := api.NewMemberController(service, api.MemberControllerOptions{
+		Database: database,
+	})
+	app.MountMemberController(service, c6)
+
+	// Mount "administrator" controller
+	c7 := api.NewAdministratorController(service, api.AdministratorControllerOptions{
+		Database: database,
+	})
+	app.MountAdministratorController(service, c7)
+
+	// Mount "input" controller
+	c8 := api.NewInputController(service, api.InputControllerOptions{
+		Database: database,
+	})
+	app.MountInputController(service, c8)
 
 	// Start service
 	if err := service.ListenAndServe(flagConfig.addr); err != nil {

@@ -8,6 +8,8 @@ import jwtDecode from 'jwt-decode';
 const JWT_KEY = 'jwt';
 const JWT_EXPIRATION_TIME_KEY = 'jwt-expiration';
 
+export type SupportedMethods = 'GET' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PUT' | 'PATCH';
+
 export class APIError extends BaseError {
   response: ?Response;
   body: ?string;
@@ -31,39 +33,15 @@ export class APIClient {
     this.baseUrl = baseUrl;
   }
 
-  async post(path: string, body?: FormData | string | null, headers: Object = {}): Promise<Response> {
-    const url = new URL(path, this.baseUrl);
-
-    log.info('POST', path, body, headers);
-
-    let res;
-    try {
-      res = await fetch(url.toString(), {
-        method: 'POST',
-        body,
-        headers
-      });
-    } catch (e) {
-      log.error(e);
-      log.error('Threw while POSTing', url.toString());
-      throw new APIError('HTTP error', res);
-    }
-
-    if (!res.ok) {
-      const body = await res.text();
-      if (res.status === 401) {
-        log.error('Bad auth while POSTing', url.toString(), body);
-        throw new AuthenticationError(res, body);
-      } else {
-        log.error('Non-OK response while POSTing', url.toString(), body);
-        throw new APIError('HTTP error', res, body);
-      }
-    }
-
-    return res;
-  }
-
-  async get(path: string, params?: Object, headers: Object = {}): Promise<Response> {
+  async exec(
+    method: SupportedMethods,
+    path: string,
+    { params, body, headers = {} }: {
+      params?: Object,
+      body?: ?(Blob | FormData | URLSearchParams | string),
+      headers: Object
+    } = {}
+  ): Promise<Response> {
     const url = new URL(path, this.baseUrl);
 
     if (params) {
@@ -72,32 +50,41 @@ export class APIClient {
       }
     }
 
-    log.info('GET', path, params);
+    log.info(method, path, { params, body, headers });
 
     let res;
     try {
-      res = await fetch(url.toString(), {
-        method: 'GET',
-        headers
-      });
+      res = await fetch(url.toString(), { method, params, body, headers });
     } catch (e) {
       log.error(e);
-      log.error('Threw while GETing', url.toString());
+      log.error('Threw during', method, url.toString());
       throw new APIError('HTTP error', res);
     }
 
     if (!res.ok) {
       const body = await res.text();
       if (res.status === 401) {
-        log.error('Bad auth while GETing', url.toString(), body);
+        log.error('Bad auth during', method, url.toString(), body);
         throw new AuthenticationError(res, body);
       } else {
-        log.error('Non-OK response while GETing', url.toString(), body);
+        log.error('Non-OK response during', method, url.toString(), body);
         throw new APIError('HTTP error', res, body);
       }
     }
 
     return res;
+  }
+
+  post(path: string, body?: FormData | string | null, headers: Object = {}): Promise<Response> {
+    return this.exec('POST', path, { body, headers });
+  }
+
+  get(path: string, params?: Object, headers: Object = {}): Promise<Response> {
+    return this.exec('GET', path, { params, headers });
+  }
+
+  del(path: string, body?: FormData | string | null, headers: Object = {}): Promise<Response> {
+    return this.exec('DELETE', path, { body, headers });
   }
 
   async postForm(path: string, body?: Object, headers: Object = {}): Promise<string> {
@@ -128,6 +115,14 @@ export class APIClient {
 
   async getJSON(path: string, params?: Object, headers: Object = {}): Promise<any> {
     const res = await this.get(path, params, headers);
+    return res.json();
+  }
+
+  async delJSON(path: string, body?: Object, headers: Object = {}): Promise<any> {
+    const res = await this.del(path, JSON.stringify(body), headers);
+    if (res.status === 204) {
+      return null
+    }
     return res.json();
   }
 }
@@ -206,7 +201,15 @@ export class JWTAPIClient extends APIClient {
     }
   }
 
-  async post(path: string, body?: FormData | string | null = null, headers: Object = {}): Promise<any> {
+  async exec(
+    method: SupportedMethods,
+    path: string,
+    { params, body, headers = {} }: {
+      params?: Object,
+      body?: ?(Blob | FormData | URLSearchParams | string),
+      headers: Object
+    } = {}
+  ): Promise<Response> {
     if (headers['Authorization'] === undefined) {
       await this.checkRefreshJWT();
       const jwt = this.loadJWT();
@@ -214,22 +217,7 @@ export class JWTAPIClient extends APIClient {
         headers['Authorization'] = `Bearer ${jwt}`;
       }
     }
-
-    const res = await super.post(path, body, headers);
-    this.saveJWTFromResponse(res);
-    return res;
-  }
-
-  async get(path: string, params: Object = {}, headers: Object = {}): Promise<any> {
-    if (headers['Authorization'] === undefined) {
-      await this.checkRefreshJWT();
-      const jwt = this.loadJWT();
-      if (jwt) {
-        headers['Authorization'] = `Bearer ${jwt}`;
-      }
-    }
-
-    const res = await super.get(path, params, headers);
+    const res = await super.exec(method, path, { params, body, headers });
     this.saveJWTFromResponse(res);
     return res;
   }

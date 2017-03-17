@@ -25,6 +25,199 @@ func initService(service *goa.Service) {
 	service.Decoder.Register(goa.NewJSONDecoder, "*/*")
 }
 
+// AdministratorController is the controller interface for the Administrator actions.
+type AdministratorController interface {
+	goa.Muxer
+	Add(*AddAdministratorContext) error
+	Delete(*DeleteAdministratorContext) error
+	Get(*GetAdministratorContext) error
+	GetID(*GetIDAdministratorContext) error
+	List(*ListAdministratorContext) error
+	ListID(*ListIDAdministratorContext) error
+}
+
+// MountAdministratorController "mounts" a Administrator resource controller on the given service.
+func MountAdministratorController(service *goa.Service, ctrl AdministratorController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrator", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrators/:user_id", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/administrators/@/:username", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/administrators", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrators", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddAdministratorPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("POST", "/projects/:project_id/administrator", ctrl.MuxHandler("Add", h, unmarshalAddAdministratorPayload))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "Add", "route", "POST /projects/:project_id/administrator", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("DELETE", "/projects/:project_id/administrators/:user_id", ctrl.MuxHandler("Delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "Delete", "route", "DELETE /projects/:project_id/administrators/:user_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Get(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/administrators/@/:username", ctrl.MuxHandler("Get", h, nil))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "Get", "route", "GET /projects/@/:project/administrators/@/:username", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetIDAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project_id/administrators/:user_id", ctrl.MuxHandler("GetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "GetID", "route", "GET /projects/:project_id/administrators/:user_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/administrators", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "List", "route", "GET /projects/@/:project/administrators", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDAdministratorContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleAdministratorOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project_id/administrators", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "ListID", "route", "GET /projects/:project_id/administrators", "security", "jwt")
+}
+
+// handleAdministratorOrigin applies the CORS response headers corresponding to the origin.
+func handleAdministratorOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddAdministratorPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddAdministratorPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addAdministratorPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
 // ExpeditionController is the controller interface for the Expedition actions.
 type ExpeditionController interface {
 	goa.Muxer
@@ -154,7 +347,7 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -167,7 +360,7 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -180,7 +373,7 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -193,6 +386,384 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddExpeditionPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddExpeditionPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addExpeditionPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// InputController is the controller interface for the Input actions.
+type InputController interface {
+	goa.Muxer
+	Add(*AddInputContext) error
+	Get(*GetInputContext) error
+	GetID(*GetIDInputContext) error
+	List(*ListInputContext) error
+	ListID(*ListIDInputContext) error
+}
+
+// MountInputController "mounts" a Input resource controller on the given service.
+func MountInputController(service *goa.Service, ctrl InputController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/input", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/inputs/@/:input", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/:input_id", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddInputPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("POST", "/projects/:project_id/input", ctrl.MuxHandler("Add", h, unmarshalAddInputPayload))
+	service.LogInfo("mount", "ctrl", "Input", "action", "Add", "route", "POST /projects/:project_id/input", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Get(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/inputs/@/:input", ctrl.MuxHandler("Get", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "Get", "route", "GET /projects/@/:project/inputs/@/:input", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetIDInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/inputs/:input_id", ctrl.MuxHandler("GetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "GetID", "route", "GET /inputs/:input_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/inputs", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "List", "route", "GET /projects/@/:project/inputs", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project_id/inputs", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /projects/:project_id/inputs", "security", "jwt")
+}
+
+// handleInputOrigin applies the CORS response headers corresponding to the origin.
+func handleInputOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddInputPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddInputPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// MemberController is the controller interface for the Member actions.
+type MemberController interface {
+	goa.Muxer
+	Add(*AddMemberContext) error
+	Delete(*DeleteMemberContext) error
+	Get(*GetMemberContext) error
+	GetID(*GetIDMemberContext) error
+	List(*ListMemberContext) error
+	ListID(*ListIDMemberContext) error
+}
+
+// MountMemberController "mounts" a Member resource controller on the given service.
+func MountMemberController(service *goa.Service, ctrl MemberController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/teams/:team_id/member", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/teams/:team_id/members/:user_id", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/teams/:team_id/members", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddMemberPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("POST", "/teams/:team_id/member", ctrl.MuxHandler("Add", h, unmarshalAddMemberPayload))
+	service.LogInfo("mount", "ctrl", "Member", "action", "Add", "route", "POST /teams/:team_id/member", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("DELETE", "/teams/:team_id/members/:user_id", ctrl.MuxHandler("Delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Member", "action", "Delete", "route", "DELETE /teams/:team_id/members/:user_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Get(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username", ctrl.MuxHandler("Get", h, nil))
+	service.LogInfo("mount", "ctrl", "Member", "action", "Get", "route", "GET /projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetIDMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("GET", "/teams/:team_id/members/:user_id", ctrl.MuxHandler("GetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Member", "action", "GetID", "route", "GET /teams/:team_id/members/:user_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Member", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/teams/@/:team/members", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("GET", "/teams/:team_id/members", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Member", "action", "ListID", "route", "GET /teams/:team_id/members", "security", "jwt")
+}
+
+// handleMemberOrigin applies the CORS response headers corresponding to the origin.
+func handleMemberOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddMemberPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddMemberPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addMemberPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -334,7 +905,7 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -347,7 +918,7 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -360,7 +931,7 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -436,7 +1007,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -449,7 +1020,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -462,7 +1033,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -601,7 +1172,7 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -614,7 +1185,7 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -627,7 +1198,7 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -846,7 +1417,7 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -859,7 +1430,7 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
@@ -872,7 +1443,7 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
 				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
 			}
 			return h(ctx, rw, req)
