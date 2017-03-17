@@ -4,7 +4,8 @@ import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
-import type { ErrorMap } from '../../common/util';
+
+import type { APIErrors } from '../../api/types';
 
 type Props = {
   name?: string,
@@ -14,7 +15,7 @@ type Props = {
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (n: string, s: string, d: string) => Promise<?ErrorMap>;
+  onSave: (n: string, s: string, d: string) => Promise<?APIErrors>;
 }
 
 export class ProjectForm extends Component {
@@ -25,7 +26,7 @@ export class ProjectForm extends Component {
     description: string,
     slugHasChanged: boolean,
     saveDisabled: boolean,
-    errors: ?ErrorMap
+    errors: ?APIErrors
   };
 
   constructor(props: Props) {

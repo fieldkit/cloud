@@ -5,13 +5,14 @@ import { Redirect } from 'react-router'
 
 import { FKApiClient } from '../../api/api';
 import { errorsFor } from '../../common/util';
-import type { ErrorMap } from '../../common/util';
 
 import { Unauth } from '../containers/Unauth';
 
+import type { APIErrors } from '../../api/types';
+
 export class Signup extends Component {
   state: {
-    errors: ?ErrorMap,
+    errors: ?APIErrors,
     redirectToApp: boolean
   }
   onSubmit: Function;

@@ -8,10 +8,12 @@ import { ProjectForm } from './forms/ProjectForm';
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
 import { FKApiClient } from '../api/api';
 
+import type { APIProject } from '../api/types';
+
 import '../../css/home.css'
 
 type Props = {
-  project: Object;
+  project: APIProject;
   onProjectUpdate: (newSlug: ?string) => void;
 
   match: Object;

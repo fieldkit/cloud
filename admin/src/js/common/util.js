@@ -2,6 +2,8 @@
 import React from 'react';
 import slug from 'slug';
 
+import type { APIErrors } from '../api/types';
+
 export class BaseError {
   name: string;
   message: string;
@@ -18,11 +20,9 @@ export class BaseError {
   }
 }
 
-export type ErrorMap = { [key: string]: string[] };
-
-export function errorsFor(errors: ?ErrorMap, key: string) {
-  if (errors && errors[key]) {
-    return errors[key].map((error, i) =>  <p key={`errors-${key}-${i}`} className="error">{error}</p>);
+export function errorsFor(errors: ?APIErrors, key: string) {
+  if (errors && errors.meta[key]) {
+    return errors.meta[key];
   }
 }
 

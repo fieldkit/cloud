@@ -5,19 +5,19 @@ import { Redirect } from 'react-router'
 
 import { FKApiClient } from '../../api/api';
 import { errorsFor } from '../../common/util';
-import type { ErrorMap } from '../../common/util';
 
 import { Unauth } from '../containers/Unauth';
+import type { APIErrors } from '../../api/types';
 
 type Props = {
-  requestSignIn: (u: string, p: string) => Promise<?ErrorMap>;
+  requestSignIn: (u: string, p: string) => Promise<?APIErrors>;
   location: Object;
 };
 
 export class Signin extends Component {
   props: Props;
   state: {
-    errors: ?ErrorMap,
+    errors: ?APIErrors,
     redirectToReferrer: boolean
   }
   onSubmit: Function;
