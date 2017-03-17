@@ -140,14 +140,12 @@ export class Main extends Component {
 
           { project && expedition &&
             <div className="expedition-sidebar">
+              <div className="settings">
+                <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`} className="bt-icon medium settings"></Link>
+              </div>            
               <div className="expedition-name">
                 <span>{expedition.name}</span>
-                {/* TODO: use image icon */}
-                <Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`}>GO</Link>
-              </div>
-              <div className="settings">
-                {/* TODO: use image icon */}
-                <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>Settings</Link>
+                <Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`} className="bt-icon new-window"></Link>
               </div>
               <div className="nav">
                 <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`}>Data Sources</NavLink>

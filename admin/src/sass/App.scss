@@ -292,19 +292,28 @@ button {
 	&.cancel {
 		@include button(false);	
 	}
+}
 
-	// Icon button
-	&.bt-icon {
-		display: inline-block;
-		width: 12px;
-		height: 12px;
-		border: none;
-		background-color: Transparent;
-		background-repeat: none;
+// Icon button
+.bt-icon {
+	display: inline-block;
+	border: none;
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin: 0 $elements-margin/2;
+	width: $baseline-height;
+	height: $baseline-height;	
 
-		&.edit 		{ background-image: url('../img/icons/icon-edit-small.png'); }
-		&.remove 	{ background-image: url('../img/icons/icon-remove-small.png'); }
+	&.medium {
+		width: $baseline-height*1.5;
+		height: $baseline-height*1.5;
 	}	
+
+	&.edit 			{ background-image: url('../img/icons/icon-edit-small.png'); }
+	&.remove 		{ background-image: url('../img/icons/icon-remove-small.png'); }
+	&.new-window 	{ background-image: url('../img/icons/icon-new-window-small.png'); }
+	&.settings 		{ background-image: url('../img/icons/icon-settings-medium.png'); }
 }
 
 input[type="submit"] {
