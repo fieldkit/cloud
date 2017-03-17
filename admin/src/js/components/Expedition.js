@@ -29,17 +29,14 @@ export class Expedition extends Component {
     super(props);
   }
 
-  async onExpeditionSave(name: string, description: string) {
-    const expedition = await FKApiClient.get().updateExpedition(this.props.expedition.id, { name, description });
-    if (expedition.type === 'ok') {
-      await this.loadData();
-      this.props.history.push("/");
-    } else {
-      return expedition.errors;
+  async onExpeditionSave(expedition: APINewExpedition) {
+    const expeditionRes = await FKApiClient.get().updateExpedition(this.props.expedition.id, expedition);
+    if (expeditionRes.type !== 'ok') {
+      return expeditionRes.errors;
     }
 
-    if (expedition.slug != this.props.expedition.slug) {
-      this.props.onExpeditionUpdate(expedition.slug);
+    if (expeditionRes.slug != this.props.expedition.slug) {
+      this.props.onExpeditionUpdate(expeditionRes.slug);
     } else {
       this.props.onExpeditionUpdate();
     }

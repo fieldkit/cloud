@@ -57,19 +57,18 @@ export class Project extends Component {
     }
   }
 
-  async onProjectSave(name: string, slug: string, description: string) {
+  async onProjectSave(project: APINewProject) {
     // TODO: this isn't implemented on the backend yet!
 
-    const project = await FKApiClient.get().updateProject(this.props.project.id, { name, slug, description });
-    if (project.type === 'ok') {
+    const projectRes = await FKApiClient.get().updateProject(this.props.project.id, project);
+    if (projectRes.type === 'ok') {
       await this.loadData();
-      this.props.history.push("/");
     } else {
-      return project.errors;
+      return projectRes.errors;
     }
 
-    if (slug != this.props.project.slug) {
-      this.props.onProjectUpdate(slug);
+    if (projectRes.slug != this.props.project.slug) {
+      this.props.onProjectUpdate(projectRes.slug);
     } else {
       this.props.onProjectUpdate();
     }
