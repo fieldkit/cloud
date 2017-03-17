@@ -983,34 +983,6 @@ paths:
       summary: add user
       tags:
       - user
-  /user/{username}:
-    get:
-      description: |-
-        Get a user
-
-        Required security scopes:
-          * `api:access`
-      operationId: user#get
-      parameters:
-      - in: path
-        name: username
-        required: true
-        type: string
-      produces:
-      - application/vnd.app.user+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get user
-      tags:
-      - user
   /user/projects:
     get:
       description: |-
@@ -1057,6 +1029,62 @@ paths:
       - jwt:
         - api:access
       summary: list user
+      tags:
+      - user
+  /users/@/{username}:
+    get:
+      description: |-
+        Get a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get
+      parameters:
+      - in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get user
+      tags:
+      - user
+  /users/{user_id}:
+    get:
+      description: |-
+        Get a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get id
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id user
       tags:
       - user
 produces:

@@ -1,13 +1,26 @@
 // @flow weak
 
 import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
+import type {
+  APIErrors,
+  APIUser,
+  APIUsers,
+  APINewUser,
+  APIProject,
+  APINewProject,
+  APIProjects,
+  APIExpedition,
+  APINewExpedition,
+  APIExpeditions,
+  APITeam,
+  APINewTeam,
+  APITeams
+} from './types';
 
-import type { ErrorMap } from '../common/util';
-
-export type FKAPIResponse = {
+export type FKAPIResponse<T> = {
   type: 'ok' | 'err';
-  payload?: any;
-  errors?: ErrorMap;
+  payload?: T;
+  errors?: APIErrors;
   raw?: string;
 }
 
@@ -92,7 +105,7 @@ export class FKApiClient extends JWTAPIClient {
     return apiClientInstance;
   }
 
-  async execWithJSONErrors(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse> {
+  async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
     try {
       const res = await p;
       if (res) {
@@ -106,7 +119,7 @@ export class FKApiClient extends JWTAPIClient {
       }
     } catch (e) {
       if (e instanceof APIError) {
-        if (e.body) {
+        if (e.body && parseJSON) {
           return { type: 'err', errors: JSON.parse(e.body) };
         } else {
           return { type: 'err', errors: e.msg };
@@ -117,24 +130,20 @@ export class FKApiClient extends JWTAPIClient {
     }
   }
 
-  postFormWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(this.postForm(endpoint, values), true);
+  postWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.postJSON(endpoint, values));
   }
 
-  postJSONWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(this.postJSON(endpoint, values));
+  getWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.getJSON(endpoint, values));
   }
 
-  getWithJSONErrors(endpoint: string, values?: Object): Promise<FKAPIResponse> {
-    return this.execWithJSONErrors(this.getJSON(endpoint, values));
+  signUp(email: string, username: string, password: string, invite_token: string): Promise<FKAPIResponse<APIUser>> {
+    return this.postWithErrors('/user', { email, username, password, invite_token });
   }
 
-  signUp(email: string, username: string, password: string, invite_token: string): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors('/user', { email, username, password, invite_token });
-  }
-
-  async signIn(username, password): Promise<FKAPIResponse> {
-    const response = await this.postJSONWithJSONErrors('/login', { username, password });
+  async signIn(username, password): Promise<FKAPIResponse<void>> {
+    const response = await this.postWithErrors('/login', { username, password });
     if (response.type === 'ok') {
       this.onSignin();
     }
@@ -146,47 +155,59 @@ export class FKApiClient extends JWTAPIClient {
     this.onSignout();
   }
 
-  getUser(): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors('/user')
+  getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
+    return this.getWithErrors('/user');
   }
 
-  getProjects(): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors('/projects')
+  getUserById(userId: number): Promise<FKAPIResponse<?APIUser>> {
+    return this.getWithErrors(`/users/${userId}`);
   }
 
-  getProjectBySlug(slug: string): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors(`/projects/@/${slug}`)
+  getUserByUsername(username: string): Promise<FKAPIResponse<?APIUser>> {
+    return this.getWithErrors(`/users/@/${username}`);
   }
 
-  createProject(values: { name: string, slug: string, description: string }): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors('/project', values)
+  getUsers(): Promise<FKAPIResponse<APIUsers>> {
+    return this.getWithErrors('/users');
   }
 
-  updateProject(id: string, values: { name: string, slug: string, description: string }): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors(`/projects/${id}`, values)
+  getProjects(): Promise<FKAPIResponse<APIProjects>> {
+    return this.getWithErrors('/projects')
   }
 
-  getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors(`/projects/@/${projectSlug}/expeditions`)
+  getProjectBySlug(slug: string): Promise<FKAPIResponse<APIProject>> {
+    return this.getWithErrors(`/projects/@/${slug}`)
   }
 
-  getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}`)
+  createProject(values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+    return this.postWithErrors('/project', values)
   }
 
-  createExpedition(projectId: number, values: { name: string, slug: string, description: string }): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors(`/projects/${projectId}/expedition`, values)
+  updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+    return this.postWithErrors(`/projects/${projectId}`, values)
   }
 
-  getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
+  getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions`)
   }
 
-  getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse> {
-    return this.getWithJSONErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}`)
+  getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIExpedition>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}`)
   }
 
-  createTeam(expeditionId: number, values: { name: string, slug: string, description: string }): Promise<FKAPIResponse> {
-    return this.postJSONWithJSONErrors(`/expeditions/${expeditionId}/team`, values)
+  createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+    return this.postWithErrors(`/projects/${projectId}/expedition`, values)
+  }
+
+  getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
+  }
+
+  getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APITeam>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}`)
+  }
+
+  createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/team`, values)
   }
 }

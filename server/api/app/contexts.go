@@ -715,6 +715,41 @@ func (ctx *GetCurrentUserContext) OK(r *User) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// GetIDUserContext provides the user get id action context.
+type GetIDUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID int
+}
+
+// NewGetIDUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller get id action.
+func NewGetIDUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDUserContext) OK(r *User) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // ListUserContext provides the user list action context.
 type ListUserContext struct {
 	context.Context

@@ -139,7 +139,7 @@ export class JWTAPIClient extends APIClient {
 
     const refreshToken: string = jwt.refresh_token;
     try {
-      await super.postJSON('/refresh', { payload: { refresh_token: refreshToken } }, { Authorization: null });
+      await super.postJSON('/refresh', { refresh_token: refreshToken }, { Authorization: null });
     } catch (e) {
       console.error('JWT refresh error', e);
       this.clearJWT();
@@ -171,6 +171,9 @@ export class JWTAPIClient extends APIClient {
     const decoded: Object = jwtDecode(jwt);
     const expiration = decoded.exp;
 
+    const nowSeconds = Math.floor(new Date().getTime() / 1000);
+    console.log('Got JWT with expiration', expiration, 'now is', nowSeconds, decoded);
+
     localStorage.setItem(JWT_KEY, jwt);
     localStorage.setItem(JWT_EXPIRATION_TIME_KEY, expiration.toString(10));
   }
@@ -197,6 +200,7 @@ export class JWTAPIClient extends APIClient {
       const jwtExpired = nowSeconds > jwtExpiration;
 
       if (jwtExpired) {
+        console.log('JWT is expired, refreshing...', nowSeconds, jwtExpiration, this.loadDecodedJWT());
         await this.refreshJWT();
       }
     }

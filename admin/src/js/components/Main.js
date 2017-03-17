@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 
 import { FKApiClient } from '../api/api';
+import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
 import { Projects } from './Projects';
 import { Project } from './Project';
@@ -23,9 +24,9 @@ export class Main extends Component {
   state: {
     loading: boolean,
     redirectTo: ?string,
-    user: ?Object,
-    project: ?Object,
-    expedition: ?Object
+    user: ?APIUser,
+    project: ?APIProject,
+    expedition: ?APIExpedition
   }
 
   constructor(props: Props) {
@@ -55,9 +56,9 @@ export class Main extends Component {
   }
 
   async loadUser() {
-    const userRes = await FKApiClient.get().getUser();
+    const userRes = await FKApiClient.get().getCurrentUser();
     if (userRes.type == 'ok' && userRes.payload) {
-      this.setState({ user: userRes.payload.user });
+      this.setState({ user: userRes.payload });
     }
   }
 
