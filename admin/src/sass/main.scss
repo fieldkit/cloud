@@ -1,0 +1,55 @@
+@import 'App';
+
+$sidebar-width: 240px;
+$contents-width: 834px;
+
+.main {
+  width: 100vw;
+  height: 100vh;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.left {
+  float: left;
+  width: $sidebar-width;
+  height: 100%;
+  background-image: url('../img/fieldkit-background.png');
+
+  .logo-area {
+    height: 100px;
+
+    img {
+      max-height: 75px;
+      max-width: 150px;
+    }
+  }
+}
+
+.right {
+  // float: left;
+  width: 100%;
+  text-align: center;
+}
+
+.nav {
+  width: $contents-width;
+  height: 100px;
+  text-align: left;
+
+  .profile-image {
+    float: right;
+    width: 100px;
+    height: 100px;
+
+    img {
+      width: 75%;
+      height: 75%;
+    }
+  }
+}
+
+.contents {
+  width: $contents-width;
+  text-align: left;
+}
