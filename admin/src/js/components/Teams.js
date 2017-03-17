@@ -44,10 +44,7 @@ export class TeamsTable extends Component {
 		}
 	}
 	render() {
-		const rows = [];
-		this.state.teams.forEach(function(team) {
-			rows.push(<TeamRow name={team.name} members={team.members} />);
-		});
+		const rows = this.props.teams.map(team => <TeamRow name={team.name} members={team.members} />);
 		return (
 			<table className="teams-table">
 				<tbody>{rows}</tbody>
@@ -61,8 +58,7 @@ export class Teams extends Component {
 		return (
 			<div className="teams">
 				<h1>Teams</h1>
-				<TeamsTable>
-				</TeamsTable>
+				<TeamsTable />
 				<button>Add Team</button>
 			</div>
 		)

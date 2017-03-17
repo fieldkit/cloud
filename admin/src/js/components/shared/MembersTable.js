@@ -26,10 +26,7 @@ export class MembersTable extends Component {
 		super();
 	}	
 	render() {
-		const rows = [];
-		this.props.members.forEach(function(member) {
-			rows.push(<MemberRow name={member.name} username={member.username} role={member.role}/>);
-		});
+		const rows = this.props.members.map(member => <MemberRow name={member.name} username={member.username} role={member.role}/>);
 		return (
 			<div>
 				<table className="members-table">
