@@ -12,49 +12,56 @@ import type { APIExpedition } from '../api/types';
 import '../../css/home.css'
 
 type Props = {
-	project: APIProject;
-	expedition: APIExpedition;
-	onExpeditionUpdate: (newSlug: ?string) => void;
+  project: APIProject;
+  expedition: APIExpedition;
+  onExpeditionUpdate: (newSlug: ?string) => void;
 
-	match: Object;
-	location: Object;
-	history: Object;
+  match: Object;
+  location: Object;
+  history: Object;
 }
 
 export class Expedition extends Component {
-	
-	props: Props;
-	state: {
-		expedition: Object
-	}
+  
+  props: Props;
 
-	constructor(props: Props) {
-		super(props);
+  constructor(props: Props) {
+    super(props);
+  }
 
-		this.state = {
-			project: null,
-			expeditions: []
-		};
-	}
+  async onExpeditionSave(name: string, description: string) {
+    const expedition = await FKApiClient.get().updateExpedition(this.props.expedition.id, { name, description });
+    if (expedition.type === 'ok') {
+      await this.loadData();
+      this.props.history.push("/");
+    } else {
+      return expedition.errors;
+    }
 
-	async onExpeditionSave(name: string, description: string) {
-		// TODO	
-	}	
+    if (slug != this.props.expedition.slug) {
+      this.props.onExpeditionUpdate(slug);
+    } else {
+      this.props.onProjectUpdate();
+    }
+  } 
 
-	render() {
-		const { project } = this.props;
-		const projectSlug = project.slug;
-		const { expedition } = this.props;
-		const expeditionSlug = project.slug;
+  render() {
+    const { project } = this.props;
+    const projectSlug = project.slug;
+    const { expedition } = this.props;
+    const expeditionSlug = project.slug;
 
-		return (
+    return (
 
-			<div className="expedition">
-				<h1>Expedition Settings</h1>
-				<ProjectExpeditionForm
-					projectSlug={projectSlug}
-					onSave={this.onExpeditionSave.bind(this)} />				
-			</div>
-		)
-	}
+      <div className="expedition">
+        <h1>Expedition Settings</h1>
+        <ProjectExpeditionForm
+          projectSlug={projectSlug}
+          name={expedition.name}
+          slug={expedition.slug}
+          description={expedition.description}
+          onSave={this.onExpeditionSave.bind(this)} />        
+      </div>
+    )
+  }
 }

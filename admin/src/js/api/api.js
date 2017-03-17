@@ -199,6 +199,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.postWithErrors(`/projects/${projectId}/expedition`, values)
   }
 
+  updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}`, values)
+  }  
+
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
     return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/teams`)
   }

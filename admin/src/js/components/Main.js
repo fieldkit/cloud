@@ -15,180 +15,189 @@ import placeholderImage from '../../img/profile_placeholder.svg'
 import '../../css/main.css'
 
 type Props = {
-	match: Object;
-	location: Object;
-	history: Object;
+  match: Object;
+  location: Object;
+  history: Object;
 }
 
 export class Main extends Component {
-	props: Props;
-	state: {
-		loading: boolean,
-		redirectTo: ?string,
-		user: ?APIUser,
-		project: ?APIProject,
-		expedition: ?APIExpedition
-	}
+  props: Props;
+  state: {
+    loading: boolean,
+    redirectTo: ?string,
+    user: ?APIUser,
+    project: ?APIProject,
+    expedition: ?APIExpedition
+  }
 
-	constructor(props: Props) {
-		super(props);
+  constructor(props: Props) {
+    super(props);
 
-		this.state = {
-			loading: true,
-			redirectTo: null,
-			user: null,
-			project: null,
-			expedition: null
-		}
+    this.state = {
+      loading: true,
+      redirectTo: null,
+      user: null,
+      project: null,
+      expedition: null
+    }
 
-		Promise.all([
-			this.loadUser(),
-			this.loadProject(),
-			this.loadExpedition()
-		]).then(() => this.setState({ loading: false }));
-	}
+    Promise.all([
+      this.loadUser(),
+      this.loadProject(),
+      this.loadExpedition()
+    ]).then(() => this.setState({ loading: false }));
+  }
 
-	projectSlug(): ?string {
-		return this.props.match.params.projectSlug;
-	}
+  projectSlug(): ?string {
+    return this.props.match.params.projectSlug;
+  }
 
-	expeditionSlug(): ?string {
-		return this.props.match.params.expeditionSlug;
-	}
+  expeditionSlug(): ?string {
+    return this.props.match.params.expeditionSlug;
+  }
 
-	async loadUser() {
-		const userRes = await FKApiClient.get().getCurrentUser();
-		if (userRes.type == 'ok' && userRes.payload) {
-			this.setState({ user: userRes.payload });
-		}
-	}
+  async loadUser() {
+    const userRes = await FKApiClient.get().getCurrentUser();
+    if (userRes.type == 'ok' && userRes.payload) {
+      this.setState({ user: userRes.payload });
+    }
+  }
 
-	async loadProject() {
-		const projectSlug = this.projectSlug();
-		if (projectSlug) {
-			const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-			console.log(projectRes);
-			if (projectRes.type == 'ok' && projectRes.payload) {
-				this.setState({ project: projectRes.payload });
-			}
-		}
-	}
+  async loadProject() {
+    const projectSlug = this.projectSlug();
+    if (projectSlug) {
+      const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
+      console.log(projectRes);
+      if (projectRes.type == 'ok' && projectRes.payload) {
+        this.setState({ project: projectRes.payload });
+      }
+    }
+  }
 
-	async loadExpedition() {
-		const projectSlug = this.projectSlug();
-		const expeditionSlug = this.expeditionSlug();
-		if (projectSlug && expeditionSlug) {
-			const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
-			if (expRes.type == 'ok' && expRes.payload) {
-				this.setState({ expedition: expRes.payload });
-			}
-		}
-	}
+  async loadExpedition() {
+    const projectSlug = this.projectSlug();
+    const expeditionSlug = this.expeditionSlug();
+    if (projectSlug && expeditionSlug) {
+      const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
+      if (expRes.type == 'ok' && expRes.payload) {
+        this.setState({ expedition: expRes.payload });
+      }
+    }
+  }
 
-	onProjectUpdate(newSlug: ?string = null) {
-		if (newSlug) {
-			this.setState({ redirectTo: `/projects/${newSlug}`})
-		} else {
-			this.loadProject();
-		}
-	}
+  onProjectUpdate(newSlug: ?string = null) {
+    if (newSlug) {
+      this.setState({ redirectTo: `/projects/${newSlug}`})
+    } else {
+      this.loadProject();
+    }
+  }
 
-	render() {
-		if (this.state.redirectTo) {
-			return <Redirect to={this.state.redirectTo} />;
-		}
+  onExpeditionUpdate(newSlug: ?string = null) {
+    if (newSlug) {
+      const projectSlug = this.projectSlug();
+      this.setState({ redirectTo: `/projects/${projectSlug}/expeditions/${newSlug}`})
+    } else {
+      this.loadExpedition();
+    }
+  }
 
-		const projectSlug = this.projectSlug();
-		const expeditionSlug = this.expeditionSlug();
+  render() {
+    if (this.state.redirectTo) {
+      return <Redirect to={this.state.redirectTo} />;
+    }
 
-		const {
-			project,
-			expedition
-		} = this.state;
+    const projectSlug = this.projectSlug();
+    const expeditionSlug = this.expeditionSlug();
 
-		const breadcrumbs = [];
-		if (project) {
-			breadcrumbs.push(
-				<Link to={`/projects/${project.slug}`}>{project.name}</Link>
-			);
-			if (expedition) {
-				breadcrumbs.push(
-					<Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
-				);
-			}
-		}
+    const {
+      project,
+      expedition
+    } = this.state;
 
-		return (
-			<div className="main">
-				<div className="left">
-					<div className="logo-area">
-						<img src={fieldkitLogo} alt="fieldkit logo" />
-					</div>
+    const breadcrumbs = [];
+    if (project) {
+      breadcrumbs.push(
+        <Link to={`/projects/${project.slug}`}>{project.name}</Link>
+      );
+      if (expedition) {
+        breadcrumbs.push(
+          <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
+        );
+      }
+    }
 
-					{ project && expedition &&
-						<div className="expedition-sidebar">
-							<div className="expedition-name">
-								<span>{expedition.name}</span>
-								{/* TODO: use image icon */}
-								<Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`}>GO</Link>
-							</div>
-							<div className="settings">
-								{/* TODO: use image icon */}
-								<Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>Settings</Link>
-							</div>
-							<div className="nav">
-								<NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`}>Data Sources</NavLink>
-								<NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/teams`}>Teams</NavLink>
-								<NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/website`}>Website</NavLink>
-							</div>
-						</div> }
+    return (
+      <div className="main">
+        <div className="left">
+          <div className="logo-area">
+            <img src={fieldkitLogo} alt="fieldkit logo" />
+          </div>
 
-					<footer>
-						<Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
-					</footer>
-				</div>
+          { project && expedition &&
+            <div className="expedition-sidebar">
+              <div className="expedition-name">
+                <span>{expedition.name}</span>
+                {/* TODO: use image icon */}
+                <Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`}>GO</Link>
+              </div>
+              <div className="settings">
+                {/* TODO: use image icon */}
+                <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>Settings</Link>
+              </div>
+              <div className="nav">
+                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`}>Data Sources</NavLink>
+                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/teams`}>Teams</NavLink>
+                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/website`}>Website</NavLink>
+              </div>
+            </div> }
 
-				<div className="right">
-					<div className="nav">
-						<div className="breadcrumbs">
-							{ breadcrumbs.length > 0 && breadcrumbs.reduce((prev, curr) => [prev, ' / ', curr]) }
-						</div>
-						<div className="profile-image">
-							<img src={placeholderImage} alt="profile" />
-						</div>
-					</div>
+          <footer>
+            <Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
+          </footer>
+        </div>
 
-					<div className="contents">
-						<Switch>
-							<Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
-								if (expedition) {
-									return (
-										<Expedition
-											project={project}
-											expedition={expedition}
-										/>
-									)                
-								} else {
-									return <div></div>
-								}
-							}} />            
-							<Route path="/projects/:projectSlug" render={props => {
-								if (project) {
-									return (
-										<Project
-											project={project}
-											onProjectUpdate={this.onProjectUpdate.bind(this)}
-											{...props} />
-									)                
-								} else {
-									return <div></div>
-								}
-							}} />
-							<Route path="/" render={props => <Projects {...props} />} />
-						</Switch>
-					</div>
-				</div>
-			</div>
-		)
-	}
+        <div className="right">
+          <div className="nav">
+            <div className="breadcrumbs">
+              { breadcrumbs.length > 0 && breadcrumbs.reduce((prev, curr) => [prev, ' / ', curr]) }
+            </div>
+            <div className="profile-image">
+              <img src={placeholderImage} alt="profile" />
+            </div>
+          </div>
+
+          <div className="contents">
+            <Switch>
+              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
+                if (expedition) {
+                  return (
+                    <Expedition
+                      project={project}
+                      expedition={expedition}
+                    />
+                  )                
+                } else {
+                  return <div></div>
+                }
+              }} />            
+              <Route path="/projects/:projectSlug" render={props => {
+                if (project) {
+                  return (
+                    <Project
+                      project={project}
+                      onProjectUpdate={this.onProjectUpdate.bind(this)}
+                      {...props} />
+                  )                
+                } else {
+                  return <div></div>
+                }
+              }} />
+              <Route path="/" render={props => <Projects {...props} />} />
+            </Switch>
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
