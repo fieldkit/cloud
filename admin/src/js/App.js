@@ -11,9 +11,6 @@ import { Signup } from './components/unauth/Signup';
 
 import { Main } from './components/Main';
 
-// import { Expedition } from './components/Expedition';
-// import { Teams } from './components/Teams';
-
 import '../css/App.css';
 
 const PrivateRoute = ({ component, ...rest }) => (
