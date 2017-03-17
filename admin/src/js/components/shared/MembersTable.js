@@ -24,7 +24,7 @@ export class MemberRow extends Component {
 export class MembersTable extends Component {
 	constructor() {
 		super();
-	}	
+	}
 	render() {
 		const rows = this.props.members.map(member => <MemberRow name={member.name} username={member.username} role={member.role}/>);
 		return (
@@ -36,7 +36,7 @@ export class MembersTable extends Component {
 							<th>Members ({rows.length})</th>
 							<th>Role</th>
 						</tr>
-					</thead>			
+					</thead>
 					<tbody>{rows}</tbody>
 				</table>
 			</div>

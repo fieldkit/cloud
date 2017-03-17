@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { MembersTable } from './shared/MembersTable';
 
-export class TeamRow extends Component {	
+export class TeamRow extends Component {
 	render() {
 		return (
 			<tr>
@@ -38,7 +38,7 @@ export class TeamsTable extends Component {
 						{name: 'eric', username: 'some_username', role: 'creative researcher'},
 						{name: 'chris', username: 'some_username', role: 'creative researcher'},
 						{name: 'noa', username: 'some_username', role: 'creative researcher'}
-					]					
+					]
 				}
 			]
 		}

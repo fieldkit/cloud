@@ -9,6 +9,7 @@ import type { APIUser, APIProject, APIExpedition } from '../api/types';
 import { Projects } from './Projects';
 import { Project } from './Project';
 import { Expedition } from './Expedition'
+import { Teams } from './Teams';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -214,6 +215,18 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
+              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug/teams" render={props => {
+                if (project && expedition) {
+                  return (
+                    <Teams
+                      project={project}
+                      expedition={expedition}
+                      {...props} />
+                  )
+                } else {
+                  return <div></div>
+                }
+              }} />
               <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
                 if (project && expedition) {
                   return (
