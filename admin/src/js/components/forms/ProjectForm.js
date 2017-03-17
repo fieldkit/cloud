@@ -8,44 +8,50 @@ import type { ErrorMap } from '../../common/util';
 
 type Props = {
   name?: string,
+  slug?: string,
   description?: string,
 
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (n: string, d: string) => Promise<?ErrorMap>;
+  onSave: (n: string, s: string, d: string) => Promise<?ErrorMap>;
 }
 
 export class ProjectForm extends Component {
   props: Props;
   state: {
     name: string,
-    path: string,
+    slug: string,
     description: string,
+    slugHasChanged: boolean,
     saveDisabled: boolean,
     errors: ?ErrorMap
   };
 
   constructor(props: Props) {
     super(props)
-    const name = this.props.name || '';
     this.state = {
-      name,
-      path: slugify(name),
+      name: this.props.name || '',
+      slug: this.props.slug || '',
       description: this.props.description || '',
+      slugHasChanged: false,
       saveDisabled: false,
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const name = nextProps.name || '';
-    const description = nextProps.description || '';
-    this.setState({ name, path: slugify(name), description });
+    this.setState({
+      name: nextProps.name || '',
+      slug: nextProps.slug || '',
+      description: nextProps.description || '',
+      slugHasChanged: false,
+      errors: null
+    });
   }
 
   async save() {
-    const errors = await this.props.onSave(this.state.name, this.state.description);
+    const errors = await this.props.onSave(this.state.name, this.state.slug, this.state.description);
     if (errors) {
       this.setState({ errors });
     }
@@ -53,10 +59,16 @@ export class ProjectForm extends Component {
 
   handleNameChange(event) {
     const v = event.target.value;
-    this.setState({
-      name: v,
-      path: slugify(v)
-    });
+    let stateUpdate = { name: v };
+    if (!this.state.slugHasChanged) {
+      stateUpdate = { slug: slugify(v), ...stateUpdate };
+    }
+    this.setState(stateUpdate);
+  }
+
+  handleSlugChange(event) {
+    const v = event.target.value;
+    this.setState({ slug: v, slugHasChanged: true });
   }
 
   handleInputChange(event) {
@@ -84,8 +96,9 @@ export class ProjectForm extends Component {
         <div className="url-preview">
           <p className="label">Your project will be available at the following address:</p>
           <p className="url">
+            <input type="text" name="slug" className='lg slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
             {/* TODO: replace with something that handles alternative domains */}
-            {`https://${this.state.path}.fieldkit.org/`}
+            <span className="domain">.fieldkit.org/</span>
           </p>
           { errorsFor(this.state.errors, 'path') }
         </div>

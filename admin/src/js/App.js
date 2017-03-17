@@ -9,8 +9,7 @@ import { Landing } from './components/Landing';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
 
-import { Projects } from './components/Projects';
-import { Project } from './components/Project';
+import { Main } from './components/Main';
 
 import { Expedition } from './components/Expedition';
 import { Teams } from './components/Teams';
@@ -61,9 +60,8 @@ export class App extends Component {
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
           <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Expedition} />
-          <PrivateRoute path="/projects/:projectSlug" component={Project} />
-          <PrivateRoute path="/" component={Projects} />
-
+          <PrivateRoute path="/projects/:projectSlug" component={Main} />
+          <PrivateRoute path="/" component={Main} />
         </Switch>
       </Router>
     );

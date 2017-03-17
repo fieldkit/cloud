@@ -4,7 +4,6 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
-import { MainContainer } from './containers/MainContainer';
 import { ProjectForm } from './forms/ProjectForm';
 import { FKApiClient } from '../api/api';
 
@@ -34,13 +33,13 @@ export class Projects extends Component {
 
   async loadData() {
     const projectsRes = await FKApiClient.get().getProjects();
-    if (projectsRes.type === 'ok') {
-      this.setState({ projects: projectsRes.payload })
+    if (projectsRes.type === 'ok' && projectsRes.payload) {
+      this.setState({ projects: projectsRes.payload.projects })
     }
   }
 
-  async onProjectCreate(name: string, description: string) {
-    const project = await FKApiClient.get().createProject(name, description);
+  async onProjectCreate(name: string, slug: string, description: string) {
+    const project = await FKApiClient.get().createProject({ name, slug, description });
     if (project.type === 'ok') {
       await this.loadData();
       this.props.history.push("/");
@@ -51,30 +50,26 @@ export class Projects extends Component {
 
   render () {
     return (
-      <MainContainer
-        breadcrumbs={[{ url: '/', text: 'Projects'}]}
-      >
-        <div className="projects">
-          <Route path="/new-project" render={() =>
-            <ReactModal isOpen={true} contentLabel="New project form">
-              <h1>Create a new project</h1>
-              <ProjectForm
-                onCancel={() => this.props.history.push("/")}
-                onSave={this.onProjectCreate.bind(this)} />
-            </ReactModal> } />
+      <div className="projects">
+        <Route path="/new-project" render={() =>
+          <ReactModal isOpen={true} contentLabel="New project form">
+            <h1>Create a new project</h1>
+            <ProjectForm
+              onCancel={() => this.props.history.push("/")}
+              onSave={this.onProjectCreate.bind(this)} />
+          </ReactModal> } />
 
-          <div id="projects">
-          { this.state.projects.map((p, i) =>
-            <div key={`project-${i}`} className="project-item">
-              <Link to={`/projects/${p.slug}`}>{p.name}</Link>
-            </div> )}
-          { this.state.projects.length === 0 &&
-            <span className="empty">No projects!</span> }
-          </div>
-
-          <Link to="/new-project">Show new project modal</Link>
+        <div id="projects">
+        { this.state.projects.map((p, i) =>
+          <div key={`project-${i}`} className="project-item">
+            <Link to={`/projects/${p.slug}`}>{p.name}</Link>
+          </div> )}
+        { this.state.projects.length === 0 &&
+          <span className="empty">No projects!</span> }
         </div>
-      </MainContainer>
+
+        <Link to="/new-project">Show new project modal</Link>
+      </div>
     )
   }
 }
