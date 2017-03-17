@@ -1234,6 +1234,7 @@ type UserController interface {
 	Login(*LoginUserContext) error
 	Logout(*LogoutUserContext) error
 	Refresh(*RefreshUserContext) error
+	Validate(*ValidateUserContext) error
 }
 
 // MountUserController "mounts" a User resource controller on the given service.
@@ -1247,6 +1248,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/validate", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1398,6 +1400,22 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/refresh", ctrl.MuxHandler("Refresh", h, unmarshalRefreshUserPayload))
 	service.LogInfo("mount", "ctrl", "User", "action", "Refresh", "route", "POST /refresh")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewValidateUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Validate(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/validate", ctrl.MuxHandler("Validate", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "Validate", "route", "GET /validate")
 }
 
 // handleUserOrigin applies the CORS response headers corresponding to the origin.

@@ -98,6 +98,22 @@ var _ = Resource("user", func() {
 		Response(Unauthorized)
 	})
 
+	Action("validate", func() {
+		Routing(GET("validate"))
+		Description("Validate a user's email address.")
+		NoSecurity()
+		Params(func() {
+			Param("token", String)
+			Required("token")
+		})
+		Response(Found, func() {
+			Headers(func() {
+				Header("Location", String)
+			})
+		})
+		Response(Unauthorized)
+	})
+
 	Action("add", func() {
 		Routing(POST("user"))
 		Description("Add a user")

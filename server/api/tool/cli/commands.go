@@ -311,6 +311,12 @@ type (
 		PrettyPrint bool
 	}
 
+	// ValidateUserCommand is the command line data structure for the validate action of user
+	ValidateUserCommand struct {
+		Token       string
+		PrettyPrint bool
+	}
+
 	// DownloadCommand is the command line data structure for the download command.
 	DownloadCommand struct {
 		// OutFile is the path to the download output file.
@@ -809,6 +815,20 @@ Payload example:
 	}
 	tmp63.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp63.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "validate",
+		Short: `Validate a user's email address.`,
+	}
+	tmp64 := new(ValidateUserCommand)
+	sub = &cobra.Command{
+		Use:   `user ["/validate"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp64.Run(c, args) },
+	}
+	tmp64.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp64.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -2154,4 +2174,30 @@ func (cmd *RefreshUserCommand) Run(c *client.Client, args []string) error {
 func (cmd *RefreshUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the ValidateUserCommand command.
+func (cmd *ValidateUserCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/validate"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ValidateUser(ctx, path, cmd.Token)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ValidateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var token string
+	cc.Flags().StringVar(&cmd.Token, "token", token, ``)
 }

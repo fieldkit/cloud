@@ -1870,6 +1870,28 @@ paths:
       summary: get id user
       tags:
       - user
+  /validate:
+    get:
+      description: Validate a user's email address.
+      operationId: user#validate
+      parameters:
+      - in: query
+        name: token
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+          headers:
+            Location:
+              type: string
+        "401":
+          description: Unauthorized
+      schemes:
+      - https
+      summary: validate user
+      tags:
+      - user
 produces:
 - application/json
 responses:

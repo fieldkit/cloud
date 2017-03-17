@@ -284,3 +284,35 @@ func (c *Client) NewRefreshUserRequest(ctx context.Context, path string, payload
 	}
 	return req, nil
 }
+
+// ValidateUserPath computes a request path to the validate action of user.
+func ValidateUserPath() string {
+
+	return fmt.Sprintf("/validate")
+}
+
+// Validate a user's email address.
+func (c *Client) ValidateUser(ctx context.Context, path string, token string) (*http.Response, error) {
+	req, err := c.NewValidateUserRequest(ctx, path, token)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewValidateUserRequest create the request corresponding to the validate action endpoint of the user resource.
+func (c *Client) NewValidateUserRequest(ctx context.Context, path string, token string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	values.Set("token", token)
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}

@@ -1689,3 +1689,42 @@ func (ctx *RefreshUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
 	return nil
 }
+
+// ValidateUserContext provides the user validate action context.
+type ValidateUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Token string
+}
+
+// NewValidateUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller validate action.
+func NewValidateUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ValidateUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ValidateUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramToken := req.Params["token"]
+	if len(paramToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("token"))
+	} else {
+		rawToken := paramToken[0]
+		rctx.Token = rawToken
+	}
+	return &rctx, err
+}
+
+// Found sends a HTTP response with status code 302.
+func (ctx *ValidateUserContext) Found() error {
+	ctx.ResponseData.WriteHeader(302)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *ValidateUserContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}

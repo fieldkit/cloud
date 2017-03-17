@@ -96,6 +96,35 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
+func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
+	fmt.Println(ctx.Token)
+
+	validationToken := &data.ValidationToken{}
+	if err := validationToken.Token.UnmarshalText([]byte(ctx.Token)); err != nil {
+		return err
+	}
+
+	err := c.options.Database.GetContext(ctx, validationToken, "SELECT * FROM fieldkit.validation_token WHERE token = $1", validationToken.Token)
+	if err == sql.ErrNoRows {
+		return ctx.Unauthorized()
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "UPDATE fieldkit.user SET valid = true WHERE id = $1", validationToken.UserID); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.validation_token WHERE token = $1", validationToken.Token); err != nil {
+		return err
+	}
+
+	ctx.ResponseData.Header().Set("Location", "https://fieldkit.org/login")
+	return ctx.Found()
+}
+
 func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	now := time.Now()
 
@@ -165,7 +194,6 @@ func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
 	return ctx.NoContent()
 }
 
-// SignUp runs the sign-up action.
 func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	now := time.Now()
 

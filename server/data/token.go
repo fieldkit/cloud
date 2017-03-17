@@ -31,15 +31,15 @@ func (t *Token) UnmarshalBinary(data []byte) error {
 
 // MarshalText returns a base64-encoded slice of bytes.
 func (t Token) MarshalText() (text []byte, err error) {
-	data := make([]byte, base64.StdEncoding.EncodedLen(len(t)))
-	base64.StdEncoding.Encode(data, t)
+	data := make([]byte, base64.URLEncoding.EncodedLen(len(t)))
+	base64.URLEncoding.Encode(data, t)
 	return data, nil
 }
 
 // UnmarshalText sets the value of the Token based on a base64-encoded slice of bytes.
 func (t *Token) UnmarshalText(text []byte) error {
-	data := make([]byte, base64.StdEncoding.DecodedLen(len(text)))
-	n, err := base64.StdEncoding.Decode(data, text)
+	data := make([]byte, base64.URLEncoding.DecodedLen(len(text)))
+	n, err := base64.URLEncoding.Decode(data, text)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (t *Token) UnmarshalText(text []byte) error {
 
 // String returns a base64-encoded string.
 func (t Token) String() string {
-	return base64.StdEncoding.EncodeToString(t)
+	return base64.URLEncoding.EncodeToString(t)
 }
 
 // Scan sets the value of the Token based on an interface.
