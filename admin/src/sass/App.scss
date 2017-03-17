@@ -255,9 +255,15 @@ $font-sans: Helvetica, Arial, sans-serif;
 }
 
 html, body {
+	width: 100%;
+	min-height: 100%;	
 	color: $gray-2;
 	@include type-body-1;
 	text-align: left;
+}
+
+html {
+	height: 100%;
 }
 
 h1 {
