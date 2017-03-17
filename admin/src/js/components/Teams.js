@@ -44,7 +44,7 @@ export class TeamsTable extends Component {
     }
   }
   render() {
-    const rows = this.props.teams.map(team => <TeamRow name={team.name} members={team.members} />);
+    const rows = this.state.teams.map((team, i) => <TeamRow key={i} name={team.name} members={team.members} />);
     return (
       <table className="teams-table">
         <tbody>{rows}</tbody>
