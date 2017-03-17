@@ -41,11 +41,51 @@ export class Main extends Component {
       expedition: null
     }
 
+    const {
+      projectSlug,
+      expeditionSlug
+    } = props.match.params;
+
     Promise.all([
       this.loadUser(),
-      this.loadProject(),
-      this.loadExpedition()
+      this.loadProject(projectSlug),
+      this.loadExpedition(projectSlug, expeditionSlug)
     ]).then(() => this.setState({ loading: false }));
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    const promises = [];
+    const stateChange = {};
+
+    const {
+      projectSlug,
+      expeditionSlug
+    } = nextProps.match.params;
+
+    const {
+      projectSlug: newProjectSlug,
+      expeditionSlug: newExpeditionSlug
+    } = nextProps.match.params;
+
+    if (projectSlug != newProjectSlug) {
+      promises.push(this.loadProject(newProjectSlug));
+      stateChange.project = null;
+    }
+    if (expeditionSlug != newExpeditionSlug) {
+      promises.push(this.loadExpedition(newProjectSlug, newExpeditionSlug));
+      stateChange.expedition = null;
+    }
+
+    if (promises.length > 0) {
+      this.setState({
+        loading: true,
+        ...stateChange
+      })
+      Promise.all(promises).then(() => {
+        this.setState({ loading: false });
+      })
+    }
+
   }
 
   projectSlug(): ?string {
@@ -63,20 +103,16 @@ export class Main extends Component {
     }
   }
 
-  async loadProject() {
-    const projectSlug = this.projectSlug();
+  async loadProject(projectSlug: ?string = this.projectSlug()) {
     if (projectSlug) {
       const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      console.log(projectRes);
       if (projectRes.type == 'ok' && projectRes.payload) {
         this.setState({ project: projectRes.payload });
       }
     }
   }
 
-  async loadExpedition() {
-    const projectSlug = this.projectSlug();
-    const expeditionSlug = this.expeditionSlug();
+  async loadExpedition(projectSlug: ?string = this.projectSlug(), expeditionSlug: ?string = this.expeditionSlug()) {
     if (projectSlug && expeditionSlug) {
       const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
       if (expRes.type == 'ok' && expRes.payload) {
@@ -89,7 +125,8 @@ export class Main extends Component {
     if (newSlug) {
       this.setState({ redirectTo: `/projects/${newSlug}`})
     } else {
-      this.loadProject();
+      this.setState({ loading: true })
+      this.loadProject(this.projectSlug()).then(() => this.setState({ loading: false }));
     }
   }
 
@@ -102,7 +139,8 @@ export class Main extends Component {
         this.setState({ redirectTo: '/' });
       }
     } else {
-      this.loadExpedition();
+      this.setState({ loading: true })
+      this.loadExpedition().then(() => this.setState({ loading: false }));
     }
   }
 
@@ -120,13 +158,13 @@ export class Main extends Component {
     } = this.state;
 
     const breadcrumbs = [];
-    if (project) {
+    if (project && this.projectSlug()) {
       breadcrumbs.push(
-        <Link to={`/projects/${project.slug}`}>{project.name}</Link>
+        <Link key={0} to={`/projects/${project.slug}`}>{project.name}</Link>
       );
-      if (expedition) {
+      if (expedition && this.expeditionSlug()) {
         breadcrumbs.push(
-          <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
+          <Link key={1} to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
         );
       }
     }

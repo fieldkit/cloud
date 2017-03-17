@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
-    "flow-bin": "^0.41.0",
+    "flow-bin": "^0.42.0",
     "node-sass": "^4.5.0",
     "react-scripts": "0.9.5"
   },

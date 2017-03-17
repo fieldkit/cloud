@@ -31,7 +31,6 @@ export class Project extends Component {
     super(props);
 
     this.state = {
-      project: null,
       expeditions: []
     };
 
@@ -92,7 +91,7 @@ export class Project extends Component {
         <div id="expeditions">
           { this.state.expeditions.map((e, i) =>
             <div key={`expedition-${i}`} className="expedition-item">
-              {JSON.stringify(e)}
+              <Link to={`/projects/${projectSlug}/expeditions/${e.slug}`}>{e.name}</Link>
             </div> )}
           { this.state.expeditions.length === 0 &&
             <span className="empty">No expeditions!</span> }
