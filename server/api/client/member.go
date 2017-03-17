@@ -95,7 +95,7 @@ func GetMemberPath(project string, expedition string, team string, username stri
 	param2 := team
 	param3 := username
 
-	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams/@/%s/member/@/%s", param0, param1, param2, param3)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams/@/%s/members/@/%s", param0, param1, param2, param3)
 }
 
 // Get a member
