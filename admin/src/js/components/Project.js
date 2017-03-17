@@ -8,7 +8,7 @@ import { ProjectForm } from './forms/ProjectForm';
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
 import { FKApiClient } from '../api/api';
 
-import type { APIProject } from '../api/types';
+import type { APIProject, APINewProject, APINewExpedition } from '../api/types';
 
 import '../../css/home.css'
 
@@ -45,10 +45,10 @@ export class Project extends Component {
     }
   }
 
-  async onExpeditionCreate(name: string, slug: string, description: string) {
+  async onExpeditionCreate(e: APINewExpedition) {
     const { project } = this.props;
 
-    const expeditionRes = await FKApiClient.get().createExpedition(project.id, { name, slug, description });
+    const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
     if (expeditionRes.type === 'ok') {
       await this.loadData();
       this.props.history.push(`/projects/${project.slug}`);
@@ -67,8 +67,8 @@ export class Project extends Component {
       return projectRes.errors;
     }
 
-    if (projectRes.slug != this.props.project.slug) {
-      this.props.onProjectUpdate(projectRes.slug);
+    if (projectRes.slug != this.props.project.slug && projectRes.payload) {
+      this.props.onProjectUpdate(projectRes.payload.slug);
     } else {
       this.props.onProjectUpdate();
     }

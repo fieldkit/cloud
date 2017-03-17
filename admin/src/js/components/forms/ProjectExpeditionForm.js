@@ -5,7 +5,7 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors } from '../../api/types';
+import type { APIErrors, APINewExpedition } from '../../api/types';
 
 type Props = {
   projectSlug: string,
@@ -16,7 +16,7 @@ type Props = {
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (n: string, s: string, d: string) => Promise<?APIErrors>;
+  onSave: (e: APINewExpedition) => Promise<?APIErrors>;
 }
 
 export class ProjectExpeditionForm extends Component {
@@ -53,7 +53,11 @@ export class ProjectExpeditionForm extends Component {
   }
 
   async save() {
-    const errors = await this.props.onSave(this.state.name, this.state.slug, this.state.description);
+    const errors = await this.props.onSave({
+      name: this.state.name,
+      slug: this.state.slug,
+      description: this.state.description
+    });
     if (errors) {
       this.setState({ errors });
     }
