@@ -11,8 +11,8 @@ import { Signup } from './components/unauth/Signup';
 
 import { Main } from './components/Main';
 
-import { Expedition } from './components/Expedition';
-import { Teams } from './components/Teams';
+// import { Expedition } from './components/Expedition';
+// import { Teams } from './components/Teams';
 
 import '../css/App.css';
 
@@ -54,12 +54,12 @@ export class App extends Component {
     return (
       <Router>
         <Switch>
-          <Route exact path="/teams" component={Teams} />        
+          {/* <Route exact path="/teams" component={Teams} /> */}
           <Route exact path="/landing" component={Landing} />
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
-          <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Expedition} />
+          {/* <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Expedition} /> */}
           <PrivateRoute path="/projects/:projectSlug" component={Main} />
           <PrivateRoute path="/" component={Main} />
         </Switch>
