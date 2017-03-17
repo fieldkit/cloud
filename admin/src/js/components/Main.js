@@ -60,7 +60,7 @@ export class Main extends Component {
     const {
       projectSlug,
       expeditionSlug
-    } = nextProps.match.params;
+    } = this.props.match.params;
 
     const {
       projectSlug: newProjectSlug,
@@ -70,20 +70,20 @@ export class Main extends Component {
     if (projectSlug != newProjectSlug) {
       promises.push(this.loadProject(newProjectSlug));
       stateChange.project = null;
+    } else if (!newProjectSlug) {
+      stateChange.project = null;
     }
+
     if (expeditionSlug != newExpeditionSlug) {
       promises.push(this.loadExpedition(newProjectSlug, newExpeditionSlug));
       stateChange.expedition = null;
+    } else if (!newExpeditionSlug) {
+      stateChange.expedition = null;
     }
 
-    if (promises.length > 0) {
-      this.setState({
-        loading: true,
-        ...stateChange
-      })
-      Promise.all(promises).then(() => {
-        this.setState({ loading: false });
-      })
+    if (promises.length > 0 || Object.keys(stateChange).length > 0) {
+      this.setState({ loading: true, ...stateChange });
+      Promise.all(promises).then(() => { this.setState({ loading: false }); });
     }
 
   }
@@ -109,6 +109,8 @@ export class Main extends Component {
       if (projectRes.type == 'ok' && projectRes.payload) {
         this.setState({ project: projectRes.payload });
       }
+    } else {
+      this.setState({ project: null });
     }
   }
 
@@ -118,6 +120,8 @@ export class Main extends Component {
       if (expRes.type == 'ok' && expRes.payload) {
         this.setState({ expedition: expRes.payload });
       }
+    } else {
+      this.setState({ expedition: null });
     }
   }
 
@@ -149,9 +153,6 @@ export class Main extends Component {
       return <Redirect to={this.state.redirectTo} />;
     }
 
-    const projectSlug = this.projectSlug();
-    const expeditionSlug = this.expeditionSlug();
-
     const {
       project,
       expedition
@@ -181,7 +182,9 @@ export class Main extends Component {
               <div className="expedition-name">
                 <span>{expedition.name}</span>
                 {/* TODO: use image icon */}
-                <Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`}>GO</Link>
+                <a href={`https://${project.slug}.fieldkit.org/${expedition.slug}`}
+                  alt="go to expedition"
+                  target="_blank">GO</a>
               </div>
               <div className="settings">
                 {/* TODO: use image icon */}
