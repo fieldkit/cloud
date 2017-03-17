@@ -159,6 +159,15 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
+              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
+                if (expedition) {
+                  return (
+                    <div>I'm here!</div>
+                  )                
+                } else {
+                  return <div></div>
+                }
+              }} />            
               <Route path="/projects/:projectSlug" render={props => {
                 if (project) {
                   return (
@@ -166,7 +175,7 @@ export class Main extends Component {
                       project={project}
                       onProjectUpdate={this.onProjectUpdate.bind(this)}
                       {...props} />
-                  )
+                  )                
                 } else {
                   return <div></div>
                 }
