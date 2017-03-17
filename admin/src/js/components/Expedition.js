@@ -38,10 +38,10 @@ export class Expedition extends Component {
       return expedition.errors;
     }
 
-    if (slug != this.props.expedition.slug) {
-      this.props.onExpeditionUpdate(slug);
+    if (expedition.slug != this.props.expedition.slug) {
+      this.props.onExpeditionUpdate(expedition.slug);
     } else {
-      this.props.onProjectUpdate();
+      this.props.onExpeditionUpdate();
     }
   } 
 
