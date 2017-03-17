@@ -124,6 +124,68 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
+// Input media type (default view)
+//
+// Identifier: application/vnd.app.input+json; view=default
+type Input struct {
+	ID   int    `form:"id" json:"id" xml:"id"`
+	Name string `form:"name" json:"name" xml:"name"`
+	Slug string `form:"slug" json:"slug" xml:"slug"`
+}
+
+// Validate validates the Input media type instance.
+func (mt *Input) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(mt.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+	}
+	return
+}
+
+// InputCollection is the media type for an array of Input (default view)
+//
+// Identifier: application/vnd.app.input+json; type=collection; view=default
+type InputCollection []*Input
+
+// Validate validates the InputCollection media type instance.
+func (mt InputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Inputs media type (default view)
+//
+// Identifier: application/vnd.app.inputs+json; view=default
+type Inputs struct {
+	Inputs InputCollection `form:"inputs" json:"inputs" xml:"inputs"`
+}
+
+// Validate validates the Inputs media type instance.
+func (mt *Inputs) Validate() (err error) {
+	if mt.Inputs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputs"))
+	}
+	if err2 := mt.Inputs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // TeamMember media type (default view)
 //
 // Identifier: application/vnd.app.member+json; view=default

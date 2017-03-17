@@ -80,14 +80,12 @@ CREATE TABLE fieldkit.team_user (
 
 CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
-	name varchar(100) NOT NULL
+	project_id integer REFERENCES fieldkit.project (id) NOT NULL,
+	name varchar(100) NOT NULL,
+	slug varchar(100) NOT NULL
 );
 
-CREATE TABLE fieldkit.input_expedition (
-	input_id integer REFERENCES fieldkit.input (id) NOT NULL,
-	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
-	PRIMARY KEY (input_id, expedition_id)
-);
+CREATE UNIQUE INDEX ON fieldkit.input (project_id, slug);
 
 -- schema
 

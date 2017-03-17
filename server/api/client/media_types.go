@@ -167,6 +167,89 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// Input media type (default view)
+//
+// Identifier: application/vnd.app.input+json; view=default
+type Input struct {
+	ID   int    `form:"id" json:"id" xml:"id"`
+	Name string `form:"name" json:"name" xml:"name"`
+	Slug string `form:"slug" json:"slug" xml:"slug"`
+}
+
+// Validate validates the Input media type instance.
+func (mt *Input) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(mt.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+	}
+	return
+}
+
+// DecodeInput decodes the Input instance encoded in resp body.
+func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
+	var decoded Input
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// InputCollection is the media type for an array of Input (default view)
+//
+// Identifier: application/vnd.app.input+json; type=collection; view=default
+type InputCollection []*Input
+
+// Validate validates the InputCollection media type instance.
+func (mt InputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeInputCollection decodes the InputCollection instance encoded in resp body.
+func (c *Client) DecodeInputCollection(resp *http.Response) (InputCollection, error) {
+	var decoded InputCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Inputs media type (default view)
+//
+// Identifier: application/vnd.app.inputs+json; view=default
+type Inputs struct {
+	Inputs InputCollection `form:"inputs" json:"inputs" xml:"inputs"`
+}
+
+// Validate validates the Inputs media type instance.
+func (mt *Inputs) Validate() (err error) {
+	if mt.Inputs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputs"))
+	}
+	if err2 := mt.Inputs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeInputs decodes the Inputs instance encoded in resp body.
+func (c *Client) DecodeInputs(resp *http.Response) (*Inputs, error) {
+	var decoded Inputs
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // TeamMember media type (default view)
 //
 // Identifier: application/vnd.app.member+json; view=default
