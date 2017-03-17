@@ -13,6 +13,7 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // AddUserPath computes a request path to the add action of user.
@@ -53,7 +54,7 @@ func (c *Client) NewAddUserRequest(ctx context.Context, path string, payload *Ad
 func GetUserPath(username string) string {
 	param0 := username
 
-	return fmt.Sprintf("/user/%s", param0)
+	return fmt.Sprintf("/users/@/%s", param0)
 }
 
 // Get a user
@@ -99,6 +100,39 @@ func (c *Client) GetCurrentUser(ctx context.Context, path string) (*http.Respons
 
 // NewGetCurrentUserRequest create the request corresponding to the get current action endpoint of the user resource.
 func (c *Client) NewGetCurrentUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// GetIDUserPath computes a request path to the get id action of user.
+func GetIDUserPath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s", param0)
+}
+
+// Get a user
+func (c *Client) GetIDUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetIDUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetIDUserRequest create the request corresponding to the get id action endpoint of the user resource.
+func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

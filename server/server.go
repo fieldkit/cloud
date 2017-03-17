@@ -4,13 +4,8 @@ package main
 
 import (
 	"crypto/rand"
-	"crypto/sha512"
-	"flag"
-	// "encoding/json"
-	// "os"
-	// "fmt"
-	// "reflect"
 	"encoding/base64"
+	"flag"
 	"io"
 
 	"github.com/O-C-R/fieldkit/server/api"
@@ -29,6 +24,7 @@ var flagConfig struct {
 	backendURL              string
 	adminPath, frontendPath string
 	emailer                 string
+	sessionKey              string
 }
 
 func init() {
@@ -37,6 +33,7 @@ func init() {
 	flag.StringVar(&flagConfig.adminPath, "admin", "", "admin path")
 	flag.StringVar(&flagConfig.frontendPath, "frontend", "", "frontend path")
 	flag.StringVar(&flagConfig.emailer, "emailer", "default", "emailer: default, aws")
+	flag.StringVar(&flagConfig.sessionKey, "session-key", "", "base64-encoded HMAC key")
 }
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
@@ -93,12 +90,12 @@ func main() {
 	service := goa.New("fieldkit")
 
 	// Mount middleware
-	key := make([]byte, sha512.BlockSize)
-	if _, err := rand.Read(key); err != nil {
+	jwtHMACKey, err := base64.StdEncoding.DecodeString(flagConfig.sessionKey)
+	if err != nil {
 		panic(err)
 	}
 
-	jwtMiddleware, err := api.NewJWTMiddleware(key)
+	jwtMiddleware, err := api.NewJWTMiddleware(jwtHMACKey)
 	if err != nil {
 		panic(err)
 	}
@@ -119,26 +116,30 @@ func main() {
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
 	app.MountSwaggerController(service, c)
+
 	// Mount "user" controller
 	c2, err := api.NewUserController(service, api.UserControllerOptions{
 		Database:   database,
 		Emailer:    email.NewEmailer(),
-		JWTHMACKey: key,
+		JWTHMACKey: jwtHMACKey,
 	})
 	if err != nil {
 		panic(err)
 	}
 	app.MountUserController(service, c2)
+
 	// Mount "project" controller
 	c3 := api.NewProjectController(service, api.ProjectControllerOptions{
 		Database: database,
 	})
 	app.MountProjectController(service, c3)
+
 	// Mount "expedition" controller
 	c4 := api.NewExpeditionController(service, api.ExpeditionControllerOptions{
 		Database: database,
 	})
 	app.MountExpeditionController(service, c4)
+
 	// Mount "team" controller
 	c5 := api.NewTeamController(service, api.TeamControllerOptions{
 		Database: database,

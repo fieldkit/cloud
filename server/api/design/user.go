@@ -131,8 +131,19 @@ var _ = Resource("user", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("user/:username"))
+		Routing(GET("users/@/:username"))
 		Description("Get a user")
+		Response(OK, func() {
+			Media(User)
+		})
+	})
+
+	Action("get id", func() {
+		Routing(GET("users/:user_id"))
+		Description("Get a user")
+		Params(func() {
+			Param("user_id", Integer)
+		})
 		Response(OK, func() {
 			Media(User)
 		})

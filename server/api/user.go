@@ -237,6 +237,15 @@ func (c *UserController) Get(ctx *app.GetUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
+func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
+		return err
+	}
+
+	return ctx.OK(UserType(user))
+}
+
 func (c *UserController) List(ctx *app.ListUserContext) error {
 	users := []*data.User{}
 	if err := c.options.Database.SelectContext(ctx, &users, "SELECT * FROM fieldkit.user"); err != nil {
