@@ -8,6 +8,7 @@ import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
 import { Projects } from './Projects';
 import { Project } from './Project';
+import { Expedition } from './Expedition'
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -92,6 +93,15 @@ export class Main extends Component {
     }
   }
 
+  onExpeditionUpdate(newSlug: ?string = null) {
+    if (newSlug) {
+      const projectSlug = this.projectSlug();
+      this.setState({ redirectTo: `/projects/${projectSlug}/expeditions/${newSlug}`})
+    } else {
+      this.loadExpedition();
+    }
+  }
+
   render() {
     if (this.state.redirectTo) {
       return <Redirect to={this.state.redirectTo} />;
@@ -159,6 +169,18 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
+              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
+                if (expedition) {
+                  return (
+                    <Expedition
+                      project={project}
+                      expedition={expedition}
+                    />
+                  )                
+                } else {
+                  return <div></div>
+                }
+              }} />            
               <Route path="/projects/:projectSlug" render={props => {
                 if (project) {
                   return (
@@ -166,7 +188,7 @@ export class Main extends Component {
                       project={project}
                       onProjectUpdate={this.onProjectUpdate.bind(this)}
                       {...props} />
-                  )
+                  )                
                 } else {
                   return <div></div>
                 }

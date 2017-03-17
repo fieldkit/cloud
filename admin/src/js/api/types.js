@@ -46,7 +46,7 @@ export type APINewExpedition = {
 
 export type APIExpedition = {
   id: number;
-} & APINewProject;
+} & APINewExpedition;
 
 export type APIExpeditions = {
   expeditions: APIExpedition[]

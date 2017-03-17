@@ -203,12 +203,16 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIExpedition>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}`)
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
   }
 
   createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
     return this.postWithErrors(`/projects/${projectId}/expedition`, values)
   }
+
+  updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}`, values)
+  }  
 
   getInputsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIInputs>> {
     return this.getWithErrors(`/projects/@/${projectSlug}/inputs`)
@@ -227,7 +231,7 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/teams`)
   }
 
   getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APITeam>> {

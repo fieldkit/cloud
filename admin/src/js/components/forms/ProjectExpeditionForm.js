@@ -90,7 +90,7 @@ export class ProjectExpeditionForm extends Component {
         cancelText={this.props.cancelText}>
 
         <div className="form-group">
-          <label htmlFor="name">Name:</label>
+          <label htmlFor="name">Name</label>
           <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleNameChange.bind(this)} />
           { errorsFor(this.state.errors, 'name') }
         </div>
@@ -104,7 +104,7 @@ export class ProjectExpeditionForm extends Component {
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">Description:</label>
+          <label htmlFor="description">Description</label>
           <input type="text" name="description" className="lg" value={this.state.description} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'description') }
         </div>

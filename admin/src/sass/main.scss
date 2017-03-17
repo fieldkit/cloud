@@ -1,12 +1,20 @@
+@import 'App';
+
+$sidebar-width: 240px;
+$contents-width: 834px;
+
 .main {
-  width: 860px;
+  width: 100vw;
+  height: 100vh;
   margin: 0 auto;
   text-align: left;
 }
 
 .left {
   float: left;
-  width: 180px;
+  width: $sidebar-width;
+  height: 100%;
+  background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
     height: 100px;
@@ -19,13 +27,15 @@
 }
 
 .right {
-  float: left;
-  width: 680px;
+  // float: left;
+  width: 100%;
+  text-align: center;
 }
 
 .nav {
-  width: 100%;
+  width: $contents-width;
   height: 100px;
+  text-align: left;
 
   .profile-image {
     float: right;
@@ -40,5 +50,6 @@
 }
 
 .contents {
-  width: 100%;
+  width: $contents-width;
+  text-align: left;
 }

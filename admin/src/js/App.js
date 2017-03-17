@@ -51,12 +51,12 @@ export class App extends Component {
     return (
       <Router>
         <Switch>
+          {/* <Route exact path="/teams" component={Teams} /> */}
           <Route exact path="/landing" component={Landing} />
-
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
-
+          <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Main} />
           <PrivateRoute path="/projects/:projectSlug" component={Main} />
           <PrivateRoute path="/" component={Main} />
         </Switch>
