@@ -142,7 +142,7 @@ export class FKApiClient extends JWTAPIClient {
     return this.execWithErrors(this.getJSON(endpoint, values));
   }
 
-  deleteWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+  delWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
     return this.execWithErrors(this.delJSON(endpoint, values));
   }
 
@@ -232,7 +232,7 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   deleteAdministrator(projectId: number, userId: number): Promise<FKAPIResponse<APIAdministrator>> {
-    return this.deleteWithErrors(`/projects/${projectId}/administrators/${userId}`)
+    return this.delWithErrors(`/projects/${projectId}/administrators/${userId}`)
   }
 
   addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
@@ -248,6 +248,6 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
-    return this.deleteWithErrors(`/teams/${teamId}/members/${userId}`)
+    return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
   }
 }
