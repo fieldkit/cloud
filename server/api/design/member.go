@@ -70,7 +70,7 @@ var _ = Resource("member", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team/member/@/:username"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username"))
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
