@@ -52,6 +52,20 @@ export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
+export type APINewInput = {
+  name: string;
+  slug: string;
+  description: string;
+}
+
+export type APIInput = {
+  id: number;
+} & APINewInput;
+
+export type APIInputs = {
+  inputs: APIInput[]
+}
+
 export type APINewTeam = {
   name: string;
   slug: string;
