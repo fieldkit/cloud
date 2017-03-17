@@ -12,6 +12,33 @@ import (
 	"unicode/utf8"
 )
 
+// addAdministratorPayload user type.
+type addAdministratorPayload struct {
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the addAdministratorPayload type instance.
+func (ut *addAdministratorPayload) Validate() (err error) {
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "user_id"))
+	}
+	return
+}
+
+// Publicize creates AddAdministratorPayload from addAdministratorPayload
+func (ut *addAdministratorPayload) Publicize() *AddAdministratorPayload {
+	var pub AddAdministratorPayload
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
+	return &pub
+}
+
+// AddAdministratorPayload user type.
+type AddAdministratorPayload struct {
+	UserID int `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
 // addExpeditionPayload user type.
 type addExpeditionPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
@@ -81,6 +108,50 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Slug) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, ut.Slug, utf8.RuneCountInString(ut.Slug), 40, false))
+	}
+	return
+}
+
+// addMemberPayload user type.
+type addMemberPayload struct {
+	Role   *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the addMemberPayload type instance.
+func (ut *addMemberPayload) Validate() (err error) {
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "user_id"))
+	}
+	if ut.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
+// Publicize creates AddMemberPayload from addMemberPayload
+func (ut *addMemberPayload) Publicize() *AddMemberPayload {
+	var pub AddMemberPayload
+	if ut.Role != nil {
+		pub.Role = *ut.Role
+	}
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
+	return &pub
+}
+
+// AddMemberPayload user type.
+type AddMemberPayload struct {
+	Role   string `form:"role" json:"role" xml:"role"`
+	UserID int    `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
+// Validate validates the AddMemberPayload type instance.
+func (ut *AddMemberPayload) Validate() (err error) {
+
+	if ut.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
 	}
 	return
 }

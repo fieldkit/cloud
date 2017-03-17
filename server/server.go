@@ -146,6 +146,18 @@ func main() {
 	})
 	app.MountTeamController(service, c5)
 
+	// Mount "member" controller
+	c6 := api.NewMemberController(service, api.MemberControllerOptions{
+		Database: database,
+	})
+	app.MountMemberController(service, c6)
+
+	// Mount "administrator" controller
+	c7 := api.NewAdministratorController(service, api.AdministratorControllerOptions{
+		Database: database,
+	})
+	app.MountAdministratorController(service, c7)
+
 	// Start service
 	if err := service.ListenAndServe(flagConfig.addr); err != nil {
 		service.LogError("startup", "err", err)

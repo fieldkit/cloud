@@ -14,6 +14,268 @@ import (
 	"strconv"
 )
 
+// AddAdministratorContext provides the administrator add action context.
+type AddAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	Payload   *AddAdministratorPayload
+}
+
+// NewAddAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller add action.
+func NewAddAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddAdministratorContext) OK(r *ProjectAdministrator) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrator+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddAdministratorContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteAdministratorContext provides the administrator delete action context.
+type DeleteAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	UserID    int
+}
+
+// NewDeleteAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller delete action.
+func NewDeleteAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteAdministratorContext) OK(r *ProjectAdministrator) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrator+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteAdministratorContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetAdministratorContext provides the administrator get action context.
+type GetAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Project  string
+	Username string
+}
+
+// NewGetAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller get action.
+func NewGetAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramUsername := req.Params["username"]
+	if len(paramUsername) > 0 {
+		rawUsername := paramUsername[0]
+		rctx.Username = rawUsername
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetAdministratorContext) OK(r *ProjectAdministrator) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrator+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// GetIDAdministratorContext provides the administrator get id action context.
+type GetIDAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	UserID    int
+}
+
+// NewGetIDAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller get id action.
+func NewGetIDAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDAdministratorContext) OK(r *ProjectAdministrator) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrator+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// ListAdministratorContext provides the administrator list action context.
+type ListAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Project string
+}
+
+// NewListAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller list action.
+func NewListAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListAdministratorContext) OK(r *ProjectAdministrators) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrators+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListAdministratorContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDAdministratorContext provides the administrator list id action context.
+type ListIDAdministratorContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewListIDAdministratorContext parses the incoming request URL and body, performs validations and creates the
+// context used by the administrator controller list id action.
+func NewListIDAdministratorContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDAdministratorContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDAdministratorContext) OK(r *ProjectAdministrators) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.administrators+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDAdministratorContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddExpeditionContext provides the expedition add action context.
 type AddExpeditionContext struct {
 	context.Context
@@ -223,6 +485,304 @@ func (ctx *ListIDExpeditionContext) OK(r *Expeditions) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListIDExpeditionContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// AddMemberContext provides the member add action context.
+type AddMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID  int
+	Payload *AddMemberPayload
+}
+
+// NewAddMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller add action.
+func NewAddMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddMemberContext) OK(r *TeamMember) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.member+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddMemberContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteMemberContext provides the member delete action context.
+type DeleteMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+	UserID int
+}
+
+// NewDeleteMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller delete action.
+func NewDeleteMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteMemberContext) OK(r *TeamMember) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.member+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteMemberContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetMemberContext provides the member get action context.
+type GetMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+	Team       string
+	Username   string
+}
+
+// NewGetMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller get action.
+func NewGetMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramTeam := req.Params["team"]
+	if len(paramTeam) > 0 {
+		rawTeam := paramTeam[0]
+		rctx.Team = rawTeam
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramUsername := req.Params["username"]
+	if len(paramUsername) > 0 {
+		rawUsername := paramUsername[0]
+		rctx.Username = rawUsername
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetMemberContext) OK(r *TeamMember) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.member+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// GetIDMemberContext provides the member get id action context.
+type GetIDMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+	UserID int
+}
+
+// NewGetIDMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller get id action.
+func NewGetIDMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDMemberContext) OK(r *TeamMember) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.member+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// ListMemberContext provides the member list action context.
+type ListMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+	Team       string
+}
+
+// NewListMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller list action.
+func NewListMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramTeam := req.Params["team"]
+	if len(paramTeam) > 0 {
+		rawTeam := paramTeam[0]
+		rctx.Team = rawTeam
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListMemberContext) OK(r *TeamMembers) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.members+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListMemberContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDMemberContext provides the member list id action context.
+type ListIDMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+}
+
+// NewListIDMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller list id action.
+func NewListIDMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDMemberContext) OK(r *TeamMembers) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.members+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDMemberContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -467,6 +1027,9 @@ func NewGetTeamContext(ctx context.Context, r *http.Request, service *goa.Servic
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
@@ -562,6 +1125,9 @@ func NewListTeamContext(ctx context.Context, r *http.Request, service *goa.Servi
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
