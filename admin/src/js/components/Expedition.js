@@ -6,8 +6,7 @@ import { Route, Link } from 'react-router-dom'
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
 import { FKApiClient } from '../api/api';
 
-import type { APIProject } from '../api/types';
-import type { APIExpedition } from '../api/types';
+import type { APIProject, APIExpedition, APINewExpedition } from '../api/types';
 
 import '../../css/home.css'
 
@@ -22,7 +21,6 @@ type Props = {
 }
 
 export class Expedition extends Component {
-  
   props: Props;
 
   constructor(props: Props) {
@@ -35,12 +33,12 @@ export class Expedition extends Component {
       return expeditionRes.errors;
     }
 
-    if (expeditionRes.slug != this.props.expedition.slug) {
-      this.props.onExpeditionUpdate(expeditionRes.slug);
+    if (expeditionRes.slug != this.props.expedition.slug && expeditionRes.payload) {
+      this.props.onExpeditionUpdate(expeditionRes.payload.slug);
     } else {
       this.props.onExpeditionUpdate();
     }
-  } 
+  }
 
   render() {
     const { project } = this.props;
@@ -57,7 +55,7 @@ export class Expedition extends Component {
           name={expedition.name}
           slug={expedition.slug}
           description={expedition.description}
-          onSave={this.onExpeditionSave.bind(this)} />        
+          onSave={this.onExpeditionSave.bind(this)} />
       </div>
     )
   }

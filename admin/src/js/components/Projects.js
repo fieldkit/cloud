@@ -6,6 +6,7 @@ import ReactModal from 'react-modal';
 
 import { ProjectForm } from './forms/ProjectForm';
 import { FKApiClient } from '../api/api';
+import type { APINewProject } from '../api/types';
 
 import '../../css/projects.css'
 
@@ -38,8 +39,8 @@ export class Projects extends Component {
     }
   }
 
-  async onProjectCreate(name: string, slug: string, description: string) {
-    const project = await FKApiClient.get().createProject({ name, slug, description });
+  async onProjectCreate(p: APINewProject) {
+    const project = await FKApiClient.get().createProject(p);
     if (project.type === 'ok') {
       await this.loadData();
       this.props.history.push("/");

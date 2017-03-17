@@ -96,7 +96,11 @@ export class Main extends Component {
   onExpeditionUpdate(newSlug: ?string = null) {
     if (newSlug) {
       const projectSlug = this.projectSlug();
-      this.setState({ redirectTo: `/projects/${projectSlug}/expeditions/${newSlug}`})
+      if (projectSlug) {
+        this.setState({ redirectTo: `/projects/${projectSlug}/expeditions/${newSlug}`})
+      } else {
+        this.setState({ redirectTo: '/' });
+      }
     } else {
       this.loadExpedition();
     }
@@ -170,17 +174,17 @@ export class Main extends Component {
           <div className="contents">
             <Switch>
               <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
-                if (expedition) {
+                if (project && expedition) {
                   return (
                     <Expedition
                       project={project}
                       expedition={expedition}
-                    />
-                  )                
+                      {...props} />
+                  )
                 } else {
                   return <div></div>
                 }
-              }} />            
+              }} />
               <Route path="/projects/:projectSlug" render={props => {
                 if (project) {
                   return (
@@ -188,7 +192,7 @@ export class Main extends Component {
                       project={project}
                       onProjectUpdate={this.onProjectUpdate.bind(this)}
                       {...props} />
-                  )                
+                  )
                 } else {
                   return <div></div>
                 }
