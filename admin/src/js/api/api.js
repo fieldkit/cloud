@@ -1,6 +1,8 @@
 // @flow weak
 
 import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
+import type { SupportedMethods } from './base-api';
+
 import type {
   APIErrors,
   APIUser,
@@ -14,7 +16,13 @@ import type {
   APIExpeditions,
   APITeam,
   APINewTeam,
-  APITeams
+  APITeams,
+  APIMember,
+  APINewMember,
+  APIMembers,
+  APIAdministrator,
+  APINewAdministrator,
+  APIAdministrators
 } from './types';
 
 export type FKAPIResponse<T> = {
@@ -29,6 +37,14 @@ export class FKApiClient extends JWTAPIClient {
   signinCb: ?() => void;
   signoutCb: ?() => void;
   unauthorizedHandler: ?() => void;
+
+  static get(): FKApiClient {
+    if (!apiClientInstance) {
+      throw new APIError('API has not been set up!');
+    }
+
+    return apiClientInstance;
+  }
 
   static setup(
     baseUrl: string,
@@ -73,9 +89,17 @@ export class FKApiClient extends JWTAPIClient {
     }
   }
 
-  async post(path: string, body?: FormData | string | null = null, headers: Object = {}): Promise<any> {
+  async exec(
+    method: SupportedMethods,
+    path: string,
+    { params, body, headers = {} }: {
+      params?: Object,
+      body?: ?(Blob | FormData | URLSearchParams | string),
+      headers: Object
+    } = {}
+  ): Promise<Response> {
     try {
-      return await super.post(path, body, headers);
+      return await super.exec(method, path, { params, body, headers });
     } catch (e) {
       if (e instanceof AuthenticationError) {
         this.onAuthError(e);
@@ -83,26 +107,6 @@ export class FKApiClient extends JWTAPIClient {
 
       throw e;
     }
-  }
-
-  async get(path: string, params: Object = {}, headers: Object = {}): Promise<any> {
-    try {
-      return await super.get(path, params, headers);
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e);
-      }
-
-      throw e;
-    }
-  }
-
-  static get(): FKApiClient {
-    if (!apiClientInstance) {
-      throw new APIError('API has not been set up!');
-    }
-
-    return apiClientInstance;
   }
 
   async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
@@ -136,6 +140,10 @@ export class FKApiClient extends JWTAPIClient {
 
   getWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
     return this.execWithErrors(this.getJSON(endpoint, values));
+  }
+
+  deleteWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.delJSON(endpoint, values));
   }
 
   signUp(email: string, username: string, password: string, invite_token: string): Promise<FKAPIResponse<APIUser>> {
@@ -209,5 +217,37 @@ export class FKApiClient extends JWTAPIClient {
 
   createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
     return this.postWithErrors(`/expeditions/${expeditionId}/team`, values)
+  }
+
+  addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
+    return this.postWithErrors(`/projects/${projectId}/administrator`, values)
+  }
+
+  getAdministrators(projectId: number): Promise<FKAPIResponse<APIAdministrators>> {
+    return this.getWithErrors(`/projects/${projectId}/administrators`)
+  }
+
+  getAdministratorsBySlug(projectSlug: string): Promise<FKAPIResponse<APIAdministrators>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/administrators`)
+  }
+
+  deleteAdministrator(projectId: number, userId: number): Promise<FKAPIResponse<APIAdministrator>> {
+    return this.deleteWithErrors(`/projects/${projectId}/administrators/${userId}`)
+  }
+
+  addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
+    return this.postWithErrors(`/teams/${teamId}/member`, values)
+  }
+
+  getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {
+    return this.getWithErrors(`/teams/${teamId}/members`)
+  }
+
+  getMembersBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APIMembers>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}/members`)
+  }
+
+  deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
+    return this.deleteWithErrors(`/teams/${teamId}/members/${userId}`)
   }
 }

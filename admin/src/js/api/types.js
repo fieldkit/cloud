@@ -65,3 +65,28 @@ export type APITeam = {
 export type APITeams = {
   teams: APITeam[]
 }
+
+export type APINewAdministrator = {
+  user_id: number;
+}
+
+export type APIAdministrator = {
+  project_id: number;
+} & APINewAdministrator;
+
+export type APIAdministrators = {
+  administrators: APIAdministrator[]
+}
+
+export type APINewMember = {
+  user_id: number;
+  role: string;
+};
+
+export type APIMember = {
+  team_id: number;
+} & APINewMember;
+
+export type APIMembers = {
+  members: APIMember[]
+}
