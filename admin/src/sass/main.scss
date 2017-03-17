@@ -7,7 +7,8 @@ $contents-width: 834px;
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
-  text-align: left;
+  text-align: center;
+  background-image: url('../img/fieldkit-background.png');  
 }
 
 .left {
@@ -15,9 +16,8 @@ $contents-width: 834px;
   display: inline-block;
   vertical-align: top;
   width: $sidebar-width;
+  text-align: left;
   height: 100%;
-  margin-right: $col-gutter;
-  background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
     height: 100px;
@@ -90,8 +90,10 @@ $contents-width: 834px;
   // float: left;
   display: inline-block;
   vertical-align: top;
-  width: $contents-width;
-  text-align: center;
+  width: $contents-width + $col-gutter;
+  height: 100%;
+  padding-left: $col-gutter;
+  background-color: white;
 
   .nav {
     width: 100%;
