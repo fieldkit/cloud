@@ -11,9 +11,12 @@ $contents-width: 834px;
 }
 
 .left {
-  float: left;
+  // float: left;
+  display: inline-block;
+  vertical-align: top;
   width: $sidebar-width;
   height: 100%;
+  margin-right: $col-gutter;
   background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
@@ -24,16 +27,36 @@ $contents-width: 834px;
       max-width: 150px;
     }
   }
+
+  .expedition-sidebar {
+    background-color: $color-1;
+    mix-blend-mode: multiply;
+    padding: $elements-padding*2;
+    color: white;
+
+    .expedition-name {
+      @include type-h4;
+    }
+
+    .nav {
+      a {
+        width: 100%;
+        display: block;
+      }
+    }
+  }
 }
 
 .right {
   // float: left;
-  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+  width: $contents-width;
   text-align: center;
 }
 
 .nav {
-  width: $contents-width;
+  width: 100%;
   height: 100px;
   text-align: left;
 
@@ -50,6 +73,6 @@ $contents-width: 834px;
 }
 
 .contents {
-  width: $contents-width;
+  width: 100%;
   text-align: left;
 }

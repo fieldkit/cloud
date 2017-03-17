@@ -6,8 +6,7 @@ import { Route, Link } from 'react-router-dom'
 import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
 import { FKApiClient } from '../api/api';
 
-import type { APIProject } from '../api/types';
-import type { APIExpedition } from '../api/types';
+import type { APIProject, APIExpedition, APINewExpedition } from '../api/types';
 
 import '../../css/home.css'
 
