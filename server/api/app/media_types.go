@@ -78,6 +78,59 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
+// TeamMember media type (default view)
+//
+// Identifier: application/vnd.app.member+json; view=default
+type TeamMember struct {
+	Role   string `form:"role" json:"role" xml:"role"`
+	TeamID int    `form:"team_id" json:"team_id" xml:"team_id"`
+	UserID int    `form:"user_id" json:"user_id" xml:"user_id"`
+}
+
+// Validate validates the TeamMember media type instance.
+func (mt *TeamMember) Validate() (err error) {
+
+	if mt.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
+// TeamMemberCollection is the media type for an array of TeamMember (default view)
+//
+// Identifier: application/vnd.app.member+json; type=collection; view=default
+type TeamMemberCollection []*TeamMember
+
+// Validate validates the TeamMemberCollection media type instance.
+func (mt TeamMemberCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// TeamMembers media type (default view)
+//
+// Identifier: application/vnd.app.members+json; view=default
+type TeamMembers struct {
+	Members TeamMemberCollection `form:"members" json:"members" xml:"members"`
+}
+
+// Validate validates the TeamMembers media type instance.
+func (mt *TeamMembers) Validate() (err error) {
+	if mt.Members == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "members"))
+	}
+	if err2 := mt.Members.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // Project media type (default view)
 //
 // Identifier: application/vnd.app.project+json; view=default

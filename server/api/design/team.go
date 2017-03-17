@@ -70,6 +70,10 @@ var _ = Resource("team", func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
 			})
+			Param("expedition", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Expedition slug")
+			})
 			Param("team", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
@@ -100,6 +104,10 @@ var _ = Resource("team", func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
+			})
+			Param("expedition", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Expedition slug")
 			})
 		})
 		Response(BadRequest)

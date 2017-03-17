@@ -3,18 +3,18 @@ consumes:
 definitions:
   AddExpeditionPayload:
     example:
-      description: Reiciendis odit sapiente ipsa expedita qui.
-      name: Enim deleniti sint velit.
-      slug: 0nc6t9s67z
+      description: Et quidem quis fugit.
+      name: Ut qui.
+      slug: z8os8qw8bg
     properties:
       description:
-        example: Reiciendis odit sapiente ipsa expedita qui.
+        example: Et quidem quis fugit.
         type: string
       name:
-        example: Enim deleniti sint velit.
+        example: Ut qui.
         type: string
       slug:
-        example: 0nc6t9s67z
+        example: z8os8qw8bg
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -24,20 +24,37 @@ definitions:
     - description
     title: AddExpeditionPayload
     type: object
+  AddMemberPayload:
+    example:
+      role: Amet ipsam reprehenderit.
+      user_id: 8.4556045e+18
+    properties:
+      role:
+        example: Amet ipsam reprehenderit.
+        type: string
+      user_id:
+        example: 8.4556045e+18
+        format: int64
+        type: integer
+    required:
+    - user_id
+    - role
+    title: AddMemberPayload
+    type: object
   AddProjectPayload:
     example:
-      description: Nulla dolore laboriosam soluta quia molestias.
-      name: Quam est amet ipsam reprehenderit totam.
-      slug: ht4idr480b
+      description: Impedit hic dolore quidem.
+      name: Cupiditate nemo.
+      slug: 0bux7jxef7
     properties:
       description:
-        example: Nulla dolore laboriosam soluta quia molestias.
+        example: Impedit hic dolore quidem.
         type: string
       name:
-        example: Quam est amet ipsam reprehenderit totam.
+        example: Cupiditate nemo.
         type: string
       slug:
-        example: ht4idr480b
+        example: 0bux7jxef7
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -49,18 +66,18 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Nobis in harum doloribus.
-      name: Placeat amet illo reprehenderit quod provident dolorum.
-      slug: bp8qpy7qrf
+      description: Reprehenderit quod provident.
+      name: Provident eligendi ut voluptatem et ratione.
+      slug: 7qrfgzslj0
     properties:
       description:
-        example: Nobis in harum doloribus.
+        example: Reprehenderit quod provident.
         type: string
       name:
-        example: Placeat amet illo reprehenderit quod provident dolorum.
+        example: Provident eligendi ut voluptatem et ratione.
         type: string
       slug:
-        example: bp8qpy7qrf
+        example: 7qrfgzslj0
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -72,24 +89,24 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: selina.hoppe@conroy.info
-      invite_token: Quo eos fuga.
-      password: o4ic2d6hce
-      username: 0voebzeo5q
+      email: maud.shields@schamberger.com
+      invite_token: Dignissimos voluptatem consequatur nihil.
+      password: 6hce00voeb
+      username: eo5qmtbwjv
     properties:
       email:
-        example: selina.hoppe@conroy.info
+        example: maud.shields@schamberger.com
         format: email
         type: string
       invite_token:
-        example: Quo eos fuga.
+        example: Dignissimos voluptatem consequatur nihil.
         type: string
       password:
-        example: o4ic2d6hce
+        example: 6hce00voeb
         minLength: 10
         type: string
       username:
-        example: 0voebzeo5q
+        example: eo5qmtbwjv
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -160,15 +177,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: tbwjv73wy8
-      username: r3k1msmhgb
+      password: 3wy8mr3k1m
+      username: mhgbrltfvt
     properties:
       password:
-        example: tbwjv73wy8
+        example: 3wy8mr3k1m
         minLength: 10
         type: string
       username:
-        example: r3k1msmhgb
+        example: mhgbrltfvt
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -180,23 +197,23 @@ definitions:
   Project:
     description: Project media type (default view)
     example:
-      description: Inventore voluptas.
-      id: 3.0773821e+18
-      name: Nihil sit.
-      slug: n2552fo50o
+      description: Dolorem vel laboriosam aut voluptatum praesentium error.
+      id: 6.152274e+18
+      name: Incidunt consequuntur fugit non ut.
+      slug: xgi4xylmrh
     properties:
       description:
-        example: Inventore voluptas.
+        example: Dolorem vel laboriosam aut voluptatum praesentium error.
         type: string
       id:
-        example: 3.0773821e+18
+        example: 6.152274e+18
         format: int64
         type: integer
       name:
-        example: Nihil sit.
+        example: Incidunt consequuntur fugit non ut.
         type: string
       slug:
-        example: n2552fo50o
+        example: xgi4xylmrh
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -211,18 +228,10 @@ definitions:
     description: ProjectCollection is the media type for an array of Project (default
       view)
     example:
-    - description: Inventore voluptas.
-      id: 3.0773821e+18
-      name: Nihil sit.
-      slug: n2552fo50o
-    - description: Inventore voluptas.
-      id: 3.0773821e+18
-      name: Nihil sit.
-      slug: n2552fo50o
-    - description: Inventore voluptas.
-      id: 3.0773821e+18
-      name: Nihil sit.
-      slug: n2552fo50o
+    - description: Dolorem vel laboriosam aut voluptatum praesentium error.
+      id: 6.152274e+18
+      name: Incidunt consequuntur fugit non ut.
+      slug: xgi4xylmrh
     items:
       $ref: '#/definitions/Project'
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
@@ -232,14 +241,10 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Inventore voluptas.
-        id: 3.0773821e+18
-        name: Nihil sit.
-        slug: n2552fo50o
-      - description: Inventore voluptas.
-        id: 3.0773821e+18
-        name: Nihil sit.
-        slug: n2552fo50o
+      - description: Dolorem vel laboriosam aut voluptatum praesentium error.
+        id: 6.152274e+18
+        name: Incidunt consequuntur fugit non ut.
+        slug: xgi4xylmrh
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -249,10 +254,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Ducimus autem.
+      refresh_token: Expedita libero.
     properties:
       refresh_token:
-        example: Ducimus autem.
+        example: Expedita libero.
         type: string
     required:
     - refresh_token
@@ -261,23 +266,23 @@ definitions:
   Team:
     description: Team media type (default view)
     example:
-      description: Ut voluptatum ducimus perspiciatis quasi error.
-      id: 1.3719604e+18
-      name: Debitis ducimus.
-      slug: hxwu5kh0we
+      description: Earum sit.
+      id: 2.0900096e+18
+      name: Assumenda excepturi dolores dolores.
+      slug: bukk5y3b7y
     properties:
       description:
-        example: Ut voluptatum ducimus perspiciatis quasi error.
+        example: Earum sit.
         type: string
       id:
-        example: 1.3719604e+18
+        example: 2.0900096e+18
         format: int64
         type: integer
       name:
-        example: Debitis ducimus.
+        example: Assumenda excepturi dolores dolores.
         type: string
       slug:
-        example: hxwu5kh0we
+        example: bukk5y3b7y
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -291,39 +296,79 @@ definitions:
   TeamCollection:
     description: TeamCollection is the media type for an array of Team (default view)
     example:
-    - description: Ut voluptatum ducimus perspiciatis quasi error.
-      id: 1.3719604e+18
-      name: Debitis ducimus.
-      slug: hxwu5kh0we
-    - description: Ut voluptatum ducimus perspiciatis quasi error.
-      id: 1.3719604e+18
-      name: Debitis ducimus.
-      slug: hxwu5kh0we
-    - description: Ut voluptatum ducimus perspiciatis quasi error.
-      id: 1.3719604e+18
-      name: Debitis ducimus.
-      slug: hxwu5kh0we
+    - description: Earum sit.
+      id: 2.0900096e+18
+      name: Assumenda excepturi dolores dolores.
+      slug: bukk5y3b7y
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
       view=default'
     type: array
+  TeamMember:
+    description: TeamMember media type (default view)
+    example:
+      role: Inventore voluptas.
+      team_id: 3.0773821e+18
+      user_id: 8.568918e+18
+    properties:
+      role:
+        example: Inventore voluptas.
+        type: string
+      team_id:
+        example: 3.0773821e+18
+        format: int64
+        type: integer
+      user_id:
+        example: 8.568918e+18
+        format: int64
+        type: integer
+    required:
+    - team_id
+    - user_id
+    - role
+    title: 'Mediatype identifier: application/vnd.app.member+json; view=default'
+    type: object
+  TeamMemberCollection:
+    description: TeamMemberCollection is the media type for an array of TeamMember
+      (default view)
+    example:
+    - role: Inventore voluptas.
+      team_id: 3.0773821e+18
+      user_id: 8.568918e+18
+    - role: Inventore voluptas.
+      team_id: 3.0773821e+18
+      user_id: 8.568918e+18
+    items:
+      $ref: '#/definitions/TeamMember'
+    title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
+      view=default'
+    type: array
+  TeamMembers:
+    description: TeamMembers media type (default view)
+    example:
+      members:
+      - role: Inventore voluptas.
+        team_id: 3.0773821e+18
+        user_id: 8.568918e+18
+      - role: Inventore voluptas.
+        team_id: 3.0773821e+18
+        user_id: 8.568918e+18
+    properties:
+      members:
+        $ref: '#/definitions/TeamMemberCollection'
+    required:
+    - members
+    title: 'Mediatype identifier: application/vnd.app.members+json; view=default'
+    type: object
   Teams:
     description: Teams media type (default view)
     example:
       teams:
-      - description: Ut voluptatum ducimus perspiciatis quasi error.
-        id: 1.3719604e+18
-        name: Debitis ducimus.
-        slug: hxwu5kh0we
-      - description: Ut voluptatum ducimus perspiciatis quasi error.
-        id: 1.3719604e+18
-        name: Debitis ducimus.
-        slug: hxwu5kh0we
-      - description: Ut voluptatum ducimus perspiciatis quasi error.
-        id: 1.3719604e+18
-        name: Debitis ducimus.
-        slug: hxwu5kh0we
+      - description: Earum sit.
+        id: 2.0900096e+18
+        name: Assumenda excepturi dolores dolores.
+        slug: bukk5y3b7y
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -334,15 +379,15 @@ definitions:
   User:
     description: User media type (default view)
     example:
-      id: 7.9396906e+18
-      username: ukk5y3b7yo
+      id: 5.67901e+18
+      username: 2fjzajwq8p
     properties:
       id:
-        example: 7.9396906e+18
+        example: 5.67901e+18
         format: int64
         type: integer
       username:
-        example: ukk5y3b7yo
+        example: 2fjzajwq8p
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -354,12 +399,8 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - id: 7.9396906e+18
-      username: ukk5y3b7yo
-    - id: 7.9396906e+18
-      username: ukk5y3b7yo
-    - id: 7.9396906e+18
-      username: ukk5y3b7yo
+    - id: 5.67901e+18
+      username: 2fjzajwq8p
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -369,12 +410,12 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - id: 7.9396906e+18
-        username: ukk5y3b7yo
-      - id: 7.9396906e+18
-        username: ukk5y3b7yo
-      - id: 7.9396906e+18
-        username: ukk5y3b7yo
+      - id: 5.67901e+18
+        username: 2fjzajwq8p
+      - id: 5.67901e+18
+        username: 2fjzajwq8p
+      - id: 5.67901e+18
+        username: 2fjzajwq8p
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -697,8 +738,10 @@ paths:
           * `api:access`
       operationId: team#list
       parameters:
-      - in: path
+      - description: Expedition slug
+        in: path
         name: expedition
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
       - description: Project slug
@@ -733,8 +776,10 @@ paths:
           * `api:access`
       operationId: team#get
       parameters:
-      - in: path
+      - description: Expedition slug
+        in: path
         name: expedition
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
       - description: Project slug
@@ -766,6 +811,98 @@ paths:
       summary: get team
       tags:
       - team
+  /projects/@/{project}/expeditions/@/{expedition}/teams/@/{team}/member/@/{username}:
+    get:
+      description: |-
+        Get a member
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#get
+      parameters:
+      - description: Expedition slug
+        in: path
+        name: expedition
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Project slug
+        in: path
+        name: project
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Team slug
+        in: path
+        name: team
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Team slug
+        in: path
+        name: username
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.member+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMember'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get member
+      tags:
+      - member
+  /projects/@/{project}/expeditions/@/{expedition}/teams/@/{team}/members:
+    get:
+      description: |-
+        List an teams's members
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#list
+      parameters:
+      - description: Expedition slug
+        in: path
+        name: expedition
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Project slug
+        in: path
+        name: project
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Team slug
+        in: path
+        name: team
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.members+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMembers'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list member
+      tags:
+      - member
   /projects/{project_id}:
     get:
       description: |-
@@ -937,6 +1074,136 @@ paths:
       summary: get id team
       tags:
       - team
+  /teams/{team_id}/member:
+    post:
+      description: |-
+        Add a member to a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#add
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddMemberPayload'
+      produces:
+      - application/vnd.app.member+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMember'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add member
+      tags:
+      - member
+  /teams/{team_id}/members:
+    get:
+      description: |-
+        List an teams's members
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#list id
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.members+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMembers'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id member
+      tags:
+      - member
+  /teams/{team_id}/members/{user_id}:
+    delete:
+      description: |-
+        Remove a member from a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#delete
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.member+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMember'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete member
+      tags:
+      - member
+    get:
+      description: |-
+        Get a member
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#get id
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.member+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMember'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id member
+      tags:
+      - member
   /user:
     get:
       description: |-

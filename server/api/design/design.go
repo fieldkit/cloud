@@ -8,7 +8,7 @@ import (
 var cors = func() {
 	Headers("Authorization")
 	Expose("Authorization")
-	Methods("GET", "OPTIONS", "POST")
+	Methods("GET", "OPTIONS", "POST", "DELETE")
 }
 
 var _ = API("fieldkit", func() {
