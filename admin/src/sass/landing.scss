@@ -1,0 +1,178 @@
+@import 'App';
+
+#landing-page {
+	background-position: center top;
+	background-size: cover;
+	background-repeat: no-repeat;
+	display: flex;
+	flex-direction: column;
+	
+	background-image: url('../img/fieldkit-background.png');
+	transition: background-position 0.6s ease-in-out;
+
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+
+	.navigation {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 10;
+
+		padding: 0 50px;
+
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+
+		&_links {
+			padding: 30px 0px;
+			display: flex;
+		}
+
+		&_item {
+			margin: 0px 10px;
+			
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		&_link {
+			padding: 5px 8px;
+			// color: $color-dark;
+			font-weight: bold;
+
+			&.sign-up {
+				border: 1px solid black;
+				// border: 1px solid rgba($color-dark, 1);
+				border-radius: 3px;
+
+				transition: border-color 0.3s;
+
+				&:hover {
+					// border-color: $color-accent;
+				}
+			}
+		}
+	}
+
+	.slide {
+		// @include gridle_row();
+
+		height: 100vh;
+		display: flex !important;
+		align-items: center;
+
+		transition: transform 0.6s ease-in-out;
+	}
+
+	&.slided {
+		background-position: center bottom;
+
+		.slide {
+			transform: translateY(-100%);
+		}
+	}
+
+	.slide-back {
+		@extend .alignX;
+		z-index: 10;
+
+		top: 30px;
+		font-size: 22px;
+		letter-spacing: 0.2em;
+		font-weight: bold;
+		// color: $color-dark;
+		color: black;
+		cursor: pointer;
+	}
+
+	.content {
+		text-align: center;
+		margin: auto;
+		width: 53.125vw;
+
+		&_nat {
+			display: block;
+			margin: 0 auto 15px auto;
+			width: 250px;
+		}
+
+		&_title {
+			position: relative;
+			margin-bottom: 20px;
+
+			&_img {
+				width: 250px;
+				background-size: cover;
+  				mix-blend-mode: multiply;
+			}
+
+			&::after {
+				content: "";
+				@extend .alignX;
+				bottom: -10px;
+				width: 50px;
+				height: 1px;
+				// background: $color-dark;
+				background: black;
+			}
+		}
+
+		&_sub {
+			// @extend .h2;
+			margin: 10px 0;
+			line-height: 1.4;
+		}
+
+		&_desc {
+			margin: 10px 0;
+		}
+
+		&_join {
+			// @extend .button;
+			// @extend .button-lg;
+			mix-blend-mode: multiply;
+		}
+	}
+
+	footer, .footer {
+		position: absolute;
+		right: 0;
+		left: 0;
+		top: 100vh;
+    	transform: translate(0,-100%);
+		z-index: 10;
+
+		padding: 0 100px;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		background: rgba(white, 1);
+
+		&_logos {
+			padding: 20px 0px;
+
+			display: flex;
+		}
+
+		&_logo {
+			margin: 0px 20px;
+
+			&:first-child {
+				margin-left: 0;
+			}
+
+			&_img {
+				display: block;
+				height: 30px;
+			}
+		}
+	}
+}
+

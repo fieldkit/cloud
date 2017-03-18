@@ -1,176 +1,276 @@
+// @flow weak
 
-import 'whatwg-fetch'
-import {BaseError} from '../utils.js'
-import { protocol, hostname } from '../constants/APIBaseURL'
-class APIError extends BaseError {}
-class AuthenticationError extends APIError {}
-const SIGNED_IN_KEY = 'signedIn'
+import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
+import type { SupportedMethods } from './base-api';
 
-class FKApiClient {
+import type {
+  APIErrors,
+  APIUser,
+  APIUsers,
+  APINewUser,
+  APIProject,
+  APINewProject,
+  APIProjects,
+  APIExpedition,
+  APINewExpedition,
+  APIExpeditions,
+  APIInput,
+  APINewInput,
+  APIInputs,
+  APITeam,
+  APINewTeam,
+  APITeams,
+  APIMember,
+  APINewMember,
+  APIMembers,
+  APIAdministrator,
+  APINewAdministrator,
+  APIAdministrators
+} from './types';
 
-  onAuthError(e) {
-    if (this.signedIn) {
-      this.onSignOut()
-    }
-  }
-
-  onSignIn() {
-    localStorage.setItem(SIGNED_IN_KEY, 'signedIn')
-  }
-
-  onSignOut() {
-    localStorage.removeItem(SIGNED_IN_KEY)
-  }
-
-  signedIn() {
-    return localStorage.getItem(SIGNED_IN_KEY) != null
-  }
-
-  async get(path, params) {
-    try {
-      const url = new URL(path, protocol + hostname)
-      if (params) {
-        for (const key in params) {
-          url.searchParams.set(key, params[key])
-        }
-      }
-      let res
-      try {
-        res = await fetch(url.toString(), {
-          method: 'GET',
-          credentials: 'include'
-        })
-      } catch (e) {
-        console.log('Threw while GETing', url.toString(), e)
-        throw new APIError('HTTP error')
-      }
-      if (res.status == 404) {
-        console.log('not found', url.toString(), await res.text())
-        throw new APIError('not found')
-      }
-      if (res.status == 401) {
-        console.log('Bad auth while GETing', url.toString(), await res.text())
-        this.onAuthError()
-        throw new AuthenticationError()
-      } else if (!res.ok) {
-        const err = await res.json()
-        console.log('Non-OK response while GETing', url.toString(), err)
-        throw new APIError(err)
-      }
-      return res
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e)
-      }
-      throw e
-    }
-  }
-
-  async getJSON(path: string, params?: Object): Promise<any> {
-    const res = await this.get(path, params)
-    return res.json()
-  }
-
-  async post(path, body) {
-    try {
-      const url = new URL(path, protocol + hostname)
-      let res
-      try {
-        res = await fetch(url.toString(), {
-          method: 'POST',
-          credentials: 'include',
-          body
-        })
-      } catch (e) {
-        console.log('Threw while POSTing', url.toString(), e)
-        throw new APIError('HTTP error')
-      }
-      if (res.status == 401) {
-        console.log('Bad auth while POSTing', url.toString(), await res.text())
-        this.onAuthError()
-        throw new AuthenticationError()
-      } else if (!res.ok) {
-        const err = await res.json()
-        console.log('Non-OK response while POSTing', url.toString(), err)
-        throw new APIError(err)
-      }
-      return res
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e)
-      }
-      throw e
-    }
-  }
-
-  async postForm(path, body) {
-    const data = new FormData()
-    if (body) {
-      for (const key in body) {
-        data.append(key, body[key])
-      }
-    }
-    const res = await this.post(path, data)
-    return res.text()
-  }
-
-  async signUp(params) {
-    await this.postForm('/api/user/sign-up', params)
-  }
-
-  async signIn(username, password) {
-    await this.postForm('/api/user/sign-in', { username, password })
-  }
-
-  async signOut() {
-    await this.postForm('/api/user/sign-out')
-    this.onSignOut()
-  }
-
-  async getUser() {
-    const res = await this.getJSON('/api/user/current')
-    return res
-  }
-
-  async getProjects () {
-    const res = await this.getJSON('/api/projects')
-    return res
-  }
-
-  async createProjects (name) {
-    const res = await this.getJSON('/api/projects/add?name=' + name)
-    return res
-  }
-
-  async getExpeditions (projectID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expeditions')
-    return res
-  }
-
-  async postGeneralSettings (projectID, expeditionName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expeditions/add?name=' + expeditionName)
-    return res
-  }
-
-  async postInputs (projectID, expeditionID, inputName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
-    return res
-  }
-
-  async addExpeditionToken (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/tokens/add')
-    return res
-  }
-
-  async addInput (projectID, expeditionID, inputName) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs/add?name=' + inputName)
-    return res
-  }
-
-  async getInputs (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/inputs')
-    return res
-  }
+export type FKAPIResponse<T> = {
+  type: 'ok' | 'err';
+  payload?: T;
+  errors?: APIErrors;
+  raw?: string;
 }
 
-export default new FKApiClient()
+let apiClientInstance;
+export class FKApiClient extends JWTAPIClient {
+  signinCb: ?() => void;
+  signoutCb: ?() => void;
+  unauthorizedHandler: ?() => void;
+
+  static get(): FKApiClient {
+    if (!apiClientInstance) {
+      throw new APIError('API has not been set up!');
+    }
+
+    return apiClientInstance;
+  }
+
+  static setup(
+    baseUrl: string,
+    unauthorizedHandler: () => void,
+    { onSignin, onSignout }: { onSignin?: () => void, onSignout?: () => void } = {}
+  ): FKApiClient
+  {
+    if (!apiClientInstance) {
+      apiClientInstance = new FKApiClient(baseUrl);
+      apiClientInstance.signinCb = onSignin;
+      apiClientInstance.signoutCb = onSignout;
+      apiClientInstance.unauthorizedHandler = unauthorizedHandler;
+    }
+
+    return apiClientInstance;
+  }
+
+  onSignin() {
+    if (this.signinCb) {
+      this.signinCb();
+    }
+  }
+
+  onSignout() {
+    this.clearJWT();
+
+    if (this.signoutCb) {
+      this.signoutCb();
+    }
+  }
+
+  signedIn(): boolean {
+    return this.loadJWT() != null;
+  }
+
+  onAuthError(e: AuthenticationError) {
+    if (this.signedIn()) {
+      if (this.unauthorizedHandler) {
+        this.unauthorizedHandler();
+      }
+      this.onSignout();
+    }
+  }
+
+  async exec(
+    method: SupportedMethods,
+    path: string,
+    { params, body, headers = {} }: {
+      params?: Object,
+      body?: ?(Blob | FormData | URLSearchParams | string),
+      headers: Object
+    } = {}
+  ): Promise<Response> {
+    try {
+      return await super.exec(method, path, { params, body, headers });
+    } catch (e) {
+      if (e instanceof AuthenticationError) {
+        this.onAuthError(e);
+      }
+
+      throw e;
+    }
+  }
+
+  async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
+    try {
+      const res = await p;
+      if (res) {
+        if (parseJSON) {
+          return { type: 'ok', payload: JSON.parse(res) };
+        } else {
+          return { type: 'ok', payload: res };
+        }
+      } else {
+        return { type: 'ok' }
+      }
+    } catch (e) {
+      if (e instanceof APIError) {
+        if (e.body && parseJSON) {
+          return { type: 'err', errors: JSON.parse(e.body) };
+        } else {
+          return { type: 'err', errors: e.msg };
+        }
+      } else {
+        return { type: 'err', raw: e.body };
+      }
+    }
+  }
+
+  postWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.postJSON(endpoint, values));
+  }
+
+  getWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.getJSON(endpoint, values));
+  }
+
+  delWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.delJSON(endpoint, values));
+  }
+
+  signUp(email: string, username: string, password: string, invite_token: string): Promise<FKAPIResponse<APIUser>> {
+    return this.postWithErrors('/user', { email, username, password, invite_token });
+  }
+
+  async signIn(username, password): Promise<FKAPIResponse<void>> {
+    const response = await this.postWithErrors('/login', { username, password });
+    if (response.type === 'ok') {
+      this.onSignin();
+    }
+    return response;
+  }
+
+  async signOut(): Promise<void> {
+    await this.postForm('/logout')
+    this.onSignout();
+  }
+
+  getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
+    return this.getWithErrors('/user');
+  }
+
+  getUserById(userId: number): Promise<FKAPIResponse<?APIUser>> {
+    return this.getWithErrors(`/users/${userId}`);
+  }
+
+  getUserByUsername(username: string): Promise<FKAPIResponse<?APIUser>> {
+    return this.getWithErrors(`/users/@/${username}`);
+  }
+
+  getUsers(): Promise<FKAPIResponse<APIUsers>> {
+    return this.getWithErrors('/users');
+  }
+
+  getProjects(): Promise<FKAPIResponse<APIProjects>> {
+    return this.getWithErrors('/projects')
+  }
+
+  getProjectBySlug(slug: string): Promise<FKAPIResponse<APIProject>> {
+    return this.getWithErrors(`/projects/@/${slug}`)
+  }
+
+  createProject(values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+    return this.postWithErrors('/project', values)
+  }
+
+  updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+    return this.postWithErrors(`/projects/${projectId}`, values)
+  }
+
+  getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions`)
+  }
+
+  getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIExpedition>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
+  }
+
+  createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+    return this.postWithErrors(`/projects/${projectId}/expedition`, values)
+  }
+
+  updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}`, values)
+  }  
+
+  getInputsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIInputs>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/inputs`)
+  }
+
+  getInputBySlugs(projectSlug: string, inputSlug: string): Promise<FKAPIResponse<APIInput>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/inputs/@/${inputSlug}`)
+  }
+
+  getInput(inputId: number): Promise<FKAPIResponse<APIInput>> {
+    return this.getWithErrors(`/inputs/${inputId}`)
+  }
+
+  createInput(projectId: number, values: APINewInput): Promise<FKAPIResponse<APIInput>> {
+    return this.postWithErrors(`/projects/${projectId}/input`, values)
+  }
+
+  getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/teams`)
+  }
+
+  getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APITeam>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}`)
+  }
+
+  createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/team`, values)
+  }
+
+  addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
+    return this.postWithErrors(`/projects/${projectId}/administrator`, values)
+  }
+
+  getAdministrators(projectId: number): Promise<FKAPIResponse<APIAdministrators>> {
+    return this.getWithErrors(`/projects/${projectId}/administrators`)
+  }
+
+  getAdministratorsBySlug(projectSlug: string): Promise<FKAPIResponse<APIAdministrators>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/administrators`)
+  }
+
+  deleteAdministrator(projectId: number, userId: number): Promise<FKAPIResponse<APIAdministrator>> {
+    return this.delWithErrors(`/projects/${projectId}/administrators/${userId}`)
+  }
+
+  addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
+    return this.postWithErrors(`/teams/${teamId}/member`, values)
+  }
+
+  getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {
+    return this.getWithErrors(`/teams/${teamId}/members`)
+  }
+
+  getMembersBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APIMembers>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}/members`)
+  }
+
+  deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
+    return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
+  }
+}
