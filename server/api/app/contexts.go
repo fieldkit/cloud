@@ -494,8 +494,8 @@ type AddInputContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	ProjectID int
-	Payload   *AddInputPayload
+	ExpeditionID int
+	Payload      *AddInputPayload
 }
 
 // NewAddInputContext parses the incoming request URL and body, performs validations and creates the
@@ -507,13 +507,13 @@ func NewAddInputContext(ctx context.Context, r *http.Request, service *goa.Servi
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -536,8 +536,9 @@ type GetInputContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Input   string
-	Project string
+	Expedition string
+	Input      string
+	Project    string
 }
 
 // NewGetInputContext parses the incoming request URL and body, performs validations and creates the
@@ -549,6 +550,14 @@ func NewGetInputContext(ctx context.Context, r *http.Request, service *goa.Servi
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetInputContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
 	paramInput := req.Params["input"]
 	if len(paramInput) > 0 {
 		rawInput := paramInput[0]
@@ -626,7 +635,8 @@ type ListInputContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Project string
+	Expedition string
+	Project    string
 }
 
 // NewListInputContext parses the incoming request URL and body, performs validations and creates the
@@ -638,6 +648,14 @@ func NewListInputContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListInputContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
@@ -666,7 +684,7 @@ type ListIDInputContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	ProjectID int
+	ExpeditionID int
 }
 
 // NewListIDInputContext parses the incoming request URL and body, performs validations and creates the
@@ -678,13 +696,13 @@ func NewListIDInputContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err

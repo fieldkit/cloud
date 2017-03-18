@@ -17,10 +17,10 @@ import (
 )
 
 // AddInputPath computes a request path to the add action of input.
-func AddInputPath(projectID int) string {
-	param0 := strconv.Itoa(projectID)
+func AddInputPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/projects/%s/input", param0)
+	return fmt.Sprintf("/expedition/%s/input", param0)
 }
 
 // Add a input
@@ -55,11 +55,12 @@ func (c *Client) NewAddInputRequest(ctx context.Context, path string, payload *A
 }
 
 // GetInputPath computes a request path to the get action of input.
-func GetInputPath(project string, input string) string {
+func GetInputPath(project string, expedition string, input string) string {
 	param0 := project
-	param1 := input
+	param1 := expedition
+	param2 := input
 
-	return fmt.Sprintf("/projects/@/%s/inputs/@/%s", param0, param1)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/inputs/@/%s", param0, param1, param2)
 }
 
 // Add a input
@@ -122,10 +123,11 @@ func (c *Client) NewGetIDInputRequest(ctx context.Context, path string) (*http.R
 }
 
 // ListInputPath computes a request path to the list action of input.
-func ListInputPath(project string) string {
+func ListInputPath(project string, expedition string) string {
 	param0 := project
+	param1 := expedition
 
-	return fmt.Sprintf("/projects/@/%s/inputs", param0)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/inputs", param0, param1)
 }
 
 // List a project's inputs
@@ -155,10 +157,10 @@ func (c *Client) NewListInputRequest(ctx context.Context, path string) (*http.Re
 }
 
 // ListIDInputPath computes a request path to the list id action of input.
-func ListIDInputPath(projectID int) string {
-	param0 := strconv.Itoa(projectID)
+func ListIDInputPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/projects/%s/inputs", param0)
+	return fmt.Sprintf("/expedition/%s/inputs", param0)
 }
 
 // List a project's inputs

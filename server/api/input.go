@@ -14,9 +14,10 @@ type InputControllerOptions struct {
 
 func InputType(input *data.Input) *app.Input {
 	return &app.Input{
-		ID:   int(input.ID),
-		Name: input.Name,
-		Slug: input.Slug,
+		ID:           int(input.ID),
+		ExpeditionID: int(input.ExpeditionID),
+		Name:         input.Name,
+		Slug:         input.Slug,
 	}
 }
 
@@ -46,12 +47,12 @@ func NewInputController(service *goa.Service, options InputControllerOptions) *I
 
 func (c *InputController) Add(ctx *app.AddInputContext) error {
 	input := &data.Input{
-		ProjectID: int32(ctx.ProjectID),
-		Name:      ctx.Payload.Name,
-		Slug:      ctx.Payload.Slug,
+		ExpeditionID: int32(ctx.ExpeditionID),
+		Name:         ctx.Payload.Name,
+		Slug:         ctx.Payload.Slug,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, input, "INSERT INTO fieldkit.input (project_id, name, slug) VALUES (:project_id, :name, :slug) RETURNING *", input); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, input, "INSERT INTO fieldkit.input (expedition_id, name, slug) VALUES (:expedition_id, :name, :slug) RETURNING *", input); err != nil {
 		return err
 	}
 
@@ -60,7 +61,7 @@ func (c *InputController) Add(ctx *app.AddInputContext) error {
 
 func (c *InputController) Get(ctx *app.GetInputContext) error {
 	input := &data.Input{}
-	if err := c.options.Database.GetContext(ctx, input, "SELECT e.* FROM fieldkit.input AS e JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Input); err != nil {
+	if err := c.options.Database.GetContext(ctx, input, "SELECT i.* FROM fieldkit.input AS i JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2 AND i.slug = $2", ctx.Project, ctx.Expedition, ctx.Input); err != nil {
 		return err
 	}
 
@@ -78,7 +79,7 @@ func (c *InputController) GetID(ctx *app.GetIDInputContext) error {
 
 func (c *InputController) List(ctx *app.ListInputContext) error {
 	inputs := []*data.Input{}
-	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT e.* FROM fieldkit.input AS e JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1", ctx.Project); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT i.* FROM fieldkit.input AS i JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $1", ctx.Project, ctx.Expedition); err != nil {
 		return err
 	}
 
@@ -87,7 +88,7 @@ func (c *InputController) List(ctx *app.ListInputContext) error {
 
 func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
 	inputs := []*data.Input{}
-	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT * FROM fieldkit.input WHERE project_id = $1", ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT * FROM fieldkit.input WHERE expedition_id = $1", ctx.ExpeditionID); err != nil {
 		return err
 	}
 
