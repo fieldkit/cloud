@@ -4,11 +4,11 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
-import { ProjectForm } from './forms/ProjectForm';
-import { FKApiClient } from '../api/api';
-import type { APINewProject } from '../api/types';
+import { ProjectForm } from '../forms/ProjectForm';
+import { FKApiClient } from '../../api/api';
+import type { APINewProject } from '../../api/types';
 
-import '../../css/projects.css'
+import '../../../css/projects.css'
 
 type Props = {
   match: Object;

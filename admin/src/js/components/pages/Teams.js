@@ -1,5 +1,7 @@
+// @flow weak
+
 import React, { Component } from 'react'
-import { MembersTable } from './shared/MembersTable';
+import { MembersTable } from '../shared/MembersTable';
 
 export class TeamRow extends Component {
   render() {

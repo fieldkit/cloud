@@ -4,14 +4,14 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
-import { ProjectForm } from './forms/ProjectForm';
-import { ProjectExpeditionForm } from './forms/ProjectExpeditionForm';
-import { InputForm } from './forms/InputForm';
-import { FKApiClient } from '../api/api';
+import { ProjectForm } from '../forms/ProjectForm';
+import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
+import { InputForm } from '../forms/InputForm';
+import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInput, APINewInput } from '../api/types';
+import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInput, APINewInput } from '../../api/types';
 
-import '../../css/home.css'
+import '../../../css/home.css'
 
 type Props = {
   project: APIProject;
