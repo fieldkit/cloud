@@ -234,6 +234,7 @@ export class Main extends Component {
                     <Expedition
                       project={project}
                       expedition={expedition}
+                      onExpeditionUpdate={this.onExpeditionUpdate.bind(this)}
                       {...props} />
                   )
                 } else {

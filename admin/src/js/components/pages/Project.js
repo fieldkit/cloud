@@ -11,8 +11,6 @@ import { FKApiClient } from '../../api/api';
 
 import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInput, APINewInput } from '../../api/types';
 
-import '../../../css/home.css'
-
 type Props = {
   project: APIProject;
   onProjectUpdate: (newSlug: ?string) => void;
