@@ -8,8 +8,6 @@ import { errorsFor, slugify } from '../../common/util';
 import type { APIErrors, APINewTeam } from '../../api/types';
 
 type Props = {
-  projectSlug: string,
-  expeditionSlug: string,
   name?: string,
   slug?: string,  
   description?: string,

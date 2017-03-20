@@ -6,9 +6,10 @@ import ReactModal from 'react-modal';
 
 import { MembersTable } from '../shared/MembersTable';
 import { TeamForm } from '../forms/TeamForm';
+import { MemberForm } from '../forms/MemberForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APITeam, APINewTeam } from '../../api/types';
+import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -18,57 +19,6 @@ type Props = {
   location: Object;
   history: Object;
 }
-
-export class TeamRow extends Component {
-
-  render() {
-    return (
-      <tr>
-        <td>
-        
-          {this.props.name}
-
-          <button>Add Members</button>
-        </td>
-      </tr>
-    )
-  }
-}
-
-// export class TeamsTable extends Component {
-//   constructor() {
-//     super();
-//     this.state = {
-//       teams: [
-//         {
-//           name: 'river',
-//           members: [
-//             {name: 'adjany', username: 'some_username', role: 'explorer'},
-//             {name: 'steve', username: 'some_username', role: 'explorer'},
-//             {name: 'jer', username: 'some_username', role: 'explorer'},
-//             {name: 'chris', username: 'some_username', role: 'explorer'},
-//             {name: 'john', username: 'some_username', role: 'explorer'}
-//           ]
-//         },
-//         {
-//           name: 'ground',
-//           members: [
-//             {name: 'kate', username: 'some_username', role: 'creative researcher'},
-//             {name: 'eric', username: 'some_username', role: 'creative researcher'},
-//             {name: 'chris', username: 'some_username', role: 'creative researcher'},
-//             {name: 'noa', username: 'some_username', role: 'creative researcher'}
-//           ]
-//         }
-//       ]
-//     }
-//   }
-//   render() {
-
-//     return (
-
-//     )
-//   }
-// }
 
 export class Teams extends Component {
 
@@ -98,23 +48,33 @@ export class Teams extends Component {
   }
 
   async onTeamCreate(e: APINewTeam) {
-    const { project, expedition } = this.props;
-    const projectSlug = project.slug;
-    const expeditionSlug = expedition.slug;
+    
+    const { expedition, match } = this.props;
 
     const teamRes = await FKApiClient.get().createTeam(expedition.id, e);
     if (teamRes.type === 'ok') {
       await this.loadData();
-      this.props.history.push(`/projects/${projectSlug}/expeditions/${expeditionSlug}/teams`);
+      this.props.history.push(`${match.url}`);
     } else {
       return teamRes.errors;
     }
-  }  
+  }
+
+  async onMemberAdding(team_id: number, e: APINewMember) {
+
+    const { match } = this.props;
+
+    const memberRes = await FKApiClient.get().addMember(team_id, e);
+    if (memberRes.type === 'ok') {
+      await this.loadData();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return memberRes.errors;
+    }
+  }
 
   render() {
-    const { match, project, expedition } = this.props;
-    const projectSlug = project.slug;
-    const expeditionSlug = expedition.slug;
+    const { match } = this.props;
     
     return (
       <div className="teams">
@@ -122,10 +82,17 @@ export class Teams extends Component {
           <ReactModal isOpen={true} contentLabel="Create New Team">
             <h1>Create a new team</h1>
             <TeamForm
-              projectSlug={projectSlug}
-              expeditionSlug={expeditionSlug}
-              onCancel={() => this.props.history.push(`/projects/${projectSlug}/expeditions/${expeditionSlug}/teams`)}
+              onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
+          </ReactModal> } />
+
+        <Route path={`${match.url}/:teamId/add-member`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Add Members">
+            <h1>Add Members</h1>
+            <MemberForm
+              team_id={props.match.params.teamId}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onMemberAdding.bind(this)} />
           </ReactModal> } />
 
         <h1>Teams</h1>
@@ -134,15 +101,19 @@ export class Teams extends Component {
         { this.state.teams.map((team, i) =>
           <table className="teams-table">
             <tbody>
-              <TeamRow key={i} name={team.name} members={team.members} />
+              <tr>
+                <td key={i} name={team.name}>
+                  {team.name}, {team.id}
+                  <button>Edit</button>
+                  <Link className="button" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
+                </td>
+              </tr>
             </tbody>
           </table> ) }
         { this.state.teams.length === 0 &&
           <span className="empty">No teams</span> }
         </div>
-
-        {/* <button>Add Team</button> */}
-        <Link to={`${match.url}/new-team`}>Show new team modal</Link>
+        <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
       </div>
     )
   }

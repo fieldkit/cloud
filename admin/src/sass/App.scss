@@ -282,7 +282,7 @@ h4 {
 	@include type-h4;
 }
 
-button {
+button, .button {
 	// Primary button
 	&:not(.bt-icon){
 		@include button();
