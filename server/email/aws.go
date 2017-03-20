@@ -1,8 +1,12 @@
 package email
 
 import (
+	"bytes"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
+
+	"github.com/O-C-R/fieldkit/server/data"
 )
 
 type AWSSESEmailer struct {
@@ -17,22 +21,41 @@ func NewAWSSESEmailer(client *ses.SES, source string) *AWSSESEmailer {
 	}
 }
 
-func (a *AWSSESEmailer) SendEmail(address, subject, message string) error {
+func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {
+	subjectBuffer := bytes.NewBuffer([]byte{})
+	if err := subjectTemplate.Execute(subjectBuffer, person); err != nil {
+		return err
+	}
+
+	bodyTextBuffer := bytes.NewBuffer([]byte{})
+	if err := bodyTextTemplate.Execute(bodyTextBuffer, validationToken); err != nil {
+		return err
+	}
+
+	bodyHTMLBuffer := bytes.NewBuffer([]byte{})
+	if err := bodyHTMLTemplate.Execute(bodyHTMLBuffer, validationToken); err != nil {
+		return err
+	}
+
 	sendEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
-				aws.String(address),
+				aws.String(person.Email),
 			},
 		},
 		Message: &ses.Message{
 			Body: &ses.Body{
 				Text: &ses.Content{
-					Data:    aws.String(message),
+					Data:    aws.String(bodyTextBuffer.String()),
+					Charset: aws.String("utf8"),
+				},
+				Html: &ses.Content{
+					Data:    aws.String(bodyHTMLBuffer.String()),
 					Charset: aws.String("utf8"),
 				},
 			},
 			Subject: &ses.Content{
-				Data:    aws.String(subject),
+				Data:    aws.String(subjectBuffer.String()),
 				Charset: aws.String("utf8"),
 			},
 		},

@@ -9,15 +9,18 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/O-C-R/fieldkit/server/api"
-	"github.com/O-C-R/fieldkit/server/api/app"
-	"github.com/O-C-R/fieldkit/server/email"
-
 	"github.com/O-C-R/sqlxcache"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
 	_ "github.com/lib/pq"
+
+	"github.com/O-C-R/fieldkit/server/api"
+	"github.com/O-C-R/fieldkit/server/api/app"
+	"github.com/O-C-R/fieldkit/server/email"
 )
 
 var flagConfig struct {
@@ -89,6 +92,29 @@ func main() {
 		return errBadRequest(message, keyvals...)
 	}
 
+	awsSessionOptions := session.Options{
+		Profile: "fieldkit",
+		Config: aws.Config{
+			Region: aws.String("us-east-1"),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+	}
+
+	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
+	if err != nil {
+		panic(err)
+	}
+
+	var emailer email.Emailer
+	switch flagConfig.emailer {
+	case "default":
+		emailer = email.NewEmailer()
+	case "aws":
+		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin@fieldkit.org")
+	default:
+		panic("invalid emailer")
+	}
+
 	// Create service
 	service := goa.New("fieldkit")
 
@@ -123,7 +149,7 @@ func main() {
 	// Mount "user" controller
 	c2, err := api.NewUserController(service, api.UserControllerOptions{
 		Database:   database,
-		Emailer:    email.NewEmailer(),
+		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
 	})
 	if err != nil {

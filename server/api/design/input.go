@@ -19,12 +19,14 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 	Reference(AddInputPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
+		Attribute("expedition_id", Integer)
 		Attribute("name")
 		Attribute("slug")
-		Required("id", "name", "slug")
+		Required("id", "expedition_id", "name", "slug")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("expedition_id")
 		Attribute("name")
 		Attribute("slug")
 	})
@@ -47,10 +49,10 @@ var _ = Resource("input", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("projects/:project_id/input"))
+		Routing(POST("expedition/:expedition_id/input"))
 		Description("Add a input")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("expedition_id", Integer)
 		})
 		Payload(AddInputPayload)
 		Response(BadRequest)
@@ -60,12 +62,16 @@ var _ = Resource("input", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/@/:project/inputs/@/:input"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/@/:input"))
 		Description("Add a input")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
+			})
+			Param("expedition", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Expedition slug")
 			})
 			Param("input", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
@@ -91,12 +97,16 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list", func() {
-		Routing(GET("projects/@/:project/inputs"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs"))
 		Description("List a project's inputs")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
+			})
+			Param("expedition", String, func() {
+				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+				Description("Expedition slug")
 			})
 		})
 		Response(BadRequest)
@@ -106,10 +116,10 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("projects/:project_id/inputs"))
+		Routing(GET("expedition/:expedition_id/inputs"))
 		Description("List a project's inputs")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("expedition_id", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

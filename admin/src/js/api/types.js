@@ -24,82 +24,88 @@ export type APIUsers = {
   users: APIUser[]
 }
 
-export type APINewProject = {
+export type APINewProject = {|
   name: string;
   slug: string;
   description: string;
-}
+|}
 
 export type APIProject = {
   id: number;
-} & APINewProject;
+  ...APINewProject;
+};
 
 export type APIProjects = {
   projects: APIProject[];
 }
 
-export type APINewExpedition = {
+export type APINewExpedition = {|
   name: string;
   slug: string;
   description: string;
-}
+|}
 
 export type APIExpedition = {
   id: number;
-} & APINewExpedition;
+  ...APINewExpedition;
+};
 
 export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
-export type APINewInput = {
+export type APINewInput = {|
   name: string;
   slug: string;
   description: string;
-}
+|}
 
 export type APIInput = {
   id: number;
-} & APINewInput;
+  ...APINewInput;
+};
 
 export type APIInputs = {
   inputs: APIInput[]
 }
 
-export type APINewTeam = {
+export type APINewTeam = {|
   name: string;
   slug: string;
   description: string;
-}
+|}
 
 export type APITeam = {
   id: string;
-} & APINewTeam;
+  ...APINewTeam;
+};
 
 export type APITeams = {
   teams: APITeam[]
 }
 
-export type APINewAdministrator = {
+export type APINewAdministrator = {|
   user_id: number;
-}
+|};
 
 export type APIAdministrator = {
   project_id: number;
-} & APINewAdministrator;
+  ...APINewAdministrator;
+};
 
 export type APIAdministrators = {
   administrators: APIAdministrator[]
 }
 
-export type APINewMember = {
+export type APINewMember = {|
   user_id: number;
   role: string;
-};
+|};
 
 export type APIMember = {
   team_id: number;
-} & APINewMember;
+   ...APINewMember;
+};
 
 export type APIMembers = {
   members: APIMember[]

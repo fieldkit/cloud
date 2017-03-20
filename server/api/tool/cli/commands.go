@@ -107,14 +107,16 @@ type (
 
 	// AddInputCommand is the command line data structure for the add action of input
 	AddInputCommand struct {
-		Payload     string
-		ContentType string
-		ProjectID   int
-		PrettyPrint bool
+		Payload      string
+		ContentType  string
+		ExpeditionID int
+		PrettyPrint  bool
 	}
 
 	// GetInputCommand is the command line data structure for the get action of input
 	GetInputCommand struct {
+		// Expedition slug
+		Expedition string
 		// Input slug
 		Input string
 		// Project slug
@@ -130,6 +132,8 @@ type (
 
 	// ListInputCommand is the command line data structure for the list action of input
 	ListInputCommand struct {
+		// Expedition slug
+		Expedition string
 		// Project slug
 		Project     string
 		PrettyPrint bool
@@ -137,8 +141,8 @@ type (
 
 	// ListIDInputCommand is the command line data structure for the list id action of input
 	ListIDInputCommand struct {
-		ProjectID   int
-		PrettyPrint bool
+		ExpeditionID int
+		PrettyPrint  bool
 	}
 
 	// AddMemberCommand is the command line data structure for the add action of member
@@ -311,6 +315,12 @@ type (
 		PrettyPrint bool
 	}
 
+	// ValidateUserCommand is the command line data structure for the validate action of user
+	ValidateUserCommand struct {
+		Token       string
+		PrettyPrint bool
+	}
+
 	// DownloadCommand is the command line data structure for the download command.
 	DownloadCommand struct {
 		// OutFile is the path to the download output file.
@@ -334,7 +344,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 Payload example:
 
 {
-   "user_id": 5370365768490460960
+   "user_id": 6525323513591937023
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp24.Run(c, args) },
 	}
@@ -350,9 +360,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Dolorem impedit hic dolore quidem repellendus cupiditate.",
-   "name": "Doloribus recusandae dignissimos ea nobis in.",
-   "slug": "xef7unsz2r"
+   "description": "Nobis in harum doloribus.",
+   "name": "Placeat amet illo reprehenderit quod provident dolorum.",
+   "slug": "bp8qpy7qrf"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp25.Run(c, args) },
 	}
@@ -361,15 +371,15 @@ Payload example:
 	command.AddCommand(sub)
 	tmp26 := new(AddInputCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/projects/PROJECT_ID/input"]`,
+		Use:   `input ["/expedition/EXPEDITION_ID/input"]`,
 		Short: ``,
 		Long: `
 
 Payload example:
 
 {
-   "name": "Ut voluptatem et.",
-   "slug": "y7qrfgzslj"
+   "name": "Autem et autem aliquid.",
+   "slug": "tddkn54oth"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp26.Run(c, args) },
 	}
@@ -385,8 +395,8 @@ Payload example:
 Payload example:
 
 {
-   "role": "Natus dolores quo suscipit voluptatem magni in.",
-   "user_id": 1077091600673584356
+   "role": "Dignissimos aut repellendus quam soluta odio.",
+   "user_id": 6546498497560926270
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp27.Run(c, args) },
 	}
@@ -402,9 +412,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Nostrum facere dignissimos.",
-   "name": "Repellendus quam soluta.",
-   "slug": "i3n7ahu8r8"
+   "description": "Ut repellendus ratione voluptatum.",
+   "name": "Rerum praesentium.",
+   "slug": "vb7alpfpmg"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp28.Run(c, args) },
 	}
@@ -420,9 +430,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Dolores a voluptas sed dolorum itaque.",
-   "name": "Sequi corrupti.",
-   "slug": "0o5eo4ic2d"
+   "description": "Quo eos fuga.",
+   "name": "Repudiandae dignissimos.",
+   "slug": "c2d6hce00v"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp29.Run(c, args) },
 	}
@@ -438,10 +448,10 @@ Payload example:
 Payload example:
 
 {
-   "email": "coby.douglas@mooremonahan.info",
-   "invite_token": "Expedita libero.",
-   "password": "guc87ez0kv",
-   "username": "3i11056gah"
+   "email": "demond@torp.net",
+   "invite_token": "Ut cum iusto iusto quia.",
+   "password": "kvi3i11056",
+   "username": "ahfdgbyyau"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp30.Run(c, args) },
 	}
@@ -496,7 +506,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp35 := new(GetInputCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/projects/@/PROJECT/inputs/@/INPUT"]`,
+		Use:   `input ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs/@/INPUT"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp35.Run(c, args) },
 	}
@@ -646,7 +656,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp50 := new(ListInputCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/projects/@/PROJECT/inputs"]`,
+		Use:   `input ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp50.Run(c, args) },
 	}
@@ -728,7 +738,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp58 := new(ListIDInputCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/projects/PROJECT_ID/inputs"]`,
+		Use:   `input ["/expedition/EXPEDITION_ID/inputs"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp58.Run(c, args) },
 	}
@@ -767,8 +777,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "dgbyyauoy5",
-   "username": "dmi76cingd"
+   "password": "y52dmi76ci",
+   "username": "gd200jauck"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp61.Run(c, args) },
 	}
@@ -803,12 +813,26 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Et quia ut incidunt consequatur magni."
+   "refresh_token": "Itaque consequatur non nisi dolor autem sint."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp63.Run(c, args) },
 	}
 	tmp63.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp63.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "validate",
+		Short: `Validate a user's email address.`,
+	}
+	tmp64 := new(ValidateUserCommand)
+	sub = &cobra.Command{
+		Use:   `user ["/validate"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp64.Run(c, args) },
+	}
+	tmp64.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp64.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -1341,7 +1365,7 @@ func (cmd *AddInputCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/%v/input", cmd.ProjectID)
+		path = fmt.Sprintf("/expedition/%v/input", cmd.ExpeditionID)
 	}
 	var payload client.AddInputPayload
 	if cmd.Payload != "" {
@@ -1366,8 +1390,8 @@ func (cmd *AddInputCommand) Run(c *client.Client, args []string) error {
 func (cmd *AddInputCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var projectID int
-	cc.Flags().IntVar(&cmd.ProjectID, "project_id", projectID, ``)
+	var expeditionID int
+	cc.Flags().IntVar(&cmd.ExpeditionID, "expedition_id", expeditionID, ``)
 }
 
 // Run makes the HTTP request corresponding to the GetInputCommand command.
@@ -1376,7 +1400,7 @@ func (cmd *GetInputCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/@/%v/inputs/@/%v", url.QueryEscape(cmd.Project), url.QueryEscape(cmd.Input))
+		path = fmt.Sprintf("/projects/@/%v/expeditions/@/%v/inputs/@/%v", url.QueryEscape(cmd.Project), url.QueryEscape(cmd.Expedition), url.QueryEscape(cmd.Input))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -1392,6 +1416,8 @@ func (cmd *GetInputCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *GetInputCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var expedition string
+	cc.Flags().StringVar(&cmd.Expedition, "expedition", expedition, `Expedition slug`)
 	var input string
 	cc.Flags().StringVar(&cmd.Input, "input", input, `Input slug`)
 	var project string
@@ -1430,7 +1456,7 @@ func (cmd *ListInputCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/@/%v/inputs", url.QueryEscape(cmd.Project))
+		path = fmt.Sprintf("/projects/@/%v/expeditions/@/%v/inputs", url.QueryEscape(cmd.Project), url.QueryEscape(cmd.Expedition))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -1446,6 +1472,8 @@ func (cmd *ListInputCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *ListInputCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var expedition string
+	cc.Flags().StringVar(&cmd.Expedition, "expedition", expedition, `Expedition slug`)
 	var project string
 	cc.Flags().StringVar(&cmd.Project, "project", project, `Project slug`)
 }
@@ -1456,7 +1484,7 @@ func (cmd *ListIDInputCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/%v/inputs", cmd.ProjectID)
+		path = fmt.Sprintf("/expedition/%v/inputs", cmd.ExpeditionID)
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -1472,8 +1500,8 @@ func (cmd *ListIDInputCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *ListIDInputCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var projectID int
-	cc.Flags().IntVar(&cmd.ProjectID, "project_id", projectID, ``)
+	var expeditionID int
+	cc.Flags().IntVar(&cmd.ExpeditionID, "expedition_id", expeditionID, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddMemberCommand command.
@@ -2154,4 +2182,30 @@ func (cmd *RefreshUserCommand) Run(c *client.Client, args []string) error {
 func (cmd *RefreshUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the ValidateUserCommand command.
+func (cmd *ValidateUserCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/validate"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ValidateUser(ctx, path, cmd.Token)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ValidateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var token string
+	cc.Flags().StringVar(&cmd.Token, "token", token, ``)
 }

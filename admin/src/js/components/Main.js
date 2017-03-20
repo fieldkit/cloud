@@ -9,6 +9,7 @@ import type { APIUser, APIProject, APIExpedition } from '../api/types';
 import { Projects } from './Projects';
 import { Project } from './Project';
 import { Expedition } from './Expedition'
+import { Teams } from './Teams';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -41,11 +42,51 @@ export class Main extends Component {
       expedition: null
     }
 
+    const {
+      projectSlug,
+      expeditionSlug
+    } = props.match.params;
+
     Promise.all([
       this.loadUser(),
-      this.loadProject(),
-      this.loadExpedition()
+      this.loadProject(projectSlug),
+      this.loadExpedition(projectSlug, expeditionSlug)
     ]).then(() => this.setState({ loading: false }));
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    const promises = [];
+    const stateChange = {};
+
+    const {
+      projectSlug,
+      expeditionSlug
+    } = this.props.match.params;
+
+    const {
+      projectSlug: newProjectSlug,
+      expeditionSlug: newExpeditionSlug
+    } = nextProps.match.params;
+
+    if (projectSlug != newProjectSlug) {
+      promises.push(this.loadProject(newProjectSlug));
+      stateChange.project = null;
+    } else if (!newProjectSlug) {
+      stateChange.project = null;
+    }
+
+    if (expeditionSlug != newExpeditionSlug) {
+      promises.push(this.loadExpedition(newProjectSlug, newExpeditionSlug));
+      stateChange.expedition = null;
+    } else if (!newExpeditionSlug) {
+      stateChange.expedition = null;
+    }
+
+    if (promises.length > 0 || Object.keys(stateChange).length > 0) {
+      this.setState({ loading: true, ...stateChange });
+      Promise.all(promises).then(() => { this.setState({ loading: false }); });
+    }
+
   }
 
   projectSlug(): ?string {
@@ -63,25 +104,25 @@ export class Main extends Component {
     }
   }
 
-  async loadProject() {
-    const projectSlug = this.projectSlug();
+  async loadProject(projectSlug: ?string = this.projectSlug()) {
     if (projectSlug) {
       const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      console.log(projectRes);
       if (projectRes.type == 'ok' && projectRes.payload) {
         this.setState({ project: projectRes.payload });
       }
+    } else {
+      this.setState({ project: null });
     }
   }
 
-  async loadExpedition() {
-    const projectSlug = this.projectSlug();
-    const expeditionSlug = this.expeditionSlug();
+  async loadExpedition(projectSlug: ?string = this.projectSlug(), expeditionSlug: ?string = this.expeditionSlug()) {
     if (projectSlug && expeditionSlug) {
       const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
       if (expRes.type == 'ok' && expRes.payload) {
         this.setState({ expedition: expRes.payload });
       }
+    } else {
+      this.setState({ expedition: null });
     }
   }
 
@@ -89,7 +130,8 @@ export class Main extends Component {
     if (newSlug) {
       this.setState({ redirectTo: `/projects/${newSlug}`})
     } else {
-      this.loadProject();
+      this.setState({ loading: true })
+      this.loadProject(this.projectSlug()).then(() => this.setState({ loading: false }));
     }
   }
 
@@ -102,7 +144,8 @@ export class Main extends Component {
         this.setState({ redirectTo: '/' });
       }
     } else {
-      this.loadExpedition();
+      this.setState({ loading: true })
+      this.loadExpedition().then(() => this.setState({ loading: false }));
     }
   }
 
@@ -111,22 +154,19 @@ export class Main extends Component {
       return <Redirect to={this.state.redirectTo} />;
     }
 
-    const projectSlug = this.projectSlug();
-    const expeditionSlug = this.expeditionSlug();
-
     const {
       project,
       expedition
     } = this.state;
 
     const breadcrumbs = [];
-    if (project) {
+    if (project && this.projectSlug()) {
       breadcrumbs.push(
-        <Link to={`/projects/${project.slug}`}>{project.name}</Link>
+        <Link key={0} to={`/projects/${project.slug}`}>{project.name}</Link>
       );
-      if (expedition) {
+      if (expedition && this.expeditionSlug()) {
         breadcrumbs.push(
-          <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
+          <Link key={1} to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
         );
       }
     }
@@ -145,7 +185,12 @@ export class Main extends Component {
               </div>            
               <div className="expedition-name">
                 <span>{expedition.name}</span>
-                <Link to={`https://${project.slug}.fieldkit.org/${expedition.slug}`} className="bt-icon new-window"></Link>
+                {/* TODO: use image icon */}
+                <a href={`https://${project.slug}.fieldkit.org/${expedition.slug}`}
+                  alt="go to expedition"
+                  target="_blank"
+                  className="bt-icon new-window"
+                />
               </div>
               <div className="nav">
                 <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`}>Data Sources</NavLink>
@@ -171,6 +216,18 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
+              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug/teams" render={props => {
+                if (project && expedition) {
+                  return (
+                    <Teams
+                      project={project}
+                      expedition={expedition}
+                      {...props} />
+                  )
+                } else {
+                  return <div></div>
+                }
+              }} />
               <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
                 if (project && expedition) {
                   return (

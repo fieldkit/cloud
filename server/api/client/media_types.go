@@ -171,9 +171,10 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 //
 // Identifier: application/vnd.app.input+json; view=default
 type Input struct {
-	ID   int    `form:"id" json:"id" xml:"id"`
-	Name string `form:"name" json:"name" xml:"name"`
-	Slug string `form:"slug" json:"slug" xml:"slug"`
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	Slug         string `form:"slug" json:"slug" xml:"slug"`
 }
 
 // Validate validates the Input media type instance.
