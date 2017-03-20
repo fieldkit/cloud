@@ -113,53 +113,34 @@ const updateViewport = (state, nextDate, nextFocusType) => {
         .get('viewport')
     }
     case 'documents': {
-
-     const { project, unproject } = ViewportMercator(state.get('viewport').toJS())
-
-     // console.log('aga', state.get('documents').toJS())
-     const minLng = state.get('documents').minBy(doc => {
+      const minLng = state.get('documents').minBy(doc => {
       return doc.getIn(['geometry', 'coordinates', 1])
-     }).getIn(['geometry', 'coordinates', 1])
+      }).getIn(['geometry', 'coordinates', 1])
 
-     const maxLng = state.get('documents').maxBy(doc => {
+      const maxLng = state.get('documents').maxBy(doc => {
       return doc.getIn(['geometry', 'coordinates', 1])
-     }).getIn(['geometry', 'coordinates', 1])
+      }).getIn(['geometry', 'coordinates', 1])
 
-     const minLat = state.get('documents').minBy(doc => {
+      const minLat = state.get('documents').minBy(doc => {
       return doc.getIn(['geometry', 'coordinates', 0])
-     }).getIn(['geometry', 'coordinates', 0])
+      }).getIn(['geometry', 'coordinates', 0])
 
-     const maxLat = state.get('documents').maxBy(doc => {
+      const maxLat = state.get('documents').maxBy(doc => {
       return doc.getIn(['geometry', 'coordinates', 0])
-     }).getIn(['geometry', 'coordinates', 0])
+      }).getIn(['geometry', 'coordinates', 0])
 
-     const latitude = (minLat + maxLat) / 2
-     const longitude = (minLng + maxLng) / 2
+      const latitude = (minLat + maxLat) / 2
+      const longitude = (minLng + maxLng) / 2
 
-     const screenTopLeft = unproject([0, 0])
-     const screenBottomRight = unproject([window.innerWidth, window.innerHeight])
-     const screenWidth = screenBottomRight[0] - screenTopLeft[0]
-     const screenHeight = screenTopLeft[1] - screenBottomRight[1]
+      const documentWidth = maxLng - minLng
+      const documentHeight = maxLat - minLat
 
-     const documentWidth = maxLng - minLng
-     const documentHeight = maxLat - minLat
-
-     // const zoom = state.getIn(['viewport', 'zoom']) / Math.sqrt(Math.sqrt((documentWidth / screenWidth)))
-     // console.log(state.getIn(['viewport', 'zoom']), documentWidth, screenWidth, zoom)
-     // console.log(latitude, longitude)
-
-     // const unprojectMinZoom = ViewportMercator(state.get('viewport').set('zoom', 1).toJS()).unproject
-     // const unprojectMaxZoom = ViewportMercator(state.get('viewport').set('zoom', 20).toJS()).unproject
-     // const distMinZoom = unprojectMinZoom([window.innerWidth, window.innerHeight])[0] - unprojectMinZoom([0, 0])[0]
-     // const distMaxZoom = unprojectMaxZoom([window.innerWidth, window.innerHeight])[0] - unprojectMaxZoom([0, 0])[0]
-     // const zoom = map(Math.sqrt(documentWidth), Math.sqrt(distMinZoom), Math.sqrt(distMaxZoom), 20, 1)
-     // console.log('okok', documentWidth, distMinZoom, distMaxZoom, zoom)
-
-     // const zoom2 = Math.pow(10, (360 * Math.log(2) / documentWidth)) + 1
-     // const zoom2 = Math.pow(10, 360 / (documentWidth * Math.log(2))) + 1
-     // console.log('Et voilà:', zoom2)
-     const zoom = Math.log2(360 / (documentWidth * 1.1)) + 1
-
+      let zoom = state.getIn(['viewport', 'zoom'])
+      if ((documentWidth * window.innerWidth) >= (documentHeight * window.innerHeight)) {
+        zoom = Math.log2(360 / (documentWidth * 1.1)) + 1
+      } else {
+        zoom = Math.log2(180 / (documentHeight * 1.1)) + 1
+      }
 
       return state
         .update('viewport', viewport => viewport
