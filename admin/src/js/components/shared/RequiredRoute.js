@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Route } from 'react-router-dom'
+import ReactModal from 'react-modal'
 import _ from 'lodash'
 
 export const RouteOrLoading = ({ component, required, path, ...rest }) => {

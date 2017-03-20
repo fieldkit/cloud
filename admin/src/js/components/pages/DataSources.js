@@ -92,12 +92,12 @@ export class DataSources extends Component {
   }
 
   async onInputCreate(i: APINewInput) {
-    const { project, expedition } = this.props;
+    const { match, expedition } = this.props;
 
     const inputRes = await FKApiClient.get().createInput(expedition.id, i);
     if (inputRes.type === 'ok') {
       await this.loadInputs();
-      this.props.history.push(`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`);
+      this.props.history.push(match.url);
     } else {
       return inputRes.errors;
     }
@@ -107,47 +107,44 @@ export class DataSources extends Component {
     // TODO: better error
     if (!inputId) return;
 
-    const { project, expedition } = this.props;
+    const { match } = this.props;
 
     // TODO: this isn't on the server yet
     // const inputRes = await FKApiClient.get().updateInput(inputId, i);
     // if (inputRes.type === 'ok') {
     //   await this.loadInputs();
-    //   this.props.history.push(`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`);
+    //   this.props.history.push(match.url);
     // } else {
     //   return inputRes.errors;
     // }
 
-    this.props.history.push(`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`);
+    this.props.history.push(match.url);
   }
 
   render() {
-    const { project, expedition } = this.props;
+    const { match, project, expedition } = this.props;
     const projectSlug = project.slug;
     const expeditionSlug = expedition.slug;
 
     return (
       <div className="inputs">
-        <Route path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources/new-datasource" render={() =>
+        <Route path={`${match.url}/new-datasource`} render={props =>
           <ReactModal isOpen={true} contentLabel="New datasource form">
             <h1>Create a new data source</h1>
             <InputForm
               projectSlug={projectSlug}
-              onCancel={() => this.props.history.push(`/projects/${projectSlug}/expeditions/${expeditionSlug}/datasources`)}
+              onCancel={() => this.props.history.push(match.url)}
               onSave={this.onInputCreate.bind(this)} />
           </ReactModal> } />
-        <RouteOrLoading
-          path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources/:inputId/edit"
-          required={[this.state.editingInput]}
-          component={() =>
-            <ReactModal isOpen={true} contentLabel="Edit datasource form">
-              <h1>Edit data source</h1>
-              <InputForm
-                input={this.state.editingInput}
-                projectSlug={projectSlug}
-                onCancel={() => this.props.history.push(`/projects/${projectSlug}/expeditions/${expeditionSlug}/datasources`)}
-                onSave={(i) => this.onInputSave(this.editingInputId(), i)} />
-            </ReactModal> } />
+        <Route path={`${match.url}/:inputId/edit`} render={props =>
+          <ReactModal isOpen={true} contentLabel="New datasource form">
+            <h1>Edit data source</h1>
+            <InputForm
+              input={this.state.inputs.find(i => i.id == props.match.params.inputId)}
+              projectSlug={projectSlug}
+              onCancel={() => this.props.history.push(match.url)}
+              onSave={(i) => this.onInputSave(this.editingInputId(), i)} />
+          </ReactModal> } />
 
         <h1>Data Sources</h1>
         { this.state.inputs &&
@@ -166,14 +163,14 @@ export class DataSources extends Component {
                 <td>Sensor</td>
                 <td>Jer Thorp</td>
                 <td>Water Quality</td>
-                <td><Link to={`/projects/${projectSlug}/expeditions/${expeditionSlug}/datasources/${input.id}/edit`}>edit</Link></td>
+                <td><Link to={`${match.url}/${input.id}/edit`}>edit</Link></td>
               </tr> )}
             </tbody>
           </table> }
         { this.state.inputs.length === 0 &&
           <span className="empty">No inputs!</span> }
 
-      <Link to={`/projects/${projectSlug}/expeditions/${expeditionSlug}/datasources/new-datasource`}>Show new datasource modal</Link>
+      <Link to={`${match.url}/new-datasource`}>Show new datasource modal</Link>
       </div>
     )
   }
