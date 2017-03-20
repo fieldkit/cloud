@@ -224,6 +224,12 @@ export class Main extends Component {
                 project={project}
                 expedition={expedition} />
               <RouteOrLoading
+                path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources/:inputId"
+                component={DataSources}
+                required={[project, expedition]}
+                project={project}
+                expedition={expedition} />
+              <RouteOrLoading
                 path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources"
                 component={DataSources}
                 required={[project, expedition]}

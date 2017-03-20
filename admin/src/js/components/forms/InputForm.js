@@ -9,7 +9,7 @@ import type { APIErrors, APIInput, APINewInput } from '../../api/types';
 
 type Props = {
   projectSlug: string,
-  input?: APIInput;
+  input?: ?APIInput;
 
   cancelText?: string;
   saveText?: ?string;
