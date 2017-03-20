@@ -230,18 +230,13 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['focus', 'type'], focusType)
         .set('playbackMode', 'pause')
         .update('viewport', viewport => updateViewport(state, null, focusType))
-        // .update('playbackMode', playbackMode => {
-        //   switch (focusType) {
-        //     case 'expedition':
-        //       return playbackMode
-        //     case 'member':
-        //       return playbackMode
-        //     case 'documents':
-        //       return 'pause'
-        //     case 'manual':
-        //       return 'pause'
-        //   }
-        // })
+    }
+
+    case actions.SELECT_ZOOM: {
+      return state
+        .setIn(['viewport', 'zoom'], action.zoom)
+        .setIn(['focus', 'type'], 'manual')
+        .set('playbackMode', 'pause')
     }
 
     case actions.SET_MOUSE_POSITION: {

@@ -14,6 +14,9 @@ import iconPauseHover from '../../../img/icon-pause-hover.png'
 import iconForwardHover from '../../../img/icon-forward-hover.png'
 import iconFastForwardHover from '../../../img/icon-fastForward-hover.png'
 
+import iconMinus from '../../../img/icon-minus.png'
+import iconPlus from '../../../img/icon-plus.png'
+
 class ControlPanel extends React.Component {
 
   render () {
@@ -22,8 +25,10 @@ class ControlPanel extends React.Component {
       currentDate,
       playbackMode,
       focus,
+      zoom,
       selectPlaybackMode,
-      selectFocusType
+      selectFocusType,
+      selectZoom
     } = this.props
 
     return (
@@ -123,6 +128,24 @@ class ControlPanel extends React.Component {
             </li>
           </ul>
         </div>
+        <ul className="control-panel_zoom-selector">
+          <li
+            className="control-panel_zoom-selector_button"
+            onClick={ () => selectZoom(zoom - 1) }
+          >
+            <img
+              src={ iconMinus }
+            />
+          </li>
+          <li
+            className="control-panel_zoom-selector_button"
+            onClick={ () => selectZoom(zoom + 1) }
+          >
+            <img
+              src={ iconPlus }
+            />
+          </li>
+        </ul>
       </div>
     )
   }

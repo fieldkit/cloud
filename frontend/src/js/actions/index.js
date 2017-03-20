@@ -15,6 +15,7 @@ export const SET_VIEWPORT = 'SET_VIEWPORT'
 export const UPDATE_DATE = 'UPDATE_DATE'
 export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
 export const SELECT_FOCUS_TYPE = 'SELECT_FOCUS_TYPE'
+export const SELECT_ZOOM = 'SELECT_ZOOM'
 export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 export const SET_ZOOM = 'SET_ZOOM'
@@ -259,6 +260,15 @@ export function selectFocusType (focusType) {
     dispatch({
       type: SELECT_FOCUS_TYPE,
       focusType
+    })
+  }
+}
+
+export function selectZoom (zoom) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SELECT_ZOOM,
+      zoom
     })
   }
 }

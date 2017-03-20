@@ -12,7 +12,7 @@
 
       &_button {
         cursor: pointer;
-        border: black 1px solid;
+        border: rgba(0,0,0,0.05) 1px solid;
         width: 100%;
         display: block;
         text-align: center;
@@ -36,5 +36,18 @@
         background-color: $color-accent;
       }
     }
+  }
+
+  &_zoom-selector {
+    display: flex;
+    justify-content: space-between;
+
+      &_button {
+        cursor: pointer;
+        border: rgba(0,0,0,0.05) 1px solid;
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
   }
 }

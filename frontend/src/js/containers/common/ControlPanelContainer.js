@@ -10,11 +10,13 @@ const mapStateToProps = (state, ownProps) => {
   const currentDate = state.expeditions.get('currentDate')
   const playbackMode = state.expeditions.get('playbackMode')
   const focus = state.expeditions.get('focus')
+  const zoom = state.expeditions.getIn(['viewport', 'zoom'])
 
   return {
     currentDate,
     playbackMode,
-    focus
+    focus,
+    zoom
   }
 }
 
@@ -25,6 +27,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     selectFocusType (type) {
       return dispatch(actions.selectFocusType(type))
+    },
+    selectZoom (zoom) {
+      return dispatch(actions.selectZoom(zoom))
     },
     cancelAction () {
       return dispatch(actions.cancelAction())
