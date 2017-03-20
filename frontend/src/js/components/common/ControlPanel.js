@@ -16,18 +16,14 @@ import iconFastForwardHover from '../../../img/icon-fastForward-hover.png'
 
 class ControlPanel extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
-  }
-
   render () {
 
     const { 
       currentDate,
       playbackMode,
-      selectPlaybackMode
+      focus,
+      selectPlaybackMode,
+      selectFocusType
     } = this.props
 
     return (
@@ -95,14 +91,35 @@ class ControlPanel extends React.Component {
         <div className="control-panel_focus-selector">
           <p>Map Focus:</p>
           <ul>
-            <li>
+            <li
+              className={ focus.get('type') === 'expedition' ? 'active' : '' }
+              onClick={ () => selectFocusType('expedition') }
+            >
               Expedition
             </li>
-            <li>
-              Member
-            </li>
-            <li>
+            {
+              /*
+              <li
+                style={{
+                  backgroundColor: focus.get('type') === 'member' ? '#D0462C' : 'white',
+                  color: focus.get('type') === 'member' ? 'white' : '#D0462C'
+                }}
+              >
+                Member
+              </li>
+              */
+            }
+            <li
+              className={ focus.get('type') === 'documents' ? 'active' : '' }
+              onClick={ () => selectFocusType('documents') }
+            >
               Documents
+            </li>
+            <li
+              className={ focus.get('type') === 'manual' ? 'active' : '' }
+              onClick={ () => selectFocusType('manual') }
+            >
+              Manual
             </li>
           </ul>
         </div>

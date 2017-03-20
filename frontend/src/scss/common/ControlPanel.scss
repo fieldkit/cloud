@@ -18,4 +18,23 @@
         text-align: center;
       }
   }
+
+  &_focus-selector {
+
+    li {
+      color: $color-accent;
+      background-color: white;
+      cursor: pointer;
+
+      &:hover {
+        color: white;
+        background-color: $color-accent;
+      }
+
+      &.active {
+        color: white;
+        background-color: $color-accent;
+      }
+    }
+  }
 }

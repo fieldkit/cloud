@@ -67,6 +67,109 @@ export const initialState = I.fromJS({
   }
 })
 
+const updateViewport = (state, nextDate, nextFocusType) => {
+  const focusType = nextFocusType || state.getIn(['focus', 'type'])
+  const date = nextDate || state.get('currentDate')
+
+  switch (focusType) {
+    case 'expedition' : {
+      const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
+      const startDate = expedition.get('startDate')
+      const endDate = expedition.get('endDate')
+
+      const documents = state.get('documents')
+        .filter(d => {
+          return state.get('currentDocuments').includes(d.get('id'))
+        })
+        .sort((d1, d2) => {
+          return d1.get('date') - d2.get('date')
+        })
+
+      const previousDocuments = documents
+        .filter(d => {
+          return d.get('date') <= date
+        })
+      const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
+        date < startDate ? documents.first() :
+        date >= endDate ? documents.last() : null
+
+      const nextDocuments = documents
+        .filter(d => {
+          return d.get('date') > date
+        })
+      const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
+        date < startDate ? documents.first() :
+        date >= endDate ? documents.last() : null
+
+      const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
+      const latitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
+
+      return state
+        .update('viewport', viewport => viewport
+          .set('longitude', longitude)
+          .set('latitude', latitude)
+          .set('zoom', 15)
+        )
+        .get('viewport')
+    }
+    case 'documents': {
+
+     const { project, unproject } = ViewportMercator(state.get('viewport').toJS())
+
+     // console.log('aga', state.get('documents').toJS())
+     const minLng = state.get('documents').minBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 1])
+     }).getIn(['geometry', 'coordinates', 1])
+
+     const maxLng = state.get('documents').maxBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 1])
+     }).getIn(['geometry', 'coordinates', 1])
+
+     const minLat = state.get('documents').minBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 0])
+     }).getIn(['geometry', 'coordinates', 0])
+
+     const maxLat = state.get('documents').maxBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 0])
+     }).getIn(['geometry', 'coordinates', 0])
+
+     const latitude = (minLat + maxLat) / 2
+     const longitude = (minLng + maxLng) / 2
+
+     const screenTopLeft = unproject([0, 0])
+     const screenBottomRight = unproject([window.innerWidth, window.innerHeight])
+     const screenWidth = screenBottomRight[0] - screenTopLeft[0]
+     const screenHeight = screenTopLeft[1] - screenBottomRight[1]
+
+     const documentWidth = maxLng - minLng
+     const documentHeight = maxLat - minLat
+
+     const zoom = state.getIn(['viewport', 'zoom']) / Math.sqrt(Math.sqrt((documentWidth / screenWidth)))
+     // console.log(state.getIn(['viewport', 'zoom']), documentWidth, screenWidth, zoom)
+     // console.log(latitude, longitude)
+
+     // const unprojectMinZoom = ViewportMercator(state.get('viewport').set('zoom', 1).toJS()).unproject
+     // const unprojectMaxZoom = ViewportMercator(state.get('viewport').set('zoom', 20).toJS()).unproject
+     // const distMinZoom = unprojectMinZoom([window.innerWidth, window.innerHeight])[0] - unprojectMinZoom([0, 0])[0]
+     // const distMaxZoom = unprojectMaxZoom([window.innerWidth, window.innerHeight])[0] - unprojectMaxZoom([0, 0])[0]
+     // const zoom = map(Math.sqrt(documentWidth), Math.sqrt(distMinZoom), Math.sqrt(distMaxZoom), 20, 1)
+     // console.log('okok', documentWidth, distMinZoom, distMaxZoom, zoom)
+
+
+      return state
+        .update('viewport', viewport => viewport
+          .set('longitude', longitude)
+          .set('latitude', latitude)
+          .set('zoom', zoom)
+        )
+        .get('viewport')
+    }
+    default: {
+      return state.get('viewport')
+    }
+  }
+}
+
 const expeditionReducer = (state = initialState, action) => {
 
   if (action.type !== actions.UPDATE_DATE && action.type !== actions.SET_MOUSE_POSITION ) {
@@ -121,48 +224,38 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.UPDATE_DATE: {
-      const focus = state.get('focus')
       const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
       const startDate = expedition.get('startDate')
       const endDate = expedition.get('endDate')
       const nextDate = constrain(action.date, startDate, endDate)
-
-      const documents = state.get('documents')
-        .filter(d => {
-          return state.get('currentDocuments').includes(d.get('id'))
-        })
-        .sort((d1, d2) => {
-          return d1.get('date') - d2.get('date')
-        })
-
-      const previousDocuments = documents
-        .filter(d => {
-          return d.get('date') <= nextDate
-        })
-      const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
-        nextDate < startDate ? documents.first() :
-        nextDate >= endDate ? documents.last() : null
-
-      const nextDocuments = documents
-        .filter(d => {
-          return d.get('date') > nextDate
-        })
-      const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
-        nextDate < startDate ? documents.first() :
-        nextDate >= endDate ? documents.last() : null
-
-      const longitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
-      const latitude = map(nextDate, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
-
       return state
         .set('currentDate', nextDate)
-        .setIn(['viewport', 'longitude'], state.getIn(['focus', 'type']) === 'manual' ? state.getIn(['viewport', 'longitude']) : longitude)
-        .setIn(['viewport', 'latitude'], state.getIn(['focus', 'type']) === 'manual' ? state.getIn(['viewport', 'latitude']) : latitude)
+        .update('viewport', viewport => updateViewport(state, nextDate, null))
     }
 
     case actions.SELECT_PLAYBACK_MODE: {
       return state
         .set('playbackMode', action.mode)
+    }
+
+    case actions.SELECT_FOCUS_TYPE: {
+      const focusType = action.focusType
+      return state
+        .setIn(['focus', 'type'], focusType)
+        .set('playbackMode', 'pause')
+        .update('viewport', viewport => updateViewport(state, null, focusType))
+        // .update('playbackMode', playbackMode => {
+        //   switch (focusType) {
+        //     case 'expedition':
+        //       return playbackMode
+        //     case 'member':
+        //       return playbackMode
+        //     case 'documents':
+        //       return 'pause'
+        //     case 'manual':
+        //       return 'pause'
+        //   }
+        // })
     }
 
     case actions.SET_MOUSE_POSITION: {

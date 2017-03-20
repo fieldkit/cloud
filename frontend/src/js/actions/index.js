@@ -14,6 +14,7 @@ export const INITIALIZE_DOCUMENTS = 'INITIALIZE_DOCUMENTS'
 export const SET_VIEWPORT = 'SET_VIEWPORT'
 export const UPDATE_DATE = 'UPDATE_DATE'
 export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
+export const SELECT_FOCUS_TYPE = 'SELECT_FOCUS_TYPE'
 export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 export const SET_ZOOM = 'SET_ZOOM'
@@ -249,6 +250,15 @@ export function selectPlaybackMode (mode) {
     dispatch({
       type: SELECT_PLAYBACK_MODE,
       mode
+    })
+  }
+}
+
+export function selectFocusType (focusType) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SELECT_FOCUS_TYPE,
+      focusType
     })
   }
 }
