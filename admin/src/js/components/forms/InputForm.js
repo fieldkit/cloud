@@ -96,7 +96,7 @@ export class InputForm extends Component {
         </div>
 
         <div className="url-preview">
-          <p className="label">Your input will be available at the following address:</p>
+          <p className="label">Your data source will be available at the following address:</p>
           <p className="url">
             {/* TODO: replace with something that handles alternative domains */}
             <span className="domain">{this.props.projectSlug}.fieldkit.org/inputs/</span>

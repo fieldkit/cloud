@@ -6,10 +6,12 @@ import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
+import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
 import { Project } from './pages/Project';
 import { Expedition } from './pages/Expedition'
 import { Teams } from './pages/Teams';
+import { DataSources } from './pages/DataSources';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -215,43 +217,31 @@ export class Main extends Component {
 
           <div className="contents">
             <Switch>
-              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug/teams" render={props => {
-                if (project && expedition) {
-                  return (
-                    <Teams
-                      project={project}
-                      expedition={expedition}
-                      {...props} />
-                  )
-                } else {
-                  return <div></div>
-                }
-              }} />
-              <Route path="/projects/:projectSlug/expeditions/:expeditionSlug" render={props => {
-                if (project && expedition) {
-                  return (
-                    <Expedition
-                      project={project}
-                      expedition={expedition}
-                      {...props} />
-                  )
-                } else {
-                  return <div></div>
-                }
-              }} />
-              <Route path="/projects/:projectSlug" render={props => {
-                if (project) {
-                  return (
-                    <Project
-                      project={project}
-                      onProjectUpdate={this.onProjectUpdate.bind(this)}
-                      {...props} />
-                  )
-                } else {
-                  return <div></div>
-                }
-              }} />
-              <Route path="/" render={props => <Projects {...props} />} />
+              <RouteOrLoading
+                path="/projects/:projectSlug/expeditions/:expeditionSlug/teams"
+                component={Teams}
+                required={[project, expedition]}
+                project={project}
+                expedition={expedition} />
+              <RouteOrLoading
+                path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources"
+                component={DataSources}
+                required={[project, expedition]}
+                project={project}
+                expedition={expedition} />
+              <RouteOrLoading
+                path="/projects/:projectSlug/expeditions/:expeditionSlug"
+                component={Expedition}
+                required={[project, expedition]}
+                project={project}
+                expedition={expedition} />
+              <RouteOrLoading
+                path="/projects/:projectSlug"
+                component={Project}
+                required={[project]}
+                project={project} />
+
+              <Route path="/" component={Projects} />
             </Switch>
           </div>
         </div>
