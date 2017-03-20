@@ -79,7 +79,7 @@ func (c *InputController) GetID(ctx *app.GetIDInputContext) error {
 
 func (c *InputController) List(ctx *app.ListInputContext) error {
 	inputs := []*data.Input{}
-	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT i.* FROM fieldkit.input AS i JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $1", ctx.Project, ctx.Expedition); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &inputs, "SELECT i.* FROM fieldkit.input AS i JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Expedition); err != nil {
 		return err
 	}
 

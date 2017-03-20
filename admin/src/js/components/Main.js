@@ -6,10 +6,10 @@ import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
-import { Projects } from './Projects';
-import { Project } from './Project';
-import { Expedition } from './Expedition'
-import { Teams } from './Teams';
+import { Projects } from './pages/Projects';
+import { Project } from './pages/Project';
+import { Expedition } from './pages/Expedition'
+import { Teams } from './pages/Teams';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'

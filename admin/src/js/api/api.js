@@ -212,22 +212,26 @@ export class FKApiClient extends JWTAPIClient {
 
   updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
     return this.postWithErrors(`/expeditions/${expeditionId}`, values)
-  }  
-
-  getInputsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIInputs>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/inputs`)
   }
 
-  getInputBySlugs(projectSlug: string, inputSlug: string): Promise<FKAPIResponse<APIInput>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/inputs/@/${inputSlug}`)
+  getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
+    return this.getWithErrors(`/expedition/${expeditionId}/inputs`)
+  }
+
+  getInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputs>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs`)
+  }
+
+  getInputBySlugs(projectSlug: string, expeditionSlug: string, inputSlug: string): Promise<FKAPIResponse<APIInput>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/@/${inputSlug}`)
   }
 
   getInput(inputId: number): Promise<FKAPIResponse<APIInput>> {
     return this.getWithErrors(`/inputs/${inputId}`)
   }
 
-  createInput(projectId: number, values: APINewInput): Promise<FKAPIResponse<APIInput>> {
-    return this.postWithErrors(`/projects/${projectId}/input`, values)
+  createInput(expeditionId: number, values: APINewInput): Promise<FKAPIResponse<APIInput>> {
+    return this.postWithErrors(`/expedition/${expeditionId}/input`, values)
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
