@@ -171,26 +171,25 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 //
 // Identifier: application/vnd.app.input+json; view=default
 type Input struct {
+	Active       bool   `form:"active" json:"active" xml:"active"`
 	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
 	ID           int    `form:"id" json:"id" xml:"id"`
 	Name         string `form:"name" json:"name" xml:"name"`
-	Slug         string `form:"slug" json:"slug" xml:"slug"`
+	Type         string `form:"type" json:"type" xml:"type"`
 }
 
 // Validate validates the Input media type instance.
 func (mt *Input) Validate() (err error) {
 
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
-	if mt.Slug == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
-	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-	}
-	if utf8.RuneCountInString(mt.Slug) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+
+	if !(mt.Type == "webhook" || mt.Type == "twitter") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, mt.Type, []interface{}{"webhook", "twitter"}))
 	}
 	return
 }

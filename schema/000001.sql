@@ -78,14 +78,17 @@ CREATE TABLE fieldkit.team_user (
 
 -- input
 
+CREATE TYPE input_type AS ENUM ('webhook', 'twitter');
+
 CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
+	type input_type NOT NULL,
 	name varchar(100) NOT NULL,
-	slug varchar(100) NOT NULL
+	active bool NOT NULL DEFAULT false
 );
 
-CREATE UNIQUE INDEX ON fieldkit.input (expedition_id, slug);
+CREATE UNIQUE INDEX ON fieldkit.input (expedition_id, name);
 
 -- schema
 

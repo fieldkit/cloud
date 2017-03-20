@@ -1,3 +1,5 @@
+// @flow weak
+
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
@@ -110,14 +112,13 @@ export class Teams extends Component {
   }  
 
   render() {
-    const { project } = this.props;
+    const { match, project, expedition } = this.props;
     const projectSlug = project.slug;
-    const { expedition } = this.props;
     const expeditionSlug = expedition.slug;
     
     return (
       <div className="teams">
-        <Route path="/projects/:projectSlug/expeditions/:expeditionSlug/teams/new-team" render={() =>
+        <Route path={`${match.url}/new-team`} render={() =>
           <ReactModal isOpen={true} contentLabel="Create New Team">
             <h1>Create a new team</h1>
             <TeamForm
@@ -141,7 +142,7 @@ export class Teams extends Component {
         </div>
 
         {/* <button>Add Team</button> */}
-        <Link to={`/projects/${projectSlug}/expeditions/${expeditionSlug}/teams/new-team`}>Show new team modal</Link>
+        <Link to={`${match.url}/new-team`}>Show new team modal</Link>
       </div>
     )
   }

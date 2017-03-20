@@ -16,8 +16,8 @@ func InputType(input *data.Input) *app.Input {
 	return &app.Input{
 		ID:           int(input.ID),
 		ExpeditionID: int(input.ExpeditionID),
+		Type:         input.Type,
 		Name:         input.Name,
-		Slug:         input.Slug,
 	}
 }
 
@@ -48,11 +48,11 @@ func NewInputController(service *goa.Service, options InputControllerOptions) *I
 func (c *InputController) Add(ctx *app.AddInputContext) error {
 	input := &data.Input{
 		ExpeditionID: int32(ctx.ExpeditionID),
+		Type:         ctx.Payload.Type,
 		Name:         ctx.Payload.Name,
-		Slug:         ctx.Payload.Slug,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, input, "INSERT INTO fieldkit.input (expedition_id, name, slug) VALUES (:expedition_id, :name, :slug) RETURNING *", input); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, input, "INSERT INTO fieldkit.input (expedition_id, type, name, active) VALUES (:expedition_id, :type, :name, :active) RETURNING *", input); err != nil {
 		return err
 	}
 

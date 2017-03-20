@@ -6,12 +6,12 @@ import (
 )
 
 var AddInputPayload = Type("AddInputPayload", func() {
-	Attribute("name", String)
-	Attribute("slug", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-		MaxLength(40)
+	Attribute("type", String, func() {
+		Enum("webhook", "twitter")
 	})
-	Required("name", "slug")
+	Attribute("name", String)
+	Attribute("active", Boolean)
+	Required("type", "name", "active")
 })
 
 var Input = MediaType("application/vnd.app.input+json", func() {
@@ -20,15 +20,17 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("expedition_id", Integer)
+		Attribute("type")
 		Attribute("name")
-		Attribute("slug")
-		Required("id", "expedition_id", "name", "slug")
+		Attribute("active")
+		Required("id", "expedition_id", "type", "name", "active")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("type")
 		Attribute("name")
-		Attribute("slug")
+		Attribute("active")
 	})
 })
 
