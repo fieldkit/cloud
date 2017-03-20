@@ -23,9 +23,9 @@ export class TeamRow extends Component {
     return (
       <tr>
         <td>
+        
           {this.props.name}
-          <MembersTable members={this.props.members}>
-          </MembersTable>
+
           <button>Add Members</button>
         </td>
       </tr>
