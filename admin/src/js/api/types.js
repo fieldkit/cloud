@@ -54,15 +54,18 @@ export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
-export type APINewInput = {|
+export type APIInputType = 'webhook' | 'twitter';
+
+export type APINewInput = {
   name: string;
-  slug: string;
-  description: string;
-|}
+  type: APIInputType;
+  active: boolean;
+}
 
 export type APIInput = {
   id: number;
-  ...APINewInput;
+  expedtion_id: number;
+  ...$Exact<APINewInput>;
 };
 
 export type APIInputs = {

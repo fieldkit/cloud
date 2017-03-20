@@ -5,7 +5,7 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIInput, APINewInput } from '../../api/types';
+import type { APIErrors, APIInput, APINewInput, APIInputType } from '../../api/types';
 
 type Props = {
   projectSlug: string,
@@ -17,11 +17,20 @@ type Props = {
   onSave: (i: APINewInput) => Promise<?APIErrors>;
 }
 
+const INPUT_TYPES = [
+  { value: "webhook", display: "Webhook" },
+  { value: "twitter", display: "Twitter" },
+]
+
 function initialStateFromProps(props: Props) {
   return {
-    slugHasChanged: false,
     saveDisabled: false,
     errors: null,
+
+    name: '',
+    type: INPUT_TYPES[0].value,
+    active: true,
+
     ...props.input
   }
 }
@@ -30,10 +39,9 @@ export class InputForm extends Component {
   props: Props;
   state: {
     name: string,
-    description: string,
-    slug: string,
+    type: APIInputType,
+    active: boolean,
 
-    slugHasChanged: boolean,
     saveDisabled: boolean,
     errors: ?APIErrors
   };
@@ -50,27 +58,13 @@ export class InputForm extends Component {
   async save() {
     const errors = await this.props.onSave({
       name: this.state.name,
-      slug: this.state.slug,
-      description: this.state.description
+      type: this.state.type,
+      active: this.state.active
     });
 
     if (errors) {
       this.setState({ errors });
     }
-  }
-
-  handleNameChange(event) {
-    const v = event.target.value;
-    let stateUpdate = { name: v };
-    if (!this.state.slugHasChanged) {
-      stateUpdate = { slug: slugify(v), ...stateUpdate };
-    }
-    this.setState(stateUpdate);
-  }
-
-  handleSlugChange(event) {
-    const v = event.target.value;
-    this.setState({ slug: v, slugHasChanged: true });
   }
 
   handleInputChange(event) {
@@ -91,24 +85,22 @@ export class InputForm extends Component {
 
         <div className="form_group">
           <label htmlFor="name">Name:</label>
-          <input type="text" name="name" className='lg' value={this.state.name} onChange={this.handleNameChange.bind(this)} />
+          <input type="text" name="name" className='lg' value={this.state.name} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'name') }
         </div>
 
-        <div className="url-preview">
-          <p className="label">Your data source will be available at the following address:</p>
-          <p className="url">
-            {/* TODO: replace with something that handles alternative domains */}
-            <span className="domain">{this.props.projectSlug}.fieldkit.org/inputs/</span>
-            <input type="text" name="slug" className='lg slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
-          </p>
-          { errorsFor(this.state.errors, 'path') }
+        <div className="form_group">
+          <label htmlFor="type">Type:</label>
+          <select name="type" className='lg' value={this.state.type} onChange={this.handleInputChange.bind(this)}>
+            { INPUT_TYPES.map((o, i) => <option key={i} value={o.value}>{o.display}</option>) }
+          </select>
+          { errorsFor(this.state.errors, 'type') }
         </div>
 
         <div className="form_group">
-          <label htmlFor="description">Description:</label>
-          <input type="text" name="description" className='lg' value={this.state.description} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(this.state.errors, 'description') }
+          <label htmlFor="active">Active:</label>
+          <input type="checkbox" name="active" className='lg' checked={this.state.active} onChange={this.handleInputChange.bind(this)} />
+          { errorsFor(this.state.errors, 'active') }
         </div>
       </FormContainer>
     );
