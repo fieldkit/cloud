@@ -144,7 +144,7 @@ const updateViewport = (state, nextDate, nextFocusType) => {
      const documentWidth = maxLng - minLng
      const documentHeight = maxLat - minLat
 
-     const zoom = state.getIn(['viewport', 'zoom']) / Math.sqrt(Math.sqrt((documentWidth / screenWidth)))
+     // const zoom = state.getIn(['viewport', 'zoom']) / Math.sqrt(Math.sqrt((documentWidth / screenWidth)))
      // console.log(state.getIn(['viewport', 'zoom']), documentWidth, screenWidth, zoom)
      // console.log(latitude, longitude)
 
@@ -154,6 +154,11 @@ const updateViewport = (state, nextDate, nextFocusType) => {
      // const distMaxZoom = unprojectMaxZoom([window.innerWidth, window.innerHeight])[0] - unprojectMaxZoom([0, 0])[0]
      // const zoom = map(Math.sqrt(documentWidth), Math.sqrt(distMinZoom), Math.sqrt(distMaxZoom), 20, 1)
      // console.log('okok', documentWidth, distMinZoom, distMaxZoom, zoom)
+
+     // const zoom2 = Math.pow(10, (360 * Math.log(2) / documentWidth)) + 1
+     // const zoom2 = Math.pow(10, 360 / (documentWidth * Math.log(2))) + 1
+     // console.log('Et voilà:', zoom2)
+     const zoom = Math.log2(360 / (documentWidth * 1.1)) + 1
 
 
       return state
