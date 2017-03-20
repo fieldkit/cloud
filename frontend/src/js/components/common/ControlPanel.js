@@ -45,7 +45,7 @@ class ControlPanel extends React.Component {
             }}
           >
             <img
-              src={ playbackMode === 'fastBackward' ? iconFastBackwardHover : iconFastBackward }
+              src={ '/' + (playbackMode === 'fastBackward' ? iconFastBackwardHover : iconFastBackward) }
             />
           </li>
           <li
@@ -56,7 +56,7 @@ class ControlPanel extends React.Component {
             }}
           >
             <img
-              src={ playbackMode === 'backward' ? iconBackwardHover : iconBackward }
+              src={ '/' + (playbackMode === 'backward' ? iconBackwardHover : iconBackward) }
             />
           </li>
           <li
@@ -67,7 +67,7 @@ class ControlPanel extends React.Component {
             }}
           >
             <img
-              src={ playbackMode === 'pause' ? iconPauseHover : iconPause }
+              src={ '/' + (playbackMode === 'pause' ? iconPauseHover : iconPause) }
             />
           </li>
           <li
@@ -78,7 +78,7 @@ class ControlPanel extends React.Component {
             }}
           >
             <img
-              src={ playbackMode === 'forward' ? iconForwardHover : iconForward }
+              src={ '/' + (playbackMode === 'forward' ? iconForwardHover : iconForward) }
             />
           </li>
           <li
@@ -89,7 +89,7 @@ class ControlPanel extends React.Component {
             }}
           >
             <img
-              src={ playbackMode === 'fastForward' ? iconFastForwardHover : iconFastForward }
+              src={ '/' + (playbackMode === 'fastForward' ? iconFastForwardHover : iconFastForward) }
             />
           </li>
         </ul>
@@ -134,7 +134,7 @@ class ControlPanel extends React.Component {
             onClick={ () => selectZoom(zoom - 1) }
           >
             <img
-              src={ iconMinus }
+              src={ '/' + (iconMinus) }
             />
           </li>
           <li
@@ -142,7 +142,7 @@ class ControlPanel extends React.Component {
             onClick={ () => selectZoom(zoom + 1) }
           >
             <img
-              src={ iconPlus }
+              src={ '/' + (iconPlus) }
             />
           </li>
         </ul>

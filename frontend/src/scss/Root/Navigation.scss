@@ -1,9 +1,10 @@
 
 .navigation {
-  flex-basis: $line-width * 8;
+  flex-basis: $line-width * 12;
   display: flex;
   pointer-events: auto;
   z-index: 1;
+  justify-content: space-between;
 
   &_link {
     flex-grow: 1;
@@ -12,6 +13,11 @@
 
       &:not(.active) {
         opacity: 0.5;
+      }
+
+      &:hover {
+        opacity: 1;
+        color: $color-accent;
       }
   }
 }

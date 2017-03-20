@@ -1,16 +1,18 @@
 
 import { connect } from 'react-redux'
-import Header from '../../components/Root/Header'
+import JournalPage from '../../components/JournalPage'
 import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
-  const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
+  const projects = state.expeditions.get('projects')
+  const expeditions = state.expeditions.get('expeditions')
+  const modal = state.expeditions.get('modal')
 
   return {
-    expeditionName,
-    currentExpeditionID
+    expeditions,
+    projects,
+    modal
   }
 }
 
@@ -25,9 +27,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-const HeaderContainer = connect(
+const JournalPageContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(Header)
+)(JournalPage)
 
-export default HeaderContainer
+export default JournalPageContainer

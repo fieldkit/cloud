@@ -19,6 +19,7 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 import RootContainer from './containers/Root'
 
 import MapPageContainer from './containers/MapPage'
+import JournalPageContainer from './containers/JournalPage'
 
 import FKApiClient from './api/api.js'
 
@@ -54,8 +55,10 @@ const routes = (
     <Route path=":expeditionID" onEnter={(state) => {
       store.dispatch(actions.requestExpedition(state.params.expeditionID))
     }}>
-      <IndexRoute component={MapPageContainer} />
-      <Route path="map" component={MapPageContainer}/>
+      <IndexRoute component={ MapPageContainer } />
+      <Route path="map" component={ MapPageContainer }/>
+      <Route path="journal" component={ JournalPageContainer }/>
+      <Route path="about" component={ JournalPageContainer }/>
     </Route>
   </Route>
 )
