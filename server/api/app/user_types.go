@@ -114,26 +114,25 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 
 // addInputPayload user type.
 type addInputPayload struct {
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Slug *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Type   *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 }
 
 // Validate validates the addInputPayload type instance.
 func (ut *addInputPayload) Validate() (err error) {
+	if ut.Type == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
-	if ut.Slug == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	if ut.Active == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "active"))
 	}
-	if ut.Slug != nil {
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Slug); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, *ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-		}
-	}
-	if ut.Slug != nil {
-		if utf8.RuneCountInString(*ut.Slug) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, *ut.Slug, utf8.RuneCountInString(*ut.Slug), 40, false))
+	if ut.Type != nil {
+		if !(*ut.Type == "webhook" || *ut.Type == "twitter") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, *ut.Type, []interface{}{"webhook", "twitter"}))
 		}
 	}
 	return
@@ -142,34 +141,36 @@ func (ut *addInputPayload) Validate() (err error) {
 // Publicize creates AddInputPayload from addInputPayload
 func (ut *addInputPayload) Publicize() *AddInputPayload {
 	var pub AddInputPayload
+	if ut.Active != nil {
+		pub.Active = *ut.Active
+	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
-	if ut.Slug != nil {
-		pub.Slug = *ut.Slug
+	if ut.Type != nil {
+		pub.Type = *ut.Type
 	}
 	return &pub
 }
 
 // AddInputPayload user type.
 type AddInputPayload struct {
-	Name string `form:"name" json:"name" xml:"name"`
-	Slug string `form:"slug" json:"slug" xml:"slug"`
+	Active bool   `form:"active" json:"active" xml:"active"`
+	Name   string `form:"name" json:"name" xml:"name"`
+	Type   string `form:"type" json:"type" xml:"type"`
 }
 
 // Validate validates the AddInputPayload type instance.
 func (ut *AddInputPayload) Validate() (err error) {
+	if ut.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
-	if ut.Slug == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
-	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Slug); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-	}
-	if utf8.RuneCountInString(ut.Slug) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, ut.Slug, utf8.RuneCountInString(ut.Slug), 40, false))
+
+	if !(ut.Type == "webhook" || ut.Type == "twitter") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, ut.Type, []interface{}{"webhook", "twitter"}))
 	}
 	return
 }
