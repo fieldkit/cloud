@@ -11,8 +11,6 @@ import { FKApiClient } from '../../api/api';
 
 import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInput, APINewInput } from '../../api/types';
 
-import '../../../css/home.css'
-
 type Props = {
   project: APIProject;
   onProjectUpdate: (newSlug: ?string) => void;
@@ -48,12 +46,12 @@ export class Project extends Component {
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
-    const { project } = this.props;
+    const { match, project } = this.props;
 
     const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
     if (expeditionRes.type === 'ok') {
       await this.loadData();
-      this.props.history.push(`/projects/${project.slug}`);
+      this.props.history.push(match.url);
     } else {
       return expeditionRes.errors;
     }
@@ -77,17 +75,17 @@ export class Project extends Component {
   }
 
   render () {
-    const { project } = this.props;
+    const { match, project } = this.props;
     const projectSlug = project.slug;
 
     return (
       <div className="project">
-        <Route path="/projects/:projectSlug/new-expedition" render={() =>
+        <Route path={`${match.url}/new-expedition`} render={() =>
           <ReactModal isOpen={true} contentLabel="New expedition form">
             <h1>Create a new expedition</h1>
             <ProjectExpeditionForm
               projectSlug={projectSlug}
-              onCancel={() => this.props.history.push(`/projects/${projectSlug}`)}
+              onCancel={() => this.props.history.push(match.url)}
               onSave={this.onExpeditionCreate.bind(this)} />
           </ReactModal> } />
 
@@ -95,12 +93,12 @@ export class Project extends Component {
           <h4>Expeditions</h4>
           { this.state.expeditions.map((e, i) =>
             <div key={`expedition-${i}`} className="expedition-item">
-              <Link to={`/projects/${projectSlug}/expeditions/${e.slug}`}>{e.name}</Link>
+              <Link to={`${match.url}/expeditions/${e.slug}`}>{e.name}</Link>
             </div> )}
           { this.state.expeditions.length === 0 &&
             <span className="empty">No expeditions!</span> }
         </div>
-        <Link to={`/projects/${projectSlug}/new-expedition`}>Show new expedition modal</Link>
+        <Link to={`${match.url}/new-expedition`}>Show new expedition modal</Link>
 
         <h2>Edit project</h2>
         <ProjectForm

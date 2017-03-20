@@ -50,9 +50,11 @@ export class Projects extends Component {
   }
 
   render () {
+    const { match } = this.props;
+
     return (
       <div className="projects">
-        <Route path="/new-project" render={() =>
+        <Route path={`${match.url}/new-project`} render={() =>
           <ReactModal isOpen={true} contentLabel="New project form">
             <h1>Create a new project</h1>
             <ProjectForm
@@ -63,13 +65,13 @@ export class Projects extends Component {
         <div id="projects">
         { this.state.projects.map((p, i) =>
           <div key={`project-${i}`} className="project-item">
-            <Link to={`/projects/${p.slug}`}>{p.name}</Link>
+            <Link to={`${match.url}/projects/${p.slug}`}>{p.name}</Link>
           </div> )}
         { this.state.projects.length === 0 &&
           <span className="empty">No projects!</span> }
         </div>
 
-        <Link to="/new-project">Show new project modal</Link>
+        <Link to={`${match.url}/new-project`}>Show new project modal</Link>
       </div>
     )
   }
