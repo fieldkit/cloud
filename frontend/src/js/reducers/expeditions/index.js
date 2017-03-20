@@ -9,6 +9,10 @@ export const initialState = I.fromJS({
   currentPage: 'map',
   currentExpedition: '',
   playbackMode: 'pause',
+  focus: {
+    type: 'expedition',
+    id: null
+  },
   currentDate: new Date(),
   mousePosition: [-1, -1],
   expeditions: {},
@@ -100,8 +104,13 @@ const expeditionReducer = (state = initialState, action) => {
       const nw = unproject([0, 0])
       const se = unproject([window.innerWidth, window.innerHeight])
       const geoBounds = [nw[0], nw[1], se[0], se[1]]
+
       return state
+        .set('viewport', I.fromJS(action.viewport))
         .setIn(['viewport', 'geoBounds'], geoBounds)
+        .set('playbackMode', action.viewport.isDragging ? 'pause' : state.get('playbackMode'))
+        .setIn(['focus', 'type'], action.viewport.isDragging ? 'manual' : state.getIn(['focus', 'type']))
+        .setIn(['focus', 'id'], null)
         .set('viewport', state.get('viewport')
           .merge(action.viewport))
     }
@@ -112,6 +121,7 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.UPDATE_DATE: {
+      const focus = state.get('focus')
       const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
       const startDate = expedition.get('startDate')
       const endDate = expedition.get('endDate')
@@ -146,8 +156,8 @@ const expeditionReducer = (state = initialState, action) => {
 
       return state
         .set('currentDate', nextDate)
-        .setIn(['viewport', 'longitude'], longitude)
-        .setIn(['viewport', 'latitude'], latitude)
+        .setIn(['viewport', 'longitude'], state.getIn(['focus', 'type']) === 'manual' ? state.getIn(['viewport', 'longitude']) : longitude)
+        .setIn(['viewport', 'latitude'], state.getIn(['focus', 'type']) === 'manual' ? state.getIn(['viewport', 'latitude']) : latitude)
     }
 
     case actions.SELECT_PLAYBACK_MODE: {

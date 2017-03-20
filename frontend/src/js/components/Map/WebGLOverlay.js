@@ -176,6 +176,7 @@ export default class WebGLOverlay extends Component {
                 </points>
               }
               { 
+                false &&
                 !!bufferGeometries.focusParticles &&
                 <points>
                   <bufferGeometry

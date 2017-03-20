@@ -2,6 +2,8 @@
 .navigation {
   flex-basis: $line-width * 8;
   display: flex;
+  pointer-events: auto;
+  z-index: 1;
 
   &_link {
     flex-grow: 1;

@@ -225,11 +225,12 @@ export function initializeDocuments (id, data) {
   }
 }
 
-export function setViewport(viewport) {
+export function setViewport(viewport, manual) {
   return function (dispatch, getState) {
     dispatch({
       type: SET_VIEWPORT,
-      viewport
+      viewport,
+      manual
     })
   }
 }

@@ -9,10 +9,17 @@ class Map extends React.Component {
 
   constructor (props) {
     super(props)
+    this.state = {
+      viewport: {
+        longitude: 0,
+        latitude: 0,
+        zoom: 15
+      }
+    }
     this.tick = this.tick.bind(this)
   }
 
-  tick () {
+  tick (firstFrame) {
     const { currentDate, playbackMode, updateDate } = this.props
     const framesPerSecond = 60
     const dateDelta = 
@@ -22,12 +29,12 @@ class Map extends React.Component {
       playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
-    updateDate(nextDate)
-    requestAnimationFrame(this.tick)
+    if (firstFrame || dateDelta !== 0) updateDate(nextDate)
+    requestAnimationFrame(() => this.tick(false))
   }
 
   componentDidMount () {
-    requestAnimationFrame(this.tick)
+    requestAnimationFrame(() => this.tick(true))
   }
 
   shouldComponentUpdate (nextProps) {
@@ -42,7 +49,7 @@ class Map extends React.Component {
       focusParticles,
       readingParticles,
       readingPath,
-      focusedDocument
+      focusedDocument,
     } = this.props
 
     return (
@@ -51,14 +58,12 @@ class Map extends React.Component {
           { ...viewport }
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          onChangeViewport={viewport => {
-            setViewport(viewport)
-          }}
+          onChangeViewport={ viewport => setViewport(viewport, true) }
         >
           <WebGLOverlay
             { ...viewport }
-            startDragLngLat={[0, 0]}
-            redraw={this.redrawGLOverlay}
+            startDragLngLat={ [0, 0] }
+            redraw={ this.redrawGLOverlay }
             focusParticles={ focusParticles }
             readingParticles={ readingParticles }
             readingPath={ readingPath }

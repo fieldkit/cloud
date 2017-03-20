@@ -8,9 +8,11 @@ const mapStateToProps = (state, ownProps) => {
   // const currentExpeditionID = state.expeditions.get('currentExpedition')
   // const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
   const currentDate = state.expeditions.get('currentDate')
+  const playbackMode = state.expeditions.get('playbackMode')
 
   return {
-    currentDate
+    currentDate,
+    playbackMode
   }
 }
 
