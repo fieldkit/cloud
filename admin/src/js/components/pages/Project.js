@@ -103,6 +103,7 @@ export class Project extends Component {
         <h2>Edit project</h2>
         <ProjectForm
           name={project ? project.name : undefined}
+          slug={project ? project.slug : undefined}
           description={project ? project.description : undefined}
           onSave={this.onProjectSave.bind(this)} />
       </div>
