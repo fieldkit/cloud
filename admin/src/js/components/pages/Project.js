@@ -13,7 +13,8 @@ import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInp
 
 type Props = {
   project: APIProject;
-  onProjectUpdate: (newSlug: ?string) => void;
+  expeditions: APIExpedition[];
+  onUpdate: (newSlug: ?string) => void;
 
   match: Object;
   location: Object;
@@ -22,27 +23,14 @@ type Props = {
 
 export class Project extends Component {
   props: Props;
-  state: {
-    expeditions: APIExpedition[],
-    inputs: APIInput[]
-  }
+  state: {}
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      expeditions: [],
-      inputs: []
+      expeditions: []
     };
-
-    this.loadData();
-  }
-
-  async loadData() {
-    const expeditionsRes = await FKApiClient.get().getExpeditionsByProjectSlug(this.props.project.slug);
-    if (expeditionsRes.type === 'ok' && expeditionsRes.payload) {
-      this.setState({ expeditions: expeditionsRes.payload.expeditions || [] })
-    }
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
@@ -50,8 +38,7 @@ export class Project extends Component {
 
     const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
     if (expeditionRes.type === 'ok') {
-      await this.loadData();
-      this.props.history.push(match.url);
+      this.props.history.push(`${match.url}/expeditions/${e.slug}`);
     } else {
       return expeditionRes.errors;
     }
@@ -61,16 +48,14 @@ export class Project extends Component {
     // TODO: this isn't implemented on the backend yet!
 
     const projectRes = await FKApiClient.get().updateProject(this.props.project.id, project);
-    if (projectRes.type === 'ok') {
-      await this.loadData();
-    } else {
+    if (projectRes.type !== 'ok') {
       return projectRes.errors;
     }
 
     if (projectRes.slug != this.props.project.slug && projectRes.payload) {
-      this.props.onProjectUpdate(projectRes.payload.slug);
+      this.props.onUpdate(projectRes.payload.slug);
     } else {
-      this.props.onProjectUpdate();
+      this.props.onUpdate();
     }
   }
 
@@ -91,11 +76,11 @@ export class Project extends Component {
 
         <div id="expeditions">
           <h4>Expeditions</h4>
-          { this.state.expeditions.map((e, i) =>
+          { this.props.expeditions.map((e, i) =>
             <div key={`expedition-${i}`} className="expedition-item">
               <Link to={`${match.url}/expeditions/${e.slug}`}>{e.name}</Link>
             </div> )}
-          { this.state.expeditions.length === 0 &&
+          { this.props.expeditions.length === 0 &&
             <span className="empty">No expeditions!</span> }
         </div>
         <Link to={`${match.url}/new-expedition`}>Show new expedition modal</Link>

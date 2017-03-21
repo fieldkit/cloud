@@ -7,11 +7,13 @@ import ReactModal from 'react-modal';
 import { ProjectForm } from '../forms/ProjectForm';
 import { FKApiClient } from '../../api/api';
 import { joinPath } from '../../common/util';
-import type { APINewProject } from '../../api/types';
+import type { APIProject, APINewProject } from '../../api/types';
 
 import '../../../css/projects.css'
 
 type Props = {
+  projects: APIProject[],
+
   match: Object;
   location: Object;
   history: Object;
@@ -19,31 +21,10 @@ type Props = {
 
 export class Projects extends Component {
   props: Props;
-  state: {
-    projects: Object[]
-  }
-
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      projects: []
-    };
-
-    this.loadData();
-  }
-
-  async loadData() {
-    const projectsRes = await FKApiClient.get().getProjects();
-    if (projectsRes.type === 'ok' && projectsRes.payload) {
-      this.setState({ projects: projectsRes.payload.projects })
-    }
-  }
 
   async onProjectCreate(p: APINewProject) {
     const project = await FKApiClient.get().createProject(p);
     if (project.type === 'ok') {
-      await this.loadData();
       this.props.history.push("/");
     } else {
       return project.errors;
@@ -51,7 +32,7 @@ export class Projects extends Component {
   }
 
   render () {
-    const { match } = this.props;
+    const { projects, match } = this.props;
 
     return (
       <div className="projects">
@@ -64,11 +45,11 @@ export class Projects extends Component {
           </ReactModal> } />
 
         <div id="projects">
-        { this.state.projects.map((p, i) =>
+        { projects.map((p, i) =>
           <div key={`project-${i}`} className="project-item">
             <Link to={joinPath(match.url, 'projects', p.slug)}>{p.name}</Link>
           </div> )}
-        { this.state.projects.length === 0 &&
+        { projects.length === 0 &&
           <span className="empty">No projects!</span> }
         </div>
 

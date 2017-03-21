@@ -13,7 +13,7 @@ import type { APIProject, APIExpedition, APINewExpedition, APIInput, APINewInput
 type Props = {
   project: APIProject;
   expedition: APIExpedition;
-  onExpeditionUpdate: (newSlug: ?string) => void;
+  onUpdate: (newSlug: ?string) => void;
 
   match: Object;
   location: Object;
@@ -30,9 +30,9 @@ export class Expedition extends Component {
     }
 
     if (expeditionRes.slug != this.props.expedition.slug && expeditionRes.payload) {
-      this.props.onExpeditionUpdate(expeditionRes.payload.slug);
+      this.props.onUpdate(expeditionRes.payload.slug);
     } else {
-      this.props.onExpeditionUpdate();
+      this.props.onUpdate();
     }
   }
 
