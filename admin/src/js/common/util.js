@@ -29,3 +29,11 @@ export function errorsFor(errors: ?APIErrors, key: string) {
 export function slugify(input: string): string {
   return slug(input).toLowerCase();
 }
+
+export function joinPath(basePath: string, ...parts: string[]): string {
+  const nextParts = parts.join('/');
+  if (basePath.endsWith('/')) {
+    basePath = basePath.substr(0, basePath.length - 1);
+  }
+  return `${basePath}/${nextParts}`;
+}

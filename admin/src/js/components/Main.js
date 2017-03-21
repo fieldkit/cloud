@@ -13,6 +13,7 @@ import { Project } from './pages/Project';
 import { Expedition } from './pages/Expedition'
 import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
+import { Profile } from './pages/Profile';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -257,6 +258,11 @@ export class Main extends Component {
                 component={Project}
                 required={[project]}
                 project={project} />
+              <RouteOrLoading
+                path="/profile"
+                component={Profile}
+                required={[user]}
+                project={user} />
 
               <Route path="/" component={Projects} />
             </Switch>
