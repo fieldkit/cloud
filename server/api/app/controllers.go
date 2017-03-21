@@ -401,7 +401,6 @@ func unmarshalAddExpeditionPayload(ctx context.Context, service *goa.Service, re
 // InputController is the controller interface for the Input actions.
 type InputController interface {
 	goa.Muxer
-	GetID(*GetIDInputContext) error
 	List(*ListInputContext) error
 	ListID(*ListIDInputContext) error
 }
@@ -410,26 +409,8 @@ type InputController interface {
 func MountInputController(service *goa.Service, ctrl InputController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/inputs/:input_id", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewGetIDInputContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.GetID(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleInputOrigin(h)
-	service.Mux.Handle("GET", "/inputs/:input_id", ctrl.MuxHandler("GetID", h, nil))
-	service.LogInfo("mount", "ctrl", "Input", "action", "GetID", "route", "GET /inputs/:input_id", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

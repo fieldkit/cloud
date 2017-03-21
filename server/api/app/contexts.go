@@ -489,47 +489,6 @@ func (ctx *ListIDExpeditionContext) BadRequest() error {
 	return nil
 }
 
-// GetIDInputContext provides the input get id action context.
-type GetIDInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-}
-
-// NewGetIDInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller get id action.
-func NewGetIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetIDInputContext) OK(r *Input) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetIDInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // ListInputContext provides the input list action context.
 type ListInputContext struct {
 	context.Context

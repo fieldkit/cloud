@@ -8,14 +8,16 @@ import (
 var TwitterAccount = MediaType("application/vnd.app.twitter_account+json", func() {
 	TypeName("TwitterAccount")
 	Attributes(func() {
-		Attribute("input_id", Integer)
 		Attribute("id", Integer)
+		Attribute("expedition_id", Integer)
+		Attribute("twitter_account_id", Integer)
 		Attribute("screen_name", String)
-		Required("input_id", "id", "screen_name")
+		Required("id", "expedition_id", "twitter_account_id", "screen_name")
 	})
 	View("default", func() {
-		Attribute("input_id")
 		Attribute("id")
+		Attribute("expedition_id")
+		Attribute("twitter_account_id")
 		Attribute("screen_name")
 	})
 })

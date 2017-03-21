@@ -5,49 +5,19 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var Input = MediaType("application/vnd.app.input+json", func() {
-	TypeName("Input")
-	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("expedition_id", Integer)
-		Attribute("team_id", Integer)
-		Attribute("user_id", Integer)
-		Required("id", "expedition_id")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("expedition_id")
-		Attribute("team_id")
-		Attribute("user_id")
-	})
-})
-
 var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 	TypeName("Inputs")
 	Attributes(func() {
-		Attribute("inputs", CollectionOf(Input))
-		Required("inputs")
+		Attribute("twitter_accounts", CollectionOf(TwitterAccount))
 	})
 	View("default", func() {
-		Attribute("inputs")
+		Attribute("twitter_accounts")
 	})
 })
 
 var _ = Resource("input", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
-	})
-
-	Action("get id", func() {
-		Routing(GET("inputs/:input_id"))
-		Description("Add a input")
-		Params(func() {
-			Param("input_id", Integer)
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Input)
-		})
 	})
 
 	Action("list", func() {

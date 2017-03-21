@@ -13,9 +13,10 @@ import (
 
 func TwitterAccountType(twitterAccount *data.TwitterAccount) *app.TwitterAccount {
 	return &app.TwitterAccount{
-		ID:         int(twitterAccount.ID),
-		InputID:    int(twitterAccount.InputID),
-		ScreenName: twitterAccount.ScreenName,
+		ID:               int(twitterAccount.ID),
+		ExpeditionID:     int(twitterAccount.ExpeditionID),
+		TwitterAccountID: int(twitterAccount.TwitterAccountID),
+		ScreenName:       twitterAccount.ScreenName,
 	}
 }
 
@@ -84,7 +85,7 @@ func (c *TwitterController) Add(ctx *app.AddTwitterContext) error {
 
 func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
 	twitterAccount := &data.TwitterAccount{}
-	if err := c.options.Database.GetContext(ctx, twitterAccount, "SELECT ita.input_id, ta.* FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id WHERE ita.input_id = $1", ctx.InputID); err != nil {
+	if err := c.options.Database.GetContext(ctx, twitterAccount, "SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id JOIN fieldkit.input AS i ON i.id = ita.input_id WHERE i.id = $1", ctx.InputID); err != nil {
 		return err
 	}
 
@@ -93,7 +94,7 @@ func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
 
 func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
 	twitterAccounts := []*data.TwitterAccount{}
-	if err := c.options.Database.SelectContext(ctx, &twitterAccounts, "SELECT ita.input_id, ta.* FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id JOIN fieldkit.input AS i ON i.id = ita.input_id WHERE i.expedition_id = $1", ctx.ExpeditionID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &twitterAccounts, "SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id JOIN fieldkit.input AS i ON i.id = ita.input_id WHERE i.expedition_id = $1", ctx.ExpeditionID); err != nil {
 		return err
 	}
 
@@ -102,7 +103,7 @@ func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
 
 func (c *TwitterController) List(ctx *app.ListTwitterContext) error {
 	twitterAccounts := []*data.TwitterAccount{}
-	if err := c.options.Database.SelectContext(ctx, &twitterAccounts, "SELECT ita.input_id, ta.* FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id JOIN fieldkit.input AS i ON i.id = ita.input_id JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Expedition); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &twitterAccounts, "SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret FROM fieldkit.twitter_account AS ta JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id JOIN fieldkit.input AS i ON i.id = ita.input_id JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Expedition); err != nil {
 		return err
 	}
 
@@ -131,18 +132,11 @@ func (c *TwitterController) Callback(ctx *app.CallbackTwitterContext) error {
 		return err
 	}
 
-	twitterAccount := &data.TwitterAccount{
-		ID:           user.ID,
-		ScreenName:   user.ScreenName,
-		AccessToken:  accessToken,
-		AccessSecret: accessSecret,
-	}
-
-	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.twitter_account (id, screen_name, access_token, access_secret) VALUES (:id, :screen_name, :access_token, :access_secret) ON CONFLICT (id) DO UPDATE SET screen_name = :screen_name, access_token = :access_token, access_secret = :access_secret", twitterAccount); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.twitter_account (id, screen_name, access_token, access_secret) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET screen_name = $2, access_token = $3, access_secret = $4", user.ID, user.ScreenName, accessToken, accessSecret); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.input_twitter_account (input_id, twitter_account_id) VALUES ($1, $2) ON CONFLICT (input_id) DO UPDATE SET twitter_account_id = $2", twitterOAuth.InputID, twitterAccount.ID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.input_twitter_account (input_id, twitter_account_id) VALUES ($1, $2) ON CONFLICT (input_id) DO UPDATE SET twitter_account_id = $2", twitterOAuth.InputID, user.ID); err != nil {
 		return err
 	}
 

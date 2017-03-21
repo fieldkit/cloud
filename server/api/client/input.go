@@ -15,39 +15,6 @@ import (
 	"strconv"
 )
 
-// GetIDInputPath computes a request path to the get id action of input.
-func GetIDInputPath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
-
-	return fmt.Sprintf("/inputs/%s", param0)
-}
-
-// Add a input
-func (c *Client) GetIDInput(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetIDInputRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetIDInputRequest create the request corresponding to the get id action endpoint of the input resource.
-func (c *Client) NewGetIDInputRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
-	}
-	return req, nil
-}
-
 // ListInputPath computes a request path to the list action of input.
 func ListInputPath(project string, expedition string) string {
 	param0 := project
