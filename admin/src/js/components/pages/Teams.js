@@ -90,7 +90,7 @@ export class Teams extends Component {
           <ReactModal isOpen={true} contentLabel="Add Members">
             <h1>Add Members</h1>
             <MemberForm
-              team_id={props.match.params.teamId}
+              teamId={props.match.params.teamId}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdding.bind(this)} />
           </ReactModal> } />

@@ -8,18 +8,19 @@ import { errorsFor, slugify } from '../../common/util';
 import type { APIErrors, APINewMember } from '../../api/types';
 
 type Props = {
-  teamId?: number,
+  teamId: number,
 
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (e: APINewMember) => Promise<?APIErrors>; 
+  onSave: (teamId: number, e: APINewMember) => Promise<?APIErrors>; 
 }
 
 export class MemberForm extends Component {
   props: Props;
   state: {
-    member: APINewMember,
+    userId: number,
+    role: string,
     saveDisabled: boolean,
     errors: ?APIErrors
   };
@@ -27,10 +28,8 @@ export class MemberForm extends Component {
   constructor(props: Props) {
     super(props)
     this.state = {
-      member: {
-        user_id: 0,
-        role: ''
-      },
+      userId: 0,
+      role: '',
       saveDisabled: false,
       errors: null
     }
@@ -40,20 +39,17 @@ export class MemberForm extends Component {
 
   componentWillReceiveProps(nextProps: Props) {
     this.setState({
-      member: {
-        user_id: 0,
-        role: ''
-      },
+      userId: 0,
+      role: '',
       saveDisabled: false,
       errors: null
     });
   }
 
   async save() {
-    console.log(this.state.member);
     const errors = await this.props.onSave(this.props.teamId, {
-      user_id: this.state.member.user_id,
-      role: this.state.member.role
+      user_id: parseInt(this.state.userId),
+      role: this.state.role
     });
     if (errors) {
       this.setState({ errors });
@@ -74,11 +70,11 @@ export class MemberForm extends Component {
 
   render () {
     const users = [
-        {user_id: 1234, name: 'adjany', username: 'adjany', avatar_url: 'img/test.png'},
-        {user_id: 1235, name: 'steve', username: 'steve', avatar_url: 'img/test.png'},
-        {user_id: 1236, name: 'jer', username: 'jer', avatar_url: 'img/test.png'},
-        {user_id: 1237, name: 'chris', username: 'chris', avatar_url: 'img/test.png'},
-        {user_id: 1238, name: 'john', username: 'john', avatar_url: 'img/test.png'}
+        {userId: 1234, name: 'adjany', username: 'adjany', avatar_url: 'img/test.png'},
+        {userId: 1235, name: 'steve', username: 'steve', avatar_url: 'img/test.png'},
+        {userId: 1236, name: 'jer', username: 'jer', avatar_url: 'img/test.png'},
+        {userId: 1237, name: 'chris', username: 'chris', avatar_url: 'img/test.png'},
+        {userId: 1238, name: 'john', username: 'john', avatar_url: 'img/test.png'}
       ];
 
     return (
@@ -89,21 +85,21 @@ export class MemberForm extends Component {
         cancelText={this.props.cancelText}>
 
         <div className="form-group">
-          <label htmlFor="member">Member</label>
-          <select name="member" value={this.state.member.user_id} onChange={this.handleInputChange.bind(this)}>
-            <option value={null}>Select a user</option>) }
+          <label htmlFor="userId">Member</label>
+          <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
+            <option value={null}>Select a user</option>
             { users.map((user, i) => 
-              <option key={i} value={user.user_id}>{user.username}</option>) }
+              <option key={i} value={user.userId}>{user.username}</option>) }
           </select>
-          { errorsFor(this.state.errors, 'member') }          
+          { errorsFor(this.state.errors, 'userId') }          
         </div>
 
         <div className="form-group">
           <label htmlFor="role">Role</label>
-          <input type="text" name="role" className="lg" value={this.state.member.role} onChange={this.handleInputChange.bind(this)} />
+          <input type="text" name="role" className="lg" value={this.state.role} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'role') }
-        </div>        
-      </FormContainer>      
+        </div>
+      </FormContainer>
     )
   }
 }  
