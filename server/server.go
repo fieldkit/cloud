@@ -29,6 +29,10 @@ var flagConfig struct {
 	adminPath, frontendPath string
 	emailer                 string
 	sessionKey              string
+	twitter                 struct {
+		ConsumerKey    string
+		ConsumerSecret string
+	}
 }
 
 func init() {
@@ -38,6 +42,8 @@ func init() {
 	flag.StringVar(&flagConfig.frontendPath, "frontend", "", "frontend path")
 	flag.StringVar(&flagConfig.emailer, "emailer", "default", "emailer: default, aws")
 	flag.StringVar(&flagConfig.sessionKey, "session-key", "", "base64-encoded HMAC key")
+	flag.StringVar(&flagConfig.twitter.ConsumerKey, "twitter-consumer-key", "", "")
+	flag.StringVar(&flagConfig.twitter.ConsumerSecret, "twitter-consumer-secret", "", "")
 }
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
@@ -192,6 +198,14 @@ func main() {
 		Database: database,
 	})
 	app.MountInputController(service, c8)
+
+	// Mount "twitter" controller
+	c9 := api.NewTwitterController(service, api.TwitterControllerOptions{
+		Database:       database,
+		ConsumerKey:    flagConfig.twitter.ConsumerKey,
+		ConsumerSecret: flagConfig.twitter.ConsumerSecret,
+	})
+	app.MountTwitterController(service, c9)
 
 	// Start service
 	if err := service.ListenAndServe(flagConfig.addr); err != nil {

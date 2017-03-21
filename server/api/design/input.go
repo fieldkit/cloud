@@ -5,32 +5,20 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var AddInputPayload = Type("AddInputPayload", func() {
-	Attribute("type", String, func() {
-		Enum("webhook", "twitter")
-	})
-	Attribute("name", String)
-	Attribute("active", Boolean)
-	Required("type", "name", "active")
-})
-
 var Input = MediaType("application/vnd.app.input+json", func() {
 	TypeName("Input")
-	Reference(AddInputPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("expedition_id", Integer)
-		Attribute("type")
-		Attribute("name")
-		Attribute("active")
-		Required("id", "expedition_id", "type", "name", "active")
+		Attribute("team_id", Integer)
+		Attribute("user_id", Integer)
+		Required("id", "expedition_id")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
-		Attribute("type")
-		Attribute("name")
-		Attribute("active")
+		Attribute("team_id")
+		Attribute("user_id")
 	})
 })
 
@@ -48,42 +36,6 @@ var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 var _ = Resource("input", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
-	})
-
-	Action("add", func() {
-		Routing(POST("expedition/:expedition_id/input"))
-		Description("Add a input")
-		Params(func() {
-			Param("expedition_id", Integer)
-		})
-		Payload(AddInputPayload)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Input)
-		})
-	})
-
-	Action("get", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/@/:input"))
-		Description("Add a input")
-		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Expedition slug")
-			})
-			Param("input", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Input slug")
-			})
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Input)
-		})
 	})
 
 	Action("get id", func() {
@@ -118,7 +70,7 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("expedition/:expedition_id/inputs"))
+		Routing(GET("expeditions/:expedition_id/inputs"))
 		Description("List a project's inputs")
 		Params(func() {
 			Param("expedition_id", Integer)

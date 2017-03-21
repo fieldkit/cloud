@@ -167,7 +167,7 @@ func ListMemberPath(project string, expedition string, team string) string {
 	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams/@/%s/members", param0, param1, param2)
 }
 
-// List an teams's members
+// List an team's members
 func (c *Client) ListMember(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListMemberRequest(ctx, path)
 	if err != nil {

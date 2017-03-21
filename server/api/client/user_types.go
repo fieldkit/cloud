@@ -112,69 +112,6 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	return
 }
 
-// addInputPayload user type.
-type addInputPayload struct {
-	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Type   *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
-}
-
-// Validate validates the addInputPayload type instance.
-func (ut *addInputPayload) Validate() (err error) {
-	if ut.Type == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
-	}
-	if ut.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	if ut.Active == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "active"))
-	}
-	if ut.Type != nil {
-		if !(*ut.Type == "webhook" || *ut.Type == "twitter") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, *ut.Type, []interface{}{"webhook", "twitter"}))
-		}
-	}
-	return
-}
-
-// Publicize creates AddInputPayload from addInputPayload
-func (ut *addInputPayload) Publicize() *AddInputPayload {
-	var pub AddInputPayload
-	if ut.Active != nil {
-		pub.Active = *ut.Active
-	}
-	if ut.Name != nil {
-		pub.Name = *ut.Name
-	}
-	if ut.Type != nil {
-		pub.Type = *ut.Type
-	}
-	return &pub
-}
-
-// AddInputPayload user type.
-type AddInputPayload struct {
-	Active bool   `form:"active" json:"active" xml:"active"`
-	Name   string `form:"name" json:"name" xml:"name"`
-	Type   string `form:"type" json:"type" xml:"type"`
-}
-
-// Validate validates the AddInputPayload type instance.
-func (ut *AddInputPayload) Validate() (err error) {
-	if ut.Type == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
-	}
-	if ut.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-
-	if !(ut.Type == "webhook" || ut.Type == "twitter") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, ut.Type, []interface{}{"webhook", "twitter"}))
-	}
-	return
-}
-
 // addMemberPayload user type.
 type addMemberPayload struct {
 	Role   *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`

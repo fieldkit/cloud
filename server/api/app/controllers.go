@@ -401,8 +401,6 @@ func unmarshalAddExpeditionPayload(ctx context.Context, service *goa.Service, re
 // InputController is the controller interface for the Input actions.
 type InputController interface {
 	goa.Muxer
-	Add(*AddInputContext) error
-	Get(*GetInputContext) error
 	GetID(*GetIDInputContext) error
 	List(*ListInputContext) error
 	ListID(*ListIDInputContext) error
@@ -412,51 +410,9 @@ type InputController interface {
 func MountInputController(service *goa.Service, ctrl InputController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/expedition/:expedition_id/input", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/@/:input", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/:input_id", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/expedition/:expedition_id/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewAddInputContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*AddInputPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Add(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleInputOrigin(h)
-	service.Mux.Handle("POST", "/expedition/:expedition_id/input", ctrl.MuxHandler("Add", h, unmarshalAddInputPayload))
-	service.LogInfo("mount", "ctrl", "Input", "action", "Add", "route", "POST /expedition/:expedition_id/input", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewGetInputContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.Get(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleInputOrigin(h)
-	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/inputs/@/:input", ctrl.MuxHandler("Get", h, nil))
-	service.LogInfo("mount", "ctrl", "Input", "action", "Get", "route", "GET /projects/@/:project/expeditions/@/:expedition/inputs/@/:input", "security", "jwt")
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -506,8 +462,8 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleInputOrigin(h)
-	service.Mux.Handle("GET", "/expedition/:expedition_id/inputs", ctrl.MuxHandler("ListID", h, nil))
-	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /expedition/:expedition_id/inputs", "security", "jwt")
+	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs", "security", "jwt")
 }
 
 // handleInputOrigin applies the CORS response headers corresponding to the origin.
@@ -561,21 +517,6 @@ func handleInputOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
-}
-
-// unmarshalAddInputPayload unmarshals the request body into the context request data Payload field.
-func unmarshalAddInputPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &addInputPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
 }
 
 // MemberController is the controller interface for the Member actions.
@@ -1221,6 +1162,164 @@ func unmarshalAddTeamPayload(ctx context.Context, service *goa.Service, req *htt
 	}
 	goa.ContextRequest(ctx).Payload = payload.Publicize()
 	return nil
+}
+
+// TwitterController is the controller interface for the Twitter actions.
+type TwitterController interface {
+	goa.Muxer
+	Add(*AddTwitterContext) error
+	Callback(*CallbackTwitterContext) error
+	GetID(*GetIDTwitterContext) error
+	List(*ListTwitterContext) error
+	ListID(*ListIDTwitterContext) error
+}
+
+// MountTwitterController "mounts" a Twitter resource controller on the given service.
+func MountTwitterController(service *goa.Service, ctrl TwitterController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/twitter-account", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/twitter/callback", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/twitter-accounts/:input_id", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/twitter-account", ctrl.MuxHandler("Add", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/twitter-account", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewCallbackTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Callback(rctx)
+	}
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("GET", "/twitter/callback", ctrl.MuxHandler("Callback", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "Callback", "route", "GET /twitter/callback")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetIDTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("GET", "/inputs/twitter-accounts/:input_id", ctrl.MuxHandler("GetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "GetID", "route", "GET /inputs/twitter-accounts/:input_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListIDTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("ListID", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs/twitter-accounts", "security", "jwt")
+}
+
+// handleTwitterOrigin applies the CORS response headers corresponding to the origin.
+func handleTwitterOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
 }
 
 // UserController is the controller interface for the User actions.
