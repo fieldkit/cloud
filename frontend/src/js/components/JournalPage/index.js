@@ -1,26 +1,57 @@
 
+import ControlPanelContainer from '../../containers/common/ControlPanelContainer'
+import Post from './Post'
 import React, { PropTypes } from 'react'
 
-class MapPage extends React.Component {
+class JournalPage extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
+  shouldComponentUpdate (props) {
+    return this.props.documents.size === 0
   }
 
   render () {
+    const {
+      documents,
+      currentExpeditionID,
+      updateDate
+    } = this.props
+
     return (
-      <div className="map-page page">
-        Journal page !
+      <div className="journal-page page">
+        <div
+          className="journal-page_map-overlay"
+        />
+        <ControlPanelContainer/>
+        <div
+          className="journal-page_content"
+        >
+          <ul className="journal-page_content_posts">
+            {
+              documents.map(d => {
+                return (
+                  <li
+                    className="journal-page_content_posts_post"
+                    key={ 'post-' + d.get('id') }
+                  >
+                    <Post
+                      data={ d }
+                      currentExpeditionID={ currentExpeditionID }
+                      updateDate={ updateDate }
+                    />
+                  </li>
+                )
+              })
+            }
+          </ul>
+        </div>
       </div>
     )
   }
 
 }
 
-MapPage.propTypes = {
+JournalPage.propTypes = {
 
 }
 
-export default MapPage
+export default JournalPage

@@ -12,19 +12,26 @@ export default class Root extends React.Component {
   render () {
     const {
       expeditionFetching,
-      documentsFetching
+      documentsFetching,
+      currentExpedition
     } = this.props
+
+    const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpedition)[0] || 'map'
 
     return (
       <div
         className="root"
-        onMouseMove={ (e) => {
+        onMouseMove={(e) => {
           const x = e.nativeEvent.clientX
           const y = e.nativeEvent.clientY
-          this.props.setMousePosition(x, y)
+          if (currentPage === 'map') {
+            this.props.setMousePosition(x, y)
+          }
         }}
         onMouseOut={ () => {
-          this.props.setMousePosition(-1, -1)
+          if (currentPage === 'map') {
+            this.props.setMousePosition(-1, -1)
+          }
         }}
       >
         { !expeditionFetching && !documentsFetching &&

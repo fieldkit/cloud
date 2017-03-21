@@ -5,24 +5,24 @@ import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
+  const currentExpeditionID = state.expeditions.get('currentExpedition')
   const projects = state.expeditions.get('projects')
   const expeditions = state.expeditions.get('expeditions')
-  const modal = state.expeditions.get('modal')
+  const documents = state.expeditions.get('currentDocuments')
+    .map(id => state.expeditions.getIn(['documents', id]))
 
   return {
     expeditions,
     projects,
-    modal
+    documents,
+    currentExpeditionID
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    saveChangesAndResume () {
-      return dispatch(actions.saveChangesAndResume())
-    },
-    cancelAction () {
-      return dispatch(actions.cancelAction())
+    updateDate (date, playbackMode) {
+      return dispatch(actions.updateDate(date, playbackMode))
     }
   }
 }

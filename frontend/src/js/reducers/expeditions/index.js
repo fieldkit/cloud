@@ -217,6 +217,7 @@ const expeditionReducer = (state = initialState, action) => {
       return state
         .set('currentDate', nextDate)
         .update('viewport', viewport => updateViewport(state, nextDate, null))
+        .update('playbackMode', playbackMode => action.playbackMode || playbackMode)
     }
 
     case actions.SELECT_PLAYBACK_MODE: {

@@ -1,0 +1,45 @@
+
+.post {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $line-height * 4;
+
+  &_type {
+    flex-basis: $line-width * 2;
+    margin-right: $line-width * 2;
+  }
+
+  &_main {
+    flex-grow: 1;
+
+    &_content {
+
+    }
+
+    &_meta {
+      margin-top: $line-height;
+      display: flex;
+
+      &_geo {
+        margin: 0 $line-width;
+
+        img {
+          vertical-align: middle;
+        }
+      }
+
+      &_separator {
+        background-color: white;
+        flex-grow: 1;
+        height: 1px;
+        align-self: center;
+      }
+    }
+  }
+  &_actions {
+    flex-basis: $line-width * 2;
+    margin-left: $line-width * 2;
+  }
+  
+}

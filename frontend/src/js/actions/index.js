@@ -237,11 +237,12 @@ export function setViewport(viewport, manual) {
   }
 }
 
-export function updateDate (date) {
+export function updateDate (date, playbackMode) {
   return function (dispatch, getState) {
     dispatch({
       type: UPDATE_DATE,
-      date
+      date,
+      playbackMode
     })
   }
 }
