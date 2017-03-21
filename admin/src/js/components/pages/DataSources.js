@@ -91,7 +91,7 @@ export class DataSources extends Component {
     }
   }
 
-  async onInputCreate(i: APINewInput) {
+  async onInputCreate(_inputId: ?number, i: APINewInput) {
     const { match, expedition } = this.props;
 
     const inputRes = await FKApiClient.get().createInput(expedition.id, i);
@@ -143,7 +143,7 @@ export class DataSources extends Component {
               input={this.state.inputs.find(i => i.id == props.match.params.inputId)}
               projectSlug={projectSlug}
               onCancel={() => this.props.history.push(match.url)}
-              onSave={(i) => this.onInputSave(this.editingInputId(), i)} />
+              onSave={this.onInputSave.bind(this)} />
           </ReactModal> } />
 
         <h1>Data Sources</h1>

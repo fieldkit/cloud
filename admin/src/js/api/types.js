@@ -24,30 +24,44 @@ export type APIUsers = {
   users: APIUser[]
 }
 
-export type APINewProject = {|
+// TODO: not officially the API spec, revise when it's there
+export type APIUserProfile = {
+  ...$Exact<APIUser>;
+  name: string;
+  bio: string;
+  email: string;
+  profile_picture: string;
+}
+
+// TODO: not officially the API spec, revise when it's there
+export type APIPasswordChange = {
+  newPassword: string;
+};
+
+export type APINewProject = {
   name: string;
   slug: string;
   description: string;
-|}
+  }
 
 export type APIProject = {
   id: number;
-  ...APINewProject;
+  ...$Exact<APINewProject>;
 };
 
 export type APIProjects = {
   projects: APIProject[];
 }
 
-export type APINewExpedition = {|
+export type APINewExpedition = {
   name: string;
   slug: string;
   description: string;
-|}
+};
 
 export type APIExpedition = {
   id: number;
-  ...APINewExpedition;
+  ...$Exact<APINewExpedition>;
 };
 
 export type APIExpeditions = {
@@ -72,42 +86,42 @@ export type APIInputs = {
   inputs: APIInput[]
 }
 
-export type APINewTeam = {|
+export type APINewTeam = {
   name: string;
   slug: string;
   description: string;
-|}
+};
 
 export type APITeam = {
   id: string;
-  ...APINewTeam;
+  ...$Exact<APINewTeam>;
 };
 
 export type APITeams = {
   teams: APITeam[]
 }
 
-export type APINewAdministrator = {|
+export type APINewAdministrator = {
   user_id: number;
-|};
+};
 
 export type APIAdministrator = {
   project_id: number;
-  ...APINewAdministrator;
+  ...$Exact<APINewAdministrator>;
 };
 
 export type APIAdministrators = {
   administrators: APIAdministrator[]
 }
 
-export type APINewMember = {|
+export type APINewMember = {
   user_id: number;
   role: string;
-|};
+};
 
 export type APIMember = {
   team_id: number;
-   ...APINewMember;
+   ...$Exact<APINewMember>;
 };
 
 export type APIMembers = {

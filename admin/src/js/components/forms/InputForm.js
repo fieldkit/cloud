@@ -14,7 +14,7 @@ type Props = {
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (i: APINewInput) => Promise<?APIErrors>;
+  onSave: (inputId: ?number, i: APINewInput) => Promise<?APIErrors>;
 }
 
 const INPUT_TYPES = [
@@ -56,7 +56,9 @@ export class InputForm extends Component {
   }
 
   async save() {
-    const errors = await this.props.onSave({
+    const inputId = this.props.input ? this.props.input.id : undefined;
+
+    const errors = await this.props.onSave(inputId, {
       name: this.state.name,
       type: this.state.type,
       active: this.state.active

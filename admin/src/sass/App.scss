@@ -3,23 +3,23 @@
 //-------------------- RESPONSIVE --------------------//
 
 @mixin for-phone-down {
-	@media (max-width: 600px) { @content; }
+  @media (max-width: 600px) { @content; }
 }
 
 @mixin for-tablet-portrait-down {
-	@media (max-width: 900px) { @content; }
+  @media (max-width: 900px) { @content; }
 }
 
 @mixin for-tablet-landscape-down {
-	@media (max-width: 1200px) { @content; }
+  @media (max-width: 1200px) { @content; }
 }
 
 @mixin for-desktop-down {
-	@media (max-width: 1799px) { @content; }
+  @media (max-width: 1799px) { @content; }
 }
 
 @mixin for-big-desktop-only {
-	@media (min-width: 1800px) { @content; }
+  @media (min-width: 1800px) { @content; }
 }
 
 //---------------------- LAYOUT ----------------------//
@@ -30,24 +30,24 @@ $elements-padding: $baseline-height;
 
 // Columns
 .column {
-	display: inline-block;
-	vertical-align: top;
-	&:not(:first-child) {
-		margin-left: $col-gutter;
-	}
+  display: inline-block;
+  vertical-align: top;
+  &:not(:first-child) {
+    margin-left: $col-gutter;
+  }
 }
 @mixin one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
 @mixin two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
 @mixin three-columns  { width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
 @mixin four-columns   { width: 100%; }
 
-// Main 
+// Main
 @mixin content-width {
-	width: 834px;
-	margin: auto;
-	@include for-tablet-portrait-down {
-		width: calc(100% - #{$col-gutter}*2);
-	}
+  width: 834px;
+  margin: auto;
+  @include for-tablet-portrait-down {
+    width: calc(100% - #{$col-gutter}*2);
+  }
 }
 
 //---------------------- COLOR -----------------------//
@@ -70,177 +70,190 @@ $font-sans: Helvetica, Arial, sans-serif;
 
 // Styles
 @mixin type-h1 {
-	font-size: 36px;
-	line-height: $baseline-height*4;
-	font-family: $font-sans;
-	font-weight: light;
+  font-size: 36px;
+  line-height: $baseline-height*4;
+  font-family: $font-sans;
+  font-weight: light;
 
-	@include for-phone-down {
-		// font-size: 21px;
-		// line-height: 26px;          
-	} 
+  @include for-phone-down {
+    // font-size: 21px;
+    // line-height: 26px;
+  }
 }
 
 @mixin type-h2 {
-	font-size: 30px;
-	line-height: $baseline-height*3;
-	font-family: $font-sans;
-	font-weight: bold;
+  font-size: 30px;
+  line-height: $baseline-height*3;
+  font-family: $font-sans;
+  font-weight: bold;
 
-	@include for-phone-down {
-		// font-size: 16px;
-		// line-height: 21px;
-	}
+  @include for-phone-down {
+    // font-size: 16px;
+    // line-height: 21px;
+  }
 }
 
 @mixin type-h3 {
-	font-size: 16px;
-	line-height: $baseline-height*2;
-	font-family: $font-sans;
-	// font-weight: 900;
-	text-transform: uppercase;
-	letter-spacing: 2px;
+  font-size: 16px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
+  // font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 @mixin type-h4 {
-	font-size: 16px;
-	line-height: $baseline-height*2;
-	font-family: $font-sans;
-	font-weight: bold;
+  font-size: 16px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
+  font-weight: bold;
 }
 
 @mixin type-intro {
-	font-size: 16px;
-	line-height: $baseline-height*2;
-	font-family: $font-sans;
+  font-size: 16px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
 }
 
 @mixin type-body-1 {
-	font-size: 16px;
-	line-height: $baseline-height*1.5;
-	font-family: $font-sans;
+  font-size: 16px;
+  line-height: $baseline-height*1.5;
+  font-family: $font-sans;
 }
 
 @mixin type-body-2 {
-	@include type-body-1;
-	font-weight: bold;
+  @include type-body-1;
+  font-weight: bold;
 }
 
 @mixin type-small {
-	font-size: 12px;
-	line-height: $baseline-height*1.5;
-	font-family: $font-sans;
+  font-size: 12px;
+  line-height: $baseline-height*1.5;
+  font-family: $font-sans;
 }
 
 @mixin type-button {
-	font-size: 10px;
-	line-height: $baseline-height*2.5;
-	font-family: $font-sans;
-	font-weight: bold;
-	text-transform: uppercase;
-	letter-spacing: 1px;
+  font-size: 10px;
+  line-height: $baseline-height*2.5;
+  font-family: $font-sans;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 
 //-------------------- INTERACTION --------------------//
 @mixin button ($primary: true){
-	display: inline-block;
-	padding: 0 $elements-padding;
-	border-radius: 3px;
-	border: 2px solid $color-2;
-	@include type-button;
+  display: inline-block;
+  padding: 0 $elements-padding;
+  border-radius: 3px;
+  border: 2px solid $color-2;
+  @include type-button;
 
-	&:not(:last-child) {
-		margin-right: $elements-margin;
-	}
+  &:not(:last-child) {
+    margin-right: $elements-margin;
+  }
 
-	// &:not(:first-child) {
-	// 	margin-left: $elements-margin;
-	// }
+  // &:not(:first-child) {
+  //   margin-left: $elements-margin;
+  // }
 
-	@if $primary {
-		color: white;
-		background-color: $color-2;
+  @if $primary {
+    color: white;
+    background-color: $color-2;
 
-		&:hover {
-			background-color: $color-1;
-		}
+    &:hover {
+      background-color: $color-1;
+    }
 
-		&:active {
+    &:active {
 
-		}
+    }
 
-		&:disabled {
-			background-color: $color-6;
-		}
+    &:disabled {
+      background-color: $color-6;
+    }
 
-	} @else {
-		color: $color-2;
-		background-color: white;
+  } @else {
+    color: $color-2;
+    background-color: white;
 
-		&:hover {
-			border-color: $color-1;
-		}
+    &:hover {
+      border-color: $color-1;
+    }
 
-		&:active {
-			
-		}
+    &:active {
 
-		&:disabled {
-			
-		}
-	}
+    }
+
+    &:disabled {
+
+    }
+  }
 }
 
 @mixin form {
-	display: inline-block;
-	padding: 0 $elements-padding/2;
-	color: $gray-2;
-	background-color: white;
-	border: 2px solid $gray-3; 
-	border-radius: 3px;
-	@include type-body-1;
-	line-height: $baseline-height*2.5;
+  display: inline-block;
+  padding: 0 $elements-padding/2;
+  color: $gray-2;
+  background-color: white;
+  border: 2px solid $gray-3;
+  border-radius: 3px;
+  @include type-body-1;
+  line-height: $baseline-height*2.5;
 
-	&:not(:last-child) {
-		margin-right: $elements-margin;
-	}
+  &:not(:last-child) {
+    margin-right: $elements-margin;
+  }
 
-	// &:not(:first-child) {
-	// 	margin-left: $elements-margin;
-	// }
+  // &:not(:first-child) {
+  //   margin-left: $elements-margin;
+  // }
 
-	&:focus {
-		border-color: $gray-2;
-	}
+  &:focus {
+    border-color: $gray-2;
+  }
 
-	&:disabled {
-		// color: $gray-3;
-	}
+  &:disabled {
+    // color: $gray-3;
+  }
 
-	&::placeholder {
-		color: $gray-3;
-	}
+  &::placeholder {
+    color: $gray-3;
+  }
 }
 
 //-------------------- ALIGN --------------------//
 .alignXY {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .alignX {
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .alignY {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// -------------------- DROPDOWN GENERIC --------------------//
+
+.dropdown {
+  display: inline-block;
+}
+.dropdown__content {
+  display: none;
+  position: absolute;
+}
+.dropdown--active .dropdown__content {
+  display: block;
 }
 
 //-------------------- STYLES --------------------//
@@ -251,159 +264,198 @@ $font-sans: Helvetica, Arial, sans-serif;
 }
 
 *:focus {
-	outline: none;
+  outline: none;
 }
 
 html, body {
-	width: 100%;
-	min-height: 100%;	
-	color: $gray-2;
-	@include type-body-1;
-	text-align: left;
+  width: 100%;
+  min-height: 100%;
+  color: $gray-2;
+  @include type-body-1;
+  text-align: left;
 }
 
 html {
-	height: 100%;
+  height: 100%;
 }
 
 h1 {
-	@include type-h1;
+  @include type-h1;
 }
 
 h2 {
-	@include type-h2;
+  @include type-h2;
 }
 
 h3 {
-	@include type-h3;
+  @include type-h3;
 }
 
 h4 {
-	@include type-h4;
+  @include type-h4;
 }
 
-button, .button {
-	// Primary button
-	&:not(.bt-icon){
-		@include button();
-	}
+button {
+  // Primary button
+  &:not(.bt-icon){
+    @include button();
+  }
 
-	// Secondary button
-	&.cancel,
-	&.secondary {
-		@include button(false);	
-	}
-}
+  // Secondary button
+  &.cancel {
+    @include button(false);
+    &.secondary {
+      @include button(false); 
+    }    
+  }
 
-// Icon button
-.bt-icon {
-	display: inline-block;
-	border: none;
-	background-color: Transparent;
-	background-repeat: no-repeat;
-	background-position: center center;
-	margin: 0 $elements-margin/2;
-	width: $baseline-height;
-	height: $baseline-height;	
+  // Icon button
+  &.bt-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: none;
+    background-color: Transparent;
+    background-repeat: none;
 
-	&.medium {
-		width: $baseline-height*1.5;
-		height: $baseline-height*1.5;
-	}	
-
-	&.edit 			{ background-image: url('../img/icons/icon-edit-small.png'); }
-	&.remove 		{ background-image: url('../img/icons/icon-remove-small.png'); }
-	&.new-window 	{ background-image: url('../img/icons/icon-new-window-small.png'); }
-	&.settings 		{ background-image: url('../img/icons/icon-settings-medium.png'); }
+    &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
+    &.remove   { background-image: url('../img/icons/icon-remove-small.png'); }
+  }
 }
 
 input[type="submit"] {
-	@include button();
+  @include button();
 }
 
 input[type="text"], input[type="email"], input[type="password"], input[type="username"] {
-	@include form;
+  @include form;
 }
 
 label {
-	@include type-body-2;
-	display: block;
-	margin-bottom: $baseline-height/2;
+  @include type-body-2;
+  display: block;
+  margin-bottom: $baseline-height/2;
 }
 
 .form-group, .url-preview {
-	display: block;
-	margin-bottom: $baseline-height*1.5;
+  display: block;
+  margin-bottom: $baseline-height*1.5;
 }
 
 table {
-	thead, tbody {
-		tr {
-			th, td {
-				vertical-align: middle;
-			}
-		}
-	}
+  thead, tbody {
+    tr {
+      th, td {
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.account-dropdown {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 75px;
+  height: 75px;
+  cursor: pointer;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .dropdown-contents {
+    left: auto;
+    right: 0;
+
+    white-space: nowrap;
+
+    margin-top: 5px;
+    padding: 10px;
+
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.10);
+
+    strong {
+      font-weight: bold;
+    }
+
+    .header {
+      margin-bottom: 5px;
+    }
+
+    ul {
+      list-style-type: none;
+
+      li {
+        margin: 5px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
 }
 
 .teams-table, .data-sources-table {
-	text-align: left;
-	margin-bottom: $baseline-height*1.5;
+  text-align: left;
+  margin-bottom: $baseline-height*1.5;
 
-	tbody {
-		tr {
-			td {
-				@include type-h4;
-			}
-		}
-	}
+  tbody {
+    tr {
+      td {
+        @include type-h4;
+      }
+    }
+  }
 }
 
 .teams-table {
 
-	.members-table {
+  .members-table {
 
-		// width: 100%;
-		width: 900px;
-		margin-bottom: $baseline-height*1.5;
+    // width: 100%;
+    width: 900px;
+    margin-bottom: $baseline-height*1.5;
 
-		th, tr {
-			height: $baseline-height*4;
-		}
+    th, tr {
+      height: $baseline-height*4;
+    }
 
-		thead {
-			background-color: $gray-4;
-			tr {
-				border-bottom: 1px solid $gray-3;				
-				th:first-child {
-					border-top-left-radius: 3px;
-				}
-				th:last-child {
-					border-top-right-radius: 3px;
-				}
-			}
-		}
+    thead {
+      background-color: $gray-4;
+      tr {
+        border-bottom: 1px solid $gray-3;
+        th:first-child {
+          border-top-left-radius: 3px;
+        }
+        th:last-child {
+          border-top-right-radius: 3px;
+        }
+      }
+    }
 
-		tbody {
-			tr {
-				td{
-					&:first-child {
-						width: calc(44px + #{$elements-padding});
-					}
-					&:not(:first-child){
-						border-top: 1px solid $gray-3;
-						@include type-small;
-					}					
-					.user-avatar {
-						width: 40px;
-						height: 40px;
-						border-radius: 22px;
-						background-color: $gray-3;
-						margin: 4px 0;
-					}
-				}
-			}
-		}
-	}
+    tbody {
+      tr {
+        td{
+          &:first-child {
+            width: calc(44px + #{$elements-padding});
+          }
+          &:not(:first-child){
+            border-top: 1px solid $gray-3;
+            @include type-small;
+          }
+          .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 22px;
+            background-color: $gray-3;
+            margin: 4px 0;
+          }
+        }
+      }
+    }
+  }
 }
-

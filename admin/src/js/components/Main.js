@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
+import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
@@ -12,6 +13,7 @@ import { Project } from './pages/Project';
 import { Expedition } from './pages/Expedition'
 import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
+import { Profile } from './pages/Profile';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
@@ -151,12 +153,17 @@ export class Main extends Component {
     }
   }
 
+  handleLinkClick() {
+    this.refs.dropdown.hide();
+  }
+
   render() {
     if (this.state.redirectTo) {
       return <Redirect to={this.state.redirectTo} />;
     }
 
     const {
+      user,
       project,
       expedition
     } = this.state;
@@ -211,9 +218,20 @@ export class Main extends Component {
             <div className="breadcrumbs">
               { breadcrumbs.length > 0 && breadcrumbs.reduce((prev, curr) => [prev, ' / ', curr]) }
             </div>
-            <div className="profile-image">
-              <img src={placeholderImage} alt="profile" />
-            </div>
+            <Dropdown className="account-dropdown" ref="dropdown">
+              <DropdownTrigger className="trigger">
+                <img src={placeholderImage} alt="profile" />
+              </DropdownTrigger>
+              <DropdownContent className="dropdown-contents">
+                <div className="header">
+                  Signed in as <strong>{user ? user.username : ''}</strong>
+                </div>
+                <ul>
+                  <li><Link to="/profile" onClick={this.handleLinkClick.bind(this)}>Profile</Link></li>
+                  <li><Link to="/logout">Logout</Link></li>
+                </ul>
+              </DropdownContent>
+            </Dropdown>
           </div>
 
           <div className="contents">
@@ -241,6 +259,11 @@ export class Main extends Component {
                 component={Project}
                 required={[project]}
                 project={project} />
+              <RouteOrLoading
+                path="/profile"
+                component={Profile}
+                required={[user]}
+                project={user} />
 
               <Route path="/" component={Projects} />
             </Switch>
