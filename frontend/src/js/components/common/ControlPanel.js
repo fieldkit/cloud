@@ -10,6 +10,7 @@ class ControlPanel extends React.Component {
   render () {
 
     const { 
+      currentExpeditionID,
       currentDate,
       playbackMode,
       focus,
@@ -19,23 +20,30 @@ class ControlPanel extends React.Component {
       selectZoom
     } = this.props
 
+    const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
+
     return (
       <div className="control-panel">
         <div className="control-panel_date-counter">
           { dateToString(new Date(currentDate)) }
         </div>
-        <PlaybackSelector
-          playbackMode={ playbackMode }
-          selectPlaybackMode={ selectPlaybackMode }
-        />
-        <FocusSelector
-          focus={ focus }
-          selectFocusType={ selectFocusType }
-        />
-        <ZoomSelector
-          zoom={ zoom }
-          selectZoom={ selectZoom }
-        />
+        {
+          currentPage === 'map' &&
+          <div>
+            <PlaybackSelector
+              playbackMode={ playbackMode }
+              selectPlaybackMode={ selectPlaybackMode }
+            />
+            <FocusSelector
+              focus={ focus }
+              selectFocusType={ selectFocusType }
+            />
+            <ZoomSelector
+              zoom={ zoom }
+              selectZoom={ selectZoom }
+            />
+          </div>
+        }
       </div>
     )
   }
