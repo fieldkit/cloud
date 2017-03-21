@@ -402,6 +402,12 @@
 			"revisionTime": "2017-03-08T17:16:22Z"
 		},
 		{
+			"checksumSHA1": "pyUcq4sKKVm0KzBSZIPpHsmDF6k=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
+			"revisionTime": "2017-02-06T22:33:54Z"
+		},
+		{
 			"checksumSHA1": "5f/QhGjPgETWzP3aS9WdGFqoT1I=",
 			"path": "github.com/lib/pq",
 			"revision": "472a0745531a17dbac346e828b4c60e73ddff30c",

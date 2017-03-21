@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/O-C-R/sqlxcache"
 	"github.com/aws/aws-sdk-go/aws"
@@ -16,6 +17,7 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
+	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 
 	"github.com/O-C-R/fieldkit/server/api"
@@ -23,27 +25,14 @@ import (
 	"github.com/O-C-R/fieldkit/server/email"
 )
 
-var flagConfig struct {
-	addr                    string
-	backendURL              string
-	adminPath, frontendPath string
-	emailer                 string
-	sessionKey              string
-	twitter                 struct {
-		ConsumerKey    string
-		ConsumerSecret string
-	}
-}
-
-func init() {
-	flag.StringVar(&flagConfig.addr, "a", "127.0.0.1:8080", "address to listen on")
-	flag.StringVar(&flagConfig.backendURL, "backend-url", "postgres://localhost/fieldkit?sslmode=disable", "PostgreSQL URL")
-	flag.StringVar(&flagConfig.adminPath, "admin", "", "admin path")
-	flag.StringVar(&flagConfig.frontendPath, "frontend", "", "frontend path")
-	flag.StringVar(&flagConfig.emailer, "emailer", "default", "emailer: default, aws")
-	flag.StringVar(&flagConfig.sessionKey, "session-key", "", "base64-encoded HMAC key")
-	flag.StringVar(&flagConfig.twitter.ConsumerKey, "twitter-consumer-key", "", "")
-	flag.StringVar(&flagConfig.twitter.ConsumerSecret, "twitter-consumer-secret", "", "")
+type Config struct {
+	Addr                  string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL           string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	SessionKey            string `split_words:"true"`
+	TwitterConsumerKey    string `split_words:"true"`
+	TwitterConsumerSecret string `split_words:"true"`
+	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	Emailer               string `split_words:"true" default:"default" required:"true"`
 }
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
@@ -53,8 +42,24 @@ func newErrorID() string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
+var help bool
+
+func init() {
+	flag.BoolVar(&help, "h", false, "print usage")
+}
+
 func main() {
 	flag.Parse()
+
+	var config Config
+	if help {
+		envconfig.Usage("fieldkit", &config)
+		os.Exit(0)
+	}
+
+	if err := envconfig.Process("fieldkit", &config); err != nil {
+		panic(err)
+	}
 
 	goa.ErrorMediaIdentifier += "+json"
 
@@ -99,7 +104,7 @@ func main() {
 	}
 
 	awsSessionOptions := session.Options{
-		Profile: "fieldkit",
+		Profile: config.AWSProfile,
 		Config: aws.Config{
 			Region: aws.String("us-east-1"),
 			CredentialsChainVerboseErrors: aws.Bool(true),
@@ -112,7 +117,7 @@ func main() {
 	}
 
 	var emailer email.Emailer
-	switch flagConfig.emailer {
+	switch config.Emailer {
 	case "default":
 		emailer = email.NewEmailer()
 	case "aws":
@@ -125,7 +130,7 @@ func main() {
 	service := goa.New("fieldkit")
 
 	// Mount middleware
-	jwtHMACKey, err := base64.StdEncoding.DecodeString(flagConfig.sessionKey)
+	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
 		panic(err)
 	}
@@ -143,7 +148,7 @@ func main() {
 	service.Use(middleware.Recover())
 	// service.Use(gzip.Middleware(6))
 
-	database, err := sqlxcache.Open("postgres", flagConfig.backendURL)
+	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
 		panic(err)
 	}
@@ -202,13 +207,13 @@ func main() {
 	// Mount "twitter" controller
 	c9 := api.NewTwitterController(service, api.TwitterControllerOptions{
 		Database:       database,
-		ConsumerKey:    flagConfig.twitter.ConsumerKey,
-		ConsumerSecret: flagConfig.twitter.ConsumerSecret,
+		ConsumerKey:    config.TwitterConsumerKey,
+		ConsumerSecret: config.TwitterConsumerSecret,
 	})
 	app.MountTwitterController(service, c9)
 
 	// Start service
-	if err := service.ListenAndServe(flagConfig.addr); err != nil {
+	if err := service.ListenAndServe(config.Addr); err != nil {
 		service.LogError("startup", "err", err)
 	}
 }

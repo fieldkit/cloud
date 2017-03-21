@@ -6,8 +6,13 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-    command: server -a :8080 -backend-url postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
+    command: server
     restart: always
+    env_file:
+      - fieldkit.env
+    environment:
+      - FIELDKIT_ADDR=:8080
+      - FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
   postgres:
     image: postgres:9.6.2-alpine
     environment:
