@@ -14,6 +14,7 @@ export const initialState = I.fromJS({
     id: null
   },
   currentDate: new Date(),
+  forceDateUpdate: false,
   mousePosition: [-1, -1],
   expeditions: {},
   viewport: {
@@ -218,8 +219,10 @@ const expeditionReducer = (state = initialState, action) => {
       const nextDate = constrain(action.date, startDate, endDate)
       return state
         .set('currentDate', nextDate)
+        .set('forceDateUpdate', !!action.forceUpdate)
         .update('viewport', viewport => updateViewport(state, nextDate, null))
         .update('playbackMode', playbackMode => action.playbackMode || playbackMode)
+
     }
 
     case actions.SELECT_PLAYBACK_MODE: {

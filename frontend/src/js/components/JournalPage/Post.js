@@ -6,6 +6,11 @@ import { Link } from 'react-router'
 import iconLocation from '../../../img/icon-location.png'
 
 class Post extends React.Component {
+
+  shouldComponentUpdate () {
+    return false
+  }
+
   render () {
     const {
       data,
@@ -16,7 +21,7 @@ class Post extends React.Component {
     // console.log('aga', data.toJS())
 
     return (
-      <div className="post">
+      <div className="post" ref="container">
         <div className="post_type">
           Tweet
         </div>

@@ -10,12 +10,18 @@ const mapStateToProps = (state, ownProps) => {
   const expeditions = state.expeditions.get('expeditions')
   const documents = state.expeditions.get('currentDocuments')
     .map(id => state.expeditions.getIn(['documents', id]))
+    .sortBy(d => d.get('date'))
+    .reverse()
+  const currentDate = state.expeditions.get('currentDate')
+  const forceDateUpdate = state.expeditions.get('forceDateUpdate')
 
   return {
     expeditions,
     projects,
     documents,
-    currentExpeditionID
+    currentExpeditionID,
+    currentDate,
+    forceDateUpdate
   }
 }
 

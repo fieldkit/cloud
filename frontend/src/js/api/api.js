@@ -97,13 +97,15 @@ class FKApiClient {
   }
 
   async getExpedition (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID)
-    return res
+    // const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID)
+    // return res
+    return new Promise((callback) => { return callback(true) })
   }
 
   async getDocuments (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/documents')
-    return res
+    // const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/documents')
+    // return res
+    return new Promise((callback) => { return callback(true) })
   }
 }
 

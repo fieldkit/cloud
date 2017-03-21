@@ -19,8 +19,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    updateDate (date) {
-      return dispatch(actions.updateDate(date))
+    updateDate (date, playbackMode, forceUpdate) {
+      return dispatch(actions.updateDate(date, playbackMode, forceUpdate))
     }
   }
 }

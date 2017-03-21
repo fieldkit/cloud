@@ -44,7 +44,7 @@ class Timeline extends React.Component {
           onClick={(e) => {
             const mouseY = e.nativeEvent.clientY - lineHeight * 2
             const nextDate = constrain(map(mouseY, 0, h, startDate, endDate), startDate, endDate)
-            updateDate(nextDate)
+            updateDate(nextDate, null, true)
           }}
         >
           <rect
