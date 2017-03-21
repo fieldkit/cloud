@@ -31,6 +31,7 @@ class Navigation extends React.Component {
             Journal
           </Link>
         </li>
+      {/*
         <li 
           className={ 'navigation_link ' + (currentPage === 'about' ? 'active' : '') }
         >
@@ -40,6 +41,7 @@ class Navigation extends React.Component {
             About
           </Link>
         </li>
+      */}
       </ul>
     )
   }
