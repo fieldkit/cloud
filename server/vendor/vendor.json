@@ -158,6 +158,36 @@
 			"revisionTime": "2017-03-17T20:29:26Z"
 		},
 		{
+			"checksumSHA1": "nA+gmB0uOk+I06FhtCMrWlhHp00=",
+			"path": "github.com/cenkalti/backoff",
+			"revision": "3db60c813733fce657c114634171689bbf1f8dee",
+			"revisionTime": "2017-02-01T15:12:07Z"
+		},
+		{
+			"checksumSHA1": "mO6yxa23lXY/HZ5nLTr1XgPAuXU=",
+			"path": "github.com/dghubble/go-twitter/twitter",
+			"revision": "fc93bb35701bb85903d17daa80a21a824b9c592f",
+			"revisionTime": "2017-02-19T21:55:44Z"
+		},
+		{
+			"checksumSHA1": "yLfKa2rrb1kpNopWZtRTzI+PYdg=",
+			"path": "github.com/dghubble/oauth1",
+			"revision": "3c7784d12fed88888d612324ea6897f7dc30723e",
+			"revisionTime": "2017-02-19T19:42:38Z"
+		},
+		{
+			"checksumSHA1": "3mj2/UJNPtEiVVw5TN+sTFi088c=",
+			"path": "github.com/dghubble/oauth1/twitter",
+			"revision": "3c7784d12fed88888d612324ea6897f7dc30723e",
+			"revisionTime": "2017-02-19T19:42:38Z"
+		},
+		{
+			"checksumSHA1": "BsoROpVGqRTsVkKPperv5VDv+lE=",
+			"path": "github.com/dghubble/sling",
+			"revision": "91b015f8c5e231605ed75a74130ca0fa48b28cb1",
+			"revisionTime": "2017-02-19T19:46:32Z"
+		},
+		{
 			"checksumSHA1": "2Fy1Y6Z3lRRX1891WF/+HT4XS2I=",
 			"path": "github.com/dgrijalva/jwt-go",
 			"revision": "2268707a8f0843315e2004ee4f1d021dc08baedf",
@@ -340,6 +370,12 @@
 			"revisionTime": "2017-03-15T07:43:11Z",
 			"version": "=v1",
 			"versionExact": "v1"
+		},
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"revisionTime": "2017-01-11T10:11:55Z"
 		},
 		{
 			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
