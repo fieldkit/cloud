@@ -60,11 +60,11 @@ export class Teams extends Component {
     }
   }
 
-  async onMemberAdding(team_id: number, e: APINewMember) {
+  async onMemberAdding(teamId: number, e: APINewMember) {
 
     const { match } = this.props;
 
-    const memberRes = await FKApiClient.get().addMember(team_id, e);
+    const memberRes = await FKApiClient.get().addMember(teamId, e);
     if (memberRes.type === 'ok') {
       await this.loadData();
       this.props.history.push(`${match.url}`);
@@ -103,9 +103,10 @@ export class Teams extends Component {
             <tbody>
               <tr>
                 <td key={i} name={team.name}>
-                  {team.name}, {team.id}
-                  <button>Edit</button>
-                  <Link className="button" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
+                  {team.name}, {team.id} <br/>
+                  {team.description} <br/>
+                  <button className="secondary">Edit</button>
+                  <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
                 </td>
               </tr>
             </tbody>

@@ -50,8 +50,8 @@ export class MemberForm extends Component {
   }
 
   async save() {
-    const team_id = this.props.team_id;
-    const errors = await this.props.onSave(team_id, {
+    console.log(this.state.member);
+    const errors = await this.props.onSave(this.props.teamId, {
       user_id: this.state.member.user_id,
       role: this.state.member.role
     });
@@ -91,11 +91,18 @@ export class MemberForm extends Component {
         <div className="form-group">
           <label htmlFor="member">Member</label>
           <select name="member" value={this.state.member.user_id} onChange={this.handleInputChange.bind(this)}>
-            { errorsFor(this.state.errors, 'member') }
+            <option value={null}>Select a user</option>) }
             { users.map((user, i) => 
-              <option value={user.user_id}>{user.username}</option>) }
+              <option key={i} value={user.user_id}>{user.username}</option>) }
           </select>
+          { errorsFor(this.state.errors, 'member') }          
         </div>
+
+        <div className="form-group">
+          <label htmlFor="role">Role</label>
+          <input type="text" name="role" className="lg" value={this.state.member.role} onChange={this.handleInputChange.bind(this)} />
+          { errorsFor(this.state.errors, 'role') }
+        </div>        
       </FormContainer>      
     )
   }

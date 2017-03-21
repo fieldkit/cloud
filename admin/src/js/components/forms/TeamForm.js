@@ -9,7 +9,7 @@ import type { APIErrors, APINewTeam } from '../../api/types';
 
 type Props = {
   name?: string,
-  slug?: string,  
+  slug?: string,
   description?: string,
 
   cancelText?: string;
