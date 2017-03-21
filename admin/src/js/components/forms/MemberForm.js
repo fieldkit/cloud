@@ -5,7 +5,8 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APINewMember } from '../../api/types';
+import type { APIErrors, APIUser, APINewMember } from '../../api/types';
+import { FKApiClient } from '../../api/api';
 
 type Props = {
   teamId: number,
@@ -19,6 +20,7 @@ type Props = {
 export class MemberForm extends Component {
   props: Props;
   state: {
+    users: APIUser[],    
     userId: number,
     role: string,
     saveDisabled: boolean,
@@ -28,6 +30,7 @@ export class MemberForm extends Component {
   constructor(props: Props) {
     super(props)
     this.state = {
+      users: [],
       userId: 0,
       role: '',
       saveDisabled: false,
@@ -39,6 +42,7 @@ export class MemberForm extends Component {
 
   componentWillReceiveProps(nextProps: Props) {
     this.setState({
+      users: [],      
       userId: 0,
       role: '',
       saveDisabled: false,
@@ -65,18 +69,15 @@ export class MemberForm extends Component {
   }  
 
   async loadData() {
-    // TO DO: load real list of users from server
+    const usersRes = await FKApiClient.get().getUsers();
+    if (usersRes.type === 'ok' && usersRes.payload) {
+      this.setState({users: usersRes.payload.users} || []);
+    }
   }
 
   render () {
-    const users = [
-        {userId: 1234, name: 'adjany', username: 'adjany', avatar_url: 'img/test.png'},
-        {userId: 1235, name: 'steve', username: 'steve', avatar_url: 'img/test.png'},
-        {userId: 1236, name: 'jer', username: 'jer', avatar_url: 'img/test.png'},
-        {userId: 1237, name: 'chris', username: 'chris', avatar_url: 'img/test.png'},
-        {userId: 1238, name: 'john', username: 'john', avatar_url: 'img/test.png'}
-      ];
-
+    const { users } = this.state;
+    console.log(this.state.users);
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -89,7 +90,7 @@ export class MemberForm extends Component {
           <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
             <option value={null}>Select a user</option>
             { users.map((user, i) => 
-              <option key={i} value={user.userId}>{user.username}</option>) }
+              <option key={i} value={user.id}>{user.username}</option>) }
           </select>
           { errorsFor(this.state.errors, 'userId') }          
         </div>
