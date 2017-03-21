@@ -77,7 +77,7 @@ export class MemberForm extends Component {
 
   render () {
     const { users } = this.state;
-    console.log(this.state.users);
+
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -103,4 +103,4 @@ export class MemberForm extends Component {
       </FormContainer>
     )
   }
-}  
+}

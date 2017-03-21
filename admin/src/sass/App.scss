@@ -295,18 +295,15 @@ h4 {
   @include type-h4;
 }
 
-button {
+button, .button {
   // Primary button
   &:not(.bt-icon){
     @include button();
   }
 
   // Secondary button
-  &.cancel {
+  &.cancel, &.secondary {
     @include button(false);
-    &.secondary {
-      @include button(false); 
-    }    
   }
 
   // Icon button

@@ -9,7 +9,7 @@ import { TeamForm } from '../forms/TeamForm';
 import { MemberForm } from '../forms/MemberForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember } from '../../api/types';
+import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -24,22 +24,37 @@ export class Teams extends Component {
 
   props: Props;
   state: {
-    teams: APITeam[]
+    teams: APITeam[],
+    members: { [teamId: number]: APIMember[] }
   }
 
   constructor (props: Props) {
     super(props);
     this.state = {
-      teams: []
+      teams: [],
+      members: {}
     }
 
-    this.loadData();
+    this.loadTeams();
   }
 
-  async loadData() {
+  async loadTeams() {
     const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
     if (teamsRes.type === 'ok' && teamsRes.payload) {
-      this.setState({ teams: teamsRes.payload.teams || [] })
+      const { teams } = teamsRes.payload;
+      this.setState({ teams: teams });
+      for (const team of teams) {
+        await this.loadMembers(team.id);
+      }
+    }
+  }
+
+  async loadMembers(teamId: number) {
+    const membersRes = await FKApiClient.get().getMembers(teamId);  
+    if (membersRes.type === 'ok' && membersRes.payload) {
+      const { members } = this.state;
+      members[teamId] = membersRes.payload.members;
+      this.setState({members: members});
     }
   }
   
@@ -53,7 +68,7 @@ export class Teams extends Component {
 
     const teamRes = await FKApiClient.get().createTeam(expedition.id, e);
     if (teamRes.type === 'ok') {
-      await this.loadData();
+      await this.loadTeams();
       this.props.history.push(`${match.url}`);
     } else {
       return teamRes.errors;
@@ -66,7 +81,7 @@ export class Teams extends Component {
 
     const memberRes = await FKApiClient.get().addMember(teamId, e);
     if (memberRes.type === 'ok') {
-      await this.loadData();
+      await this.loadTeams();
       this.props.history.push(`${match.url}`);
     } else {
       return memberRes.errors;
@@ -99,14 +114,18 @@ export class Teams extends Component {
 
         <div id="teams">
         { this.state.teams.map((team, i) =>
-          <table className="teams-table">
+          <table key={i} className="teams-table">
             <tbody>
               <tr>
-                <td key={i} name={team.name}>
+                <td name={team.name}>
                   {team.name}, {team.id} <br/>
                   {team.description} <br/>
+                  
                   <button className="secondary">Edit</button>
                   <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
+                  { <MembersTable members={this.state.members[team.id]}/> }
+                  { !this.state.members[team.id] &&
+                    <span className="empty">No members</span> }
                 </td>
               </tr>
             </tbody>
