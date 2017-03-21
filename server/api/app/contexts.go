@@ -1683,9 +1683,9 @@ func (ctx *LoginUserContext) BadRequest() error {
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *LoginUserContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
+func (ctx *LoginUserContext) Unauthorized(r error) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // LogoutUserContext provides the user logout action context.

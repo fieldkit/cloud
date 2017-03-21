@@ -594,6 +594,43 @@ definitions:
     - users
     title: 'Mediatype identifier: application/vnd.app.users+json; view=default'
     type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
 host: api.data.fieldkit.org
 info:
   description: A one-click open platform for field researchers and explorers.
@@ -825,6 +862,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/LoginPayload'
+      produces:
+      - application/vnd.goa.error
       responses:
         "204":
           description: No Content
@@ -836,6 +875,8 @@ paths:
           description: Bad Request
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: login user
