@@ -56,9 +56,21 @@ const routes = (
       store.dispatch(actions.requestExpedition(state.params.expeditionID))
     }}>
       <IndexRoute component={ MapPageContainer } />
-      <Route path="map" component={ MapPageContainer }/>
-      <Route path="journal" component={ JournalPageContainer }/>
-      <Route path="about" component={ JournalPageContainer }/>
+      <Route 
+        path="map"
+        component={ MapPageContainer }
+      />
+      <Route
+        path="journal"
+        component={ JournalPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.selectPlaybackMode('pause'))
+        }}
+      />
+      <Route
+        path="about"
+        component={ JournalPageContainer }
+      />
     </Route>
   </Route>
 )
