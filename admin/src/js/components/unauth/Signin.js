@@ -3,8 +3,10 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 
+import log from 'loglevel';
+
 import { FKApiClient } from '../../api/api';
-import { errorsFor } from '../../common/util';
+import { errorClass } from '../../common/util';
 
 import { Unauth } from '../containers/Unauth';
 import type { APIErrors } from '../../api/types';
@@ -34,8 +36,15 @@ export class Signin extends Component {
   async onSubmit(event) {
     event.preventDefault()
     const response = await FKApiClient.get().signIn(this.refs.username.value, this.refs.password.value);
+    log.info(response);
     if (response.type === 'err') {
-      this.setState({ errors: response.errors });
+      if (response.errors) {
+        this.setState({ errors: response.errors });
+      } else {
+        // TODO: someday it'll be fixed
+        const fakeError = { code: '100', detail: '', id: '', meta: {}, status: 200 };
+        this.setState({ errors: fakeError })
+      }
     } else {
       this.setState({ redirectToReferrer: true });
     }
@@ -49,6 +58,8 @@ export class Signin extends Component {
       return <Redirect to={from} />;
     }
 
+    const { errors } = this.state;
+
     return (
       <Unauth>
         <div className="signin">
@@ -57,25 +68,21 @@ export class Signin extends Component {
           </header>
 
           <form onSubmit={this.onSubmit}>
+            { this.state.errors &&
+              <p className="errors">
+                Username or password invalid. Check your information and try again.
+              </p> }
             <div className="content">
-              <div className="group">
+              <div className={`group ${errorClass(errors, 'username')}`}>
                 <label htmlFor="username">Username</label>
-                <input ref="username" id="username" name="username" type="username" placeholder="" />
-                { errorsFor(this.state.errors, 'username') }
+                <input ref="username" id="username" name="username" type="text" placeholder="" />
               </div>
-              <div className="group">
+              <div className={`group ${errorClass(errors, 'password')}`}>
                 <label htmlFor="password">Password</label>
                 <input ref="password" id="password" name="password" type="password" placeholder="" />
-                { errorsFor(this.state.errors, 'password') }
               </div>
             </div>
-            <footer>
-              { this.state.errors &&
-                <p className="errors">
-                  Username or password invalid. Check your information and try again.
-                </p> }
-              <input type="submit" value="Submit"/>
-            </footer>
+            <input type="submit" value="Submit"/>
           </form>
         </div>
       </Unauth>

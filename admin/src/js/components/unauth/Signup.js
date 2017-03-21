@@ -54,6 +54,11 @@ export class Signup extends Component {
           </header>
 
           <form onSubmit={this.onSubmit}>
+            { this.state.errors &&
+              <p className="errors">
+                We found one or multiple errors. Please check your information above or try again later.
+              </p> }
+
             <div className="content">
               <div className="group">
                 <label htmlFor="email">Email</label>
@@ -80,13 +85,7 @@ export class Signup extends Component {
               </div>
             </div>
 
-            <footer>
-              { this.state.errors &&
-                <p className="errors">
-                  We found one or multiple errors. Please check your information above or try again later.
-                </p> }
-              <input type="submit" value="Submit"/>
-            </footer>
+            <input type="submit" value="Submit" />
           </form>
         </div>
       </Unauth>

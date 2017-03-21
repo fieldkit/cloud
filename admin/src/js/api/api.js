@@ -1,5 +1,7 @@
 // @flow weak
 
+import log from 'loglevel';
+
 import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
 import type { SupportedMethods } from './base-api';
 
@@ -125,11 +127,13 @@ export class FKApiClient extends JWTAPIClient {
         return { type: 'ok' }
       }
     } catch (e) {
-      if (e instanceof APIError) {
-        if (e.body && parseJSON) {
+      if (e instanceof AuthenticationError) {
+        return { type: 'err', raw: e.message };
+      } else if (e instanceof APIError) {
+        try {
           return { type: 'err', errors: JSON.parse(e.body) };
-        } else {
-          return { type: 'err', errors: e.msg };
+        } catch (e2) {
+          return { type: 'err', errors: e.message };
         }
       } else {
         return { type: 'err', raw: e.body };
