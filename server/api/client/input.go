@@ -8,86 +8,12 @@
 package client
 
 import (
-	"bytes"
 	"fmt"
 	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
 	"strconv"
 )
-
-// AddInputPath computes a request path to the add action of input.
-func AddInputPath(expeditionID int) string {
-	param0 := strconv.Itoa(expeditionID)
-
-	return fmt.Sprintf("/expedition/%s/input", param0)
-}
-
-// Add a input
-func (c *Client) AddInput(ctx context.Context, path string, payload *AddInputPayload) (*http.Response, error) {
-	req, err := c.NewAddInputRequest(ctx, path, payload)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewAddInputRequest create the request corresponding to the add action endpoint of the input resource.
-func (c *Client) NewAddInputRequest(ctx context.Context, path string, payload *AddInputPayload) (*http.Request, error) {
-	var body bytes.Buffer
-	err := c.Encoder.Encode(payload, &body, "*/*")
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode body: %s", err)
-	}
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("POST", u.String(), &body)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
-	}
-	return req, nil
-}
-
-// GetInputPath computes a request path to the get action of input.
-func GetInputPath(project string, expedition string, input string) string {
-	param0 := project
-	param1 := expedition
-	param2 := input
-
-	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/inputs/@/%s", param0, param1, param2)
-}
-
-// Add a input
-func (c *Client) GetInput(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetInputRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetInputRequest create the request corresponding to the get action endpoint of the input resource.
-func (c *Client) NewGetInputRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
-	}
-	return req, nil
-}
 
 // GetIDInputPath computes a request path to the get id action of input.
 func GetIDInputPath(inputID int) string {
@@ -160,7 +86,7 @@ func (c *Client) NewListInputRequest(ctx context.Context, path string) (*http.Re
 func ListIDInputPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expedition/%s/inputs", param0)
+	return fmt.Sprintf("/expeditions/%s/inputs", param0)
 }
 
 // List a project's inputs

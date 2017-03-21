@@ -81,16 +81,26 @@ CREATE TABLE fieldkit.team_user (
 CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
-	name varchar(100) NOT NULL,
-	slug varchar(100) NOT NULL
+	team_id integer REFERENCES fieldkit.team (id),
+	user_id integer REFERENCES fieldkit.user (id)
 );
 
-CREATE UNIQUE INDEX ON fieldkit.input (expedition_id, slug);
+-- twitter
 
--- schema
-
-CREATE TABLE fieldkit.schema (
-	id serial PRIMARY KEY,
-	schema jsonb NOT NULL
+CREATE TABLE fieldkit.twitter_oauth (
+	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+	request_token varchar NOT NULL UNIQUE,
+	request_secret varchar NOT NULL
 );
 
+CREATE TABLE fieldkit.twitter_account (
+	id bigint PRIMARY KEY,
+	screen_name varchar(15) NOT NULL,
+	access_token varchar NOT NULL,
+	access_secret varchar NOT NULL
+);
+
+CREATE TABLE fieldkit.input_twitter_account (
+	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+	twitter_account_id bigint REFERENCES fieldkit.twitter_account (id) ON DELETE CASCADE NOT NULL
+);

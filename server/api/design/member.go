@@ -109,7 +109,7 @@ var _ = Resource("member", func() {
 
 	Action("list", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team/members"))
-		Description("List an teams's members")
+		Description("List an team's members")
 		Params(func() {
 			Param("project", String, func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")

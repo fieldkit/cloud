@@ -26,3 +26,16 @@ var JWT = JWTSecurity("jwt", func() {
 	Header("Authorization")
 	Scope("api:access", "API access") // Define "api:access" scope
 })
+
+var Location = MediaType("application/vnd.app.location+json", func() {
+	TypeName("Location")
+	Attributes(func() {
+		Attribute("location", func() {
+			Format("uri")
+		})
+		Required("location")
+	})
+	View("default", func() {
+		Attribute("location")
+	})
+})

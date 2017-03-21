@@ -13,12 +13,20 @@ type InputControllerOptions struct {
 }
 
 func InputType(input *data.Input) *app.Input {
-	return &app.Input{
+	appInput := &app.Input{
 		ID:           int(input.ID),
 		ExpeditionID: int(input.ExpeditionID),
-		Name:         input.Name,
-		Slug:         input.Slug,
 	}
+
+	if input.TeamID != nil {
+		*appInput.TeamID = int(*input.TeamID)
+	}
+
+	if input.UserID != nil {
+		*appInput.UserID = int(*input.UserID)
+	}
+
+	return appInput
 }
 
 func InputsType(inputs []*data.Input) *app.Inputs {
@@ -43,29 +51,6 @@ func NewInputController(service *goa.Service, options InputControllerOptions) *I
 		Controller: service.NewController("InputController"),
 		options:    options,
 	}
-}
-
-func (c *InputController) Add(ctx *app.AddInputContext) error {
-	input := &data.Input{
-		ExpeditionID: int32(ctx.ExpeditionID),
-		Name:         ctx.Payload.Name,
-		Slug:         ctx.Payload.Slug,
-	}
-
-	if err := c.options.Database.NamedGetContext(ctx, input, "INSERT INTO fieldkit.input (expedition_id, name, slug) VALUES (:expedition_id, :name, :slug) RETURNING *", input); err != nil {
-		return err
-	}
-
-	return ctx.OK(InputType(input))
-}
-
-func (c *InputController) Get(ctx *app.GetInputContext) error {
-	input := &data.Input{}
-	if err := c.options.Database.GetContext(ctx, input, "SELECT i.* FROM fieldkit.input AS i JOIN fieldkit.expedition AS e ON e.id = i.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2 AND i.slug = $2", ctx.Project, ctx.Expedition, ctx.Input); err != nil {
-		return err
-	}
-
-	return ctx.OK(InputType(input))
 }
 
 func (c *InputController) GetID(ctx *app.GetIDInputContext) error {
