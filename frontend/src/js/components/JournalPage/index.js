@@ -27,20 +27,23 @@ class JournalPage extends React.Component {
         >
           <ul className="journal-page_content_posts">
             {
-              documents.map(d => {
-                return (
-                  <li
-                    className="journal-page_content_posts_post"
-                    key={ 'post-' + d.get('id') }
-                  >
-                    <Post
-                      data={ d }
-                      currentExpeditionID={ currentExpeditionID }
-                      updateDate={ updateDate }
-                    />
-                  </li>
-                )
-              })
+              documents
+                .sortBy(d =>  d.get('date'))
+                .reverse()
+                .map(d => {
+                  return (
+                    <li
+                      className="journal-page_content_posts_post"
+                      key={ 'post-' + d.get('id') }
+                    >
+                      <Post
+                        data={ d }
+                        currentExpeditionID={ currentExpeditionID }
+                        updateDate={ updateDate }
+                      />
+                    </li>
+                  )
+                })
             }
           </ul>
         </div>
