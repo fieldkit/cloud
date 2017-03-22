@@ -6,10 +6,9 @@ class Navigation extends React.Component {
   render () {
 
     const {
-      currentExpeditionID
+      currentExpeditionID,
+      currentPage
     } = this.props
-
-    const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
 
     return (
       <ul className="navigation">

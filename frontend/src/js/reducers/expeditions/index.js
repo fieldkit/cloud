@@ -164,6 +164,11 @@ const expeditionReducer = (state = initialState, action) => {
   }
   switch (action.type) {
 
+    case actions.SET_CURRENT_PAGE: {
+      return state
+        .set('currentPage', action.currentPage)
+    }
+
     case actions.REQUEST_EXPEDITION: {
       return state
         .set('currentExpedition', action.id)

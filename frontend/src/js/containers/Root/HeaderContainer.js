@@ -7,10 +7,12 @@ const mapStateToProps = (state, ownProps) => {
 
   const currentExpeditionID = state.expeditions.get('currentExpedition')
   const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
+  const currentPage = state.expeditions.get('currentPage')
 
   return {
     expeditionName,
-    currentExpeditionID
+    currentExpeditionID,
+    currentPage
   }
 }
 

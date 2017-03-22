@@ -20,6 +20,7 @@ export const SELECT_ZOOM = 'SELECT_ZOOM'
 export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 export const SET_ZOOM = 'SET_ZOOM'
+export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
 
 export function requestExpedition (expeditionID) {
   return function (dispatch, getState) {
@@ -184,6 +185,15 @@ export function setMousePosition (x, y) {
       type: SET_MOUSE_POSITION,
       x,
       y
+    })
+  }
+}
+
+export function setCurrentPage (currentPage) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_CURRENT_PAGE,
+      currentPage
     })
   }
 }

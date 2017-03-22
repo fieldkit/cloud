@@ -11,14 +11,21 @@ class Header extends React.Component {
 
   render () {
 
-    const { expeditionName, currentExpeditionID } = this.props
+    const {
+      expeditionName,
+      currentPage,
+      currentExpeditionID
+    } = this.props
 
     return (
       <div className="header">
         <h1 className="header_title">
           { expeditionName }
         </h1>
-        <Navigation currentExpeditionID={ currentExpeditionID }/>
+        <Navigation
+          currentExpeditionID={ currentExpeditionID }
+          currentPage={ currentPage }
+        />
       </div>
     )
   }
