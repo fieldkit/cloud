@@ -5,12 +5,19 @@ import * as actions from '../../actions'
 
 const mapStateToProps = (state, ownProps) => {
 
-  // const currentExpeditionID = state.expeditions.get('currentExpedition')
+  const currentExpeditionID = state.expeditions.get('currentExpedition')
   // const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
   const currentDate = state.expeditions.get('currentDate')
+  const playbackMode = state.expeditions.get('playbackMode')
+  const focus = state.expeditions.get('focus')
+  const zoom = state.expeditions.getIn(['viewport', 'zoom'])
 
   return {
-    currentDate
+    currentExpeditionID,
+    currentDate,
+    playbackMode,
+    focus,
+    zoom
   }
 }
 
@@ -18,6 +25,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     selectPlaybackMode (mode) {
       return dispatch(actions.selectPlaybackMode(mode))
+    },
+    selectFocusType (type) {
+      return dispatch(actions.selectFocusType(type))
+    },
+    selectZoom (zoom) {
+      return dispatch(actions.selectZoom(zoom))
     },
     cancelAction () {
       return dispatch(actions.cancelAction())

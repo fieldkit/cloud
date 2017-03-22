@@ -7,9 +7,12 @@ const mapStateToProps = (state, ownProps) => {
 
   const currentExpeditionID = state.expeditions.get('currentExpedition')
   const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
+  const currentPage = state.expeditions.get('currentPage')
 
   return {
-    expeditionName
+    expeditionName,
+    currentExpeditionID,
+    currentPage
   }
 }
 
@@ -20,6 +23,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     cancelAction () {
       return dispatch(actions.cancelAction())
+    },
+    openExpeditionPanel () {
+      return dispatch(actions.openExpeditionPanel())
     }
   }
 }

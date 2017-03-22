@@ -2,11 +2,20 @@
   display: flex;
   justify-content: space-between;
   height: $line-height * 3;
+  pointer-events: none;
 
   &_title {
     flex-grow: 1;
     line-height: 36px;
     margin-bottom: 12px;
     color: white;
+    z-index: 1;
+
+    img {
+      margin-right: $line-width;
+      height: $line-height;
+      cursor: pointer;
+      pointer-events: auto;
+    }
   }
 }

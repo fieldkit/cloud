@@ -103,8 +103,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     cancelAction () {
       return dispatch(actions.cancelAction())
     },
-    setViewport (viewport) {
-      return dispatch(actions.setViewport(viewport))
+    setViewport (viewport, manual) {
+      return dispatch(actions.setViewport(viewport, manual))
     },
     updateDate (date) {
       return dispatch(actions.updateDate(date))

@@ -9,18 +9,20 @@ const mapStateToProps = (state, ownProps) => {
   const currentExpedition = state.expeditions.get('currentExpedition')
   const startDate = state.expeditions.getIn(['expeditions', currentExpedition, 'startDate'])
   const endDate = state.expeditions.getIn(['expeditions', currentExpedition, 'endDate'])
+  const documents = state.expeditions.get('documents')
 
   return {
     currentDate,
     startDate,
-    endDate
+    endDate,
+    documents
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    updateDate (date) {
-      return dispatch(actions.updateDate(date))
+    updateDate (date, playbackMode, forceUpdate) {
+      return dispatch(actions.updateDate(date, playbackMode, forceUpdate))
     }
   }
 }

@@ -1,56 +1,49 @@
 
 import React, { PropTypes } from 'react'
 import { dateToString } from '../../utils.js'
+import PlaybackSelector from './ControlPanel/PlaybackSelector'
+import FocusSelector from './ControlPanel/FocusSelector'
+import ZoomSelector from './ControlPanel/ZoomSelector'
 
 class ControlPanel extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
-  }
-
   render () {
 
-    const { currentDate, selectPlaybackMode } = this.props
+    const { 
+      currentExpeditionID,
+      currentDate,
+      playbackMode,
+      focus,
+      zoom,
+      selectPlaybackMode,
+      selectFocusType,
+      selectZoom
+    } = this.props
+
+    const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
 
     return (
       <div className="control-panel">
         <div className="control-panel_date-counter">
           { dateToString(new Date(currentDate)) }
         </div>
-        <ul className="control-panel_playback-selector">
-          <li
-            className="control-panel_playback-selector_button"
-            onClick={ () => selectPlaybackMode('fastBackward') }
-          >
-            fb
-          </li>
-          <li
-            className="control-panel_playback-selector_button"
-            onClick={ () => selectPlaybackMode('backward') }
-          >
-            b
-          </li>
-          <li
-            className="control-panel_playback-selector_button"
-            onClick={ () => selectPlaybackMode('pause') }
-          >
-            p
-          </li>
-          <li
-            className="control-panel_playback-selector_button"
-            onClick={ () => selectPlaybackMode('forward') }
-          >
-            f
-          </li>
-          <li
-            className="control-panel_playback-selector_button"
-            onClick={ () => selectPlaybackMode('fastForward') }
-          >
-            ff
-          </li>
-        </ul>
+        {
+          currentPage === 'map' &&
+          <div>
+            <PlaybackSelector
+              playbackMode={ playbackMode }
+              selectPlaybackMode={ selectPlaybackMode }
+            />
+            <FocusSelector
+              focus={ focus }
+              selectFocusType={ selectFocusType }
+            />
+            <ZoomSelector
+              zoom={ zoom }
+              selectZoom={ selectZoom }
+            />
+          </div>
+        }
       </div>
     )
   }

@@ -13,12 +13,16 @@
 @import 'Root/Root';
 @import 'Root/Header';
 @import 'Root/Navigation';
+@import 'Root/ExpeditionPanel';
 
 @import 'Map/Map';
 @import 'Map/DOMOverlay';
 
 @import 'MapPage/MapPage';
 @import 'MapPage/NotificationPanel';
+
+@import 'JournalPage/JournalPage';
+@import 'JournalPage/Post';
 
 * {
   text-rendering: optimizeLegibility;

@@ -19,6 +19,7 @@ import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-route
 import RootContainer from './containers/Root'
 
 import MapPageContainer from './containers/MapPage'
+import JournalPageContainer from './containers/JournalPage'
 
 import FKApiClient from './api/api.js'
 
@@ -32,18 +33,19 @@ const createStoreWithMiddleware = applyMiddleware(
 //   fn => fn()
 // )(createStoreWithMiddleware)
 const reducer = combineReducers({
-  expeditions: expeditionReducer,
+  expeditions: expeditionReducer
   // routing: routerReducer
 })
 const store = createStoreWithMiddleware(reducer)
 
 
 const routes = (
-  <Route path="/" component={RootContainer}>
+  <Route 
+    path="/"
+    component={RootContainer}
+  >
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
-        // console.log('aga', store.getState().expeditions.get('expeditions').toJS())
-        // const expeditionID = store.getState().expeditions.get('expeditions').toList().get(0).get('id')
         const expeditionID = 'okavango'
         replace({
           pathname: '/' + expeditionID,
@@ -54,8 +56,38 @@ const routes = (
     <Route path=":expeditionID" onEnter={(state) => {
       store.dispatch(actions.requestExpedition(state.params.expeditionID))
     }}>
-      <IndexRoute component={MapPageContainer} />
-      <Route path="map" component={MapPageContainer}/>
+      <IndexRoute
+        component={ MapPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.setCurrentPage('map'))
+        }}
+      />
+      <Route 
+        path="map"
+        component={ MapPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.setCurrentPage('map'))
+        }}
+      />
+      <Route
+        path="journal"
+        component={ JournalPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.selectPlaybackMode('pause'))
+          store.dispatch(actions.setCurrentPage('journal'))
+        }}
+      />
+      {
+        /*
+      <Route
+        path="about"
+        component={ JournalPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.setCurrentPage('about'))
+        }}
+      />
+        */
+      }
     </Route>
   </Route>
 )
