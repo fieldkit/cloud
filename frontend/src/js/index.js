@@ -23,8 +23,6 @@ import JournalPageContainer from './containers/JournalPage'
 
 import FKApiClient from './api/api.js'
 
-import { updateDeepLinking } from './utils.js'
-
 document.getElementById('root').remove()
 
 const createStoreWithMiddleware = applyMiddleware(
@@ -103,9 +101,6 @@ var render = function () {
     ),
     document.getElementById('fieldkit')
   )
-  window.setInterval(() => {
-    updateDeepLinking(browserHistory, store.getState)
-  }, 1000)
 }
 
 render()

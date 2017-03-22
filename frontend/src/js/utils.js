@@ -21,10 +21,10 @@ export function updateDeepLinking (history, getState) {
   const currentPage = getState().expeditions.get('currentPage')
   const focusType = getState().expeditions.getIn(['focus', 'type'])
   const focusID = getState().expeditions.getIn(['focus', 'id'])
-  const currentDate = getState().expeditions.get('currentDate')
+  const currentDate = Math.floor(getState().expeditions.get('currentDate'))
   const longitude = getState().expeditions.getIn(['viewport', 'longitude'])
   const latitude = getState().expeditions.getIn(['viewport', 'latitude'])
-  const zoom = getState().expeditions.getIn(['viewport', 'zoom'])
+  const zoom = Math.round(getState().expeditions.getIn(['viewport', 'zoom']))
 
   switch (currentPage) {
     case 'map': {
@@ -99,27 +99,6 @@ export function lerp (start, end, ratio) {
 
 export function rgb2hex (rgb) {
   return ((rgb[0] * 255 << 16) + (rgb[1] * 255 << 8) + rgb[2] * 255)
-}
-
-export function getURLParameters () {
-  let queryString = {}
-  let query = window.location.search.substring(1)
-  let vars = query.split('&')
-  for (let i = 0; i < vars.length; i++) {
-    let pair = vars[i].split('=')
-        // If first entry with this name
-    if (typeof queryString[pair[0]] === 'undefined') {
-      queryString[pair[0]] = decodeURIComponent(pair[1])
-        // If second entry with this name
-    } else if (typeof queryString[pair[0]] === 'string') {
-      let arr = [ queryString[pair[0]], decodeURIComponent(pair[1]) ]
-      queryString[pair[0]] = arr
-        // If third or later entry with this name
-    } else {
-      queryString[pair[0]].push(decodeURIComponent(pair[1]))
-    }
-  }
-  return queryString
 }
 
 export function getSampleData () {

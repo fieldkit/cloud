@@ -126,6 +126,11 @@ const expeditionReducer = (state = initialState, action) => {
     console.log('reducer:', action.type, action)
   }
   switch (action.type) {
+    case actions.SET_CURRENT_PAGE: {
+      return state
+        .set('currentPage', action.currentPage)
+    }
+
     case actions.OPEN_EXPEDITION_PANEL: {
       return state
         .set('expeditionPanelOpen', true)

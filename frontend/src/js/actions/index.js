@@ -3,7 +3,7 @@ import fetch from 'whatwg-fetch'
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 import FKApiClient from '../api/api.js'
-import { getSampleData } from '../utils'
+import { getSampleData, updateDeepLinking } from '../utils'
 
 import I from 'immutable'
 
@@ -22,6 +22,77 @@ export const SET_ZOOM = 'SET_ZOOM'
 export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
 export const OPEN_EXPEDITION_PANEL = 'OPEN_EXPEDITION_PANEL'
 export const CLOSE_EXPEDITION_PANEL = 'CLOSE_EXPEDITION_PANEL'
+
+export function processQueryString (getState) {
+  var queryString = {};
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if (typeof queryString[pair[0]] === "undefined") {
+      queryString[pair[0]] = decodeURIComponent(pair[1]);
+    } else if (typeof queryString[pair[0]] === "string") {
+      var arr = [ queryString[pair[0]],decodeURIComponent(pair[1]) ];
+      queryString[pair[0]] = arr;
+    } else {
+      queryString[pair[0]].push(decodeURIComponent(pair[1]));
+    }
+  } 
+  const params = I.fromJS(queryString)
+  const currentPage = getState().expeditions.get('currentPage')
+
+  switch (currentPage) {
+    case 'map': {
+      if (params.has('date')) {
+        return [{
+          type: UPDATE_DATE,
+          date: params.get('date')
+        }]
+      } else if (params.has('type')) {
+        return [{
+          type: SELECT_FOCUS_TYPE,
+          focusType: 'documents',
+          focusID: params.get('type')
+        }]
+      } else if (params.has('view')) {
+        const coords = params.get('view').split(',')
+        const viewport = {
+          bearing: 0,
+          isDragging: false,
+          longitude: parseFloat(coords[0]),
+          latitude: parseFloat(coords[1]),
+          pitch: 0,
+          startBearing: null,
+          startDragLngLat: null,
+          startPitch: null,
+          zoom: parseFloat(coords[2])
+        }
+        return [
+          {
+            type: SELECT_FOCUS_TYPE,
+            focusType: 'manual'
+          },
+          {
+            type: SET_VIEWPORT,
+            viewport
+          }
+        ]
+      } else {
+        return [{}]
+      }
+    }
+    case 'journal': {
+      return [{
+        type: UPDATE_DATE,
+        date: parseFloat(params.get('date')),
+        forceUpdate: true
+      }]
+    }
+    default: {
+      return [{}]
+    }
+  }
+}
 
 export function requestExpedition (expeditionID) {
   return function (dispatch, getState) {
@@ -96,8 +167,12 @@ export function requestExpedition (expeditionID) {
                     {
                       type: INITIALIZE_DOCUMENTS,
                       data: documents
-                    }
+                    },
+                    ...processQueryString(getState)
                   ])
+                  window.setInterval(() => {
+                    updateDeepLinking(browserHistory, getState)
+                  }, 1000)
                 } else {
                   const expeditions = I.fromJS(resExpeditionsMap)
                     .map(e => {
