@@ -9,11 +9,12 @@ import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APINewAdministrator } from '../../api/types';
+import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APINewAdministrator, APIAdministrator } from '../../api/types';
 
 type Props = {
   project: APIProject;
   expeditions: APIExpedition[];
+  administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
 
   match: Object;
@@ -23,15 +24,30 @@ type Props = {
 
 export class Project extends Component {
   props: Props;
-  state: {}
+  state: {
+    expeditions: APIExpedition[],
+    administrators: APIAdministrator[]
+  }
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      expeditions: []
+      expeditions: [],
+      administrators: []
     };
+
+    this.loadAdministrators();
   }
+
+  async loadAdministrators() {
+    const { project } = this.props;
+    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);  
+    if (administratorsRes.type === 'ok' && administratorsRes.payload) {
+      const administrators = administratorsRes.payload.administrators;
+      this.setState({administrators: administrators});
+    }
+  }  
 
   async onExpeditionCreate(e: APINewExpedition) {
     const { match, project } = this.props;
