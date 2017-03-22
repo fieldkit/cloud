@@ -70,6 +70,7 @@ export class MemberForm extends Component {
   }  
 
   async loadData() {
+    /* TO DO: remove already added members from this list */
     const usersRes = await FKApiClient.get().getUsers();
     if (usersRes.type === 'ok' && usersRes.payload) {
       this.setState({users: usersRes.payload.users} || []);

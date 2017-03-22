@@ -72,9 +72,7 @@ export class Teams extends Component {
   }
 
   async onMemberAdding(teamId: number, e: APINewMember) {
-
     const { match } = this.props;
-
     const memberRes = await FKApiClient.get().addMember(teamId, e);
     if (memberRes.type === 'ok') {
       await this.loadTeams();
@@ -84,13 +82,16 @@ export class Teams extends Component {
     }
   }
 
-  async onMemberDelete() {
-
+  async onMemberDelete(teamId: number, userId: number) {
+    const { match } = this.props;
+    const memberRes = await FKApiClient.get().deleteMember(teamId, userId);
+    if (memberRes.type === 'ok') {
+      await this.loadTeams();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return memberRes.errors;
+    }    
   }
-
-  deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
-    return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
-  }  
 
   render() {
     const { match } = this.props;
@@ -127,7 +128,10 @@ export class Teams extends Component {
                   {team.description}                  
                   <button className="secondary">Edit</button>
 
-                  { <MembersTable members={members[team.id]}/> }
+                  { <MembersTable
+                      teamId={team.id}
+                      members={members[team.id]}
+                      onDelete={this.onMemberDelete.bind(this)}/> }
                   { !members[team.id] &&
                     <span className="empty">No members</span> }
                   <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
