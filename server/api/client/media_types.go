@@ -167,77 +167,16 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
-// Input media type (default view)
-//
-// Identifier: application/vnd.app.input+json; view=default
-type Input struct {
-	Active       bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	Type         string `form:"type" json:"type" xml:"type"`
-}
-
-// Validate validates the Input media type instance.
-func (mt *Input) Validate() (err error) {
-
-	if mt.Type == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
-	}
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-
-	if !(mt.Type == "webhook" || mt.Type == "twitter") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, mt.Type, []interface{}{"webhook", "twitter"}))
-	}
-	return
-}
-
-// DecodeInput decodes the Input instance encoded in resp body.
-func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
-	var decoded Input
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// InputCollection is the media type for an array of Input (default view)
-//
-// Identifier: application/vnd.app.input+json; type=collection; view=default
-type InputCollection []*Input
-
-// Validate validates the InputCollection media type instance.
-func (mt InputCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DecodeInputCollection decodes the InputCollection instance encoded in resp body.
-func (c *Client) DecodeInputCollection(resp *http.Response) (InputCollection, error) {
-	var decoded InputCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default
 type Inputs struct {
-	Inputs InputCollection `form:"inputs" json:"inputs" xml:"inputs"`
+	TwitterAccounts TwitterAccountCollection `form:"twitter_accounts,omitempty" json:"twitter_accounts,omitempty" xml:"twitter_accounts,omitempty"`
 }
 
 // Validate validates the Inputs media type instance.
 func (mt *Inputs) Validate() (err error) {
-	if mt.Inputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputs"))
-	}
-	if err2 := mt.Inputs.Validate(); err2 != nil {
+	if err2 := mt.TwitterAccounts.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return
@@ -246,6 +185,31 @@ func (mt *Inputs) Validate() (err error) {
 // DecodeInputs decodes the Inputs instance encoded in resp body.
 func (c *Client) DecodeInputs(resp *http.Response) (*Inputs, error) {
 	var decoded Inputs
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// Location media type (default view)
+//
+// Identifier: application/vnd.app.location+json; view=default
+type Location struct {
+	Location string `form:"location" json:"location" xml:"location"`
+}
+
+// Validate validates the Location media type instance.
+func (mt *Location) Validate() (err error) {
+	if mt.Location == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatURI, mt.Location); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.location`, mt.Location, goa.FormatURI, err2))
+	}
+	return
+}
+
+// DecodeLocation decodes the Location instance encoded in resp body.
+func (c *Client) DecodeLocation(resp *http.Response) (*Location, error) {
+	var decoded Location
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
@@ -498,6 +462,81 @@ func (c *Client) DecodeTeams(resp *http.Response) (*Teams, error) {
 	return &decoded, err
 }
 
+// TwitterAccount media type (default view)
+//
+// Identifier: application/vnd.app.twitter_account+json; view=default
+type TwitterAccount struct {
+	ExpeditionID     int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID               int    `form:"id" json:"id" xml:"id"`
+	ScreenName       string `form:"screen_name" json:"screen_name" xml:"screen_name"`
+	TwitterAccountID int    `form:"twitter_account_id" json:"twitter_account_id" xml:"twitter_account_id"`
+}
+
+// Validate validates the TwitterAccount media type instance.
+func (mt *TwitterAccount) Validate() (err error) {
+
+	if mt.ScreenName == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "screen_name"))
+	}
+	return
+}
+
+// DecodeTwitterAccount decodes the TwitterAccount instance encoded in resp body.
+func (c *Client) DecodeTwitterAccount(resp *http.Response) (*TwitterAccount, error) {
+	var decoded TwitterAccount
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// TwitterAccountCollection is the media type for an array of TwitterAccount (default view)
+//
+// Identifier: application/vnd.app.twitter_account+json; type=collection; view=default
+type TwitterAccountCollection []*TwitterAccount
+
+// Validate validates the TwitterAccountCollection media type instance.
+func (mt TwitterAccountCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeTwitterAccountCollection decodes the TwitterAccountCollection instance encoded in resp body.
+func (c *Client) DecodeTwitterAccountCollection(resp *http.Response) (TwitterAccountCollection, error) {
+	var decoded TwitterAccountCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// TwitterAccounts media type (default view)
+//
+// Identifier: application/vnd.app.twitter_accounts+json; view=default
+type TwitterAccounts struct {
+	TwitterAccounts TwitterAccountCollection `form:"twitter_accounts" json:"twitter_accounts" xml:"twitter_accounts"`
+}
+
+// Validate validates the TwitterAccounts media type instance.
+func (mt *TwitterAccounts) Validate() (err error) {
+	if mt.TwitterAccounts == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitter_accounts"))
+	}
+	if err2 := mt.TwitterAccounts.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeTwitterAccounts decodes the TwitterAccounts instance encoded in resp body.
+func (c *Client) DecodeTwitterAccounts(resp *http.Response) (*TwitterAccounts, error) {
+	var decoded TwitterAccounts
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // User media type (default view)
 //
 // Identifier: application/vnd.app.user+json; view=default
@@ -573,6 +612,13 @@ func (mt *Users) Validate() (err error) {
 // DecodeUsers decodes the Users instance encoded in resp body.
 func (c *Client) DecodeUsers(resp *http.Response) (*Users, error) {
 	var decoded Users
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DecodeErrorResponse decodes the ErrorResponse instance encoded in resp body.
+func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, error) {
+	var decoded goa.ErrorResponse
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

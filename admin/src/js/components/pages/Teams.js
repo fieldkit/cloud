@@ -89,8 +89,12 @@ export class Teams extends Component {
   }
 
   async onMemberDelete() {
-    
+
   }
+
+  deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
+    return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
+  }  
 
   render() {
     const { match } = this.props;

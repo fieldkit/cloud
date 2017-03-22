@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 
 import { FKApiClient } from '../../api/api';
-import { errorsFor } from '../../common/util';
+import { FormItem } from '../forms/FormItem';
 
 import type { APIErrors, APIUserProfile } from '../../api/types';
 
@@ -78,50 +78,44 @@ export class Profile extends Component {
   }
 
   render() {
+    const {
+      name,
+      bio,
+      errors,
+      username,
+      email,
+      oldPassword,
+      newPassword,
+      newPasswordConfirmation
+    } = this.state;
+
+    const onChange = this.handleInputChange.bind(this);
+
     return (
       <div className="profile-page">
         <h1>Profile</h1>
         <div className="profile-form">
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input ref="name" id="name" name="name" type="text" value={this.state.name} />
-            { errorsFor(this.state.errors, 'name') }
-          </div>
-          <div className="form-group">
-            <label htmlFor="bio">Bio</label>
-            <input ref="bio" id="bio" name="bio" type="text" value={this.state.bio} />
-            { errorsFor(this.state.errors, 'bio') }
-          </div>
+          <FormItem labelText="Name" name="name" value={name} errors={errors} onChange={onChange} />
+          <FormItem labelText="Bio" name="bio" value={bio} errors={errors} onChange={onChange} />
         </div>
 
         <div className="account-settings">
           <div className="form-group">
             <label htmlFor="username">Username</label>
-            <span name="username">{this.state.username}</span>
+            <span className="disabled-form">{username}</span>
           </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
-            <span name="username">{this.state.email}</span>
+            <span className="disabled-form">{email}</span>
           </div>
         </div>
 
         <div className="password-form">
           <h3>Change Password</h3>
-          <div className="form-group">
-            <label htmlFor="oldPassword">Old Pasword</label>
-            <input type="text" name="oldPassword" className="lg" value={this.state.oldPassword} onChange={this.handleInputChange.bind(this)} />
-            { errorsFor(this.state.passwordErrors, 'oldPassword') }
-          </div>
-          <div className="form-group">
-            <label htmlFor="newPassword">Old Pasword</label>
-            <input type="text" name="newPassword" className="lg" value={this.state.newPassword} onChange={this.handleInputChange.bind(this)} />
-            { errorsFor(this.state.passwordErrors, 'newPassword') }
-          </div>
-          <div className="form-group">
-            <label htmlFor="newPasswordConfirmation">Old Pasword</label>
-            <input type="text" name="newPasswordConfirmation" className="lg" value={this.state.newPasswordConfirmation} onChange={this.handleInputChange.bind(this)} />
-            { errorsFor(this.state.passwordErrors, 'newPasswordConfirmation') }
-          </div>
+          <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} />
+          <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} />
+          <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} />
+
           <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
         </div>
       </div>

@@ -20,10 +20,14 @@ export class BaseError {
   }
 }
 
-export function errorsFor(errors: ?APIErrors, key: string) {
-  if (errors && errors.meta[key]) {
-    return errors.meta[key];
+export function errorsFor(errors: ?APIErrors, key: string): ?string {
+  if (errors && errors.meta[`response.${key}`]) {
+    return errors.meta[`response.${key}`];
   }
+}
+
+export function errorClass(errors: ?APIErrors, key: string): string {
+  return errorsFor(errors, key) ? 'with-errors' : '';
 }
 
 export function slugify(input: string): string {

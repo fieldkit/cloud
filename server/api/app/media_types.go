@@ -124,64 +124,35 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
-// Input media type (default view)
-//
-// Identifier: application/vnd.app.input+json; view=default
-type Input struct {
-	Active       bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	Type         string `form:"type" json:"type" xml:"type"`
-}
-
-// Validate validates the Input media type instance.
-func (mt *Input) Validate() (err error) {
-
-	if mt.Type == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
-	}
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-
-	if !(mt.Type == "webhook" || mt.Type == "twitter") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, mt.Type, []interface{}{"webhook", "twitter"}))
-	}
-	return
-}
-
-// InputCollection is the media type for an array of Input (default view)
-//
-// Identifier: application/vnd.app.input+json; type=collection; view=default
-type InputCollection []*Input
-
-// Validate validates the InputCollection media type instance.
-func (mt InputCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default
 type Inputs struct {
-	Inputs InputCollection `form:"inputs" json:"inputs" xml:"inputs"`
+	TwitterAccounts TwitterAccountCollection `form:"twitter_accounts,omitempty" json:"twitter_accounts,omitempty" xml:"twitter_accounts,omitempty"`
 }
 
 // Validate validates the Inputs media type instance.
 func (mt *Inputs) Validate() (err error) {
-	if mt.Inputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputs"))
-	}
-	if err2 := mt.Inputs.Validate(); err2 != nil {
+	if err2 := mt.TwitterAccounts.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// Location media type (default view)
+//
+// Identifier: application/vnd.app.location+json; view=default
+type Location struct {
+	Location string `form:"location" json:"location" xml:"location"`
+}
+
+// Validate validates the Location media type instance.
+func (mt *Location) Validate() (err error) {
+	if mt.Location == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatURI, mt.Location); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.location`, mt.Location, goa.FormatURI, err2))
 	}
 	return
 }
@@ -366,6 +337,60 @@ func (mt *Teams) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "teams"))
 	}
 	if err2 := mt.Teams.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// TwitterAccount media type (default view)
+//
+// Identifier: application/vnd.app.twitter_account+json; view=default
+type TwitterAccount struct {
+	ExpeditionID     int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID               int    `form:"id" json:"id" xml:"id"`
+	ScreenName       string `form:"screen_name" json:"screen_name" xml:"screen_name"`
+	TwitterAccountID int    `form:"twitter_account_id" json:"twitter_account_id" xml:"twitter_account_id"`
+}
+
+// Validate validates the TwitterAccount media type instance.
+func (mt *TwitterAccount) Validate() (err error) {
+
+	if mt.ScreenName == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "screen_name"))
+	}
+	return
+}
+
+// TwitterAccountCollection is the media type for an array of TwitterAccount (default view)
+//
+// Identifier: application/vnd.app.twitter_account+json; type=collection; view=default
+type TwitterAccountCollection []*TwitterAccount
+
+// Validate validates the TwitterAccountCollection media type instance.
+func (mt TwitterAccountCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// TwitterAccounts media type (default view)
+//
+// Identifier: application/vnd.app.twitter_accounts+json; view=default
+type TwitterAccounts struct {
+	TwitterAccounts TwitterAccountCollection `form:"twitter_accounts" json:"twitter_accounts" xml:"twitter_accounts"`
+}
+
+// Validate validates the TwitterAccounts media type instance.
+func (mt *TwitterAccounts) Validate() (err error) {
+	if mt.TwitterAccounts == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitter_accounts"))
+	}
+	if err2 := mt.TwitterAccounts.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return

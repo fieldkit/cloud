@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      user_id: 3.7761713e+18
+      user_id: 1.6821646e+18
     properties:
       user_id:
-        example: 3.7761713e+18
+        example: 1.6821646e+18
         format: int64
         type: integer
     required:
@@ -15,18 +15,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Est amet ipsam reprehenderit totam dolorem impedit.
-      name: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
-      slug: ux7jxef7un
+      description: Asperiores nostrum.
+      name: Dignissimos aut repellendus quam soluta odio.
+      slug: 3n7ahu8r8v
     properties:
       description:
-        example: Est amet ipsam reprehenderit totam dolorem impedit.
+        example: Asperiores nostrum.
         type: string
       name:
-        example: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+        example: Dignissimos aut repellendus quam soluta odio.
         type: string
       slug:
-        example: ux7jxef7un
+        example: 3n7ahu8r8v
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -36,40 +36,16 @@ definitions:
     - description
     title: AddExpeditionPayload
     type: object
-  AddInputPayload:
-    example:
-      active: true
-      name: Dolorum provident eligendi ut voluptatem.
-      type: webhook
-    properties:
-      active:
-        example: true
-        type: boolean
-      name:
-        example: Dolorum provident eligendi ut voluptatem.
-        type: string
-      type:
-        enum:
-        - webhook
-        - twitter
-        example: webhook
-        type: string
-    required:
-    - type
-    - name
-    - active
-    title: AddInputPayload
-    type: object
   AddMemberPayload:
     example:
-      role: Porro iusto quaerat ea quibusdam.
-      user_id: 5.391817e+18
+      role: A voluptas.
+      user_id: 6.5765226e+17
     properties:
       role:
-        example: Porro iusto quaerat ea quibusdam.
+        example: A voluptas.
         type: string
       user_id:
-        example: 5.391817e+18
+        example: 6.5765226e+17
         format: int64
         type: integer
     required:
@@ -79,18 +55,18 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Et autem aliquid voluptate.
-      name: Dolores quo suscipit.
-      slug: 54othhnivt
+      description: Itaque qui sequi.
+      name: Laudantium quo eos fuga ab repudiandae.
+      slug: ic2d6hce00
     properties:
       description:
-        example: Et autem aliquid voluptate.
+        example: Itaque qui sequi.
         type: string
       name:
-        example: Dolores quo suscipit.
+        example: Laudantium quo eos fuga ab repudiandae.
         type: string
       slug:
-        example: 54othhnivt
+        example: ic2d6hce00
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -102,18 +78,18 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Odio eum quis ut repellendus ratione.
-      name: Dolores rerum praesentium ratione et dolores.
-      slug: alpfpmgz0o
+      description: Consequatur ullam sed magni.
+      name: Et blanditiis debitis eos iure ea.
+      slug: jv73wy8mr3
     properties:
       description:
-        example: Odio eum quis ut repellendus ratione.
+        example: Consequatur ullam sed magni.
         type: string
       name:
-        example: Dolores rerum praesentium ratione et dolores.
+        example: Et blanditiis debitis eos iure ea.
         type: string
       slug:
-        example: alpfpmgz0o
+        example: jv73wy8mr3
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -125,24 +101,24 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: christina@cremin.biz
-      invite_token: Qui perspiciatis adipisci aut ducimus.
-      password: fvtq833guc
-      username: 7ez0kvi3i1
+      email: jailyn.ernser@brekkeankunding.com
+      invite_token: Occaecati occaecati omnis sint.
+      password: y52dmi76ci
+      username: gd200jauck
     properties:
       email:
-        example: christina@cremin.biz
+        example: jailyn.ernser@brekkeankunding.com
         format: email
         type: string
       invite_token:
-        example: Qui perspiciatis adipisci aut ducimus.
+        example: Occaecati occaecati omnis sint.
         type: string
       password:
-        example: fvtq833guc
+        example: y52dmi76ci
         minLength: 10
         type: string
       username:
-        example: 7ez0kvi3i1
+        example: gd200jauck
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -212,14 +188,6 @@ definitions:
         id: 1.2402411e+18
         name: Saepe facilis quis blanditiis recusandae est.
         slug: ap0fuesxsv
-      - description: Qui possimus porro quaerat.
-        id: 1.2402411e+18
-        name: Saepe facilis quis blanditiis recusandae est.
-        slug: ap0fuesxsv
-      - description: Qui possimus porro quaerat.
-        id: 1.2402411e+18
-        name: Saepe facilis quis blanditiis recusandae est.
-        slug: ap0fuesxsv
     properties:
       expeditions:
         $ref: '#/definitions/ExpeditionCollection'
@@ -227,89 +195,43 @@ definitions:
     - expeditions
     title: 'Mediatype identifier: application/vnd.app.expeditions+json; view=default'
     type: object
-  Input:
-    description: Input media type (default view)
-    example:
-      active: true
-      expedition_id: 4.464267e+18
-      id: 3.6825135e+17
-      name: Laboriosam aut voluptatum.
-      type: twitter
-    properties:
-      active:
-        example: true
-        type: boolean
-      expedition_id:
-        example: 4.464267e+18
-        format: int64
-        type: integer
-      id:
-        example: 3.6825135e+17
-        format: int64
-        type: integer
-      name:
-        example: Laboriosam aut voluptatum.
-        type: string
-      type:
-        enum:
-        - webhook
-        - twitter
-        example: twitter
-        type: string
-    required:
-    - id
-    - expedition_id
-    - type
-    - name
-    - active
-    title: 'Mediatype identifier: application/vnd.app.input+json; view=default'
-    type: object
-  InputCollection:
-    description: InputCollection is the media type for an array of Input (default
-      view)
-    example:
-    - active: true
-      expedition_id: 4.464267e+18
-      id: 3.6825135e+17
-      name: Laboriosam aut voluptatum.
-      type: twitter
-    items:
-      $ref: '#/definitions/Input'
-    title: 'Mediatype identifier: application/vnd.app.input+json; type=collection;
-      view=default'
-    type: array
   Inputs:
     description: Inputs media type (default view)
     example:
-      inputs:
-      - active: true
-        expedition_id: 4.464267e+18
+      twitter_accounts:
+      - expedition_id: 4.464267e+18
         id: 3.6825135e+17
-        name: Laboriosam aut voluptatum.
-        type: twitter
-      - active: true
-        expedition_id: 4.464267e+18
-        id: 3.6825135e+17
-        name: Laboriosam aut voluptatum.
-        type: twitter
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
     properties:
-      inputs:
-        $ref: '#/definitions/InputCollection'
-    required:
-    - inputs
+      twitter_accounts:
+        $ref: '#/definitions/TwitterAccountCollection'
     title: 'Mediatype identifier: application/vnd.app.inputs+json; view=default'
+    type: object
+  Location:
+    description: Location media type (default view)
+    example:
+      location: http://stehr.net/lura
+    properties:
+      location:
+        example: http://stehr.net/lura
+        format: uri
+        type: string
+    required:
+    - location
+    title: 'Mediatype identifier: application/vnd.app.location+json; view=default'
     type: object
   LoginPayload:
     example:
-      password: 056gahfdgb
-      username: yauoy52dmi
+      password: p4mrpluru5
+      username: rgjkna1y63
     properties:
       password:
-        example: 056gahfdgb
+        example: p4mrpluru5
         minLength: 10
         type: string
       username:
-        example: yauoy52dmi
+        example: rgjkna1y63
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -321,23 +243,23 @@ definitions:
   Project:
     description: Project media type (default view)
     example:
-      description: Voluptatem et debitis ducimus.
-      id: 1.7504376e+18
-      name: Unde recusandae provident earum.
-      slug: h0wekapbuk
+      description: Eum enim deleniti sint velit qui.
+      id: 1.3454926e+17
+      name: Quidem quis fugit commodi ut.
+      slug: 7z8os8qw8b
     properties:
       description:
-        example: Voluptatem et debitis ducimus.
+        example: Eum enim deleniti sint velit qui.
         type: string
       id:
-        example: 1.7504376e+18
+        example: 1.3454926e+17
         format: int64
         type: integer
       name:
-        example: Unde recusandae provident earum.
+        example: Quidem quis fugit commodi ut.
         type: string
       slug:
-        example: h0wekapbuk
+        example: 7z8os8qw8b
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -388,6 +310,10 @@ definitions:
       administrators:
       - project_id: 1.2833427e+18
         user_id: 6.2970576e+18
+      - project_id: 1.2833427e+18
+        user_id: 6.2970576e+18
+      - project_id: 1.2833427e+18
+        user_id: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -399,18 +325,14 @@ definitions:
     description: ProjectCollection is the media type for an array of Project (default
       view)
     example:
-    - description: Voluptatem et debitis ducimus.
-      id: 1.7504376e+18
-      name: Unde recusandae provident earum.
-      slug: h0wekapbuk
-    - description: Voluptatem et debitis ducimus.
-      id: 1.7504376e+18
-      name: Unde recusandae provident earum.
-      slug: h0wekapbuk
-    - description: Voluptatem et debitis ducimus.
-      id: 1.7504376e+18
-      name: Unde recusandae provident earum.
-      slug: h0wekapbuk
+    - description: Eum enim deleniti sint velit qui.
+      id: 1.3454926e+17
+      name: Quidem quis fugit commodi ut.
+      slug: 7z8os8qw8b
+    - description: Eum enim deleniti sint velit qui.
+      id: 1.3454926e+17
+      name: Quidem quis fugit commodi ut.
+      slug: 7z8os8qw8b
     items:
       $ref: '#/definitions/Project'
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
@@ -420,18 +342,10 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Voluptatem et debitis ducimus.
-        id: 1.7504376e+18
-        name: Unde recusandae provident earum.
-        slug: h0wekapbuk
-      - description: Voluptatem et debitis ducimus.
-        id: 1.7504376e+18
-        name: Unde recusandae provident earum.
-        slug: h0wekapbuk
-      - description: Voluptatem et debitis ducimus.
-        id: 1.7504376e+18
-        name: Unde recusandae provident earum.
-        slug: h0wekapbuk
+      - description: Eum enim deleniti sint velit qui.
+        id: 1.3454926e+17
+        name: Quidem quis fugit commodi ut.
+        slug: 7z8os8qw8b
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -441,10 +355,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Voluptatem explicabo.
+      refresh_token: Vel quisquam voluptatem doloribus.
     properties:
       refresh_token:
-        example: Voluptatem explicabo.
+        example: Vel quisquam voluptatem doloribus.
         type: string
     required:
     - refresh_token
@@ -453,23 +367,23 @@ definitions:
   Team:
     description: Team media type (default view)
     example:
-      description: Consequatur debitis sit ratione aut.
-      id: 6.953372e+18
-      name: Amet reiciendis odit.
-      slug: zajwq8p9r0
+      description: Ipsam reprehenderit totam dolorem impedit hic.
+      id: 6.0403337e+18
+      name: Repellendus cupiditate nemo doloribus.
+      slug: bux7jxef7u
     properties:
       description:
-        example: Consequatur debitis sit ratione aut.
+        example: Ipsam reprehenderit totam dolorem impedit hic.
         type: string
       id:
-        example: 6.953372e+18
+        example: 6.0403337e+18
         format: int64
         type: integer
       name:
-        example: Amet reiciendis odit.
+        example: Repellendus cupiditate nemo doloribus.
         type: string
       slug:
-        example: zajwq8p9r0
+        example: bux7jxef7u
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -483,18 +397,18 @@ definitions:
   TeamCollection:
     description: TeamCollection is the media type for an array of Team (default view)
     example:
-    - description: Consequatur debitis sit ratione aut.
-      id: 6.953372e+18
-      name: Amet reiciendis odit.
-      slug: zajwq8p9r0
-    - description: Consequatur debitis sit ratione aut.
-      id: 6.953372e+18
-      name: Amet reiciendis odit.
-      slug: zajwq8p9r0
-    - description: Consequatur debitis sit ratione aut.
-      id: 6.953372e+18
-      name: Amet reiciendis odit.
-      slug: zajwq8p9r0
+    - description: Ipsam reprehenderit totam dolorem impedit hic.
+      id: 6.0403337e+18
+      name: Repellendus cupiditate nemo doloribus.
+      slug: bux7jxef7u
+    - description: Ipsam reprehenderit totam dolorem impedit hic.
+      id: 6.0403337e+18
+      name: Repellendus cupiditate nemo doloribus.
+      slug: bux7jxef7u
+    - description: Ipsam reprehenderit totam dolorem impedit hic.
+      id: 6.0403337e+18
+      name: Repellendus cupiditate nemo doloribus.
+      slug: bux7jxef7u
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
@@ -503,19 +417,19 @@ definitions:
   TeamMember:
     description: TeamMember media type (default view)
     example:
-      role: Incidunt consequuntur fugit non ut.
-      team_id: 7.202539e+18
-      user_id: 3.0649945e+18
+      role: Et amet amet reiciendis.
+      team_id: 5.857079e+18
+      user_id: 5.3071106e+18
     properties:
       role:
-        example: Incidunt consequuntur fugit non ut.
+        example: Et amet amet reiciendis.
         type: string
       team_id:
-        example: 7.202539e+18
+        example: 5.857079e+18
         format: int64
         type: integer
       user_id:
-        example: 3.0649945e+18
+        example: 5.3071106e+18
         format: int64
         type: integer
     required:
@@ -528,12 +442,15 @@ definitions:
     description: TeamMemberCollection is the media type for an array of TeamMember
       (default view)
     example:
-    - role: Incidunt consequuntur fugit non ut.
-      team_id: 7.202539e+18
-      user_id: 3.0649945e+18
-    - role: Incidunt consequuntur fugit non ut.
-      team_id: 7.202539e+18
-      user_id: 3.0649945e+18
+    - role: Et amet amet reiciendis.
+      team_id: 5.857079e+18
+      user_id: 5.3071106e+18
+    - role: Et amet amet reiciendis.
+      team_id: 5.857079e+18
+      user_id: 5.3071106e+18
+    - role: Et amet amet reiciendis.
+      team_id: 5.857079e+18
+      user_id: 5.3071106e+18
     items:
       $ref: '#/definitions/TeamMember'
     title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
@@ -543,12 +460,9 @@ definitions:
     description: TeamMembers media type (default view)
     example:
       members:
-      - role: Incidunt consequuntur fugit non ut.
-        team_id: 7.202539e+18
-        user_id: 3.0649945e+18
-      - role: Incidunt consequuntur fugit non ut.
-        team_id: 7.202539e+18
-        user_id: 3.0649945e+18
+      - role: Et amet amet reiciendis.
+        team_id: 5.857079e+18
+        user_id: 5.3071106e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -560,10 +474,10 @@ definitions:
     description: Teams media type (default view)
     example:
       teams:
-      - description: Consequatur debitis sit ratione aut.
-        id: 6.953372e+18
-        name: Amet reiciendis odit.
-        slug: zajwq8p9r0
+      - description: Ipsam reprehenderit totam dolorem impedit hic.
+        id: 6.0403337e+18
+        name: Repellendus cupiditate nemo doloribus.
+        slug: bux7jxef7u
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -571,18 +485,80 @@ definitions:
     - teams
     title: 'Mediatype identifier: application/vnd.app.teams+json; view=default'
     type: object
+  TwitterAccount:
+    description: TwitterAccount media type (default view)
+    example:
+      expedition_id: 4.464267e+18
+      id: 3.6825135e+17
+      screen_name: Laboriosam aut voluptatum.
+      twitter_account_id: 2.2726114e+18
+    properties:
+      expedition_id:
+        example: 4.464267e+18
+        format: int64
+        type: integer
+      id:
+        example: 3.6825135e+17
+        format: int64
+        type: integer
+      screen_name:
+        example: Laboriosam aut voluptatum.
+        type: string
+      twitter_account_id:
+        example: 2.2726114e+18
+        format: int64
+        type: integer
+    required:
+    - id
+    - expedition_id
+    - twitter_account_id
+    - screen_name
+    title: 'Mediatype identifier: application/vnd.app.twitter_account+json; view=default'
+    type: object
+  TwitterAccountCollection:
+    description: TwitterAccountCollection is the media type for an array of TwitterAccount
+      (default view)
+    example:
+    - expedition_id: 4.464267e+18
+      id: 3.6825135e+17
+      screen_name: Laboriosam aut voluptatum.
+      twitter_account_id: 2.2726114e+18
+    - expedition_id: 4.464267e+18
+      id: 3.6825135e+17
+      screen_name: Laboriosam aut voluptatum.
+      twitter_account_id: 2.2726114e+18
+    items:
+      $ref: '#/definitions/TwitterAccount'
+    title: 'Mediatype identifier: application/vnd.app.twitter_account+json; type=collection;
+      view=default'
+    type: array
+  TwitterAccounts:
+    description: TwitterAccounts media type (default view)
+    example:
+      twitter_accounts:
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
+    properties:
+      twitter_accounts:
+        $ref: '#/definitions/TwitterAccountCollection'
+    required:
+    - twitter_accounts
+    title: 'Mediatype identifier: application/vnd.app.twitter_accounts+json; view=default'
+    type: object
   User:
     description: User media type (default view)
     example:
-      id: 3.4522485e+18
-      username: 9s67z8os8q
+      id: 5.5453506e+18
+      username: gzslj0tddk
     properties:
       id:
-        example: 3.4522485e+18
+        example: 5.5453506e+18
         format: int64
         type: integer
       username:
-        example: 9s67z8os8q
+        example: gzslj0tddk
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -594,12 +570,12 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - id: 3.4522485e+18
-      username: 9s67z8os8q
-    - id: 3.4522485e+18
-      username: 9s67z8os8q
-    - id: 3.4522485e+18
-      username: 9s67z8os8q
+    - id: 5.5453506e+18
+      username: gzslj0tddk
+    - id: 5.5453506e+18
+      username: gzslj0tddk
+    - id: 5.5453506e+18
+      username: gzslj0tddk
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -609,8 +585,8 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - id: 3.4522485e+18
-        username: 9s67z8os8q
+      - id: 5.5453506e+18
+        username: gzslj0tddk
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -618,77 +594,49 @@ definitions:
     - users
     title: 'Mediatype identifier: application/vnd.app.users+json; view=default'
     type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
 host: api.data.fieldkit.org
 info:
   description: A one-click open platform for field researchers and explorers.
   title: Fieldkit API
   version: ""
 paths:
-  /expedition/{expedition_id}/input:
-    post:
-      description: |-
-        Add a input
-
-        Required security scopes:
-          * `api:access`
-      operationId: input#add
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddInputPayload'
-      produces:
-      - application/vnd.app.input+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Input'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add input
-      tags:
-      - input
-  /expedition/{expedition_id}/inputs:
-    get:
-      description: |-
-        List a project's inputs
-
-        Required security scopes:
-          * `api:access`
-      operationId: input#list id
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.inputs+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Inputs'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id input
-      tags:
-      - input
   /expeditions/{expedition_id}:
     get:
       description: |-
@@ -719,6 +667,96 @@ paths:
       summary: get id expedition
       tags:
       - expedition
+  /expeditions/{expedition_id}/inputs:
+    get:
+      description: |-
+        List a project's inputs
+
+        Required security scopes:
+          * `api:access`
+      operationId: input#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.inputs+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Inputs'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id input
+      tags:
+      - input
+  /expeditions/{expedition_id}/inputs/twitter-account:
+    post:
+      description: |-
+        Add a Twitter account input
+
+        Required security scopes:
+          * `api:access`
+      operationId: twitter#add
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.location+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Location'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add twitter
+      tags:
+      - twitter
+  /expeditions/{expedition_id}/inputs/twitter-accounts:
+    get:
+      description: |-
+        List an expedition's Twitter account inputs
+
+        Required security scopes:
+          * `api:access`
+      operationId: twitter#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.twitter_accounts+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TwitterAccounts'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id twitter
+      tags:
+      - twitter
   /expeditions/{expedition_id}/team:
     post:
       description: |-
@@ -784,26 +822,26 @@ paths:
       summary: list id team
       tags:
       - team
-  /inputs/{input_id}:
+  /inputs/twitter-accounts/{input_id}:
     get:
       description: |-
-        Add a input
+        Get a Twitter account input
 
         Required security scopes:
           * `api:access`
-      operationId: input#get id
+      operationId: twitter#get id
       parameters:
       - in: path
         name: input_id
         required: true
         type: integer
       produces:
-      - application/vnd.app.input+json
+      - application/vnd.app.twitter_account+json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Input'
+            $ref: '#/definitions/TwitterAccount'
         "400":
           description: Bad Request
       schemes:
@@ -811,9 +849,9 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: get id input
+      summary: get id twitter
       tags:
-      - input
+      - twitter
   /login:
     post:
       description: Creates a valid JWT given login credentials.
@@ -824,6 +862,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/LoginPayload'
+      produces:
+      - application/vnd.goa.error
       responses:
         "204":
           description: No Content
@@ -835,6 +875,8 @@ paths:
           description: Bad Request
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: login user
@@ -1125,24 +1167,18 @@ paths:
       summary: list input
       tags:
       - input
-  /projects/@/{project}/expeditions/@/{expedition}/inputs/@/{input}:
+  /projects/@/{project}/expeditions/@/{expedition}/inputs/twitter-accounts:
     get:
       description: |-
-        Add a input
+        List an expedition's Twitter account inputs
 
         Required security scopes:
           * `api:access`
-      operationId: input#get
+      operationId: twitter#list
       parameters:
       - description: Expedition slug
         in: path
         name: expedition
-        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
-        required: true
-        type: string
-      - description: Input slug
-        in: path
-        name: input
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
@@ -1153,12 +1189,12 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.app.input+json
+      - application/vnd.app.twitter_accounts+json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Input'
+            $ref: '#/definitions/TwitterAccounts'
         "400":
           description: Bad Request
       schemes:
@@ -1166,9 +1202,9 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: get input
+      summary: list twitter
       tags:
-      - input
+      - twitter
   /projects/@/{project}/expeditions/@/{expedition}/teams:
     get:
       description: |-
@@ -1254,7 +1290,7 @@ paths:
   /projects/@/{project}/expeditions/@/{expedition}/teams/@/{team}/members:
     get:
       description: |-
-        List an teams's members
+        List an team's members
 
         Required security scopes:
           * `api:access`
@@ -1774,6 +1810,32 @@ paths:
       summary: get id member
       tags:
       - member
+  /twitter/callback:
+    get:
+      description: OAuth callback endpoint for Twitter
+      operationId: twitter#callback
+      parameters:
+      - in: query
+        name: oauth_token
+        required: true
+        type: string
+      - in: query
+        name: oauth_verifier
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+          headers:
+            Location:
+              type: string
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: callback twitter
+      tags:
+      - twitter
   /user:
     get:
       description: |-

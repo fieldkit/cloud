@@ -1,10 +1,11 @@
 .git
 .gitignore
-admin/
 admin-archive/
+admin/
 build
 build.bash
 docker-compose.yml
+fieldkit.env
 postgres-init.sh
 README.md
 run.sh

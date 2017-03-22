@@ -4,6 +4,8 @@ import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 
+import log from 'loglevel';
+
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
@@ -17,6 +19,8 @@ import { Profile } from './pages/Profile';
 
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
+import externalLinkImg from '../../img/icons/icon-external-link.png'
+import gearImg from '../../img/icons/icon-gear.png'
 import '../../css/main.css'
 
 type Props = {
@@ -31,8 +35,10 @@ export class Main extends Component {
     loading: boolean,
     redirectTo: ?string,
     user: ?APIUser,
-    project: ?APIProject,
-    expedition: ?APIExpedition
+    projects: ?APIProject[],
+    expeditions: ?APIExpedition[],
+    activeProject: ?APIProject,
+    activeExpedition: ?APIExpedition
   }
 
   constructor(props: Props) {
@@ -42,19 +48,18 @@ export class Main extends Component {
       loading: true,
       redirectTo: null,
       user: null,
-      project: null,
-      expedition: null
+      projects: [],
+      expeditions: [],
+      activeProject: null,
+      activeExpedition: null
     }
-
-    const {
-      projectSlug,
-      expeditionSlug
-    } = props.match.params;
 
     Promise.all([
       this.loadUser(),
-      this.loadProject(projectSlug),
-      this.loadExpedition(projectSlug, expeditionSlug)
+      this.loadProjects(),
+      this.loadExpeditions(this.projectSlug()),
+      this.loadActiveProject(this.projectSlug()),
+      this.loadActiveExpedition(this.projectSlug(), this.expeditionSlug()),
     ]).then(() => this.setState({ loading: false }));
   }
 
@@ -73,17 +78,17 @@ export class Main extends Component {
     } = nextProps.match.params;
 
     if (projectSlug != newProjectSlug) {
-      promises.push(this.loadProject(newProjectSlug));
-      stateChange.project = null;
+      promises.push(this.loadActiveProject(newProjectSlug));
+      stateChange.activeProject = null;
     } else if (!newProjectSlug) {
-      stateChange.project = null;
+      stateChange.activeProject = null;
     }
 
     if (expeditionSlug != newExpeditionSlug) {
-      promises.push(this.loadExpedition(newProjectSlug, newExpeditionSlug));
-      stateChange.expedition = null;
+      promises.push(this.loadActiveExpedition(newProjectSlug, newExpeditionSlug));
+      stateChange.activeExpedition = null;
     } else if (!newExpeditionSlug) {
-      stateChange.expedition = null;
+      stateChange.activeExpedition = null;
     }
 
     if (promises.length > 0 || Object.keys(stateChange).length > 0) {
@@ -102,44 +107,75 @@ export class Main extends Component {
   }
 
   async loadUser() {
+    log.debug('main -> loadUser');
     const userRes = await FKApiClient.get().getCurrentUser();
-    if (userRes.type == 'ok' && userRes.payload) {
+    if (userRes.type === 'ok') {
       this.setState({ user: userRes.payload });
+    } else {
+      this.setState({ user: null });
     }
   }
 
-  async loadProject(projectSlug: ?string = this.projectSlug()) {
+  async loadProjects() {
+    log.debug('main -> loadProjects');
+    const projectRes = await FKApiClient.get().getProjects();
+    if (projectRes.type === 'ok') {
+      this.setState({ projects: projectRes.payload.projects });
+    } else {
+      this.setState({ projects: null });
+    }
+  }
+
+  async loadExpeditions(projectSlug: ?string) {
+    log.debug('main -> loadExpeditions', projectSlug);
+    if (projectSlug) {
+      const expRes = await FKApiClient.get().getExpeditionsByProjectSlug(projectSlug);
+      if (expRes.type === 'ok') {
+        this.setState({ expeditions: expRes.payload.expeditions });
+      }
+    } else {
+      this.setState({ expeditions: null });
+    }
+  }
+
+  async loadActiveProject(projectSlug: ?string ) {
+    log.debug('main -> loadActiveProject', projectSlug);
     if (projectSlug) {
       const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type == 'ok' && projectRes.payload) {
-        this.setState({ project: projectRes.payload });
+      if (projectRes.type === 'ok') {
+        this.setState({ activeProject: projectRes.payload });
       }
     } else {
-      this.setState({ project: null });
+      this.setState({ activeProject: null });
     }
   }
 
-  async loadExpedition(projectSlug: ?string = this.projectSlug(), expeditionSlug: ?string = this.expeditionSlug()) {
+  async loadActiveExpedition(projectSlug: ?string, expeditionSlug: ?string) {
+    log.debug('main -> loadActiveExpedition', projectSlug, expeditionSlug);
     if (projectSlug && expeditionSlug) {
       const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
-      if (expRes.type == 'ok' && expRes.payload) {
-        this.setState({ expedition: expRes.payload });
+      if (expRes.type === 'ok') {
+        this.setState({ activeExpedition: expRes.payload });
       }
     } else {
-      this.setState({ expedition: null });
+      this.setState({ activeExpedition: null });
     }
   }
 
-  onProjectUpdate(newSlug: ?string = null) {
+  async onProjectUpdate(newSlug: ?string = null) {
     if (newSlug) {
       this.setState({ redirectTo: `/projects/${newSlug}`})
     } else {
       this.setState({ loading: true })
-      this.loadProject(this.projectSlug()).then(() => this.setState({ loading: false }));
+      await Promise.all([
+        this.loadProjects(),
+        this.loadActiveProject(this.projectSlug())
+      ]);
+      this.setState({ loading: false });
     }
   }
 
-  onExpeditionUpdate(newSlug: ?string = null) {
+  async onExpeditionUpdate(newSlug: ?string = null) {
     if (newSlug) {
       const projectSlug = this.projectSlug();
       if (projectSlug) {
@@ -148,8 +184,12 @@ export class Main extends Component {
         this.setState({ redirectTo: '/' });
       }
     } else {
-      this.setState({ loading: true })
-      this.loadExpedition().then(() => this.setState({ loading: false }));
+      this.setState({ loading: true });
+      await Promise.all([
+        this.loadExpeditions(this.projectSlug()),
+        this.loadActiveExpedition(this.projectSlug(), this.expeditionSlug())
+      ]);
+      this.setState({ loading: false });
     }
   }
 
@@ -164,48 +204,86 @@ export class Main extends Component {
 
     const {
       user,
-      project,
-      expedition
+      activeProject,
+      activeExpedition
     } = this.state;
 
-    const breadcrumbs = [];
-    if (project && this.projectSlug()) {
-      breadcrumbs.push(
-        <Link key={0} to={`/projects/${project.slug}`}>{project.name}</Link>
-      );
-      if (expedition && this.expeditionSlug()) {
-        breadcrumbs.push(
-          <Link key={1} to={`/projects/${project.slug}/expeditions/${expedition.slug}`}>{expedition.name}</Link>
-        );
-      }
+    let {
+      projects,
+      expeditions
+    } = this.state;
+
+    if (projects && activeProject) {
+      projects = projects.filter(p => p.id !== activeProject.id);
+    }
+
+    if (expeditions && activeExpedition) {
+      expeditions = expeditions.filter(e => e.id !== activeExpedition.id);
     }
 
     return (
       <div className="main">
         <div className="left">
           <div className="logo-area">
-            <img src={fieldkitLogo} alt="fieldkit logo" />
+            <Link to="/"><img src={fieldkitLogo} alt="fieldkit logo" /></Link>
           </div>
 
-          { project && expedition &&
-            <div className="expedition-sidebar">
-              <div className="settings">
-                <Link to={`/projects/${project.slug}/expeditions/${expedition.slug}`} className="bt-icon medium settings"></Link>
-              </div>            
-              <div className="expedition-name">
-                <span>{expedition.name}</span>
-                {/* TODO: use image icon */}
-                <a href={`https://${project.slug}.fieldkit.org/${expedition.slug}`}
-                  alt="go to expedition"
-                  target="_blank"
-                  className="bt-icon new-window"
-                />
+          { activeProject &&
+            <div className="sidebar">
+              <div className="sidebar-section project-nav">
+                <div className="name project-name">
+                  <Link to={`/projects/${activeProject.slug}`}>{activeProject.name}</Link>
+                  <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
+                    <img src={externalLinkImg} alt="external link" />
+                  </a>
+                </div>
+                <div className="settings">
+                  <Link to={`/projects/${activeProject.slug}/settings`}>
+                    <img src={gearImg} alt="settings gear" />
+                  </Link>
+                </div>
+                { !activeExpedition &&
+                  <div className="sidebar-nav">
+                    <NavLink to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
+                  </div> }
               </div>
-              <div className="nav">
-                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/datasources`}>Data Sources</NavLink>
-                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/teams`}>Teams</NavLink>
-                <NavLink to={`/projects/${project.slug}/expeditions/${expedition.slug}/website`}>Website</NavLink>
-              </div>
+              { activeExpedition &&
+                <div className="sidebar-section expedition-nav">
+                  <div className="name expedition-name">
+                    <Link to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>{activeExpedition.name}</Link>
+                    <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
+                      alt="go to expedition"
+                      target="_blank">
+                      <img src={externalLinkImg} alt="external link" />
+                    </a>
+                  </div>
+                  <div className="settings">
+                    <Link to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>
+                      <img src={gearImg} alt="settings gear" />
+                    </Link>
+                  </div>
+                  <div className="sidebar-nav">
+                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
+                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
+                    {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
+                  </div>
+              </div> }
+              { activeProject && !activeExpedition && projects &&
+                <div className="project-select">
+                  <ul>
+                    { projects.map((p, i) => (
+                      <li key={i}><Link to={`/projects/${p.slug}`}>{p.name}</Link></li>
+                    ))}
+                  </ul>
+                </div> }
+              { activeProject && activeExpedition && expeditions &&
+                <div className="expedition-select">
+                  <ul>
+                    { expeditions.map((e, i) => (
+                      <li key={i}><Link to={`/projects/${activeProject.slug}/expeditions/${e.slug}`}>{e.name}</Link></li>
+                    ))}
+                  </ul>
+                </div> }
             </div> }
 
           <footer>
@@ -215,9 +293,6 @@ export class Main extends Component {
 
         <div className="right">
           <div className="nav">
-            <div className="breadcrumbs">
-              { breadcrumbs.length > 0 && breadcrumbs.reduce((prev, curr) => [prev, ' / ', curr]) }
-            </div>
             <Dropdown className="account-dropdown" ref="dropdown">
               <DropdownTrigger className="trigger">
                 <img src={placeholderImage} alt="profile" />
@@ -239,33 +314,39 @@ export class Main extends Component {
               <RouteOrLoading
                 path="/projects/:projectSlug/expeditions/:expeditionSlug/teams"
                 component={Teams}
-                required={[project, expedition]}
-                project={project}
-                expedition={expedition} />
+                required={[activeProject, activeExpedition]}
+                project={activeProject}
+                expedition={activeExpedition} />
               <RouteOrLoading
                 path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources"
                 component={DataSources}
-                required={[project, expedition]}
-                project={project}
-                expedition={expedition} />
+                required={[activeProject, activeExpedition]}
+                project={activeProject}
+                expedition={activeExpedition} />
               <RouteOrLoading
                 path="/projects/:projectSlug/expeditions/:expeditionSlug"
                 component={Expedition}
-                required={[project, expedition]}
-                project={project}
-                expedition={expedition} />
+                required={[activeProject, activeExpedition]}
+                project={activeProject}
+                expedition={activeExpedition}
+                onUpdate={this.onExpeditionUpdate.bind(this)} />
               <RouteOrLoading
                 path="/projects/:projectSlug"
                 component={Project}
-                required={[project]}
-                project={project} />
+                required={[activeProject, expeditions]}
+                project={activeProject}
+                expeditions={expeditions}
+                onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
                 path="/profile"
                 component={Profile}
                 required={[user]}
-                project={user} />
-
-              <Route path="/" component={Projects} />
+                user={user} />
+              <RouteOrLoading
+                path="/"
+                component={Projects}
+                required={[projects]}
+                projects={projects} />
             </Switch>
           </div>
         </div>

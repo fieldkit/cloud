@@ -1,5 +1,7 @@
 // @flow weak
 
+import log from 'loglevel';
+
 import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
 import type { SupportedMethods } from './base-api';
 
@@ -14,8 +16,8 @@ import type {
   APIExpedition,
   APINewExpedition,
   APIExpeditions,
-  APIInput,
-  APINewInput,
+  APITwitterInput,
+  APITwitterInputCreateResponse,
   APIInputs,
   APITeam,
   APINewTeam,
@@ -28,12 +30,15 @@ import type {
   APIAdministrators
 } from './types';
 
-export type FKAPIResponse<T> = {
-  type: 'ok' | 'err';
-  payload?: T;
-  errors?: APIErrors;
-  raw?: string;
+export type FKAPIOKResponse<T> = {
+  type: 'ok';
+  payload: T;
+};
+export type FKAPIErrResponse = {
+  type: 'err';
+  errors: APIErrors;
 }
+export type FKAPIResponse<T> = FKAPIOKResponse<T> | FKAPIErrResponse;
 
 let apiClientInstance;
 export class FKApiClient extends JWTAPIClient {
@@ -115,24 +120,41 @@ export class FKApiClient extends JWTAPIClient {
   async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
     try {
       const res = await p;
-      if (res) {
-        if (parseJSON) {
-          return { type: 'ok', payload: JSON.parse(res) };
-        } else {
-          return { type: 'ok', payload: res };
-        }
-      } else {
-        return { type: 'ok' }
-      }
+      return { type: 'ok', payload: res };
     } catch (e) {
-      if (e instanceof APIError) {
-        if (e.body && parseJSON) {
-          return { type: 'err', errors: JSON.parse(e.body) };
-        } else {
-          return { type: 'err', errors: e.msg };
+      if (e instanceof AuthenticationError) {
+        const APIFakeAuthError: APIErrors = {
+          code: 'AuthenticationError',
+          detail: 'Unauthorized',
+          id: '',
+          meta: {},
+          status: 401
+        };
+        return { type: 'err', errors: APIFakeAuthError };
+      } else if (e instanceof APIError) {
+        const APIFakeOtherError: APIErrors = {
+          code: 'UnknownAPIError',
+          detail: e.body || '',
+          id: '',
+          meta: {},
+          status: 500
+        }
+
+        try {
+          return { type: 'err', errors: APIFakeOtherError };
+        } catch (e2) {
+          return { type: 'err', errors: APIFakeOtherError };
         }
       } else {
-        return { type: 'err', raw: e.body };
+        const APIFakeOtherError: APIErrors = {
+          code: 'UnknownError',
+          detail: e.msg,
+          id: '',
+          meta: {},
+          status: 500
+        }
+
+        return { type: 'err', errors: APIFakeOtherError };
       }
     }
   }
@@ -215,27 +237,19 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
-    return this.getWithErrors(`/expedition/${expeditionId}/inputs`)
+    return this.getWithErrors(`/expeditions/${expeditionId}/inputs`)
   }
 
   getInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputs>> {
     return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs`)
   }
 
-  getInputBySlugs(projectSlug: string, expeditionSlug: string, inputSlug: string): Promise<FKAPIResponse<APIInput>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/@/${inputSlug}`)
+  getTwitterInput(inputId: number): Promise<FKAPIResponse<APITwitterInput>> {
+    return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
   }
 
-  getInput(inputId: number): Promise<FKAPIResponse<APIInput>> {
-    return this.getWithErrors(`/inputs/${inputId}`)
-  }
-
-  createInput(expeditionId: number, values: APINewInput): Promise<FKAPIResponse<APIInput>> {
-    return this.postWithErrors(`/expedition/${expeditionId}/input`, values)
-  }
-
-  updateInput(inputId: number, values: APINewInput): Promise<FKAPIResponse<APIInput>> {
-    return this.postWithErrors(`/inputs/${inputId}`, values)
+  createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-account`)
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {

@@ -5,15 +5,14 @@ import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal'
 
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
-import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewExpedition, APIInput, APINewInput } from '../../api/types';
+import type { APIProject, APIExpedition, APINewExpedition } from '../../api/types';
 
 type Props = {
   project: APIProject;
   expedition: APIExpedition;
-  onExpeditionUpdate: (newSlug: ?string) => void;
+  onUpdate: (newSlug: ?string) => void;
 
   match: Object;
   location: Object;
@@ -30,9 +29,9 @@ export class Expedition extends Component {
     }
 
     if (expeditionRes.slug != this.props.expedition.slug && expeditionRes.payload) {
-      this.props.onExpeditionUpdate(expeditionRes.payload.slug);
+      this.props.onUpdate(expeditionRes.payload.slug);
     } else {
-      this.props.onExpeditionUpdate();
+      this.props.onUpdate();
     }
   }
 

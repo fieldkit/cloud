@@ -68,22 +68,23 @@ export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
-export type APIInputType = 'webhook' | 'twitter';
+export type APITwitterInputCreateResponse = {
+  location: string;
+};
 
-export type APINewInput = {
-  name: string;
-  type: APIInputType;
-  active: boolean;
-}
-
-export type APIInput = {
+export type APIBaseInput = {
   id: number;
-  expedtion_id: number;
-  ...$Exact<APINewInput>;
+  expedition_id: number;
+};
+
+export type APITwitterInput = {
+  ...$Exact<APIBaseInput>;
+  screen_name: string;
+  twitter_account_id: number;
 };
 
 export type APIInputs = {
-  inputs: APIInput[]
+  twitter_accounts?: APITwitterInput[]
 }
 
 export type APINewTeam = {

@@ -71,7 +71,7 @@ var _ = Resource("user", func() {
 				Header("Authorization", String, "Generated JWT")
 			})
 		})
-		Response(Unauthorized)
+		Response(Unauthorized, ErrorMedia)
 		Response(BadRequest)
 	})
 

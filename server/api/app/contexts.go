@@ -489,147 +489,6 @@ func (ctx *ListIDExpeditionContext) BadRequest() error {
 	return nil
 }
 
-// AddInputContext provides the input add action context.
-type AddInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ExpeditionID int
-	Payload      *AddInputPayload
-}
-
-// NewAddInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller add action.
-func NewAddInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AddInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AddInputContext) OK(r *Input) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *AddInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// GetInputContext provides the input get action context.
-type GetInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Expedition string
-	Input      string
-	Project    string
-}
-
-// NewGetInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller get action.
-func NewGetInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpedition := req.Params["expedition"]
-	if len(paramExpedition) > 0 {
-		rawExpedition := paramExpedition[0]
-		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-		}
-	}
-	paramInput := req.Params["input"]
-	if len(paramInput) > 0 {
-		rawInput := paramInput[0]
-		rctx.Input = rawInput
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Input); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`input`, rctx.Input, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-		}
-	}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetInputContext) OK(r *Input) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// GetIDInputContext provides the input get id action context.
-type GetIDInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-}
-
-// NewGetIDInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller get id action.
-func NewGetIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetIDInputContext) OK(r *Input) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetIDInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // ListInputContext provides the input list action context.
 type ListInputContext struct {
 	context.Context
@@ -1424,6 +1283,225 @@ func (ctx *ListIDTeamContext) BadRequest() error {
 	return nil
 }
 
+// AddTwitterContext provides the twitter add action context.
+type AddTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewAddTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller add action.
+func NewAddTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddTwitterContext) OK(r *Location) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// CallbackTwitterContext provides the twitter callback action context.
+type CallbackTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	OauthToken    string
+	OauthVerifier string
+}
+
+// NewCallbackTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller callback action.
+func NewCallbackTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*CallbackTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := CallbackTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramOauthToken := req.Params["oauth_token"]
+	if len(paramOauthToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("oauth_token"))
+	} else {
+		rawOauthToken := paramOauthToken[0]
+		rctx.OauthToken = rawOauthToken
+	}
+	paramOauthVerifier := req.Params["oauth_verifier"]
+	if len(paramOauthVerifier) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("oauth_verifier"))
+	} else {
+		rawOauthVerifier := paramOauthVerifier[0]
+		rctx.OauthVerifier = rawOauthVerifier
+	}
+	return &rctx, err
+}
+
+// Found sends a HTTP response with status code 302.
+func (ctx *CallbackTwitterContext) Found() error {
+	ctx.ResponseData.WriteHeader(302)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *CallbackTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetIDTwitterContext provides the twitter get id action context.
+type GetIDTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewGetIDTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller get id action.
+func NewGetIDTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDTwitterContext) OK(r *TwitterAccount) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListTwitterContext provides the twitter list action context.
+type ListTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller list action.
+func NewListTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListTwitterContext) OK(r *TwitterAccounts) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_accounts+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDTwitterContext provides the twitter list id action context.
+type ListIDTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListIDTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller list id action.
+func NewListIDTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDTwitterContext) OK(r *TwitterAccounts) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_accounts+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddUserContext provides the user add action context.
 type AddUserContext struct {
 	context.Context
@@ -1605,9 +1683,9 @@ func (ctx *LoginUserContext) BadRequest() error {
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *LoginUserContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
+func (ctx *LoginUserContext) Unauthorized(r error) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // LogoutUserContext provides the user logout action context.
