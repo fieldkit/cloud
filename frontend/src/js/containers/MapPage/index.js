@@ -8,11 +8,13 @@ const mapStateToProps = (state, ownProps) => {
   const projects = state.expeditions.get('projects')
   const expeditions = state.expeditions.get('expeditions')
   const modal = state.expeditions.get('modal')
+  const documents = state.expeditions.get('documents')
 
   return {
     expeditions,
     projects,
-    modal
+    modal,
+    documents
   }
 }
 

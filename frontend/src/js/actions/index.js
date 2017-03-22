@@ -32,28 +32,24 @@ export function requestExpedition (expeditionID) {
 
     let projectID = location.hostname.split('.')[0]
     if (projectID === 'localhost') projectID = 'eric'
-    console.log('getting expedition')
+    console.log('querying expedition')
     FKApiClient.getExpedition(projectID, expeditionID)
       .then(resExpedition => {
       // const resExpedition = {"name":"demoExpedition","slug":"demoexpedition"}
-        console.log('expedition received:', resExpedition)
+        console.log('server response received:', resExpedition)
         if (!resExpedition) {
-          console.log('error getting expedition')
+          console.log('expedition data empty')
         } else {
-          console.log('expedition properly received')
-
-          // {"name":"ian test","slug":"ian-test"}
-
+          console.log('expedition data received, now querying documents')
           FKApiClient.getDocuments(projectID, expeditionID)
             .then(resDocuments => {
               if (!resDocuments) resDocuments = []
-              // const resDocuments = getSampleData()
-
-              console.log('documents received:', resDocuments)
+              // resDocuments = getSampleData()
+              console.log('server response received:', resDocuments)
               if (!resDocuments) {
-                console.log('error getting documents')
+                console.log('documents data empty')
               } else {
-                console.log('documents properly received')
+                console.log('documents data received')
                 const documentMap = {}
                 resDocuments
                   .forEach((d, i) => {
@@ -75,8 +71,6 @@ export function requestExpedition (expeditionID) {
                       return d1.get('date') - d2.get('date')
                     })
                     .get(resDocuments.length - 1).get('date')
-
-                  console.log(new Date(startDate), new Date(endDate))
 
                   const expeditionData = I.fromJS({
                     id: expeditionID,
@@ -127,6 +121,10 @@ export function requestExpedition (expeditionID) {
               }
             })
         }
+      })
+      .catch(error => {
+        console.log('Project or expedition could not be found')
+        window.location.replace('https://fieldkit.org')
       }) 
   }
 }

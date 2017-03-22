@@ -145,7 +145,10 @@ class JournalPage extends React.Component {
         <div
           className="journal-page_map-overlay"
         />
-        <ControlPanelContainer/>
+        {
+          !!documents && documents.size > 0 &&
+          <ControlPanelContainer/>
+        }
         <div
           className="journal-page_content"
           onScroll={ this.onScroll }

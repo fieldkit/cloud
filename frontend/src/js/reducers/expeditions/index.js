@@ -28,44 +28,7 @@ export const initialState = I.fromJS({
     geoBounds: [0, 0, 0, 0]
   },
   currentDocuments: [],
-  documents: {
-    'reading-0': {
-      id: 'reading-0',
-      type: 'sensor-reading',
-      geometry: {
-        type: 'Point',
-        coordinates: [125.6, 10.1]
-      },
-      date: 1484328718000
-    },
-    'reading-1': {
-      id: 'reading-1',
-      type: 'sensor-reading',
-      geometry: {
-        type: 'Point',
-        coordinates: [125.68, 10.11]
-      },
-      date: 1484328818000
-    },
-    'reading-2': {
-      id: 'reading-2',
-      type: 'sensor-reading',
-      geometry: {
-        type: 'Point',
-        coordinates: [125.7, 10.31]
-      },
-      date: 1484328958000
-    },
-    'reading-3': {
-      id: 'reading-3',
-      type: 'sensor-reading',
-      geometry: {
-        type: 'Point',
-        coordinates: [125.3, 10.35]
-      },
-      date: 1484329258000
-    }
-  }
+  documents: {}
 })
 
 const updateViewport = (state, nextDate, nextFocusType) => {
@@ -77,14 +40,11 @@ const updateViewport = (state, nextDate, nextFocusType) => {
       const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
       const startDate = expedition.get('startDate')
       const endDate = expedition.get('endDate')
-
       const documents = state.get('documents')
         .filter(d => {
           return state.get('currentDocuments').includes(d.get('id'))
         })
-        .sort((d1, d2) => {
-          return d1.get('date') - d2.get('date')
-        })
+        .sortBy(d => d.get('date'))
 
       const previousDocuments = documents
         .filter(d => {
@@ -102,6 +62,8 @@ const updateViewport = (state, nextDate, nextFocusType) => {
         date < startDate ? documents.first() :
         date >= endDate ? documents.last() : null
 
+      if (!previousDocument || !nextDocument) return state.get('viewport')
+      
       const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
       const latitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
 
@@ -185,6 +147,8 @@ const expeditionReducer = (state = initialState, action) => {
     }
 
     case actions.INITIALIZE_DOCUMENTS: {
+      if (!action.data || action.data.size === 0) return state
+        .set('playbackMode', 'pause')
       const position = action.data.toList().get(0).getIn(['geometry', 'coordinates'])
       const currentDocuments = action.data.map(d => d.get('id')).toList()
       const newState = state

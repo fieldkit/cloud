@@ -12,9 +12,16 @@ class Timeline extends React.Component {
   }
 
   render () {
-
-    const { currentDate, startDate, endDate, updateDate } = this.props
+    const {
+      currentDate,
+      startDate,
+      endDate,
+      documents,
+      updateDate
+    } = this.props
     const { mouseOver } = this.state
+
+    if (!documents || documents.size === 0) return null
 
     const lineWidth = 0.01388888889 * window.innerWidth
     const lineHeight = 0.02487562189 * window.innerHeight

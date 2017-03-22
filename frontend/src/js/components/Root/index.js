@@ -13,7 +13,8 @@ export default class Root extends React.Component {
     const {
       expeditionFetching,
       documentsFetching,
-      currentExpedition
+      currentExpedition,
+      documents
     } = this.props
 
     const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpedition)[0] || 'map'
@@ -40,6 +41,12 @@ export default class Root extends React.Component {
             <div className="root_content">
               <HeaderContainer/>
               <TimelineContainer/>
+              {
+                !documents || documents.size === 0 &&
+                <div className="root_no-document">
+                  This expedition doesn't seem to have any document yet...
+                </div>
+              }
               { this.props.children }
             </div>
           </div>

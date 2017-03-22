@@ -4,17 +4,17 @@ import ControlPanelContainer from '../../containers/common/ControlPanelContainer
 import NotificationPanelContainer from '../../containers/MapPage/NotificationPanelContainer'
 
 class MapPage extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
-  }
-
   render () {
+    const {
+      documents
+    } = this.props
+
     return (
       <div className="map-page page">
-        <ControlPanelContainer/>
+        {
+          !!documents && documents.size > 0 &&
+          <ControlPanelContainer/>
+        }
         <NotificationPanelContainer/>
       </div>
     )
