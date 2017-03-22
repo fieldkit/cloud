@@ -5,10 +5,9 @@ import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal'
 
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
-import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewExpedition, APIInput, APINewInput } from '../../api/types';
+import type { APIProject, APIExpedition, APINewExpedition } from '../../api/types';
 
 type Props = {
   project: APIProject;

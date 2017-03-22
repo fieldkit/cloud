@@ -109,7 +109,7 @@ export class Main extends Component {
   async loadUser() {
     log.debug('main -> loadUser');
     const userRes = await FKApiClient.get().getCurrentUser();
-    if (userRes.type == 'ok' && userRes.payload) {
+    if (userRes.type === 'ok') {
       this.setState({ user: userRes.payload });
     } else {
       this.setState({ user: null });
@@ -119,7 +119,7 @@ export class Main extends Component {
   async loadProjects() {
     log.debug('main -> loadProjects');
     const projectRes = await FKApiClient.get().getProjects();
-    if (projectRes.type == 'ok' && projectRes.payload) {
+    if (projectRes.type === 'ok') {
       this.setState({ projects: projectRes.payload.projects });
     } else {
       this.setState({ projects: null });
@@ -130,7 +130,7 @@ export class Main extends Component {
     log.debug('main -> loadExpeditions', projectSlug);
     if (projectSlug) {
       const expRes = await FKApiClient.get().getExpeditionsByProjectSlug(projectSlug);
-      if (expRes.type == 'ok' && expRes.payload) {
+      if (expRes.type === 'ok') {
         this.setState({ expeditions: expRes.payload.expeditions });
       }
     } else {
@@ -142,7 +142,7 @@ export class Main extends Component {
     log.debug('main -> loadActiveProject', projectSlug);
     if (projectSlug) {
       const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type == 'ok' && projectRes.payload) {
+      if (projectRes.type === 'ok') {
         this.setState({ activeProject: projectRes.payload });
       }
     } else {
@@ -154,7 +154,7 @@ export class Main extends Component {
     log.debug('main -> loadActiveExpedition', projectSlug, expeditionSlug);
     if (projectSlug && expeditionSlug) {
       const expRes = await FKApiClient.get().getExpeditionBySlugs(projectSlug, expeditionSlug);
-      if (expRes.type == 'ok' && expRes.payload) {
+      if (expRes.type === 'ok') {
         this.setState({ activeExpedition: expRes.payload });
       }
     } else {

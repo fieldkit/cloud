@@ -6,10 +6,9 @@ import ReactModal from 'react-modal';
 
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
-import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APIInput, APINewInput } from '../../api/types';
+import type { APIProject, APIExpedition, APINewProject, APINewExpedition } from '../../api/types';
 
 type Props = {
   project: APIProject;
