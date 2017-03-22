@@ -33,6 +33,7 @@ export class MembersTable extends Component {
   constructor(props: Props) {
     super(props);
   }
+
   render() {
     const { members } = this.props;
 

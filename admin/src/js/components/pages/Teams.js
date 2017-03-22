@@ -88,6 +88,10 @@ export class Teams extends Component {
     }
   }
 
+  async onMemberDelete() {
+    
+  }
+
   render() {
     const { match } = this.props;
     
