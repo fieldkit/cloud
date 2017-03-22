@@ -96,6 +96,16 @@ class FKApiClient {
     return res.text()
   }
 
+  async getProject (project) {
+    const res = await this.getJSON('/api/project/' + projectID)
+    return res
+  }
+
+  async getExpeditions (projectID) {
+    const res = await this.getJSON('/api/project/' + projectID + '/expeditions')
+    return res
+  }
+
   async getExpedition (projectID, expeditionID) {
     const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID)
     return res

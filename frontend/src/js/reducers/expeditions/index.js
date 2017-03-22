@@ -142,12 +142,12 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['expeditions', action.id, 'expeditionFetching'], true)
     }
 
-    case actions.INITIALIZE_EXPEDITION: {
+    case actions.INITIALIZE_EXPEDITIONS: {
       const currentPage = location.pathname.split('/').filter(p => !!p && p !== state.get('currentExpedition'))[0] || 'map'
       const playbackMode = currentPage === 'map' ? 'forward' : 'pause'
       return state
-        .setIn(['expeditions', action.id], action.data)
-        .set('currentDate', action.data.get('startDate'))
+        .set('expeditions', action.data)
+        .set('currentDate', action.data.getIn([action.id, 'startDate']))
         .set('playbackMode', playbackMode)
     }
 

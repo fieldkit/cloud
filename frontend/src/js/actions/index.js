@@ -9,7 +9,7 @@ import { getSampleData } from '../utils'
 import I from 'immutable'
 
 export const REQUEST_EXPEDITION = 'REQUEST_EXPEDITION'
-export const INITIALIZE_EXPEDITION = 'INITIALIZE_EXPEDITION'
+export const INITIALIZE_EXPEDITIONS = 'INITIALIZE_EXPEDITION'
 export const REQUEST_DOCUMENTS = 'REQUEST_DOCUMENTS'
 export const INITIALIZE_DOCUMENTS = 'INITIALIZE_DOCUMENTS'
 export const SET_VIEWPORT = 'SET_VIEWPORT'
@@ -35,14 +35,16 @@ export function requestExpedition (expeditionID) {
     let projectID = location.hostname.split('.')[0]
     if (projectID === 'localhost') projectID = 'eric'
     console.log('querying expedition')
-    FKApiClient.getExpedition(projectID, expeditionID)
-      .then(resExpedition => {
-      // const resExpedition = {"name":"demoExpedition","slug":"demoexpedition"}
-        console.log('server response received:', resExpedition)
-        if (!resExpedition) {
+    FKApiClient.getExpeditions(projectID)
+      .then(resExpeditions => {
+      // const resExpeditions = {"name":"demoExpedition","slug":"demoexpedition"}
+        console.log('server response received:', resExpeditions)
+        if (!resExpeditions) {
           console.log('expedition data empty')
         } else {
           console.log('expedition data received, now querying documents')
+          const resExpeditionsMap = {}
+          resExpeditions.forEach(e => resExpeditionsMap[e.slug] = e)
           FKApiClient.getDocuments(projectID, expeditionID)
             .then(resDocuments => {
               if (!resDocuments) resDocuments = []
@@ -63,6 +65,7 @@ export function requestExpedition (expeditionID) {
                 const documents = I.fromJS(documentMap)
 
                 if (documents.size > 0) {
+                  
                   const startDate = documents.toList()
                     .sort((d1, d2) => {
                       return d1.get('date') - d2.get('date')
@@ -74,19 +77,24 @@ export function requestExpedition (expeditionID) {
                     })
                     .get(resDocuments.length - 1).get('date')
 
-                  const expeditionData = I.fromJS({
-                    id: expeditionID,
-                    name: expeditionID,
-                    focusType: 'sensor-reading',
-                    startDate,
-                    endDate
-                  })
+                  const expeditions = I.fromJS(resExpeditionsMap)
+                    .map(e => {
+                      const id = e.get('slug')
+                      return e
+                        .set('id', id)
+                        .set('name', e.get('name'))
+                        .set('startDate', id === expeditionID ? startDate : Date.now())
+                        .set('endDate', id === expeditionID ? endDate : Date.now())
+                        .delete('slug')
+                    })
+
+                  console.log('WOW', expeditions)
 
                   dispatch([
                     {
-                      type: INITIALIZE_EXPEDITION,
+                      type: INITIALIZE_EXPEDITIONS,
                       id: expeditionID,
-                      data: expeditionData
+                      data: expeditions
                     },
                     {
                       type: INITIALIZE_DOCUMENTS,
@@ -94,25 +102,25 @@ export function requestExpedition (expeditionID) {
                     }
                   ])
                 } else {
-                  const startDate = new Date()
-                  const endDate = new Date()
-                  const expeditionData = I.fromJS({
-                    id: expeditionID,
-                    name: expeditionID,
-                    focusType: 'sensor-reading',
-                    startDate,
-                    endDate
-                  })
-
+                  const expeditions = I.fromJS(resExpeditionsMap)
+                    .map(e => {
+                      const id = e.get('slug')
+                      return e
+                        .set('id', id)
+                        .set('name', e.get('name'))
+                        .set('startDate', Date.now())
+                        .set('endDate', Date.now())
+                        .delete('slug')
+                    })
                   dispatch([
                     {
                       type: SET_ZOOM,
                       zoom: 2
                     },
                     {
-                      type: INITIALIZE_EXPEDITION,
+                      type: INITIALIZE_EXPEDITIONS,
                       id: expeditionID,
-                      data: expeditionData
+                      data: expeditions
                     },
                     {
                       type: INITIALIZE_DOCUMENTS,

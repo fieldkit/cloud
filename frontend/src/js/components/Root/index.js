@@ -18,6 +18,8 @@ export default class Root extends React.Component {
       currentExpedition,
       expeditionPanelOpen,
       documents,
+      project,
+      expeditions,
       closeExpeditionPanel
     } = this.props
 
@@ -44,6 +46,9 @@ export default class Root extends React.Component {
             <ExpeditionPanel
               active={ expeditionPanelOpen }
               closeExpeditionPanel={ closeExpeditionPanel }
+              expeditions={ expeditions }
+              project={ project }
+              currentExpedition={ currentExpedition }
             />
             <MapContainer/>
             <div className="root_content">

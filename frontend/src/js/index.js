@@ -40,7 +40,10 @@ const store = createStoreWithMiddleware(reducer)
 
 
 const routes = (
-  <Route path="/" component={RootContainer}>
+  <Route 
+    path="/"
+    component={RootContainer}
+  >
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
         const expeditionID = 'okavango'

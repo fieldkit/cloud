@@ -2,6 +2,7 @@
 import { connect } from 'react-redux'
 import Root from '../../components/Root'
 import * as actions from '../../actions'
+import I from 'immutable'
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -11,12 +12,17 @@ const mapStateToProps = (state, ownProps) => {
   const documents = state.expeditions.get('documents')
   const expeditionPanelOpen = state.expeditions.get('expeditionPanelOpen')
 
+  const expeditions = state.expeditions.get('expeditions')
+  const project = I.fromJS({id: 'eric', name: 'eric'})
+
   return {
     expeditionFetching,
     documentsFetching,
     currentExpedition,
     expeditionPanelOpen,
-    documents
+    documents,
+    expeditions,
+    project
   }
 }
 
