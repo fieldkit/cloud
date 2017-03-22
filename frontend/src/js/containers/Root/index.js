@@ -9,11 +9,13 @@ const mapStateToProps = (state, ownProps) => {
   const expeditionFetching = state.expeditions.getIn(['expeditions', currentExpedition, 'expeditionFetching'])
   const documentsFetching = state.expeditions.getIn(['expeditions', currentExpedition, 'documentsFetching'])
   const documents = state.expeditions.get('documents')
+  const expeditionPanelOpen = state.expeditions.get('expeditionPanelOpen')
 
   return {
     expeditionFetching,
     documentsFetching,
     currentExpedition,
+    expeditionPanelOpen,
     documents
   }
 }
@@ -22,6 +24,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     setMousePosition (x, y) {
       return dispatch(actions.setMousePosition(x, y))
+    },
+    closeExpeditionPanel () {
+      return dispatch(actions.closeExpeditionPanel())
     }
   }
 }

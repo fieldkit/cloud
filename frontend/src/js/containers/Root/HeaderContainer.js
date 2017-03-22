@@ -23,6 +23,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     cancelAction () {
       return dispatch(actions.cancelAction())
+    },
+    openExpeditionPanel () {
+      return dispatch(actions.openExpeditionPanel())
     }
   }
 }

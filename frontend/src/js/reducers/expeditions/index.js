@@ -6,6 +6,7 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
+  expeditionPanelOpen: false,
   currentPage: 'map',
   currentExpedition: '',
   playbackMode: 'pause',
@@ -125,10 +126,14 @@ const expeditionReducer = (state = initialState, action) => {
     console.log('reducer:', action.type, action)
   }
   switch (action.type) {
-
-    case actions.SET_CURRENT_PAGE: {
+    case actions.OPEN_EXPEDITION_PANEL: {
       return state
-        .set('currentPage', action.currentPage)
+        .set('expeditionPanelOpen', true)
+    }
+
+    case actions.CLOSE_EXPEDITION_PANEL: {
+      return state
+        .set('expeditionPanelOpen', false)
     }
 
     case actions.REQUEST_EXPEDITION: {

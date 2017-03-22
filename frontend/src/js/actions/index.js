@@ -21,6 +21,8 @@ export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 export const SET_ZOOM = 'SET_ZOOM'
 export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
+export const OPEN_EXPEDITION_PANEL = 'OPEN_EXPEDITION_PANEL'
+export const CLOSE_EXPEDITION_PANEL = 'CLOSE_EXPEDITION_PANEL'
 
 export function requestExpedition (expeditionID) {
   return function (dispatch, getState) {
@@ -192,6 +194,22 @@ export function setCurrentPage (currentPage) {
     dispatch({
       type: SET_CURRENT_PAGE,
       currentPage
+    })
+  }
+}
+
+export function openExpeditionPanel () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: OPEN_EXPEDITION_PANEL
+    })
+  }
+}
+
+export function closeExpeditionPanel () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLOSE_EXPEDITION_PANEL
     })
   }
 }

@@ -10,5 +10,12 @@
     margin-bottom: 12px;
     color: white;
     z-index: 1;
+
+    img {
+      margin-right: $line-width;
+      height: $line-width * 1.5;
+      cursor: pointer;
+      pointer-events: auto;
+    }
   }
 }

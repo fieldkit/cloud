@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react'
 import TimelineContainer from '../../containers/common/TimelineContainer'
 import HeaderContainer from '../../containers/Root/HeaderContainer'
 import MapContainer from '../../containers/Map'
+import ExpeditionPanel from './ExpeditionPanel'
+
 
 export default class Root extends React.Component {
   constructor (props) {
@@ -14,7 +16,9 @@ export default class Root extends React.Component {
       expeditionFetching,
       documentsFetching,
       currentExpedition,
-      documents
+      expeditionPanelOpen,
+      documents,
+      closeExpeditionPanel
     } = this.props
 
     const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpedition)[0] || 'map'
@@ -37,6 +41,10 @@ export default class Root extends React.Component {
       >
         { !expeditionFetching && !documentsFetching &&
           <div>
+            <ExpeditionPanel
+              active={ expeditionPanelOpen }
+              closeExpeditionPanel={ closeExpeditionPanel }
+            />
             <MapContainer/>
             <div className="root_content">
               <HeaderContainer/>
