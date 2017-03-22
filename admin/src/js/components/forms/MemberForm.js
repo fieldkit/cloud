@@ -38,7 +38,7 @@ export class MemberForm extends Component {
       errors: null
     }
 
-    this.loadData();
+    this.loadUsers();
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -50,6 +50,17 @@ export class MemberForm extends Component {
       errors: null
     });
   }
+
+  async loadUsers() {
+    /* TO DO:
+      remove already added members from this list.
+      Could probably pass current members in the props from the
+      Teams table and use componentWillReceiveProps to set the state */
+    const usersRes = await FKApiClient.get().getUsers();
+    if (usersRes.type === 'ok' && usersRes.payload) {
+      this.setState({users: usersRes.payload.users} || []);
+    }
+  }  
 
   async save() {
     const errors = await this.props.onSave(this.props.teamId, {
@@ -67,17 +78,6 @@ export class MemberForm extends Component {
     const name = target.name;
 
     this.setState({ [name]: value });
-  }  
-
-  async loadData() {
-    /* TO DO:
-      remove already added members from this list.
-      Could probably pass current members in the props from the
-      Teams table and use componentWillReceiveProps to set the state */
-    const usersRes = await FKApiClient.get().getUsers();
-    if (usersRes.type === 'ok' && usersRes.payload) {
-      this.setState({users: usersRes.payload.users} || []);
-    }
   }
 
   render () {

@@ -35,6 +35,26 @@ export class AdministratorForm extends Component {
       saveDisabled: true,
       errors: null      
     }
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    /* TO DO:
+      remove already added members from this list.
+      Could probably pass current members in the props from the
+      Teams table and use componentWillReceiveProps to set the state */
+    const usersRes = await FKApiClient.get().getUsers();
+    if (usersRes.type === 'ok' && usersRes.payload) {
+      this.setState({users: usersRes.payload.users} || []);
+    }
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({ [name]: value });
   }
 
   async save() {
@@ -55,7 +75,15 @@ export class AdministratorForm extends Component {
       <FormContainer
         onSave={this.save.bind(this)}>
 
-
+        <div className="form-group">
+          <label htmlFor="userId">Member</label>
+          <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
+            <option value={null}>Select a user</option>
+            { users.map((user, i) => 
+              <option key={i} value={user.id}>{user.username}</option>) }
+          </select>
+          { errorsFor(this.state.errors, 'userId') }          
+        </div>
 
       </FormContainer>
     )

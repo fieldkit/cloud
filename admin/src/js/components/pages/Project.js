@@ -47,7 +47,7 @@ export class Project extends Component {
       const administrators = administratorsRes.payload.administrators;
       this.setState({administrators: administrators});
     }
-  }  
+  }
 
   async onExpeditionCreate(e: APINewExpedition) {
     const { match, project } = this.props;
@@ -90,6 +90,7 @@ export class Project extends Component {
 
   render () {
     const { match, project } = this.props;
+    const { administrators } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -108,6 +109,7 @@ export class Project extends Component {
             <h1>Add Users</h1>
             <AdministratorForm
               project={project}
+              administrators={administrators}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onAdministratorAdd.bind(this)} />
           </ReactModal> } />          
@@ -130,6 +132,8 @@ export class Project extends Component {
           description={project ? project.description : undefined}
           onSave={this.onProjectSave.bind(this)} />
         <h3>Users</h3>
+        { administrators.map(administrator =>
+          <div> {administrator.user_id}</div>)}
         <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>
     )
