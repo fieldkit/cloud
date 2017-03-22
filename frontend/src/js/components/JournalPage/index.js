@@ -57,7 +57,7 @@ class JournalPage extends React.Component {
     updateDate(currentDate)
   }
 
-  updateScrollTop (prevProps, prevState) {
+  updateScrollTop (prevProps, prevState, didMount) {
     const {
       documents,
       currentDate
@@ -66,7 +66,7 @@ class JournalPage extends React.Component {
       postDimensions
     } = this.state
 
-    if (this.shouldThisUpdate(prevProps, prevState, true)) {
+    if (didMount || this.shouldThisUpdate(prevProps, prevState, true)) {
       const timeFrame = [
         documents.last().get('date'),
         documents.first().get('date')
@@ -81,16 +81,17 @@ class JournalPage extends React.Component {
         firstDocument = d
       })
       const timeRatio = map(currentDate, firstDocument.get('date'), secondDocument.get('date'), 0, 1)
-      this.refs.content.scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
+      const scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
+      this.refs.content.scrollTop = scrollTop
     }
   }
 
-  updatePostLayout (prevProps) {
+  updatePostLayout (prevProps, didMount) {
     const {
       documents
     } = this.props
 
-    if ((!prevProps.documents || prevProps.documents.size === 0) && !!documents && documents.size > 0) {
+    if (didMount || ((!prevProps.documents || prevProps.documents.size === 0) && !!documents && documents.size > 0)) {
       const postDimensions = {}
       documents.forEach(d => {
         const id = 'post-' + d.get('id')
@@ -113,7 +114,13 @@ class JournalPage extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     this.updateScrollTop(prevProps, prevState)
-    this.updatePostLayout(prevProps, prevState)
+    this.updatePostLayout(prevProps)
+  }
+
+  componentDidMount () {
+    if (!!this.props.documents && this.props.documents.size > 0) {
+      this.updatePostLayout(null, true)
+    }
   }
 
   onScroll (e) {
