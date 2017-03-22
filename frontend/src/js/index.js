@@ -23,6 +23,8 @@ import JournalPageContainer from './containers/JournalPage'
 
 import FKApiClient from './api/api.js'
 
+import { updateDeepLinking } from './utils.js'
+
 document.getElementById('root').remove()
 
 const createStoreWithMiddleware = applyMiddleware(
@@ -33,7 +35,7 @@ const createStoreWithMiddleware = applyMiddleware(
 //   fn => fn()
 // )(createStoreWithMiddleware)
 const reducer = combineReducers({
-  expeditions: expeditionReducer,
+  expeditions: expeditionReducer
   // routing: routerReducer
 })
 const store = createStoreWithMiddleware(reducer)
@@ -56,7 +58,12 @@ const routes = (
     <Route path=":expeditionID" onEnter={(state) => {
       store.dispatch(actions.requestExpedition(state.params.expeditionID))
     }}>
-      <IndexRoute component={ MapPageContainer } />
+      <IndexRoute
+        component={ MapPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.setCurrentPage('map'))
+        }}
+      />
       <Route 
         path="map"
         component={ MapPageContainer }
@@ -72,6 +79,8 @@ const routes = (
           store.dispatch(actions.setCurrentPage('journal'))
         }}
       />
+      {
+        /*
       <Route
         path="about"
         component={ JournalPageContainer }
@@ -79,6 +88,8 @@ const routes = (
           store.dispatch(actions.setCurrentPage('about'))
         }}
       />
+        */
+      }
     </Route>
   </Route>
 )
@@ -92,6 +103,9 @@ var render = function () {
     ),
     document.getElementById('fieldkit')
   )
+  window.setInterval(() => {
+    updateDeepLinking(browserHistory, store.getState)
+  }, 1000)
 }
 
 render()

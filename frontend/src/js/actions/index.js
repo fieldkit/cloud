@@ -1,6 +1,5 @@
 
 import fetch from 'whatwg-fetch'
-// import { fetch } from "../vendor_modules/redux-auth"
 import * as d3 from 'd3'
 import { browserHistory } from 'react-router'
 import FKApiClient from '../api/api.js'
@@ -87,8 +86,6 @@ export function requestExpedition (expeditionID) {
                         .set('endDate', id === expeditionID ? endDate : Date.now())
                         .delete('slug')
                     })
-
-                  console.log('WOW', expeditions)
 
                   dispatch([
                     {

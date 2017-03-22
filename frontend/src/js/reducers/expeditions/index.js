@@ -170,7 +170,6 @@ const expeditionReducer = (state = initialState, action) => {
       const nw = unproject([0, 0])
       const se = unproject([window.innerWidth, window.innerHeight])
       const geoBounds = [nw[0], nw[1], se[0], se[1]]
-
       return state
         .set('viewport', I.fromJS(action.viewport))
         .setIn(['viewport', 'geoBounds'], geoBounds)

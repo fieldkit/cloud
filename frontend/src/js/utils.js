@@ -1,4 +1,6 @@
 
+import I from 'immutable'
+
 export class BaseError {
   name: string;
   message: string;
@@ -11,6 +13,47 @@ export class BaseError {
       Error.captureStackTrace(this, this.constructor);
     } else {
       this.stack = (new Error(message)).stack;
+    }
+  }
+}
+
+export function updateDeepLinking (history, getState) {
+  const currentPage = getState().expeditions.get('currentPage')
+  const focusType = getState().expeditions.getIn(['focus', 'type'])
+  const focusID = getState().expeditions.getIn(['focus', 'id'])
+  const currentDate = getState().expeditions.get('currentDate')
+  const longitude = getState().expeditions.getIn(['viewport', 'longitude'])
+  const latitude = getState().expeditions.getIn(['viewport', 'latitude'])
+  const zoom = getState().expeditions.getIn(['viewport', 'zoom'])
+
+  switch (currentPage) {
+    case 'map': {
+      switch (focusType) {
+        case 'expedition': {
+          return history.push({
+            pathname: location.pathname,
+            search: `?date=${currentDate}`
+          })
+        }
+        case 'documents': {
+          return history.push({
+            pathname: location.pathname,
+            search: `?type=${focusID}`
+          }) 
+        }
+        case 'manual': {
+          return history.push({
+            pathname: location.pathname,
+            search: `?view=${longitude},${latitude},${zoom}`
+          })  
+        }
+      }
+    }
+    case 'journal': {
+      return history.push({
+        pathname: location.pathname,
+        search: `?date=${currentDate}`
+      })
     }
   }
 }
