@@ -310,6 +310,12 @@ h4 {
 .sidebar {
   .sidebar-section {
     position: relative;
+
+    .sidebar-nav {
+      a {
+        display: block;
+      }
+    }
   }
 
   .settings {
@@ -337,19 +343,19 @@ button, .button {
   &.cancel, &.secondary {
     @include button(false);
   }
+}
 
-  // Icon button
-  &.bt-icon {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border: none;
-    background-color: Transparent;
-    background-repeat: none;
+// Icon button
+.bt-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: none;
+  background-color: Transparent;
+  background-repeat: none;
 
-    &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
-    &.remove   { background-image: url('../img/icons/icon-remove-small.png'); }
-  }
+  &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
+  &.remove   { background-image: url('../img/icons/icon-remove-small.png'); }
 }
 
 input[type="submit"] {

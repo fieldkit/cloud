@@ -5,11 +5,12 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIUser, APINewMember } from '../../api/types';
+import type { APIErrors, APIUser, APINewMember, APIMember } from '../../api/types';
 import { FKApiClient } from '../../api/api';
 
 type Props = {
   teamId: number,
+  member?: APIMember,
 
   cancelText?: string;
   saveText?: ?string;

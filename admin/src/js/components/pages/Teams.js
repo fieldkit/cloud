@@ -57,10 +57,6 @@ export class Teams extends Component {
       this.setState({members: members});
     }
   }
-  
-  createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/team`, values)
-  }
 
   async onTeamCreate(e: APINewTeam) {
     
@@ -98,6 +94,7 @@ export class Teams extends Component {
 
   render() {
     const { match } = this.props;
+    const { members, teams } = this.state;
     
     return (
       <div className="teams">
@@ -121,24 +118,25 @@ export class Teams extends Component {
         <h1>Teams</h1>
 
         <div id="teams">
-        { this.state.teams.map((team, i) =>
+        { teams.map((team, i) =>
           <table key={i} className="teams-table">
             <tbody>
               <tr>
                 <td name={team.name}>
-                  {team.name}, {team.id} <br/>
-                  {team.description} <br/>
-                  
+                  {team.name}<br/>
+                  {team.description}                  
                   <button className="secondary">Edit</button>
-                  <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
-                  { <MembersTable members={this.state.members[team.id]}/> }
-                  { !this.state.members[team.id] &&
+
+                  { <MembersTable members={members[team.id]}/> }
+                  { !members[team.id] &&
                     <span className="empty">No members</span> }
+                  <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+
                 </td>
               </tr>
             </tbody>
           </table> ) }
-        { this.state.teams.length === 0 &&
+        { teams.length === 0 &&
           <span className="empty">No teams</span> }
         </div>
         <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
