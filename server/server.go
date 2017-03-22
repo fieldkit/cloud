@@ -22,6 +22,7 @@ import (
 
 	"github.com/O-C-R/fieldkit/server/api"
 	"github.com/O-C-R/fieldkit/server/api/app"
+	"github.com/O-C-R/fieldkit/server/backend"
 	"github.com/O-C-R/fieldkit/server/email"
 )
 
@@ -152,6 +153,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(config.PostgresURL)
+	backend, err := backend.New(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
 
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
@@ -200,13 +206,13 @@ func main() {
 
 	// Mount "input" controller
 	c8 := api.NewInputController(service, api.InputControllerOptions{
-		Database: database,
+		Backend: backend,
 	})
 	app.MountInputController(service, c8)
 
 	// Mount "twitter" controller
 	c9 := api.NewTwitterController(service, api.TwitterControllerOptions{
-		Database:       database,
+		Backend:        backend,
 		ConsumerKey:    config.TwitterConsumerKey,
 		ConsumerSecret: config.TwitterConsumerSecret,
 	})
