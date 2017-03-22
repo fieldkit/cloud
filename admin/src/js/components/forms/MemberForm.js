@@ -32,7 +32,7 @@ export class MemberForm extends Component {
     super(props)
     this.state = {
       users: [],
-      userId: 0,
+      userId: -1,
       role: '',
       saveDisabled: false,
       errors: null
@@ -44,7 +44,7 @@ export class MemberForm extends Component {
   componentWillReceiveProps(nextProps: Props) {
     this.setState({
       users: [],      
-      userId: 0,
+      userId: -1,
       role: '',
       saveDisabled: false,
       errors: null

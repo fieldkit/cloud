@@ -6,9 +6,10 @@ import ReactModal from 'react-modal';
 
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
+import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition } from '../../api/types';
+import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APINewAdministrator } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -43,6 +44,19 @@ export class Project extends Component {
     }
   }
 
+  async onAdministratorAdd(e: APINewAdministrator) {
+    // requires: (projectId: number, values: APINewAdministrator)
+
+    // const { match } = this.props;
+    // const memberRes = await FKApiClient.get().addMember(teamId, e);
+    // if (memberRes.type === 'ok') {
+    //   await this.loadTeams();
+    //   this.props.history.push(`${match.url}`);
+    // } else {
+    //   return memberRes.errors;
+    // }
+  }  
+
   async onProjectSave(project: APINewProject) {
     // TODO: this isn't implemented on the backend yet!
 
@@ -73,6 +87,15 @@ export class Project extends Component {
               onSave={this.onExpeditionCreate.bind(this)} />
           </ReactModal> } />
 
+        <Route path={`${match.url}/add-administrator`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Add Users">
+            <h1>Add Users</h1>
+            <AdministratorForm
+              project={project}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onAdministratorAdd.bind(this)} />
+          </ReactModal> } />          
+
         <div id="expeditions">
           <h4>Expeditions</h4>
           { this.props.expeditions.map((e, i) =>
@@ -90,6 +113,8 @@ export class Project extends Component {
           slug={project ? project.slug : undefined}
           description={project ? project.description : undefined}
           onSave={this.onProjectSave.bind(this)} />
+        <h3>Users</h3>
+        <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>
     )
   }

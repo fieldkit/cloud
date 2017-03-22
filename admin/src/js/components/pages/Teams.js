@@ -71,7 +71,7 @@ export class Teams extends Component {
     }
   }
 
-  async onMemberAdding(teamId: number, e: APINewMember) {
+  async onMemberAdd(teamId: number, e: APINewMember) {
     const { match } = this.props;
     const memberRes = await FKApiClient.get().addMember(teamId, e);
     if (memberRes.type === 'ok') {
@@ -113,7 +113,7 @@ export class Teams extends Component {
             <MemberForm
               teamId={props.match.params.teamId}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onMemberAdding.bind(this)} />
+              onSave={this.onMemberAdd.bind(this)} />
           </ReactModal> } />
 
         <h1>Teams</h1>
