@@ -11,7 +11,9 @@ import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
 import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
-import { Project } from './pages/Project';
+// import { Project } from './pages/Project';
+import { ProjectExpeditions } from './pages/ProjectExpeditions';
+import { ProjectSettings } from './pages/ProjectSettings';
 import { Expedition } from './pages/Expedition'
 import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
@@ -227,64 +229,44 @@ export class Main extends Component {
           <div className="logo-area">
             <Link to="/"><img src={fieldkitLogo} alt="fieldkit logo" /></Link>
           </div>
-
-          { activeProject &&
-            <div className="sidebar">
-              <div className="sidebar-section project-nav">
-                <div className="name project-name">
-                  <Link to={`/projects/${activeProject.slug}`}>{activeProject.name}</Link>
-                  <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
-                    <img src={externalLinkImg} alt="external link" />
-                  </a>
-                </div>
-                <div className="settings">
-                  <Link to={`/projects/${activeProject.slug}/settings`}>
-                    <img src={gearImg} alt="settings gear" />
-                  </Link>
-                </div>
-                { !activeExpedition &&
+          <div className="sidebar">
+            <div className="sidebar-section project-nav">
+              <h4>Projects</h4>
+              <Link to={`/`}>All</Link>
+              { activeProject &&
+                <div>
+                  <p>
+                    {activeProject.name}
+                    <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
+                      <img src={externalLinkImg} alt="external link" />
+                    </a>                  
+                  </p>
                   <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
-                  </div> }
-              </div>
-              { activeExpedition &&
-                <div className="sidebar-section expedition-nav">
-                  <div className="name expedition-name">
-                    <Link to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>{activeExpedition.name}</Link>
+                    <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+                  </div>
+                </div> }
+            </div>
+            {activeExpedition &&
+              <div className="sidebar-section expedition-nav">
+                <h4>Expedition</h4>
+                  <p>
+                    {activeExpedition.name}
                     <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
                       <img src={externalLinkImg} alt="external link" />
                     </a>
-                  </div>
-                  <div className="settings">
-                    <Link to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>
-                      <img src={gearImg} alt="settings gear"/>
-                    </Link>
-                  </div>
+                  </p>
                   <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
                     {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
                   </div>
-              </div> }
-              { activeProject && !activeExpedition && projects &&
-                <div className="project-select">
-                  <ul>
-                    { projects.map((p, i) => (
-                      <li key={i}><Link to={`/projects/${p.slug}`}>{p.name}</Link></li>
-                    ))}
-                  </ul>
-                </div> }
-              { activeProject && activeExpedition && expeditions &&
-                <div className="expedition-select">
-                  <ul>
-                    { expeditions.map((e, i) => (
-                      <li key={i}><Link to={`/projects/${activeProject.slug}/expeditions/${e.slug}`}>{e.name}</Link></li>
-                    ))}
-                  </ul>
-                </div> }
-            </div> }
+              </div>
+              }
+          </div>
+
 
           <footer>
             <Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
@@ -331,8 +313,14 @@ export class Main extends Component {
                 expedition={activeExpedition}
                 onUpdate={this.onExpeditionUpdate.bind(this)} />
               <RouteOrLoading
+                path="/projects/:projectSlug/settings"
+                component={ProjectSettings}
+                required={[activeProject]}
+                project={activeProject}
+                onUpdate={this.onProjectUpdate.bind(this)} />
+              <RouteOrLoading
                 path="/projects/:projectSlug"
-                component={Project}
+                component={ProjectExpeditions}
                 required={[activeProject, expeditions]}
                 project={activeProject}
                 expeditions={expeditions}
