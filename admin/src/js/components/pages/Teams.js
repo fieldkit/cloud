@@ -112,6 +112,7 @@ export class Teams extends Component {
             <h1>Add Members</h1>
             <MemberForm
               teamId={props.match.params.teamId}
+              members={this.state.members[props.match.params.teamId]}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdd.bind(this)} />
           </ReactModal> } />

@@ -11,6 +11,7 @@ import { FKApiClient } from '../../api/api';
 type Props = {
   teamId: number,
   member?: APIMember,
+  members: APIMember[],
 
   cancelText?: string;
   saveText?: ?string;
@@ -58,7 +59,11 @@ export class MemberForm extends Component {
       Teams table and use componentWillReceiveProps to set the state */
     const usersRes = await FKApiClient.get().getUsers();
     if (usersRes.type === 'ok' && usersRes.payload) {
-      this.setState({users: usersRes.payload.users} || []);
+      const membersIds = this.props.members.map(member =>
+        member.user_id);
+      const availableUsers = usersRes.payload.users.filter(user =>
+        membersIds.indexOf(user.id) < 0);
+      this.setState({users: availableUsers} || []);
     }
   }  
 

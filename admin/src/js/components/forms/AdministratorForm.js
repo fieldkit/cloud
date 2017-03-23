@@ -11,7 +11,6 @@ import { FKApiClient } from '../../api/api';
 type Props = {
   project: APIProject,
   administrators: APIAdministrator[],
-//   member?: APIMember,
 
   cancelText?: string;
   saveText?: ?string;
@@ -42,15 +41,11 @@ export class AdministratorForm extends Component {
   async loadUsers() {
     const usersRes = await FKApiClient.get().getUsers();
     if (usersRes.type === 'ok' && usersRes.payload) {
-      const adminIds = this.props.administrators.map(admin =>
-        admin.user_id);
-        console.log(adminIds);
-        console.log(usersRes.payload.users);
+      const administratorsIds = this.props.administrators.map(administrator =>
+        administrator.user_id);
       const availableUsers = usersRes.payload.users.filter(user =>
-        adminIds.indexOf(user.id) < 0);
-      console.log(availableUsers);
+        administratorsIds.indexOf(user.id) < 0);
       this.setState({users: availableUsers} || []);
-      console.log(this.state.users);
     }
   }
 
