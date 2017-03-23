@@ -5,20 +5,25 @@ data "aws_iam_policy_document" "fieldkit-server" {
       "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
     ]
+
     resources = [
       "${aws_sqs_queue.fieldkit.arn}",
     ]
   }
+
   statement {
     actions = [
       "ses:SendEmail",
     ]
+
     resources = [
       "*",
     ]
+
     condition {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "ses:FromAddress"
+
       values = [
         "admin@fieldkit.org",
       ]
@@ -28,6 +33,7 @@ data "aws_iam_policy_document" "fieldkit-server" {
 
 resource "aws_iam_role" "fieldkit-server" {
   name = "fieldkit-server"
+
   assume_role_policy = <<EOF
 {
   "Statement": [
@@ -44,12 +50,12 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "fieldkit-server" {
-  name = "fieldkit-server"
+  name  = "fieldkit-server"
   roles = ["${aws_iam_role.fieldkit-server.name}"]
 }
 
 resource "aws_iam_role_policy" "fieldkit-server" {
-  name = "fieldkit-server"
-  role = "${aws_iam_role.fieldkit-server.id}"
+  name   = "fieldkit-server"
+  role   = "${aws_iam_role.fieldkit-server.id}"
   policy = "${data.aws_iam_policy_document.fieldkit-server.json}"
 }
