@@ -63,6 +63,8 @@ export class Project extends Component {
   async onAdministratorAdd(e: APINewAdministrator) {
     // requires: (projectId: number, values: APINewAdministrator)
 
+    const { project } = this.props;
+    
     // const { match } = this.props;
     // const memberRes = await FKApiClient.get().addMember(teamId, e);
     // if (memberRes.type === 'ok') {
