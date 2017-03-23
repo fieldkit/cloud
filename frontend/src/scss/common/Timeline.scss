@@ -4,6 +4,7 @@
   height: (100vh - $line-height * 2);
   top: $line-height;
   left: $line-width;
+  z-index: 1;
 
   & svg {
     width: 100%;

@@ -96,6 +96,16 @@ class FKApiClient {
     return res.text()
   }
 
+  async getProject (project) {
+    const res = await this.getJSON('/api/project/' + projectID)
+    return res
+  }
+
+  async getExpeditions (projectID) {
+    const res = await this.getJSON('/api/project/' + projectID + '/expeditions')
+    return res
+  }
+
   async getExpedition (projectID, expeditionID) {
     const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID)
     return res
@@ -107,5 +117,7 @@ class FKApiClient {
   }
 }
 
-const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+// TODO switch back as soon as we can collect data locally
+// const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
+const hostname = 'https://fieldkit.org'
 export default new FKApiClient(hostname)

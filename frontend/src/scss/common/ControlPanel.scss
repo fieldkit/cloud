@@ -12,7 +12,39 @@
 
       &_button {
         cursor: pointer;
-        border: black 1px solid;
+        border: rgba(0,0,0,0.05) 1px solid;
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
+  }
+
+  &_focus-selector {
+
+    li {
+      color: $color-accent;
+      background-color: white;
+      cursor: pointer;
+
+      &:hover {
+        color: white;
+        background-color: $color-accent;
+      }
+
+      &.active {
+        color: white;
+        background-color: $color-accent;
+      }
+    }
+  }
+
+  &_zoom-selector {
+    display: flex;
+    justify-content: space-between;
+
+      &_button {
+        cursor: pointer;
+        border: rgba(0,0,0,0.05) 1px solid;
         width: 100%;
         display: block;
         text-align: center;

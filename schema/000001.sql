@@ -81,8 +81,7 @@ CREATE TABLE fieldkit.team_user (
 CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
-	team_id integer REFERENCES fieldkit.team (id),
-	user_id integer REFERENCES fieldkit.user (id)
+	active boolean NOT NULL DEFAULT false
 );
 
 -- twitter

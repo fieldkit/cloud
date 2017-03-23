@@ -93,6 +93,7 @@
     "redux-logger": "^2.6.1",
     "redux-multi": "^0.1.12",
     "redux-thunk": "^2.1.0",
+    "slug": "^0.9.1",
     "style-loader": "0.13.1",
     "three": "^0.82.1",
     "transform-loader": "^0.2.3",

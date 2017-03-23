@@ -5,6 +5,7 @@
   width: $line-width * 18;
   height: calc(100vh - (2.487562189vh * 7));
   overflow: visible;
+  pointer-events: none;
 
   &_post {
     height: auto;
@@ -12,6 +13,7 @@
     margin-bottom: $line-height;
     transition: opacity 0.2s, max-height 0.5s ease-in-out, margin-bottom 0.2s ease-in;
     overflow: visible;
+    pointer-events: auto;
     
     &.transition-enter {
       opacity: 0.01;

@@ -56,7 +56,7 @@ export default class WebGLOverlay extends Component {
       }
     }
 
-    const sightingTexture = new TextureLoader().load(sightingTexturePath)
+    const sightingTexture = new TextureLoader().load(('/' + sightingTexturePath))
 
     this.state = {
       shaders,
@@ -176,6 +176,7 @@ export default class WebGLOverlay extends Component {
                 </points>
               }
               { 
+                false &&
                 !!bufferGeometries.focusParticles &&
                 <points>
                   <bufferGeometry
