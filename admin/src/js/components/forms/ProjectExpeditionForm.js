@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
+import { FormItem } from './FormItem';
 import { errorsFor, slugify } from '../../common/util';
 
 import type { APIErrors, APINewExpedition } from '../../api/types';
@@ -86,6 +87,14 @@ export class ProjectExpeditionForm extends Component {
   }
 
   render () {
+    const { projectSlug } = this.props;
+    const {
+      name,
+      slug,
+      description,
+      errors
+    } = this.state;
+
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -93,25 +102,17 @@ export class ProjectExpeditionForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <div className="form-group">
-          <label htmlFor="name">Name</label>
-          <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleNameChange.bind(this)} />
-          { errorsFor(this.state.errors, 'name') }
-        </div>
+        <FormItem name="name" value={name} labelText="name" onChange={this.handleNameChange.bind(this)} errors={errors} />
 
         <div className="url-preview">
           <p className="label">Your expedition will be available at the following address:</p>
           <p className="url">
             {/* TODO: replace with something that handles alternative domains */}
-            {`https://${this.props.projectSlug}.fieldkit.org/${this.state.slug}`}
+            {`https://${projectSlug}.fieldkit.org/${slug}`}
           </p>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="description">Description</label>
-          <input type="text" name="description" className="lg" value={this.state.description} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(this.state.errors, 'description') }
-        </div>
+        <FormItem name="description" value={description} labelText="description" onChange={this.handleInputChange.bind(this)} errors={errors} />
       </FormContainer>
     )
   }
