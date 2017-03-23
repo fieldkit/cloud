@@ -63,16 +63,17 @@ export class Project extends Component {
   async onAdministratorAdd(e: APINewAdministrator) {
     // requires: (projectId: number, values: APINewAdministrator)
 
-    const { project } = this.props;
-    
-    // const { match } = this.props;
-    // const memberRes = await FKApiClient.get().addMember(teamId, e);
-    // if (memberRes.type === 'ok') {
-    //   await this.loadTeams();
-    //   this.props.history.push(`${match.url}`);
-    // } else {
-    //   return memberRes.errors;
-    // }
+    const { project, match } = this.props;
+    console.log(typeof project.id, project.id);
+    console.log(typeof e, e);
+
+    const administratorRes = await FKApiClient.get().addAdministrator(project.id, e);
+    if (administratorRes.type === 'ok') {
+      await this.loadAdministrators();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return administratorRes.errors;
+    }
   }  
 
   async onProjectSave(project: APINewProject) {
@@ -92,7 +93,6 @@ export class Project extends Component {
 
   render () {
     const { match, project } = this.props;
-    const { administrators } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -111,7 +111,7 @@ export class Project extends Component {
             <h1>Add Users</h1>
             <AdministratorForm
               project={project}
-              administrators={administrators}
+              administrators={this.state.administrators}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onAdministratorAdd.bind(this)} />
           </ReactModal> } />          
@@ -132,9 +132,10 @@ export class Project extends Component {
           name={project ? project.name : undefined}
           slug={project ? project.slug : undefined}
           description={project ? project.description : undefined}
+
           onSave={this.onProjectSave.bind(this)} />
         <h3>Users</h3>
-        { administrators.map(administrator =>
+        { this.state.administrators.map(administrator =>
           <div> {administrator.user_id}</div>)}
         <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>

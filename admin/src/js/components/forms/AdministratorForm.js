@@ -5,17 +5,18 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIProject, APIUser, APINewAdministrator } from '../../api/types';
+import type { APIErrors, APIProject, APIUser, APINewAdministrator, APIAdministrator } from '../../api/types';
 import { FKApiClient } from '../../api/api';
 
 type Props = {
   project: APIProject,
+  administrators: APIAdministrator[],
 //   member?: APIMember,
 
-//   cancelText?: string;
-//   saveText?: ?string;
-//   onCancel?: () => void;
-//   onSave: (teamId: number, e: APINewMember) => Promise<?APIErrors>; 
+  cancelText?: string;
+  saveText?: ?string;
+  onCancel?: () => void;
+  onSave: (e: APINewAdministrator) => Promise<?APIErrors>; 
 }
 
 export class AdministratorForm extends Component {
@@ -39,13 +40,17 @@ export class AdministratorForm extends Component {
   }
 
   async loadUsers() {
-    /* TO DO:
-      remove already added members from this list.
-      Could probably pass current members in the props from the
-      Teams table and use componentWillReceiveProps to set the state */
     const usersRes = await FKApiClient.get().getUsers();
     if (usersRes.type === 'ok' && usersRes.payload) {
-      this.setState({users: usersRes.payload.users} || []);
+      const adminIds = this.props.administrators.map(admin =>
+        admin.user_id);
+        console.log(adminIds);
+        console.log(usersRes.payload.users);
+      const availableUsers = usersRes.payload.users.filter(user =>
+        adminIds.indexOf(user.id) < 0);
+      console.log(availableUsers);
+      this.setState({users: availableUsers} || []);
+      console.log(this.state.users);
     }
   }
 
@@ -58,28 +63,28 @@ export class AdministratorForm extends Component {
   }
 
   async save() {
-  //   const errors = await this.props.onSave(this.props.teamId, {
-  //     user_id: parseInt(this.state.userId),
-  //     role: this.state.role
-  //   });
-  //   if (errors) {
-  //     this.setState({ errors });
-  //   }
+    const { project } = this.props;
+    const { userId } = this.state;
+    const errors = await this.props.onSave({ user_id: parseInt(userId) });
+    if (errors) {
+      this.setState({ errors });
+    }
   }
 
   render () {
-    
-    const { users, userId } = this.state;
 
     return (
       <FormContainer
-        onSave={this.save.bind(this)}>
+        onSave={this.save.bind(this)}
+        onCancel={this.props.onCancel}
+        saveText={this.props.saveText}
+        cancelText={this.props.cancelText}>        
 
         <div className="form-group">
           <label htmlFor="userId">Member</label>
           <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
             <option value={null}>Select a user</option>
-            { users.map((user, i) => 
+            { this.state.users.map((user, i) => 
               <option key={i} value={user.id}>{user.username}</option>) }
           </select>
           { errorsFor(this.state.errors, 'userId') }          
