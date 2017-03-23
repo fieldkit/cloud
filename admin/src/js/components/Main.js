@@ -259,7 +259,7 @@ export class Main extends Component {
                   </div>
                   <div className="settings">
                     <Link to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>
-                      <img src={gearImg} alt="settings gear" />
+                      <img src={gearImg} alt="settings gear"/>
                     </Link>
                   </div>
                   <div className="sidebar-nav">

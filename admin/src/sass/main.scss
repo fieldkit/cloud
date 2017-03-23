@@ -7,14 +7,17 @@ $contents-width: 834px;
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
-  text-align: left;
+  text-align: center;
+  background-image: url('../img/fieldkit-background.png');  
 }
 
 .left {
-  float: left;
+  // float: left;
+  display: inline-block;
+  vertical-align: top;
   width: $sidebar-width;
+  text-align: left;
   height: 100%;
-  background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
     height: 100px;
@@ -22,34 +25,96 @@ $contents-width: 834px;
     img {
       max-height: 75px;
       max-width: 150px;
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
+  }
+
+  .expedition-sidebar {
+    background-color: rgba($color-1, 0.72);
+    padding: $elements-padding*2;
+    color: white;
+
+    .expedition-name {
+      @include type-h4;
+    }
+
+    .settings {
+      float: right;
+      position: relative;
+      top: -6px;
+      left: 10px;
+    }
+
+    a {
+      color: white;
+    }
+
+    .nav {
+      margin-top: $baseline-height;
+      a {
+        // height: $baseline-height*2;
+        padding: $elements-padding;
+        display: block;
+        border-radius: 3px;
+        @include type-body-1;
+        
+        &:link {
+
+        }
+        &:visited {
+
+        }
+        &:hover {
+          background-color: rgba($color-1, 0.48);
+        }
+        &:active {
+          background-color: rgba($color-1, 0.72);
+        }
+      }
+    }
+  }
+
+  footer {
+    @include type-small;
+    position: absolute;
+    bottom: $elements-padding;
+    width: $sidebar-width;
+    text-align: center;
   }
 }
 
 .right {
   // float: left;
-  width: 100%;
-  text-align: center;
-}
+  display: inline-block;
+  vertical-align: top;
+  width: $contents-width + $col-gutter;
+  height: 100%;
+  padding-left: $col-gutter;
+  background-color: white;
 
-.nav {
-  width: $contents-width;
-  height: 100px;
-  text-align: left;
-
-  .profile-image {
-    float: right;
-    width: 100px;
+  .nav {
+    width: 100%;
     height: 100px;
+    text-align: left;
 
-    img {
-      width: 75%;
-      height: 75%;
+    .profile-image {
+      float: right;
+      width: 100px;
+      height: 100px;
+
+      img {
+        width: 75%;
+        height: 75%;
+      }
     }
   }
-}
 
-.contents {
-  width: $contents-width;
-  text-align: left;
+  .contents {
+    width: 100%;
+    text-align: left;
+  }
+
 }

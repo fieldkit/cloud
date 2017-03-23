@@ -94,7 +94,7 @@ export type APINewTeam = {
 };
 
 export type APITeam = {
-  id: string;
+  id: number;
   ...$Exact<APINewTeam>;
 };
 
