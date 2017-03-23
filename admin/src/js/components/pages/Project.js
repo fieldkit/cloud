@@ -61,12 +61,7 @@ export class Project extends Component {
   }
 
   async onAdministratorAdd(e: APINewAdministrator) {
-    // requires: (projectId: number, values: APINewAdministrator)
-
     const { project, match } = this.props;
-    console.log(typeof project.id, project.id);
-    console.log(typeof e, e);
-
     const administratorRes = await FKApiClient.get().addAdministrator(project.id, e);
     if (administratorRes.type === 'ok') {
       await this.loadAdministrators();
@@ -75,6 +70,17 @@ export class Project extends Component {
       return administratorRes.errors;
     }
   }  
+
+  async onAdministratorDelete(e: APIAdministrator) {
+    const { match } = this.props;
+    const administratorRes = await FKApiClient.get().deleteAdministrator(e.project_id, e.user_id);
+    if (administratorRes.type === 'ok') {
+      await this.loadAdministrators();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return administratorRes.errors;
+    }
+  }
 
   async onProjectSave(project: APINewProject) {
     // TODO: this isn't implemented on the backend yet!
@@ -136,7 +142,10 @@ export class Project extends Component {
           onSave={this.onProjectSave.bind(this)} />
         <h3>Users</h3>
         { this.state.administrators.map(administrator =>
-          <div> {administrator.user_id}</div>)}
+          <div>
+            {administrator.user_id}
+            <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
+          </div> )}
         <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>
     )
