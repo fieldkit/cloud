@@ -34,12 +34,16 @@ export class ProjectExpeditions extends Component {
     };
   }
 
+  onComponentWillReceiveProps(props: Props) {
+    this.setState({expeditions: props.expeditions});
+  }
+
   async onExpeditionCreate(e: APINewExpedition) {
     const { match, project } = this.props;
 
     const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
     if (expeditionRes.type === 'ok') {
-      this.props.history.push(`${match.url}/expeditions/${e.slug}`);
+      this.props.history.push(`${match.url}/expeditions/${e.slug}/datasources`);
     } else {
       return expeditionRes.errors;
     }

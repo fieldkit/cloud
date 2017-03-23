@@ -11,7 +11,6 @@ import type { APIUser, APIProject, APIExpedition } from '../api/types';
 
 import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
-// import { Project } from './pages/Project';
 import { ProjectExpeditions } from './pages/ProjectExpeditions';
 import { ProjectSettings } from './pages/ProjectSettings';
 import { Expedition } from './pages/Expedition'
@@ -247,6 +246,7 @@ export class Main extends Component {
                   </div>
                 </div> }
             </div>
+            <br />
             {activeExpedition &&
               <div className="sidebar-section expedition-nav">
                 <h4>Expedition</h4>
@@ -261,6 +261,7 @@ export class Main extends Component {
                   <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
+                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
                     {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
                   </div>
               </div>
