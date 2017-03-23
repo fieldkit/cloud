@@ -6,13 +6,15 @@ import ReactModal from 'react-modal';
 
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
+import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition } from '../../api/types';
+import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APINewAdministrator, APIAdministrator } from '../../api/types';
 
 type Props = {
   project: APIProject;
   expeditions: APIExpedition[];
+  administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
 
   match: Object;
@@ -22,14 +24,29 @@ type Props = {
 
 export class Project extends Component {
   props: Props;
-  state: {}
+  state: {
+    expeditions: APIExpedition[],
+    administrators: APIAdministrator[]
+  }
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      expeditions: []
+      expeditions: [],
+      administrators: []
     };
+
+    this.loadAdministrators();
+  }
+
+  async loadAdministrators() {
+    const { project } = this.props;
+    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);  
+    if (administratorsRes.type === 'ok' && administratorsRes.payload) {
+      const administrators = administratorsRes.payload.administrators;
+      this.setState({administrators: administrators});
+    }
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
@@ -40,6 +57,28 @@ export class Project extends Component {
       this.props.history.push(`${match.url}/expeditions/${e.slug}`);
     } else {
       return expeditionRes.errors;
+    }
+  }
+
+  async onAdministratorAdd(e: APINewAdministrator) {
+    const { project, match } = this.props;
+    const administratorRes = await FKApiClient.get().addAdministrator(project.id, e);
+    if (administratorRes.type === 'ok') {
+      await this.loadAdministrators();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return administratorRes.errors;
+    }
+  }  
+
+  async onAdministratorDelete(e: APIAdministrator) {
+    const { match } = this.props;
+    const administratorRes = await FKApiClient.get().deleteAdministrator(e.project_id, e.user_id);
+    if (administratorRes.type === 'ok') {
+      await this.loadAdministrators();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return administratorRes.errors;
     }
   }
 
@@ -73,6 +112,16 @@ export class Project extends Component {
               onSave={this.onExpeditionCreate.bind(this)} />
           </ReactModal> } />
 
+        <Route path={`${match.url}/add-administrator`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Add Users">
+            <h1>Add Users</h1>
+            <AdministratorForm
+              project={project}
+              administrators={this.state.administrators}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onAdministratorAdd.bind(this)} />
+          </ReactModal> } />          
+
         <div id="expeditions">
           <h4>Expeditions</h4>
           { this.props.expeditions.map((e, i) =>
@@ -87,8 +136,17 @@ export class Project extends Component {
         <h2>Edit project</h2>
         <ProjectForm
           name={project ? project.name : undefined}
+          slug={project ? project.slug : undefined}
           description={project ? project.description : undefined}
+
           onSave={this.onProjectSave.bind(this)} />
+        <h3>Users</h3>
+        { this.state.administrators.map(administrator =>
+          <div>
+            {administrator.user_id}
+            <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
+          </div> )}
+        <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>
     )
   }
