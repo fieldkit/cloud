@@ -7,7 +7,7 @@ $contents-width: 834px;
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
-  // text-align: center;
+  text-align: center;
 }
 
 .out-link {
@@ -110,10 +110,11 @@ $contents-width: 834px;
 .right {
   float: left;
   vertical-align: top;
-  width: $contents-width + $col-gutter;
+  width: calc(100% - #{$sidebar-width});
   height: 100%;
   padding-left: $col-gutter;
   background-color: white;
+  @include shadow(8px);
 
   .nav {
     width: 100%;

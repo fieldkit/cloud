@@ -53,7 +53,7 @@ export class Projects extends Component {
           <span className="empty">No projects!</span> }
         </div>
 
-        <Link to={joinPath(match.url, 'new-project')}>Show new project modal</Link>
+        <Link className="button secondary" to={joinPath(match.url, 'new-project')}>Create new project</Link>
       </div>
     )
   }

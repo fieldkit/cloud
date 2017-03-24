@@ -153,7 +153,7 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 @mixin shadow($weigth) {
-  
+  box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24);
 }
 
 
@@ -176,13 +176,18 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   @if $primary {
     color: white;
     background-color: $color-2;
+    @include shadow(1px);
 
     &:hover {
-      background-color: $color-1;
+      background-color: lighten($color-2, 12%);
+      border-color: lighten($color-2, 6%);
+      @include shadow(2px);
     }
 
     &:active {
-
+      background-color: lighten($color-2, 18%);
+      border-color: lighten($color-2, 12%);
+      @include shadow(1px);
     }
 
     &:disabled {
@@ -194,11 +199,17 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     background-color: white;
 
     &:hover {
-      border-color: $color-1;
+      background-color: white;
+      color: lighten($color-2, 12%);
+      border-color: lighten($color-2, 12%);
+      @include shadow(2px);
     }
 
     &:active {
-
+      background-color: white;
+      color: lighten($color-2, 24%);
+      border-color: lighten($color-2, 24%);
+      @include shadow(1px);
     }
 
     &:disabled {
