@@ -1,5 +1,26 @@
 @import 'utils/reset';
 
+//-------------------- ALIGN --------------------//
+// TO DO: remove these from here and move to Landing.scss
+.alignXY {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.alignX {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.alignY {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 //-------------------- RESPONSIVE --------------------//
 
 @mixin for-phone-down {
@@ -61,7 +82,7 @@ $color-4: rgb(249, 189, 82);
 $color-5: rgb(255, 229, 169);
 $color-6: rgb(223, 223, 107);
 $gray-1: rgb(50, 50, 50);
-$gray-2: rgb(74, 74, 74);
+$gray-2: rgb(90, 90, 90);
 $gray-3: rgb(170, 170, 170);
 $gray-4: rgb(236, 236, 236);
 
@@ -134,7 +155,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 @mixin type-body-1 {
   font-size: 16px;
-  line-height: $baseline-height*1.5;
+  line-height: $baseline-height*2;
   font-family: $font-sans;
 }
 
@@ -145,7 +166,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 @mixin type-small {
   font-size: 12px;
-  line-height: $baseline-height*1.5;
+  line-height: $baseline-height*2;
   font-family: $font-sans;
 }
 
@@ -161,7 +182,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 @mixin shadow($weigth, $inset: false) {
   box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24);
   @if $inset == true {
-      box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24), inset 0 1px 2px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24), inset 0 1px 2px rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -172,6 +193,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   padding: 0 $elements-padding;
   border-radius: 3px;
   border: 2px solid $color-2;
+  cursor: pointer;
   @include type-button;
 
   &:not(:last-child) {
@@ -182,7 +204,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   //   margin-left: $elements-margin;
   // }
 
-  @if $primary {
+  @if $primary == true {
     color: white;
     background-color: $color-2;
     @include shadow(1px);
@@ -203,6 +225,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
       background-color: $color-6;
     }
 
+  // Secondary button
   } @else {
     color: $color-2;
     background-color: white;
@@ -211,14 +234,12 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
       background-color: white;
       color: lighten($color-2, 12%);
       border-color: lighten($color-2, 12%);
-      @include shadow(2px);
     }
 
     &:active {
       background-color: white;
       color: lighten($color-2, 24%);
       border-color: lighten($color-2, 24%);
-      @include shadow(1px);
     }
 
     &:disabled {
@@ -258,26 +279,6 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   &::placeholder {
     color: $gray-3;
   }
-}
-
-//-------------------- ALIGN --------------------//
-.alignXY {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.alignX {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.alignY {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 // -------------------- DROPDOWN GENERIC --------------------//
@@ -323,6 +324,7 @@ h4  { @include type-h4; }
 h5  { @include type-h5; }
 
 button, .button {
+
   // Primary button
   &:not(.bt-icon){
     @include button();
@@ -339,17 +341,15 @@ button, .button {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: none;
-  background-color: Transparent;
-  background-repeat: none;
+  cursor: pointer;
 
   img {
     width: 100%;
     height: auto;
+    vertical-align: top;
   }
 
   &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
-  &.remove   { background-image: url('../img/icons/icon-remove-small.png'); }
 }
 
 input[type="submit"] {
@@ -374,14 +374,58 @@ label, .label {
   margin-bottom: $baseline-height*1.5;
 }
 
-table {
-  thead, tbody {
-    tr {
-      th, td {
-        vertical-align: middle;
-      }
+
+.list {
+  width: 100%;
+  margin-top: $baseline-height*2;
+  margin-bottom: $baseline-height*1.5;
+
+  .list-row {
+    display: flex;
+    flex-direction: row;
+    height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    padding: $elements-padding;
+
+    &:hover {
+      background-color: $gray-4;
+    }
+
+    .user-avatar, .user-name {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 22px;
+      background-color: $gray-3;
+      margin-right: $elements-padding;
     }
   }
+}
+
+// TABLES
+table, .table {
+  display: table;
+}
+tr, .table-row {
+  display: table-row;
+}
+
+th, td, .table-cell {
+  vertical-align: middle;
+  display: table-cell;
+  height: $baseline-height*4;  
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 22px;
+  background-color: $gray-3;
 }
 
 .account-dropdown {
@@ -478,13 +522,6 @@ table {
           &:not(:first-child){
             border-top: 1px solid $gray-3;
             @include type-small;
-          }
-          .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 22px;
-            background-color: $gray-3;
-            margin: 4px 0;
           }
         }
       }

@@ -9,6 +9,8 @@ import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
+import removeImg from '../../../img/icons/icon-remove-small.png'
+
 import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator } from '../../api/types';
 
 type Props = {
@@ -113,11 +115,24 @@ export class ProjectSettings extends Component {
           </div>
           <div className="two-columns">        
             <h3>Users</h3>
-            { this.state.administrators.map(administrator =>
-              <div>
-                {administrator.user_id}
-                <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
-              </div> )}
+            <p>
+              Users you add to this project have administrative rights. They can create a new expedition, change its settings and add members to it. If you’re trying to add a member to an expedition instead, select an expedition and then go to <i>Teams</i>.
+            </p>
+            <div className="list">
+              { this.state.administrators.map(administrator =>
+                <div className="list-row">
+                  <div>
+                    <div className="user-avatar">
+                      <img />
+                    </div>
+                    <div className="user-name">
+                      {administrator.user_id}</div>
+                    </div>
+                  <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
+                    <img src={removeImg} alt="external link" />
+                  </div>
+                </div> )}
+              </div>
             <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
           </div>
         </div>

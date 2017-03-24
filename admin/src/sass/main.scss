@@ -112,9 +112,9 @@ $contents-width: 834px;
   vertical-align: top;
   // width: calc(100% - #{$sidebar-width});
   // width: $contents-width;
-  width: $contents-width + $col-gutter;
+  width: $contents-width + (2 * $col-gutter);
   height: 100%;
-  padding-left: $col-gutter;
+  padding: 0 $col-gutter;
   background-color: white;
   @include shadow(8px);
 
