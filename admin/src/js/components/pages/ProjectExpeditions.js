@@ -80,10 +80,10 @@ export class ProjectExpeditions extends Component {
           </ReactModal> } />
 
         <div id="expeditions">
-          <h4>Expeditions</h4>
+          <h1>Expeditions</h1>
           { this.props.expeditions.map((e, i) =>
             <div key={`expedition-${i}`} className="expedition-item">
-              <Link to={`${match.url}/expeditions/${e.slug}`}>{e.name}</Link>
+              <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`}>{e.name}</Link>
             </div> )}
           { this.props.expeditions.length === 0 &&
             <span className="empty">No expeditions!</span> }

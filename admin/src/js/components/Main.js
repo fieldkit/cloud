@@ -229,39 +229,38 @@ export class Main extends Component {
             <Link to="/"><img src={fieldkitLogo} alt="fieldkit logo" /></Link>
           </div>
           <div className="sidebar">
-            <div className="sidebar-section project-nav">
-              <h4>Projects</h4>
+            <div className="sidebar-section project-section">
+              <h5>Projects</h5>
               <Link to={`/`}>All</Link>
               { activeProject &&
                 <div>
                   <p>
                     {activeProject.name}
-                    <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
-                      <img src={externalLinkImg} alt="external link" />
-                    </a>                  
-                  </p>
-                  <div className="sidebar-nav">
-                    <NavLink to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
-                    <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
-                  </div>
-                </div> }
-            </div>
-            <br />
-            {activeExpedition &&
-              <div className="sidebar-section expedition-nav">
-                <h4>Expedition</h4>
-                  <p>
-                    {activeExpedition.name}
-                    <a className="out-link" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
-                      alt="go to expedition"
-                      target="_blank">
+                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
                       <img src={externalLinkImg} alt="external link" />
                     </a>
                   </p>
                   <div className="sidebar-nav">
+                    <NavLink to={`/projects/${activeProject.slug}/projectexpeditions`}>Expeditions</NavLink>
+                    <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+                  </div>
+                </div> }
+            </div>
+            {activeExpedition &&
+              <div className="sidebar-section expedition-section">
+                <h5>Expedition</h5>
+                  <h4>
+                    {activeExpedition.name}
+                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
+                      alt="go to expedition"
+                      target="_blank">
+                      <img src={externalLinkImg} alt="external link" />
+                    </a>
+                  </h4>
+                  <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
-                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
+                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/settings`}>Settings</NavLink>
                     {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
                   </div>
               </div>
@@ -307,7 +306,7 @@ export class Main extends Component {
                 project={activeProject}
                 expedition={activeExpedition} />
               <RouteOrLoading
-                path="/projects/:projectSlug/expeditions/:expeditionSlug"
+                path="/projects/:projectSlug/expeditions/:expeditionSlug/settings"
                 component={Expedition}
                 required={[activeProject, activeExpedition]}
                 project={activeProject}
@@ -320,7 +319,7 @@ export class Main extends Component {
                 project={activeProject}
                 onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
-                path="/projects/:projectSlug"
+                path="/projects/:projectSlug/projectexpeditions"
                 component={ProjectExpeditions}
                 required={[activeProject, expeditions]}
                 project={activeProject}

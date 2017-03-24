@@ -7,60 +7,75 @@ $contents-width: 834px;
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
-  text-align: center;
-  background-image: url('../img/fieldkit-background.png');  
+  // text-align: center;
 }
 
-.left {
-  // float: left;
+.out-link {
   display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 5px;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+
+.left {
+  float: left;
   vertical-align: top;
   width: $sidebar-width;
   text-align: left;
   height: 100%;
+  background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
-    height: 100px;
+    padding: $elements-padding*4 $elements-padding*2;
 
     img {
-      max-height: 75px;
-      max-width: 150px;
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      width: 100%;
+      height: auto;
     }
   }
 
-  .expedition-sidebar {
-    background-color: rgba($color-1, 0.72);
-    padding: $elements-padding*2;
-    color: white;
+  .sidebar {
 
-    .expedition-name {
-      @include type-h4;
-    }
+    @include type-body-1;
 
-    .settings {
-      float: right;
-      position: relative;
-      top: -6px;
-      left: 10px;
-    }
+    .sidebar-section {
 
-    a {
+      padding: $elements-padding*2 0;
       color: white;
-    }
+      background: url('../img/fieldkit-background.png') no-repeat fixed;      
+      background-blend-mode: multiply;
+      
+      &.project-section {
+        background-color: $color-1;      
+      }
+      &.expedition-section {
+        background-color: $color-2;      
+      }      
 
-    .nav {
-      margin-top: $baseline-height;
-      a {
-        // height: $baseline-height*2;
-        padding: $elements-padding;
+      h5 {
+        padding: 0 $elements-padding*2;
+      }
+
+      h4, p {
+        padding: 0 $elements-padding*2;
+        line-height: $baseline-height*3;
+      }
+
+      a:not(.bt-icon) {
         display: block;
-        border-radius: 3px;
-        @include type-body-1;
+        padding: 0 $elements-padding*2;
+        line-height: $baseline-height*3;
         
+        &:link, &:visited, &:active {
+          color: white;
+        }
+
         &:link {
 
         }
@@ -68,13 +83,19 @@ $contents-width: 834px;
 
         }
         &:hover {
-          background-color: rgba($color-1, 0.48);
+          background-color: rgba(0, 0, 0, 0.10);
         }
-        &:active {
-          background-color: rgba($color-1, 0.72);
+        &:active, &.active {
+          background-color: rgba(0, 0, 0, 0.12);
         }
       }
-    }
+
+      .sidebar-nav {
+        a {
+          padding-left: $elements-padding*3;
+        }
+      }
+    } 
   }
 
   footer {
@@ -87,8 +108,7 @@ $contents-width: 834px;
 }
 
 .right {
-  // float: left;
-  display: inline-block;
+  float: left;
   vertical-align: top;
   width: $contents-width + $col-gutter;
   height: 100%;
