@@ -4,6 +4,12 @@ import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 
+import type {
+  Match as RouterMatch,
+  Location as RouterLocation,
+  RouterHistory
+} from 'react-router-dom';
+
 import log from 'loglevel';
 
 import { FKApiClient } from '../api/api';
@@ -24,9 +30,9 @@ import gearImg from '../../img/icons/icon-gear.png'
 import '../../css/main.css'
 
 type Props = {
-  match: Object;
-  location: Object;
-  history: Object;
+  match: RouterMatch;
+  location: RouterLocation;
+  history: RouterHistory;
 }
 
 export class Main extends Component {
@@ -79,6 +85,7 @@ export class Main extends Component {
 
     if (projectSlug != newProjectSlug) {
       promises.push(this.loadActiveProject(newProjectSlug));
+      promises.push(this.loadProjects());
       stateChange.activeProject = null;
     } else if (!newProjectSlug) {
       stateChange.activeProject = null;
@@ -86,6 +93,7 @@ export class Main extends Component {
 
     if (expeditionSlug != newExpeditionSlug) {
       promises.push(this.loadActiveExpedition(newProjectSlug, newExpeditionSlug));
+      promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeExpedition = null;
     } else if (!newExpeditionSlug) {
       stateChange.activeExpedition = null;
@@ -159,6 +167,19 @@ export class Main extends Component {
       }
     } else {
       this.setState({ activeExpedition: null });
+    }
+  }
+
+  onProjectCreate() {
+    this.loadProjects();
+    this.props.history.push('/');
+  }
+
+  onExpeditionCreate() {
+    const projectSlug = this.projectSlug();
+    if (projectSlug) {
+      this.loadExpeditions(projectSlug);
+      this.props.history.push(`/projects/${projectSlug}`);
     }
   }
 
@@ -336,7 +357,8 @@ export class Main extends Component {
                 required={[activeProject, expeditions]}
                 project={activeProject}
                 expeditions={expeditions}
-                onUpdate={this.onProjectUpdate.bind(this)} />
+                onUpdate={this.onProjectUpdate.bind(this)}
+                onExpeditionCreate={this.onExpeditionCreate.bind(this)} />
               <RouteOrLoading
                 path="/profile"
                 component={Profile}
@@ -346,7 +368,8 @@ export class Main extends Component {
                 path="/"
                 component={Projects}
                 required={[projects]}
-                projects={projects} />
+                projects={projects}
+                onProjectCreate={this.onProjectCreate.bind(this)} />
             </Switch>
           </div>
         </div>
