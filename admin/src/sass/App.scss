@@ -28,7 +28,10 @@ $baseline-height: 12px;
 $elements-margin: $baseline-height;
 $elements-padding: $baseline-height;
 
-// Columns
+.row {
+  width: 100%;
+}
+
 .column {
   display: inline-block;
   vertical-align: top;
@@ -36,10 +39,10 @@ $elements-padding: $baseline-height;
     margin-left: $col-gutter;
   }
 }
-.one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
-.two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
-.three-columns  { width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
-.four-columns   { width: 100%; }
+.one-column     { @extend .column; width: calc((100% - 3*#{$col-gutter}) * 1/4); }
+.two-columns    { @extend .column; width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
+.three-columns  { @extend .column; width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
+.four-columns   { @extend .column; width: 100%; }
 
 // Main
 @mixin content-width {
@@ -66,13 +69,15 @@ $gray-4: rgb(236, 236, 236);
 
 // Variables
 // $font-serif: 'Merriweather', serif;
-$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+// $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 // Styles
 @mixin type-h1 {
   font-size: 36px;
   line-height: $baseline-height*4;
-  font-family: $font-sans;
+  // font-family: $font-sans;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
   letter-spacing: 2px;
   margin-bottom: $baseline-height*2;
@@ -96,12 +101,12 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 @mixin type-h3 {
-  font-size: 16px;
-  line-height: $baseline-height*2;
+  font-size: 20px;
+  line-height: $baseline-height*4;
   font-family: $font-sans;
-  // font-weight: 900;
+  font-weight: 300;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
 @mixin type-h4 {

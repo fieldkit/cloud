@@ -93,24 +93,22 @@ export class ProjectExpeditionForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
         
-        <div className="two-columns">
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleNameChange.bind(this)} />
-            { errorsFor(this.state.errors, 'name') }
-          </div>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
+          <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleNameChange.bind(this)} />
+          { errorsFor(this.state.errors, 'name') }
+        </div>
 
-          <div className="url-preview">
-            <p className="label">Your expedition will be available at:</p>
-            {/* TODO: replace with something that handles alternative domains */}          
-            <p>{`https://${this.props.projectSlug}.fieldkit.org/${this.state.slug}`}</p>
-          </div>
+        <div className="url-preview">
+          <p className="label">Your expedition will be available at:</p>
+          {/* TODO: replace with something that handles alternative domains */}          
+          <p>{`https://${this.props.projectSlug}.fieldkit.org/${this.state.slug}`}</p>
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <input type="text" name="description" className="lg" value={this.state.description} onChange={this.handleInputChange.bind(this)} />
-            { errorsFor(this.state.errors, 'description') }
-          </div>
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <input type="text" name="description" className="lg" value={this.state.description} onChange={this.handleInputChange.bind(this)} />
+          { errorsFor(this.state.errors, 'description') }
         </div>
       </FormContainer>
     )

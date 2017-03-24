@@ -92,7 +92,7 @@ export class ProjectSettings extends Component {
 
         <Route path={`${match.url}/add-administrator`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Users">
-            <h1>Add Users</h1>
+            <h2>Add Users</h2>
             <AdministratorForm
               project={project}
               administrators={this.state.administrators}
@@ -100,20 +100,27 @@ export class ProjectSettings extends Component {
               onSave={this.onAdministratorAdd.bind(this)} />
           </ReactModal> } />
 
-        <h2>Edit project</h2>
-        <ProjectForm
-          name={project ? project.name : undefined}
-          slug={project ? project.slug : undefined}
-          description={project ? project.description : undefined}
+        <h1>Project Settings</h1>
+        <div className="row">
+          <div className="two-columns">
+            <h3>Main</h3>
+            <ProjectForm
+              name={project ? project.name : undefined}
+              slug={project ? project.slug : undefined}
+              description={project ? project.description : undefined}
 
-          onSave={this.onProjectSave.bind(this)} />
-        <h3>Users</h3>
-        { this.state.administrators.map(administrator =>
-          <div>
-            {administrator.user_id}
-            <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
-          </div> )}
-        <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
+              onSave={this.onProjectSave.bind(this)} />
+          </div>
+          <div className="two-columns">        
+            <h3>Users</h3>
+            { this.state.administrators.map(administrator =>
+              <div>
+                {administrator.user_id}
+                <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
+              </div> )}
+            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
+          </div>
+        </div>
       </div>
     )
   }
