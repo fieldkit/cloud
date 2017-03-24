@@ -241,7 +241,7 @@ export class Main extends Component {
                     </a>
                   </p>
                   <div className="sidebar-nav">
-                    <NavLink to={`/projects/${activeProject.slug}/projectexpeditions`}>Expeditions</NavLink>
+                    <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
                   </div>
                 </div> }
@@ -260,7 +260,7 @@ export class Main extends Component {
                   <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
-                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/settings`}>Settings</NavLink>
+                    <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
                     {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
                   </div>
               </div>
@@ -306,7 +306,7 @@ export class Main extends Component {
                 project={activeProject}
                 expedition={activeExpedition} />
               <RouteOrLoading
-                path="/projects/:projectSlug/expeditions/:expeditionSlug/settings"
+                path="/projects/:projectSlug/expeditions/:expeditionSlug"
                 component={Expedition}
                 required={[activeProject, activeExpedition]}
                 project={activeProject}
@@ -319,7 +319,7 @@ export class Main extends Component {
                 project={activeProject}
                 onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
-                path="/projects/:projectSlug/projectexpeditions"
+                path="/projects/:projectSlug"
                 component={ProjectExpeditions}
                 required={[activeProject, expeditions]}
                 project={activeProject}

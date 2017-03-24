@@ -152,6 +152,10 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: 1px;
 }
 
+@mixin shadow($weigth) {
+  
+}
+
 
 //-------------------- INTERACTION --------------------//
 @mixin button ($primary: true){

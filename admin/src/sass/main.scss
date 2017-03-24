@@ -52,10 +52,10 @@ $contents-width: 834px;
       background-blend-mode: multiply;
       
       &.project-section {
-        background-color: $color-1;      
+        background-color: rgba($color-1, 0.80);
       }
       &.expedition-section {
-        background-color: $color-2;      
+        background-color: $color-1;
       }      
 
       h5 {

@@ -47,7 +47,7 @@ export class Projects extends Component {
         <div id="projects">
         { projects.map((p, i) =>
           <div key={`project-${i}`} className="project-item">
-            <Link to={joinPath(match.url, 'projects', p.slug, 'projectexpeditions')}>{p.name}</Link>
+            <Link to={joinPath(match.url, 'projects', p.slug)}>{p.name}</Link>
           </div> )}
         { projects.length === 0 &&
           <span className="empty">No projects!</span> }
