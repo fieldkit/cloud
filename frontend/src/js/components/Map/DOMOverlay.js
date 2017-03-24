@@ -4,10 +4,19 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 export default class WebGLOverlay extends Component {
 
   render () {
-    const { focusedDocument } = this.props
+    const {
+      focusedDocument,
+      openLightbox
+    } = this.props
 
     return (
-      <div  className="dom-overlay">
+      <div
+        className="dom-overlay"
+        style={{
+          cursor: !!focusedDocument ? 'pointer' : 'auto'
+        }}
+        onClick={ () => { if (!!focusedDocument) openLightbox(focusedDocument.get('id')) }}
+      >
         <ReactCSSTransitionGroup
           transitionName="transition"
           transitionEnter={true}

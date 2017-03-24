@@ -6,6 +6,7 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
+  lightboxDocumentID: null,
   expeditionPanelOpen: false,
   currentPage: 'map',
   currentExpedition: '',
@@ -32,100 +33,22 @@ export const initialState = I.fromJS({
   documents: {}
 })
 
-const updateViewport = (state, nextDate, nextFocusType) => {
-  const focusType = nextFocusType || state.getIn(['focus', 'type'])
-  const date = nextDate || state.get('currentDate')
-
-  switch (focusType) {
-    case 'expedition' : {
-      const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
-      const startDate = expedition.get('startDate')
-      const endDate = expedition.get('endDate')
-      const documents = state.get('documents')
-        .filter(d => {
-          return state.get('currentDocuments').includes(d.get('id'))
-        })
-        .sortBy(d => d.get('date'))
-
-      const previousDocuments = documents
-        .filter(d => {
-          return d.get('date') <= date
-        })
-      const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
-        date < startDate ? documents.first() :
-        date >= endDate ? documents.last() : null
-
-      const nextDocuments = documents
-        .filter(d => {
-          return d.get('date') > date
-        })
-      const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
-        date < startDate ? documents.first() :
-        date >= endDate ? documents.last() : null
-
-      if (!previousDocument || !nextDocument) return state.get('viewport')
-      
-      const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
-      const latitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
-
-      return state
-        .update('viewport', viewport => viewport
-          .set('longitude', longitude)
-          .set('latitude', latitude)
-          .set('zoom', 15)
-        )
-        .get('viewport')
-    }
-    case 'documents': {
-      const minLng = state.get('documents').minBy(doc => {
-      return doc.getIn(['geometry', 'coordinates', 1])
-      }).getIn(['geometry', 'coordinates', 1])
-
-      const maxLng = state.get('documents').maxBy(doc => {
-      return doc.getIn(['geometry', 'coordinates', 1])
-      }).getIn(['geometry', 'coordinates', 1])
-
-      const minLat = state.get('documents').minBy(doc => {
-      return doc.getIn(['geometry', 'coordinates', 0])
-      }).getIn(['geometry', 'coordinates', 0])
-
-      const maxLat = state.get('documents').maxBy(doc => {
-      return doc.getIn(['geometry', 'coordinates', 0])
-      }).getIn(['geometry', 'coordinates', 0])
-
-      const latitude = (minLat + maxLat) / 2
-      const longitude = (minLng + maxLng) / 2
-
-      const documentWidth = maxLng - minLng
-      const documentHeight = maxLat - minLat
-
-      let zoom = state.getIn(['viewport', 'zoom'])
-      if ((documentWidth * window.innerWidth) >= (documentHeight * window.innerHeight)) {
-        zoom = Math.log2(360 / (documentWidth * 1.1)) + 1
-      } else {
-        zoom = Math.log2(180 / (documentHeight * 1.1)) + 1
-      }
-
-      return state
-        .update('viewport', viewport => viewport
-          .set('longitude', longitude)
-          .set('latitude', latitude)
-          .set('zoom', zoom)
-        )
-        .get('viewport')
-    }
-    default: {
-      return state.get('viewport')
-    }
-  }
-}
-
 const expeditionReducer = (state = initialState, action) => {
 
   if (action.type !== actions.UPDATE_DATE && action.type !== actions.SET_MOUSE_POSITION ) {
     console.log('reducer:', action.type, action)
   }
   switch (action.type) {
+    case actions.OPEN_LIGHTBOX: {
+      return state
+        .set('lightboxDocumentID', action.id)
+    }
+
+    case actions.CLOSE_LIGHTBOX: {
+      return state
+        .set('lightboxDocumentID', null)
+    }
+
     case actions.SET_CURRENT_PAGE: {
       return state
         .set('currentPage', action.currentPage)
@@ -231,6 +154,94 @@ const expeditionReducer = (state = initialState, action) => {
     
   }
   return state
+}
+
+const updateViewport = (state, nextDate, nextFocusType) => {
+  const focusType = nextFocusType || state.getIn(['focus', 'type'])
+  const date = nextDate || state.get('currentDate')
+
+  switch (focusType) {
+    case 'expedition' : {
+      const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
+      const startDate = expedition.get('startDate')
+      const endDate = expedition.get('endDate')
+      const documents = state.get('documents')
+        .filter(d => {
+          return state.get('currentDocuments').includes(d.get('id'))
+        })
+        .sortBy(d => d.get('date'))
+
+      const previousDocuments = documents
+        .filter(d => {
+          return d.get('date') <= date
+        })
+      const previousDocument = previousDocuments.size > 0 ? previousDocuments.last() : 
+        date < startDate ? documents.first() :
+        date >= endDate ? documents.last() : null
+
+      const nextDocuments = documents
+        .filter(d => {
+          return d.get('date') > date
+        })
+      const nextDocument = nextDocuments.size > 0 ? nextDocuments.first() : 
+        date < startDate ? documents.first() :
+        date >= endDate ? documents.last() : null
+
+      if (!previousDocument || !nextDocument) return state.get('viewport')
+      
+      const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
+      const latitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
+
+      return state
+        .update('viewport', viewport => viewport
+          .set('longitude', longitude)
+          .set('latitude', latitude)
+          .set('zoom', 15)
+        )
+        .get('viewport')
+    }
+    case 'documents': {
+      const minLng = state.get('documents').minBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 1])
+      }).getIn(['geometry', 'coordinates', 1])
+
+      const maxLng = state.get('documents').maxBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 1])
+      }).getIn(['geometry', 'coordinates', 1])
+
+      const minLat = state.get('documents').minBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 0])
+      }).getIn(['geometry', 'coordinates', 0])
+
+      const maxLat = state.get('documents').maxBy(doc => {
+      return doc.getIn(['geometry', 'coordinates', 0])
+      }).getIn(['geometry', 'coordinates', 0])
+
+      const latitude = (minLat + maxLat) / 2
+      const longitude = (minLng + maxLng) / 2
+
+      const documentWidth = maxLng - minLng
+      const documentHeight = maxLat - minLat
+
+      let zoom = state.getIn(['viewport', 'zoom'])
+      if ((documentWidth * window.innerWidth) >= (documentHeight * window.innerHeight)) {
+        zoom = Math.log2(360 / (documentWidth * 1.1)) + 1
+      } else {
+        zoom = Math.log2(180 / (documentHeight * 1.1)) + 1
+      }
+
+      return state
+        .update('viewport', viewport => viewport
+          .set('longitude', longitude)
+          .set('latitude', latitude)
+          .set('zoom', zoom)
+        )
+        .get('viewport')
+    }
+    default: {
+      return state.get('viewport')
+    }
+  }
 }
 
 export default expeditionReducer

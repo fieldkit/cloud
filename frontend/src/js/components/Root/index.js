@@ -3,6 +3,7 @@ import TimelineContainer from '../../containers/common/TimelineContainer'
 import HeaderContainer from '../../containers/Root/HeaderContainer'
 import MapContainer from '../../containers/Map'
 import ExpeditionPanel from './ExpeditionPanel'
+import LightboxContainer from '../../containers/common/Lightbox'
 
 
 export default class Root extends React.Component {
@@ -53,6 +54,9 @@ export default class Root extends React.Component {
             <MapContainer/>
             <div className="root_content">
               <HeaderContainer/>
+            {/*
+              <LightboxContainer/>
+            */}
               <TimelineContainer/>
               {
                 !documents || documents.size === 0 &&

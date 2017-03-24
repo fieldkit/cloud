@@ -50,6 +50,7 @@ class Map extends React.Component {
       readingParticles,
       readingPath,
       focusedDocument,
+      openLightbox
     } = this.props
 
     return (
@@ -70,6 +71,7 @@ class Map extends React.Component {
           />
           <DOMOverlay
             focusedDocument={ focusedDocument }
+            openLightbox={ openLightbox }
           />
         </MapboxGL>
       </div>

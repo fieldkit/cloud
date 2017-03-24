@@ -108,6 +108,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     updateDate (date) {
       return dispatch(actions.updateDate(date))
+    },
+    openLightbox (id) {
+      return dispatch(actions.openLightbox(id))
     }
   }
 }
