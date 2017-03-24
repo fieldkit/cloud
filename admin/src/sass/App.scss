@@ -36,10 +36,10 @@ $elements-padding: $baseline-height;
     margin-left: $col-gutter;
   }
 }
-@mixin one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
-@mixin two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
-@mixin three-columns  { width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
-@mixin four-columns   { width: 100%; }
+.one-column     { width: calc((100% - 3*#{$col-gutter}) * 1/4); }
+.two-columns    { width: calc((100% - 3*#{$col-gutter}) * 2/4 + 1*#{$col-gutter}); }
+.three-columns  { width: calc((100% - 3*#{$col-gutter}) * 3/4 + 2*#{$col-gutter}); }
+.four-columns   { width: 100%; }
 
 // Main
 @mixin content-width {
@@ -75,6 +75,7 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-family: $font-sans;
   font-weight: 300;
   letter-spacing: 2px;
+  margin-bottom: $baseline-height*2;
 
   @include for-phone-down {
     // font-size: 21px;
@@ -134,7 +135,7 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 @mixin type-body-2 {
   @include type-body-1;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 @mixin type-small {
@@ -152,8 +153,11 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: 1px;
 }
 
-@mixin shadow($weigth) {
+@mixin shadow($weigth, $inset: false) {
   box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24);
+  @if $inset == true {
+      box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24), inset 0 1px 2px rgba(0, 0, 0, 0.12);
+  }
 }
 
 
@@ -223,10 +227,11 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0 $elements-padding/2;
   color: $gray-2;
   background-color: white;
-  border: 2px solid $gray-3;
+  border: 1px solid $gray-3;
   border-radius: 3px;
   @include type-body-1;
   line-height: $baseline-height*2.5;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
 
   &:not(:last-child) {
     margin-right: $elements-margin;
@@ -238,10 +243,11 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   &:focus {
     border-color: $gray-2;
+    @include shadow(2px, true);
   }
 
   &:disabled {
-    // color: $gray-3;
+    color: $gray-3;
   }
 
   &::placeholder {
@@ -347,9 +353,12 @@ input[type="submit"] {
 
 input[type="text"], input[type="email"], input[type="password"], input[type="username"] {
   @include form;
+  &.lg {
+    width: 100%;
+  }
 }
 
-label {
+label, .label {
   @include type-body-2;
   display: block;
   margin-bottom: $baseline-height/2;
