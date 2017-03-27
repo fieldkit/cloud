@@ -6,29 +6,3 @@ coreos:
   units:
     - name: "docker.service"
       command: "start"
-    - name "fieldkit.service"
-      command: "start"
-      content: |
-        [Unit]
-        Description=fieldkit
-        Requires=docker.service
-        After=docker.service
-
-        [Service]
-        ExecStartPre=-/usr/bin/docker kill fieldkit
-        ExecStartPre=-/usr/bin/docker rm fieldkit
-        ExecStartPre=/usr/bin/docker pull ocrnyc/fieldkit:${docker_tag}
-        ExecStart=/usr/bin/docker run \
-          --name=fieldkit \
-          --rm \
-          --read-only \
-          --env-file=/etc/fieldkit/fieldkit.env \
-          -v /usr/share/ca-certificates/:/etc/ssl/certs:ro \
-          -p 80:8080 \
-          ocrnyc/fieldkit:${docker_tag}
-        ExecStop=/usr/bin/docker stop fieldkit
-        Restart=always
-        RestartSec=10s
-
-        [Install]
-        WantedBy=multi-user.target
