@@ -85,6 +85,7 @@ $gray-1: rgb(50, 50, 50);
 $gray-2: rgb(90, 90, 90);
 $gray-3: rgb(170, 170, 170);
 $gray-4: rgb(236, 236, 236);
+$gray-5: rgb(248, 248, 248);
 
 //-------------------- TYPOGRAPHY --------------------//
 
@@ -346,7 +347,6 @@ button, .button {
   img {
     width: 100%;
     height: auto;
-    vertical-align: top;
   }
 
   &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
@@ -374,7 +374,6 @@ label, .label {
   margin-bottom: $baseline-height*1.5;
 }
 
-
 .list {
   width: 100%;
   margin-top: $baseline-height*2;
@@ -393,7 +392,7 @@ label, .label {
     }
 
     div:first-child {
-      background-color: red; 
+      width: 100%;
     }
 
     .user-avatar, .user-name {
@@ -409,20 +408,6 @@ label, .label {
       margin-right: $elements-padding;
     }
   }
-}
-
-// TABLES
-table, .table {
-  display: table;
-}
-tr, .table-row {
-  display: table-row;
-}
-
-th, td, .table-cell {
-  vertical-align: middle;
-  display: table-cell;
-  height: $baseline-height*4;  
 }
 
 .user-avatar {
@@ -477,6 +462,45 @@ th, td, .table-cell {
       }
     }
   }
+}
+
+table {
+  width: 100%;
+  text-align: left;
+  margin-top: $baseline-height*2;
+  margin-bottom: $baseline-height*1.5;
+
+  thead {
+    background-color: $gray-4;
+    tr {
+      height: $baseline-height*4;
+      th {
+        vertical-align: middle;
+        &:first-child {
+          border-top-left-radius: 3px;
+        }
+        &:last-child {
+          border-top-right-radius: 3px;
+        }
+      }
+    }
+  }  
+
+  tbody {
+    tr {
+      height: $baseline-height*5;
+      &:hover {
+        background-color: $gray-5;
+      }
+      td {
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.table-border {
+  border-bottom: 2px solid $gray-4;
 }
 
 .teams-table, .data-sources-table {

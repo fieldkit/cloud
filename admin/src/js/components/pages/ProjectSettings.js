@@ -118,21 +118,35 @@ export class ProjectSettings extends Component {
             <p>
               Users you add to this project have administrative rights. They can create a new expedition, change its settings and add members to it. If you’re trying to add a member to an expedition instead, select an expedition and then go to <i>Teams</i>.
             </p>
-            <div className="list">
+
+            <table className="user-list">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Users ({ this.state.administrators.length })</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
               { this.state.administrators.map(administrator =>
-                <div className="list-row">
-                  <div>
+                <tr>
+                  <td>
                     <div className="user-avatar">
                       <img />
+                    </div>                    
+                  </td>
+                  <td>
+                    {administrator.user_id}
+                  </td>
+                  <td>
+                    <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
+                      <img src={removeImg} alt="external link" />
                     </div>
-                    <div className="user-name">
-                      {administrator.user_id}ajksdhkaj hdkajsh dkjashd kjashdkj ahskjd haksjdh kjashdk jaskjd hakjsdh aksjdh kjashd kjash dkjh</div>
-                    </div>
-                  <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
-                    <img src={removeImg} alt="external link" />
-                  </div>
-                </div> )}
-              </div>
+                  </td>
+                </tr> )}
+              </tbody>
+            </table>
+
             <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
           </div>
         </div>
