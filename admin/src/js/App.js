@@ -50,7 +50,7 @@ export class App extends Component {
 
   render() {
     return (
-      <Router>
+      <Router basename="/admin">
         <Switch>
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
