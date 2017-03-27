@@ -175,6 +175,7 @@ func main() {
 		Database:   database,
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
+		Domain:     config.Domain,
 	})
 	if err != nil {
 		panic(err)
