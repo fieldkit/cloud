@@ -6,6 +6,10 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
+  project: {
+    id: 'eric',
+    name: 'eric'
+  },
   lightboxDocumentID: null,
   expeditionPanelOpen: false,
   currentPage: 'map',

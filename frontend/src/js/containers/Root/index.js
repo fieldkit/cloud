@@ -1,28 +1,32 @@
 
 import { connect } from 'react-redux'
-import Root from '../../components/Root'
 import * as actions from '../../actions'
-import I from 'immutable'
+import { createSelector } from 'reselect'
 
-const mapStateToProps = (state, ownProps) => {
+import Root from '../../components/Root'
 
-  const currentExpedition = state.expeditions.get('currentExpedition')
-  const expeditionFetching = state.expeditions.getIn(['expeditions', currentExpedition, 'expeditionFetching'])
-  const documentsFetching = state.expeditions.getIn(['expeditions', currentExpedition, 'documentsFetching'])
-  const documents = state.expeditions.get('documents')
-  const expeditionPanelOpen = state.expeditions.get('expeditionPanelOpen')
-
-  const expeditions = state.expeditions.get('expeditions')
-  const project = I.fromJS({id: 'eric', name: 'eric'})
-
-  return {
+const selectComputedData = createSelector(
+  state => state.expeditions.get('currentExpedition'),
+  state => {
+    const currentExpedition = state.expeditions.get('currentExpedition')
+    return state.expeditions.getIn(['expeditions', currentExpedition, 'expeditionFetching'])
+  },
+  state => {
+    const currentExpedition = state.expeditions.get('currentExpedition')
+    return state.expeditions.getIn(['expeditions', currentExpedition, 'documentsFetching'])
+  },
+  state => state.expeditions.get('documents'),
+  (currentExpedition, expeditionFetching, documentsFetching, documents) => ({
+    currentExpedition,
     expeditionFetching,
     documentsFetching,
-    currentExpedition,
-    expeditionPanelOpen,
-    documents,
-    expeditions,
-    project
+    documents
+  })
+)
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    ...selectComputedData(state)
   }
 }
 
@@ -30,9 +34,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     setMousePosition (x, y) {
       return dispatch(actions.setMousePosition(x, y))
-    },
-    closeExpeditionPanel () {
-      return dispatch(actions.closeExpeditionPanel())
     }
   }
 }

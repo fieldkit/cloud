@@ -6,15 +6,24 @@ import logoNatGeo from '../../../img/national-geographic-logo-long.svg'
 import iconClose from '../../../img/icon-close.svg'
 
 class ExpeditionPanel extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {}
+    this.stopPropagation = this.stopPropagation.bind(this)
+  }
+
+  stopPropagation (e) {
+    e.stopPropagation()
+  }
+
   render () {
     const {
-      active,
+      expeditionPanelOpen,
       project,
       expeditions,
-      closeExpeditionPanel,
-      currentExpedition
+      currentExpedition,
+      closeExpeditionPanel
     } = this.props
-
 
     let hostname = location.hostname.split('.').slice(1).join('.')
     const protocol = hostname !== 'localhost' ? 'https://' : ''
@@ -22,12 +31,12 @@ class ExpeditionPanel extends React.Component {
 
     return (
       <div
-        className={`expedition-panel ${ active ? 'active' : '' }`}
+        className={`expedition-panel ${ expeditionPanelOpen ? 'active' : '' }`}
         onClick={ closeExpeditionPanel }
       >
         <div
           className="expedition-panel_content"
-          onClick={ (e) => { e.stopPropagation() }}
+          onClick={ this.stopPropagation }
         >
           <div className="expedition-panel_content_header">
             <div

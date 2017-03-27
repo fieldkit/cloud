@@ -14,13 +14,20 @@ class Map extends React.Component {
         longitude: 0,
         latitude: 0,
         zoom: 15
-      }
+      },
+      startDragLngLat: [0, 0] 
     }
     this.tick = this.tick.bind(this)
+    this.onChangeViewport = this.onChangeViewport.bind(this)
   }
 
   tick (firstFrame) {
-    const { currentDate, playbackMode, updateDate } = this.props
+    const {
+      currentDate,
+      playbackMode,
+      updateDate,
+      focusType
+    } = this.props
     const framesPerSecond = 60
     const dateDelta = 
       (playbackMode === 'forward' ? 500000 :
@@ -29,8 +36,17 @@ class Map extends React.Component {
       playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
-    if (firstFrame || dateDelta !== 0) updateDate(nextDate)
+    if (focusType === 'expedition' && (firstFrame || dateDelta !== 0)) updateDate(nextDate)
     requestAnimationFrame(() => this.tick(false))
+  }
+
+  onChangeViewport (viewport) {
+    if (viewport.longitude !== this.props.viewport.longitude ||
+        viewport.latitude !== this.props.viewport.latitude ||
+        viewport.zoom !== this.props.viewport.zoom
+      ) {
+      setViewport(viewport, true) 
+    }
   }
 
   componentDidMount () {
@@ -53,24 +69,19 @@ class Map extends React.Component {
       openLightbox
     } = this.props
 
+    console.log('rendering map', Math.random())
+
     return (
       <div id="map">
         <MapboxGL
           { ...viewport }
-          mapStyle={MAPBOX_STYLE}
-          mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          onChangeViewport={ viewport => {
-            if (viewport.longitude !== this.props.viewport.longitude ||
-                viewport.latitude !== this.props.viewport.latitude ||
-                viewport.zoom !== this.props.viewport.zoom
-              ) {
-              setViewport(viewport, true) 
-            }
-          }}
+          mapStyle={ MAPBOX_STYLE }
+          mapboxApiAccessToken={ MAPBOX_ACCESS_TOKEN }
+          onChangeViewport={ this.onChangeViewport }
         >
           <WebGLOverlay
             { ...viewport }
-            startDragLngLat={ [0, 0] }
+            startDragLngLat={ this.state.startDragLngLat }
             redraw={ this.redrawGLOverlay }
             focusParticles={ focusParticles }
             readingParticles={ readingParticles }
