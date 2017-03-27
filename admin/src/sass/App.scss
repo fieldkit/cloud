@@ -437,3 +437,20 @@ table {
 .table-border {
   border-bottom: 2px solid $gray-4;
 }
+
+.accordion {
+  margin-bottom: $baseline-height*1.5;
+  .accordion-row {
+    &.expanded{
+      padding: $elements-padding;
+      border: 2px solid $gray-4;
+      border-radius: 3px;
+    }
+    .accordion-row-header {
+      button{
+        float: right;
+        margin-right: 0;
+      }
+    }
+  }
+}

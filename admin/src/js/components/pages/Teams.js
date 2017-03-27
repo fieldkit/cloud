@@ -120,13 +120,13 @@ export class Teams extends Component {
 
         <h1>Teams</h1>
 
-        <div id="teams-accordion">
+        <div className="accordion">
         { teams.map((team, i) =>
-          <div key={i} className="team-row expanded">
-              <div>
-                {team.name}<br/>
-                {team.description}                  
+          <div key={i} className="accordion-row expanded">
+              <div className="accordion-row-header">
                 <button className="secondary">Edit</button>
+                <h4>{team.name}</h4>
+                <p>{team.description}</p>
               </div>
               <div>
                 { <MembersTable

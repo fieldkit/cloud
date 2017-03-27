@@ -21,7 +21,6 @@ import { Profile } from './pages/Profile';
 import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
-import gearImg from '../../img/icons/icon-gear.png'
 import '../../css/main.css'
 
 type Props = {
@@ -235,7 +234,7 @@ export class Main extends Component {
               { activeProject &&
                 <div>
                   <p>
-                    {activeProject.name}
+                    <span>{activeProject.name}</span>
                     <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
                       <img src={externalLinkImg} alt="external link" />
                     </a>
@@ -250,7 +249,7 @@ export class Main extends Component {
               <div className="sidebar-section expedition-section">
                 <h5>Expedition</h5>
                   <h4>
-                    {activeExpedition.name}
+                    <span>{activeExpedition.name}</span>
                     <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
