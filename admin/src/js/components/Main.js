@@ -126,7 +126,7 @@ export class Main extends Component {
 
   async loadProjects() {
     log.debug('main -> loadProjects');
-    const projectRes = await FKApiClient.get().getProjects();
+    const projectRes = await FKApiClient.get().getCurrentUserProjects();
     if (projectRes.type === 'ok') {
       this.setState({ projects: projectRes.payload.projects });
     } else {
