@@ -27,7 +27,8 @@ class Timeline extends React.Component {
     const lineWidth = 0.01388888889 * window.innerWidth
     const lineHeight = 0.02487562189 * window.innerHeight
     const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
-    const w = mouseOver >= 0 && mouseOver < h ? lineWidth / 2 : 4
+    const w = 4
+    const hoverWidth = mouseOver >= 0 && mouseOver < h ? (lineWidth / 2 - w) : 0
     const rad = lineWidth / 2
     const x = lineWidth - w / 2
     const y = lineHeight
@@ -59,6 +60,7 @@ class Timeline extends React.Component {
             documents={ documents }
             startDate={ startDate }
             endDate={ endDate }
+            lineWidth={ lineWidth }
             x={ x }
             y={ y }
             w={ w }
@@ -66,16 +68,16 @@ class Timeline extends React.Component {
             rad={ rad }
           />
           <rect
-            x={ x }
+            x={ x - hoverWidth / 2 }
             y={ y }
-            width={ w }
+            width={ w + hoverWidth }
             height={ h }
             fill="rgb(150,150,150)"
           />
           <rect
-            x={ x }
+            x={ x - hoverWidth / 2 }
             y={ y }
-            width={ w }
+            width={ w + hoverWidth }
             height={ h * progress }
             fill="#D0462C"
           />
@@ -91,12 +93,12 @@ class Timeline extends React.Component {
           { 
             mouseOver >= 0 && mouseOver < h &&
             <rect
-              x={ x }
+              x={ x - hoverWidth / 2 }
               style={{
                 pointerEvents: 'none'
               }}
               y={ mouseOver + lineHeight - 2 }
-              width={ w }
+              width={ w + hoverWidth }
               height={ 2 }
               fill="white"
             />

@@ -8,6 +8,7 @@ class ActivityGraph extends React.Component {
       documents,
       startDate,
       endDate,
+      lineWidth,
       x,
       y,
       w,
@@ -15,7 +16,6 @@ class ActivityGraph extends React.Component {
       rad
     } = this.props
 
-    const lineWidth = 1.388888889
     const bucketCount = Math.floor(h / 5)
     const buckets = new Array(bucketCount).fill(0)
     const bucketHeight = h / bucketCount - 1
@@ -35,7 +35,7 @@ class ActivityGraph extends React.Component {
       >
         {
           buckets.map((b, i) => {
-            const width = map(b, 0, maxDocuments, w, w + (lineWidth * window.innerWidth / 100) * 2)
+            const width = map(b, 0, maxDocuments, w, w + lineWidth * 2)
             return (
               <rect
                 key={ i }
