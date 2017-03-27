@@ -1,6 +1,7 @@
 
 import React, { PropTypes } from 'react'
 import { map, constrain } from '../../utils.js'
+import ActivityGraph from './Timeline/ActivityGraph'
 
 class Timeline extends React.Component {
 
@@ -54,19 +55,22 @@ class Timeline extends React.Component {
             updateDate(nextDate, null, true)
           }}
         >
-          <rect
+          <ActivityGraph
+            documents={ documents }
+            startDate={ startDate }
+            endDate={ endDate }
             x={ x }
             y={ y }
-            width={ w }
-            height={ h }
-            fill="rgba(255,255,255,0.25)"
+            w={ w }
+            h={ h }
+            rad={ rad }
           />
           <rect
             x={ x }
             y={ y }
             width={ w }
             height={ h }
-            fill="rgba(255,255,255,0.5)"
+            fill="rgb(150,150,150)"
           />
           <rect
             x={ x }
@@ -94,7 +98,7 @@ class Timeline extends React.Component {
               y={ mouseOver + lineHeight - 2 }
               width={ w }
               height={ 2 }
-              fill="rgba(255,255,255,0.75)"
+              fill="white"
             />
           }
         </svg>
