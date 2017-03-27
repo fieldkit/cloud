@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "sMXTaE5P3q//jluejx9c0GqZPs0=",
+			"path": "github.com/O-C-R/singlepage",
+			"revision": "bbbe2159ecec95ee029557c8646d7904ec5aeec3",
+			"revisionTime": "2017-03-27T18:44:21Z"
+		},
+		{
 			"checksumSHA1": "J9EggVHAM7zEz3GNpKCHF8z9ONY=",
 			"path": "github.com/O-C-R/sqlxcache",
 			"revision": ""
