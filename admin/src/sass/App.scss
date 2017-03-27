@@ -392,8 +392,11 @@ label, .label {
 table {
   width: 100%;
   text-align: left;
-  margin-top: $baseline-height*2;
   margin-bottom: $baseline-height*1.5;
+
+  &:not(:first-child) {
+    margin-top: $baseline-height*2;
+  }
 
   thead {
     background-color: $gray-4;
@@ -451,6 +454,22 @@ table {
         float: right;
         margin-right: 0;
       }
+    }
+  }
+}
+
+.gallery-list {
+  @extend .row;
+  margin-bottom: $baseline-height*1.5;
+  .gallery-list-item {
+    @extend .two-columns;
+    position: relative;    
+    height: $baseline-height*15;
+    background-color: $gray-5;
+    h4 {
+      position: absolute;
+      left: $elements-padding;
+      bottom: $elements-padding;
     }
   }
 }

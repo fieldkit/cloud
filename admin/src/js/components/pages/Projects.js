@@ -9,8 +9,6 @@ import { FKApiClient } from '../../api/api';
 import { joinPath } from '../../common/util';
 import type { APIProject, APINewProject } from '../../api/types';
 
-import '../../../css/projects.css'
-
 type Props = {
   projects: APIProject[],
 
@@ -44,16 +42,17 @@ export class Projects extends Component {
               onSave={this.onProjectCreate.bind(this)} />
           </ReactModal> } />
 
-        <div id="projects">
+        <h1>Projects</h1>
+        <div id="projects" className="gallery-list">
         { projects.map((p, i) =>
-          <div key={`project-${i}`} className="project-item">
-            <Link to={joinPath(match.url, 'projects', p.slug)}>{p.name}</Link>
-          </div> )}
+          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item">
+            <h4>{p.name}</h4>
+          </Link> )}
         { projects.length === 0 &&
           <span className="empty">No projects!</span> }
         </div>
 
-        <Link className="button secondary" to={joinPath(match.url, 'new-project')}>Create new project</Link>
+        <Link className="button" to={joinPath(match.url, 'new-project')}>Create new project</Link>
       </div>
     )
   }

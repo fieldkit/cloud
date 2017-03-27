@@ -78,17 +78,17 @@ export class ProjectExpeditions extends Component {
               onCancel={() => this.props.history.push(match.url)}
               onSave={this.onExpeditionCreate.bind(this)} />
           </ReactModal> } />
-
-        <div id="expeditions">
-          <h1>Expeditions</h1>
+        
+        <h1>Expeditions</h1>
+        <div id="expeditions" className="gallery-list">
           { this.props.expeditions.map((e, i) =>
-            <div key={`expedition-${i}`} className="expedition-item">
-              <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`}>{e.name}</Link>
-            </div> )}
+            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item">
+              <h4>{e.name}</h4>
+            </Link> )}
           { this.props.expeditions.length === 0 &&
             <span className="empty">No expeditions!</span> }
         </div>
-        <Link to={`${match.url}/new-expedition`}>Show new expedition modal</Link>
+        <Link to={`${match.url}/new-expedition`} className="button">Create new expedition</Link>
       </div>
     )
   }

@@ -10,7 +10,7 @@ import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
 import removeImg from '../../../img/icons/icon-remove-small.png'
-import '../../../css/projects.css'
+import '../../../css/projectsettings.css'
 
 import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator } from '../../api/types';
 
