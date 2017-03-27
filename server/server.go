@@ -40,6 +40,7 @@ type Config struct {
 	AdminRoot             string `split_words:"true"`
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
+	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 }
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
@@ -126,9 +127,9 @@ func main() {
 	var emailer email.Emailer
 	switch config.Emailer {
 	case "default":
-		emailer = email.NewEmailer()
+		emailer = email.NewEmailer("admin", config.Domain)
 	case "aws":
-		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin@fieldkit.org")
+		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
 	default:
 		panic("invalid emailer")
 	}
@@ -261,6 +262,8 @@ func main() {
 		landingServer = singlepageApplication
 	}
 
+	apiDomain := "api." + config.Domain
+	suffix := "." + config.Domain
 	server := &http.Server{
 		Addr: config.Addr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -269,7 +272,12 @@ func main() {
 				return
 			}
 
-			if req.Host == "fieldkit.org" || req.Host == "fieldkit.team" {
+			if req.Host == apiDomain {
+				service.Mux.ServeHTTP(w, req)
+				return
+			}
+
+			if req.Host == config.Domain {
 				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
 					adminServer.ServeHTTP(w, req)
 					return
@@ -279,7 +287,7 @@ func main() {
 				return
 			}
 
-			if strings.HasSuffix(req.Host, ".fieldkit.org") || strings.HasSuffix(req.Host, ".fieldkit.team") {
+			if strings.HasSuffix(req.Host, suffix) {
 				frontendServer.ServeHTTP(w, req)
 				return
 			}
