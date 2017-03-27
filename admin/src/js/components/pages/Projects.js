@@ -49,7 +49,7 @@ export class Projects extends Component {
             <h4>{p.name}</h4>
           </Link> )}
         { projects.length === 0 &&
-          <span className="empty">No projects!</span> }
+          <span className="empty">You don't have any projects yet.</span> }
         </div>
 
         <Link className="button" to={joinPath(match.url, 'new-project')}>Create new project</Link>

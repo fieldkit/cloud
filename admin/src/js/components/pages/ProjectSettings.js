@@ -88,6 +88,7 @@ export class ProjectSettings extends Component {
 
   render () {
     const { match, project } = this.props;
+    let { administrators } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -124,12 +125,12 @@ export class ProjectSettings extends Component {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Users ({ this.state.administrators.length })</th>
+                  <th>Users ({ administrators.length })</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-              { this.state.administrators.map(administrator =>
+              { administrators.map(administrator =>
                 <tr>
                   <td>
                     <div className="user-avatar">

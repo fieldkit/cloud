@@ -273,22 +273,20 @@ export class Main extends Component {
         </div>
 
         <div className="right">
-          <div className="nav">
-            <Dropdown className="account-dropdown" ref="dropdown">
-              <DropdownTrigger className="trigger">
-                <img src={placeholderImage} alt="profile" />
-              </DropdownTrigger>
-              <DropdownContent className="dropdown-contents">
-                <div className="header">
-                  Signed in as <strong>{user ? user.username : ''}</strong>
-                </div>
-                <ul>
-                  <li><Link to="/profile" onClick={this.handleLinkClick.bind(this)}>Profile</Link></li>
-                  <li><Link to="/logout">Logout</Link></li>
-                </ul>
-              </DropdownContent>
-            </Dropdown>
-          </div>
+          <Dropdown className="account-dropdown" ref="dropdown">
+            <DropdownTrigger className="trigger">
+              <img src={placeholderImage} alt="profile" />
+            </DropdownTrigger>
+            <DropdownContent className="dropdown-contents">
+              <div className="header">
+                Signed in as <strong>{user ? user.username : ''}</strong>
+              </div>
+              <div className="nav">
+                <Link to="/profile" onClick={this.handleLinkClick.bind(this)}>Profile</Link>
+                <Link to="/logout">Logout</Link>
+              </div>
+            </DropdownContent>
+          </Dropdown>
 
           <div className="contents">
             <Switch>

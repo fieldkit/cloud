@@ -36,7 +36,6 @@ export class MembersTable extends Component {
 
   render() {
     const { teamId, members } = this.props;
-    console.log(members);
     if(members){
       return (
           <div>
