@@ -5,8 +5,8 @@ import Lightbox from '../../components/common/Lightbox'
 
 const mapStateToProps = (state, ownProps) => {
   const lightboxDocumentID = state.expeditions.get('lightboxDocumentID')
-  const data = state.expeditions.getIn(['documents', lightboxDocumentID])
-  const currentExpeditionID = state.get('currentExpedition')
+  const data = !!lightboxDocumentID ? state.expeditions.getIn(['documents', lightboxDocumentID]) : null
+  const currentExpeditionID = state.expeditions.get('currentExpedition')
   return {
     data,
     currentExpeditionID

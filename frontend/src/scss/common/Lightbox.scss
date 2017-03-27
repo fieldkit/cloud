@@ -18,5 +18,19 @@
     overflow-y: scroll;
     width: $line-width * 66;
     display: flex;
+
+    &_type {
+      flex-basis: $line-width * 2;
+      margin-right: $line-width * 2;
+    }
+
+    &_main {
+      flex-grow: 1;
+    }
+
+    &_type {
+      flex-basis: $line-width * 2;
+      margin-left: $line-width * 2;
+    }
   }
 }

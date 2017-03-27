@@ -10,19 +10,31 @@ class Lightbox extends React.Component {
     const {
       data,
       currentExpeditionID,
-      updateDate
+      updateDate,
+      closeLightbox
     } = this.props
 
-    return <div></div>
+    if (!data) return null
+
+    const type = data.get('type')
 
     return (
       <div className="lightbox">
         <div className="lightbox_map-overlay"/>
-        <div className="lightbox_content">
-          HELLO WORLD LIGHTBOX
+        <div
+          className="lightbox_content"
+          style={{
+            padding: `0 ${ 1.388888889 * 12.5 }vw`
+          }}
+          onClick={ closeLightbox }
+        >
           <div className="lightbox_content_type">
+            { data.get('type') }
           </div>
           <div className="lightbox_content_main">
+            <p>
+              { `This is a sensor reading: ${ data.get('date') }`}
+            </p>
             <div className="post_main_meta">
               <div className="post_main_meta_data">
                 { dateToString(new Date(data.get('date'))) }
@@ -30,7 +42,10 @@ class Lightbox extends React.Component {
               <div className="post_main_meta_geo">
                 <Link
                   to={ '/' + currentExpeditionID + '/map' }
-                  onClick={ () => updateDate(data.get('date'), 'pause') }
+                  onClick={ () => {
+                    updateDate(data.get('date'), 'pause')
+                    closeLightbox()
+                  }}
                 >
                   <img src={ '/' + iconLocation }/>
                 </Link>

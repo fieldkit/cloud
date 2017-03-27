@@ -54,9 +54,7 @@ export default class Root extends React.Component {
             <MapContainer/>
             <div className="root_content">
               <HeaderContainer/>
-            {/*
               <LightboxContainer/>
-            */}
               <TimelineContainer/>
               {
                 !documents || documents.size === 0 &&
