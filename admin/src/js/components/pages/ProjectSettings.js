@@ -10,6 +10,7 @@ import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
 import removeImg from '../../../img/icons/icon-remove-small.png'
+import '../../../css/projects.css'
 
 import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator } from '../../api/types';
 
@@ -119,7 +120,7 @@ export class ProjectSettings extends Component {
               Users you add to this project have administrative rights. They can create a new expedition, change its settings and add members to it. If you’re trying to add a member to an expedition instead, select an expedition and then go to <i>Teams</i>.
             </p>
 
-            <table className="user-list">
+            <table className="administrators-table">
               <thead>
                 <tr>
                   <th></th>

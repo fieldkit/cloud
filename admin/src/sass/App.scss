@@ -49,6 +49,11 @@ $baseline-height: 12px;
 $elements-margin: $baseline-height;
 $elements-padding: $baseline-height;
 
+$avatar-size-medium: $baseline-height*3.5;
+$avatar-size-small: $baseline-height*2.5;
+
+$icon-size-small: $baseline-height;
+
 .row {
   width: 100%;
 }
@@ -340,8 +345,8 @@ button, .button {
 // Icon button
 .bt-icon {
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: $icon-size-small;
+  height: $icon-size-small;
   cursor: pointer;
 
   img {
@@ -411,9 +416,9 @@ label, .label {
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 22px;
+  width: $avatar-size-medium;
+  height: $avatar-size-medium;
+  border-radius: $avatar-size-medium;
   background-color: $gray-3;
 }
 
@@ -477,10 +482,12 @@ table {
       th {
         vertical-align: middle;
         &:first-child {
-          border-top-left-radius: 3px;
+          border-top-left-radius: 6px;
+          padding-left: $elements-padding;
         }
         &:last-child {
-          border-top-right-radius: 3px;
+          border-top-right-radius: 6px;
+          padding-right: $elements-padding;
         }
       }
     }
@@ -494,6 +501,12 @@ table {
       }
       td {
         vertical-align: middle;
+        &:first-child {
+          padding-left: $elements-padding;
+        }
+        &:last-child {
+          padding-right: $elements-padding;
+        }        
       }
     }
   }
@@ -502,6 +515,8 @@ table {
 .table-border {
   border-bottom: 2px solid $gray-4;
 }
+
+
 
 .teams-table, .data-sources-table {
   text-align: left;
