@@ -126,7 +126,7 @@ export class ProjectSettings extends Component {
                       <img />
                     </div>
                     <div className="user-name">
-                      {administrator.user_id}</div>
+                      {administrator.user_id}ajksdhkaj hdkajsh dkjashd kjashdkj ahskjd haksjdh kjashdk jaskjd hakjsdh aksjdh kjashd kjash dkjh</div>
                     </div>
                   <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
                     <img src={removeImg} alt="external link" />

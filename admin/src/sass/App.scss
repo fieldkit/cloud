@@ -392,6 +392,10 @@ label, .label {
       background-color: $gray-4;
     }
 
+    div:first-child {
+      background-color: red; 
+    }
+
     .user-avatar, .user-name {
       display: inline-block;
       vertical-align: middle;
