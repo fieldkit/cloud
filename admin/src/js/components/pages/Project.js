@@ -4,6 +4,12 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
+import type {
+  Match as RouterMatch,
+  Location as RouterLocation,
+  RouterHistory
+} from 'react-router-dom';
+
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
@@ -16,14 +22,15 @@ type Props = {
   expeditions: APIExpedition[];
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
+  onExpeditionCreate: () => void;
 
-  match: Object;
-  location: Object;
-  history: Object;
+  match: RouterMatch;
+  location: RouterLocation;
+  history: RouterHistory;
 }
 
 export class Project extends Component {
-  props: Props;
+  props: $Exact<Props>;
   state: {
     expeditions: APIExpedition[],
     administrators: APIAdministrator[]
@@ -42,7 +49,7 @@ export class Project extends Component {
 
   async loadAdministrators() {
     const { project } = this.props;
-    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);  
+    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
       this.setState({administrators: administrators});
@@ -54,7 +61,7 @@ export class Project extends Component {
 
     const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
     if (expeditionRes.type === 'ok') {
-      this.props.history.push(`${match.url}/expeditions/${e.slug}`);
+      this.props.onExpeditionCreate();
     } else {
       return expeditionRes.errors;
     }
@@ -69,7 +76,7 @@ export class Project extends Component {
     } else {
       return administratorRes.errors;
     }
-  }  
+  }
 
   async onAdministratorDelete(e: APIAdministrator) {
     const { match } = this.props;
@@ -120,7 +127,7 @@ export class Project extends Component {
               administrators={this.state.administrators}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onAdministratorAdd.bind(this)} />
-          </ReactModal> } />          
+          </ReactModal> } />
 
         <div id="expeditions">
           <h4>Expeditions</h4>
