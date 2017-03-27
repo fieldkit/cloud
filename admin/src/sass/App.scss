@@ -186,9 +186,9 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 }
 
 @mixin shadow($weigth, $inset: false) {
-  box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24);
+  box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.18);
   @if $inset == true {
-    box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.24), inset 0 1px 2px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 $weigth 0 rgba(0,0,0,0.12), 0 $weigth $weigth 0 rgba(0,0,0,0.18), inset 0 1px 2px rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -201,6 +201,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   border: 2px solid $color-2;
   cursor: pointer;
   @include type-button;
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
 
   &:not(:last-child) {
     margin-right: $elements-margin;
@@ -259,7 +261,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   padding: 0 $elements-padding/2;
   color: $gray-2;
   background-color: white;
-  border: 1px solid $gray-3;
+  border: 1px solid $gray-4;
   border-radius: 3px;
   @include type-body-1;
   line-height: $baseline-height*2.5;
@@ -274,8 +276,9 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   // }
 
   &:focus {
-    border-color: $gray-2;
-    @include shadow(2px, true);
+    // border-color: $gray-3;
+    // @include shadow(2px, true);
+    @include shadow(2px);    
   }
 
   &:disabled {
@@ -348,13 +351,13 @@ button, .button {
   width: $icon-size-small;
   height: $icon-size-small;
   cursor: pointer;
-
+  &:not(:first-child){
+    margin-left: $elements-padding;
+  }
   img {
     width: 100%;
     height: auto;
   }
-
-  &.edit     { background-image: url('../img/icons/icon-edit-small.png'); }
 }
 
 input[type="submit"] {
@@ -379,94 +382,11 @@ label, .label {
   margin-bottom: $baseline-height*1.5;
 }
 
-.list {
-  width: 100%;
-  margin-top: $baseline-height*2;
-  margin-bottom: $baseline-height*1.5;
-
-  .list-row {
-    display: flex;
-    flex-direction: row;
-    height: 48px;
-    align-items: center;
-    justify-content: space-between;
-    padding: $elements-padding;
-
-    &:hover {
-      background-color: $gray-4;
-    }
-
-    div:first-child {
-      width: 100%;
-    }
-
-    .user-avatar, .user-name {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 22px;
-      background-color: $gray-3;
-      margin-right: $elements-padding;
-    }
-  }
-}
-
 .user-avatar {
   width: $avatar-size-medium;
   height: $avatar-size-medium;
   border-radius: $avatar-size-medium;
   background-color: $gray-3;
-}
-
-.account-dropdown {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 75px;
-  height: 75px;
-  cursor: pointer;
-
-  img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .dropdown-contents {
-    left: auto;
-    right: 0;
-
-    white-space: nowrap;
-
-    margin-top: 5px;
-    padding: 10px;
-
-    border-radius: 5px;
-    box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.10);
-
-    strong {
-      font-weight: bold;
-    }
-
-    .header {
-      margin-bottom: 5px;
-    }
-
-    ul {
-      list-style-type: none;
-
-      li {
-        margin: 5px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
 }
 
 table {
@@ -496,6 +416,8 @@ table {
   tbody {
     tr {
       height: $baseline-height*5;
+      transition-property: background-color;
+      transition-duration: 0.25s;
       &:hover {
         background-color: $gray-5;
       }
@@ -514,60 +436,4 @@ table {
 
 .table-border {
   border-bottom: 2px solid $gray-4;
-}
-
-
-
-.teams-table, .data-sources-table {
-  text-align: left;
-  margin-bottom: $baseline-height*1.5;
-
-  tbody {
-    tr {
-      td {
-        @include type-h4;
-      }
-    }
-  }
-}
-
-.teams-table {
-
-  .members-table {
-
-    // width: 100%;
-    width: 900px;
-    margin-bottom: $baseline-height*1.5;
-
-    th, tr {
-      height: $baseline-height*4;
-    }
-
-    thead {
-      background-color: $gray-4;
-      tr {
-        border-bottom: 1px solid $gray-3;
-        th:first-child {
-          border-top-left-radius: 3px;
-        }
-        th:last-child {
-          border-top-right-radius: 3px;
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        td{
-          &:first-child {
-            width: calc(44px + #{$elements-padding});
-          }
-          &:not(:first-child){
-            border-top: 1px solid $gray-3;
-            @include type-small;
-          }
-        }
-      }
-    }
-  }
 }

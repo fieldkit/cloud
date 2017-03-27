@@ -8,6 +8,7 @@ import { MembersTable } from '../shared/MembersTable';
 import { TeamForm } from '../forms/TeamForm';
 import { MemberForm } from '../forms/MemberForm';
 import { FKApiClient } from '../../api/api';
+import '../../../css/teams.css'
 
 import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
 
@@ -119,28 +120,24 @@ export class Teams extends Component {
 
         <h1>Teams</h1>
 
-        <div id="teams">
+        <div id="teams-accordion">
         { teams.map((team, i) =>
-          <table key={i} className="teams-table">
-            <tbody>
-              <tr>
-                <td name={team.name}>
-                  {team.name}<br/>
-                  {team.description}                  
-                  <button className="secondary">Edit</button>
-
-                  { <MembersTable
-                      teamId={team.id}
-                      members={members[team.id]}
-                      onDelete={this.onMemberDelete.bind(this)}/> }
-                  { !members[team.id] &&
-                    <span className="empty">No members</span> }
-                  <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
-
-                </td>
-              </tr>
-            </tbody>
-          </table> ) }
+          <div key={i} className="team-row expanded">
+              <div>
+                {team.name}<br/>
+                {team.description}                  
+                <button className="secondary">Edit</button>
+              </div>
+              <div>
+                { <MembersTable
+                    teamId={team.id}
+                    members={members[team.id]}
+                    onDelete={this.onMemberDelete.bind(this)} /> }
+                { !members[team.id] &&
+                  <span className="empty">No members</span> }
+                <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+              </div>
+          </div> ) }
         { teams.length === 0 &&
           <span className="empty">No teams</span> }
         </div>

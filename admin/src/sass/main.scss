@@ -141,3 +141,50 @@ $contents-width: 834px;
   }
 
 }
+
+.account-dropdown {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 75px;
+  height: 75px;
+  cursor: pointer;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .dropdown-contents {
+    left: auto;
+    right: 0;
+
+    white-space: nowrap;
+
+    margin-top: 5px;
+    padding: 10px;
+
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.10);
+
+    strong {
+      font-weight: bold;
+    }
+
+    .header {
+      margin-bottom: 5px;
+    }
+
+    ul {
+      list-style-type: none;
+
+      li {
+        margin: 5px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
