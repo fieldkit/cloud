@@ -1,6 +1,7 @@
 
-.journal-page {
-  position: relative;
+.lightbox {
+  position: absolute;
+  z-index: 10;
 
   &_map-overlay {
     position: absolute;
@@ -16,6 +17,20 @@
     height: 100vh - ($line-height * 5);
     overflow-y: scroll;
     width: $line-width * 66;
-    padding: 0 $line-width * 14;
+    display: flex;
+
+    &_type {
+      flex-basis: $line-width * 2;
+      margin-right: $line-width * 2;
+    }
+
+    &_main {
+      flex-grow: 1;
+    }
+
+    &_type {
+      flex-basis: $line-width * 2;
+      margin-left: $line-width * 2;
+    }
   }
 }

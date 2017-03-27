@@ -142,9 +142,7 @@ class JournalPage extends React.Component {
 
     return (
       <div className="journal-page page">
-        <div
-          className="journal-page_map-overlay"
-        />
+        <div className="journal-page_map-overlay"/>
         {
           !!documents && documents.size > 0 &&
           <ControlPanelContainer/>

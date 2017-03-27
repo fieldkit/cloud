@@ -50,6 +50,7 @@ class Map extends React.Component {
       readingParticles,
       readingPath,
       focusedDocument,
+      openLightbox
     } = this.props
 
     return (
@@ -58,7 +59,14 @@ class Map extends React.Component {
           { ...viewport }
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          onChangeViewport={ viewport => setViewport(viewport, true) }
+          onChangeViewport={ viewport => {
+            if (viewport.longitude !== this.props.viewport.longitude ||
+                viewport.latitude !== this.props.viewport.latitude ||
+                viewport.zoom !== this.props.viewport.zoom
+              ) {
+              setViewport(viewport, true) 
+            }
+          }}
         >
           <WebGLOverlay
             { ...viewport }
@@ -70,6 +78,7 @@ class Map extends React.Component {
           />
           <DOMOverlay
             focusedDocument={ focusedDocument }
+            openLightbox={ openLightbox }
           />
         </MapboxGL>
       </div>
