@@ -264,6 +264,11 @@ func main() {
 	server := &http.Server{
 		Addr: config.Addr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/status" {
+				fmt.Fprint(w, "ok")
+				return
+			}
+
 			if req.Host == "fieldkit.org" || req.Host == "fieldkit.team" {
 				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
 					adminServer.ServeHTTP(w, req)
