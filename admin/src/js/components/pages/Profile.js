@@ -94,30 +94,38 @@ export class Profile extends Component {
     return (
       <div className="profile-page">
         <h1>Profile</h1>
-        <div className="profile-form">
-          <FormItem labelText="Name" name="name" value={name} errors={errors} onChange={onChange} />
-          <FormItem labelText="Bio" name="bio" value={bio} errors={errors} onChange={onChange} />
-        </div>
-
-        <div className="account-settings">
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <span className="disabled-form">{username}</span>
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <span className="disabled-form">{email}</span>
+        
+        <div className="row">
+          <div className="profile-form two-columns">
+            <FormItem labelText="Name" name="name" value={name} errors={errors} onChange={onChange} className="lg" />
+            <FormItem labelText="Bio" name="bio" value={bio} errors={errors} onChange={onChange} className="lg" />
           </div>
         </div>
 
-        <div className="password-form">
-          <h3>Change Password</h3>
-          <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} />
-          <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} />
-          <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} />
-
-          <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
+        <div className="row">
+          <div className="account-settings two-columns">
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <span className="disabled-form">{username}</span>
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <span className="disabled-form">{email}</span>
+            </div>
+          </div>
         </div>
+
+        <div className="row">
+          <div className="password-form two-columns">
+            <h3>Change Password</h3>
+            <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} className="lg" />
+            <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} className="lg" />
+            <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} className="lg" />
+
+            <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
+          </div>
+        </div>
+
       </div>
     )
   }
