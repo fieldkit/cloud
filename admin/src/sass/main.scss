@@ -29,6 +29,8 @@ $contents-width: 834px;
   width: $sidebar-width;
   text-align: left;
   height: 100%;
+  max-height: 100%;
+  overflow-y: scroll;  
   background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
