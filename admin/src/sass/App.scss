@@ -279,7 +279,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   &:focus {
     // border-color: $gray-3;
     // @include shadow(2px, true);
-    @include shadow(2px);    
+    @include shadow(1px);
   }
 
   &:disabled {
@@ -440,7 +440,7 @@ table {
     tr {
       height: $baseline-height*5;
       transition-property: background-color;
-      transition-duration: 0.25s;
+      transition-duration: 0.5s;
       &:hover {
         background-color: $gray-4;
         // background-color: lighten($gray-1, 50%);
