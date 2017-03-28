@@ -54,6 +54,8 @@ $avatar-size-small: $baseline-height*2.5;
 
 $icon-size-small: $baseline-height;
 
+$modal-width: 618px;
+
 .row {
   width: 100%;
 }
@@ -493,4 +495,33 @@ table {
       bottom: $elements-padding;
     }
   }
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.24);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal {
+
+  @extend .alignXY;
+  width: $modal-width;
+  max-height: 100%;
+  overflow-y: scroll;
+  background-color: white;
+  @include shadow(16px);
+
+  h2 {
+    background-color: $gray-5;
+    padding: $elements-padding*2 $elements-padding*3;
+  }
+
+  .form {
+    padding: $elements-padding*3;
+  }
+
 }

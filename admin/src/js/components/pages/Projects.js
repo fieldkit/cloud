@@ -42,8 +42,8 @@ export class Projects extends Component {
     return (
       <div className="projects">
         <Route path={joinPath(match.url, 'new-project')} render={() =>
-          <ReactModal isOpen={true} contentLabel="New project form">
-            <h1>Create a new project</h1>
+          <ReactModal isOpen={true} contentLabel="New project form" className="modal" overlayClassName="modal-overlay">
+            <h2>Create a new project</h2>
             <ProjectForm
               onCancel={() => this.props.history.push("/")}
               onSave={this.onProjectCreate.bind(this)} />
