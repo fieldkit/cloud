@@ -50,8 +50,22 @@ var _ = Resource("project", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("project"))
+		Routing(POST("projects"))
 		Description("Add a project")
+		Payload(AddProjectPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Project)
+		})
+	})
+
+	Action("update", func() {
+		Routing(PATCH("projects/:project_id"))
+		Description("Update a project")
+		Params(func() {
+			Param("project_id", Integer)
+			Required("project_id")
+		})
 		Payload(AddProjectPayload)
 		Response(BadRequest)
 		Response(OK, func() {
@@ -79,6 +93,7 @@ var _ = Resource("project", func() {
 		Description("Get a project")
 		Params(func() {
 			Param("project_id", Integer)
+			Required("project_id")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

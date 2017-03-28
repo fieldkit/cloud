@@ -19,7 +19,7 @@ import (
 func AddTwitterPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expeditions/%s/inputs/twitter-account", param0)
+	return fmt.Sprintf("/expeditions/%s/inputs/twitter-accounts", param0)
 }
 
 // Add a Twitter account input

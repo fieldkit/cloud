@@ -502,19 +502,53 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// updateMemberPayload user type.
+type updateMemberPayload struct {
+	Role *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+}
+
+// Validate validates the updateMemberPayload type instance.
+func (ut *updateMemberPayload) Validate() (err error) {
+	if ut.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
+// Publicize creates UpdateMemberPayload from updateMemberPayload
+func (ut *updateMemberPayload) Publicize() *UpdateMemberPayload {
+	var pub UpdateMemberPayload
+	if ut.Role != nil {
+		pub.Role = *ut.Role
+	}
+	return &pub
+}
+
+// UpdateMemberPayload user type.
+type UpdateMemberPayload struct {
+	Role string `form:"role" json:"role" xml:"role"`
+}
+
+// Validate validates the UpdateMemberPayload type instance.
+func (ut *UpdateMemberPayload) Validate() (err error) {
+	if ut.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
 // updateUserPayload user type.
 type updateUserPayload struct {
 	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	ID       *int    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
 // Validate validates the updateUserPayload type instance.
 func (ut *updateUserPayload) Validate() (err error) {
-	if ut.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
 	if ut.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
@@ -537,11 +571,8 @@ func (ut *updateUserPayload) Publicize() *UpdateUserPayload {
 	if ut.Email != nil {
 		pub.Email = *ut.Email
 	}
-	if ut.ID != nil {
-		pub.ID = *ut.ID
-	}
 	if ut.Name != nil {
-		pub.Name = ut.Name
+		pub.Name = *ut.Name
 	}
 	if ut.Username != nil {
 		pub.Username = *ut.Username
@@ -551,16 +582,17 @@ func (ut *updateUserPayload) Publicize() *UpdateUserPayload {
 
 // UpdateUserPayload user type.
 type UpdateUserPayload struct {
-	Bio      string  `form:"bio" json:"bio" xml:"bio"`
-	Email    string  `form:"email" json:"email" xml:"email"`
-	ID       int     `form:"id" json:"id" xml:"id"`
-	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Username string  `form:"username" json:"username" xml:"username"`
+	Bio      string `form:"bio" json:"bio" xml:"bio"`
+	Email    string `form:"email" json:"email" xml:"email"`
+	Name     string `form:"name" json:"name" xml:"name"`
+	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the UpdateUserPayload type instance.
 func (ut *UpdateUserPayload) Validate() (err error) {
-
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
 	if ut.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
 	}

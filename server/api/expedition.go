@@ -60,6 +60,21 @@ func (c *ExpeditionController) Add(ctx *app.AddExpeditionContext) error {
 	return ctx.OK(ExpeditionType(expedition))
 }
 
+func (c *ExpeditionController) Update(ctx *app.UpdateExpeditionContext) error {
+	expedition := &data.Expedition{
+		ID:          int32(ctx.ExpeditionID),
+		Name:        ctx.Payload.Name,
+		Slug:        ctx.Payload.Slug,
+		Description: ctx.Payload.Description,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, expedition, "UPDATE fieldkit.expedition SET name = name, slug = slug, description = description) WHERE id = :id RETURNING *", expedition); err != nil {
+		return err
+	}
+
+	return ctx.OK(ExpeditionType(expedition))
+}
+
 func (c *ExpeditionController) Get(ctx *app.GetExpeditionContext) error {
 	expedition := &data.Expedition{}
 	if err := c.options.Database.GetContext(ctx, expedition, "SELECT e.* FROM fieldkit.expedition AS e JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2", ctx.Project, ctx.Expedition); err != nil {

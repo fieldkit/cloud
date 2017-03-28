@@ -20,7 +20,7 @@ import (
 func AddAdministratorPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)
 
-	return fmt.Sprintf("/projects/%s/administrator", param0)
+	return fmt.Sprintf("/projects/%s/administrators", param0)
 }
 
 // Add an administrator to a project

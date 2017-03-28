@@ -60,6 +60,21 @@ func (c *TeamController) Add(ctx *app.AddTeamContext) error {
 	return ctx.OK(TeamType(team))
 }
 
+func (c *TeamController) Update(ctx *app.UpdateTeamContext) error {
+	team := &data.Team{
+		ID:          int32(ctx.TeamID),
+		Name:        ctx.Payload.Name,
+		Slug:        ctx.Payload.Slug,
+		Description: ctx.Payload.Description,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, team, "UPDATE fieldkit.team expedition_id = :expedition_id, name = :name, slug = :slug, description = :description) WHERE id = :id RETURNING *", team); err != nil {
+		return err
+	}
+
+	return ctx.OK(TeamType(team))
+}
+
 func (c *TeamController) Get(ctx *app.GetTeamContext) error {
 	team := &data.Team{}
 	if err := c.options.Database.GetContext(ctx, team, "SELECT t.* FROM fieldkit.team AS t JOIN fieldkit.expedition AS e ON e.id = t.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2 AND t.slug = $3", ctx.Project, ctx.Expedition, ctx.Team); err != nil {

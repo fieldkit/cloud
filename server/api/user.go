@@ -102,6 +102,22 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
+func (c *UserController) Update(ctx *app.UpdateUserContext) error {
+	user := &data.User{
+		ID:       int32(ctx.UserID),
+		Name:     ctx.Payload.Name,
+		Username: ctx.Payload.Username,
+		Email:    ctx.Payload.Email,
+		Bio:      ctx.Payload.Bio,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET name = :name, username = :username, email = :email, bio = :bio WHERE id = :id RETURNING *", user); err != nil {
+		return err
+	}
+
+	return ctx.OK(UserType(user))
+}
+
 func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	fmt.Println(ctx.Token)
 
