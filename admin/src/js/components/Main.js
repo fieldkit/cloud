@@ -233,7 +233,7 @@ export class Main extends Component {
               <Link to={`/`}>All</Link>
               { activeProject &&
                 <div>
-                  <p>
+                  <p className="project-name">
                     <span>{activeProject.name}</span>
                     <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
                       <img src={externalLinkImg} alt="external link" />
@@ -248,14 +248,14 @@ export class Main extends Component {
             {activeExpedition &&
               <div className="sidebar-section expedition-section">
                 <h5>Expedition</h5>
-                  <h4>
+                  <p className="expedition-name">
                     <span>{activeExpedition.name}</span>
                     <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
                       <img src={externalLinkImg} alt="external link" />
                     </a>
-                  </h4>
+                  </p>
                   <div className="sidebar-nav">
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
                     <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
@@ -275,7 +275,9 @@ export class Main extends Component {
         <div className="right">
           <Dropdown className="account-dropdown" ref="dropdown">
             <DropdownTrigger className="trigger">
-              <img src={placeholderImage} alt="profile" />
+              <div className="user-avatar small">
+                <img src={placeholderImage} alt="profile" />
+              </div>
             </DropdownTrigger>
             <DropdownContent className="dropdown-contents">
               <div className="header">

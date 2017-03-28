@@ -171,7 +171,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 }
 
 @mixin type-small {
-  font-size: 12px;
+  font-size: 13px;
   line-height: $baseline-height*2;
   font-family: $font-sans;
 }
@@ -331,6 +331,7 @@ h2  { @include type-h2; }
 h3  { @include type-h3; }
 h4  { @include type-h4; }
 h5  { @include type-h5; }
+.type-small { @include type-small; }
 
 button, .button {
 
@@ -383,10 +384,22 @@ label, .label {
 }
 
 .user-avatar {
-  width: $avatar-size-medium;
-  height: $avatar-size-medium;
-  border-radius: $avatar-size-medium;
-  background-color: $gray-3;
+  background-color: $gray-4;
+  overflow: hidden;
+  &.small {
+    width: $avatar-size-small;
+    height: $avatar-size-small;
+    border-radius: $avatar-size-small;    
+  }  
+  &.medium {
+    width: $avatar-size-medium;
+    height: $avatar-size-medium;
+    border-radius: $avatar-size-medium;    
+  }
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }  
 }
 
 table {

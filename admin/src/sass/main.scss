@@ -42,7 +42,7 @@ $contents-width: 834px;
 
   .sidebar {
 
-    @include type-body-1;
+    @include type-small;
 
     .sidebar-section {
 
@@ -62,9 +62,19 @@ $contents-width: 834px;
         padding: 0 $elements-padding*2;
       }
 
-      h4, p {
+      // h4,
+      p {
         padding: 0 $elements-padding*2;
         line-height: $baseline-height*3;
+
+        &.project-name {
+          // font-weight: 600;
+        }
+
+        &.expedition-name {
+          @include type-body-2;
+          line-height: $elements-padding*3;
+        }
       }
 
       a:not(.bt-icon) {
@@ -92,7 +102,7 @@ $contents-width: 834px;
 
       .sidebar-nav {
         a {
-          padding-left: $elements-padding*3;
+          padding-left: $elements-padding*4;
         }
       }
     } 
@@ -133,32 +143,43 @@ $contents-width: 834px;
 }
 
 .account-dropdown {
-  float: right;  
-  width: $avatar-size-small;
-  height: $avatar-size-small;
-  overflow: hidden;
-  border-radius: $avatar-size-small;  
+  float: right;
+  position: relative;
   margin-top: $baseline-height*2;
-  background-color: $gray-5;
+  text-align: right;
 
   a {
     cursor: pointer; 
   }
 
-  img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-
   .dropdown-contents {
-    position: relative;
+    position: absolute;
+    width: 180px;
+    top: $avatar-size-small + 10px;
     right: 0;
     padding: $elements-padding 0;
     text-align: left;
     background-color: white;
-
-    border-radius: 6px;
     @include shadow(8px);
+    @include type-small;
+
+    &::before {
+      position: absolute;
+      top: -20px;
+      right: 6px;
+      content: "";
+      border: 10px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+    &::after {
+      position: absolute;
+      top: -16px;
+      right: 8px;
+      content: "";
+      border: 8px solid transparent;
+      border-bottom-color: white;
+    }    
+    
 
     strong {
       font-weight: bold;

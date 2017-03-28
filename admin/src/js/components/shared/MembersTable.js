@@ -52,7 +52,7 @@ export class MembersTable extends Component {
                 { members.map((member, i) =>
                     <tr>
                       <td>
-                        <div className="user-avatar">
+                        <div className="user-avatar medium">
                         </div>
                       </td>
                       <td>

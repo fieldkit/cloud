@@ -133,7 +133,7 @@ export class ProjectSettings extends Component {
               { administrators.map(administrator =>
                 <tr>
                   <td>
-                    <div className="user-avatar">
+                    <div className="user-avatar medium">
                       <img />
                     </div>                    
                   </td>
