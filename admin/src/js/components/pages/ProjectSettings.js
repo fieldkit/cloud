@@ -18,7 +18,7 @@ import { FKApiClient } from '../../api/api';
 import removeImg from '../../../img/icons/icon-remove-small.png'
 import '../../../css/projectsettings.css'
 
-import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator } from '../../api/types';
+import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition } from '../../api/types';
 
 type Props = {
   project: APIProject;

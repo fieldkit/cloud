@@ -266,7 +266,7 @@ export class Main extends Component {
                   </div>
                 </div> }
             </div>
-            {activeExpedition &&
+            {activeProject && activeExpedition &&
               <div className="sidebar-section expedition-section">
                 <h5>Expedition</h5>
                   <p className="expedition-name">
