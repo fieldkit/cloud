@@ -40,11 +40,10 @@ type AdministratorController interface {
 func MountAdministratorController(service *goa.Service, ctrl AdministratorController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrator", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrators", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrators/:user_id", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/administrators/@/:username", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/administrators", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/:project_id/administrators", ctrl.MuxHandler("preflight", handleAdministratorOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -66,8 +65,8 @@ func MountAdministratorController(service *goa.Service, ctrl AdministratorContro
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleAdministratorOrigin(h)
-	service.Mux.Handle("POST", "/projects/:project_id/administrator", ctrl.MuxHandler("Add", h, unmarshalAddAdministratorPayload))
-	service.LogInfo("mount", "ctrl", "Administrator", "action", "Add", "route", "POST /projects/:project_id/administrator", "security", "jwt")
+	service.Mux.Handle("POST", "/projects/:project_id/administrators", ctrl.MuxHandler("Add", h, unmarshalAddAdministratorPayload))
+	service.LogInfo("mount", "ctrl", "Administrator", "action", "Add", "route", "POST /projects/:project_id/administrators", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -258,11 +257,10 @@ type ExpeditionController interface {
 func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/projects/:project_id/expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/:project_id/expeditions", ctrl.MuxHandler("preflight", handleExpeditionOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -284,8 +282,8 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleExpeditionOrigin(h)
-	service.Mux.Handle("POST", "/projects/:project_id/expedition", ctrl.MuxHandler("Add", h, unmarshalAddExpeditionPayload))
-	service.LogInfo("mount", "ctrl", "Expedition", "action", "Add", "route", "POST /projects/:project_id/expedition", "security", "jwt")
+	service.Mux.Handle("POST", "/projects/:project_id/expeditions", ctrl.MuxHandler("Add", h, unmarshalAddExpeditionPayload))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "Add", "route", "POST /projects/:project_id/expeditions", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -593,11 +591,10 @@ type MemberController interface {
 func MountMemberController(service *goa.Service, ctrl MemberController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/teams/:team_id/member", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/teams/:team_id/members", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/teams/:team_id/members/:user_id", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team/members", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/teams/:team_id/members", ctrl.MuxHandler("preflight", handleMemberOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -619,8 +616,8 @@ func MountMemberController(service *goa.Service, ctrl MemberController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleMemberOrigin(h)
-	service.Mux.Handle("POST", "/teams/:team_id/member", ctrl.MuxHandler("Add", h, unmarshalAddMemberPayload))
-	service.LogInfo("mount", "ctrl", "Member", "action", "Add", "route", "POST /teams/:team_id/member", "security", "jwt")
+	service.Mux.Handle("POST", "/teams/:team_id/members", ctrl.MuxHandler("Add", h, unmarshalAddMemberPayload))
+	service.LogInfo("mount", "ctrl", "Member", "action", "Add", "route", "POST /teams/:team_id/members", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -924,10 +921,9 @@ type ProjectController interface {
 func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/project", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:project_id", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -950,8 +946,8 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
-	service.Mux.Handle("POST", "/project", ctrl.MuxHandler("Add", h, unmarshalAddProjectPayload))
-	service.LogInfo("mount", "ctrl", "Project", "action", "Add", "route", "POST /project", "security", "jwt")
+	service.Mux.Handle("POST", "/projects", ctrl.MuxHandler("Add", h, unmarshalAddProjectPayload))
+	service.LogInfo("mount", "ctrl", "Project", "action", "Add", "route", "POST /projects", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1243,11 +1239,10 @@ type TeamController interface {
 func MountTeamController(service *goa.Service, ctrl TeamController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/teams/:team_id", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1269,8 +1264,8 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleTeamOrigin(h)
-	service.Mux.Handle("POST", "/expeditions/:expedition_id/team", ctrl.MuxHandler("Add", h, unmarshalAddTeamPayload))
-	service.LogInfo("mount", "ctrl", "Team", "action", "Add", "route", "POST /expeditions/:expedition_id/team", "security", "jwt")
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("Add", h, unmarshalAddTeamPayload))
+	service.LogInfo("mount", "ctrl", "Team", "action", "Add", "route", "POST /expeditions/:expedition_id/teams", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1449,11 +1444,10 @@ type TwitterController interface {
 func MountTwitterController(service *goa.Service, ctrl TwitterController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/twitter-account", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/twitter/callback", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/twitter-accounts/:input_id", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("preflight", handleTwitterOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1469,8 +1463,8 @@ func MountTwitterController(service *goa.Service, ctrl TwitterController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleTwitterOrigin(h)
-	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/twitter-account", ctrl.MuxHandler("Add", h, nil))
-	service.LogInfo("mount", "ctrl", "Twitter", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/twitter-account", "security", "jwt")
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("Add", h, nil))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/twitter-accounts", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -44,7 +44,7 @@ var _ = Resource("member", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("teams/:team_id/member"))
+		Routing(POST("teams/:team_id/members"))
 		Description("Add a member to a team")
 		Params(func() {
 			Param("team_id", Integer)

@@ -360,7 +360,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	}
 	tmp27 := new(AddAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/PROJECT_ID/administrator"]`,
+		Use:   `administrator ["/projects/PROJECT_ID/administrators"]`,
 		Short: ``,
 		Long: `
 
@@ -376,7 +376,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp28 := new(AddExpeditionCommand)
 	sub = &cobra.Command{
-		Use:   `expedition ["/projects/PROJECT_ID/expedition"]`,
+		Use:   `expedition ["/projects/PROJECT_ID/expeditions"]`,
 		Short: ``,
 		Long: `
 
@@ -394,7 +394,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp29 := new(AddMemberCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/teams/TEAM_ID/member"]`,
+		Use:   `member ["/teams/TEAM_ID/members"]`,
 		Short: ``,
 		Long: `
 
@@ -411,7 +411,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp30 := new(AddProjectCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/project"]`,
+		Use:   `project ["/projects"]`,
 		Short: ``,
 		Long: `
 
@@ -429,7 +429,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp31 := new(AddTeamCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/expeditions/EXPEDITION_ID/team"]`,
+		Use:   `team ["/expeditions/EXPEDITION_ID/teams"]`,
 		Short: ``,
 		Long: `
 
@@ -447,7 +447,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp32 := new(AddTwitterCommand)
 	sub = &cobra.Command{
-		Use:   `twitter ["/expeditions/EXPEDITION_ID/inputs/twitter-account"]`,
+		Use:   `twitter ["/expeditions/EXPEDITION_ID/inputs/twitter-accounts"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp32.Run(c, args) },
 	}
@@ -1124,7 +1124,7 @@ func (cmd *AddAdministratorCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/%v/administrator", cmd.ProjectID)
+		path = fmt.Sprintf("/projects/%v/administrators", cmd.ProjectID)
 	}
 	var payload client.AddAdministratorPayload
 	if cmd.Payload != "" {
@@ -1295,7 +1295,7 @@ func (cmd *AddExpeditionCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/projects/%v/expedition", cmd.ProjectID)
+		path = fmt.Sprintf("/projects/%v/expeditions", cmd.ProjectID)
 	}
 	var payload client.AddExpeditionPayload
 	if cmd.Payload != "" {
@@ -1490,7 +1490,7 @@ func (cmd *AddMemberCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/teams/%v/member", cmd.TeamID)
+		path = fmt.Sprintf("/teams/%v/members", cmd.TeamID)
 	}
 	var payload client.AddMemberPayload
 	if cmd.Payload != "" {
@@ -1695,7 +1695,7 @@ func (cmd *AddProjectCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/project"
+		path = "/projects"
 	}
 	var payload client.AddProjectPayload
 	if cmd.Payload != "" {
@@ -1828,7 +1828,7 @@ func (cmd *AddTeamCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/expeditions/%v/team", cmd.ExpeditionID)
+		path = fmt.Sprintf("/expeditions/%v/teams", cmd.ExpeditionID)
 	}
 	var payload client.AddTeamPayload
 	if cmd.Payload != "" {
@@ -1973,7 +1973,7 @@ func (cmd *AddTwitterCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/expeditions/%v/inputs/twitter-account", cmd.ExpeditionID)
+		path = fmt.Sprintf("/expeditions/%v/inputs/twitter-accounts", cmd.ExpeditionID)
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)

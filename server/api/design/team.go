@@ -50,7 +50,7 @@ var _ = Resource("team", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expedition_id/team"))
+		Routing(POST("expeditions/:expedition_id/teams"))
 		Description("Add a team")
 		Params(func() {
 			Param("expedition_id", Integer)

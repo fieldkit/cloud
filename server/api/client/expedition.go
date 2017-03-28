@@ -20,7 +20,7 @@ import (
 func AddExpeditionPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)
 
-	return fmt.Sprintf("/projects/%s/expedition", param0)
+	return fmt.Sprintf("/projects/%s/expeditions", param0)
 }
 
 // Add a expedition

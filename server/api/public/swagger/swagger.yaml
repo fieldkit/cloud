@@ -776,36 +776,6 @@ paths:
       summary: list id input
       tags:
       - input
-  /expeditions/{expedition_id}/inputs/twitter-account:
-    post:
-      description: |-
-        Add a Twitter account input
-
-        Required security scopes:
-          * `api:access`
-      operationId: twitter#add
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.location+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Location'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add twitter
-      tags:
-      - twitter
   /expeditions/{expedition_id}/inputs/twitter-accounts:
     get:
       description: |-
@@ -836,7 +806,65 @@ paths:
       summary: list id twitter
       tags:
       - twitter
-  /expeditions/{expedition_id}/team:
+    post:
+      description: |-
+        Add a Twitter account input
+
+        Required security scopes:
+          * `api:access`
+      operationId: twitter#add
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.location+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Location'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add twitter
+      tags:
+      - twitter
+  /expeditions/{expedition_id}/teams:
+    get:
+      description: |-
+        List an expedition's teams
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.teams+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Teams'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id team
+      tags:
+      - team
     post:
       description: |-
         Add a team
@@ -869,36 +897,6 @@ paths:
       - jwt:
         - api:access
       summary: add team
-      tags:
-      - team
-  /expeditions/{expedition_id}/teams:
-    get:
-      description: |-
-        List an expedition's teams
-
-        Required security scopes:
-          * `api:access`
-      operationId: team#list id
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.teams+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Teams'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id team
       tags:
       - team
   /inputs/twitter-accounts/{input_id}:
@@ -982,7 +980,31 @@ paths:
       summary: logout user
       tags:
       - user
-  /project:
+  /projects:
+    get:
+      description: |-
+        List projects
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#list
+      produces:
+      - application/vnd.app.projects+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Projects'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list project
+      tags:
+      - project
     post:
       description: |-
         Add a project
@@ -1011,31 +1033,6 @@ paths:
       - jwt:
         - api:access
       summary: add project
-      tags:
-      - project
-  /projects:
-    get:
-      description: |-
-        List projects
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#list
-      produces:
-      - application/vnd.app.projects+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Projects'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list project
       tags:
       - project
   /projects/@/{project}:
@@ -1488,7 +1485,36 @@ paths:
       summary: get id project
       tags:
       - project
-  /projects/{project_id}/administrator:
+  /projects/{project_id}/administrators:
+    get:
+      description: |-
+        List an projects's administrators
+
+        Required security scopes:
+          * `api:access`
+      operationId: administrator#list id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.administrators+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ProjectAdministrators'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id administrator
+      tags:
+      - administrator
     post:
       description: |-
         Add an administrator to a project
@@ -1521,36 +1547,6 @@ paths:
       - jwt:
         - api:access
       summary: add administrator
-      tags:
-      - administrator
-  /projects/{project_id}/administrators:
-    get:
-      description: |-
-        List an projects's administrators
-
-        Required security scopes:
-          * `api:access`
-      operationId: administrator#list id
-      parameters:
-      - in: path
-        name: project_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.administrators+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ProjectAdministrators'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id administrator
       tags:
       - administrator
   /projects/{project_id}/administrators/{user_id}:
@@ -1618,7 +1614,36 @@ paths:
       summary: get id administrator
       tags:
       - administrator
-  /projects/{project_id}/expedition:
+  /projects/{project_id}/expeditions:
+    get:
+      description: |-
+        List a project's expeditions
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#list id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.expeditions+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expeditions'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id expedition
+      tags:
+      - expedition
     post:
       description: |-
         Add a expedition
@@ -1651,36 +1676,6 @@ paths:
       - jwt:
         - api:access
       summary: add expedition
-      tags:
-      - expedition
-  /projects/{project_id}/expeditions:
-    get:
-      description: |-
-        List a project's expeditions
-
-        Required security scopes:
-          * `api:access`
-      operationId: expedition#list id
-      parameters:
-      - in: path
-        name: project_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.expeditions+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Expeditions'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id expedition
       tags:
       - expedition
   /refresh:
@@ -1759,7 +1754,36 @@ paths:
       summary: get id team
       tags:
       - team
-  /teams/{team_id}/member:
+  /teams/{team_id}/members:
+    get:
+      description: |-
+        List an teams's members
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#list id
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.members+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMembers'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id member
+      tags:
+      - member
     post:
       description: |-
         Add a member to a team
@@ -1792,36 +1816,6 @@ paths:
       - jwt:
         - api:access
       summary: add member
-      tags:
-      - member
-  /teams/{team_id}/members:
-    get:
-      description: |-
-        List an teams's members
-
-        Required security scopes:
-          * `api:access`
-      operationId: member#list id
-      parameters:
-      - in: path
-        name: team_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.members+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/TeamMembers'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id member
       tags:
       - member
   /teams/{team_id}/members/{user_id}:

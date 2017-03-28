@@ -50,7 +50,7 @@ var _ = Resource("project", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("project"))
+		Routing(POST("projects"))
 		Description("Add a project")
 		Payload(AddProjectPayload)
 		Response(BadRequest)

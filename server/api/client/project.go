@@ -19,7 +19,7 @@ import (
 // AddProjectPath computes a request path to the add action of project.
 func AddProjectPath() string {
 
-	return fmt.Sprintf("/project")
+	return fmt.Sprintf("/projects")
 }
 
 // Add a project
