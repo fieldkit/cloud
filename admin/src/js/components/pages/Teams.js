@@ -8,6 +8,8 @@ import { MembersTable } from '../shared/MembersTable';
 import { TeamForm } from '../forms/TeamForm';
 import { MemberForm } from '../forms/MemberForm';
 import { FKApiClient } from '../../api/api';
+import '../../../css/teams.css'
+
 import { FormContainer } from '../containers/FormContainer';
 
 import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
@@ -173,28 +175,25 @@ export class Teams extends Component {
 
         <h1>Teams</h1>
 
-        <div id="teams">
+        <div className="accordion">
         { teams.map((team, i) =>
-          <table key={i} className="teams-table">
-            <tbody>
-              <tr>
-                <td name={team.name}>
-                  {team.name}<br/>
-                  {team.description}
-                  <button className="secondary">Edit</button>
-
-                  { <MembersTable
-                      teamId={team.id}
-                      members={members[team.id]}
-                      onDelete={this.startMemberDelete.bind(this)}/> }
-                  { !members[team.id] &&
-                    <span className="empty">No members</span> }
-                  <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
-
-                </td>
-              </tr>
-            </tbody>
-          </table> ) }
+          <div key={i} className="accordion-row expanded">
+              <div className="accordion-row-header">
+                <button className="secondary">Edit</button>
+                <h4>{team.name}</h4>
+                <p>{team.description}</p>
+              </div>
+              <div>
+                { members[team.id] && members[team.id].length > 0 &&
+                  <MembersTable
+                    teamId={team.id}
+                    members={members[team.id]}
+                    onDelete={this.startMemberDelete.bind(this)} /> }
+                { (!members[team.id] || members[team.id].length === 0) &&
+                  <p className="empty">No members</p> }
+                <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+              </div>
+          </div> ) }
         { teams.length === 0 &&
           <span className="empty">No teams</span> }
         </div>

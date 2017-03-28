@@ -43,12 +43,16 @@ export class Expedition extends Component {
     return (
       <div className="expedition">
         <h1>Expedition Settings</h1>
-        <ProjectExpeditionForm
-          projectSlug={projectSlug}
-          name={expedition.name}
-          slug={expedition.slug}
-          description={expedition.description}
-          onSave={this.onExpeditionSave.bind(this)} />
+        <div className="row">
+          <div className="two-columns">              
+            <ProjectExpeditionForm
+              projectSlug={projectSlug}
+              name={expedition.name}
+              slug={expedition.slug}
+              description={expedition.description}
+              onSave={this.onExpeditionSave.bind(this)} />
+          </div>
+        </div>
       </div>
     )
   }

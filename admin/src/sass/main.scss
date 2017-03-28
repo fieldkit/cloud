@@ -8,59 +8,84 @@ $contents-width: 834px;
   height: 100vh;
   margin: 0 auto;
   text-align: center;
-  background-image: url('../img/fieldkit-background.png');  
 }
 
-.left {
-  // float: left;
+.out-link {
   display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 5px;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+
+.left {
+  float: left;
   vertical-align: top;
   width: $sidebar-width;
   text-align: left;
   height: 100%;
+  background-image: url('../img/fieldkit-background.png');
 
   .logo-area {
-    height: 100px;
+    padding: $elements-padding*4 $elements-padding*2;
 
     img {
-      max-height: 75px;
-      max-width: 150px;
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      width: 100%;
+      height: auto;
     }
   }
 
-  .expedition-sidebar {
-    background-color: rgba($color-1, 0.72);
-    padding: $elements-padding*2;
-    color: white;
+  .sidebar {
 
-    .expedition-name {
-      @include type-h4;
-    }
+    @include type-small;
 
-    .settings {
-      float: right;
-      position: relative;
-      top: -6px;
-      left: 10px;
-    }
+    .sidebar-section {
 
-    a {
+      padding: $elements-padding*2 0;
       color: white;
-    }
+      background: url('../img/fieldkit-background.png') no-repeat fixed;      
+      background-blend-mode: multiply;
+      
+      &.project-section {
+        background-color: rgba($color-1, 0.80);
+      }
+      &.expedition-section {
+        background-color: $color-1;
+      }      
 
-    .nav {
-      margin-top: $baseline-height;
-      a {
-        // height: $baseline-height*2;
-        padding: $elements-padding;
+      h5 {
+        padding: 0 $elements-padding*2;
+      }
+
+      // h4,
+      p {
+        padding: 0 $elements-padding*2;
+        line-height: $baseline-height*3;
+
+        &.project-name {
+          // font-weight: 600;
+        }
+
+        &.expedition-name {
+          @include type-body-2;
+          line-height: $elements-padding*3;
+        }
+      }
+
+      a:not(.bt-icon) {
         display: block;
-        border-radius: 3px;
-        @include type-body-1;
+        padding: 0 $elements-padding*2;
+        line-height: $baseline-height*3;
         
+        &:link, &:visited, &:active {
+          color: white;
+        }
+
         &:link {
 
         }
@@ -68,13 +93,19 @@ $contents-width: 834px;
 
         }
         &:hover {
-          background-color: rgba($color-1, 0.48);
+          background-color: rgba(0, 0, 0, 0.10);
         }
-        &:active {
-          background-color: rgba($color-1, 0.72);
+        &:active, &.active {
+          background-color: rgba(0, 0, 0, 0.12);
         }
       }
-    }
+
+      .sidebar-nav {
+        a {
+          padding-left: $elements-padding*4;
+        }
+      }
+    } 
   }
 
   footer {
@@ -83,38 +114,110 @@ $contents-width: 834px;
     bottom: $elements-padding;
     width: $sidebar-width;
     text-align: center;
+    a:hover, a:active {
+      text-decoration: underline;
+    }
   }
 }
 
 .right {
-  // float: left;
-  display: inline-block;
+  float: left;
   vertical-align: top;
-  width: $contents-width + $col-gutter;
+  width: calc(100% - #{$sidebar-width});
+  // width: $contents-width;
+  // width: $contents-width + (2 * $col-gutter);
   height: 100%;
-  padding-left: $col-gutter;
+  overflow-y: scroll;
+  padding: 0 $col-gutter;
   background-color: white;
+  @include shadow(8px);
 
-  .nav {
-    width: 100%;
+  .profile-image {
+    float: right;
+    width: 100px;
     height: 100px;
-    text-align: left;
-
-    .profile-image {
-      float: right;
-      width: 100px;
-      height: 100px;
-
-      img {
-        width: 75%;
-        height: 75%;
-      }
-    }
   }
 
   .contents {
-    width: 100%;
+    // width: 100%;
+    width: $contents-width;
+    max-width: 100%;
     text-align: left;
+    padding: $baseline-height*4 0;
+    display: inline-block;
   }
 
 }
+
+.account-dropdown {
+  position: absolute;
+  top: $baseline-height*2;
+  right: $baseline-height*2;
+
+  a {
+    cursor: pointer; 
+  }
+
+  .dropdown-contents {
+    position: absolute;
+    width: 180px;
+    top: $avatar-size-small + 10px;
+    right: 0;
+    padding: $elements-padding 0;
+    text-align: left;
+    background-color: white;
+    @include shadow(8px);
+    @include type-small;
+
+    &::before {
+      position: absolute;
+      top: -20px;
+      right: 6px;
+      content: "";
+      border: 10px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+    &::after {
+      position: absolute;
+      top: -16px;
+      right: 8px;
+      content: "";
+      border: 8px solid transparent;
+      border-bottom-color: white;
+    }    
+    
+
+    strong {
+      font-weight: bold;
+    }
+
+    .header {
+      padding: 0 $elements-padding*2;
+      margin-bottom: $elements-padding;
+    }
+
+    a {
+      display: block;
+      padding: 0 $elements-padding*2;
+      line-height: $baseline-height*3;
+      
+      &:link, &:visited, &:active {
+        color: $gray-1;
+      }
+
+      &:link {
+
+      }
+      &:visited {
+
+      }
+      &:hover {
+        background-color: $gray-5;
+      }
+      &:active, &.active {
+        background-color: $gray-5;
+      }
+    }
+  }
+}
+
