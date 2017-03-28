@@ -98,17 +98,17 @@ $gray-5: rgb(248, 248, 248);
 
 // Variables
 // $font-serif: 'Merriweather', serif;
-$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-// $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
+// $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 // Styles
 @mixin type-h1 {
   font-size: 36px;
   line-height: $baseline-height*4;
   font-family: $font-sans;
-  // font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-bottom: $baseline-height*2;
 
   @include for-phone-down {
@@ -377,11 +377,15 @@ input[type="submit"] {
   @include button();
 }
 
-input[type="text"], input[type="email"], input[type="password"], input[type="username"] {
+input[type="text"], input[type="email"], input[type="password"], input[type="username"], select {
   @include form;
   &.lg {
     width: 100%;
   }
+}
+
+select {
+  height: $baseline-height*2.5;
 }
 
 label, .label {
