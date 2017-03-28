@@ -1,7 +1,7 @@
 
 import React, { PropTypes } from 'react'
-import { map, constrain } from '../../utils.js'
-import ActivityGraph from './Timeline/ActivityGraph'
+import { map, constrain } from '../../../utils.js'
+import ActivityGraph from './ActivityGraph'
 
 class Timeline extends React.Component {
 

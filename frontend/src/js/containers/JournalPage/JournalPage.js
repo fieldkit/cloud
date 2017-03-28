@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions'
 import { createSelector } from 'reselect'
 
-import JournalPage from '../../components/JournalPage'
+import JournalPage from '../../components/JournalPage/JournalPage'
 
 const mapStateToProps = (state, ownProps) => {
   return {

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
-import TimelineContainer from '../../containers/common/TimelineContainer'
-import HeaderContainer from '../../containers/Root/HeaderContainer'
-import MapContainer from '../../containers/Map'
+import TimelineContainer from '../../containers/common/Timeline'
+import HeaderContainer from '../../containers/Root/Header'
+import MapContainer from '../../containers/Map/Map'
 import ExpeditionPanelContainer from '../../containers/Root/ExpeditionPanel'
 import LightboxContainer from '../../containers/common/Lightbox'
 

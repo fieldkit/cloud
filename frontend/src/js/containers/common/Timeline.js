@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions'
 import { createSelector } from 'reselect'
 
-import Timeline from '../../components/common/Timeline'
+import Timeline from '../../components/common/Timeline/Timeline'
 
 const mapStateToProps = (state, ownProps) => {
   return {

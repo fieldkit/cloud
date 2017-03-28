@@ -1,5 +1,5 @@
 
-import ControlPanelContainer from '../../containers/common/ControlPanelContainer'
+import ControlPanelContainer from '../../containers/common/ControlPanel'
 import Post from './Post'
 import React, { PropTypes } from 'react'
 import I from 'immutable'

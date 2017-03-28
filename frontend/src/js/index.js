@@ -1,25 +1,21 @@
 
-
 import '../scss/app.scss'
 
 import 'babel-polyfill'
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
 import multiMiddleware from 'redux-multi'
-import { batchedSubscribe } from 'redux-batched-subscribe'
+import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
 import * as actions from './actions'
 import expeditionReducer from './reducers/expeditions'
-import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
-import RootContainer from './containers/Root'
-
-import MapPageContainer from './containers/MapPage'
-import JournalPageContainer from './containers/JournalPage'
+import RootContainer from './containers/Root/Root'
+import MapPageContainer from './containers/MapPage/MapPage'
+import JournalPageContainer from './containers/JournalPage/JournalPage'
 
 import FKApiClient from './api/api.js'
 
@@ -29,12 +25,8 @@ const createStoreWithMiddleware = applyMiddleware(
   thunkMiddleware,
   multiMiddleware,
 )(createStore)
-// const createStoreWithBatching = batchedSubscribe(
-//   fn => fn()
-// )(createStoreWithMiddleware)
 const reducer = combineReducers({
   expeditions: expeditionReducer
-  // routing: routerReducer
 })
 const store = createStoreWithMiddleware(reducer)
 
@@ -77,17 +69,6 @@ const routes = (
           store.dispatch(actions.setCurrentPage('journal'))
         }}
       />
-      {
-        /*
-      <Route
-        path="about"
-        component={ JournalPageContainer }
-        onEnter={(state, replace) => {
-          store.dispatch(actions.setCurrentPage('about'))
-        }}
-      />
-        */
-      }
     </Route>
   </Route>
 )

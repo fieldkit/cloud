@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions'
 import { createSelector } from 'reselect'
 
-import ControlPanel from '../../components/common/ControlPanel'
+import ControlPanel from '../../components/common/ControlPanel/ControlPanel'
 
 const mapStateToProps = (state, ownProps) => {
   return {

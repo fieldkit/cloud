@@ -5,7 +5,7 @@ import { Vector3, Color } from 'three'
 import ViewportMercator from 'viewport-mercator-project'
 import { createSelector } from 'reselect'
 
-import Map from '../../components/Map'
+import Map from '../../components/Map/Map'
 
 const mapStateToProps = (state, ownProps) => {
   return {
