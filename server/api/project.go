@@ -77,6 +77,21 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 	return ctx.OK(ProjectType(project))
 }
 
+func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
+	project := &data.Project{
+		ID:          int32(ctx.ProjectID),
+		Name:        ctx.Payload.Name,
+		Slug:        ctx.Payload.Slug,
+		Description: ctx.Payload.Description,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, project, "UPDATE fieldkit.project SET name = :name, slug = :slug, description = :description WHERE id = :id RETURNING *", project); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectType(project))
+}
+
 func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 	project := &data.Project{}
 	if err := c.options.Database.GetContext(ctx, project, "SELECT * FROM fieldkit.project WHERE slug = $1", ctx.Project); err != nil {

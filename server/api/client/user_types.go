@@ -502,6 +502,41 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// updateMemberPayload user type.
+type updateMemberPayload struct {
+	Role *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+}
+
+// Validate validates the updateMemberPayload type instance.
+func (ut *updateMemberPayload) Validate() (err error) {
+	if ut.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
+// Publicize creates UpdateMemberPayload from updateMemberPayload
+func (ut *updateMemberPayload) Publicize() *UpdateMemberPayload {
+	var pub UpdateMemberPayload
+	if ut.Role != nil {
+		pub.Role = *ut.Role
+	}
+	return &pub
+}
+
+// UpdateMemberPayload user type.
+type UpdateMemberPayload struct {
+	Role string `form:"role" json:"role" xml:"role"`
+}
+
+// Validate validates the UpdateMemberPayload type instance.
+func (ut *UpdateMemberPayload) Validate() (err error) {
+	if ut.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	return
+}
+
 // updateUserPayload user type.
 type updateUserPayload struct {
 	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`

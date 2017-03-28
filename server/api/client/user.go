@@ -292,7 +292,7 @@ func UpdateUserPath(userID int) string {
 	return fmt.Sprintf("/users/%s", param0)
 }
 
-// Get a user
+// Update a user
 func (c *Client) UpdateUser(ctx context.Context, path string, payload *UpdateUserPayload) (*http.Response, error) {
 	req, err := c.NewUpdateUserRequest(ctx, path, payload)
 	if err != nil {

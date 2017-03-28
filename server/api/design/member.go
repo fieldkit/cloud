@@ -11,6 +11,11 @@ var AddMemberPayload = Type("AddMemberPayload", func() {
 	Required("user_id", "role")
 })
 
+var UpdateMemberPayload = Type("UpdateMemberPayload", func() {
+	Attribute("role", String)
+	Required("role")
+})
+
 var TeamMember = MediaType("application/vnd.app.member+json", func() {
 	TypeName("TeamMember")
 	Reference(AddMemberPayload)
@@ -51,6 +56,20 @@ var _ = Resource("member", func() {
 		})
 		Payload(AddMemberPayload)
 		Response(BadRequest)
+		Response(OK, func() {
+			Media(TeamMember)
+		})
+	})
+
+	Action("update", func() {
+		Routing(PATCH("teams/:team_id/members/:user_id"))
+		Description("Update a member")
+		Params(func() {
+			Param("team_id", Integer)
+			Param("user_id", Integer)
+			Required("team_id", "user_id")
+		})
+		Payload(UpdateMemberPayload)
 		Response(OK, func() {
 			Media(TeamMember)
 		})
@@ -101,6 +120,7 @@ var _ = Resource("member", func() {
 		Params(func() {
 			Param("team_id", Integer)
 			Param("user_id", Integer)
+			Required("team_id", "user_id")
 		})
 		Response(OK, func() {
 			Media(TeamMember)

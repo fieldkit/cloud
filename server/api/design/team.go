@@ -62,6 +62,20 @@ var _ = Resource("team", func() {
 		})
 	})
 
+	Action("update", func() {
+		Routing(PATCH("teams/:team_id"))
+		Description("Update a team")
+		Params(func() {
+			Param("team_id", Integer)
+			Required("team_id")
+		})
+		Payload(AddTeamPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Team)
+		})
+	})
+
 	Action("get", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team"))
 		Description("Add a team")
@@ -90,6 +104,7 @@ var _ = Resource("team", func() {
 		Description("Add a team")
 		Params(func() {
 			Param("team_id", Integer)
+			Required("team_id")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

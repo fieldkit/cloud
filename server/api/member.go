@@ -58,6 +58,20 @@ func (c *MemberController) Add(ctx *app.AddMemberContext) error {
 	return ctx.OK(TeamMemberType(member))
 }
 
+func (c *MemberController) Update(ctx *app.UpdateMemberContext) error {
+	member := &data.Member{
+		TeamID: int32(ctx.TeamID),
+		UserID: int32(ctx.UserID),
+		Role:   ctx.Payload.Role,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, member, "UPDATE fieldkit.team_user SET role = :role WHERE team_id = :team_id AND user_id = :user_id RETURNING *", member); err != nil {
+		return err
+	}
+
+	return ctx.OK(TeamMemberType(member))
+}
+
 func (c *MemberController) Delete(ctx *app.DeleteMemberContext) error {
 	member := &data.Member{}
 	if err := c.options.Database.GetContext(ctx, member, "DELETE FROM fieldkit.team_user WHERE team_id = $1 AND user_id = $2 RETURNING *", int32(ctx.TeamID), int32(ctx.UserID)); err != nil {

@@ -90,6 +90,7 @@ var _ = Resource("administrator", func() {
 		Params(func() {
 			Param("project_id", Integer)
 			Param("user_id", Integer)
+			Required("project_id", "user_id")
 		})
 		Response(OK, func() {
 			Media(ProjectAdministrator)

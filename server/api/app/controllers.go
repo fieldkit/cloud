@@ -251,6 +251,7 @@ type ExpeditionController interface {
 	GetID(*GetIDExpeditionContext) error
 	List(*ListExpeditionContext) error
 	ListID(*ListIDExpeditionContext) error
+	Update(*UpdateExpeditionContext) error
 }
 
 // MountExpeditionController "mounts" a Expedition resource controller on the given service.
@@ -352,6 +353,29 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 	h = handleExpeditionOrigin(h)
 	service.Mux.Handle("GET", "/projects/:project_id/expeditions", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Expedition", "action", "ListID", "route", "GET /projects/:project_id/expeditions", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateExpeditionContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddExpeditionPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleExpeditionOrigin(h)
+	service.Mux.Handle("PATCH", "/expeditions/:expedition_id", ctrl.MuxHandler("Update", h, unmarshalUpdateExpeditionPayload))
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "Update", "route", "PATCH /expeditions/:expedition_id", "security", "jwt")
 }
 
 // handleExpeditionOrigin applies the CORS response headers corresponding to the origin.
@@ -435,6 +459,21 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 
 // unmarshalAddExpeditionPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddExpeditionPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addExpeditionPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateExpeditionPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateExpeditionPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addExpeditionPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
@@ -585,6 +624,7 @@ type MemberController interface {
 	GetID(*GetIDMemberContext) error
 	List(*ListMemberContext) error
 	ListID(*ListIDMemberContext) error
+	Update(*UpdateMemberContext) error
 }
 
 // MountMemberController "mounts" a Member resource controller on the given service.
@@ -703,6 +743,29 @@ func MountMemberController(service *goa.Service, ctrl MemberController) {
 	h = handleMemberOrigin(h)
 	service.Mux.Handle("GET", "/teams/:team_id/members", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Member", "action", "ListID", "route", "GET /teams/:team_id/members", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateMemberContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UpdateMemberPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleMemberOrigin(h)
+	service.Mux.Handle("PATCH", "/teams/:team_id/members/:user_id", ctrl.MuxHandler("Update", h, unmarshalUpdateMemberPayload))
+	service.LogInfo("mount", "ctrl", "Member", "action", "Update", "route", "PATCH /teams/:team_id/members/:user_id", "security", "jwt")
 }
 
 // handleMemberOrigin applies the CORS response headers corresponding to the origin.
@@ -787,6 +850,21 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddMemberPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddMemberPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addMemberPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateMemberPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateMemberPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateMemberPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -915,6 +993,7 @@ type ProjectController interface {
 	GetID(*GetIDProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
+	Update(*UpdateProjectContext) error
 }
 
 // MountProjectController "mounts" a Project resource controller on the given service.
@@ -1016,6 +1095,29 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/user/projects", ctrl.MuxHandler("ListCurrent", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "ListCurrent", "route", "GET /user/projects", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddProjectPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("PATCH", "/projects/:project_id", ctrl.MuxHandler("Update", h, unmarshalUpdateProjectPayload))
+	service.LogInfo("mount", "ctrl", "Project", "action", "Update", "route", "PATCH /projects/:project_id", "security", "jwt")
 }
 
 // handleProjectOrigin applies the CORS response headers corresponding to the origin.
@@ -1099,6 +1201,21 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 
 // unmarshalAddProjectPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addProjectPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateProjectPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addProjectPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
@@ -1233,6 +1350,7 @@ type TeamController interface {
 	GetID(*GetIDTeamContext) error
 	List(*ListTeamContext) error
 	ListID(*ListIDTeamContext) error
+	Update(*UpdateTeamContext) error
 }
 
 // MountTeamController "mounts" a Team resource controller on the given service.
@@ -1334,6 +1452,29 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	h = handleTeamOrigin(h)
 	service.Mux.Handle("GET", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Team", "action", "ListID", "route", "GET /expeditions/:expedition_id/teams", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddTeamPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("PATCH", "/teams/:team_id", ctrl.MuxHandler("Update", h, unmarshalUpdateTeamPayload))
+	service.LogInfo("mount", "ctrl", "Team", "action", "Update", "route", "PATCH /teams/:team_id", "security", "jwt")
 }
 
 // handleTeamOrigin applies the CORS response headers corresponding to the origin.
@@ -1417,6 +1558,21 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 
 // unmarshalAddTeamPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddTeamPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addTeamPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateTeamPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateTeamPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addTeamPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
