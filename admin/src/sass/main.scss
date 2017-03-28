@@ -127,6 +127,7 @@ $contents-width: 834px;
   // width: $contents-width;
   // width: $contents-width + (2 * $col-gutter);
   height: 100%;
+  overflow-y: scroll;
   padding: 0 $col-gutter;
   background-color: white;
   @include shadow(8px);
@@ -142,7 +143,7 @@ $contents-width: 834px;
     width: $contents-width;
     max-width: 100%;
     text-align: left;
-    padding-top: $baseline-height*4;
+    padding: $baseline-height*4 0;
     display: inline-block;
   }
 
