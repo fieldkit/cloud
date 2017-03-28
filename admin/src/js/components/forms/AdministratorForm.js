@@ -76,7 +76,7 @@ export class AdministratorForm extends Component {
         cancelText={this.props.cancelText}>        
 
         <div className="form-group">
-          <label htmlFor="userId">Member</label>
+          <label htmlFor="userId">User</label>
           <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
             <option value={null}>Select a user</option>
             { this.state.users.map((user, i) => 

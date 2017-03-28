@@ -113,7 +113,7 @@ export class ProjectSettings extends Component {
       <div className="project">
 
         <Route path={`${match.url}/add-administrator`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Add Users">
+          <ReactModal isOpen={true} contentLabel="Add Users" className="modal" overlayClassName="modal-overlay">
             <h2>Add Users</h2>
             <AdministratorForm
               project={project}
