@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
+import log from 'loglevel';
 
 import type {
   Match as RouterMatch,
@@ -90,14 +91,14 @@ export class ProjectSettings extends Component {
   }
 
   async onProjectSave(project: APINewProject) {
-    // TODO: this isn't implemented on the backend yet!
-
     const projectRes = await FKApiClient.get().updateProject(this.props.project.id, project);
     if (projectRes.type !== 'ok') {
       return projectRes.errors;
     }
 
-    if (projectRes.slug != this.props.project.slug && projectRes.payload) {
+    log.debug('onProjectSave', projectRes, this.props.project);
+
+    if (projectRes.payload.slug != this.props.project.slug && projectRes.payload) {
       this.props.onUpdate(projectRes.payload.slug);
     } else {
       this.props.onUpdate();
@@ -133,7 +134,7 @@ export class ProjectSettings extends Component {
 
               onSave={this.onProjectSave.bind(this)} />
           </div>
-          <div className="two-columns">        
+          <div className="two-columns">
             <h3>Users</h3>
             <p>
               Users you add to this project have administrative rights. They can create a new expedition, change its settings and add members to it. If you’re trying to add a member to an expedition instead, select an expedition and then go to <i>Teams</i>.
@@ -153,7 +154,7 @@ export class ProjectSettings extends Component {
                   <td>
                     <div className="user-avatar medium">
                       <img />
-                    </div>                    
+                    </div>
                   </td>
                   <td>
                     {administrator.user_id}
