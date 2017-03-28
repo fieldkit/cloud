@@ -29,6 +29,8 @@ import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
 import '../../css/main.css'
 
+import { HamburgerIcon, ArrowDown } from './icons/Icons'
+
 type Props = {
   match: RouterMatch;
   location: RouterLocation;
@@ -251,7 +253,7 @@ export class Main extends Component {
           <div className="sidebar">
             <div className="sidebar-section project-section">
               <h5>Projects</h5>
-              <Link to={`/`}>All</Link>
+              <Link to={`/`}><HamburgerIcon />All</Link>
               { activeProject &&
                 <div>
                   <p className="project-name">

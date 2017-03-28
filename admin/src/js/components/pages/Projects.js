@@ -48,7 +48,6 @@ export class Projects extends Component {
               onCancel={() => this.props.history.push("/")}
               onSave={this.onProjectCreate.bind(this)} />
           </ReactModal> } />
-
         <h1>Projects</h1>
         <div id="projects" className="gallery-list">
         { projects.map((p, i) =>
