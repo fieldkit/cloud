@@ -102,7 +102,7 @@ export class ProjectExpeditionForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <FormItem name="name" value={name} labelText="name" onChange={this.handleNameChange.bind(this)} errors={errors} />
+        <FormItem name="name" value={name} labelText="name" className="lg" onChange={this.handleNameChange.bind(this)} errors={errors} />
 
         <div className="url-preview">
           <p className="label">Your expedition will be available at the following address:</p>
@@ -112,7 +112,7 @@ export class ProjectExpeditionForm extends Component {
           </p>
         </div>
 
-        <FormItem name="description" value={description} labelText="description" onChange={this.handleInputChange.bind(this)} errors={errors} />
+        <FormItem name="description" value={description} labelText="description" className="lg" onChange={this.handleInputChange.bind(this)} errors={errors} />
       </FormContainer>
     )
   }
