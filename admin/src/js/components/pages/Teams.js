@@ -111,7 +111,7 @@ export class Teams extends Component {
     }
     this.setState({
       memberDeletion: {
-        contents: <span>Are you sure you want to remove <strong>{userName}</strong> from <strong>{teamName}</strong></span>,
+        contents: <span>Are you sure you want to remove <strong>{userName}</strong> from <strong>{teamName}?</strong></span>,
         userId, teamId
       }
     })
@@ -144,16 +144,16 @@ export class Teams extends Component {
     return (
       <div className="teams">
         <Route path={`${match.url}/new-team`} render={() =>
-          <ReactModal isOpen={true} contentLabel="Create New Team">
-            <h1>Create a new team</h1>
+          <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Create a new team</h2>
             <TeamForm
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
           </ReactModal> } />
 
         <Route path={`${match.url}/:teamId/add-member`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Add Members">
-            <h1>Add Members</h1>
+          <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
+            <h2>Add Members</h2>
             <MemberForm
               teamId={props.match.params.teamId}
               members={this.state.members[props.match.params.teamId]}
@@ -162,8 +162,8 @@ export class Teams extends Component {
           </ReactModal> } />
 
         { memberDeletion &&
-          <ReactModal isOpen={true} contentLabel="Remove member confirmation">
-            <h1>Confirm removal</h1>
+          <ReactModal isOpen={true} contentLabel="Remove member confirmation" className="modal" overlayClassName="modal-overlay">
+            <h2>Remove Member</h2>
             <FormContainer
               onSave={this.confirmMemberDelete.bind(this)}
               onCancel={this.cancelMemberDelete.bind(this)}
