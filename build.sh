@@ -12,7 +12,7 @@ docker build -t fieldkit-landing-build landing
 mkdir build
 
 docker rm -f fieldkit-server-build || true
-docker run --rm --name fieldkit-server-build -v `pwd`/build:/build fieldkit-server-build sh -c 'cp -r $GOPATH/bin/server /build/'
+docker run --rm --name fieldkit-server-build -v `pwd`/build:/build fieldkit-server-build sh -c 'cp -r $GOPATH/bin/server /build/ && mkdir /build/api && cp -r api/public /build/api/'
 
 mkdir build/admin
 docker rm -f fieldkit-admin-build || true
