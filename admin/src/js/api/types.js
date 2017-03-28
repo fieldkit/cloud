@@ -9,6 +9,8 @@ export type APIErrors = {
 }
 
 export type APINewUser = {
+  name: string;
+  bio: string;
   email: string;
   username: string;
   password: string;
