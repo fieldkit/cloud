@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-d
 
 import { FKApiClient } from './api/api';
 
-import { Landing } from './components/Landing';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
 
@@ -19,7 +18,7 @@ const PrivateRoute = ({ component, ...rest }) => (
       React.createElement(component, props)
     ) : (
       <Redirect to={{
-        pathname: '/landing',
+        pathname: '/signin',
         state: { from: props.location }
       }}/>
     )
@@ -30,9 +29,11 @@ export class App extends Component {
   constructor(props) {
     super(props);
 
-    let API_HOST = 'https://fieldkit.org';
+    let API_HOST = 'https://api.fieldkit.org';
     if (process.env.NODE_ENV === 'development') {
       API_HOST = 'http://localhost:8080';
+    } else if (process.env.NODE_ENV === 'staging' || window.location.hostname.endsWith('fieldkit.team')) {
+      API_HOST = 'https://api.fieldkit.team';
     }
 
     FKApiClient.setup(API_HOST, this.onUnauthorizedAccess.bind(this));
@@ -40,7 +41,7 @@ export class App extends Component {
 
   signOut() {
     FKApiClient.get().signOut();
-    return <Redirect to="/landing" />;
+    return <Redirect to="/signin" />;
   }
 
   onUnauthorizedAccess() {
@@ -49,15 +50,12 @@ export class App extends Component {
 
   render() {
     return (
-      <Router>
+      <Router basename="/admin">
         <Switch>
-          <Route exact path="/landing" component={Landing} />
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/signout" render={() => this.signOut()} />
 
-          <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug/teams" component={Main} />
-          <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug/datasources" component={Main} />
           <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Main} />
           <PrivateRoute path="/projects/:projectSlug" component={Main} />
           <PrivateRoute path="/" component={Main} />

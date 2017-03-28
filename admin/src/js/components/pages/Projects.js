@@ -1,8 +1,14 @@
-// @flow weak
+// @flow
 
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
+
+import type {
+  Match as RouterMatch,
+  Location as RouterLocation,
+  RouterHistory
+} from 'react-router-dom';
 
 import { ProjectForm } from '../forms/ProjectForm';
 import { FKApiClient } from '../../api/api';
@@ -10,20 +16,21 @@ import { joinPath } from '../../common/util';
 import type { APIProject, APINewProject } from '../../api/types';
 
 type Props = {
-  projects: APIProject[],
+  projects: APIProject[];
+  onProjectCreate: () => void;
 
-  match: Object;
-  location: Object;
-  history: Object;
+  match: RouterMatch;
+  location: RouterLocation;
+  history: RouterHistory;
 }
 
 export class Projects extends Component {
-  props: Props;
+  props: $Exact<Props>;
 
   async onProjectCreate(p: APINewProject) {
     const project = await FKApiClient.get().createProject(p);
     if (project.type === 'ok') {
-      this.props.history.push("/");
+      this.props.onProjectCreate();
     } else {
       return project.errors;
     }

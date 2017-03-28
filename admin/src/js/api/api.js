@@ -208,6 +208,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors('/projects')
   }
 
+  getCurrentUserProjects(): Promise<FKAPIResponse<APIProjects>> {
+    return this.getWithErrors('/user/projects')
+  }
+
   getProjectBySlug(slug: string): Promise<FKAPIResponse<APIProject>> {
     return this.getWithErrors(`/projects/@/${slug}`)
   }

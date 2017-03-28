@@ -2,14 +2,14 @@
 
 import React, {Component} from 'react'
 
-import '../../css/landing.css'
-import fieldkitLogoRed from '../../img/logos/fieldkit-logo-red.svg'
-import nationalGeographicLogoLong from '../../img/logos/national-geographic-logo-long.png'
-import conservifyLogo from '../../img/logos/conservify_logo.png'
-import ocrLogo from '../../img/logos/ocr_logo.jpg'
+import './css/App.css'
 
-export class Landing extends Component {
+import fieldkitLogoRed from './img/fieldkit-logo-red.svg'
+import nationalGeographicLogoLong from './img/national-geographic-logo-long.png'
+import conservifyLogo from './img/conservify_logo.png'
+import ocrLogo from './img/ocr_logo.jpg'
 
+export class App extends Component {
   render () {
     return (
       <div id="landing-page" className="page">

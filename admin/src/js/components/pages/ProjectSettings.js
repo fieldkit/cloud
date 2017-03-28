@@ -4,6 +4,12 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
+import type {
+  Match as RouterMatch,
+  Location as RouterLocation,
+  RouterHistory
+} from 'react-router-dom';
+
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
@@ -18,14 +24,15 @@ type Props = {
   project: APIProject;
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
+  onExpeditionCreate: () => void;
 
-  match: Object;
-  location: Object;
-  history: Object;
+  match: RouterMatch;
+  location: RouterLocation;
+  history: RouterHistory;
 }
 
 export class ProjectSettings extends Component {
-  props: Props;
+  props: $Exact<Props>;
   state: {
     administrators: APIAdministrator[]
   }
@@ -42,10 +49,21 @@ export class ProjectSettings extends Component {
 
   async loadAdministrators() {
     const { project } = this.props;
-    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);  
+    const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
       this.setState({administrators: administrators});
+    }
+  }
+
+  async onExpeditionCreate(e: APINewExpedition) {
+    const { match, project } = this.props;
+
+    const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
+    if (expeditionRes.type === 'ok') {
+      this.props.onExpeditionCreate();
+    } else {
+      return expeditionRes.errors;
     }
   }
 

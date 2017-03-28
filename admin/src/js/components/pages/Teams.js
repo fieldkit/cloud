@@ -10,6 +10,8 @@ import { MemberForm } from '../forms/MemberForm';
 import { FKApiClient } from '../../api/api';
 import '../../../css/teams.css'
 
+import { FormContainer } from '../containers/FormContainer';
+
 import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
 
 type Props = {
@@ -26,14 +28,20 @@ export class Teams extends Component {
   props: Props;
   state: {
     teams: APITeam[],
-    members: { [teamId: number]: APIMember[] }
+    members: { [teamId: number]: APIMember[] },
+    memberDeletion: ?{
+      contents: React$Element<*>;
+      userId: number;
+      teamId: number;
+    }
   }
 
   constructor (props: Props) {
     super(props);
     this.state = {
       teams: [],
-      members: {}
+      members: {},
+      memberDeletion: null
     }
 
     this.loadTeams();
@@ -51,7 +59,7 @@ export class Teams extends Component {
   }
 
   async loadMembers(teamId: number) {
-    const membersRes = await FKApiClient.get().getMembers(teamId);  
+    const membersRes = await FKApiClient.get().getMembers(teamId);
     if (membersRes.type === 'ok' && membersRes.payload) {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
@@ -60,7 +68,7 @@ export class Teams extends Component {
   }
 
   async onTeamCreate(e: APINewTeam) {
-    
+
     const { expedition, match } = this.props;
 
     const teamRes = await FKApiClient.get().createTeam(expedition.id, e);
@@ -83,21 +91,56 @@ export class Teams extends Component {
     }
   }
 
-  async onMemberDelete(teamId: number, userId: number) {
-    const { match } = this.props;
-    const memberRes = await FKApiClient.get().deleteMember(teamId, userId);
-    if (memberRes.type === 'ok') {
-      await this.loadTeams();
-      this.props.history.push(`${match.url}`);
-    } else {
-      return memberRes.errors;
-    }    
+  startMemberDelete(teamId: number, userId: number) {
+    const { teams, members } = this.state;
+    let teamName = 'unknownTeam';
+    let userName = 'unknownUser';
+
+    if (members[teamId]) {
+      const teamMembers = members[teamId];
+      const teamMember = teamMembers.find((u: APIMember) => u.user_id === userId);
+      const team = teams.find((t: APITeam) => t.id === teamId);
+
+      if (team) {
+        teamName = team.name;
+      }
+      if (teamMember) {
+        // TODO: look up username
+        userName = teamMember.user_id.toString(10);
+      }
+    }
+    this.setState({
+      memberDeletion: {
+        contents: <span>Are you sure you want to remove <strong>{userName}</strong> from <strong>{teamName}</strong></span>,
+        userId, teamId
+      }
+    })
+  }
+
+  async confirmMemberDelete() {
+    const { memberDeletion } = this.state;
+
+    if (memberDeletion) {
+      const { teamId, userId } = memberDeletion;
+
+      const memberRes = await FKApiClient.get().deleteMember(teamId, userId);
+      if (memberRes.type === 'ok') {
+        await this.loadMembers(teamId);
+        this.setState({ memberDeletion: null })
+      } else {
+        // TODO: show errors somewhere
+      }
+    }
+  }
+
+  cancelMemberDelete() {
+    this.setState({ memberDeletion: null });
   }
 
   render() {
     const { match } = this.props;
-    const { members, teams } = this.state;
-    
+    const { members, teams, memberDeletion } = this.state;
+
     return (
       <div className="teams">
         <Route path={`${match.url}/new-team`} render={() =>
@@ -117,6 +160,18 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdd.bind(this)} />
           </ReactModal> } />
+
+        { memberDeletion &&
+          <ReactModal isOpen={true} contentLabel="Remove member confirmation">
+            <h1>Confirm removal</h1>
+            <FormContainer
+              onSave={this.confirmMemberDelete.bind(this)}
+              onCancel={this.cancelMemberDelete.bind(this)}
+              saveText="Confirm"
+            >
+              <div>{memberDeletion.contents}</div>
+            </FormContainer>
+          </ReactModal> }
 
         <h1>Teams</h1>
 

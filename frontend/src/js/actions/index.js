@@ -22,6 +22,8 @@ export const SET_ZOOM = 'SET_ZOOM'
 export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
 export const OPEN_EXPEDITION_PANEL = 'OPEN_EXPEDITION_PANEL'
 export const CLOSE_EXPEDITION_PANEL = 'CLOSE_EXPEDITION_PANEL'
+export const OPEN_LIGHTBOX = 'OPEN_LIGHTBOX'
+export const CLOSE_LIGHTBOX = 'CLOSE_LIGHTBOX'
 
 export function processQueryString (getState) {
   var queryString = {};
@@ -78,7 +80,9 @@ export function processQueryString (getState) {
           }
         ]
       } else {
-        return [{}]
+        return [{
+          type: 'blank'
+        }]
       }
     }
     case 'journal': {
@@ -290,6 +294,24 @@ export function closeExpeditionPanel () {
   return function (dispatch, getState) {
     dispatch({
       type: CLOSE_EXPEDITION_PANEL
+    })
+  }
+}
+
+export function openLightbox (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: OPEN_LIGHTBOX,
+      id
+    })
+  }
+}
+
+export function closeLightbox (id) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: CLOSE_LIGHTBOX,
+      id
     })
   }
 }

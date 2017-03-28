@@ -1,5 +1,5 @@
 .DS_Store
 .gitignore
-build
-build.bash
+build/
+Dockerfile
 node_modules/

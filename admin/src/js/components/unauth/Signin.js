@@ -52,8 +52,8 @@ export class Signin extends Component {
 
   render() {
     if (this.state.redirectToReferrer) {
-      let from = this.props.location.state || '/';
-      if (from === '/signin') { from = '/' };
+      let from = this.props.location.state || '/admin';
+      if (from.endsWith('/signin')) { from = '/admin' };
 
       return <Redirect to={from} />;
     }

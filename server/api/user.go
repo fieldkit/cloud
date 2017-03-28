@@ -51,6 +51,7 @@ type UserControllerOptions struct {
 	Database   *sqlxcache.DB
 	Emailer    email.Emailer
 	JWTHMACKey []byte
+	Domain     string
 }
 
 // UserController implements the user resource.
@@ -121,7 +122,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 		return err
 	}
 
-	ctx.ResponseData.Header().Set("Location", "https://fieldkit.org/login")
+	ctx.ResponseData.Header().Set("Location", "https://"+c.options.Domain+"/admin/signin")
 	return ctx.Found()
 }
 

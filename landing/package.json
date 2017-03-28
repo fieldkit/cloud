@@ -1,0 +1,25 @@
+{
+  "name": "landing",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "flow-bin": "^0.42.0",
+    "node-sass": "^4.5.1",
+    "react-scripts": "0.9.5"
+  },
+  "scripts": {
+    "start": "yarn sass-build && react-scripts start",
+    "build": "yarn sass-build && react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "flow": "flow",
+    "lint": "eslint src",
+    "sass-watch": "chokidar 'src/sass/**/*.scss' --initial -c 'yarn run sass-build'",
+    "sass-build": "node-sass --recursive src/sass --output src/css --source-map true"
+  }
+}

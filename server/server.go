@@ -8,8 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
+	"strings"
 
+	"github.com/O-C-R/singlepage"
 	"github.com/O-C-R/sqlxcache"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -34,6 +37,10 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
 	Emailer               string `split_words:"true" default:"default" required:"true"`
+	AdminRoot             string `split_words:"true"`
+	FrontendRoot          string `split_words:"true"`
+	LandingRoot           string `split_words:"true"`
+	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 }
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
@@ -120,9 +127,9 @@ func main() {
 	var emailer email.Emailer
 	switch config.Emailer {
 	case "default":
-		emailer = email.NewEmailer()
+		emailer = email.NewEmailer("admin", config.Domain)
 	case "aws":
-		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin@fieldkit.org")
+		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
 	default:
 		panic("invalid emailer")
 	}
@@ -168,6 +175,7 @@ func main() {
 		Database:   database,
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
+		Domain:     config.Domain,
 	})
 	if err != nil {
 		panic(err)
@@ -218,8 +226,79 @@ func main() {
 	})
 	app.MountTwitterController(service, c9)
 
+	notFoundHandler := http.NotFoundHandler()
+	adminServer := notFoundHandler
+	if config.AdminRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.AdminRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		adminServer = http.StripPrefix("/admin", singlepageApplication)
+	}
+
+	frontendServer := notFoundHandler
+	if config.FrontendRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.FrontendRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		frontendServer = singlepageApplication
+	}
+
+	landingServer := notFoundHandler
+	if config.LandingRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.LandingRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		landingServer = singlepageApplication
+	}
+
+	apiDomain := "api." + config.Domain
+	suffix := "." + config.Domain
+	server := &http.Server{
+		Addr: config.Addr,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/status" {
+				fmt.Fprint(w, "ok")
+				return
+			}
+
+			if req.Host == apiDomain {
+				service.Mux.ServeHTTP(w, req)
+				return
+			}
+
+			if req.Host == config.Domain {
+				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
+					adminServer.ServeHTTP(w, req)
+					return
+				}
+
+				landingServer.ServeHTTP(w, req)
+				return
+			}
+
+			if strings.HasSuffix(req.Host, suffix) {
+				frontendServer.ServeHTTP(w, req)
+				return
+			}
+
+			service.Mux.ServeHTTP(w, req)
+		}),
+	}
+
 	// Start service
-	if err := service.ListenAndServe(config.Addr); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
 	}
 }
