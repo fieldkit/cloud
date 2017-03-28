@@ -1,18 +1,22 @@
 
 import { connect } from 'react-redux'
-import Header from '../../components/Root/Header'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
+import Header from '../../components/Root/Header'
 
 const mapStateToProps = (state, ownProps) => {
-
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
-  const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
-  const currentPage = state.expeditions.get('currentPage')
-
   return {
-    expeditionName,
-    currentExpeditionID,
-    currentPage
+    ...createSelector(
+      state => state.expeditions.get('currentExpedition'),
+      state => state.expeditions.getIn(['expeditions', state.expeditions.get('currentExpedition'), 'name']),
+      state => state.expeditions.get('currentPage'),
+      (currentExpeditionID, expeditionName, currentPage) => ({
+        currentExpeditionID,
+        expeditionName,
+        currentPage
+      })
+    )(state)
   }
 }
 

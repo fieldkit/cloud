@@ -5,28 +5,20 @@ import { createSelector } from 'reselect'
 
 import Root from '../../components/Root'
 
-const selectComputedData = createSelector(
-  state => state.expeditions.get('currentExpedition'),
-  state => {
-    const currentExpedition = state.expeditions.get('currentExpedition')
-    return state.expeditions.getIn(['expeditions', currentExpedition, 'expeditionFetching'])
-  },
-  state => {
-    const currentExpedition = state.expeditions.get('currentExpedition')
-    return state.expeditions.getIn(['expeditions', currentExpedition, 'documentsFetching'])
-  },
-  state => state.expeditions.get('documents'),
-  (currentExpedition, expeditionFetching, documentsFetching, documents) => ({
-    currentExpedition,
-    expeditionFetching,
-    documentsFetching,
-    documents
-  })
-)
-
 const mapStateToProps = (state, ownProps) => {
   return {
-    ...selectComputedData(state)
+    ...createSelector(
+      state => state.expeditions.get('currentExpedition'),
+      state => state.expeditions.getIn(['expeditions', state.expeditions.get('currentExpedition'), 'expeditionFetching']),
+      state => state.expeditions.getIn(['expeditions', state.expeditions.get('currentExpedition'), 'documentsFetching']),
+      state => state.expeditions.get('documents'),
+      (currentExpedition, expeditionFetching, documentsFetching, documents) => ({
+        currentExpedition,
+        expeditionFetching,
+        documentsFetching,
+        documents
+      })
+    )(state)
   }
 }
 

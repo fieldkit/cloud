@@ -1,20 +1,19 @@
 
 import { connect } from 'react-redux'
-import MapPage from '../../components/MapPage'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
+import MapPage from '../../components/MapPage'
+
 
 const mapStateToProps = (state, ownProps) => {
-
-  const projects = state.expeditions.get('projects')
-  const expeditions = state.expeditions.get('expeditions')
-  const modal = state.expeditions.get('modal')
-  const documents = state.expeditions.get('documents')
-
   return {
-    expeditions,
-    projects,
-    modal,
-    documents
+    ...createSelector(
+      state => state.expeditions.get('documents'),
+      (documents) => ({
+        documents
+      })
+    )(state)
   }
 }
 

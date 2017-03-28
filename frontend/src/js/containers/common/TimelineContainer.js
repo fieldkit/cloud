@@ -1,21 +1,24 @@
 
 import { connect } from 'react-redux'
-import Timeline from '../../components/common/Timeline'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
+import Timeline from '../../components/common/Timeline'
 
 const mapStateToProps = (state, ownProps) => {
-
-  const currentDate = state.expeditions.get('currentDate')
-  const currentExpedition = state.expeditions.get('currentExpedition')
-  const startDate = state.expeditions.getIn(['expeditions', currentExpedition, 'startDate'])
-  const endDate = state.expeditions.getIn(['expeditions', currentExpedition, 'endDate'])
-  const documents = state.expeditions.get('documents')
-
   return {
-    currentDate,
-    startDate,
-    endDate,
-    documents
+    ...createSelector(
+      state => state.expeditions.get('currentDate'),
+      state => state.expeditions.getIn(['expeditions', state.expeditions.get('currentExpedition'), 'startDate']),
+      state => state.expeditions.getIn(['expeditions', state.expeditions.get('currentExpedition'), 'endDate']),
+      state => state.expeditions.get('documents'),
+      (currentDate, startDate, endDate, documents) => ({
+        currentDate,
+        startDate,
+        endDate,
+        documents
+      })
+    )(state)
   }
 }
 

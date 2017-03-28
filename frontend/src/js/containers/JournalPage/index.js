@@ -1,27 +1,32 @@
 
 import { connect } from 'react-redux'
-import JournalPage from '../../components/JournalPage'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
+import JournalPage from '../../components/JournalPage'
 
 const mapStateToProps = (state, ownProps) => {
-
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
-  const projects = state.expeditions.get('projects')
-  const expeditions = state.expeditions.get('expeditions')
-  const documents = state.expeditions.get('currentDocuments')
-    .map(id => state.expeditions.getIn(['documents', id]))
-    .sortBy(d => d.get('date'))
-    .reverse()
-  const currentDate = state.expeditions.get('currentDate')
-  const forceDateUpdate = state.expeditions.get('forceDateUpdate')
-
   return {
-    expeditions,
-    projects,
-    documents,
-    currentExpeditionID,
-    currentDate,
-    forceDateUpdate
+    ...createSelector(
+      state => state.expeditions.get('expeditions'),
+      state => state.expeditions.get('projects'),
+      state => state.expeditions.get('documents'),
+      state => state.expeditions.get('currentDocuments'),
+      state => state.expeditions.get('currentExpedition'),
+      state => state.expeditions.get('currentDate'),
+      state => state.expeditions.get('forceDateUpdate'),
+      (expeditions, projects, documents, currentDocuments, currentExpeditionID, currentDate, forceDateUpdate) => ({
+        expeditions,
+        projects,
+        documents: currentDocuments
+          .map(id => documents.get(id))
+          .sortBy(d => d.get('date'))
+          .reverse(),
+        currentExpeditionID,
+        currentDate,
+        forceDateUpdate
+      })
+    )(state)
   }
 }
 

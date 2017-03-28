@@ -1,23 +1,26 @@
 
 import { connect } from 'react-redux'
-import ControlPanel from '../../components/common/ControlPanel'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
+import ControlPanel from '../../components/common/ControlPanel'
 
 const mapStateToProps = (state, ownProps) => {
-
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
-  // const expeditionName = state.expeditions.getIn(['expeditions', currentExpeditionID, 'name'])
-  const currentDate = state.expeditions.get('currentDate')
-  const playbackMode = state.expeditions.get('playbackMode')
-  const focus = state.expeditions.get('focus')
-  const zoom = state.expeditions.getIn(['viewport', 'zoom'])
-
   return {
-    currentExpeditionID,
-    currentDate,
-    playbackMode,
-    focus,
-    zoom
+    ...createSelector(
+      state => state.expeditions.get('currentExpedition'),
+      state => state.expeditions.get('currentDate'),
+      state => state.expeditions.get('playbackMode'),
+      state => state.expeditions.get('focus'),
+      state => state.expeditions.getIn(['viewport', 'zoom']),
+      (currentExpeditionID, currentDate, playbackMode, focus, zoom) => ({
+        currentExpeditionID,
+        currentDate,
+        playbackMode,
+        focus,
+        zoom
+      })
+    )(state)
   }
 }
 
