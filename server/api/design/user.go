@@ -6,6 +6,9 @@ import (
 )
 
 var AddUserPayload = Type("AddUserPayload", func() {
+	Attribute("name", String, func() {
+		MaxLength(256)
+	})
 	Attribute("email", String, func() {
 		Format("email")
 	})
@@ -16,18 +19,24 @@ var AddUserPayload = Type("AddUserPayload", func() {
 	Attribute("password", String, func() {
 		MinLength(10)
 	})
+	Attribute("bio", String)
 	Attribute("invite_token", String)
-	Required("email", "username", "password", "invite_token")
+	Required("name", "email", "username", "password", "bio", "invite_token")
+})
+
+var UpdateUserPayload = Type("UpdateUserPayload", func() {
+	Attribute("id", Integer)
+	Attribute("name")
+	Attribute("email")
+	Attribute("username")
+	Attribute("bio")
+	Required("id", "email", "username", "bio")
 })
 
 var LoginPayload = Type("LoginPayload", func() {
-	Attribute("username", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-		MaxLength(40)
-	})
-	Attribute("password", String, func() {
-		MinLength(10)
-	})
+	Reference(AddUserPayload)
+	Attribute("username")
+	Attribute("password")
 	Required("username", "password")
 })
 
@@ -36,12 +45,18 @@ var User = MediaType("application/vnd.app.user+json", func() {
 	Reference(AddUserPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
+		Attribute("name")
 		Attribute("username")
-		Required("id", "username")
+		Attribute("email")
+		Attribute("bio")
+		Required("id", "name", "username", "email", "bio")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("name")
 		Attribute("username")
+		Attribute("email")
+		Attribute("bio")
 	})
 })
 

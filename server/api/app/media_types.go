@@ -400,15 +400,33 @@ func (mt *TwitterAccounts) Validate() (err error) {
 //
 // Identifier: application/vnd.app.user+json; view=default
 type User struct {
+	Bio      string `form:"bio" json:"bio" xml:"bio"`
+	Email    string `form:"email" json:"email" xml:"email"`
 	ID       int    `form:"id" json:"id" xml:"id"`
+	Name     string `form:"name" json:"name" xml:"name"`
 	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the User media type instance.
 func (mt *User) Validate() (err error) {
 
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
 	if mt.Username == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	if mt.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
+	}
+	if mt.Bio == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, mt.Email, goa.FormatEmail, err2))
+	}
+	if utf8.RuneCountInString(mt.Name) > 256 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 256, false))
 	}
 	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Username); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, mt.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))

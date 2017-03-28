@@ -304,14 +304,19 @@ func (ut *AddTeamPayload) Validate() (err error) {
 
 // addUserPayload user type.
 type addUserPayload struct {
+	Bio         *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Email       *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
+	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Password    *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 	Username    *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
 // Validate validates the addUserPayload type instance.
 func (ut *addUserPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
 	if ut.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
 	}
@@ -321,12 +326,20 @@ func (ut *addUserPayload) Validate() (err error) {
 	if ut.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "password"))
 	}
+	if ut.Bio == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
+	}
 	if ut.InviteToken == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "invite_token"))
 	}
 	if ut.Email != nil {
 		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
 			err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, *ut.Email, goa.FormatEmail, err2))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 256, false))
 		}
 	}
 	if ut.Password != nil {
@@ -350,11 +363,17 @@ func (ut *addUserPayload) Validate() (err error) {
 // Publicize creates AddUserPayload from addUserPayload
 func (ut *addUserPayload) Publicize() *AddUserPayload {
 	var pub AddUserPayload
+	if ut.Bio != nil {
+		pub.Bio = *ut.Bio
+	}
 	if ut.Email != nil {
 		pub.Email = *ut.Email
 	}
 	if ut.InviteToken != nil {
 		pub.InviteToken = *ut.InviteToken
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
 	}
 	if ut.Password != nil {
 		pub.Password = *ut.Password
@@ -367,14 +386,19 @@ func (ut *addUserPayload) Publicize() *AddUserPayload {
 
 // AddUserPayload user type.
 type AddUserPayload struct {
+	Bio         string `form:"bio" json:"bio" xml:"bio"`
 	Email       string `form:"email" json:"email" xml:"email"`
 	InviteToken string `form:"invite_token" json:"invite_token" xml:"invite_token"`
+	Name        string `form:"name" json:"name" xml:"name"`
 	Password    string `form:"password" json:"password" xml:"password"`
 	Username    string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the AddUserPayload type instance.
 func (ut *AddUserPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
 	if ut.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
 	}
@@ -384,11 +408,17 @@ func (ut *AddUserPayload) Validate() (err error) {
 	if ut.Password == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "password"))
 	}
+	if ut.Bio == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
+	}
 	if ut.InviteToken == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "invite_token"))
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, ut.Email, goa.FormatEmail, err2))
+	}
+	if utf8.RuneCountInString(ut.Name) > 256 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
 	}
 	if utf8.RuneCountInString(ut.Password) < 10 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
@@ -468,6 +498,77 @@ func (ut *LoginPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
+	}
+	return
+}
+
+// updateUserPayload user type.
+type updateUserPayload struct {
+	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	ID       *int    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+}
+
+// Validate validates the updateUserPayload type instance.
+func (ut *updateUserPayload) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
+	}
+	if ut.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	if ut.Bio == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
+	}
+	return
+}
+
+// Publicize creates UpdateUserPayload from updateUserPayload
+func (ut *updateUserPayload) Publicize() *UpdateUserPayload {
+	var pub UpdateUserPayload
+	if ut.Bio != nil {
+		pub.Bio = *ut.Bio
+	}
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Name != nil {
+		pub.Name = ut.Name
+	}
+	if ut.Username != nil {
+		pub.Username = *ut.Username
+	}
+	return &pub
+}
+
+// UpdateUserPayload user type.
+type UpdateUserPayload struct {
+	Bio      string  `form:"bio" json:"bio" xml:"bio"`
+	Email    string  `form:"email" json:"email" xml:"email"`
+	ID       int     `form:"id" json:"id" xml:"id"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Username string  `form:"username" json:"username" xml:"username"`
+}
+
+// Validate validates the UpdateUserPayload type instance.
+func (ut *UpdateUserPayload) Validate() (err error) {
+
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
+	}
+	if ut.Username == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	if ut.Bio == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
 	}
 	return
 }

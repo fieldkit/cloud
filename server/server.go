@@ -226,6 +226,10 @@ func main() {
 	})
 	app.MountTwitterController(service, c9)
 
+	// Mount "picture" controller
+	c10 := api.NewPictureController(service)
+	app.MountPictureController(service, c10)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {
