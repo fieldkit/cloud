@@ -120,9 +120,9 @@ $contents-width: 834px;
 .right {
   float: left;
   vertical-align: top;
-  // width: calc(100% - #{$sidebar-width});
+  width: calc(100% - #{$sidebar-width});
   // width: $contents-width;
-  width: $contents-width + (2 * $col-gutter);
+  // width: $contents-width + (2 * $col-gutter);
   height: 100%;
   padding: 0 $col-gutter;
   background-color: white;
@@ -135,18 +135,20 @@ $contents-width: 834px;
   }
 
   .contents {
-    width: 100%;
+    // width: 100%;
+    width: $contents-width;
+    max-width: 100%;
     text-align: left;
     padding-top: $baseline-height*4;
+    display: inline-block;
   }
 
 }
 
 .account-dropdown {
-  float: right;
-  position: relative;
-  margin-top: $baseline-height*2;
-  text-align: right;
+  position: absolute;
+  top: $baseline-height*2;
+  right: $baseline-height*2;
 
   a {
     cursor: pointer; 
