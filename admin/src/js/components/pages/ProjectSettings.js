@@ -114,12 +114,13 @@ export class ProjectSettings extends Component {
 
         <Route path={`${match.url}/add-administrator`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Users" className="modal" overlayClassName="modal-overlay">
-            <h2>Add Users</h2>
+            <h2>Add User</h2>
             <AdministratorForm
               project={project}
               administrators={this.state.administrators}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onAdministratorAdd.bind(this)} />
+              onSave={this.onAdministratorAdd.bind(this)} 
+              saveText="Add" />
           </ReactModal> } />
 
         <h1>Project Settings</h1>
@@ -167,7 +168,7 @@ export class ProjectSettings extends Component {
               </tbody>
             </table>
 
-            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
+            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add User</Link>
           </div>
         </div>
       </div>

@@ -158,7 +158,8 @@ export class Teams extends Component {
               teamId={props.match.params.teamId}
               members={this.state.members[props.match.params.teamId]}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onMemberAdd.bind(this)} />
+              onSave={this.onMemberAdd.bind(this)} 
+              saveText="Add" />
           </ReactModal> } />
 
         { memberDeletion &&
