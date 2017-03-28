@@ -2,6 +2,8 @@
 
 import React, { Component } from 'react'
 import type { APIMember, APIErrors } from '../../api/types';
+import removeImg from '../../../img/icons/icon-remove-small.png'
+import editImg from '../../../img/icons/icon-edit-small.png'
 
 type Props = {
   teamId: number,
@@ -34,7 +36,6 @@ export class MembersTable extends Component {
 
   render() {
     const { teamId, members } = this.props;
-
     if(members){
       return (
           <div>
@@ -44,13 +45,14 @@ export class MembersTable extends Component {
                   <th></th>
                   <th>Members ({ members.length })</th>
                   <th>Role</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 { members.map((member, i) =>
                     <tr>
                       <td>
-                        <div className="user-avatar">
+                        <div className="user-avatar medium">
                         </div>
                       </td>
                       <td>
@@ -58,8 +60,15 @@ export class MembersTable extends Component {
                         {member.user_id}
                       </td>
                       <td>
-                        {member.role} <button className="bt-icon edit"></button>
-                        <button className="bt-icon remove" onClick={this.delete.bind(this, member.user_id)}></button>
+                        <span>{member.role}</span>
+                        <div className="bt-icon">
+                          <img src={editImg} alt="external link" />
+                        </div>                        
+                      </td>
+                      <td>
+                        <div className="bt-icon" onClick={this.delete.bind(this, member.user_id)}>
+                          <img src={removeImg} alt="external link" />
+                        </div>
                       </td>
                     </tr> )}                
               </tbody>

@@ -15,11 +15,13 @@ import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
-import type { APIProject, APIExpedition, APINewProject, APINewExpedition, APINewAdministrator, APIAdministrator } from '../../api/types';
+import removeImg from '../../../img/icons/icon-remove-small.png'
+import '../../../css/projectsettings.css'
+
+import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition } from '../../api/types';
 
 type Props = {
   project: APIProject;
-  expeditions: APIExpedition[];
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
   onExpeditionCreate: () => void;
@@ -29,10 +31,9 @@ type Props = {
   history: RouterHistory;
 }
 
-export class Project extends Component {
+export class ProjectSettings extends Component {
   props: $Exact<Props>;
   state: {
-    expeditions: APIExpedition[],
     administrators: APIAdministrator[]
   }
 
@@ -40,7 +41,6 @@ export class Project extends Component {
     super(props);
 
     this.state = {
-      expeditions: [],
       administrators: []
     };
 
@@ -106,22 +106,15 @@ export class Project extends Component {
 
   render () {
     const { match, project } = this.props;
+    let { administrators } = this.state;
     const projectSlug = project.slug;
 
     return (
       <div className="project">
-        <Route path={`${match.url}/new-expedition`} render={() =>
-          <ReactModal isOpen={true} contentLabel="New expedition form">
-            <h1>Create a new expedition</h1>
-            <ProjectExpeditionForm
-              projectSlug={projectSlug}
-              onCancel={() => this.props.history.push(match.url)}
-              onSave={this.onExpeditionCreate.bind(this)} />
-          </ReactModal> } />
 
         <Route path={`${match.url}/add-administrator`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Users">
-            <h1>Add Users</h1>
+            <h2>Add Users</h2>
             <AdministratorForm
               project={project}
               administrators={this.state.administrators}
@@ -129,31 +122,54 @@ export class Project extends Component {
               onSave={this.onAdministratorAdd.bind(this)} />
           </ReactModal> } />
 
-        <div id="expeditions">
-          <h4>Expeditions</h4>
-          { this.props.expeditions.map((e, i) =>
-            <div key={`expedition-${i}`} className="expedition-item">
-              <Link to={`${match.url}/expeditions/${e.slug}`}>{e.name}</Link>
-            </div> )}
-          { this.props.expeditions.length === 0 &&
-            <span className="empty">No expeditions!</span> }
+        <h1>Project Settings</h1>
+        <div className="row">
+          <div className="two-columns">
+            <h3>Main</h3>
+            <ProjectForm
+              name={project ? project.name : undefined}
+              slug={project ? project.slug : undefined}
+              description={project ? project.description : undefined}
+
+              onSave={this.onProjectSave.bind(this)} />
+          </div>
+          <div className="two-columns">        
+            <h3>Users</h3>
+            <p>
+              Users you add to this project have administrative rights. They can create a new expedition, change its settings and add members to it. If you’re trying to add a member to an expedition instead, select an expedition and then go to <i>Teams</i>.
+            </p>
+
+            <table className="administrators-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Users ({ administrators.length })</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+              { administrators.map(administrator =>
+                <tr>
+                  <td>
+                    <div className="user-avatar medium">
+                      <img />
+                    </div>                    
+                  </td>
+                  <td>
+                    {administrator.user_id}
+                  </td>
+                  <td>
+                    <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
+                      <img src={removeImg} alt="external link" />
+                    </div>
+                  </td>
+                </tr> )}
+              </tbody>
+            </table>
+
+            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
+          </div>
         </div>
-        <Link to={`${match.url}/new-expedition`}>Show new expedition modal</Link>
-
-        <h2>Edit project</h2>
-        <ProjectForm
-          name={project ? project.name : undefined}
-          slug={project ? project.slug : undefined}
-          description={project ? project.description : undefined}
-
-          onSave={this.onProjectSave.bind(this)} />
-        <h3>Users</h3>
-        { this.state.administrators.map(administrator =>
-          <div>
-            {administrator.user_id}
-            <button className="bt-icon remove" onClick={this.onAdministratorDelete.bind(this, administrator)} />
-          </div> )}
-        <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
       </div>
     )
   }

@@ -1,0 +1,25 @@
+@import 'App';
+
+.administrators-table {
+  tbody {
+    tr {
+      &:not(:last-child){
+        td {
+          &:not(:first-child){
+            @extend .table-border;
+          }
+        }        
+      }
+      td {
+        &:first-child {
+          width: $avatar-size-medium;
+          padding-right: $elements-padding;
+        }
+        &:last-child {
+          width: $icon-size-small;
+          padding-left: $elements-padding;
+        }
+      }
+    }
+  }
+}

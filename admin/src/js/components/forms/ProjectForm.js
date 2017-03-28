@@ -99,9 +99,9 @@ export class ProjectForm extends Component {
         </div>
 
         <div className="url-preview">
-          <p className="label">Your project will be available at the following address:</p>
+          <p className="label">Your project will be available at:</p>
           <p className="url">
-            <input type="text" name="slug" className='lg slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
+            <input type="text" name="slug" className='slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
             {/* TODO: replace with something that handles alternative domains */}
             <span className="domain">.fieldkit.org/</span>
           </p>
