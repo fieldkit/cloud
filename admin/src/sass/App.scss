@@ -98,15 +98,15 @@ $gray-5: rgb(248, 248, 248);
 
 // Variables
 // $font-serif: 'Merriweather', serif;
-// $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
+$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+// $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 // Styles
 @mixin type-h1 {
   font-size: 36px;
   line-height: $baseline-height*4;
-  // font-family: $font-sans;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: $font-sans;
+  // font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
   letter-spacing: 2px;
   margin-bottom: $baseline-height*2;
@@ -121,7 +121,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   font-size: 30px;
   line-height: $baseline-height*3;
   font-family: $font-sans;
-  font-weight: bold;
+  font-weight: 400;
+  // color: $gray-3;
 
   @include for-phone-down {
     // font-size: 16px;
@@ -522,6 +523,11 @@ table {
 
   .form {
     padding: $elements-padding*3;
+
+    .form-footer {
+      text-align: right;
+      margin-top: $baseline-height*2;
+    }
   }
 
 }
