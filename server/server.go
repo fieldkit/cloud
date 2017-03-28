@@ -223,6 +223,7 @@ func main() {
 		Backend:        backend,
 		ConsumerKey:    config.TwitterConsumerKey,
 		ConsumerSecret: config.TwitterConsumerSecret,
+		Domain:         config.Domain,
 	})
 	app.MountTwitterController(service, c9)
 
