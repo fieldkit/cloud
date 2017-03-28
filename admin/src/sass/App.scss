@@ -473,7 +473,7 @@ table {
   margin-bottom: $baseline-height*1.5;
   .accordion-row {
     &.expanded{
-      padding: $elements-padding;
+      padding: $elements-padding*2;
       border: 2px solid $gray-4;
       border-radius: 3px;
     }

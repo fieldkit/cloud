@@ -38,42 +38,40 @@ export class MembersTable extends Component {
     const { teamId, members } = this.props;
     if(members){
       return (
-          <div>
-            <table className="members-table">
-              <thead>
+        <table className="members-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Members ({ members.length })</th>
+              <th>Role</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            { members.map((member, i) =>
                 <tr>
-                  <th></th>
-                  <th>Members ({ members.length })</th>
-                  <th>Role</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                { members.map((member, i) =>
-                    <tr>
-                      <td>
-                        <div className="user-avatar medium">
-                        </div>
-                      </td>
-                      <td>
-                        {/*member.username*/}
-                        {member.user_id}
-                      </td>
-                      <td>
-                        <span>{member.role}</span>
-                        <div className="bt-icon">
-                          <img src={editImg} alt="external link" />
-                        </div>                        
-                      </td>
-                      <td>
-                        <div className="bt-icon" onClick={this.delete.bind(this, member.user_id)}>
-                          <img src={removeImg} alt="external link" />
-                        </div>
-                      </td>
-                    </tr> )}                
-              </tbody>
-            </table>
-          </div>
+                  <td>
+                    <div className="user-avatar medium">
+                    </div>
+                  </td>
+                  <td>
+                    {/*member.username*/}
+                    {member.user_id}
+                  </td>
+                  <td>
+                    <span>{member.role}</span>
+                    <div className="bt-icon">
+                      <img src={editImg} alt="external link" />
+                    </div>                        
+                  </td>
+                  <td>
+                    <div className="bt-icon" onClick={this.delete.bind(this, member.user_id)}>
+                      <img src={removeImg} alt="external link" />
+                    </div>
+                  </td>
+                </tr> )}                
+          </tbody>
+        </table>
         )
     }
     return (<span className="empty">No members</span>)

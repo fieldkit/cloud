@@ -183,16 +183,16 @@ export class Teams extends Component {
                 <h4>{team.name}</h4>
                 <p>{team.description}</p>
               </div>
-              <div>
-                { members[team.id] && members[team.id].length > 0 &&
-                  <MembersTable
-                    teamId={team.id}
-                    members={members[team.id]}
-                    onDelete={this.startMemberDelete.bind(this)} /> }
-                { (!members[team.id] || members[team.id].length === 0) &&
-                  <p className="empty">No members</p> }
-                <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
-              </div>
+
+              { members[team.id] && members[team.id].length > 0 &&
+                <MembersTable
+                  teamId={team.id}
+                  members={members[team.id]}
+                  onDelete={this.startMemberDelete.bind(this)} /> }
+              { (!members[team.id] || members[team.id].length === 0) &&
+                <p className="empty">No members</p> }
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+
           </div> ) }
         { teams.length === 0 &&
           <span className="empty">No teams</span> }
