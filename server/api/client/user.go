@@ -19,7 +19,7 @@ import (
 // AddUserPath computes a request path to the add action of user.
 func AddUserPath() string {
 
-	return fmt.Sprintf("/user")
+	return fmt.Sprintf("/users")
 }
 
 // Add a user
@@ -281,6 +281,44 @@ func (c *Client) NewRefreshUserRequest(ctx context.Context, path string, payload
 	req, err := http.NewRequest("POST", u.String(), &body)
 	if err != nil {
 		return nil, err
+	}
+	return req, nil
+}
+
+// UpdateUserPath computes a request path to the update action of user.
+func UpdateUserPath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s", param0)
+}
+
+// Get a user
+func (c *Client) UpdateUser(ctx context.Context, path string, payload *UpdateUserPayload) (*http.Response, error) {
+	req, err := c.NewUpdateUserRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateUserRequest create the request corresponding to the update action endpoint of the user resource.
+func (c *Client) NewUpdateUserRequest(ctx context.Context, path string, payload *UpdateUserPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
 	}
 	return req, nil
 }

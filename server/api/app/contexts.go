@@ -1829,6 +1829,42 @@ func (ctx *RefreshUserContext) Unauthorized() error {
 	return nil
 }
 
+// UpdateUserContext provides the user update action context.
+type UpdateUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID  int
+	Payload *UpdateUserPayload
+}
+
+// NewUpdateUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller update action.
+func NewUpdateUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateUserContext) OK(r *User) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // ValidateUserContext provides the user validate action context.
 type ValidateUserContext struct {
 	context.Context

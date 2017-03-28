@@ -211,6 +211,10 @@ definitions:
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
         twitter_account_id: 2.2726114e+18
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -320,8 +324,6 @@ definitions:
         user_id: 6.2970576e+18
       - project_id: 1.2833427e+18
         user_id: 6.2970576e+18
-      - project_id: 1.2833427e+18
-        user_id: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -350,10 +352,6 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Eum enim deleniti sint velit qui.
-        id: 1.3454926e+17
-        name: Quidem quis fugit commodi ut.
-        slug: 7z8os8qw8b
       - description: Eum enim deleniti sint velit qui.
         id: 1.3454926e+17
         name: Quidem quis fugit commodi ut.
@@ -475,9 +473,6 @@ definitions:
       - role: Et amet amet reiciendis.
         team_id: 5.857079e+18
         user_id: 5.3071106e+18
-      - role: Et amet amet reiciendis.
-        team_id: 5.857079e+18
-        user_id: 5.3071106e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -489,14 +484,6 @@ definitions:
     description: Teams media type (default view)
     example:
       teams:
-      - description: Ipsam reprehenderit totam dolorem impedit hic.
-        id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
-      - description: Ipsam reprehenderit totam dolorem impedit hic.
-        id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
         name: Repellendus cupiditate nemo doloribus.
@@ -567,16 +554,38 @@ definitions:
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
         twitter_account_id: 2.2726114e+18
-      - expedition_id: 4.464267e+18
-        id: 3.6825135e+17
-        screen_name: Laboriosam aut voluptatum.
-        twitter_account_id: 2.2726114e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
     required:
     - twitter_accounts
     title: 'Mediatype identifier: application/vnd.app.twitter_accounts+json; view=default'
+    type: object
+  UpdateUserPayload:
+    example:
+      bio: Odio aperiam perferendis veritatis.
+      email: Eius iusto veritatis.
+      name: Est accusantium et et perspiciatis et.
+      username: Soluta et aut sunt illo.
+    properties:
+      bio:
+        example: Odio aperiam perferendis veritatis.
+        type: string
+      email:
+        example: Eius iusto veritatis.
+        type: string
+      name:
+        example: Est accusantium et et perspiciatis et.
+        type: string
+      username:
+        example: Soluta et aut sunt illo.
+        type: string
+    required:
+    - name
+    - email
+    - username
+    - bio
+    title: UpdateUserPayload
     type: object
   User:
     description: User media type (default view)
@@ -1929,29 +1938,6 @@ paths:
       summary: get current user
       tags:
       - user
-    post:
-      description: Add a user
-      operationId: user#add
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddUserPayload'
-      produces:
-      - application/vnd.app.user+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: add user
-      tags:
-      - user
   /user/projects:
     get:
       description: |-
@@ -1998,6 +1984,29 @@ paths:
       - jwt:
         - api:access
       summary: list user
+      tags:
+      - user
+    post:
+      description: Add a user
+      operationId: user#add
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddUserPayload'
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: add user
       tags:
       - user
   /users/@/{username}:
@@ -2054,6 +2063,38 @@ paths:
       - jwt:
         - api:access
       summary: get id user
+      tags:
+      - user
+    patch:
+      description: |-
+        Get a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#update
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPayload'
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update user
       tags:
       - user
   /users/{user_id}/picture:

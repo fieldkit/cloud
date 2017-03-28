@@ -25,12 +25,11 @@ var AddUserPayload = Type("AddUserPayload", func() {
 })
 
 var UpdateUserPayload = Type("UpdateUserPayload", func() {
-	Attribute("id", Integer)
 	Attribute("name")
 	Attribute("email")
 	Attribute("username")
 	Attribute("bio")
-	Required("id", "email", "username", "bio")
+	Required("name", "email", "username", "bio")
 })
 
 var LoginPayload = Type("LoginPayload", func() {
@@ -130,7 +129,7 @@ var _ = Resource("user", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("user"))
+		Routing(POST("users"))
 		Description("Add a user")
 		NoSecurity()
 		Payload(func() {
@@ -148,6 +147,19 @@ var _ = Resource("user", func() {
 			Required("email", "username", "password", "invite_token")
 		})
 		Response(BadRequest)
+		Response(OK, func() {
+			Media(User)
+		})
+	})
+
+	Action("update", func() {
+		Routing(PATCH("users/:user_id"))
+		Description("Get a user")
+		Params(func() {
+			Param("user_id", Integer)
+			Required("user_id")
+		})
+		Payload(UpdateUserPayload)
 		Response(OK, func() {
 			Media(User)
 		})
@@ -174,6 +186,7 @@ var _ = Resource("user", func() {
 		Description("Get a user")
 		Params(func() {
 			Param("user_id", Integer)
+			Required("user_id")
 		})
 		Response(OK, func() {
 			Media(User)
