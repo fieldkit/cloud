@@ -114,6 +114,9 @@ $contents-width: 834px;
     bottom: $elements-padding;
     width: $sidebar-width;
     text-align: center;
+    a:hover, a:active {
+      text-decoration: underline;
+    }
   }
 }
 

@@ -265,7 +265,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   border-radius: 3px;
   @include type-body-1;
   line-height: $baseline-height*2.5;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.25s;
+  // box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
 
   &:not(:last-child) {
     margin-right: $elements-margin;
@@ -324,6 +325,10 @@ html, body {
 
 html {
   height: 100%;
+}
+
+a:link, a:visited, a:hover, a:active {
+  color: $gray-2;
 }
 
 h1  { @include type-h1; }
@@ -412,7 +417,9 @@ table {
   }
 
   thead {
-    background-color: $gray-4;
+    background-color: $gray-5;
+    @include type-body-2;
+    border-bottom: 1px solid white;
     tr {
       height: $baseline-height*4;
       th {
@@ -435,7 +442,8 @@ table {
       transition-property: background-color;
       transition-duration: 0.25s;
       &:hover {
-        background-color: $gray-5;
+        background-color: $gray-4;
+        // background-color: lighten($gray-1, 50%);
       }
       td {
         vertical-align: middle;
