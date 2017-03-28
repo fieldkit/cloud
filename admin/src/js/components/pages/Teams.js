@@ -145,7 +145,7 @@ export class Teams extends Component {
       <div className="teams">
         <Route path={`${match.url}/new-team`} render={() =>
           <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
-            <h2>Create a new team</h2>
+            <h2>Create New Team</h2>
             <TeamForm
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
@@ -153,7 +153,7 @@ export class Teams extends Component {
 
         <Route path={`${match.url}/:teamId/add-member`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
-            <h2>Add Members</h2>
+            <h2>Add Member</h2>
             <MemberForm
               teamId={props.match.params.teamId}
               members={this.state.members[props.match.params.teamId]}

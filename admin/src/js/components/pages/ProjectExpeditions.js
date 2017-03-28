@@ -72,7 +72,7 @@ export class ProjectExpeditions extends Component {
       <div className="project">
         <Route path={`${match.url}/new-expedition`} render={() =>
           <ReactModal isOpen={true} contentLabel="New expedition form" className="modal" overlayClassName="modal-overlay">
-            <h2>Create a new expedition</h2>
+            <h2>Create New Expedition</h2>
             <ProjectExpeditionForm
               projectSlug={projectSlug}
               onCancel={() => this.props.history.push(match.url)}
