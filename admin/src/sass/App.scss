@@ -234,7 +234,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
     }
 
     &:disabled {
-      border-color: $color-6;
+      background-color: $color-5;
+      box-shadow: none;
     }
 
   // Secondary button
@@ -255,7 +256,9 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
     }
 
     &:disabled {
-
+      color: $color-5;
+      border-color: $color-5;
+      box-shadow: none;
     }
   }
 }
@@ -348,14 +351,13 @@ strong, b {
 
 button, .button {
 
-  // Primary button
   &:not(.bt-icon){
+    // Primary button    
     @include button();
-  }
-
-  // Secondary button
-  &.cancel, &.secondary {
-    @include button(false);
+    // Secondary button
+    &.cancel, &.secondary {
+      @include button(false);
+    }    
   }
 }
 
@@ -379,10 +381,11 @@ button, .button {
     margin-left: $elements-padding;
   }
 
-  img, svg {
+  svg {
     width: 100%;
     height: auto;
     vertical-align: top;
+    fill: $gray-2;    
   }
 }
 

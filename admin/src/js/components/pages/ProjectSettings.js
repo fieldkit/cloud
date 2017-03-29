@@ -16,7 +16,7 @@ import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
 import { FKApiClient } from '../../api/api';
 
-import removeImg from '../../../img/icons/icon-remove-small.png'
+import { RemoveIcon } from '../icons/Icons'
 import '../../../css/projectsettings.css'
 
 import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition } from '../../api/types';
@@ -150,8 +150,8 @@ export class ProjectSettings extends Component {
                 </tr>
               </thead>
               <tbody>
-              { administrators.map(administrator =>
-                <tr>
+              { administrators.map((administrator, i) =>
+                <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
                       <img />
@@ -161,8 +161,8 @@ export class ProjectSettings extends Component {
                     {administrator.user_id}
                   </td>
                   <td>
-                    <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
-                      <img src={removeImg} alt="external link" />
+                    <div className="bt-icon medium" onClick={this.onAdministratorDelete.bind(this, administrator)}>
+                      <RemoveIcon />
                     </div>
                   </td>
                 </tr> )}

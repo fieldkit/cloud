@@ -68,6 +68,7 @@ export class Teams extends Component {
     if (membersRes.type === 'ok' && membersRes.payload) {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
+      console.log(members[teamId]);
       this.setState({members: members});
     }
   }
@@ -114,7 +115,7 @@ export class Teams extends Component {
   
   cancelTeamDelete() {
     this.setState({ teamDeletion: null });
-  }  
+  }
 
   async onMemberAdd(teamId: number, e: APINewMember) {
     const { match } = this.props;

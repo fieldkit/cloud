@@ -49,7 +49,7 @@ export class MembersTable extends Component {
           </thead>
           <tbody>
             { members.map((member, i) =>
-                <tr>
+                <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
                     </div>
