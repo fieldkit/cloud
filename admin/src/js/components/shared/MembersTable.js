@@ -2,8 +2,8 @@
 
 import React, { Component } from 'react'
 import type { APIMember, APIErrors } from '../../api/types';
-import removeImg from '../../../img/icons/icon-remove-small.png'
-import editImg from '../../../img/icons/icon-edit-small.png'
+
+import { RemoveIcon, EditIcon } from '../icons/Icons'
 
 type Props = {
   teamId: number,
@@ -60,13 +60,13 @@ export class MembersTable extends Component {
                   </td>
                   <td>
                     <span>{member.role}</span>
-                    <div className="bt-icon">
-                      <img src={editImg} alt="external link" />
+                    <div className="bt-icon medium">
+                      <EditIcon />
                     </div>                        
                   </td>
                   <td>
-                    <div className="bt-icon" onClick={this.delete.bind(this, member.user_id)}>
-                      <img src={removeImg} alt="external link" />
+                    <div className="bt-icon medium" onClick={this.delete.bind(this, member.user_id)}>
+                      <RemoveIcon />
                     </div>
                   </td>
                 </tr> )}                

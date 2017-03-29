@@ -87,12 +87,33 @@ export class Teams extends Component {
 
   startTeamDelete(e: APITeam) {
     const teamId = e.id;
+    console.log(e);
     this.setState({
       teamDeletion: {
         contents: <span>Are you sure you want to delete the <strong>{e.name}</strong> team?</span>,
         teamId
       }
     })
+  }
+
+  async confirmTeamDelete() {
+    const { teamDeletion } = this.state;
+
+    if (teamDeletion) {
+      const { teamId } = teamDeletion;
+
+      const teamRes = await FKApiClient.get().deleteTeam(teamId);
+      if (teamRes.type === 'ok') {
+        await this.loadTeams(teamId);
+        this.setState({ teamDeletion: null })
+      } else {
+        // TODO: show errors somewhere
+      }
+    }
+  }
+  
+  cancelTeamDelete() {
+    this.setState({ teamDeletion: null });
   }  
 
   async onMemberAdd(teamId: number, e: APINewMember) {
@@ -154,7 +175,7 @@ export class Teams extends Component {
 
   render() {
     const { match } = this.props;
-    const { members, teams, memberDeletion } = this.state;
+    const { members, teams, memberDeletion, teamDeletion } = this.state;
 
     return (
       <div className="teams">
@@ -177,8 +198,20 @@ export class Teams extends Component {
               saveText="Add" />
           </ReactModal> } />
 
+        { teamDeletion &&
+          <ReactModal isOpen={true} contentLabel="Delete Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Delete Team</h2>
+            <FormContainer
+              onSave={this.confirmTeamDelete.bind(this)}
+              onCancel={this.cancelTeamDelete.bind(this)}
+              saveText="Confirm"
+            >
+              <div>{teamDeletion.contents}</div>
+            </FormContainer>
+          </ReactModal> }
+
         { memberDeletion &&
-          <ReactModal isOpen={true} contentLabel="Remove member confirmation" className="modal" overlayClassName="modal-overlay">
+          <ReactModal isOpen={true} contentLabel="Remove Member" className="modal" overlayClassName="modal-overlay">
             <h2>Remove Member</h2>
             <FormContainer
               onSave={this.confirmMemberDelete.bind(this)}
@@ -198,7 +231,7 @@ export class Teams extends Component {
                 <h4>{team.name}</h4>
                 <div className="nav">
                   <button className="secondary">Edit</button>
-                  <button className="secondary">Delete</button>
+                  <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
                 </div>
               </div>
               <p>{team.description}</p>
