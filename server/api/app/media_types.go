@@ -298,6 +298,12 @@ func (mt *Team) Validate() (err error) {
 	if mt.Description == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
 	}
+	if ok := goa.ValidatePattern(`\S`, mt.Name); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, mt.Name, `\S`))
+	}
+	if utf8.RuneCountInString(mt.Name) > 256 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 256, false))
+	}
 	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
 	}

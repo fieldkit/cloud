@@ -1267,6 +1267,47 @@ func (ctx *AddTeamContext) BadRequest() error {
 	return nil
 }
 
+// DeleteTeamContext provides the team delete action context.
+type DeleteTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+}
+
+// NewDeleteTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller delete action.
+func NewDeleteTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // GetTeamContext provides the team get action context.
 type GetTeamContext struct {
 	context.Context

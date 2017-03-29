@@ -54,6 +54,39 @@ func (c *Client) NewAddTeamRequest(ctx context.Context, path string, payload *Ad
 	return req, nil
 }
 
+// DeleteTeamPath computes a request path to the delete action of team.
+func DeleteTeamPath(teamID int) string {
+	param0 := strconv.Itoa(teamID)
+
+	return fmt.Sprintf("/teams/%s", param0)
+}
+
+// Update a team
+func (c *Client) DeleteTeam(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteTeamRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteTeamRequest create the request corresponding to the delete action endpoint of the team resource.
+func (c *Client) NewDeleteTeamRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
 // GetTeamPath computes a request path to the get action of team.
 func GetTeamPath(project string, expedition string, team string) string {
 	param0 := project

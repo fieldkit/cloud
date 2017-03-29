@@ -48,7 +48,7 @@ func NewTeamController(service *goa.Service, options TeamControllerOptions) *Tea
 func (c *TeamController) Add(ctx *app.AddTeamContext) error {
 	team := &data.Team{
 		ExpeditionID: int32(ctx.ExpeditionID),
-		Name:         ctx.Payload.Name,
+		Name:         data.Name(ctx.Payload.Name),
 		Slug:         ctx.Payload.Slug,
 		Description:  ctx.Payload.Description,
 	}
@@ -63,12 +63,21 @@ func (c *TeamController) Add(ctx *app.AddTeamContext) error {
 func (c *TeamController) Update(ctx *app.UpdateTeamContext) error {
 	team := &data.Team{
 		ID:          int32(ctx.TeamID),
-		Name:        ctx.Payload.Name,
+		Name:        data.Name(ctx.Payload.Name),
 		Slug:        ctx.Payload.Slug,
 		Description: ctx.Payload.Description,
 	}
 
 	if err := c.options.Database.NamedGetContext(ctx, team, "UPDATE fieldkit.team expedition_id = :expedition_id, name = :name, slug = :slug, description = :description) WHERE id = :id RETURNING *", team); err != nil {
+		return err
+	}
+
+	return ctx.OK(TeamType(team))
+}
+
+func (c *TeamController) Delete(ctx *app.DeleteTeamContext) error {
+	team := &data.Team{}
+	if err := c.options.Database.GetContext(ctx, team, "DELETE FROM fieldkit.team WHERE id = $1 RETURNING *", ctx.TeamID); err != nil {
 		return err
 	}
 

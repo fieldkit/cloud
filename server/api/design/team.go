@@ -6,9 +6,12 @@ import (
 )
 
 var AddTeamPayload = Type("AddTeamPayload", func() {
-	Attribute("name", String)
+	Attribute("name", String, func() {
+		Pattern(`\S`)
+		MaxLength(256)
+	})
 	Attribute("slug", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+		Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
 		MaxLength(40)
 	})
 	Attribute("description", String)
@@ -70,6 +73,19 @@ var _ = Resource("team", func() {
 			Required("team_id")
 		})
 		Payload(AddTeamPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Team)
+		})
+	})
+
+	Action("delete", func() {
+		Routing(DELETE("teams/:team_id"))
+		Description("Update a team")
+		Params(func() {
+			Param("team_id", Integer)
+			Required("team_id")
+		})
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Team)

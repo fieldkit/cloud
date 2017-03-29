@@ -247,6 +247,16 @@ func (ut *addTeamPayload) Validate() (err error) {
 	if ut.Description == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
 	}
+	if ut.Name != nil {
+		if ok := goa.ValidatePattern(`\S`, *ut.Name); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, *ut.Name, `\S`))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 256, false))
+		}
+	}
 	if ut.Slug != nil {
 		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Slug); !ok {
 			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, *ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
@@ -292,6 +302,12 @@ func (ut *AddTeamPayload) Validate() (err error) {
 	}
 	if ut.Description == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ok := goa.ValidatePattern(`\S`, ut.Name); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, ut.Name, `\S`))
+	}
+	if utf8.RuneCountInString(ut.Name) > 256 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
 	}
 	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Slug); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, ut.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))

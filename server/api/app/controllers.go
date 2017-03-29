@@ -1346,6 +1346,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 type TeamController interface {
 	goa.Muxer
 	Add(*AddTeamContext) error
+	Delete(*DeleteTeamContext) error
 	Get(*GetTeamContext) error
 	GetID(*GetIDTeamContext) error
 	List(*ListTeamContext) error
@@ -1358,8 +1359,8 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/teams/:team_id", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams/@/:team", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/teams", ctrl.MuxHandler("preflight", handleTeamOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -1384,6 +1385,23 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 	h = handleTeamOrigin(h)
 	service.Mux.Handle("POST", "/expeditions/:expedition_id/teams", ctrl.MuxHandler("Add", h, unmarshalAddTeamPayload))
 	service.LogInfo("mount", "ctrl", "Team", "action", "Add", "route", "POST /expeditions/:expedition_id/teams", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteTeamContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTeamOrigin(h)
+	service.Mux.Handle("DELETE", "/teams/:team_id", ctrl.MuxHandler("Delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Team", "action", "Delete", "route", "DELETE /teams/:team_id", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

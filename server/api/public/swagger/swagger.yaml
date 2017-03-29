@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      user_id: 7.695198e+17
+      user_id: 1.7883488e+18
     properties:
       user_id:
-        example: 7.695198e+17
+        example: 1.7883488e+18
         format: int64
         type: integer
     required:
@@ -15,18 +15,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Dolorem et magnam alias.
-      name: Delectus ipsa et hic sunt ut fugit.
-      slug: msmhgbrltf
+      description: Sunt ut fugit nobis.
+      name: Dolores sit qui perspiciatis.
+      slug: rltfvtq833
     properties:
       description:
-        example: Dolorem et magnam alias.
+        example: Sunt ut fugit nobis.
         type: string
       name:
-        example: Delectus ipsa et hic sunt ut fugit.
+        example: Dolores sit qui perspiciatis.
         type: string
       slug:
-        example: msmhgbrltf
+        example: rltfvtq833
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -38,14 +38,14 @@ definitions:
     type: object
   AddMemberPayload:
     example:
-      role: Sunt iste expedita.
-      user_id: 5.6952063e+18
+      role: Praesentium ut cum iusto iusto quia officia.
+      user_id: 2.1539757e+18
     properties:
       role:
-        example: Sunt iste expedita.
+        example: Praesentium ut cum iusto iusto quia officia.
         type: string
       user_id:
-        example: 5.6952063e+18
+        example: 2.1539757e+18
         format: int64
         type: integer
     required:
@@ -55,18 +55,18 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Cum iusto iusto quia.
-      name: Fuga architecto nobis omnis.
-      slug: 11056gahfd
+      description: Quia id.
+      name: Aliquam error et asperiores qui quas.
+      slug: gbyyauoy52
     properties:
       description:
-        example: Cum iusto iusto quia.
+        example: Quia id.
         type: string
       name:
-        example: Fuga architecto nobis omnis.
+        example: Aliquam error et asperiores qui quas.
         type: string
       slug:
-        example: 11056gahfd
+        example: gbyyauoy52
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -78,18 +78,20 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Consectetur occaecati occaecati omnis sint excepturi rerum.
-      name: Rem sint velit ad laboriosam voluptatem explicabo.
-      slug: ngd200jauc
+      description: Velit ad.
+      name: 6cingd200j
+      slug: uckup4mrpl
     properties:
       description:
-        example: Consectetur occaecati occaecati omnis sint excepturi rerum.
+        example: Velit ad.
         type: string
       name:
-        example: Rem sint velit ad laboriosam voluptatem explicabo.
+        example: 6cingd200j
+        maxLength: 256
+        pattern: \S
         type: string
       slug:
-        example: ngd200jauc
+        example: uckup4mrpl
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -101,34 +103,34 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      bio: Vitae itaque consequatur non nisi dolor.
-      email: bella@wilderman.biz
-      invite_token: Sed ducimus molestiae distinctio eum consequatur.
-      name: 1e5q3b6z6j
-      password: q26y98iweo
-      username: ufpoe7n4jt
+      bio: Vitae et corrupti ipsum fugit nisi odio.
+      email: kyleigh@wittingcarter.biz
+      invite_token: Rerum et sed dolorem consequatur quidem.
+      name: 4q26y98iwe
+      password: nufpoe7n4j
+      username: 477aketl8q
     properties:
       bio:
-        example: Vitae itaque consequatur non nisi dolor.
+        example: Vitae et corrupti ipsum fugit nisi odio.
         type: string
       email:
-        example: bella@wilderman.biz
+        example: kyleigh@wittingcarter.biz
         format: email
         type: string
       invite_token:
-        example: Sed ducimus molestiae distinctio eum consequatur.
+        example: Rerum et sed dolorem consequatur quidem.
         type: string
       name:
-        example: 1e5q3b6z6j
+        example: 4q26y98iwe
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: q26y98iweo
+        example: nufpoe7n4j
         minLength: 10
         type: string
       username:
-        example: ufpoe7n4jt
+        example: 477aketl8q
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -223,6 +225,10 @@ definitions:
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
         twitter_account_id: 2.2726114e+18
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -243,15 +249,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: 77aketl8qk
-      username: eb63hu9e7a
+      password: ueb63hu9e7
+      username: mbiiuahxos
     properties:
       password:
-        example: 77aketl8qk
+        example: ueb63hu9e7
         minLength: 10
         type: string
       username:
-        example: eb63hu9e7a
+        example: mbiiuahxos
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -332,8 +338,6 @@ definitions:
         user_id: 6.2970576e+18
       - project_id: 1.2833427e+18
         user_id: 6.2970576e+18
-      - project_id: 1.2833427e+18
-        user_id: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -366,10 +370,6 @@ definitions:
         id: 1.3454926e+17
         name: Quidem quis fugit commodi ut.
         slug: 7z8os8qw8b
-      - description: Eum enim deleniti sint velit qui.
-        id: 1.3454926e+17
-        name: Quidem quis fugit commodi ut.
-        slug: 7z8os8qw8b
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -379,10 +379,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Sed id vitae est nobis odit necessitatibus.
+      refresh_token: Unde reiciendis sit.
     properties:
       refresh_token:
-        example: Sed id vitae est nobis odit necessitatibus.
+        example: Unde reiciendis sit.
         type: string
     required:
     - refresh_token
@@ -393,8 +393,8 @@ definitions:
     example:
       description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     properties:
       description:
         example: Ipsam reprehenderit totam dolorem impedit hic.
@@ -404,10 +404,12 @@ definitions:
         format: int64
         type: integer
       name:
-        example: Repellendus cupiditate nemo doloribus.
+        example: dr480bux7j
+        maxLength: 256
+        pattern: \S
         type: string
       slug:
-        example: bux7jxef7u
+        example: ef7unsz2rb
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -423,16 +425,12 @@ definitions:
     example:
     - description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     - description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
-    - description: Ipsam reprehenderit totam dolorem impedit hic.
-      id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
@@ -487,9 +485,6 @@ definitions:
       - role: Et amet amet reiciendis.
         team_id: 5.857079e+18
         user_id: 5.3071106e+18
-      - role: Et amet amet reiciendis.
-        team_id: 5.857079e+18
-        user_id: 5.3071106e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -503,16 +498,16 @@ definitions:
       teams:
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
+        name: dr480bux7j
+        slug: ef7unsz2rb
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
+        name: dr480bux7j
+        slug: ef7unsz2rb
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
+        name: dr480bux7j
+        slug: ef7unsz2rb
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -558,10 +553,6 @@ definitions:
       id: 3.6825135e+17
       screen_name: Laboriosam aut voluptatum.
       twitter_account_id: 2.2726114e+18
-    - expedition_id: 4.464267e+18
-      id: 3.6825135e+17
-      screen_name: Laboriosam aut voluptatum.
-      twitter_account_id: 2.2726114e+18
     items:
       $ref: '#/definitions/TwitterAccount'
     title: 'Mediatype identifier: application/vnd.app.twitter_account+json; type=collection;
@@ -575,14 +566,6 @@ definitions:
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
         twitter_account_id: 2.2726114e+18
-      - expedition_id: 4.464267e+18
-        id: 3.6825135e+17
-        screen_name: Laboriosam aut voluptatum.
-        twitter_account_id: 2.2726114e+18
-      - expedition_id: 4.464267e+18
-        id: 3.6825135e+17
-        screen_name: Laboriosam aut voluptatum.
-        twitter_account_id: 2.2726114e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -592,10 +575,10 @@ definitions:
     type: object
   UpdateMemberPayload:
     example:
-      role: Est praesentium.
+      role: Nobis omnis.
     properties:
       role:
-        example: Est praesentium.
+        example: Nobis omnis.
         type: string
     required:
     - role
@@ -603,25 +586,25 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Veritatis velit.
-      email: iva@halvorson.com
-      name: v0uepd168s
-      username: lx8rzq05j6
+      bio: Est tempora cumque sed.
+      email: mable.thompson@dibbert.net
+      name: 68s1lx8rzq
+      username: 5j6w1dd458
     properties:
       bio:
-        example: Veritatis velit.
+        example: Est tempora cumque sed.
         type: string
       email:
-        example: iva@halvorson.com
+        example: mable.thompson@dibbert.net
         format: email
         type: string
       name:
-        example: v0uepd168s
+        example: 68s1lx8rzq
         maxLength: 256
         pattern: \S
         type: string
       username:
-        example: lx8rzq05j6
+        example: 5j6w1dd458
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -635,30 +618,30 @@ definitions:
   User:
     description: User media type (default view)
     example:
-      bio: Quibusdam optio autem et.
-      email: maxime@shieldsfritsch.info
-      id: 3.241645e+18
-      name: eo4ic2d6hc
-      username: 00voebzeo5
+      bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
     properties:
       bio:
-        example: Quibusdam optio autem et.
+        example: Natus dolores quo suscipit voluptatem magni in.
         type: string
       email:
-        example: maxime@shieldsfritsch.info
+        example: meta@batzsawayn.net
         format: email
         type: string
       id:
-        example: 3.241645e+18
+        example: 5.5759253e+18
         format: int64
         type: integer
       name:
-        example: eo4ic2d6hc
+        example: ce00voebze
         maxLength: 256
         pattern: \S
         type: string
       username:
-        example: 00voebzeo5
+        example: 5qmtbwjv73
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -673,21 +656,21 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - bio: Quibusdam optio autem et.
-      email: maxime@shieldsfritsch.info
-      id: 3.241645e+18
-      name: eo4ic2d6hc
-      username: 00voebzeo5
-    - bio: Quibusdam optio autem et.
-      email: maxime@shieldsfritsch.info
-      id: 3.241645e+18
-      name: eo4ic2d6hc
-      username: 00voebzeo5
-    - bio: Quibusdam optio autem et.
-      email: maxime@shieldsfritsch.info
-      id: 3.241645e+18
-      name: eo4ic2d6hc
-      username: 00voebzeo5
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -697,16 +680,16 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - bio: Quibusdam optio autem et.
-        email: maxime@shieldsfritsch.info
-        id: 3.241645e+18
-        name: eo4ic2d6hc
-        username: 00voebzeo5
-      - bio: Quibusdam optio autem et.
-        email: maxime@shieldsfritsch.info
-        id: 3.241645e+18
-        name: eo4ic2d6hc
-        username: 00voebzeo5
+      - bio: Natus dolores quo suscipit voluptatem magni in.
+        email: meta@batzsawayn.net
+        id: 5.5759253e+18
+        name: ce00voebze
+        username: 5qmtbwjv73
+      - bio: Natus dolores quo suscipit voluptatem magni in.
+        email: meta@batzsawayn.net
+        id: 5.5759253e+18
+        name: ce00voebze
+        username: 5qmtbwjv73
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -1834,6 +1817,35 @@ paths:
       - https
       summary: Download api/public/swagger/swagger.yaml
   /teams/{team_id}:
+    delete:
+      description: |-
+        Update a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#delete
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.team+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Team'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete team
+      tags:
+      - team
     get:
       description: |-
         Add a team
