@@ -14,6 +14,7 @@ import type {
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
+import { FormContainer } from '../containers/FormContainer';
 import { FKApiClient } from '../../api/api';
 
 import { RemoveIcon } from '../icons/Icons'
@@ -35,14 +36,19 @@ type Props = {
 export class ProjectSettings extends Component {
   props: $Exact<Props>;
   state: {
-    administrators: APIAdministrator[]
+    administrators: APIAdministrator[],
+    administratorDeletion: ?{
+      contents: React$Element<*>;
+      administratorId: number;
+    }
   }
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      administrators: []
+      administrators: [],
+      administratorDeletion: null
     };
 
     this.loadAdministrators();
@@ -79,15 +85,36 @@ export class ProjectSettings extends Component {
     }
   }
 
-  async onAdministratorDelete(e: APIAdministrator) {
-    const { match } = this.props;
-    const administratorRes = await FKApiClient.get().deleteAdministrator(e.project_id, e.user_id);
-    if (administratorRes.type === 'ok') {
-      await this.loadAdministrators();
-      this.props.history.push(`${match.url}`);
-    } else {
-      return administratorRes.errors;
+  startAdministratorDelete(e: APIAdministrator) {
+    const { project } = this.props;
+    const administratorId = e.user_id;
+    this.setState({
+      administratorDeletion: {
+        contents: <span>Are you sure you want to remove <strong>{administratorId}</strong> from <strong>{project.name}</strong>?</span>,
+        administratorId
+      }
+    })
+  }
+
+  async confirmAdministratorDelete() {
+    const { project, match } = this.props;
+    const { administratorDeletion } = this.state;
+
+    if (administratorDeletion) {
+      const { administratorId } = administratorDeletion;
+
+      const administratorRes = await FKApiClient.get().deleteAdministrator(project.id, administratorId);
+      if (administratorRes.type === 'ok') {
+        await this.loadAdministrators();
+        this.props.history.push(`${match.url}`);
+      } else {
+        return administratorRes.errors;
+      }
     }
+  }
+
+  cancelAdministratorDelete() {
+    this.setState({ administratorDeletion: null });
   }
 
   async onProjectSave(project: APINewProject) {
@@ -107,7 +134,7 @@ export class ProjectSettings extends Component {
 
   render () {
     const { match, project } = this.props;
-    let { administrators } = this.state;
+    let { administrators, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -123,6 +150,18 @@ export class ProjectSettings extends Component {
               onSave={this.onAdministratorAdd.bind(this)} 
               saveText="Add" />
           </ReactModal> } />
+
+        { administratorDeletion &&
+          <ReactModal isOpen={true} contentLabel="Remove User" className="modal" overlayClassName="modal-overlay">
+            <h2>Remove User</h2>
+              <FormContainer
+                onSave={this.confirmAdministratorDelete.bind(this)}
+                onCancel={this.cancelAdministratorDelete.bind(this)}
+                saveText="Confirm"
+              >            
+                <div>{administratorDeletion.contents}</div>
+              </FormContainer>
+          </ReactModal> }
 
         <h1>Project Settings</h1>
         <div className="row">
@@ -161,7 +200,7 @@ export class ProjectSettings extends Component {
                     {administrator.user_id}
                   </td>
                   <td>
-                    <div className="bt-icon medium" onClick={this.onAdministratorDelete.bind(this, administrator)}>
+                    <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator)}>
                       <RemoveIcon />
                     </div>
                   </td>

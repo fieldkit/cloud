@@ -88,7 +88,6 @@ export class Teams extends Component {
 
   startTeamDelete(e: APITeam) {
     const teamId = e.id;
-    console.log(e);
     this.setState({
       teamDeletion: {
         contents: <span>Are you sure you want to delete the <strong>{e.name}</strong> team?</span>,

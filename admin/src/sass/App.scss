@@ -256,8 +256,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
     }
 
     &:disabled {
-      color: $color-5;
-      border-color: $color-5;
+      color: $gray-4;
+      border-color: $gray-4;
       box-shadow: none;
     }
   }
