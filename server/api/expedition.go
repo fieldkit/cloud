@@ -68,7 +68,7 @@ func (c *ExpeditionController) Update(ctx *app.UpdateExpeditionContext) error {
 		Description: ctx.Payload.Description,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, expedition, "UPDATE fieldkit.expedition SET name = name, slug = slug, description = description) WHERE id = :id RETURNING *", expedition); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, expedition, "UPDATE fieldkit.expedition SET name = name, slug = slug, description = description WHERE id = :id RETURNING *", expedition); err != nil {
 		return err
 	}
 
