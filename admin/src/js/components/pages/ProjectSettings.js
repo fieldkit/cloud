@@ -100,12 +100,11 @@ export class ProjectSettings extends Component {
     }
   }
 
-  startAdministratorDelete(e: APIAdministrator) {
+  startAdministratorDelete(administratorId: number, e: APIUser) {
     const { project } = this.props;
-    const administratorId = e.user_id;
     this.setState({
       administratorDeletion: {
-        contents: <span>Are you sure you want to remove <strong>{administratorId}</strong> from <strong>{project.name}</strong>?</span>,
+        contents: <span>Are you sure you want to remove <strong>{e.name}</strong> from <strong>{project.name}</strong>?</span>,
         administratorId
       }
     })
@@ -219,7 +218,7 @@ export class ProjectSettings extends Component {
                         </div> }
                   </td>
                   <td>
-                    <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator)}>
+                    <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator.user_id, users[administrator.user_id])}>
                       <RemoveIcon />
                     </div>
                   </td>
