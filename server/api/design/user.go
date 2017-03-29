@@ -7,13 +7,14 @@ import (
 
 var AddUserPayload = Type("AddUserPayload", func() {
 	Attribute("name", String, func() {
+		Pattern(`\S`)
 		MaxLength(256)
 	})
 	Attribute("email", String, func() {
 		Format("email")
 	})
 	Attribute("username", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+		Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
 		MaxLength(40)
 	})
 	Attribute("password", String, func() {
@@ -25,6 +26,7 @@ var AddUserPayload = Type("AddUserPayload", func() {
 })
 
 var UpdateUserPayload = Type("UpdateUserPayload", func() {
+	Reference(AddUserPayload)
 	Attribute("name")
 	Attribute("email")
 	Attribute("username")

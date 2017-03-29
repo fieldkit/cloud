@@ -338,6 +338,11 @@ func (ut *addUserPayload) Validate() (err error) {
 		}
 	}
 	if ut.Name != nil {
+		if ok := goa.ValidatePattern(`\S`, *ut.Name); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, *ut.Name, `\S`))
+		}
+	}
+	if ut.Name != nil {
 		if utf8.RuneCountInString(*ut.Name) > 256 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 256, false))
 		}
@@ -416,6 +421,9 @@ func (ut *AddUserPayload) Validate() (err error) {
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, ut.Email, goa.FormatEmail, err2))
+	}
+	if ok := goa.ValidatePattern(`\S`, ut.Name); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, ut.Name, `\S`))
 	}
 	if utf8.RuneCountInString(ut.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
@@ -559,6 +567,31 @@ func (ut *updateUserPayload) Validate() (err error) {
 	if ut.Bio == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
 	}
+	if ut.Email != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, *ut.Email, goa.FormatEmail, err2))
+		}
+	}
+	if ut.Name != nil {
+		if ok := goa.ValidatePattern(`\S`, *ut.Name); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, *ut.Name, `\S`))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 256, false))
+		}
+	}
+	if ut.Username != nil {
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	if ut.Username != nil {
+		if utf8.RuneCountInString(*ut.Username) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, *ut.Username, utf8.RuneCountInString(*ut.Username), 40, false))
+		}
+	}
 	return
 }
 
@@ -601,6 +634,21 @@ func (ut *UpdateUserPayload) Validate() (err error) {
 	}
 	if ut.Bio == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, ut.Email, goa.FormatEmail, err2))
+	}
+	if ok := goa.ValidatePattern(`\S`, ut.Name); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, ut.Name, `\S`))
+	}
+	if utf8.RuneCountInString(ut.Name) > 256 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(ut.Username) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
 	}
 	return
 }

@@ -121,6 +121,7 @@ definitions:
       name:
         example: 1e5q3b6z6j
         maxLength: 256
+        pattern: \S
         type: string
       password:
         example: q26y98iweo
@@ -199,6 +200,10 @@ definitions:
         id: 1.2402411e+18
         name: Saepe facilis quis blanditiis recusandae est.
         slug: ap0fuesxsv
+      - description: Qui possimus porro quaerat.
+        id: 1.2402411e+18
+        name: Saepe facilis quis blanditiis recusandae est.
+        slug: ap0fuesxsv
     properties:
       expeditions:
         $ref: '#/definitions/ExpeditionCollection'
@@ -210,10 +215,6 @@ definitions:
     description: Inputs media type (default view)
     example:
       twitter_accounts:
-      - expedition_id: 4.464267e+18
-        id: 3.6825135e+17
-        screen_name: Laboriosam aut voluptatum.
-        twitter_account_id: 2.2726114e+18
       - expedition_id: 4.464267e+18
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
@@ -329,6 +330,10 @@ definitions:
       administrators:
       - project_id: 1.2833427e+18
         user_id: 6.2970576e+18
+      - project_id: 1.2833427e+18
+        user_id: 6.2970576e+18
+      - project_id: 1.2833427e+18
+        user_id: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -357,10 +362,6 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Eum enim deleniti sint velit qui.
-        id: 1.3454926e+17
-        name: Quidem quis fugit commodi ut.
-        slug: 7z8os8qw8b
       - description: Eum enim deleniti sint velit qui.
         id: 1.3454926e+17
         name: Quidem quis fugit commodi ut.
@@ -489,9 +490,6 @@ definitions:
       - role: Et amet amet reiciendis.
         team_id: 5.857079e+18
         user_id: 5.3071106e+18
-      - role: Et amet amet reiciendis.
-        team_id: 5.857079e+18
-        user_id: 5.3071106e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -503,6 +501,14 @@ definitions:
     description: Teams media type (default view)
     example:
       teams:
+      - description: Ipsam reprehenderit totam dolorem impedit hic.
+        id: 6.0403337e+18
+        name: Repellendus cupiditate nemo doloribus.
+        slug: bux7jxef7u
+      - description: Ipsam reprehenderit totam dolorem impedit hic.
+        id: 6.0403337e+18
+        name: Repellendus cupiditate nemo doloribus.
+        slug: bux7jxef7u
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
         name: Repellendus cupiditate nemo doloribus.
@@ -569,6 +575,14 @@ definitions:
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
         twitter_account_id: 2.2726114e+18
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -590,21 +604,26 @@ definitions:
   UpdateUserPayload:
     example:
       bio: Veritatis velit.
-      email: Reiciendis sit ut.
-      name: Tempora cumque sed voluptatem.
-      username: Et praesentium.
+      email: iva@halvorson.com
+      name: v0uepd168s
+      username: lx8rzq05j6
     properties:
       bio:
         example: Veritatis velit.
         type: string
       email:
-        example: Reiciendis sit ut.
+        example: iva@halvorson.com
+        format: email
         type: string
       name:
-        example: Tempora cumque sed voluptatem.
+        example: v0uepd168s
+        maxLength: 256
+        pattern: \S
         type: string
       username:
-        example: Et praesentium.
+        example: lx8rzq05j6
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
     required:
     - name
@@ -636,6 +655,7 @@ definitions:
       name:
         example: eo4ic2d6hc
         maxLength: 256
+        pattern: \S
         type: string
       username:
         example: 00voebzeo5

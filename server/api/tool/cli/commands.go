@@ -987,9 +987,9 @@ Payload example:
 
 {
    "bio": "Veritatis velit.",
-   "email": "Reiciendis sit ut.",
-   "name": "Tempora cumque sed voluptatem.",
-   "username": "Et praesentium."
+   "email": "iva@halvorson.com",
+   "name": "v0uepd168s",
+   "username": "lx8rzq05j6"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp79.Run(c, args) },
 	}

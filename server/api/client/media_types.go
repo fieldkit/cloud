@@ -566,6 +566,9 @@ func (mt *User) Validate() (err error) {
 	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, mt.Email, goa.FormatEmail, err2))
 	}
+	if ok := goa.ValidatePattern(`\S`, mt.Name); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.name`, mt.Name, `\S`))
+	}
 	if utf8.RuneCountInString(mt.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 256, false))
 	}

@@ -72,7 +72,7 @@ func NewUserController(service *goa.Service, options UserControllerOptions) (*Us
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {
 	user := &data.User{
-		Name:     ctx.Payload.Name,
+		Name:     data.Name(ctx.Payload.Name),
 		Username: ctx.Payload.Username,
 		Email:    ctx.Payload.Email,
 		Bio:      ctx.Payload.Bio,
@@ -105,7 +105,7 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	user := &data.User{
 		ID:       int32(ctx.UserID),
-		Name:     ctx.Payload.Name,
+		Name:     data.Name(ctx.Payload.Name),
 		Username: ctx.Payload.Username,
 		Email:    ctx.Payload.Email,
 		Bio:      ctx.Payload.Bio,
