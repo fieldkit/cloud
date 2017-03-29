@@ -178,6 +178,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
   font-size: 13px;
   line-height: $baseline-height*2;
   font-family: $font-sans;
+  color: $gray-3;
 }
 
 @mixin type-button {

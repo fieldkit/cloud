@@ -282,6 +282,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.delWithErrors(`/teams/${teamId}`)
   }
 
+  updateTeam(teamId: number, values: APINewTeam): Promise<FKAPIResponse<APINewTeam>> {
+    return this.patchWithErrors(`/teams/${teamId}`, values)
+  }
+
   addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
     return this.postWithErrors(`/projects/${projectId}/administrators`, values)
   }

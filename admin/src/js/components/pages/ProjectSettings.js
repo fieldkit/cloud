@@ -20,7 +20,7 @@ import { FKApiClient } from '../../api/api';
 import { RemoveIcon } from '../icons/Icons'
 import '../../../css/projectsettings.css'
 
-import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition } from '../../api/types';
+import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -37,6 +37,7 @@ export class ProjectSettings extends Component {
   props: $Exact<Props>;
   state: {
     administrators: APIAdministrator[],
+    users: {[id: number] : APIUser},
     administratorDeletion: ?{
       contents: React$Element<*>;
       administratorId: number;
@@ -48,10 +49,21 @@ export class ProjectSettings extends Component {
 
     this.state = {
       administrators: [],
+      users: {},
       administratorDeletion: null
     };
 
     this.loadAdministrators();
+  }
+
+  async loadName(administratorId: number){
+    const userRes = await FKApiClient.get().getUserById(administratorId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      users[administratorId] = userRes.payload;
+      console.log(users);
+      this.setState({users: users});
+    }    
   }
 
   async loadAdministrators() {
@@ -60,6 +72,9 @@ export class ProjectSettings extends Component {
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
       this.setState({administrators: administrators});
+      for (const administrator of administrators) {
+        await this.loadName(administrator.user_id);
+      }      
     }
   }
 
@@ -134,7 +149,7 @@ export class ProjectSettings extends Component {
 
   render () {
     const { match, project } = this.props;
-    let { administrators, administratorDeletion } = this.state;
+    let { administrators, users, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -193,11 +208,15 @@ export class ProjectSettings extends Component {
                 <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
-                      <img />
+                      <img src={`/users/${administrator.user_id}/picture`} />
                     </div>
                   </td>
                   <td>
-                    {administrator.user_id}
+                    {users[administrator.user_id] &&
+                      <div>
+                        <p>{users[administrator.user_id].name}</p>
+                        <p className="type-small">{users[administrator.user_id].username}</p>
+                        </div> }
                   </td>
                   <td>
                     <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator)}>
