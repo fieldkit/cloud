@@ -15,24 +15,84 @@ import (
 	"strconv"
 )
 
-// GetIDPicturePath computes a request path to the get id action of picture.
-func GetIDPicturePath(userID int) string {
-	param0 := strconv.Itoa(userID)
+// ExpeditionGetIDPicturePath computes a request path to the expedition get id action of picture.
+func ExpeditionGetIDPicturePath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/users/%s/picture", param0)
+	return fmt.Sprintf("/expeditions/%s/picture", param0)
 }
 
-// List a project's inputs
-func (c *Client) GetIDPicture(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetIDPictureRequest(ctx, path)
+// Get a expedition's picture
+func (c *Client) ExpeditionGetIDPicture(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewExpeditionGetIDPictureRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewGetIDPictureRequest create the request corresponding to the get id action endpoint of the picture resource.
-func (c *Client) NewGetIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
+// NewExpeditionGetIDPictureRequest create the request corresponding to the expedition get id action endpoint of the picture resource.
+func (c *Client) NewExpeditionGetIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// ProjectGetIDPicturePath computes a request path to the project get id action of picture.
+func ProjectGetIDPicturePath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s/picture", param0)
+}
+
+// Get a project's picture
+func (c *Client) ProjectGetIDPicture(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewProjectGetIDPictureRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewProjectGetIDPictureRequest create the request corresponding to the project get id action endpoint of the picture resource.
+func (c *Client) NewProjectGetIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// UserGetIDPicturePath computes a request path to the user get id action of picture.
+func UserGetIDPicturePath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s/picture", param0)
+}
+
+// Get a user's picture
+func (c *Client) UserGetIDPicture(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewUserGetIDPictureRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUserGetIDPictureRequest create the request corresponding to the user get id action endpoint of the picture resource.
+func (c *Client) NewUserGetIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

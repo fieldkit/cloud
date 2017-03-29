@@ -965,23 +965,109 @@ func (ctx *UpdateMemberContext) OK(r *TeamMember) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// GetIDPictureContext provides the picture get id action context.
-type GetIDPictureContext struct {
+// ExpeditionGetIDPictureContext provides the picture expedition get id action context.
+type ExpeditionGetIDPictureContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewExpeditionGetIDPictureContext parses the incoming request URL and body, performs validations and creates the
+// context used by the picture controller expedition get id action.
+func NewExpeditionGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*ExpeditionGetIDPictureContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ExpeditionGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ExpeditionGetIDPictureContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "image/png")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ExpeditionGetIDPictureContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ProjectGetIDPictureContext provides the picture project get id action context.
+type ProjectGetIDPictureContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewProjectGetIDPictureContext parses the incoming request URL and body, performs validations and creates the
+// context used by the picture controller project get id action.
+func NewProjectGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProjectGetIDPictureContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ProjectGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ProjectGetIDPictureContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "image/png")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ProjectGetIDPictureContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UserGetIDPictureContext provides the picture user get id action context.
+type UserGetIDPictureContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	UserID int
 }
 
-// NewGetIDPictureContext parses the incoming request URL and body, performs validations and creates the
-// context used by the picture controller get id action.
-func NewGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDPictureContext, error) {
+// NewUserGetIDPictureContext parses the incoming request URL and body, performs validations and creates the
+// context used by the picture controller user get id action.
+func NewUserGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*UserGetIDPictureContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := GetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := UserGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramUserID := req.Params["user_id"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
@@ -995,7 +1081,7 @@ func NewGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.S
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *GetIDPictureContext) OK(resp []byte) error {
+func (ctx *UserGetIDPictureContext) OK(resp []byte) error {
 	ctx.ResponseData.Header().Set("Content-Type", "image/png")
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
@@ -1003,7 +1089,7 @@ func (ctx *GetIDPictureContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *GetIDPictureContext) BadRequest() error {
+func (ctx *UserGetIDPictureContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
