@@ -82,7 +82,7 @@ export class ProjectExpeditions extends Component {
         <h1>Expeditions</h1>
         <div id="expeditions" className="gallery-list">
           { this.props.expeditions.map((e, i) =>
-            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item">
+            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item expeditions">
               <h4>{e.name}</h4>
             </Link> )}
           { this.props.expeditions.length === 0 &&

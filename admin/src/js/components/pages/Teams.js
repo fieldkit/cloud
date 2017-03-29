@@ -230,7 +230,7 @@ export class Teams extends Component {
               <div className="accordion-row-header">
                 <h4>{team.name}</h4>
                 <div className="nav">
-                  <button className="secondary">Edit</button>
+                  <button className="secondary" disabled>Edit</button>
                   <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
                 </div>
               </div>

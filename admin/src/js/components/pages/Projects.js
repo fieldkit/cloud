@@ -49,9 +49,9 @@ export class Projects extends Component {
               onSave={this.onProjectCreate.bind(this)} />
           </ReactModal> } />
         <h1>Projects</h1>
-        <div id="projects" className="gallery-list">
+        <div id="projects" className="gallery-list projects">
         { projects.map((p, i) =>
-          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item">
+          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects">
             <h4>{p.name}</h4>
           </Link> )}
         { projects.length === 0 &&

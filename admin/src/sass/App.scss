@@ -234,7 +234,7 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
     }
 
     &:disabled {
-      background-color: $color-6;
+      border-color: $color-6;
     }
 
   // Secondary button
@@ -507,18 +507,30 @@ table {
 }
 
 .gallery-list {
-  @extend .row;
   margin-bottom: $baseline-height*1.5;
+  width: 100%;
   .gallery-list-item {
-    @extend .two-columns;
-    position: relative;    
+    position: relative;
+    display: inline-block;
     height: $baseline-height*15;
+    margin-bottom: $col-gutter;
+    vertical-align: top;
     background-color: $gray-5;
+
+    &.projects {
+      width: 100%;
+    }
+    &.expeditions {
+      width: calc((100% - #{$col-gutter})/2);
+      &:not(:first-child) {
+        margin-left: $col-gutter;
+      }      
+    }
     h4 {
       position: absolute;
       left: $elements-padding;
       bottom: $elements-padding;
-    }
+    }    
   }
 }
 
