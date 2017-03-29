@@ -20,10 +20,10 @@ import (
 func AddExpeditionPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)
 
-	return fmt.Sprintf("/projects/%s/expedition", param0)
+	return fmt.Sprintf("/projects/%s/expeditions", param0)
 }
 
-// Add a expedition
+// Add an expedition
 func (c *Client) AddExpedition(ctx context.Context, path string, payload *AddExpeditionPayload) (*http.Response, error) {
 	req, err := c.NewAddExpeditionRequest(ctx, path, payload)
 	if err != nil {
@@ -62,7 +62,7 @@ func GetExpeditionPath(project string, expedition string) string {
 	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s", param0, param1)
 }
 
-// Add a expedition
+// Add an expedition
 func (c *Client) GetExpedition(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewGetExpeditionRequest(ctx, path)
 	if err != nil {
@@ -95,7 +95,7 @@ func GetIDExpeditionPath(expeditionID int) string {
 	return fmt.Sprintf("/expeditions/%s", param0)
 }
 
-// Add a expedition
+// Add an expedition
 func (c *Client) GetIDExpedition(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewGetIDExpeditionRequest(ctx, path)
 	if err != nil {
@@ -178,6 +178,44 @@ func (c *Client) NewListIDExpeditionRequest(ctx context.Context, path string) (*
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateExpeditionPath computes a request path to the update action of expedition.
+func UpdateExpeditionPath(expeditionID int) string {
+	param0 := strconv.Itoa(expeditionID)
+
+	return fmt.Sprintf("/expeditions/%s", param0)
+}
+
+// Update an expedition
+func (c *Client) UpdateExpedition(ctx context.Context, path string, payload *AddExpeditionPayload) (*http.Response, error) {
+	req, err := c.NewUpdateExpeditionRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateExpeditionRequest create the request corresponding to the update action endpoint of the expedition resource.
+func (c *Client) NewUpdateExpeditionRequest(ctx context.Context, path string, payload *AddExpeditionPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

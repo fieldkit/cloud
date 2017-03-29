@@ -19,7 +19,7 @@ import (
 // AddProjectPath computes a request path to the add action of project.
 func AddProjectPath() string {
 
-	return fmt.Sprintf("/project")
+	return fmt.Sprintf("/projects")
 }
 
 // Add a project
@@ -174,6 +174,44 @@ func (c *Client) NewListCurrentProjectRequest(ctx context.Context, path string) 
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateProjectPath computes a request path to the update action of project.
+func UpdateProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s", param0)
+}
+
+// Update a project
+func (c *Client) UpdateProject(ctx context.Context, path string, payload *AddProjectPayload) (*http.Response, error) {
+	req, err := c.NewUpdateProjectRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateProjectRequest create the request corresponding to the update action endpoint of the project resource.
+func (c *Client) NewUpdateProjectRequest(ctx context.Context, path string, payload *AddProjectPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

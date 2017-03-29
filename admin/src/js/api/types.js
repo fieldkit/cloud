@@ -8,29 +8,26 @@ export type APIErrors = {
   status: number;
 }
 
-export type APINewUser = {
-  email: string;
+export type APIBaseUser = {
   username: string;
+  name: string;
+  bio: string;
+  email: string;
+}
+
+export type APINewUser = {
+  ...$Exact<APIBaseUser>;
   password: string;
   invite_token: string;
 }
 
 export type APIUser = {
+  ...$Exact<APIBaseUser>;
   id: number;
-  username: string;
 }
 
 export type APIUsers = {
   users: APIUser[]
-}
-
-// TODO: not officially the API spec, revise when it's there
-export type APIUserProfile = {
-  ...$Exact<APIUser>;
-  name: string;
-  bio: string;
-  email: string;
-  profile_picture: string;
 }
 
 // TODO: not officially the API spec, revise when it's there
@@ -115,9 +112,13 @@ export type APIAdministrators = {
   administrators: APIAdministrator[]
 }
 
-export type APINewMember = {
-  user_id: number;
+export type APIBaseMember = {|
   role: string;
+|}
+
+export type APINewMember = {
+  ...$Exact<APIBaseMember>;
+  user_id: number;
 };
 
 export type APIMember = {

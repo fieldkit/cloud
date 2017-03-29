@@ -18,7 +18,10 @@ import (
 func UserType(user *data.User) *app.User {
 	return &app.User{
 		ID:       int(user.ID),
+		Name:     user.Name,
 		Username: user.Username,
+		Email:    user.Email,
+		Bio:      user.Bio,
 	}
 }
 
@@ -69,15 +72,17 @@ func NewUserController(service *goa.Service, options UserControllerOptions) (*Us
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {
 	user := &data.User{
+		Name:     data.Name(ctx.Payload.Name),
 		Username: ctx.Payload.Username,
 		Email:    ctx.Payload.Email,
+		Bio:      ctx.Payload.Bio,
 	}
 
 	if err := user.SetPassword(ctx.Payload.Password); err != nil {
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "INSERT INTO fieldkit.user (username, email, password) VALUES (:username, :email, :password) RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, "INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :username, :email, :password, :bio) RETURNING *", user); err != nil {
 		return err
 	}
 
@@ -91,6 +96,22 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	}
 
 	if err := c.options.Emailer.SendValidationToken(user, validationToken); err != nil {
+		return err
+	}
+
+	return ctx.OK(UserType(user))
+}
+
+func (c *UserController) Update(ctx *app.UpdateUserContext) error {
+	user := &data.User{
+		ID:       int32(ctx.UserID),
+		Name:     data.Name(ctx.Payload.Name),
+		Username: ctx.Payload.Username,
+		Email:    ctx.Payload.Email,
+		Bio:      ctx.Payload.Bio,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET name = :name, username = :username, email = :email, bio = :bio WHERE id = :id RETURNING *", user); err != nil {
 		return err
 	}
 

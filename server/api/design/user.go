@@ -6,28 +6,38 @@ import (
 )
 
 var AddUserPayload = Type("AddUserPayload", func() {
+	Attribute("name", String, func() {
+		Pattern(`\S`)
+		MaxLength(256)
+	})
 	Attribute("email", String, func() {
 		Format("email")
 	})
 	Attribute("username", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
+		Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
 		MaxLength(40)
 	})
 	Attribute("password", String, func() {
 		MinLength(10)
 	})
+	Attribute("bio", String)
 	Attribute("invite_token", String)
-	Required("email", "username", "password", "invite_token")
+	Required("name", "email", "username", "password", "bio", "invite_token")
+})
+
+var UpdateUserPayload = Type("UpdateUserPayload", func() {
+	Reference(AddUserPayload)
+	Attribute("name")
+	Attribute("email")
+	Attribute("username")
+	Attribute("bio")
+	Required("name", "email", "username", "bio")
 })
 
 var LoginPayload = Type("LoginPayload", func() {
-	Attribute("username", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-		MaxLength(40)
-	})
-	Attribute("password", String, func() {
-		MinLength(10)
-	})
+	Reference(AddUserPayload)
+	Attribute("username")
+	Attribute("password")
 	Required("username", "password")
 })
 
@@ -36,12 +46,18 @@ var User = MediaType("application/vnd.app.user+json", func() {
 	Reference(AddUserPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
+		Attribute("name")
 		Attribute("username")
-		Required("id", "username")
+		Attribute("email")
+		Attribute("bio")
+		Required("id", "name", "username", "email", "bio")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("name")
 		Attribute("username")
+		Attribute("email")
+		Attribute("bio")
 	})
 })
 
@@ -115,24 +131,24 @@ var _ = Resource("user", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("user"))
+		Routing(POST("users"))
 		Description("Add a user")
 		NoSecurity()
-		Payload(func() {
-			Param("email", String, func() {
-				Format("email")
-			})
-			Param("username", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				MaxLength(40)
-			})
-			Param("password", String, func() {
-				MinLength(10)
-			})
-			Param("invite_token", String)
-			Required("email", "username", "password", "invite_token")
-		})
+		Payload(AddUserPayload)
 		Response(BadRequest)
+		Response(OK, func() {
+			Media(User)
+		})
+	})
+
+	Action("update", func() {
+		Routing(PATCH("users/:user_id"))
+		Description("Update a user")
+		Params(func() {
+			Param("user_id", Integer)
+			Required("user_id")
+		})
+		Payload(UpdateUserPayload)
 		Response(OK, func() {
 			Media(User)
 		})
@@ -159,6 +175,7 @@ var _ = Resource("user", func() {
 		Description("Get a user")
 		Params(func() {
 			Param("user_id", Integer)
+			Required("user_id")
 		})
 		Response(OK, func() {
 			Media(User)

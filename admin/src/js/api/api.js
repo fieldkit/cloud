@@ -9,6 +9,7 @@ import type {
   APIErrors,
   APIUser,
   APIUsers,
+  APIBaseUser,
   APINewUser,
   APIProject,
   APINewProject,
@@ -22,6 +23,7 @@ import type {
   APITeam,
   APINewTeam,
   APITeams,
+  APIBaseMember,
   APIMember,
   APINewMember,
   APIMembers,
@@ -171,8 +173,12 @@ export class FKApiClient extends JWTAPIClient {
     return this.execWithErrors(this.delJSON(endpoint, values));
   }
 
-  signUp(email: string, username: string, password: string, invite_token: string): Promise<FKAPIResponse<APIUser>> {
-    return this.postWithErrors('/user', { email, username, password, invite_token });
+  patchWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.patchJSON(endpoint, values));
+  }
+
+  signUp(u: APINewUser): Promise<FKAPIResponse<APIUser>> {
+    return this.postWithErrors('/users', u);
   }
 
   async signIn(username, password): Promise<FKAPIResponse<void>> {
@@ -196,6 +202,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors(`/users/${userId}`);
   }
 
+  updateUserById(userId: number, u: APIBaseUser): Promise<FKAPIResponse<?APIUser>> {
+    return this.patchWithErrors(`/users/${userId}`, u);
+  }
+
   getUserByUsername(username: string): Promise<FKAPIResponse<?APIUser>> {
     return this.getWithErrors(`/users/@/${username}`);
   }
@@ -217,11 +227,11 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   createProject(values: APINewProject): Promise<FKAPIResponse<APIProject>> {
-    return this.postWithErrors('/project', values)
+    return this.postWithErrors('/projects', values)
   }
 
   updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
-    return this.postWithErrors(`/projects/${projectId}`, values)
+    return this.patchWithErrors(`/projects/${projectId}`, values)
   }
 
   getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
@@ -233,11 +243,11 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
-    return this.postWithErrors(`/projects/${projectId}/expedition`, values)
+    return this.postWithErrors(`/projects/${projectId}/expeditions`, values)
   }
 
   updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}`, values)
+    return this.patchWithErrors(`/expeditions/${expeditionId}`, values)
   }
 
   getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
@@ -253,7 +263,7 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-account`)
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`)
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
@@ -265,11 +275,15 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/team`, values)
+    return this.postWithErrors(`/expeditions/${expeditionId}/teams`, values)
+  }
+
+  deleteTeam(teamId: number): Promise<FKAPIResponse<APIMember>> {
+    return this.delWithErrors(`/teams/${teamId}`)
   }
 
   addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
-    return this.postWithErrors(`/projects/${projectId}/administrator`, values)
+    return this.postWithErrors(`/projects/${projectId}/administrators`, values)
   }
 
   getAdministrators(projectId: number): Promise<FKAPIResponse<APIAdministrators>> {
@@ -285,7 +299,11 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
-    return this.postWithErrors(`/teams/${teamId}/member`, values)
+    return this.postWithErrors(`/teams/${teamId}/members`, values)
+  }
+
+  updateMember(teamId: number, userId: number, values: APIBaseMember): Promise<FKAPIResponse<APIMember>> {
+    return this.postWithErrors(`/teams/${teamId}/member/${userId}`, values)
   }
 
   getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {

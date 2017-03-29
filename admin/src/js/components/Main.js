@@ -186,15 +186,14 @@ export class Main extends Component {
   }
 
   async onProjectUpdate(newSlug: ?string = null) {
+    log.debug('onProjectUpdate', newSlug);
     if (newSlug) {
-      this.setState({ redirectTo: `/projects/${newSlug}`})
+      this.props.history.replace(`/projects/${newSlug}/settings`);
     } else {
-      this.setState({ loading: true })
       await Promise.all([
         this.loadProjects(),
         this.loadActiveProject(this.projectSlug())
       ]);
-      this.setState({ loading: false });
     }
   }
 
@@ -202,17 +201,15 @@ export class Main extends Component {
     if (newSlug) {
       const projectSlug = this.projectSlug();
       if (projectSlug) {
-        this.setState({ redirectTo: `/projects/${projectSlug}/expeditions/${newSlug}`})
+        this.props.history.replace(`/projects/${newSlug}/expeditions/${newSlug}`);
       } else {
-        this.setState({ redirectTo: '/' });
+        this.props.history.replace('/');
       }
     } else {
-      this.setState({ loading: true });
       await Promise.all([
         this.loadExpeditions(this.projectSlug()),
         this.loadActiveExpedition(this.projectSlug(), this.expeditionSlug())
       ]);
-      this.setState({ loading: false });
     }
   }
 
@@ -221,10 +218,6 @@ export class Main extends Component {
   }
 
   render() {
-    if (this.state.redirectTo) {
-      return <Redirect to={this.state.redirectTo} />;
-    }
-
     const {
       user,
       activeProject,

@@ -489,6 +489,48 @@ func (ctx *ListIDExpeditionContext) BadRequest() error {
 	return nil
 }
 
+// UpdateExpeditionContext provides the expedition update action context.
+type UpdateExpeditionContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+	Payload      *AddExpeditionPayload
+}
+
+// NewUpdateExpeditionContext parses the incoming request URL and body, performs validations and creates the
+// context used by the expedition controller update action.
+func NewUpdateExpeditionContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateExpeditionContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateExpeditionContext) OK(r *Expedition) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateExpeditionContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListInputContext provides the input list action context.
 type ListInputContext struct {
 	context.Context
@@ -877,6 +919,95 @@ func (ctx *ListIDMemberContext) BadRequest() error {
 	return nil
 }
 
+// UpdateMemberContext provides the member update action context.
+type UpdateMemberContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID  int
+	UserID  int
+	Payload *UpdateMemberPayload
+}
+
+// NewUpdateMemberContext parses the incoming request URL and body, performs validations and creates the
+// context used by the member controller update action.
+func NewUpdateMemberContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateMemberContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateMemberContext) OK(r *TeamMember) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.member+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// GetIDPictureContext provides the picture get id action context.
+type GetIDPictureContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID int
+}
+
+// NewGetIDPictureContext parses the incoming request URL and body, performs validations and creates the
+// context used by the picture controller get id action.
+func NewGetIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDPictureContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDPictureContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "image/png")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDPictureContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddProjectContext provides the project add action context.
 type AddProjectContext struct {
 	context.Context
@@ -1052,6 +1183,48 @@ func (ctx *ListCurrentProjectContext) BadRequest() error {
 	return nil
 }
 
+// UpdateProjectContext provides the project update action context.
+type UpdateProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	Payload   *AddProjectPayload
+}
+
+// NewUpdateProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller update action.
+func NewUpdateProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["project_id"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateProjectContext) OK(r *Project) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddTeamContext provides the team add action context.
 type AddTeamContext struct {
 	context.Context
@@ -1090,6 +1263,47 @@ func (ctx *AddTeamContext) OK(r *Team) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *AddTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteTeamContext provides the team delete action context.
+type DeleteTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID int
+}
+
+// NewDeleteTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller delete action.
+func NewDeleteTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteTeamContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -1279,6 +1493,48 @@ func (ctx *ListIDTeamContext) OK(r *Teams) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListIDTeamContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateTeamContext provides the team update action context.
+type UpdateTeamContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	TeamID  int
+	Payload *AddTeamPayload
+}
+
+// NewUpdateTeamContext parses the incoming request URL and body, performs validations and creates the
+// context used by the team controller update action.
+func NewUpdateTeamContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateTeamContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramTeamID := req.Params["team_id"]
+	if len(paramTeamID) > 0 {
+		rawTeamID := paramTeamID[0]
+		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
+			rctx.TeamID = teamID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateTeamContext) OK(r *Team) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.team+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateTeamContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -1784,6 +2040,42 @@ func (ctx *RefreshUserContext) NoContent() error {
 func (ctx *RefreshUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
 	return nil
+}
+
+// UpdateUserContext provides the user update action context.
+type UpdateUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID  int
+	Payload *UpdateUserPayload
+}
+
+// NewUpdateUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller update action.
+func NewUpdateUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateUserContext) OK(r *User) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // ValidateUserContext provides the user validate action context.

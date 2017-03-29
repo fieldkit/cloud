@@ -35,6 +35,7 @@ type TwitterControllerOptions struct {
 	Backend        *backend.Backend
 	ConsumerKey    string
 	ConsumerSecret string
+	Domain         string
 }
 
 // TwitterController implements the twitter resource.
@@ -51,7 +52,7 @@ func NewTwitterController(service *goa.Service, options TwitterControllerOptions
 		config: &oauth1.Config{
 			ConsumerKey:    options.ConsumerKey,
 			ConsumerSecret: options.ConsumerSecret,
-			CallbackURL:    "https://api.data.fieldkit.org/twitter/callback",
+			CallbackURL:    "https://api." + options.Domain + "/twitter/callback",
 			Endpoint:       oauth1Twitter.AuthorizeEndpoint,
 		},
 	}

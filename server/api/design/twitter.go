@@ -39,7 +39,7 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expedition_id/inputs/twitter-account"))
+		Routing(POST("expeditions/:expedition_id/inputs/twitter-accounts"))
 		Description("Add a Twitter account input")
 		Params(func() {
 			Param("expedition_id", Integer)
