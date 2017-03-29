@@ -37,7 +37,7 @@ export class ProjectSettings extends Component {
   props: $Exact<Props>;
   state: {
     administrators: APIAdministrator[],
-    users: {[id: number] : APIUser},
+    users: {[id: number]: APIUser},
     administratorDeletion: ?{
       contents: React$Element<*>;
       administratorId: number;
@@ -56,16 +56,6 @@ export class ProjectSettings extends Component {
     this.loadAdministrators();
   }
 
-  async loadName(administratorId: number){
-    const userRes = await FKApiClient.get().getUserById(administratorId);
-    if (userRes.type === 'ok' && userRes.payload) {
-      const { users } = this.state;
-      users[administratorId] = userRes.payload;
-      console.log(users);
-      this.setState({users: users});
-    }    
-  }
-
   async loadAdministrators() {
     const { project } = this.props;
     const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
@@ -73,10 +63,19 @@ export class ProjectSettings extends Component {
       const administrators = administratorsRes.payload.administrators;
       this.setState({administrators: administrators});
       for (const administrator of administrators) {
-        await this.loadName(administrator.user_id);
+        await this.loadAdministratorName(administrator.user_id);
       }      
     }
   }
+
+  async loadAdministratorName(userId: number){
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      users[userId] = userRes.payload;
+      this.setState({users: users});
+    }    
+  }  
 
   async onExpeditionCreate(e: APINewExpedition) {
     const { match, project } = this.props;

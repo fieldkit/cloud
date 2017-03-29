@@ -12,7 +12,7 @@ import '../../../css/teams.css'
 
 import { FormContainer } from '../containers/FormContainer';
 
-import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
+import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -29,6 +29,7 @@ export class Teams extends Component {
   state: {
     teams: APITeam[],
     members: { [teamId: number]: APIMember[] },
+    users: { [teamId: number]: APIUser[] },
     teamDeletion: ?{
       contents: React$Element<*>;
       teamId: number;
@@ -45,6 +46,7 @@ export class Teams extends Component {
     this.state = {
       teams: [],
       members: {},
+      users: {},
       teamDeletion: null,
       memberDeletion: null
     }
@@ -69,8 +71,22 @@ export class Teams extends Component {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
       this.setState({members: members});
+      for (const member of members[teamId]) {
+        await this.loadMemberName(teamId, member.user_id);
+      }      
     }
   }
+
+  async loadMemberName(teamId: number, userId: number){
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      if(!users[teamId]){
+        users[teamId] = [];
+      }users[teamId].push(userRes.payload);
+      this.setState({users: users});
+    }    
+  }  
 
   async onTeamCreate(e: APINewTeam) {
 
@@ -174,7 +190,7 @@ export class Teams extends Component {
 
   render() {
     const { match } = this.props;
-    const { members, teams, memberDeletion, teamDeletion } = this.state;
+    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
 
     return (
       <div className="teams">
@@ -238,6 +254,7 @@ export class Teams extends Component {
                 <MembersTable
                   teamId={team.id}
                   members={members[team.id]}
+                  users={users[team.id]}
                   onDelete={this.startMemberDelete.bind(this)} /> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
