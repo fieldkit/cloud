@@ -29,6 +29,10 @@ export class Teams extends Component {
   state: {
     teams: APITeam[],
     members: { [teamId: number]: APIMember[] },
+    teamDeletion: ?{
+      contents: React$Element<*>;
+      teamId: number;
+    },
     memberDeletion: ?{
       contents: React$Element<*>;
       userId: number;
@@ -41,6 +45,7 @@ export class Teams extends Component {
     this.state = {
       teams: [],
       members: {},
+      teamDeletion: null,
       memberDeletion: null
     }
 
@@ -79,6 +84,16 @@ export class Teams extends Component {
       return teamRes.errors;
     }
   }
+
+  startTeamDelete(e: APITeam) {
+    const teamId = e.id;
+    this.setState({
+      teamDeletion: {
+        contents: <span>Are you sure you want to delete the <strong>{e.name}</strong> team?</span>,
+        teamId
+      }
+    })
+  }  
 
   async onMemberAdd(teamId: number, e: APINewMember) {
     const { match } = this.props;
