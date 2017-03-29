@@ -143,7 +143,7 @@ export class Teams extends Component {
   }
 
   startMemberDelete(teamId: number, userId: number) {
-    const { teams, members } = this.state;
+    const { teams, members, users } = this.state;
     let teamName = 'unknownTeam';
     let userName = 'unknownUser';
 
@@ -156,8 +156,10 @@ export class Teams extends Component {
         teamName = team.name;
       }
       if (teamMember) {
-        // TODO: look up username
-        userName = teamMember.user_id.toString(10);
+        const user = users[teamId].find((u: APIUser) => u.id === teamMember.user_id);
+        if (user) {
+          userName = user.name;
+        }
       }
     }
     this.setState({

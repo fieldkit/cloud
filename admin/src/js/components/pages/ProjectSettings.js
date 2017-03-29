@@ -40,7 +40,7 @@ export class ProjectSettings extends Component {
     users: {[id: number]: APIUser},
     administratorDeletion: ?{
       contents: React$Element<*>;
-      administratorId: number;
+      userId: number;
     }
   }
 
@@ -99,12 +99,12 @@ export class ProjectSettings extends Component {
     }
   }
 
-  startAdministratorDelete(administratorId: number, e: APIUser) {
+  startAdministratorDelete(userId: number, e: APIUser) {
     const { project } = this.props;
     this.setState({
       administratorDeletion: {
         contents: <span>Are you sure you want to remove <strong>{e.name}</strong> from <strong>{project.name}</strong>?</span>,
-        administratorId
+        userId
       }
     })
   }
@@ -114,9 +114,9 @@ export class ProjectSettings extends Component {
     const { administratorDeletion } = this.state;
 
     if (administratorDeletion) {
-      const { administratorId } = administratorDeletion;
+      const { userId } = administratorDeletion;
 
-      const administratorRes = await FKApiClient.get().deleteAdministrator(project.id, administratorId);
+      const administratorRes = await FKApiClient.get().deleteAdministrator(project.id, userId);
       if (administratorRes.type === 'ok') {
         await this.loadAdministrators();
         this.props.history.push(`${match.url}`);
