@@ -495,8 +495,11 @@ table {
       border-radius: 3px;
     }
     .accordion-row-header {
-      button{
-        float: right;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      nav{
+        flex-wrap: wrap;
         margin-right: 0;
       }
     }

@@ -180,18 +180,20 @@ export class Teams extends Component {
         { teams.map((team, i) =>
           <div key={i} className="accordion-row expanded">
               <div className="accordion-row-header">
-                <button className="secondary">Edit</button>
                 <h4>{team.name}</h4>
-                <p>{team.description}</p>
+                <div className="nav">
+                  <button className="secondary">Edit</button>
+                  <button className="secondary">Delete</button>
+                </div>
               </div>
-
+              <p>{team.description}</p>
               { members[team.id] && members[team.id].length > 0 &&
                 <MembersTable
                   teamId={team.id}
                   members={members[team.id]}
                   onDelete={this.startMemberDelete.bind(this)} /> }
               { (!members[team.id] || members[team.id].length === 0) &&
-                <p className="empty">No members</p> }
+                <p className="empty">This team has no members yet.</p> }
               <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
 
           </div> ) }
