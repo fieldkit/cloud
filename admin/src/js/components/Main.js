@@ -29,7 +29,7 @@ import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
 import '../../css/main.css'
 
-import { HamburgerIcon, ArrowDown } from './icons/Icons'
+import { HamburgerIcon, OpenInNewIcon, ArrowDownIcon } from './icons/Icons'
 
 type Props = {
   match: RouterMatch;
@@ -253,13 +253,21 @@ export class Main extends Component {
           <div className="sidebar">
             <div className="sidebar-section project-section">
               <h5>Projects</h5>
-              <Link to={`/`}><HamburgerIcon />All</Link>
+              <Link to={`/`}>
+                <div className="bt-icon medium">
+                  <HamburgerIcon />
+                </div>
+                All
+              </Link>
               { activeProject &&
                 <div>
                   <p className="project-name">
+                    <div className="bt-icon medium">
+                      <ArrowDownIcon />
+                    </div>
                     <span>{activeProject.name}</span>
-                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
-                      <img src={externalLinkImg} alt="external link" />
+                    <a className="bt-icon small" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
+                      <OpenInNewIcon />
                     </a>
                   </p>
                   <div className="sidebar-nav">
@@ -273,10 +281,10 @@ export class Main extends Component {
                 <h5>Expedition</h5>
                   <p className="expedition-name">
                     <span>{activeExpedition.name}</span>
-                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
+                    <a className="bt-icon medium" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
-                      <img src={externalLinkImg} alt="external link" />
+                      <OpenInNewIcon />
                     </a>
                   </p>
                   <div className="sidebar-nav">

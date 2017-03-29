@@ -102,6 +102,13 @@ $contents-width: 834px;
         }
       }
 
+      .bt-icon {
+        margin-right: $elements-padding;        
+        svg {
+          fill: white;
+        }
+      }
+
       .sidebar-nav {
         a {
           padding-left: $elements-padding*4;
