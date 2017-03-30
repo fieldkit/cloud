@@ -28,6 +28,7 @@ export class Teams extends Component {
   props: Props;
   state: {
     teams: APITeam[],
+    activeTeam: ?APITeam,
     members: { [teamId: number]: APIMember[] },
     users: { [teamId: number]: APIUser[] },
     teamDeletion: ?{
@@ -45,6 +46,7 @@ export class Teams extends Component {
     super(props);
     this.state = {
       teams: [],
+      activeTeam: null,
       members: {},
       users: {},
       teamDeletion: null,
@@ -190,12 +192,38 @@ export class Teams extends Component {
     this.setState({ memberDeletion: null });
   }
 
+  setActiveTeam(teamId: number) {
+    const { teams } = this.state;
+    const activeTeam = teams.find(team => team.id === teamId);
+    this.setState({activeTeam: activeTeam})
+  }
+
+  cancelTeamEdit() {
+    const { match, history } = this.props;
+    history.push(`${match.url}`);
+    this.setState({activeTeam: null});
+  }
+
+  async onTeamUpdate(team: APINewTeam) {
+    console.log(team);
+    if(this.state.activeTeam){
+      const { id } = this.state.activeTeam;
+      const teamRes = await FKApiClient.get().updateTeam(id, team);
+      if(teamRes.type === 'ok' && teamRes.payload) {
+        console.log(teamRes.payload);
+      } else {
+        return teamRes.errors;
+      }      
+    }
+  }
+
   render() {
     const { match } = this.props;
-    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
+    const { teams, activeTeam, members, users, memberDeletion, teamDeletion } = this.state;
 
     return (
       <div className="teams">
+
         <Route path={`${match.url}/new-team`} render={() =>
           <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
             <h2>Create New Team</h2>
@@ -203,7 +231,6 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
           </ReactModal> } />
-  
 
         <Route path={`${match.url}/:teamId/add-member`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
@@ -214,7 +241,18 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdd.bind(this)} 
               saveText="Add" />
-          </ReactModal> } />
+          </ReactModal> } />          
+
+        <Route path={`${match.url}/:teamId/edit`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
+            {activeTeam &&
+            <TeamForm
+              name={activeTeam.name}
+              slug={activeTeam.slug}
+              description={activeTeam.description}
+              onCancel={this.cancelTeamEdit.bind(this)}
+              onSave={this.onTeamUpdate.bind(this)} /> }
+          </ReactModal> } />          
 
         { teamDeletion &&
           <ReactModal isOpen={true} contentLabel="Delete Team" className="modal" overlayClassName="modal-overlay">
@@ -248,7 +286,7 @@ export class Teams extends Component {
               <div className="accordion-row-header">
                 <h4>{team.name}</h4>
                 <div className="nav">
-                  <Link className="button secondary" to={`${match.url}/${team.id}`}>Edit</Link>
+                  <Link className="button secondary" to={`${match.url}/${team.id}/edit`} onClick={this.setActiveTeam.bind(this, team.id)}>Edit</Link>
                   <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
                 </div>
               </div>
