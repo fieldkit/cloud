@@ -203,6 +203,7 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
           </ReactModal> } />
+  
 
         <Route path={`${match.url}/:teamId/add-member`} render={props =>
           <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
@@ -247,7 +248,7 @@ export class Teams extends Component {
               <div className="accordion-row-header">
                 <h4>{team.name}</h4>
                 <div className="nav">
-                  <button className="secondary" disabled>Edit</button>
+                  <Link className="button secondary" to={`${match.url}/${team.id}`}>Edit</Link>
                   <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
                 </div>
               </div>

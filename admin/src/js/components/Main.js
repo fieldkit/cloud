@@ -87,9 +87,10 @@ export class Main extends Component {
 
     if (projectSlug != newProjectSlug) {
       promises.push(this.loadActiveProject(newProjectSlug));
-      promises.push(this.loadProjects());
+      promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeProject = null;
     } else if (!newProjectSlug) {
+      promises.push(this.loadProjects());      
       stateChange.activeProject = null;
     }
 
@@ -98,6 +99,7 @@ export class Main extends Component {
       promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeExpedition = null;
     } else if (!newExpeditionSlug) {
+      promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeExpedition = null;
     }
 
