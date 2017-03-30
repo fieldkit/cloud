@@ -28,13 +28,13 @@ export class MembersTable extends Component {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    let { users } = this.props;
+    let { users } = nextProps;
     if(users){
       const mappedUsers = {};
       for(var u of users){
         mappedUsers[u.id] = u;
         this.setState({users: mappedUsers});
-      }      
+      }
     }
   }
 
