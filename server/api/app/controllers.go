@@ -880,13 +880,17 @@ func unmarshalUpdateMemberPayload(ctx context.Context, service *goa.Service, req
 // PictureController is the controller interface for the Picture actions.
 type PictureController interface {
 	goa.Muxer
-	GetID(*GetIDPictureContext) error
+	ExpeditionGetID(*ExpeditionGetIDPictureContext) error
+	ProjectGetID(*ProjectGetIDPictureContext) error
+	UserGetID(*UserGetIDPictureContext) error
 }
 
 // MountPictureController "mounts" a Picture resource controller on the given service.
 func MountPictureController(service *goa.Service, ctrl PictureController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/picture", ctrl.MuxHandler("preflight", handlePictureOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:project_id/picture", ctrl.MuxHandler("preflight", handlePictureOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/users/:user_id/picture", ctrl.MuxHandler("preflight", handlePictureOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -895,15 +899,47 @@ func MountPictureController(service *goa.Service, ctrl PictureController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewGetIDPictureContext(ctx, req, service)
+		rctx, err := NewExpeditionGetIDPictureContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.GetID(rctx)
+		return ctrl.ExpeditionGetID(rctx)
 	}
 	h = handlePictureOrigin(h)
-	service.Mux.Handle("GET", "/users/:user_id/picture", ctrl.MuxHandler("GetID", h, nil))
-	service.LogInfo("mount", "ctrl", "Picture", "action", "GetID", "route", "GET /users/:user_id/picture")
+	service.Mux.Handle("GET", "/expeditions/:expedition_id/picture", ctrl.MuxHandler("ExpeditionGetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Picture", "action", "ExpeditionGetID", "route", "GET /expeditions/:expedition_id/picture")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewProjectGetIDPictureContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ProjectGetID(rctx)
+	}
+	h = handlePictureOrigin(h)
+	service.Mux.Handle("GET", "/projects/:project_id/picture", ctrl.MuxHandler("ProjectGetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Picture", "action", "ProjectGetID", "route", "GET /projects/:project_id/picture")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUserGetIDPictureContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.UserGetID(rctx)
+	}
+	h = handlePictureOrigin(h)
+	service.Mux.Handle("GET", "/users/:user_id/picture", ctrl.MuxHandler("UserGetID", h, nil))
+	service.LogInfo("mount", "ctrl", "Picture", "action", "UserGetID", "route", "GET /users/:user_id/picture")
 }
 
 // handlePictureOrigin applies the CORS response headers corresponding to the origin.

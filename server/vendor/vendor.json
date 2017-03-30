@@ -456,6 +456,12 @@
 			"revisionTime": "2016-11-04T08:10:29Z"
 		},
 		{
+			"checksumSHA1": "qQ/69O0QaXw/YCajx/sj+rgFzWw=",
+			"path": "github.com/lucasb-eyer/go-colorful",
+			"revision": "c900de9dbbc73129068f5af6a823068fc5f2308c",
+			"revisionTime": "2017-02-23T22:10:28Z"
+		},
+		{
 			"checksumSHA1": "L6Ps004WGoAJBEBX5Zrv0tPa2b4=",
 			"path": "github.com/manveru/faker",
 			"revision": "717f7cf83fb78669bfab612749c2e8ff63d5be11",

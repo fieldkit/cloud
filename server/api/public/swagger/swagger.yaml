@@ -893,6 +893,27 @@ paths:
       summary: add twitter
       tags:
       - twitter
+  /expeditions/{expedition_id}/picture:
+    get:
+      description: Get a expedition's picture
+      operationId: picture#expedition get id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: expedition get id picture
+      tags:
+      - picture
   /expeditions/{expedition_id}/teams:
     get:
       description: |-
@@ -1770,6 +1791,27 @@ paths:
       summary: add expedition
       tags:
       - expedition
+  /projects/{project_id}/picture:
+    get:
+      description: Get a project's picture
+      operationId: picture#project get id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: project get id picture
+      tags:
+      - picture
   /refresh:
     post:
       description: Creates a valid JWT given a refresh token.
@@ -2284,8 +2326,8 @@ paths:
       - user
   /users/{user_id}/picture:
     get:
-      description: List a project's inputs
-      operationId: picture#get id
+      description: Get a user's picture
+      operationId: picture#user get id
       parameters:
       - in: path
         name: user_id
@@ -2300,7 +2342,7 @@ paths:
           description: Bad Request
       schemes:
       - https
-      summary: get id picture
+      summary: user get id picture
       tags:
       - picture
   /validate:

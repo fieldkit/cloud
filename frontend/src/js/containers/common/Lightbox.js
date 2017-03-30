@@ -1,15 +1,20 @@
 
 import { connect } from 'react-redux'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
 import Lightbox from '../../components/common/Lightbox'
 
 const mapStateToProps = (state, ownProps) => {
-  const lightboxDocumentID = state.expeditions.get('lightboxDocumentID')
-  const data = !!lightboxDocumentID ? state.expeditions.getIn(['documents', lightboxDocumentID]) : null
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
   return {
-    data,
-    currentExpeditionID
+    ...createSelector(
+      state => state.expeditions.getIn(['documents', state.expeditions.get('lightboxDocumentID') || 'null']),
+      state => state.expeditions.get('currentExpedition'),
+      (data, currentExpeditionID) => ({
+        data,
+        currentExpeditionID
+      })
+    )(state)
   }
 }
 
