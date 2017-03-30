@@ -80,9 +80,14 @@ class JournalPage extends React.Component {
         }
         firstDocument = d
       })
-      const timeRatio = map(currentDate, firstDocument.get('date'), secondDocument.get('date'), 0, 1)
-      const scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
-      this.refs.content.scrollTop = scrollTop
+      if (!!secondDocument) {
+        const timeRatio = map(currentDate, firstDocument.get('date'), secondDocument.get('date'), 0, 1)
+        const scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
+        this.refs.content.scrollTop = scrollTop
+      } else {
+        const scrollTop = postDimensions.getIn(['post-' + firstDocument.get('id'), 0])
+        this.refs.content.scrollTop = scrollTop
+      }
     }
   }
 

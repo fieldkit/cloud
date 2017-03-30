@@ -2,6 +2,7 @@
 import React, { PropTypes } from 'react'
 import { map, constrain } from '../../../utils.js'
 import ActivityGraph from './ActivityGraph'
+import { getLineHeight, getLineWidth } from '../../../utils.js'
 
 class Timeline extends React.Component {
 
@@ -16,7 +17,7 @@ class Timeline extends React.Component {
   }
 
   onMouseMove (e) {
-    const lineHeight = 0.02487562189 * window.innerHeight
+    const lineHeight = getLineHeight()
     const mouseY = e.nativeEvent.clientY - lineHeight * 2
     this.setState({
       ...this.state,
@@ -32,7 +33,7 @@ class Timeline extends React.Component {
   }
 
   onClick (e) {
-    const lineHeight = 0.02487562189 * window.innerHeight
+    const lineHeight = getLineHeight()
     const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
     const {
       updateDate,
@@ -55,8 +56,8 @@ class Timeline extends React.Component {
 
     if (!documents || documents.size === 0) return null
 
-    const lineWidth = 0.01388888889 * window.innerWidth
-    const lineHeight = 0.02487562189 * window.innerHeight
+    const lineWidth = getLineWidth()
+    const lineHeight = getLineHeight()
     const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
     const w = 4
     const hoverWidth = mouseOver >= 0 && mouseOver < h ? (lineWidth / 2 - w) : 0
