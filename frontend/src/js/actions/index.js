@@ -307,11 +307,10 @@ export function openLightbox (id) {
   }
 }
 
-export function closeLightbox (id) {
+export function closeLightbox () {
   return function (dispatch, getState) {
     dispatch({
-      type: CLOSE_LIGHTBOX,
-      id
+      type: CLOSE_LIGHTBOX
     })
   }
 }
