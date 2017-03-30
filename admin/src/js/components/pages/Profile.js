@@ -11,29 +11,28 @@ import type { APIErrors, APIUser, APIBaseUser } from '../../api/types';
 
 type Props = {
   user: APIUser;
-  // onUserUpdate: () => void;
+  onUpdate: (user: APIUser) => void;
 
   match: Object;
   location: Object;
   history: Object;
 }
 
-/*flow-include
-type State = {
-  oldPassword: string;
-  newPassword: string;
-  newPasswordConfirmation: string;
-  passwordMessage: ?string;
-  passwordErrors: ?APIErrors;
-
-  ...$Exact<APIBaseUser>;
-  errors: ?APIErrors;
-};
-*/
-
 export class Profile extends Component {
   props: Props;
-  state: State;
+  state: {
+    id: number,
+    username: string,
+    name: string,
+    bio: string,
+    email: string,
+    oldPassword: string,
+    newPassword: string,
+    newPasswordConfirmation: string,
+    passwordMessage: ?string,
+    passwordErrors: ?APIErrors,
+    errors: null
+  }
 
   constructor(props: Props) {
     super(props);
@@ -49,25 +48,11 @@ export class Profile extends Component {
     }
   }
 
-  async onUserUpdate(name: string, bio: string) {
-    const { id, username, email } = this.props.user;
-
-    // TODO: implement!
-    // this.props.onUserUpdate();
-    const userRes = await FKApiClient.get().updateUserById(id, {
-      username: username,
-      name: name,
-      bio: bio,
-      email: email
+  componentWillReceiveProps (nextProps: Props) {
+    this.setState({
+      name: nextProps.user.name || '',
+      bio: nextProps.user.bio || ''
     });
-    if (userRes.type === 'ok' && userRes.payload) {
-      let { name, bio } = userRes.payload;
-      console.log(name, bio);
-      this.setState({ name: name });
-      this.setState({ bio: bio });
-    } else if(userRes.errors) {
-      return userRes.errors;
-    }    
   }
 
   handleInputChange(event) {
@@ -76,6 +61,22 @@ export class Profile extends Component {
     const name = target.name;
 
     this.setState({ [name]: value });
+  }
+
+  async onUserSave(name: string, bio: string) {
+    const { id, username, email } = this.props.user;
+
+    const userRes = await FKApiClient.get().updateUserById(id, {
+      username: username,
+      name: name,
+      bio: bio,
+      email: email
+    });
+    if (userRes.type === 'ok' && userRes.payload) {
+      this.props.onUpdate(userRes.payload);
+    } else if(userRes.errors) {
+      return userRes.errors;
+    }    
   }
 
   onPasswordChange(event) {
@@ -113,38 +114,41 @@ export class Profile extends Component {
       <div className="profile-page">
         <h1>Profile</h1>
         
-        <div className="row">
+        <div className="profile">
+
           <div className="profile-form two-columns">
+            <h3>Main</h3>
             <ProfileForm
               name={name}
               bio={bio}
-              onSave={this.onUserUpdate.bind(this)}>
+              onSave={this.onUserSave.bind(this)}>
             </ProfileForm>
           </div>
-        </div>
+        
 
-        <div className="row">
-          <div className="account-settings two-columns">
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <span className="disabled-form">{username}</span>
+          <div className="two-columns">
+
+            <div className="account-settings">
+              <h3>Account Settings</h3>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <span className="disabled-form">{username}</span>
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <span className="disabled-form">{email}</span>
+              </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <span className="disabled-form">{email}</span>
+
+            <div className="password-form">
+              <h3>Change Password</h3>
+              <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} className="lg" />
+              <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} className="lg" />
+              <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} className="lg" />
+              <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
             </div>
           </div>
-        </div>
 
-        <div className="row">
-          <div className="password-form two-columns">
-            <h3>Change Password</h3>
-            <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} className="lg" />
-            <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} className="lg" />
-            <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} className="lg" />
-
-            <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
-          </div>
         </div>
 
       </div>

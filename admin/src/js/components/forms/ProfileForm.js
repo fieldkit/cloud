@@ -32,7 +32,7 @@ export class ProfileForm extends Component {
     this.state = {
       name: this.props.name || '',
       bio: this.props.bio || '',
-      saveDisabled: false,
+      saveDisabled: true,
       errors: null
     }
   }
@@ -41,6 +41,7 @@ export class ProfileForm extends Component {
     this.setState({
       name: nextProps.name || '',
       bio: nextProps.bio || '',
+      saveDisabled: true,
       errors: null
     });
   }
@@ -49,8 +50,8 @@ export class ProfileForm extends Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-
     this.setState({ [name]: value });
+    this.setState({ saveDisabled: false });
   }
 
   async save() {
@@ -62,15 +63,15 @@ export class ProfileForm extends Component {
   }
 
   render() {
-    const { name, bio, errors } = this.state;
+    const { name, bio, saveDisabled, errors } = this.state;
 
     return (
       <FormContainer
         onSave={this.save.bind(this)}
         onCancel={this.props.onCancel}
         saveText={this.props.saveText}
-        cancelText={this.props.cancelText}>
-
+        cancelText={this.props.cancelText}
+        saveDisabled={saveDisabled}>
             <FormItem labelText="Name" name="name" value={name} onChange={this.handleInputChange.bind(this)} errors={errors}  className="lg" />
             <FormItem labelText="Bio" name="bio" value={bio} onChange={this.handleInputChange.bind(this)} errors={errors}  className="lg" />
       </FormContainer>

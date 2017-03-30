@@ -116,6 +116,11 @@ export class Main extends Component {
     return this.props.match.params.expeditionSlug;
   }
 
+  async onUserUpdate (user: APIUser) {
+    log.debug('main -> onUserUpdate');
+    this.setState({user: user});
+  }
+
   async loadUser() {
     log.debug('main -> loadUser');
     const userRes = await FKApiClient.get().getCurrentUser();
@@ -353,7 +358,8 @@ export class Main extends Component {
                 path="/profile"
                 component={Profile}
                 required={[user]}
-                user={user} />
+                user={user}
+                onUpdate={this.onUserUpdate.bind(this)} />
               <RouteOrLoading
                 path="/"
                 component={Projects}

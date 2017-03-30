@@ -235,7 +235,8 @@ $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
     }
 
     &:disabled {
-      background-color: $color-5;
+      background-color: $gray-4;
+      border-color: $gray-4;
       box-shadow: none;
     }
 
