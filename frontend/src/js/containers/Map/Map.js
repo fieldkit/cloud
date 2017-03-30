@@ -86,7 +86,7 @@ const mapStateToProps = (state, ownProps) => {
 
         return {
           expeditions,
-          viewport,
+          viewport: _viewport,
           currentDocuments, 
           currentDate,
           playbackMode,

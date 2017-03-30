@@ -29,7 +29,7 @@ export const initialState = I.fromJS({
     zoom: 15,
     width: window.innerWidth,
     height: window.innerHeight,
-    startDragLngLat: null,
+    startDragLngLat: [0, 0],
     isDragging: false,
     geoBounds: [0, 0, 0, 0]
   },

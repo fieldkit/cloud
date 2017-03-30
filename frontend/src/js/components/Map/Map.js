@@ -4,20 +4,13 @@ import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
 import DOMOverlay from './DOMOverlay'
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../constants/mapbox.js'
-import { is } from 'immutable'
+import { is, fromJS } from 'immutable'
 
 class Map extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {
-      viewport: {
-        longitude: 0,
-        latitude: 0,
-        zoom: 15
-      },
-      startDragLngLat: [0, 0] 
-    }
+    this.state = {}
     this.tick = this.tick.bind(this)
     this.onChangeViewport = this.onChangeViewport.bind(this)
   }
@@ -42,11 +35,8 @@ class Map extends React.Component {
   }
 
   onChangeViewport (viewport) {
-    if (viewport.longitude !== this.props.viewport.longitude ||
-        viewport.latitude !== this.props.viewport.latitude ||
-        viewport.zoom !== this.props.viewport.zoom
-      ) {
-      setViewport(viewport, true) 
+    if (!is(this.props.viewport, fromJS(viewport))) {
+      this.props.setViewport(viewport, true) 
     }
   }
 
@@ -55,16 +45,13 @@ class Map extends React.Component {
   }
 
   shouldComponentUpdate (props) {
-    return this.props.viewport.longitude !== props.viewport.longitude ||
-      this.props.viewport.latitude !== props.viewport.latitude ||
-      this.props.viewport.zoom !== props.viewport.zoom ||
+    return !is(this.props.viewport, props.viewport) ||
       this.props.currentDate !== props.currentDate ||
       !is(this.props.focusedDocument, props.focusedDocument)
   }
 
   render () {
     const {
-      viewport,
       setViewport,
       focusParticles,
       readingParticles,
@@ -72,6 +59,8 @@ class Map extends React.Component {
       focusedDocument,
       openLightbox
     } = this.props
+
+    const viewport = this.props.viewport.toJS()
 
     return (
       <div id="map">
@@ -83,7 +72,6 @@ class Map extends React.Component {
         >
           <WebGLOverlay
             { ...viewport }
-            startDragLngLat={ this.state.startDragLngLat }
             redraw={ this.redrawGLOverlay }
             focusParticles={ focusParticles }
             readingParticles={ readingParticles }
