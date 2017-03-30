@@ -5,36 +5,34 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APINewTeam } from '../../api/types';
+import type { APIErrors, APITeam, APINewTeam } from '../../api/types';
 
 type Props = {
-  name?: string,
-  slug?: string,
-  description?: string,
+  team?: ?APITeam,
 
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (e: APINewTeam) => Promise<?APIErrors>;
+  onSave: (e: APINewTeam, teamId?: number) => Promise<?APIErrors>;
 }
 
 export class TeamForm extends Component {
   props: Props;
+  /*flow-include
   state: {
-    name: string,
-    slug: string,    
-    description: string,
+    ...$Exact<APITeam>,
     slugHasChanged: boolean,    
     saveDisabled: boolean,
     errors: ?APIErrors
   };
-
+  */
   constructor(props: Props) {
     super(props)
     this.state = {
-      name: this.props.name || '',
-      slug: this.props.slug || '',
-      description: this.props.description || '',
+      name: '',
+      slug: '',
+      description: '',
+      ...props.team,
       slugHasChanged: false,
       saveDisabled: false,
       errors: null
@@ -43,20 +41,22 @@ export class TeamForm extends Component {
 
   componentWillReceiveProps(nextProps: Props) {
     this.setState({
-      name: nextProps.name || '',
-      slug: nextProps.slug || '',
-      description: nextProps.description || '',
+      name: '',
+      slug: '',
+      description: '',
+      ...nextProps.team,
       slugHasChanged: false,
       errors: null
     });
   }
 
-  async save() {
+  async save(teamId?: number) {
     const errors = await this.props.onSave({
-      name: this.state.name,
-      slug: this.state.slug,
-      description: this.state.description
-    });
+        name: this.state.name,
+        slug: this.state.slug,
+        description: this.state.description
+      }, teamId);
+
     if (errors) {
       this.setState({ errors });
     }
