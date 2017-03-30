@@ -16,6 +16,7 @@ import expeditionReducer from './reducers/expeditions'
 import RootContainer from './containers/Root/Root'
 import MapPageContainer from './containers/MapPage/MapPage'
 import JournalPageContainer from './containers/JournalPage/JournalPage'
+import DataPageContainer from './containers/DataPage/DataPage'
 
 import FKApiClient from './api/api.js'
 
@@ -67,6 +68,14 @@ const routes = (
         onEnter={(state, replace) => {
           store.dispatch(actions.selectPlaybackMode('pause'))
           store.dispatch(actions.setCurrentPage('journal'))
+        }}
+      />
+      <Route
+        path="data"
+        component={ DataPageContainer }
+        onEnter={(state, replace) => {
+          store.dispatch(actions.selectPlaybackMode('pause'))
+          store.dispatch(actions.setCurrentPage('data'))
         }}
       />
     </Route>
