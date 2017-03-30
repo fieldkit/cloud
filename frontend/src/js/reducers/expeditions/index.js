@@ -7,8 +7,8 @@ import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
   project: {
-    id: 'eric',
-    name: 'eric'
+    id: location.hostname.split('.')[0],
+    name: location.hostname.split('.')[0]
   },
   lightboxDocumentID: null,
   previousDocumentID: null,
@@ -45,6 +45,11 @@ const expeditionReducer = (state = initialState, action) => {
   }
 
   switch (action.type) {
+    case actions.SET_PROJECT_NAME: {
+      return state
+        .setIn(['project', 'name'], action.name)
+    }
+
     case actions.OPEN_LIGHTBOX: {
       const previousDocument = state.get('documents')
         .filter(d => state.get('currentDocuments').includes(d.get('id')))
