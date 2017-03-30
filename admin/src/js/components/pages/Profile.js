@@ -4,13 +4,14 @@ import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 
 import { FKApiClient } from '../../api/api';
+import { ProfileForm } from '../forms/ProfileForm';
 import { FormItem } from '../forms/FormItem';
 
 import type { APIErrors, APIUser, APIBaseUser } from '../../api/types';
 
 type Props = {
   user: APIUser;
-  onUserUpdate: () => void;
+  // onUserUpdate: () => void;
 
   match: Object;
   location: Object;
@@ -48,9 +49,25 @@ export class Profile extends Component {
     }
   }
 
-  async onUserSave() {
+  async onUserUpdate(name: string, bio: string) {
+    const { id, username, email } = this.props.user;
+
     // TODO: implement!
-    this.props.onUserUpdate();
+    // this.props.onUserUpdate();
+    const userRes = await FKApiClient.get().updateUserById(id, {
+      username: username,
+      name: name,
+      bio: bio,
+      email: email
+    });
+    if (userRes.type === 'ok' && userRes.payload) {
+      let { name, bio } = userRes.payload;
+      console.log(name, bio);
+      this.setState({ name: name });
+      this.setState({ bio: bio });
+    } else if(userRes.errors) {
+      return userRes.errors;
+    }    
   }
 
   handleInputChange(event) {
@@ -98,8 +115,11 @@ export class Profile extends Component {
         
         <div className="row">
           <div className="profile-form two-columns">
-            <FormItem labelText="Name" name="name" value={name} errors={errors} onChange={onChange} className="lg" />
-            <FormItem labelText="Bio" name="bio" value={bio} errors={errors} onChange={onChange} className="lg" />
+            <ProfileForm
+              name={name}
+              bio={bio}
+              onSave={this.onUserUpdate.bind(this)}>
+            </ProfileForm>
           </div>
         </div>
 
