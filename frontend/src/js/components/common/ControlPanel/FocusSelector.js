@@ -2,6 +2,12 @@
 import React from 'react'
 
 class FocusSelector extends React.Component {
+
+  shouldComponentUpdate (props) {
+    return this.props.focus.get('type') !== props.focus.get('type') ||
+      this.props.focus.get('id') !== props.focus.get('id')
+  }
+
   render () {
     const {
       focus,

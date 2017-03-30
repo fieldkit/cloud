@@ -6,6 +6,10 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
+  project: {
+    id: 'eric',
+    name: 'eric'
+  },
   lightboxDocumentID: null,
   expeditionPanelOpen: false,
   currentPage: 'map',
@@ -25,7 +29,7 @@ export const initialState = I.fromJS({
     zoom: 15,
     width: window.innerWidth,
     height: window.innerHeight,
-    startDragLngLat: null,
+    startDragLngLat: [0, 0],
     isDragging: false,
     geoBounds: [0, 0, 0, 0]
   },

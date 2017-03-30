@@ -14,6 +14,11 @@ import iconForwardHover from '../../../../img/icon-forward-hover.png'
 import iconFastForwardHover from '../../../../img/icon-fastForward-hover.png'
 
 class PlaybackSelector extends React.Component {
+
+  shouldComponentUpdate (props) {
+    return this.props.playbackMode !== props.playbackMode
+  }
+
   render () {
     const {
       playbackMode,

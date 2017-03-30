@@ -6,6 +6,21 @@ import { Link } from 'react-router'
 import iconLocation from '../../../img/icon-location.png'
 
 class Lightbox extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick () {
+    const {
+      data,
+      closeLightbox
+    } = this.props
+    updateDate(data.get('date'), 'pause')
+    closeLightbox()
+  }
+
   render () {
     const {
       data,
@@ -42,10 +57,7 @@ class Lightbox extends React.Component {
               <div className="post_main_meta_geo">
                 <Link
                   to={ '/' + currentExpeditionID + '/map' }
-                  onClick={ () => {
-                    updateDate(data.get('date'), 'pause')
-                    closeLightbox()
-                  }}
+                  onClick={ this.onClick }
                 >
                   <img src={ '/' + iconLocation }/>
                 </Link>

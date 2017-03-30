@@ -2,11 +2,23 @@ import React, {PropTypes, Component} from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 export default class WebGLOverlay extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+    this.onClick = this.onClick.bind(this)
+  }
 
-  render () {
+  onClick () {
     const {
       focusedDocument,
       openLightbox
+    } = this.props
+    if (!!focusedDocument) openLightbox(focusedDocument.get('id'))
+  }
+
+  render () {
+    const {
+      focusedDocument
     } = this.props
 
     return (
@@ -15,7 +27,7 @@ export default class WebGLOverlay extends Component {
         style={{
           cursor: !!focusedDocument ? 'pointer' : 'auto'
         }}
-        onClick={ () => { if (!!focusedDocument) openLightbox(focusedDocument.get('id')) }}
+        onClick={ this.onClick }
       >
         <ReactCSSTransitionGroup
           transitionName="transition"

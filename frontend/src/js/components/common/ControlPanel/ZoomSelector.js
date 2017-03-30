@@ -5,6 +5,10 @@ import iconMinus from '../../../../img/icon-minus.png'
 import iconPlus from '../../../../img/icon-plus.png'
 
 class ZoomSelector extends React.Component {
+  shouldComponentUpdate (props) {
+    return this.props.zoom !== props.zoom
+  }
+
   render () {
     const {
       zoom,

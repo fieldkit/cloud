@@ -4,23 +4,24 @@ import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
 import DOMOverlay from './DOMOverlay'
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../constants/mapbox.js'
+import { is, fromJS } from 'immutable'
 
 class Map extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {
-      viewport: {
-        longitude: 0,
-        latitude: 0,
-        zoom: 15
-      }
-    }
+    this.state = {}
     this.tick = this.tick.bind(this)
+    this.onChangeViewport = this.onChangeViewport.bind(this)
   }
 
   tick (firstFrame) {
-    const { currentDate, playbackMode, updateDate } = this.props
+    const {
+      currentDate,
+      playbackMode,
+      updateDate,
+      focusType
+    } = this.props
     const framesPerSecond = 60
     const dateDelta = 
       (playbackMode === 'forward' ? 500000 :
@@ -29,22 +30,28 @@ class Map extends React.Component {
       playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
-    if (firstFrame || dateDelta !== 0) updateDate(nextDate)
+    if (focusType === 'expedition' && (firstFrame || dateDelta !== 0)) updateDate(nextDate)
     requestAnimationFrame(() => this.tick(false))
+  }
+
+  onChangeViewport (viewport) {
+    if (!is(this.props.viewport, fromJS(viewport))) {
+      this.props.setViewport(viewport, true) 
+    }
   }
 
   componentDidMount () {
     requestAnimationFrame(() => this.tick(true))
   }
 
-  shouldComponentUpdate (nextProps) {
-    return this.props.currentDate !== nextProps.currentDate ||
-      nextProps.playbackMode === 'pause'      
+  shouldComponentUpdate (props) {
+    return !is(this.props.viewport, props.viewport) ||
+      this.props.currentDate !== props.currentDate ||
+      !is(this.props.focusedDocument, props.focusedDocument)
   }
 
   render () {
     const {
-      viewport,
       setViewport,
       focusParticles,
       readingParticles,
@@ -53,24 +60,18 @@ class Map extends React.Component {
       openLightbox
     } = this.props
 
+    const viewport = this.props.viewport.toJS()
+
     return (
       <div id="map">
         <MapboxGL
           { ...viewport }
-          mapStyle={MAPBOX_STYLE}
-          mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          onChangeViewport={ viewport => {
-            if (viewport.longitude !== this.props.viewport.longitude ||
-                viewport.latitude !== this.props.viewport.latitude ||
-                viewport.zoom !== this.props.viewport.zoom
-              ) {
-              setViewport(viewport, true) 
-            }
-          }}
+          mapStyle={ MAPBOX_STYLE }
+          mapboxApiAccessToken={ MAPBOX_ACCESS_TOKEN }
+          onChangeViewport={ this.onChangeViewport }
         >
           <WebGLOverlay
             { ...viewport }
-            startDragLngLat={ [0, 0] }
             redraw={ this.redrawGLOverlay }
             focusParticles={ focusParticles }
             readingParticles={ readingParticles }
