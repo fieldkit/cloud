@@ -10,9 +10,13 @@ const mapStateToProps = (state, ownProps) => {
     ...createSelector(
       state => state.expeditions.getIn(['documents', state.expeditions.get('lightboxDocumentID') || 'null']),
       state => state.expeditions.get('currentExpedition'),
-      (data, currentExpeditionID) => ({
+      state => state.expeditions.get('previousDocumentID'),
+      state => state.expeditions.get('nextDocumentID'),
+      (data, currentExpeditionID, previousDocumentID, nextDocumentID) => ({
         data,
-        currentExpeditionID
+        currentExpeditionID, 
+        previousDocumentID,
+        nextDocumentID
       })
     )(state)
   }
@@ -25,6 +29,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     closeLightbox () {
       return dispatch(actions.closeLightbox())
+    },
+    openLightbox (id) {
+      return dispatch(actions.openLightbox(id))
     }
   }
 }

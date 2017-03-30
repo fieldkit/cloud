@@ -11,6 +11,8 @@ export const initialState = I.fromJS({
     name: 'eric'
   },
   lightboxDocumentID: null,
+  previousDocumentID: null,
+  nextDocumentID: null,
   expeditionPanelOpen: false,
   currentPage: 'map',
   currentExpedition: '',
@@ -44,8 +46,26 @@ const expeditionReducer = (state = initialState, action) => {
   }
   switch (action.type) {
     case actions.OPEN_LIGHTBOX: {
+
+      const previousDocument = state.get('documents')
+        .filter(d => state.get('currentDocuments').includes(d.get('id')))
+        .sortBy(d => d.get('date'))
+        .filter(d => d.get('date') < state.getIn(['documents', action.id, 'date']))
+        .last()
+
+      const nextDocument = state.get('documents')
+        .filter(d => state.get('currentDocuments').includes(d.get('id')))
+        .sortBy(d => d.get('date'))
+        .filter(d => d.get('date') > state.getIn(['documents', action.id, 'date']))
+        .first()
+
+      const nextDate = state.getIn(['documents', action.id, 'date'])
+
       return state
         .set('lightboxDocumentID', action.id)
+        .set('previousDocumentID', !!previousDocument ? previousDocument.get('id') : null)
+        .set('nextDocumentID', !!nextDocument ? nextDocument.get('id') : null)
+        .set('currentDate', nextDate)
     }
 
     case actions.CLOSE_LIGHTBOX: {
