@@ -90,7 +90,6 @@ export default class WebGLOverlay extends Component {
 
   render () {
     const { project } = ViewportMercator(this.props)
-
     const { 
       width,
       height,
@@ -125,11 +124,10 @@ export default class WebGLOverlay extends Component {
         <div id="three-renderer">
           <React3
             mainCamera="camera"
-            width={width}
-            height={height}
-            onAnimate={this._onAnimate}
-            alpha={true}
-            antialias={true}
+            width={ width }
+            height={ height }
+            alpha={ true }
+            antialias={ true }
           >
             <scene>
               <orthographicCamera

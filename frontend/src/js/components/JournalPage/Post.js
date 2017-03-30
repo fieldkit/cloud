@@ -2,13 +2,14 @@
 import React from 'react'
 import { dateToString } from '../../utils.js'
 import { Link } from 'react-router'
+import { is } from 'immutable'
 
 import iconLocation from '../../../img/icon-location.png'
 
 class Post extends React.Component {
 
-  shouldComponentUpdate () {
-    return false
+  shouldComponentUpdate (props) {
+    return !is(this.props.data, props.data)
   }
 
   render () {
@@ -17,8 +18,6 @@ class Post extends React.Component {
       currentExpeditionID,
       updateDate
     } = this.props
-
-    // console.log('aga', data.toJS())
 
     return (
       <div className="post" ref="container">

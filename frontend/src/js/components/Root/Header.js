@@ -6,7 +6,6 @@ import iconHamburger from '../../../img/icon-hamburger.svg'
 
 class Header extends React.Component {
   render () {
-
     const {
       expeditionName,
       currentPage,

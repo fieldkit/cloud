@@ -5,7 +5,6 @@ import MapContainer from '../../containers/Map/Map'
 import ExpeditionPanelContainer from '../../containers/Root/ExpeditionPanel'
 import LightboxContainer from '../../containers/common/Lightbox'
 
-
 class Root extends React.Component {
   constructor (props) {
     super(props)
@@ -46,11 +45,11 @@ class Root extends React.Component {
       currentExpedition,
     } = this.props
 
-        // onMouseMove={ this.onMouseMove }
-        // onMouseOut={ this.onMouseOut }
     return (
       <div
         className="root"
+        onMouseMove={ this.onMouseMove }
+        onMouseOut={ this.onMouseOut }
       >
         { !expeditionFetching && !documentsFetching &&
           <div>

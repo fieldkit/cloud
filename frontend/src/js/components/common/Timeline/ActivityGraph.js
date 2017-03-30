@@ -1,8 +1,19 @@
 
 import React from 'react'
 import { map } from '../../../utils.js'
+import { is } from 'immutable'
 
 class ActivityGraph extends React.Component {
+  shouldComponentUpdate (props) {
+    return !is(this.props.documents, props.documents) ||
+      this.props.lineWidth !== props.lineWidth ||
+      this.props.x !== props.x ||
+      this.props.y !== props.y ||
+      this.props.w !== props.w ||
+      this.props.h !== props.h ||
+      this.props.rad !== props.rad
+  }
+
   render () {
     const {
       documents,

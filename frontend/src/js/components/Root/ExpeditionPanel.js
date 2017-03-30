@@ -12,6 +12,10 @@ class ExpeditionPanel extends React.Component {
     this.stopPropagation = this.stopPropagation.bind(this)
   }
 
+  shouldComponentUpdate (props) {
+    return this.props.expeditionPanelOpen !== props.expeditionPanelOpen
+  }
+
   stopPropagation (e) {
     e.stopPropagation()
   }

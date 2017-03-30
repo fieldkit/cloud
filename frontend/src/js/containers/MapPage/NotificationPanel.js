@@ -12,25 +12,17 @@ const mapStateToProps = (state, ownProps) => {
       state => state.expeditions.get('documents'),
       state => state.expeditions.get('currentDocuments'),
       (currentDate, documents, currentDocuments) => ({
-        currentDate,
         currentDocuments: documents
-          .filter(d => {
-            return state.expeditions.get('currentDocuments').includes(d.get('id'))
-          })
+          .filter(d => state.expeditions.get('currentDocuments').includes(d.get('id')))
+          .filter(d => Math.abs(d.get('date') - currentDate + 100000) < 200000)
+          .sortBy(d => d.get('date'))
       })
     )(state)
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    selectPlaybackMode (mode) {
-      return dispatch(actions.selectPlaybackMode(mode))
-    },
-    cancelAction () {
-      return dispatch(actions.cancelAction())
-    }
-  }
+  return {}
 }
 
 const NotificationPanelContainer = connect(

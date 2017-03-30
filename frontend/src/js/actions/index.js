@@ -174,9 +174,9 @@ export function requestExpedition (expeditionID) {
                     },
                     ...processQueryString(getState)
                   ])
-                  window.setInterval(() => {
-                    updateDeepLinking(browserHistory, getState)
-                  }, 2000)
+                  // window.setInterval(() => {
+                  //   updateDeepLinking(browserHistory, getState)
+                  // }, 2000)
                 } else {
                   const expeditions = I.fromJS(resExpeditionsMap)
                     .map(e => {

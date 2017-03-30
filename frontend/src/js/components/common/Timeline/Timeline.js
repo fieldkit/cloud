@@ -10,6 +10,38 @@ class Timeline extends React.Component {
     this.state = {
       mouseOver: -1
     }
+    this.onMouseMove = this.onMouseMove.bind(this)
+    this.onMouseOut = this.onMouseOut.bind(this)
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onMouseMove (e) {
+    const lineHeight = 0.02487562189 * window.innerHeight
+    const mouseY = e.nativeEvent.clientY - lineHeight * 2
+    this.setState({
+      ...this.state,
+      mouseOver: mouseY
+    })
+  }
+
+  onMouseOut (e) {
+    this.setState({
+      ...this.state,
+      mouseOver: -1
+    })
+  }
+
+  onClick (e) {
+    const lineHeight = 0.02487562189 * window.innerHeight
+    const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
+    const {
+      updateDate,
+      startDate,
+      endDate
+    } = this.props
+    const mouseY = e.nativeEvent.clientY - lineHeight * 2
+    const nextDate = constrain(map(mouseY, 0, h, startDate, endDate), startDate, endDate)
+    updateDate(nextDate, null, true)
   }
 
   render () {
@@ -18,7 +50,6 @@ class Timeline extends React.Component {
       startDate,
       endDate,
       documents,
-      updateDate
     } = this.props
     const { mouseOver } = this.state
 
@@ -37,24 +68,9 @@ class Timeline extends React.Component {
     return (
       <div id="timeline">
         <svg
-          onMouseMove={(e) => {
-            const mouseY = e.nativeEvent.clientY - lineHeight * 2
-            this.setState({
-              ...this.state,
-              mouseOver: mouseY
-            })
-          }}
-          onMouseOut={() => {
-            this.setState({
-              ...this.state,
-              mouseOver: -1
-            })
-          }}
-          onClick={(e) => {
-            const mouseY = e.nativeEvent.clientY - lineHeight * 2
-            const nextDate = constrain(map(mouseY, 0, h, startDate, endDate), startDate, endDate)
-            updateDate(nextDate, null, true)
-          }}
+          onMouseMove={ this.onMouseMove }
+          onMouseOut={ this.onMouseOut }
+          onClick={ this.onClick }
         >
           <ActivityGraph
             documents={ documents }

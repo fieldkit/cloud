@@ -4,6 +4,7 @@ import MapboxGL from 'react-map-gl'
 import WebGLOverlay from './WebGLOverlay'
 import DOMOverlay from './DOMOverlay'
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../constants/mapbox.js'
+import { is } from 'immutable'
 
 class Map extends React.Component {
 
@@ -53,9 +54,12 @@ class Map extends React.Component {
     requestAnimationFrame(() => this.tick(true))
   }
 
-  shouldComponentUpdate (nextProps) {
-    return this.props.currentDate !== nextProps.currentDate ||
-      nextProps.playbackMode === 'pause'      
+  shouldComponentUpdate (props) {
+    return this.props.viewport.longitude !== props.viewport.longitude ||
+      this.props.viewport.latitude !== props.viewport.latitude ||
+      this.props.viewport.zoom !== props.viewport.zoom ||
+      this.props.currentDate !== props.currentDate ||
+      !is(this.props.focusedDocument, props.focusedDocument)
   }
 
   render () {
@@ -68,8 +72,6 @@ class Map extends React.Component {
       focusedDocument,
       openLightbox
     } = this.props
-
-    console.log('rendering map', Math.random())
 
     return (
       <div id="map">
