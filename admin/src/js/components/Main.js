@@ -99,7 +99,6 @@ export class Main extends Component {
       promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeExpedition = null;
     } else if (!newExpeditionSlug) {
-      promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeExpedition = null;
     }
 
