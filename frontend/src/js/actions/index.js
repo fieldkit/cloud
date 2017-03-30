@@ -109,6 +109,8 @@ export function requestExpedition (expeditionID) {
 
     const projectID = location.hostname.split('.')[0]
 
+    // TODO: the API calls should be moved to middleware. The document query will need to be filtered and called whenever data is required by the frontend
+
     console.log('querying project')
     FKApiClient.getProject(projectID)
       .then(resProject => {
