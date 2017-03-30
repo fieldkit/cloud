@@ -30,7 +30,7 @@ class Map extends React.Component {
       playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
-    if (focusType === 'expedition' && (firstFrame || dateDelta !== 0)) updateDate(nextDate)
+    if (firstFrame || dateDelta !== 0) updateDate(nextDate)
     requestAnimationFrame(() => this.tick(false))
   }
 
