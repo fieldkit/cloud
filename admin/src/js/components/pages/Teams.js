@@ -12,7 +12,7 @@ import '../../../css/teams.css'
 
 import { FormContainer } from '../containers/FormContainer';
 
-import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember } from '../../api/types';
+import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIBaseMember, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -29,6 +29,11 @@ export class Teams extends Component {
   state: {
     teams: APITeam[],
     members: { [teamId: number]: APIMember[] },
+    users: { [teamId: number]: APIUser[] },
+    teamDeletion: ?{
+      contents: React$Element<*>;
+      teamId: number;
+    },
     memberDeletion: ?{
       contents: React$Element<*>;
       userId: number;
@@ -41,6 +46,8 @@ export class Teams extends Component {
     this.state = {
       teams: [],
       members: {},
+      users: {},
+      teamDeletion: null,
       memberDeletion: null
     }
 
@@ -64,8 +71,22 @@ export class Teams extends Component {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
       this.setState({members: members});
+      for (const member of members[teamId]) {
+        await this.loadMemberName(teamId, member.user_id);
+      }      
     }
   }
+
+  async loadMemberName(teamId: number, userId: number){
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      if(!users[teamId]){
+        users[teamId] = [];
+      }users[teamId].push(userRes.payload);
+      this.setState({users: users});
+    }    
+  }  
 
   async onTeamCreate(e: APINewTeam) {
 
@@ -80,6 +101,36 @@ export class Teams extends Component {
     }
   }
 
+  startTeamDelete(e: APITeam) {
+    const teamId = e.id;
+    this.setState({
+      teamDeletion: {
+        contents: <span>Are you sure you want to delete the <strong>{e.name}</strong> team?</span>,
+        teamId
+      }
+    })
+  }
+
+  async confirmTeamDelete() {
+    const { teamDeletion } = this.state;
+
+    if (teamDeletion) {
+      const { teamId } = teamDeletion;
+
+      const teamRes = await FKApiClient.get().deleteTeam(teamId);
+      if (teamRes.type === 'ok') {
+        await this.loadTeams(teamId);
+        this.setState({ teamDeletion: null })
+      } else {
+        // TODO: show errors somewhere
+      }
+    }
+  }
+  
+  cancelTeamDelete() {
+    this.setState({ teamDeletion: null });
+  }
+
   async onMemberAdd(teamId: number, e: APINewMember) {
     const { match } = this.props;
     const memberRes = await FKApiClient.get().addMember(teamId, e);
@@ -92,7 +143,7 @@ export class Teams extends Component {
   }
 
   startMemberDelete(teamId: number, userId: number) {
-    const { teams, members } = this.state;
+    const { teams, members, users } = this.state;
     let teamName = 'unknownTeam';
     let userName = 'unknownUser';
 
@@ -105,13 +156,15 @@ export class Teams extends Component {
         teamName = team.name;
       }
       if (teamMember) {
-        // TODO: look up username
-        userName = teamMember.user_id.toString(10);
+        const user = users[teamId].find((u: APIUser) => u.id === teamMember.user_id);
+        if (user) {
+          userName = user.name;
+        }
       }
     }
     this.setState({
       memberDeletion: {
-        contents: <span>Are you sure you want to remove <strong>{userName}</strong> from <strong>{teamName}</strong></span>,
+        contents: <span>Are you sure you want to remove <strong>{userName}</strong> from <strong>{teamName}?</strong></span>,
         userId, teamId
       }
     })
@@ -137,33 +190,78 @@ export class Teams extends Component {
     this.setState({ memberDeletion: null });
   }
 
+  async confirmMemberUpdate(teamId: number, memberId: number, values: APIBaseMember) {
+    const memberRes = await FKApiClient.get().updateMember(teamId, memberId, values);
+    if(memberRes.type === 'ok' && memberRes.payload) {
+      await this.loadMembers(teamId);      
+    } else {
+      return memberRes.errors;
+    }
+  }
+
+  async onTeamUpdate(teamId: number, team: APINewTeam) {
+    const teamRes = await FKApiClient.get().updateTeam(teamId, team);
+    if(teamRes.type === 'ok' && teamRes.payload) {
+      await this.loadTeams();
+    } else {
+      return teamRes.errors;
+    }
+  }
+
+  getTeamById (id: number): ?APITeam {
+    const { teams } = this.state;
+    return this.state.teams.find(team => team.id === id);
+  }
+
   render() {
     const { match } = this.props;
-    const { members, teams, memberDeletion } = this.state;
+    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
 
     return (
       <div className="teams">
+
         <Route path={`${match.url}/new-team`} render={() =>
-          <ReactModal isOpen={true} contentLabel="Create New Team">
-            <h1>Create a new team</h1>
+          <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Create New Team</h2>
             <TeamForm
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onTeamCreate.bind(this)} />
           </ReactModal> } />
 
         <Route path={`${match.url}/:teamId/add-member`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Add Members">
-            <h1>Add Members</h1>
+          <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
+            <h2>Add Member</h2>
             <MemberForm
               teamId={props.match.params.teamId}
               members={this.state.members[props.match.params.teamId]}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onMemberAdd.bind(this)} />
-          </ReactModal> } />
+              onSave={this.onMemberAdd.bind(this)} 
+              saveText="Add" />
+          </ReactModal> } />          
+
+        <Route path={`${match.url}/:teamId/edit`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
+            <TeamForm
+              team={this.getTeamById(parseInt(props.match.params.teamId))}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onTeamUpdate.bind(this, parseInt(props.match.params.teamId))} />
+          </ReactModal> } />          
+
+        { teamDeletion &&
+          <ReactModal isOpen={true} contentLabel="Delete Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Delete Team</h2>
+            <FormContainer
+              onSave={this.confirmTeamDelete.bind(this)}
+              onCancel={this.cancelTeamDelete.bind(this)}
+              saveText="Confirm"
+            >
+              <div>{teamDeletion.contents}</div>
+            </FormContainer>
+          </ReactModal> }
 
         { memberDeletion &&
-          <ReactModal isOpen={true} contentLabel="Remove member confirmation">
-            <h1>Confirm removal</h1>
+          <ReactModal isOpen={true} contentLabel="Remove Member" className="modal" overlayClassName="modal-overlay">
+            <h2>Remove Member</h2>
             <FormContainer
               onSave={this.confirmMemberDelete.bind(this)}
               onCancel={this.cancelMemberDelete.bind(this)}
@@ -179,20 +277,24 @@ export class Teams extends Component {
         { teams.map((team, i) =>
           <div key={i} className="accordion-row expanded">
               <div className="accordion-row-header">
-                <button className="secondary">Edit</button>
                 <h4>{team.name}</h4>
-                <p>{team.description}</p>
+                <div className="nav">
+                  <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
+                  <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                </div>
               </div>
-              <div>
-                { members[team.id] && members[team.id].length > 0 &&
-                  <MembersTable
-                    teamId={team.id}
-                    members={members[team.id]}
-                    onDelete={this.startMemberDelete.bind(this)} /> }
-                { (!members[team.id] || members[team.id].length === 0) &&
-                  <p className="empty">No members</p> }
-                <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
-              </div>
+              <p>{team.description}</p>
+              { members[team.id] && members[team.id].length > 0 &&
+                <MembersTable
+                  teamId={team.id}
+                  members={members[team.id]}
+                  users={users[team.id]}
+                  onDelete={this.startMemberDelete.bind(this)} 
+                  onUpdate={this.confirmMemberUpdate.bind(this)}/> }
+              { (!members[team.id] || members[team.id].length === 0) &&
+                <p className="empty">This team has no members yet.</p> }
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+
           </div> ) }
         { teams.length === 0 &&
           <span className="empty">No teams</span> }
