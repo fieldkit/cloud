@@ -32,5 +32,19 @@
       flex-basis: $line-width * 2;
       margin-left: $line-width * 2;
     }
+
+    &_actions {
+      flex-basis: $line-width * 2;
+      margin-left: $line-width * 2;
+      
+      & .button {
+        border: 1px solid white;
+        cursor: pointer;
+        width: $line-width * 2;
+        height: $line-width * 2;
+        padding: $line-width / 4;
+        margin-bottom: $line-width;
+      }
+    }
   }
 }

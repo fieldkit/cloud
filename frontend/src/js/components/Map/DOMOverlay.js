@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
+import sensorIcon from '../../../img/icon-sensor-red.png'
+
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
@@ -46,7 +48,9 @@ export default class WebGLOverlay extends Component {
               }}
             >
               <div className="dom-overlay_popup_content">
-                <div className="dom-overlay_popup_content_icon"></div>
+                <div className="dom-overlay_popup_content_icon">
+                  <img src={ '/' + sensorIcon } />
+                </div>
                 <div>{focusedDocument.get('id')}</div>
                 <div>{focusedDocument.get('date')}</div>
               </div>

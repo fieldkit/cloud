@@ -20,7 +20,8 @@ const mapStateToProps = (state, ownProps) => {
       state => state.expeditions.getIn(['focus', 'type']),
       (expeditions, _viewport, documents, currentDocumentIDs, currentDate, playbackMode, mousePosition, focusType) => {
         
-        // TODO: This certainly could be optimized
+        // This is where all the geometry stuff for rendering documents on the map
+        // TODO: This certainly could be optimized, results could be cached
 
         const viewport = _viewport.toJS()
         const currentDocuments = documents.filter(d => {
