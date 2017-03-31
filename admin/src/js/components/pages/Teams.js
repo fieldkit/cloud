@@ -190,37 +190,19 @@ export class Teams extends Component {
     this.setState({ memberDeletion: null });
   }
 
-  startMemberUpdate(teamId: number, memberId: number, values: APIBaseMember) {
-    const { members } = this.state;
-    const member = this.getMemberById(teamId, memberId);
-    if(member) {
-      member.role = values.role;
+  async confirmMemberUpdate(teamId: number, memberId: number, values: APIBaseMember) {
+    const memberRes = await FKApiClient.get().updateMember(teamId, memberId, values);
+    if(memberRes.type === 'ok' && memberRes.payload) {
+      await this.loadMembers(teamId);      
+    } else {
+      return memberRes.errors;
     }
-    this.setState({members: members});
-  }
-
-  async confirmMemberUpdate(teamId: number, memberId: number) {
-    const member = this.getMemberById(teamId, memberId);
-    if(member){
-      const values = {role: member.role};
-      const memberRes = await FKApiClient.get().updateMember(teamId, memberId, values);
-      if(memberRes.type === 'ok' && memberRes.payload) {
-        this.loadMembers(teamId);
-      } else {
-        return memberRes.errors;
-      }      
-    }
-  }
-
-  getMemberById(teamId: number, memberId: number): ?APIMember {
-    const { members } = this.state;
-    return members[teamId].find(member => member.user_id === memberId);
   }
 
   async onTeamUpdate(teamId: number, team: APINewTeam) {
     const teamRes = await FKApiClient.get().updateTeam(teamId, team);
     if(teamRes.type === 'ok' && teamRes.payload) {
-      this.loadTeams();
+      await this.loadTeams();
     } else {
       return teamRes.errors;
     }
@@ -308,7 +290,6 @@ export class Teams extends Component {
                   members={members[team.id]}
                   users={users[team.id]}
                   onDelete={this.startMemberDelete.bind(this)} 
-                  onStartUpdate={this.startMemberUpdate.bind(this)}
                   onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }

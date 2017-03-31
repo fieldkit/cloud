@@ -10,8 +10,7 @@ type Props = {
   members: APIMember[],
   users: APIUser[],
   onDelete: (teamId: number, userId: number) => Promise<?APIErrors>,
-  onStartUpdate: (teamId: number, memberId: number, values: APIBaseMember) => void,
-  onUpdate: (teamId: number, memberId: number) => void
+  onUpdate: (teamId: number, memberId: number, values: APIBaseMember) => Promise<?APIErrors>
 }
 
 export class MembersTable extends Component {
@@ -44,20 +43,28 @@ export class MembersTable extends Component {
     }
   }
 
-  handleInputChange(memberId: number, event) {
+  handleInputChange(event) {
     const target = event.target;
-    const value = target.value;
-    const { teamId, onStartUpdate } = this.props;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
 
-    onStartUpdate(teamId, memberId, {role: value});
+    this.setState({ [name]: value });
   }
 
-  handleKeyUp(memberId: number, event) {
-    const { teamId, onUpdate } = this.props;
-    const { user_id } = this.state;
+  handleKeyUp(event) {
     if (event.key === 'Enter') {
-      onUpdate(teamId, memberId);
-      this.setState({user_id: -1});
+      this.save();
+    }
+  }
+
+  async save() {
+    const { teamId, onUpdate } = this.props;
+    const { user_id, role } = this.state;
+    const errors = await onUpdate(teamId, user_id, {role: role});
+    if (errors) {
+      this.setState({ errors });
+    }else{
+      this.handleBlur();
     }
   }
 
@@ -66,7 +73,10 @@ export class MembersTable extends Component {
   }
 
   handleBlur(){
-    this.setState({user_id: -1});
+    this.setState({
+      user_id: -1,
+      role: ''
+    });
   }
 
   async delete(userId: number) {
@@ -80,7 +90,7 @@ export class MembersTable extends Component {
 
   render() {
     const { teamId, members } = this.props;
-    let { users, user_id } = this.state
+    let { users, user_id, role } = this.state
 
     return (
       <table className="members-table">
@@ -108,11 +118,11 @@ export class MembersTable extends Component {
                 </td>
                 <td>
                   <input type="text"
-                    value={member.role}
+                    value={member.user_id === user_id ? role : member.role}
                     name="role"
                     disabled={member.user_id !== user_id}
-                    onChange={this.handleInputChange.bind(this, member.user_id)}
-                    onKeyUp={this.handleKeyUp.bind(this, member.user_id)}
+                    onChange={this.handleInputChange.bind(this)}
+                    onKeyUp={this.handleKeyUp.bind(this)}
                     onBlur={this.handleBlur.bind(this)}/>
                   <div id={member.user_id} className={'bt-icon medium ' + (member.user_id === user_id ? 'disabled' : '') } onClick={this.startMemberEdit.bind(this, member.user_id)}>
                     <EditIcon />
