@@ -5,6 +5,7 @@ import { Link } from 'react-router'
 import { is } from 'immutable'
 
 import iconLocation from '../../../img/icon-location.png'
+import iconSensor from '../../../img/icon-sensor-red.png'
 
 class Post extends React.Component {
 
@@ -22,7 +23,7 @@ class Post extends React.Component {
     return (
       <div className="post" ref="container">
         <div className="post_type">
-          Tweet
+          <img src={ '/' + iconSensor } />
         </div>
         <div className="post_main">
           <div className="post_main_content">
