@@ -307,7 +307,7 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   updateMember(teamId: number, userId: number, values: APIBaseMember): Promise<FKAPIResponse<APIMember>> {
-    return this.postWithErrors(`/teams/${teamId}/member/${userId}`, values)
+    return this.patchWithErrors(`/teams/${teamId}/members/${userId}`, values)
   }
 
   getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {

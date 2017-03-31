@@ -9,58 +9,70 @@ type Props = {
   teamId: number,
   members: APIMember[],
   users: APIUser[],
-  onDelete: (teamId: number, userId: number) => Promise<?APIErrors>
+  onDelete: (teamId: number, userId: number) => Promise<?APIErrors>,
+  onMemberUpdate: (teamId: number, memberId: number, role: string) => void
 }
 
 export class MembersTable extends Component {
   props: Props;
   state: {
-    users: APIUser[],
-    // users: {[id: number]: APIUser},
-    errors: ?APIErrors    
+    users: {[id: number]: APIUser},
+    editingMemberId: number,
+    errors: ?APIErrors
   }
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      users: [],
+      users: {},
+      editingMemberId: -1,
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    this.setState({
-      users: nextProps.users
-    });
+    let { users } = nextProps;
+    if(users){
+      const mappedUsers = {};
+      for(var u of users){
+        mappedUsers[u.id] = u;
+        this.setState({users: mappedUsers});
+      }
+    }
   }
 
-  // componentWillReceiveProps(nextProps: Props) {
-  //   let { users } = nextProps;
-  //   if(users){
-  //     const mappedUsers = {};
-  //     for(var u of users){
-  //       mappedUsers[u.id] = u;
-  //       this.setState({users: mappedUsers});
-  //     }
-  //   }
-  // }
+  handleInputChange(memberId: number, event) {
+    const target = event.target;
+    const value = target.value;
+    const { teamId, onMemberUpdate } = this.props;
+    // console.log(teamId, memberId, value);
+    onMemberUpdate(teamId, memberId, value);
+  }
 
-  async deleteUser(userId: number) {
+  handleKeyUp(event) {
+    console.log(event.key);
+    if (event.key === 'Enter') {
+      console.log('save');
+    }
+  }
+
+  startMemberEdit(memberId: number) {
+    console.log(memberId);
+    this.setState({editingMemberId: memberId});
+  }
+
+  async delete(userId: number) {
     const { teamId } = this.props;
 
     const errors = await this.props.onDelete(teamId, userId);
     if (errors) {
       this.setState({ errors });
-    }
-  }
-
-  getUserById:APIUser (userId: number) {
-
+    }    
   }
 
   render() {
     const { teamId, members } = this.props;
-    let { users } = this.state
+    let { users, editingMemberId } = this.state
 
     return (
       <table className="members-table">
@@ -87,13 +99,17 @@ export class MembersTable extends Component {
                       </div> }
                 </td>
                 <td>
-                  <span>{member.role}</span>
-                  <div className="bt-icon medium">
+                  <input type="text"
+                    value={member.role}
+                    name="role"
+                    disabled={member.user_id !== editingMemberId}
+                    onChange={this.handleInputChange.bind(this, member.user_id)}/>
+                  <div id={member.user_id} className={'bt-icon medium ' + (member.user_id === editingMemberId ? 'disabled' : '') } onClick={this.startMemberEdit.bind(this, member.user_id)}>
                     <EditIcon />
                   </div>                        
                 </td>
                 <td>
-                  <div className="bt-icon medium" onClick={this.deleteUser.bind(this, member.user_id)}>
+                  <div className="bt-icon medium" onClick={this.delete.bind(this, member.user_id)}>
                     <RemoveIcon />
                   </div>
                 </td>

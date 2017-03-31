@@ -190,6 +190,15 @@ export class Teams extends Component {
     this.setState({ memberDeletion: null });
   }
 
+  startMemberUpdate(teamId: number, memberId: number, role: string) {
+    const { members } = this.state;
+    const member = members[teamId].find(member => member.user_id === memberId);
+    if(member) {
+      member.role = role;      
+    }
+    this.setState({members: members});
+  }
+
   async onTeamUpdate(teamId: number, team: APINewTeam) {
     const teamRes = await FKApiClient.get().updateTeam(teamId, team);
     if(teamRes.type === 'ok' && teamRes.payload) {
@@ -280,7 +289,8 @@ export class Teams extends Component {
                   teamId={team.id}
                   members={members[team.id]}
                   users={users[team.id]}
-                  onDelete={this.startMemberDelete.bind(this)} /> }
+                  onDelete={this.startMemberDelete.bind(this)} 
+                  onMemberUpdate={this.startMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
               <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                

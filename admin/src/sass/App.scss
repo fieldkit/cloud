@@ -389,6 +389,12 @@ button, .button {
     vertical-align: top;
     fill: $gray-2;    
   }
+
+  &.disabled {
+    svg {
+      fill: $gray-3;
+    }
+  }
 }
 
 input[type="submit"] {
