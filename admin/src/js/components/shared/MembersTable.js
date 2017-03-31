@@ -15,36 +15,47 @@ type Props = {
 export class MembersTable extends Component {
   props: Props;
   state: {
-    users: {[id: number]: APIUser},
+    users: APIUser[],
+    // users: {[id: number]: APIUser},
     errors: ?APIErrors    
   }
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      users: {},
+      users: [],
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    let { users } = nextProps;
-    if(users){
-      const mappedUsers = {};
-      for(var u of users){
-        mappedUsers[u.id] = u;
-        this.setState({users: mappedUsers});
-      }
-    }
+    this.setState({
+      users: nextProps.users
+    });
   }
 
-  async delete(userId: number) {
+  // componentWillReceiveProps(nextProps: Props) {
+  //   let { users } = nextProps;
+  //   if(users){
+  //     const mappedUsers = {};
+  //     for(var u of users){
+  //       mappedUsers[u.id] = u;
+  //       this.setState({users: mappedUsers});
+  //     }
+  //   }
+  // }
+
+  async deleteUser(userId: number) {
     const { teamId } = this.props;
 
     const errors = await this.props.onDelete(teamId, userId);
     if (errors) {
       this.setState({ errors });
-    }    
+    }
+  }
+
+  getUserById:APIUser (userId: number) {
+
   }
 
   render() {
@@ -82,7 +93,7 @@ export class MembersTable extends Component {
                   </div>                        
                 </td>
                 <td>
-                  <div className="bt-icon medium" onClick={this.delete.bind(this, member.user_id)}>
+                  <div className="bt-icon medium" onClick={this.deleteUser.bind(this, member.user_id)}>
                     <RemoveIcon />
                   </div>
                 </td>
