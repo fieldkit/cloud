@@ -378,6 +378,18 @@
 			"versionExact": "v1"
 		},
 		{
+			"checksumSHA1": "aJ/kX/eCUlrCJBZ26Hwh/RXzAIw=",
+			"path": "github.com/golang/freetype/raster",
+			"revision": "d9be45aaf7452cc30c0ceb1b1bf7efe1d17b7c87",
+			"revisionTime": "2016-12-08T06:47:10Z"
+		},
+		{
+			"checksumSHA1": "M5K0e+YbpnI/3x9iNF/VOgOFnes=",
+			"path": "github.com/golang/freetype/truetype",
+			"revision": "d9be45aaf7452cc30c0ceb1b1bf7efe1d17b7c87",
+			"revisionTime": "2016-12-08T06:47:10Z"
+		},
+		{
 			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
 			"path": "github.com/google/go-querystring/query",
 			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
@@ -426,6 +438,30 @@
 			"revisionTime": "2017-03-13T20:04:23Z"
 		},
 		{
+			"checksumSHA1": "v+KQute8LPvgJyGwdPNaMrcdAPI=",
+			"path": "github.com/llgcode/draw2d",
+			"revision": "1286d3b2030ac9952e59c5ef29ef3cc24a8e83d5",
+			"revisionTime": "2016-11-04T08:10:29Z"
+		},
+		{
+			"checksumSHA1": "04IVHArLe4lH6hwzpQrIhuJ92fQ=",
+			"path": "github.com/llgcode/draw2d/draw2dbase",
+			"revision": "1286d3b2030ac9952e59c5ef29ef3cc24a8e83d5",
+			"revisionTime": "2016-11-04T08:10:29Z"
+		},
+		{
+			"checksumSHA1": "inDKxVFa6iMet6S+HKxTIAODq0c=",
+			"path": "github.com/llgcode/draw2d/draw2dimg",
+			"revision": "1286d3b2030ac9952e59c5ef29ef3cc24a8e83d5",
+			"revisionTime": "2016-11-04T08:10:29Z"
+		},
+		{
+			"checksumSHA1": "qQ/69O0QaXw/YCajx/sj+rgFzWw=",
+			"path": "github.com/lucasb-eyer/go-colorful",
+			"revision": "c900de9dbbc73129068f5af6a823068fc5f2308c",
+			"revisionTime": "2017-02-23T22:10:28Z"
+		},
+		{
 			"checksumSHA1": "L6Ps004WGoAJBEBX5Zrv0tPa2b4=",
 			"path": "github.com/manveru/faker",
 			"revision": "717f7cf83fb78669bfab612749c2e8ff63d5be11",
@@ -466,6 +502,30 @@
 			"path": "golang.org/x/crypto/blowfish",
 			"revision": "728b753d0135da6801d45a38e6f43ff55779c5c2",
 			"revisionTime": "2017-01-24T01:46:54Z"
+		},
+		{
+			"checksumSHA1": "WZqFyWo6r8KZodsU0doRvel37F0=",
+			"path": "golang.org/x/image/draw",
+			"revision": "c0851fbc5b9272dd7d08a021e9e3d2a21027b51f",
+			"revisionTime": "2017-03-18T06:56:20Z"
+		},
+		{
+			"checksumSHA1": "+U1IB5N4LDS74y4fXjARb4/S4IE=",
+			"path": "golang.org/x/image/font",
+			"revision": "c0851fbc5b9272dd7d08a021e9e3d2a21027b51f",
+			"revisionTime": "2017-03-18T06:56:20Z"
+		},
+		{
+			"checksumSHA1": "o7VkCGBiKM5HXzVzrIci1YDlpvc=",
+			"path": "golang.org/x/image/math/f64",
+			"revision": "c0851fbc5b9272dd7d08a021e9e3d2a21027b51f",
+			"revisionTime": "2017-03-18T06:56:20Z"
+		},
+		{
+			"checksumSHA1": "euzvwlMLxyD0hwc+raoVsDLv6j4=",
+			"path": "golang.org/x/image/math/fixed",
+			"revision": "c0851fbc5b9272dd7d08a021e9e3d2a21027b51f",
+			"revisionTime": "2017-03-18T06:56:20Z"
 		},
 		{
 			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",

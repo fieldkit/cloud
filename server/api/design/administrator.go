@@ -41,7 +41,7 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("projects/:project_id/administrator"))
+		Routing(POST("projects/:project_id/administrators"))
 		Description("Add an administrator to a project")
 		Params(func() {
 			Param("project_id", Integer)
@@ -90,6 +90,7 @@ var _ = Resource("administrator", func() {
 		Params(func() {
 			Param("project_id", Integer)
 			Param("user_id", Integer)
+			Required("project_id", "user_id")
 		})
 		Response(OK, func() {
 			Media(ProjectAdministrator)

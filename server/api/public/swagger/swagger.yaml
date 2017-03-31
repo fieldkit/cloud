@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      user_id: 1.6821646e+18
+      user_id: 1.7883488e+18
     properties:
       user_id:
-        example: 1.6821646e+18
+        example: 1.7883488e+18
         format: int64
         type: integer
     required:
@@ -15,18 +15,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Asperiores nostrum.
-      name: Dignissimos aut repellendus quam soluta odio.
-      slug: 3n7ahu8r8v
+      description: Sunt ut fugit nobis.
+      name: Dolores sit qui perspiciatis.
+      slug: rltfvtq833
     properties:
       description:
-        example: Asperiores nostrum.
+        example: Sunt ut fugit nobis.
         type: string
       name:
-        example: Dignissimos aut repellendus quam soluta odio.
+        example: Dolores sit qui perspiciatis.
         type: string
       slug:
-        example: 3n7ahu8r8v
+        example: rltfvtq833
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -38,14 +38,14 @@ definitions:
     type: object
   AddMemberPayload:
     example:
-      role: A voluptas.
-      user_id: 6.5765226e+17
+      role: Praesentium ut cum iusto iusto quia officia.
+      user_id: 2.1539757e+18
     properties:
       role:
-        example: A voluptas.
+        example: Praesentium ut cum iusto iusto quia officia.
         type: string
       user_id:
-        example: 6.5765226e+17
+        example: 2.1539757e+18
         format: int64
         type: integer
     required:
@@ -55,18 +55,18 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Itaque qui sequi.
-      name: Laudantium quo eos fuga ab repudiandae.
-      slug: ic2d6hce00
+      description: Quia id.
+      name: Aliquam error et asperiores qui quas.
+      slug: gbyyauoy52
     properties:
       description:
-        example: Itaque qui sequi.
+        example: Quia id.
         type: string
       name:
-        example: Laudantium quo eos fuga ab repudiandae.
+        example: Aliquam error et asperiores qui quas.
         type: string
       slug:
-        example: ic2d6hce00
+        example: gbyyauoy52
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -78,18 +78,20 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Consequatur ullam sed magni.
-      name: Et blanditiis debitis eos iure ea.
-      slug: jv73wy8mr3
+      description: Velit ad.
+      name: 6cingd200j
+      slug: uckup4mrpl
     properties:
       description:
-        example: Consequatur ullam sed magni.
+        example: Velit ad.
         type: string
       name:
-        example: Et blanditiis debitis eos iure ea.
+        example: 6cingd200j
+        maxLength: 256
+        pattern: \S
         type: string
       slug:
-        example: jv73wy8mr3
+        example: uckup4mrpl
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -101,31 +103,43 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: jailyn.ernser@brekkeankunding.com
-      invite_token: Occaecati occaecati omnis sint.
-      password: y52dmi76ci
-      username: gd200jauck
+      bio: Vitae et corrupti ipsum fugit nisi odio.
+      email: kyleigh@wittingcarter.biz
+      invite_token: Rerum et sed dolorem consequatur quidem.
+      name: 4q26y98iwe
+      password: nufpoe7n4j
+      username: 477aketl8q
     properties:
+      bio:
+        example: Vitae et corrupti ipsum fugit nisi odio.
+        type: string
       email:
-        example: jailyn.ernser@brekkeankunding.com
+        example: kyleigh@wittingcarter.biz
         format: email
         type: string
       invite_token:
-        example: Occaecati occaecati omnis sint.
+        example: Rerum et sed dolorem consequatur quidem.
+        type: string
+      name:
+        example: 4q26y98iwe
+        maxLength: 256
+        pattern: \S
         type: string
       password:
-        example: y52dmi76ci
+        example: nufpoe7n4j
         minLength: 10
         type: string
       username:
-        example: gd200jauck
+        example: 477aketl8q
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
     required:
+    - name
     - email
     - username
     - password
+    - bio
     - invite_token
     title: AddUserPayload
     type: object
@@ -188,6 +202,10 @@ definitions:
         id: 1.2402411e+18
         name: Saepe facilis quis blanditiis recusandae est.
         slug: ap0fuesxsv
+      - description: Qui possimus porro quaerat.
+        id: 1.2402411e+18
+        name: Saepe facilis quis blanditiis recusandae est.
+        slug: ap0fuesxsv
     properties:
       expeditions:
         $ref: '#/definitions/ExpeditionCollection'
@@ -199,6 +217,14 @@ definitions:
     description: Inputs media type (default view)
     example:
       twitter_accounts:
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
+      - expedition_id: 4.464267e+18
+        id: 3.6825135e+17
+        screen_name: Laboriosam aut voluptatum.
+        twitter_account_id: 2.2726114e+18
       - expedition_id: 4.464267e+18
         id: 3.6825135e+17
         screen_name: Laboriosam aut voluptatum.
@@ -223,15 +249,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: p4mrpluru5
-      username: rgjkna1y63
+      password: ueb63hu9e7
+      username: mbiiuahxos
     properties:
       password:
-        example: p4mrpluru5
+        example: ueb63hu9e7
         minLength: 10
         type: string
       username:
-        example: rgjkna1y63
+        example: mbiiuahxos
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -312,8 +338,6 @@ definitions:
         user_id: 6.2970576e+18
       - project_id: 1.2833427e+18
         user_id: 6.2970576e+18
-      - project_id: 1.2833427e+18
-        user_id: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -355,10 +379,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Vel quisquam voluptatem doloribus.
+      refresh_token: Unde reiciendis sit.
     properties:
       refresh_token:
-        example: Vel quisquam voluptatem doloribus.
+        example: Unde reiciendis sit.
         type: string
     required:
     - refresh_token
@@ -369,8 +393,8 @@ definitions:
     example:
       description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     properties:
       description:
         example: Ipsam reprehenderit totam dolorem impedit hic.
@@ -380,10 +404,12 @@ definitions:
         format: int64
         type: integer
       name:
-        example: Repellendus cupiditate nemo doloribus.
+        example: dr480bux7j
+        maxLength: 256
+        pattern: \S
         type: string
       slug:
-        example: bux7jxef7u
+        example: ef7unsz2rb
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -399,16 +425,12 @@ definitions:
     example:
     - description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     - description: Ipsam reprehenderit totam dolorem impedit hic.
       id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
-    - description: Ipsam reprehenderit totam dolorem impedit hic.
-      id: 6.0403337e+18
-      name: Repellendus cupiditate nemo doloribus.
-      slug: bux7jxef7u
+      name: dr480bux7j
+      slug: ef7unsz2rb
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
@@ -476,8 +498,16 @@ definitions:
       teams:
       - description: Ipsam reprehenderit totam dolorem impedit hic.
         id: 6.0403337e+18
-        name: Repellendus cupiditate nemo doloribus.
-        slug: bux7jxef7u
+        name: dr480bux7j
+        slug: ef7unsz2rb
+      - description: Ipsam reprehenderit totam dolorem impedit hic.
+        id: 6.0403337e+18
+        name: dr480bux7j
+        slug: ef7unsz2rb
+      - description: Ipsam reprehenderit totam dolorem impedit hic.
+        id: 6.0403337e+18
+        name: dr480bux7j
+        slug: ef7unsz2rb
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -523,10 +553,6 @@ definitions:
       id: 3.6825135e+17
       screen_name: Laboriosam aut voluptatum.
       twitter_account_id: 2.2726114e+18
-    - expedition_id: 4.464267e+18
-      id: 3.6825135e+17
-      screen_name: Laboriosam aut voluptatum.
-      twitter_account_id: 2.2726114e+18
     items:
       $ref: '#/definitions/TwitterAccount'
     title: 'Mediatype identifier: application/vnd.app.twitter_account+json; type=collection;
@@ -547,35 +573,104 @@ definitions:
     - twitter_accounts
     title: 'Mediatype identifier: application/vnd.app.twitter_accounts+json; view=default'
     type: object
+  UpdateMemberPayload:
+    example:
+      role: Nobis omnis.
+    properties:
+      role:
+        example: Nobis omnis.
+        type: string
+    required:
+    - role
+    title: UpdateMemberPayload
+    type: object
+  UpdateUserPayload:
+    example:
+      bio: Est tempora cumque sed.
+      email: mable.thompson@dibbert.net
+      name: 68s1lx8rzq
+      username: 5j6w1dd458
+    properties:
+      bio:
+        example: Est tempora cumque sed.
+        type: string
+      email:
+        example: mable.thompson@dibbert.net
+        format: email
+        type: string
+      name:
+        example: 68s1lx8rzq
+        maxLength: 256
+        pattern: \S
+        type: string
+      username:
+        example: 5j6w1dd458
+        maxLength: 40
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        type: string
+    required:
+    - name
+    - email
+    - username
+    - bio
+    title: UpdateUserPayload
+    type: object
   User:
     description: User media type (default view)
     example:
-      id: 5.5453506e+18
-      username: gzslj0tddk
+      bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
     properties:
+      bio:
+        example: Natus dolores quo suscipit voluptatem magni in.
+        type: string
+      email:
+        example: meta@batzsawayn.net
+        format: email
+        type: string
       id:
-        example: 5.5453506e+18
+        example: 5.5759253e+18
         format: int64
         type: integer
+      name:
+        example: ce00voebze
+        maxLength: 256
+        pattern: \S
+        type: string
       username:
-        example: gzslj0tddk
+        example: 5qmtbwjv73
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
     required:
     - id
+    - name
     - username
+    - email
+    - bio
     title: 'Mediatype identifier: application/vnd.app.user+json; view=default'
     type: object
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - id: 5.5453506e+18
-      username: gzslj0tddk
-    - id: 5.5453506e+18
-      username: gzslj0tddk
-    - id: 5.5453506e+18
-      username: gzslj0tddk
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
+    - bio: Natus dolores quo suscipit voluptatem magni in.
+      email: meta@batzsawayn.net
+      id: 5.5759253e+18
+      name: ce00voebze
+      username: 5qmtbwjv73
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -585,8 +680,16 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - id: 5.5453506e+18
-        username: gzslj0tddk
+      - bio: Natus dolores quo suscipit voluptatem magni in.
+        email: meta@batzsawayn.net
+        id: 5.5759253e+18
+        name: ce00voebze
+        username: 5qmtbwjv73
+      - bio: Natus dolores quo suscipit voluptatem magni in.
+        email: meta@batzsawayn.net
+        id: 5.5759253e+18
+        name: ce00voebze
+        username: 5qmtbwjv73
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -640,7 +743,7 @@ paths:
   /expeditions/{expedition_id}:
     get:
       description: |-
-        Add a expedition
+        Add an expedition
 
         Required security scopes:
           * `api:access`
@@ -665,6 +768,40 @@ paths:
       - jwt:
         - api:access
       summary: get id expedition
+      tags:
+      - expedition
+    patch:
+      description: |-
+        Update an expedition
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#update
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddExpeditionPayload'
+      produces:
+      - application/vnd.app.expedition+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expedition'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update expedition
       tags:
       - expedition
   /expeditions/{expedition_id}/inputs:
@@ -697,36 +834,6 @@ paths:
       summary: list id input
       tags:
       - input
-  /expeditions/{expedition_id}/inputs/twitter-account:
-    post:
-      description: |-
-        Add a Twitter account input
-
-        Required security scopes:
-          * `api:access`
-      operationId: twitter#add
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.location+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Location'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add twitter
-      tags:
-      - twitter
   /expeditions/{expedition_id}/inputs/twitter-accounts:
     get:
       description: |-
@@ -757,7 +864,86 @@ paths:
       summary: list id twitter
       tags:
       - twitter
-  /expeditions/{expedition_id}/team:
+    post:
+      description: |-
+        Add a Twitter account input
+
+        Required security scopes:
+          * `api:access`
+      operationId: twitter#add
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.location+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Location'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add twitter
+      tags:
+      - twitter
+  /expeditions/{expedition_id}/picture:
+    get:
+      description: Get a expedition's picture
+      operationId: picture#expedition get id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: expedition get id picture
+      tags:
+      - picture
+  /expeditions/{expedition_id}/teams:
+    get:
+      description: |-
+        List an expedition's teams
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.teams+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Teams'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id team
+      tags:
+      - team
     post:
       description: |-
         Add a team
@@ -790,36 +976,6 @@ paths:
       - jwt:
         - api:access
       summary: add team
-      tags:
-      - team
-  /expeditions/{expedition_id}/teams:
-    get:
-      description: |-
-        List an expedition's teams
-
-        Required security scopes:
-          * `api:access`
-      operationId: team#list id
-      parameters:
-      - in: path
-        name: expedition_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.teams+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Teams'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id team
       tags:
       - team
   /inputs/twitter-accounts/{input_id}:
@@ -903,7 +1059,31 @@ paths:
       summary: logout user
       tags:
       - user
-  /project:
+  /projects:
+    get:
+      description: |-
+        List projects
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#list
+      produces:
+      - application/vnd.app.projects+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Projects'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list project
+      tags:
+      - project
     post:
       description: |-
         Add a project
@@ -932,31 +1112,6 @@ paths:
       - jwt:
         - api:access
       summary: add project
-      tags:
-      - project
-  /projects:
-    get:
-      description: |-
-        List projects
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#list
-      produces:
-      - application/vnd.app.projects+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Projects'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list project
       tags:
       - project
   /projects/@/{project}:
@@ -1094,7 +1249,7 @@ paths:
   /projects/@/{project}/expeditions/@/{expedition}:
     get:
       description: |-
-        Add a expedition
+        Add an expedition
 
         Required security scopes:
           * `api:access`
@@ -1409,7 +1564,70 @@ paths:
       summary: get id project
       tags:
       - project
-  /projects/{project_id}/administrator:
+    patch:
+      description: |-
+        Update a project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#update
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddProjectPayload'
+      produces:
+      - application/vnd.app.project+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update project
+      tags:
+      - project
+  /projects/{project_id}/administrators:
+    get:
+      description: |-
+        List an projects's administrators
+
+        Required security scopes:
+          * `api:access`
+      operationId: administrator#list id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.administrators+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ProjectAdministrators'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id administrator
+      tags:
+      - administrator
     post:
       description: |-
         Add an administrator to a project
@@ -1442,36 +1660,6 @@ paths:
       - jwt:
         - api:access
       summary: add administrator
-      tags:
-      - administrator
-  /projects/{project_id}/administrators:
-    get:
-      description: |-
-        List an projects's administrators
-
-        Required security scopes:
-          * `api:access`
-      operationId: administrator#list id
-      parameters:
-      - in: path
-        name: project_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.administrators+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ProjectAdministrators'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id administrator
       tags:
       - administrator
   /projects/{project_id}/administrators/{user_id}:
@@ -1539,10 +1727,39 @@ paths:
       summary: get id administrator
       tags:
       - administrator
-  /projects/{project_id}/expedition:
+  /projects/{project_id}/expeditions:
+    get:
+      description: |-
+        List a project's expeditions
+
+        Required security scopes:
+          * `api:access`
+      operationId: expedition#list id
+      parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.expeditions+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Expeditions'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id expedition
+      tags:
+      - expedition
     post:
       description: |-
-        Add a expedition
+        Add an expedition
 
         Required security scopes:
           * `api:access`
@@ -1574,36 +1791,27 @@ paths:
       summary: add expedition
       tags:
       - expedition
-  /projects/{project_id}/expeditions:
+  /projects/{project_id}/picture:
     get:
-      description: |-
-        List a project's expeditions
-
-        Required security scopes:
-          * `api:access`
-      operationId: expedition#list id
+      description: Get a project's picture
+      operationId: picture#project get id
       parameters:
       - in: path
         name: project_id
         required: true
         type: integer
       produces:
-      - application/vnd.app.expeditions+json
+      - image/png
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/Expeditions'
         "400":
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id expedition
+      summary: project get id picture
       tags:
-      - expedition
+      - picture
   /refresh:
     post:
       description: Creates a valid JWT given a refresh token.
@@ -1651,6 +1859,35 @@ paths:
       - https
       summary: Download api/public/swagger/swagger.yaml
   /teams/{team_id}:
+    delete:
+      description: |-
+        Update a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#delete
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.team+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Team'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete team
+      tags:
+      - team
     get:
       description: |-
         Add a team
@@ -1680,7 +1917,70 @@ paths:
       summary: get id team
       tags:
       - team
-  /teams/{team_id}/member:
+    patch:
+      description: |-
+        Update a team
+
+        Required security scopes:
+          * `api:access`
+      operationId: team#update
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddTeamPayload'
+      produces:
+      - application/vnd.app.team+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Team'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update team
+      tags:
+      - team
+  /teams/{team_id}/members:
+    get:
+      description: |-
+        List an teams's members
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#list id
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.members+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMembers'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id member
+      tags:
+      - member
     post:
       description: |-
         Add a member to a team
@@ -1713,36 +2013,6 @@ paths:
       - jwt:
         - api:access
       summary: add member
-      tags:
-      - member
-  /teams/{team_id}/members:
-    get:
-      description: |-
-        List an teams's members
-
-        Required security scopes:
-          * `api:access`
-      operationId: member#list id
-      parameters:
-      - in: path
-        name: team_id
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.members+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/TeamMembers'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list id member
       tags:
       - member
   /teams/{team_id}/members/{user_id}:
@@ -1810,6 +2080,42 @@ paths:
       summary: get id member
       tags:
       - member
+    patch:
+      description: |-
+        Update a member
+
+        Required security scopes:
+          * `api:access`
+      operationId: member#update
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        type: integer
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateMemberPayload'
+      produces:
+      - application/vnd.app.member+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TeamMember'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update member
+      tags:
+      - member
   /twitter/callback:
     get:
       description: OAuth callback endpoint for Twitter
@@ -1859,29 +2165,6 @@ paths:
       summary: get current user
       tags:
       - user
-    post:
-      description: Add a user
-      operationId: user#add
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddUserPayload'
-      produces:
-      - application/vnd.app.user+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: add user
-      tags:
-      - user
   /user/projects:
     get:
       description: |-
@@ -1928,6 +2211,29 @@ paths:
       - jwt:
         - api:access
       summary: list user
+      tags:
+      - user
+    post:
+      description: Add a user
+      operationId: user#add
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/AddUserPayload'
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: add user
       tags:
       - user
   /users/@/{username}:
@@ -1986,6 +2292,59 @@ paths:
       summary: get id user
       tags:
       - user
+    patch:
+      description: |-
+        Update a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#update
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPayload'
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update user
+      tags:
+      - user
+  /users/{user_id}/picture:
+    get:
+      description: Get a user's picture
+      operationId: picture#user get id
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: user get id picture
+      tags:
+      - picture
   /validate:
     get:
       description: Validate a user's email address.

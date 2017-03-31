@@ -20,7 +20,7 @@ import (
 func AddTeamPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expeditions/%s/team", param0)
+	return fmt.Sprintf("/expeditions/%s/teams", param0)
 }
 
 // Add a team
@@ -45,6 +45,39 @@ func (c *Client) NewAddTeamRequest(ctx context.Context, path string, payload *Ad
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// DeleteTeamPath computes a request path to the delete action of team.
+func DeleteTeamPath(teamID int) string {
+	param0 := strconv.Itoa(teamID)
+
+	return fmt.Sprintf("/teams/%s", param0)
+}
+
+// Update a team
+func (c *Client) DeleteTeam(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteTeamRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteTeamRequest create the request corresponding to the delete action endpoint of the team resource.
+func (c *Client) NewDeleteTeamRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +213,44 @@ func (c *Client) NewListIDTeamRequest(ctx context.Context, path string) (*http.R
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateTeamPath computes a request path to the update action of team.
+func UpdateTeamPath(teamID int) string {
+	param0 := strconv.Itoa(teamID)
+
+	return fmt.Sprintf("/teams/%s", param0)
+}
+
+// Update a team
+func (c *Client) UpdateTeam(ctx context.Context, path string, payload *AddTeamPayload) (*http.Response, error) {
+	req, err := c.NewUpdateTeamRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateTeamRequest create the request corresponding to the update action endpoint of the team resource.
+func (c *Client) NewUpdateTeamRequest(ctx context.Context, path string, payload *AddTeamPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

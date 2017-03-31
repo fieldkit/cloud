@@ -2,13 +2,15 @@
 import React from 'react'
 import { dateToString } from '../../utils.js'
 import { Link } from 'react-router'
+import { is } from 'immutable'
 
 import iconLocation from '../../../img/icon-location.png'
+import iconSensor from '../../../img/icon-sensor-red.svg'
 
 class Post extends React.Component {
 
-  shouldComponentUpdate () {
-    return false
+  shouldComponentUpdate (props) {
+    return !is(this.props.data, props.data)
   }
 
   render () {
@@ -18,12 +20,10 @@ class Post extends React.Component {
       updateDate
     } = this.props
 
-    // console.log('aga', data.toJS())
-
     return (
       <div className="post" ref="container">
         <div className="post_type">
-          Tweet
+          <img src={ '/' + iconSensor } />
         </div>
         <div className="post_main">
           <div className="post_main_content">
@@ -38,7 +38,7 @@ class Post extends React.Component {
                 to={ '/' + currentExpeditionID + '/map' }
                 onClick={ () => updateDate(data.get('date'), 'pause') }
               >
-                <img src={ '/' + iconLocation }/>
+                <img src={ '/' + iconLocation } width="100%"/>
               </Link>
             </div>
             <div className="post_main_meta_separator"/>

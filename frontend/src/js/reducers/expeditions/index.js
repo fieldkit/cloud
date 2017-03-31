@@ -6,7 +6,13 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
 export const initialState = I.fromJS({
+  project: {
+    id: location.hostname.split('.')[0],
+    name: location.hostname.split('.')[0]
+  },
   lightboxDocumentID: null,
+  previousDocumentID: null,
+  nextDocumentID: null,
   expeditionPanelOpen: false,
   currentPage: 'map',
   currentExpedition: '',
@@ -25,7 +31,7 @@ export const initialState = I.fromJS({
     zoom: 15,
     width: window.innerWidth,
     height: window.innerHeight,
-    startDragLngLat: null,
+    startDragLngLat: [0, 0],
     isDragging: false,
     geoBounds: [0, 0, 0, 0]
   },
@@ -34,14 +40,37 @@ export const initialState = I.fromJS({
 })
 
 const expeditionReducer = (state = initialState, action) => {
-
   if (action.type !== actions.UPDATE_DATE && action.type !== actions.SET_MOUSE_POSITION ) {
     console.log('reducer:', action.type, action)
   }
+
   switch (action.type) {
+    case actions.SET_PROJECT_NAME: {
+      return state
+        .setIn(['project', 'name'], action.name)
+    }
+
     case actions.OPEN_LIGHTBOX: {
+      const previousDocument = state.get('documents')
+        .filter(d => state.get('currentDocuments').includes(d.get('id')))
+        .sortBy(d => d.get('date'))
+        .filter(d => d.get('date') < state.getIn(['documents', action.id, 'date']))
+        .last()
+
+      const nextDocument = state.get('documents')
+        .filter(d => state.get('currentDocuments').includes(d.get('id')))
+        .sortBy(d => d.get('date'))
+        .filter(d => d.get('date') > state.getIn(['documents', action.id, 'date']))
+        .first()
+
+      const nextDate = state.getIn(['documents', action.id, 'date'])
+
       return state
         .set('lightboxDocumentID', action.id)
+        .set('previousDocumentID', !!previousDocument ? previousDocument.get('id') : null)
+        .set('nextDocumentID', !!nextDocument ? nextDocument.get('id') : null)
+        .set('currentDate', nextDate)
+        .update('viewport', viewport => updateViewport(state, nextDate, null))
     }
 
     case actions.CLOSE_LIGHTBOX: {
@@ -98,11 +127,12 @@ const expeditionReducer = (state = initialState, action) => {
       const nw = unproject([0, 0])
       const se = unproject([window.innerWidth, window.innerHeight])
       const geoBounds = [nw[0], nw[1], se[0], se[1]]
+      const isDragging = action.viewport.longitude !== state.getIn(['viewport', 'longitude']) ||
+        action.viewport.latitude !== state.getIn(['viewport', 'latitude']) ||
+        action.viewport.zoom !== state.getIn(['viewport', 'zoom'])
       return state
-        .set('viewport', I.fromJS(action.viewport))
-        .setIn(['viewport', 'geoBounds'], geoBounds)
         .set('playbackMode', action.viewport.isDragging ? 'pause' : state.get('playbackMode'))
-        .setIn(['focus', 'type'], action.viewport.isDragging ? 'manual' : state.getIn(['focus', 'type']))
+        .setIn(['focus', 'type'], isDragging ? 'manual' : state.getIn(['focus', 'type']))
         .setIn(['focus', 'id'], null)
         .set('viewport', state.get('viewport')
           .merge(action.viewport))

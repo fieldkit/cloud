@@ -6,10 +6,10 @@ import { Route, Link } from 'react-router-dom'
 import { FKApiClient } from '../../api/api';
 import { FormItem } from '../forms/FormItem';
 
-import type { APIErrors, APIUserProfile } from '../../api/types';
+import type { APIErrors, APIUser, APIBaseUser } from '../../api/types';
 
 type Props = {
-  user: APIUserProfile;
+  user: APIUser;
   onUserUpdate: () => void;
 
   match: Object;
@@ -25,7 +25,7 @@ type State = {
   passwordMessage: ?string;
   passwordErrors: ?APIErrors;
 
-  ...$Exact<APIUserProfile>;
+  ...$Exact<APIBaseUser>;
   errors: ?APIErrors;
 };
 */
@@ -49,6 +49,7 @@ export class Profile extends Component {
   }
 
   async onUserSave() {
+    // TODO: implement!
     this.props.onUserUpdate();
   }
 

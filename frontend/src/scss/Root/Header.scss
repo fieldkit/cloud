@@ -2,6 +2,7 @@
   display: flex;
   justify-content: space-between;
   height: $line-height * 3;
+  width: 100vw - $line-width * 6;
   pointer-events: none;
 
   &_title {

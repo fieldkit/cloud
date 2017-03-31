@@ -3,28 +3,23 @@ CREATE SCHEMA fieldkit;
 
 CREATE TABLE fieldkit.user (
 	id serial PRIMARY KEY,
-	username varchar(40) NOT NULL,
-	email varchar(254) NOT NULL,
+	name varchar(256) NOT NULL,
+	username varchar(40) NOT NULL UNIQUE,
+	email varchar(254) NOT NULL UNIQUE,
 	password bytea NOT NULL,
-	valid bool NOT NULL DEFAULT false
-
-
-	-- login_attempts smallint NOT NULL DEFAULT 0,
-	-- login_locked_until timestamp
+	valid bool NOT NULL DEFAULT false,
+	bio varchar NOT NULL
 );
-
-CREATE UNIQUE INDEX ON fieldkit.user (username);
-CREATE UNIQUE INDEX ON fieldkit.user (email);
 
 CREATE TABLE fieldkit.validation_token (
 	token bytea PRIMARY KEY,
-	user_id integer REFERENCES fieldkit.user (id) NOT NULL,
+	user_id integer REFERENCES fieldkit.user (id) ON DELETE CASCADE  NOT NULL,
 	expires timestamp NOT NULL
 );
 
 CREATE TABLE fieldkit.refresh_token (
 	token bytea PRIMARY KEY,
-	user_id integer REFERENCES fieldkit.user (id) NOT NULL,
+	user_id integer REFERENCES fieldkit.user (id) ON DELETE CASCADE NOT NULL,
 	expires timestamp NOT NULL
 );
 
@@ -61,17 +56,16 @@ CREATE UNIQUE INDEX ON fieldkit.expedition (project_id, slug);
 
 CREATE TABLE fieldkit.team (
 	id serial PRIMARY KEY,
-	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
-	name varchar(100) NOT NULL,
+	expedition_id integer REFERENCES fieldkit.expedition (id) ON DELETE CASCADE NOT NULL,
+	name varchar(256) NOT NULL,
 	slug varchar(100) NOT NULL,
-	description text NOT NULL DEFAULT ''
+	description text NOT NULL DEFAULT '',
+	UNIQUE (expedition_id, slug)
 );
 
-CREATE UNIQUE INDEX ON fieldkit.team (expedition_id, slug);
-
 CREATE TABLE fieldkit.team_user (
-	team_id integer REFERENCES fieldkit.team (id) NOT NULL,
-	user_id integer REFERENCES fieldkit.user (id) NOT NULL,
+	team_id integer REFERENCES fieldkit.team (id) ON DELETE CASCADE NOT NULL,
+	user_id integer REFERENCES fieldkit.user (id) ON DELETE CASCADE NOT NULL,
 	role varchar(100) NOT NULL,
 	PRIMARY KEY (team_id, user_id)
 );

@@ -2,19 +2,20 @@
 import React, { PropTypes } from 'react'
 import { dateToString } from '../../utils.js'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import { is } from 'immutable'
+
+import sensorIcon from '../../../img/icon-sensor-red.svg'
 
 class NotificationPanel extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
+  shouldComponentUpdate (props) {
+    return !is(this.props.currentDocuments, props.currentDocuments)
   }
 
   render () {
-
-    const { currentDate, selectPlaybackMode, currentDocuments } = this.props
-
+    const {
+      currentDocuments
+    } = this.props
+    
     return (
       <div className="notification-panel">
         <ReactCSSTransitionGroup
@@ -26,19 +27,15 @@ class NotificationPanel extends React.Component {
         >
           {
             currentDocuments
-              .filter(d => {
-                return Math.abs(d.get('date') - currentDate + 100000) < 200000
-              })
-              .sort((d1, d2) => {
-                return d2.get('date') > d1.get('date')
-              })
               .map(d => {
                 return (
                   <div class="notification-panel_post">
                     <div className="notification-panel_post_content">
-                      <div className="notification-panel_post_content_icon"></div>
-                      <div>{d.get('id')}</div>
-                      <div>{d.get('date')}</div>
+                      <div className="notification-panel_post_content_icon">
+                        <img src={ '/' + sensorIcon } width="100%"/>
+                      </div>
+                      <div>{ d.get('id') }</div>
+                      <div>{ d.get('date') }</div>
                     </div>
                   </div>
                 )

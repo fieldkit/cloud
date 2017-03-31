@@ -20,7 +20,7 @@ import (
 func AddMemberPath(teamID int) string {
 	param0 := strconv.Itoa(teamID)
 
-	return fmt.Sprintf("/teams/%s/member", param0)
+	return fmt.Sprintf("/teams/%s/members", param0)
 }
 
 // Add a member to a team
@@ -217,6 +217,45 @@ func (c *Client) NewListIDMemberRequest(ctx context.Context, path string) (*http
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateMemberPath computes a request path to the update action of member.
+func UpdateMemberPath(teamID int, userID int) string {
+	param0 := strconv.Itoa(teamID)
+	param1 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/teams/%s/members/%s", param0, param1)
+}
+
+// Update a member
+func (c *Client) UpdateMember(ctx context.Context, path string, payload *UpdateMemberPayload) (*http.Response, error) {
+	req, err := c.NewUpdateMemberRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateMemberRequest create the request corresponding to the update action endpoint of the member resource.
+func (c *Client) NewUpdateMemberRequest(ctx context.Context, path string, payload *UpdateMemberPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

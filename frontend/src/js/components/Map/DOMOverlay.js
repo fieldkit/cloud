@@ -1,12 +1,26 @@
 import React, {PropTypes, Component} from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
-export default class WebGLOverlay extends Component {
+import sensorIcon from '../../../img/icon-sensor-red.svg'
 
-  render () {
+export default class WebGLOverlay extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick () {
     const {
       focusedDocument,
       openLightbox
+    } = this.props
+    if (!!focusedDocument) openLightbox(focusedDocument.get('id'))
+  }
+
+  render () {
+    const {
+      focusedDocument
     } = this.props
 
     return (
@@ -15,7 +29,7 @@ export default class WebGLOverlay extends Component {
         style={{
           cursor: !!focusedDocument ? 'pointer' : 'auto'
         }}
-        onClick={ () => { if (!!focusedDocument) openLightbox(focusedDocument.get('id')) }}
+        onClick={ this.onClick }
       >
         <ReactCSSTransitionGroup
           transitionName="transition"
@@ -34,7 +48,9 @@ export default class WebGLOverlay extends Component {
               }}
             >
               <div className="dom-overlay_popup_content">
-                <div className="dom-overlay_popup_content_icon"></div>
+                <div className="dom-overlay_popup_content_icon">
+                  <img src={ '/' + sensorIcon } width="100%"/>
+                </div>
                 <div>{focusedDocument.get('id')}</div>
                 <div>{focusedDocument.get('date')}</div>
               </div>

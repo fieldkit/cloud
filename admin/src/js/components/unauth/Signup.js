@@ -28,12 +28,14 @@ export class Signup extends Component {
 
   async onSubmit(event) {
     event.preventDefault()
-    const response = await FKApiClient.get().signUp(
-      this.refs.email.value,
-      this.refs.username.value,
-      this.refs.password.value,
-      this.refs.invite.value
-    );
+    const response = await FKApiClient.get().signUp({
+      email: this.refs.email.value,
+      username: this.refs.username.value,
+      password: this.refs.password.value,
+      invite_token: this.refs.invite.value,
+      name: '',
+      bio: ''
+    });
     if (response.type === 'err') {
       this.setState({ errors: response.errors });
     } else {
