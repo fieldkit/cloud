@@ -1,7 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react'
-import type { APIMember, APIUser, APIErrors } from '../../api/types';
+import type { APIMember, APIUser, APIErrors, APIBaseMember } from '../../api/types';
 
 import { RemoveIcon, EditIcon } from '../icons/Icons'
 
@@ -10,14 +10,16 @@ type Props = {
   members: APIMember[],
   users: APIUser[],
   onDelete: (teamId: number, userId: number) => Promise<?APIErrors>,
-  onMemberUpdate: (teamId: number, memberId: number, role: string) => void
+  onStartUpdate: (teamId: number, memberId: number, values: APIBaseMember) => void,
+  onUpdate: (teamId: number, memberId: number) => void
 }
 
 export class MembersTable extends Component {
   props: Props;
   state: {
     users: {[id: number]: APIUser},
-    editingMemberId: number,
+    user_id: number,
+    role: string,
     errors: ?APIErrors
   }
 
@@ -25,7 +27,8 @@ export class MembersTable extends Component {
     super(props);
     this.state = {
       users: {},
-      editingMemberId: -1,
+      user_id: -1,
+      role: '',
       errors: null
     }
   }
@@ -44,21 +47,26 @@ export class MembersTable extends Component {
   handleInputChange(memberId: number, event) {
     const target = event.target;
     const value = target.value;
-    const { teamId, onMemberUpdate } = this.props;
-    // console.log(teamId, memberId, value);
-    onMemberUpdate(teamId, memberId, value);
+    const { teamId, onStartUpdate } = this.props;
+
+    onStartUpdate(teamId, memberId, {role: value});
   }
 
-  handleKeyUp(event) {
-    console.log(event.key);
+  handleKeyUp(memberId: number, event) {
+    const { teamId, onUpdate } = this.props;
+    const { user_id } = this.state;
     if (event.key === 'Enter') {
-      console.log('save');
+      onUpdate(teamId, memberId);
+      this.setState({user_id: -1});
     }
   }
 
   startMemberEdit(memberId: number) {
-    console.log(memberId);
-    this.setState({editingMemberId: memberId});
+    this.setState({user_id: memberId});
+  }
+
+  handleBlur(){
+    this.setState({user_id: -1});
   }
 
   async delete(userId: number) {
@@ -72,7 +80,7 @@ export class MembersTable extends Component {
 
   render() {
     const { teamId, members } = this.props;
-    let { users, editingMemberId } = this.state
+    let { users, user_id } = this.state
 
     return (
       <table className="members-table">
@@ -102,9 +110,11 @@ export class MembersTable extends Component {
                   <input type="text"
                     value={member.role}
                     name="role"
-                    disabled={member.user_id !== editingMemberId}
-                    onChange={this.handleInputChange.bind(this, member.user_id)}/>
-                  <div id={member.user_id} className={'bt-icon medium ' + (member.user_id === editingMemberId ? 'disabled' : '') } onClick={this.startMemberEdit.bind(this, member.user_id)}>
+                    disabled={member.user_id !== user_id}
+                    onChange={this.handleInputChange.bind(this, member.user_id)}
+                    onKeyUp={this.handleKeyUp.bind(this, member.user_id)}
+                    onBlur={this.handleBlur.bind(this)}/>
+                  <div id={member.user_id} className={'bt-icon medium ' + (member.user_id === user_id ? 'disabled' : '') } onClick={this.startMemberEdit.bind(this, member.user_id)}>
                     <EditIcon />
                   </div>                        
                 </td>

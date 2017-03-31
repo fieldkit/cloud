@@ -12,7 +12,7 @@ import '../../../css/teams.css'
 
 import { FormContainer } from '../containers/FormContainer';
 
-import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIUser } from '../../api/types';
+import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIBaseMember, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -190,19 +190,37 @@ export class Teams extends Component {
     this.setState({ memberDeletion: null });
   }
 
-  startMemberUpdate(teamId: number, memberId: number, role: string) {
+  startMemberUpdate(teamId: number, memberId: number, values: APIBaseMember) {
     const { members } = this.state;
-    const member = members[teamId].find(member => member.user_id === memberId);
+    const member = this.getMemberById(teamId, memberId);
     if(member) {
-      member.role = role;      
+      member.role = values.role;
     }
     this.setState({members: members});
+  }
+
+  async confirmMemberUpdate(teamId: number, memberId: number) {
+    const member = this.getMemberById(teamId, memberId);
+    if(member){
+      const values = {role: member.role};
+      const memberRes = await FKApiClient.get().updateMember(teamId, memberId, values);
+      if(memberRes.type === 'ok' && memberRes.payload) {
+        this.loadMembers(teamId);
+      } else {
+        return memberRes.errors;
+      }      
+    }
+  }
+
+  getMemberById(teamId: number, memberId: number): ?APIMember {
+    const { members } = this.state;
+    return members[teamId].find(member => member.user_id === memberId);
   }
 
   async onTeamUpdate(teamId: number, team: APINewTeam) {
     const teamRes = await FKApiClient.get().updateTeam(teamId, team);
     if(teamRes.type === 'ok' && teamRes.payload) {
-      console.log(teamRes.payload);
+      this.loadTeams();
     } else {
       return teamRes.errors;
     }
@@ -290,7 +308,8 @@ export class Teams extends Component {
                   members={members[team.id]}
                   users={users[team.id]}
                   onDelete={this.startMemberDelete.bind(this)} 
-                  onMemberUpdate={this.startMemberUpdate.bind(this)}/> }
+                  onStartUpdate={this.startMemberUpdate.bind(this)}
+                  onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
               <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
