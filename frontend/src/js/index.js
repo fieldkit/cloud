@@ -31,7 +31,6 @@ const reducer = combineReducers({
 })
 const store = createStoreWithMiddleware(reducer)
 
-
 const routes = (
   <Route 
     path="/"
