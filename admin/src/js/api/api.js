@@ -194,6 +194,10 @@ export class FKApiClient extends JWTAPIClient {
     this.onSignout();
   }
 
+  userPictureUrl(userId: number): string {
+    return `${this.baseUrl}/users/${userId}/picture`;
+  }
+
   getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
     return this.getWithErrors('/user');
   }
@@ -214,6 +218,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors('/users');
   }
 
+  projectPictureUrl(projectId: number): string {
+    return `${this.baseUrl}/projects/${projectId}/picture`;
+  }
+
   getProjects(): Promise<FKAPIResponse<APIProjects>> {
     return this.getWithErrors('/projects')
   }
@@ -232,6 +240,10 @@ export class FKApiClient extends JWTAPIClient {
 
   updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
     return this.patchWithErrors(`/projects/${projectId}`, values)
+  }
+
+  expeditionPictureUrl(expeditionId: number): string {
+    return `${this.baseUrl}/expeditions/${expeditionId}/picture`;
   }
 
   getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
