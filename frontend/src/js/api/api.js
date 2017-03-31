@@ -96,7 +96,7 @@ class FKApiClient {
     return res.text()
   }
 
-  async getProject (project) {
+  async getProject (projectID) {
     const res = await this.getJSON('/api/project/' + projectID)
     return res
   }

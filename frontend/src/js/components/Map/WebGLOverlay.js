@@ -1,12 +1,33 @@
 import React, {PropTypes, Component} from 'react'
-import ViewportMercator from 'viewport-mercator-project'
-import sightingTexturePath from '../../../img/sighting.png'
-import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
 import React3 from 'react-three-renderer'
+import ViewportMercator from 'viewport-mercator-project'
+import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
+
+import iconSensorReading from '../../../img/sighting.png'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
+
+    // here you can add other feature types and assign them a particle texture
+    const bufferGeometries = {
+      particles: {
+        'Feature': {
+          count: 1000,
+          position: new BufferAttribute(new Float32Array(1000 * 3), 3),
+          color: new BufferAttribute(new Float32Array(1000 * 4), 4),
+          index: new BufferAttribute(new Uint16Array(1000 * 1), 1),
+          texture: new TextureLoader().load(('/' + iconSensorReading))
+        }
+      }
+    }
+    for (let k in bufferGeometries) {
+      for (let l in bufferGeometries[k]) {
+        for (let i = 0; i < bufferGeometries[k][l].count; i++) {
+          bufferGeometries[k][l].index.array[i] = i
+        }
+      }
+    }
 
     const shaders = {
       particles: {
@@ -35,32 +56,9 @@ export default class WebGLOverlay extends Component {
         ].join('\n')
       }
     }
-
-    const bufferGeometries = {
-      focusParticles: {
-        count: 1,
-        position: new BufferAttribute(new Float32Array(1 * 3), 3),
-        color: new BufferAttribute(new Float32Array(1 * 4), 4),
-        index: new BufferAttribute(new Uint16Array(1 * 1), 1)
-      },
-      readingParticles: {
-        count: 1000,
-        position: new BufferAttribute(new Float32Array(1000 * 3), 3),
-        color: new BufferAttribute(new Float32Array(1000 * 4), 4),
-        index: new BufferAttribute(new Uint16Array(1000 * 1), 1)
-      }
-    }
-    for (let k in bufferGeometries) {
-      for (let i = 0; i < bufferGeometries[k].count; i++) {
-        bufferGeometries[k].index.array[i] = i
-      }
-    }
-
-    const sightingTexture = new TextureLoader().load(('/' + sightingTexturePath))
-
+    
     this.state = {
       shaders,
-      sightingTexture,
       bufferGeometries
     }
   }
@@ -68,19 +66,16 @@ export default class WebGLOverlay extends Component {
   componentWillReceiveProps (nextProps) {
     const { bufferGeometries } = this.state
     const {
-      focusParticles,
-      readingParticles,
+      particles
     } = nextProps
-
-    bufferGeometries.focusParticles.position.array = focusParticles.position
-    bufferGeometries.focusParticles.position.needsUpdate = true
-    bufferGeometries.focusParticles.color.array = focusParticles.color
-    bufferGeometries.focusParticles.color.needsUpdate = true
     
-    bufferGeometries.readingParticles.position.array = readingParticles.position
-    bufferGeometries.readingParticles.position.needsUpdate = true
-    bufferGeometries.readingParticles.color.array = readingParticles.color
-    bufferGeometries.readingParticles.color.needsUpdate = true
+
+    Object.keys(particles).forEach(type => {
+      bufferGeometries.particles[type].position.array = particles[type].position
+      bufferGeometries.particles[type].position.needsUpdate = true
+      bufferGeometries.particles[type].color.array = particles[type].color
+      bufferGeometries.particles[type].color.needsUpdate = true
+    })
 
     this.setState({
       ...this.state,
@@ -100,8 +95,7 @@ export default class WebGLOverlay extends Component {
 
     const { 
       bufferGeometries,
-      shaders,
-      sightingTexture
+      shaders
      } = this.state
 
     const point = project([longitude, latitude])
@@ -152,48 +146,30 @@ export default class WebGLOverlay extends Component {
                 </line>
                 */
               }
-              { 
-                !!bufferGeometries.readingParticles &&
-                <points>
-                  <bufferGeometry
-                    position={ bufferGeometries.readingParticles.position }
-                    color={ bufferGeometries.readingParticles.color }
-                    index={ bufferGeometries.readingParticles.index }
-                  />
-                  <shaderMaterial
-                    vertexShader={ shaders.particles.vertexShader}
-                    fragmentShader={ shaders.particles.fragmentShader}
-                    uniforms={{
-                      texture: { 
-                        type: 't',
-                        value: sightingTexture 
-                      }
-                    }}
-                  >
-                  </shaderMaterial>
-                </points>
-              }
-              { 
-                false &&
-                !!bufferGeometries.focusParticles &&
-                <points>
-                  <bufferGeometry
-                    position={ bufferGeometries.focusParticles.position }
-                    color={ bufferGeometries.focusParticles.color }
-                    index={ bufferGeometries.focusParticles.index }
-                  />
-                  <shaderMaterial
-                    vertexShader={ shaders.particles.vertexShader}
-                    fragmentShader={ shaders.particles.fragmentShader}
-                    uniforms={{
-                      texture: { 
-                        type: 't',
-                        value: sightingTexture 
-                      }
-                    }}
-                  >
-                  </shaderMaterial>
-                </points>
+              {
+                Object.keys(bufferGeometries.particles).map(type => {
+                  const particles = bufferGeometries.particles[type]
+                  return (
+                    <points key={ 'particles-' + type }>
+                      <bufferGeometry
+                        position={ particles.position }
+                        color={ particles.color }
+                        index={ particles.index }
+                      />
+                      <shaderMaterial
+                        vertexShader={ shaders.particles.vertexShader}
+                        fragmentShader={ shaders.particles.fragmentShader}
+                        uniforms={{
+                          texture: { 
+                            type: 't',
+                            value: particles.texture 
+                          }
+                        }}
+                      >
+                      </shaderMaterial>
+                    </points>
+                  )
+                })
               }
             </scene>
           </React3>

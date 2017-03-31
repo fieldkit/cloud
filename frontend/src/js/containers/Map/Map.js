@@ -19,6 +19,10 @@ const mapStateToProps = (state, ownProps) => {
       state => state.expeditions.get('mousePosition'),
       state => state.expeditions.getIn(['focus', 'type']),
       (expeditions, _viewport, documents, currentDocumentIDs, currentDate, playbackMode, mousePosition, focusType) => {
+        
+        // This is where all the geometry stuff for rendering documents on the map
+        // TODO: This certainly could be optimized, results could be cached
+
         const viewport = _viewport.toJS()
         const currentDocuments = documents.filter(d => {
           return currentDocumentIDs.includes(d.get('id'))
@@ -26,63 +30,56 @@ const mapStateToProps = (state, ownProps) => {
         let focusedDocument = null
         let focusDistance = 25
         const particleCount = 1000
-        const pathVertexCount = 200
         const { unproject } = ViewportMercator(viewport)
         const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
-        
-        // Focus particles
-        const focusParticles = {
-          position: new Float32Array(3),
-          color: new Float32Array(4)
-        }
-        const radius = 15
-        const x = window.innerWidth * ((viewport.longitude - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
-        const y = window.innerHeight * ((viewport.latitude - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-        focusParticles.position[0] = x
-        focusParticles.position[1] = y
-        focusParticles.position[2] = radius
-        focusParticles.color[0] = 242/255
-        focusParticles.color[1] = 76/255
-        focusParticles.color[2] = 45/255
-        focusParticles.color[3] = 1
 
-        // Readings particles and path
-        const readingParticles = {
-          position: new Float32Array(particleCount * 3),
-          color: new Float32Array(particleCount * 4)
-        }
-        const readingPath = new Array(pathVertexCount)
+        const documentTypes = []
+        currentDocuments.forEach(d => {
+          if (documentTypes.indexOf(d.get('type')) === - 1) documentTypes.push(d.get('type'))
+        })
 
-        currentDocuments.toList().forEach((sighting, i) => {
-          const position = sighting.getIn(['geometry', 'coordinates'])
+        // particles and path
+        const particles = {}
+        documentTypes.forEach(id => {
+          particles[id] = {
+            position: new Float32Array(particleCount * 3),
+            color: new Float32Array(particleCount * 4)
+          }
+        })
+
+        currentDocuments.toList().forEach((d, i) => {
+          const type = d.get('type')
+          const position = d.getIn(['geometry', 'coordinates'])
           const radius = 15
-          const x = window.innerWidth * ((sighting.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
-          const y = window.innerHeight * ((sighting.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+          const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+          const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
           const color = new Color('#ffffff')
           
-          readingParticles.position[i * 3 + 0] = x
-          readingParticles.position[i * 3 + 1] = y
-          readingParticles.position[i * 3 + 2] = radius
-          readingParticles.color[i * 4 + 0] = color.r
-          readingParticles.color[i * 4 + 1] = color.g
-          readingParticles.color[i * 4 + 2] = color.b
-          readingParticles.color[i * 4 + 3] = 1
-
-          readingPath[i] = new Vector3(x, y, 0)
+          particles[type].position[i * 3 + 0] = x
+          particles[type].position[i * 3 + 1] = y
+          particles[type].position[i * 3 + 2] = radius
+          particles[type].color[i * 4 + 0] = color.r
+          particles[type].color[i * 4 + 1] = color.g
+          particles[type].color[i * 4 + 2] = color.b
+          particles[type].color[i * 4 + 3] = 1
 
           const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
           if (distanceToMouse < focusDistance) {
             focusDistance = distanceToMouse
-            focusedDocument = sighting
+            focusedDocument = d
               .set('x', x)
               .set('y', y)
           }
         })
 
         // clear up unused particles
-        readingParticles.position.fill(0, currentDocuments.size * 3, pathVertexCount * 3)
-        readingParticles.color.fill(0, currentDocuments.size * 4, pathVertexCount * 4)
-        readingPath.fill(readingPath[currentDocuments.size - 1], currentDocuments.size, pathVertexCount)
+        Object.keys(particles).forEach(type => {
+          const documentCount = currentDocuments
+            .filter(d => d.get('type') === type)
+            .size
+          particles[type].position.fill(0, documentCount * 3, particleCount * 3)
+          particles[type].color.fill(0, documentCount * 4, particleCount * 4)
+        })
 
         return {
           expeditions,
@@ -90,9 +87,7 @@ const mapStateToProps = (state, ownProps) => {
           currentDocuments, 
           currentDate,
           playbackMode,
-          focusParticles,
-          readingParticles,
-          readingPath,
+          particles,
           focusedDocument,
           focusType
         }

@@ -31,7 +31,6 @@ const reducer = combineReducers({
 })
 const store = createStoreWithMiddleware(reducer)
 
-
 const routes = (
   <Route 
     path="/"
@@ -67,6 +66,7 @@ const routes = (
         component={ JournalPageContainer }
         onEnter={(state, replace) => {
           store.dispatch(actions.selectPlaybackMode('pause'))
+          store.dispatch(actions.selectFocusType('expedition'))
           store.dispatch(actions.setCurrentPage('journal'))
         }}
       />

@@ -43,14 +43,19 @@
       background-color: white;
       border-radius: 3px;
       padding: $line-width;
-      padding-right: $line-width * 4;
+      padding-right: $line-width * 5;
+      word-wrap: break-word;
 
       &_icon {
         position: absolute;
         right: $line-width;
-        width: $line-width * 2;
-        height: $line-width * 2;
-        background-color: $color-accent;
+        width: $line-width * 3;
+        height: $line-width * 3;
+        padding: $line-width / 2;
+        border: 1px solid #eee;
+
+        & img {
+        }
       }
     }
 

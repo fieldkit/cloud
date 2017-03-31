@@ -7,6 +7,7 @@ import { getSampleData, updateDeepLinking } from '../utils'
 
 import I from 'immutable'
 
+export const SET_PROJECT_NAME = 'SET_PROJECT_NAME'
 export const REQUEST_EXPEDITION = 'REQUEST_EXPEDITION'
 export const INITIALIZE_EXPEDITIONS = 'INITIALIZE_EXPEDITION'
 export const REQUEST_DOCUMENTS = 'REQUEST_DOCUMENTS'
@@ -106,8 +107,25 @@ export function requestExpedition (expeditionID) {
       id: expeditionID
     })
 
-    let projectID = location.hostname.split('.')[0]
-    if (projectID === 'localhost') projectID = 'eric'
+    const projectID = location.hostname.split('.')[0]
+
+    // TODO: the API calls should be moved to middleware. The document query will need to be filtered and called whenever data is required by the frontend
+
+    console.log('querying project')
+    FKApiClient.getProject(projectID)
+      .then(resProject => {
+        console.log('server response received:', resProject)
+        if (!resProject) {
+          console.log('project data empty')
+        } else {
+          console.log('project data received')
+          dispatch({
+            type: SET_PROJECT_NAME,
+            name: resProject.name
+          })
+        }
+      })
+
     console.log('querying expedition')
     FKApiClient.getExpeditions(projectID)
       .then(resExpeditions => {
@@ -307,11 +325,10 @@ export function openLightbox (id) {
   }
 }
 
-export function closeLightbox (id) {
+export function closeLightbox () {
   return function (dispatch, getState) {
     dispatch({
-      type: CLOSE_LIGHTBOX,
-      id
+      type: CLOSE_LIGHTBOX
     })
   }
 }

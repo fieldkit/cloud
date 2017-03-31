@@ -30,7 +30,7 @@ class Map extends React.Component {
       playbackMode === 'fastBackward' ? -5000000 : 
       0) / framesPerSecond
     const nextDate = Math.round(currentDate + dateDelta)
-    if (focusType === 'expedition' && (firstFrame || dateDelta !== 0)) updateDate(nextDate)
+    if (firstFrame || dateDelta !== 0) updateDate(nextDate)
     requestAnimationFrame(() => this.tick(false))
   }
 
@@ -53,9 +53,7 @@ class Map extends React.Component {
   render () {
     const {
       setViewport,
-      focusParticles,
-      readingParticles,
-      readingPath,
+      particles,
       focusedDocument,
       openLightbox
     } = this.props
@@ -73,9 +71,7 @@ class Map extends React.Component {
           <WebGLOverlay
             { ...viewport }
             redraw={ this.redrawGLOverlay }
-            focusParticles={ focusParticles }
-            readingParticles={ readingParticles }
-            readingPath={ readingPath }
+            particles={ particles }
           />
           <DOMOverlay
             focusedDocument={ focusedDocument }
