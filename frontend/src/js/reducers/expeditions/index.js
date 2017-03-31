@@ -1,7 +1,6 @@
 
 import * as actions from '../../actions'
 import I from 'immutable'
-import slug from 'slug'
 import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
