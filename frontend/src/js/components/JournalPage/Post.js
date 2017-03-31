@@ -5,7 +5,7 @@ import { Link } from 'react-router'
 import { is } from 'immutable'
 
 import iconLocation from '../../../img/icon-location.png'
-import iconSensor from '../../../img/icon-sensor-red.png'
+import iconSensor from '../../../img/icon-sensor-red.svg'
 
 class Post extends React.Component {
 
@@ -38,7 +38,7 @@ class Post extends React.Component {
                 to={ '/' + currentExpeditionID + '/map' }
                 onClick={ () => updateDate(data.get('date'), 'pause') }
               >
-                <img src={ '/' + iconLocation }/>
+                <img src={ '/' + iconLocation } width="100%"/>
               </Link>
             </div>
             <div className="post_main_meta_separator"/>

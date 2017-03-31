@@ -4,7 +4,7 @@ import { dateToString } from '../../utils.js'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import { is } from 'immutable'
 
-import sensorIcon from '../../../img/icon-sensor-red.png'
+import sensorIcon from '../../../img/icon-sensor-red.svg'
 
 class NotificationPanel extends React.Component {
   shouldComponentUpdate (props) {
@@ -32,7 +32,7 @@ class NotificationPanel extends React.Component {
                   <div class="notification-panel_post">
                     <div className="notification-panel_post_content">
                       <div className="notification-panel_post_content_icon">
-                        <img src={ '/' + sensorIcon } />
+                        <img src={ '/' + sensorIcon } width="100%"/>
                       </div>
                       <div>{ d.get('id') }</div>
                       <div>{ d.get('date') }</div>
