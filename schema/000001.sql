@@ -105,10 +105,10 @@ CREATE TABLE fieldkit.input_twitter_account (
 CREATE TABLE fieldkit.schema (
 	id serial PRIMARY KEY,
 	project_id integer REFERENCES fieldkit.project (id),
-	schema jsonb NOT NULL
+	json_schema jsonb NOT NULL
 );
 
-CREATE UNIQUE INDEX ON fieldkit.schema (schema->id);
+CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
 
 -- documents
 
