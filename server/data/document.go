@@ -1,0 +1,49 @@
+package data
+
+import (
+	"database/sql/driver"
+	"errors"
+	"time"
+
+	"github.com/jmoiron/sqlx/types"
+	"github.com/paulmach/go.geo"
+)
+
+var (
+	invalidLocationError = errors.New("invalid location")
+)
+
+type Location struct {
+	point *geo.Point
+}
+
+func NewLocation(longitude, latitude float64) *Location {
+	return &Location{
+		point: geo.NewPoint(longitude, latitude),
+	}
+}
+
+func (l *Location) Scan(data []byte) error {
+	point := &geo.Point{}
+	if err := point.Scan(data); err != nil {
+		return err
+	}
+
+	l.point = point
+	return nil
+}
+
+func (l *Location) Value() (driver.Value, error) {
+	return l.point.ToWKT(), nil
+}
+
+type Document struct {
+	ID        int64          `db:"id,omitempty"`
+	SchemaID  int32          `db:"schema_id"`
+	InputID   int32          `db:"input_id"`
+	TeamID    *int32         `db:"team_id"`
+	UserID    *int32         `db:"user_id"`
+	Timestamp time.Time      `db:"timestamp"`
+	Location  *Location      `db:"location"`
+	Data      types.JSONText `db:"data"`
+}

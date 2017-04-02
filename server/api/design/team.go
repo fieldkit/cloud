@@ -57,6 +57,7 @@ var _ = Resource("team", func() {
 		Description("Add a team")
 		Params(func() {
 			Param("expedition_id", Integer)
+			Required("expeditions_id")
 		})
 		Payload(AddTeamPayload)
 		Response(BadRequest)
@@ -108,6 +109,7 @@ var _ = Resource("team", func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Project slug")
 			})
+			Required("project", "expedition", "team")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -140,6 +142,7 @@ var _ = Resource("team", func() {
 				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
 				Description("Expedition slug")
 			})
+			Required("project", "expedition")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -152,6 +155,7 @@ var _ = Resource("team", func() {
 		Description("List an expedition's teams")
 		Params(func() {
 			Param("expedition_id", Integer)
+			Required("expedition_id")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

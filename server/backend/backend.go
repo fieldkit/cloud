@@ -63,9 +63,8 @@ func (b *Backend) DeleteTwitterOAuth(ctx context.Context, requestToken string) e
 	return err
 }
 
-func (b *Backend) AddTwitterAccount(ctx context.Context, twitterAccount *data.TwitterAccount) error {
+func (b *Backend) AddTwitterAccountInput(ctx context.Context, twitterAccount *data.TwitterAccountInput) error {
 	if _, err := b.db.NamedExecContext(ctx, `
-		BEGIN;
 		INSERT INTO fieldkit.twitter_account (id, screen_name, access_token, access_secret)
 			VALUES (:twitter_account_id, :screen_name, :access_token, :access_secret)
 			ON CONFLICT (id)
@@ -86,10 +85,22 @@ func (b *Backend) AddTwitterAccount(ctx context.Context, twitterAccount *data.Tw
 	return nil
 }
 
-func (b *Backend) TwitterAccount(ctx context.Context, inputID int32) (*data.TwitterAccount, error) {
-	twitterAccount := &data.TwitterAccount{}
+func (b *Backend) UpdateInput(ctx context.Context, input *data.Input) error {
+	if _, err := b.db.NamedExecContext(ctx, `
+		UPDATE fieldkit.input
+			SET team_id = :team_id, user_id = :user_id
+				WHERE id = :id
+		`, input); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data.TwitterAccountInput, error) {
+	twitterAccount := &data.TwitterAccountInput{}
 	if err := b.db.GetContext(ctx, twitterAccount, `
-		SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name
 			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -101,10 +112,10 @@ func (b *Backend) TwitterAccount(ctx context.Context, inputID int32) (*data.Twit
 	return twitterAccount, nil
 }
 
-func (b *Backend) ListTwitterAccounts(ctx context.Context, project, expedition string) ([]*data.TwitterAccount, error) {
-	twitterAccounts := []*data.TwitterAccount{}
+func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedition string) ([]*data.TwitterAccountInput, error) {
+	twitterAccounts := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
-		SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -118,10 +129,10 @@ func (b *Backend) ListTwitterAccounts(ctx context.Context, project, expedition s
 	return twitterAccounts, nil
 }
 
-func (b *Backend) ListTwitterAccountsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccount, error) {
-	twitterAccounts := []*data.TwitterAccount{}
-	if err := b.db.SelectContext(ctx, &twitterAccounts, `
-		SELECT i.id, i.expedition_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
+	TwitterAccountInputs := []*data.TwitterAccountInput{}
+	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -130,5 +141,84 @@ func (b *Backend) ListTwitterAccountsByID(ctx context.Context, expeditionID int3
 		return nil, err
 	}
 
+	return TwitterAccountInputs, nil
+}
+
+func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccount, error) {
+	twitterAccounts := []*data.TwitterAccount{}
+	if err := b.db.SelectContext(ctx, &twitterAccounts, `
+		SELECT id AS twitter_account_id, screen_name, access_token, access_secret FROM fieldkit.twitter_account
+		`); err != nil {
+		return nil, err
+	}
+
 	return twitterAccounts, nil
+}
+
+func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountInput, error) {
+	TwitterAccountInputs := []*data.TwitterAccountInput{}
+	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+			FROM fieldkit.twitter_account AS ta 
+				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
+				JOIN fieldkit.input AS i ON i.id = ita.input_id
+					WHERE ta.id = $1
+			`, accountID); err != nil {
+		return nil, err
+	}
+
+	return TwitterAccountInputs, nil
+}
+
+func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {
+	_, err := b.db.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data)
+			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location),4326), :data)
+		`, document)
+	return err
+}
+
+func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, error) {
+	var schemaID int32
+	if err := b.db.NamedGetContext(ctx, &schemaID, `
+		INSERT INTO fieldkit.schema (project_id, json_schema)
+			VALUES (:project_id, :json_schema)
+			ON CONFLICT ((json_schema->'id'))
+				DO UPDATE SET project_id = :project_id, json_schema = :json_schema
+			RETURNING id
+		`, schema); err != nil {
+		return int32(0), err
+	}
+
+	return schemaID, nil
+}
+
+func (b *Backend) TwitterListCredentialer() *TwitterListCredentialer {
+	return &TwitterListCredentialer{b}
+}
+
+type TwitterListCredentialer struct {
+	b *Backend
+}
+
+func (t *TwitterListCredentialer) UserList() ([]int64, error) {
+	ids := []int64{}
+	if err := t.b.db.Select(&ids, `
+		SELECT id FROM fieldkit.twitter_account
+		`); err != nil {
+		return nil, err
+	}
+
+	return ids, nil
+}
+
+func (t *TwitterListCredentialer) UserCredentials(id int64) (accessToken, accessSecret string, err error) {
+	twitterAccount := &data.TwitterAccount{}
+	if err := t.b.db.Get(twitterAccount, `
+		SELECT id AS twitter_account_id, screen_name, access_token, access_secret FROM fieldkit.twitter_account WHERE id = $1
+		`, id); err != nil {
+		return "", "", err
+	}
+
+	return twitterAccount.AccessToken, twitterAccount.AccessSecret, nil
 }

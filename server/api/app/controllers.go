@@ -1648,6 +1648,7 @@ type TwitterController interface {
 	GetID(*GetIDTwitterContext) error
 	List(*ListTwitterContext) error
 	ListID(*ListIDTwitterContext) error
+	Update(*UpdateTwitterContext) error
 }
 
 // MountTwitterController "mounts" a Twitter resource controller on the given service.
@@ -1742,6 +1743,29 @@ func MountTwitterController(service *goa.Service, ctrl TwitterController) {
 	h = handleTwitterOrigin(h)
 	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Twitter", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs/twitter-accounts", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateTwitterContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UpdateTwitterAccountPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleTwitterOrigin(h)
+	service.Mux.Handle("PATCH", "/inputs/twitter-accounts/:input_id", ctrl.MuxHandler("Update", h, unmarshalUpdateTwitterPayload))
+	service.LogInfo("mount", "ctrl", "Twitter", "action", "Update", "route", "PATCH /inputs/twitter-accounts/:input_id", "security", "jwt")
 }
 
 // handleTwitterOrigin applies the CORS response headers corresponding to the origin.
@@ -1821,6 +1845,16 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalUpdateTwitterPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateTwitterPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateTwitterAccountPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // UserController is the controller interface for the User actions.

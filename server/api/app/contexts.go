@@ -1844,6 +1844,48 @@ func (ctx *ListIDTwitterContext) BadRequest() error {
 	return nil
 }
 
+// UpdateTwitterContext provides the twitter update action context.
+type UpdateTwitterContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+	Payload *UpdateTwitterAccountPayload
+}
+
+// NewUpdateTwitterContext parses the incoming request URL and body, performs validations and creates the
+// context used by the twitter controller update action.
+func NewUpdateTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateTwitterContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateTwitterContext) OK(r *TwitterAccount) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateTwitterContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddUserContext provides the user add action context.
 type AddUserContext struct {
 	context.Context

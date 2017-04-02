@@ -8,6 +8,7 @@
 package client
 
 import (
+	"bytes"
 	"fmt"
 	"golang.org/x/net/context"
 	"net/http"
@@ -172,6 +173,44 @@ func (c *Client) NewListIDTwitterRequest(ctx context.Context, path string) (*htt
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateTwitterPath computes a request path to the update action of twitter.
+func UpdateTwitterPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/twitter-accounts/%s", param0)
+}
+
+// Get a Twitter account input
+func (c *Client) UpdateTwitter(ctx context.Context, path string, payload *UpdateTwitterAccountPayload) (*http.Response, error) {
+	req, err := c.NewUpdateTwitterRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateTwitterRequest create the request corresponding to the update action endpoint of the twitter resource.
+func (c *Client) NewUpdateTwitterRequest(ctx context.Context, path string, payload *UpdateTwitterAccountPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

@@ -5,11 +5,20 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var UpdateTwitterAccountPayload = Type("UpdateTwitterAccountPayload", func() {
+	Reference(Input)
+	Attribute("team_id")
+	Attribute("user_id")
+})
+
 var TwitterAccount = MediaType("application/vnd.app.twitter_account+json", func() {
 	TypeName("TwitterAccount")
+	Reference(Input)
 	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("expedition_id", Integer)
+		Attribute("id")
+		Attribute("expedition_id")
+		Attribute("team_id")
+		Attribute("user_id")
 		Attribute("twitter_account_id", Integer)
 		Attribute("screen_name", String)
 		Required("id", "expedition_id", "twitter_account_id", "screen_name")
@@ -17,6 +26,8 @@ var TwitterAccount = MediaType("application/vnd.app.twitter_account+json", func(
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("team_id")
+		Attribute("user_id")
 		Attribute("twitter_account_id")
 		Attribute("screen_name")
 	})
@@ -58,6 +69,20 @@ var _ = Resource("twitter", func() {
 			Param("input_id", Integer)
 			Required("input_id")
 		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(TwitterAccount)
+		})
+	})
+
+	Action("update", func() {
+		Routing(PATCH("inputs/twitter-accounts/:input_id"))
+		Description("Get a Twitter account input")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Payload(UpdateTwitterAccountPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(TwitterAccount)

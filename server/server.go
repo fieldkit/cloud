@@ -27,6 +27,8 @@ import (
 	"github.com/O-C-R/fieldkit/server/api/app"
 	"github.com/O-C-R/fieldkit/server/backend"
 	"github.com/O-C-R/fieldkit/server/email"
+	"github.com/O-C-R/fieldkit/server/social"
+	"github.com/O-C-R/fieldkit/server/social/twitter"
 )
 
 type Config struct {
@@ -164,6 +166,23 @@ func main() {
 	backend, err := backend.New(config.PostgresURL)
 	if err != nil {
 		panic(err)
+	}
+
+	// TWITTER
+	if flag.Arg(0) == "twitter" {
+		twitterListCredentialer := backend.TwitterListCredentialer()
+		social.Twitter(social.TwitterOptions{
+			Backend: backend,
+			StreamOptions: twitter.StreamOptions{
+				UserLister:       twitterListCredentialer,
+				UserCredentialer: twitterListCredentialer,
+				ConsumerKey:      config.TwitterConsumerKey,
+				ConsumerSecret:   config.TwitterConsumerSecret,
+				Domain:           config.Domain,
+			},
+		})
+
+		os.Exit(0)
 	}
 
 	// Mount "swagger" controller

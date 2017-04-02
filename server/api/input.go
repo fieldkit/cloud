@@ -25,7 +25,7 @@ func NewInputController(service *goa.Service, options InputControllerOptions) *I
 }
 
 func (c *InputController) List(ctx *app.ListInputContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccounts(ctx, ctx.Project, ctx.Expedition)
+	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputs(ctx, ctx.Project, ctx.Expedition)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (c *InputController) List(ctx *app.ListInputContext) error {
 }
 
 func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccountsByID(ctx, int32(ctx.ExpeditionID))
+	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}

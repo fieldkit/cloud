@@ -561,6 +561,30 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 	return
 }
 
+// updateTwitterAccountPayload user type.
+type updateTwitterAccountPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateTwitterAccountPayload from updateTwitterAccountPayload
+func (ut *updateTwitterAccountPayload) Publicize() *UpdateTwitterAccountPayload {
+	var pub UpdateTwitterAccountPayload
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateTwitterAccountPayload user type.
+type UpdateTwitterAccountPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
 // updateUserPayload user type.
 type updateUserPayload struct {
 	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`

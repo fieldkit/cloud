@@ -167,6 +167,29 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// Input media type (default view)
+//
+// Identifier: application/vnd.app.input+json; view=default
+type Input struct {
+	ExpeditionID int  `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int  `form:"id" json:"id" xml:"id"`
+	TeamID       *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the Input media type instance.
+func (mt *Input) Validate() (err error) {
+
+	return
+}
+
+// DecodeInput decodes the Input instance encoded in resp body.
+func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
+	var decoded Input
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default
@@ -475,7 +498,9 @@ type TwitterAccount struct {
 	ExpeditionID     int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
 	ID               int    `form:"id" json:"id" xml:"id"`
 	ScreenName       string `form:"screen_name" json:"screen_name" xml:"screen_name"`
+	TeamID           *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
 	TwitterAccountID int    `form:"twitter_account_id" json:"twitter_account_id" xml:"twitter_account_id"`
+	UserID           *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // Validate validates the TwitterAccount media type instance.
