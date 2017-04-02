@@ -4,6 +4,7 @@
   position: relative;
 
   &_content {
+    width: 100vw;
     padding: $line-height * 2 $line-width 0 $line-width * 5;
   }
 

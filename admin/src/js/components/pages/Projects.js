@@ -42,17 +42,16 @@ export class Projects extends Component {
     return (
       <div className="projects">
         <Route path={joinPath(match.url, 'new-project')} render={() =>
-          <ReactModal isOpen={true} contentLabel="New project form">
-            <h1>Create a new project</h1>
+          <ReactModal isOpen={true} contentLabel="New project form" className="modal" overlayClassName="modal-overlay">
+            <h2>Create New Project</h2>
             <ProjectForm
               onCancel={() => this.props.history.push("/")}
               onSave={this.onProjectCreate.bind(this)} />
           </ReactModal> } />
-
         <h1>Projects</h1>
-        <div id="projects" className="gallery-list">
+        <div id="projects" className="gallery-list projects">
         { projects.map((p, i) =>
-          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item">
+          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects">
             <h4>{p.name}</h4>
           </Link> )}
         { projects.length === 0 &&

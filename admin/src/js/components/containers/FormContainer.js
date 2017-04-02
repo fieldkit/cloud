@@ -26,14 +26,15 @@ export class FormContainer extends Component {
     return (
       <div className="form">
         { this.props.children }
-
-        { this.props.onCancel !== undefined &&
-          <button className="cancel" onClick={this.props.onCancel}>
-            { this.props.cancelText || 'Cancel' }
-          </button> }
-        <button className="save" onClick={this.props.onSave} disabled={this.props.saveDisabled}>
-          { this.props.saveText || 'Save' }
-        </button>
+          <div className="form-footer">
+          { this.props.onCancel !== undefined &&
+            <button className="cancel" onClick={this.props.onCancel}>
+              { this.props.cancelText || 'Cancel' }
+            </button> }
+          <button className="save" onClick={this.props.onSave} disabled={this.props.saveDisabled}>
+            { this.props.saveText || 'Save' }
+          </button>
+          </div>
       </div>
     );
   }

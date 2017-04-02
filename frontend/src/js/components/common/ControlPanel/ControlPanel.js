@@ -1,9 +1,9 @@
 
 import React, { PropTypes } from 'react'
-import { dateToString } from '../../utils.js'
-import PlaybackSelector from './ControlPanel/PlaybackSelector'
-import FocusSelector from './ControlPanel/FocusSelector'
-import ZoomSelector from './ControlPanel/ZoomSelector'
+import { dateToString } from '../../../utils.js'
+import PlaybackSelector from './PlaybackSelector'
+import FocusSelector from './FocusSelector'
+import ZoomSelector from './ZoomSelector'
 
 class ControlPanel extends React.Component {
 

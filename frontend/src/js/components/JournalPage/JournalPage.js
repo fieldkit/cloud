@@ -1,8 +1,8 @@
 
-import ControlPanelContainer from '../../containers/common/ControlPanelContainer'
+import ControlPanelContainer from '../../containers/common/ControlPanel'
 import Post from './Post'
 import React, { PropTypes } from 'react'
-import I from 'immutable'
+import I, { is } from 'immutable'
 import { map } from '../../utils.js'
 
 class JournalPage extends React.Component {
@@ -21,7 +21,7 @@ class JournalPage extends React.Component {
   }
 
   shouldThisUpdate (props, state, prev) {
-    const docsHaveUpdated = props.documents.map(d => d.get('id')).join('') !== this.props.documents.map(d => d.get('id')).join('')
+    const docsHaveUpdated = !is(props.documents, this.props.documents)
     const docDimensionsHaveUpdated = state.postDimensions !== this.state.postDimensions
     const forcedDateUpdated = props.currentDate !== this.props.currentDate && (prev ? this.props.forceDateUpdate : props.forceDateUpdate)
     return docsHaveUpdated || docDimensionsHaveUpdated || forcedDateUpdated
@@ -80,9 +80,14 @@ class JournalPage extends React.Component {
         }
         firstDocument = d
       })
-      const timeRatio = map(currentDate, firstDocument.get('date'), secondDocument.get('date'), 0, 1)
-      const scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
-      this.refs.content.scrollTop = scrollTop
+      if (!!secondDocument) {
+        const timeRatio = map(currentDate, firstDocument.get('date'), secondDocument.get('date'), 0, 1)
+        const scrollTop = map(timeRatio, 0, 1, postDimensions.getIn(['post-' + firstDocument.get('id'), 0]), postDimensions.getIn(['post-' + secondDocument.get('id'), 0]))
+        this.refs.content.scrollTop = scrollTop
+      } else {
+        const scrollTop = postDimensions.getIn(['post-' + firstDocument.get('id'), 0])
+        this.refs.content.scrollTop = scrollTop
+      }
     }
   }
 

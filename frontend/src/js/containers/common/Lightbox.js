@@ -1,15 +1,24 @@
 
 import { connect } from 'react-redux'
 import * as actions from '../../actions'
+import { createSelector } from 'reselect'
+
 import Lightbox from '../../components/common/Lightbox'
 
 const mapStateToProps = (state, ownProps) => {
-  const lightboxDocumentID = state.expeditions.get('lightboxDocumentID')
-  const data = !!lightboxDocumentID ? state.expeditions.getIn(['documents', lightboxDocumentID]) : null
-  const currentExpeditionID = state.expeditions.get('currentExpedition')
   return {
-    data,
-    currentExpeditionID
+    ...createSelector(
+      state => state.expeditions.getIn(['documents', state.expeditions.get('lightboxDocumentID') || 'null']),
+      state => state.expeditions.get('currentExpedition'),
+      state => state.expeditions.get('previousDocumentID'),
+      state => state.expeditions.get('nextDocumentID'),
+      (data, currentExpeditionID, previousDocumentID, nextDocumentID) => ({
+        data,
+        currentExpeditionID, 
+        previousDocumentID,
+        nextDocumentID
+      })
+    )(state)
   }
 }
 
@@ -20,6 +29,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     closeLightbox () {
       return dispatch(actions.closeLightbox())
+    },
+    openLightbox (id) {
+      return dispatch(actions.openLightbox(id))
     }
   }
 }
