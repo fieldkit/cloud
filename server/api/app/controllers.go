@@ -516,11 +516,17 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 		if err != nil {
 			return err
 		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddFieldkitInputPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
 		return ctrl.Add(rctx)
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleFieldkitOrigin(h)
-	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("Add", h, nil))
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("Add", h, unmarshalAddFieldkitPayload))
 	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/fieldkits", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -675,6 +681,21 @@ func handleFieldkitOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalAddFieldkitPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddFieldkitPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addFieldkitInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // unmarshalSetBinaryFieldkitPayload unmarshals the request body into the context request data Payload field.
@@ -1909,11 +1930,17 @@ func MountTwitterController(service *goa.Service, ctrl TwitterController) {
 		if err != nil {
 			return err
 		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddTwitterAccountInputPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
 		return ctrl.Add(rctx)
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleTwitterOrigin(h)
-	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("Add", h, nil))
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/twitter-accounts", ctrl.MuxHandler("Add", h, unmarshalAddTwitterPayload))
 	service.LogInfo("mount", "ctrl", "Twitter", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/twitter-accounts", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -2061,6 +2088,21 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalAddTwitterPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddTwitterPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addTwitterAccountInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // UserController is the controller interface for the User actions.

@@ -24,8 +24,8 @@ func AddFieldkitPath(expeditionID int) string {
 }
 
 // Add a Fieldkit input
-func (c *Client) AddFieldkit(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewAddFieldkitRequest(ctx, path)
+func (c *Client) AddFieldkit(ctx context.Context, path string, payload *AddFieldkitInputPayload) (*http.Response, error) {
+	req, err := c.NewAddFieldkitRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -33,13 +33,18 @@ func (c *Client) AddFieldkit(ctx context.Context, path string) (*http.Response, 
 }
 
 // NewAddFieldkitRequest create the request corresponding to the add action endpoint of the fieldkit resource.
-func (c *Client) NewAddFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewAddFieldkitRequest(ctx context.Context, path string, payload *AddFieldkitInputPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("POST", u.String(), nil)
+	req, err := http.NewRequest("POST", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

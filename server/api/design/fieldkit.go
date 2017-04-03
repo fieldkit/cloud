@@ -7,8 +7,15 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var AddFieldkitInputPayload = Type("AddFieldkitInputPayload", func() {
+	Reference(Input)
+	Attribute("name")
+	Required("name")
+})
+
 var UpdateFieldkitInputPayload = Type("UpdateFieldkitInputPayload", func() {
 	Reference(Input)
+	Attribute("name")
 	Attribute("team_id")
 	Attribute("user_id")
 })
@@ -19,13 +26,15 @@ var FieldkitInput = MediaType("application/vnd.app.fieldkit_input+json", func() 
 	Attributes(func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
-		Required("id", "expedition_id")
+		Required("id", "expedition_id", "name")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
 	})
@@ -77,6 +86,7 @@ var _ = Resource("fieldkit", func() {
 			Param("expedition_id", Integer)
 			Required("expedition_id")
 		})
+		Payload(AddFieldkitInputPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(FieldkitInput)

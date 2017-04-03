@@ -5,27 +5,36 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var UpdateTwitterAccountPayload = Type("UpdateTwitterAccountPayload", func() {
+var AddTwitterAccountInputPayload = Type("AddTwitterAccountInputPayload", func() {
 	Reference(Input)
+	Attribute("name")
+	Required("name")
+})
+
+var UpdateTwitterAccountInputPayload = Type("UpdateTwitterAccountInputPayload", func() {
+	Reference(Input)
+	Attribute("name")
 	Attribute("team_id")
 	Attribute("user_id")
 })
 
-var TwitterAccount = MediaType("application/vnd.app.twitter_account+json", func() {
-	TypeName("TwitterAccount")
+var TwitterAccountInput = MediaType("application/vnd.app.twitter_account_input+json", func() {
+	TypeName("TwitterAccountInput")
 	Reference(Input)
 	Attributes(func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
 		Attribute("twitter_account_id", Integer)
 		Attribute("screen_name", String)
-		Required("id", "expedition_id", "twitter_account_id", "screen_name")
+		Required("id", "expedition_id", "name", "twitter_account_id", "screen_name")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
 		Attribute("twitter_account_id")
@@ -33,14 +42,14 @@ var TwitterAccount = MediaType("application/vnd.app.twitter_account+json", func(
 	})
 })
 
-var TwitterAccounts = MediaType("application/vnd.app.twitter_accounts+json", func() {
-	TypeName("TwitterAccounts")
+var TwitterAccountInputs = MediaType("application/vnd.app.twitter_account_intputs+json", func() {
+	TypeName("TwitterAccountInputs")
 	Attributes(func() {
-		Attribute("twitter_accounts", CollectionOf(TwitterAccount))
-		Required("twitter_accounts")
+		Attribute("twitter_account_inputs", CollectionOf(TwitterAccountInput))
+		Required("twitter_account_inputs")
 	})
 	View("default", func() {
-		Attribute("twitter_accounts")
+		Attribute("twitter_account_inputs")
 	})
 })
 
@@ -56,6 +65,7 @@ var _ = Resource("twitter", func() {
 			Param("expedition_id", Integer)
 			Required("expedition_id")
 		})
+		Payload(AddTwitterAccountInputPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Location)
@@ -71,7 +81,7 @@ var _ = Resource("twitter", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccount)
+			Media(TwitterAccountInput)
 		})
 	})
 
@@ -90,7 +100,7 @@ var _ = Resource("twitter", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccounts)
+			Media(TwitterAccountInputs)
 		})
 	})
 
@@ -103,7 +113,7 @@ var _ = Resource("twitter", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccounts)
+			Media(TwitterAccountInputs)
 		})
 	})
 
