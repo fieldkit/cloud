@@ -301,7 +301,7 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 func (b *Backend) ListDocuments(ctx context.Context, project, expedition string) ([]*data.Document, error) {
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location), d.data
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
 			FROM fieldkit.document AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
@@ -317,7 +317,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project, expedition string)
 func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location), d.data
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
 			FROM fieldkit.document AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 					WHERE i.expedition_id = $1
