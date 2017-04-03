@@ -103,3 +103,15 @@ resource "aws_route53_record" "api-data-staging" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "wildcard-staging" {
+  zone_id = "Z1P1FTADK9BR86"
+  name    = "*.fieldkit.team"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_alb.fieldkit-server-staging.dns_name}"
+    zone_id                = "${aws_alb.fieldkit-server-staging.zone_id}"
+    evaluate_target_health = false
+  }
+}
