@@ -4,8 +4,13 @@ import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
 
 	"github.com/xeipuuv/gojsonschema"
+)
+
+var (
+	invalidJSONSchemaError = errors.New("invalid JSON schema")
 )
 
 type JSONSchema struct {
@@ -23,20 +28,31 @@ func (s *JSONSchema) MarshalJSON() ([]byte, error) {
 }
 
 func (s *JSONSchema) UnmarshalJSON(data []byte) error {
-	if err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.json); err != nil {
+	var jsonData interface{}
+	if err := json.NewDecoder(bytes.NewReader(data)).Decode(&jsonData); err != nil {
 		return err
 	}
 
+	return s.UnmarshalGo(jsonData)
+}
+
+func (s *JSONSchema) UnmarshalGo(jsonData interface{}) error {
 	var err error
-	s.schema, err = gojsonschema.NewSchema(gojsonschema.NewGoLoader(s.json))
+	s.schema, err = gojsonschema.NewSchema(gojsonschema.NewGoLoader(jsonData))
 	if err != nil {
 		return err
 	}
+
+	s.json = jsonData
 	return nil
 }
 
-func (s *JSONSchema) Scan(data []byte) error {
-	return s.UnmarshalJSON(data)
+func (s *JSONSchema) Scan(data interface{}) error {
+	if data, ok := data.(type); ok {
+		return s.UnmarshalJSON(data)
+	}
+
+	return invalidJSONSchemaError
 }
 
 func (s *JSONSchema) Value() (driver.Value, error) {

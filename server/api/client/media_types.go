@@ -512,6 +512,66 @@ func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 	return &decoded, err
 }
 
+// Schema media type (default view)
+//
+// Identifier: application/vnd.app.schema+json; view=default
+type Schema struct {
+	ID         int         `form:"id" json:"id" xml:"id"`
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// Validate validates the Schema media type instance.
+func (mt *Schema) Validate() (err error) {
+
+	return
+}
+
+// DecodeSchema decodes the Schema instance encoded in resp body.
+func (c *Client) DecodeSchema(resp *http.Response) (*Schema, error) {
+	var decoded Schema
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// SchemaCollection is the media type for an array of Schema (default view)
+//
+// Identifier: application/vnd.app.schema+json; type=collection; view=default
+type SchemaCollection []*Schema
+
+// Validate validates the SchemaCollection media type instance.
+func (mt SchemaCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeSchemaCollection decodes the SchemaCollection instance encoded in resp body.
+func (c *Client) DecodeSchemaCollection(resp *http.Response) (SchemaCollection, error) {
+	var decoded SchemaCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Schemas media type (default view)
+//
+// Identifier: application/vnd.app.schemas+json; view=default
+type Schemas struct {
+	Schemas SchemaCollection `form:"schemas,omitempty" json:"schemas,omitempty" xml:"schemas,omitempty"`
+}
+
+// DecodeSchemas decodes the Schemas instance encoded in resp body.
+func (c *Client) DecodeSchemas(resp *http.Response) (*Schemas, error) {
+	var decoded Schemas
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default

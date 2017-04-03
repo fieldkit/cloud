@@ -256,6 +256,12 @@ func main() {
 	})
 	app.MountFieldkitController(service, c11)
 
+	// Mount "schema" controller
+	c12 := api.NewSchemaController(service, api.SchemaControllerOptions{
+		Backend: backend,
+	})
+	app.MountSchemaController(service, c12)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {

@@ -378,6 +378,45 @@ func (mt *Projects) Validate() (err error) {
 	return
 }
 
+// Schema media type (default view)
+//
+// Identifier: application/vnd.app.schema+json; view=default
+type Schema struct {
+	ID         int         `form:"id" json:"id" xml:"id"`
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// Validate validates the Schema media type instance.
+func (mt *Schema) Validate() (err error) {
+
+	return
+}
+
+// SchemaCollection is the media type for an array of Schema (default view)
+//
+// Identifier: application/vnd.app.schema+json; type=collection; view=default
+type SchemaCollection []*Schema
+
+// Validate validates the SchemaCollection media type instance.
+func (mt SchemaCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Schemas media type (default view)
+//
+// Identifier: application/vnd.app.schemas+json; view=default
+type Schemas struct {
+	Schemas SchemaCollection `form:"schemas,omitempty" json:"schemas,omitempty" xml:"schemas,omitempty"`
+}
+
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default
