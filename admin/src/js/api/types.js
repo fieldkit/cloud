@@ -98,18 +98,6 @@ export type APIFieldkitInput = {|
   ...APIBaseInput;
 |};
 
-export type APIFieldkitBinaryFieldType = 'varint' | 'uvarint' | 'float32' | 'float64';
-
-export type APINewFieldkitInputBinary = {|
-  fields: APIFieldkitBinaryFieldType[];
-|};
-
-export type APIFieldkitInputBinary = {|
-  ...APINewFieldkitInputBinary;
-  id: number;
-  input_id: number;
-|};
-
 export type APIFieldkitInputs = {|
   fieldkit_inputs: APIFieldkitInput[];
 |};

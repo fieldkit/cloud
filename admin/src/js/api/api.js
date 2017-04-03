@@ -293,10 +293,6 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`);
   }
 
-  putFieldkitBinary(fieldkitId: number, binaryId: number, binary: APINewFieldkitInputBinary): Promise<FKAPIResponse<APIFieldkitInputBinary>> {
-    return this.putWithErrors(`/inputs/${fieldkitId}/binary/${binaryId}`, binary);
-  }
-
   getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
     return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
   }
