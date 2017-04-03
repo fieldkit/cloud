@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/O-C-R/sqlxcache"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 
 	"github.com/O-C-R/fieldkit/server/data"
 )
@@ -22,6 +22,12 @@ func New(url string) (*Backend, error) {
 	return &Backend{
 		db: db,
 	}, nil
+}
+
+func (b *Backend) AddInput(ctx context.Context, input *data.Input) error {
+	return b.db.NamedGetContext(ctx, input, `
+		INSERT INTO fieldkit.input (expedition_id) VALUES (:expedition_id) RETURNING *
+		`, input)
 }
 
 func (b *Backend) AddInputID(ctx context.Context, expeditionID int32) (int32, error) {
@@ -83,6 +89,17 @@ func (b *Backend) AddTwitterAccountInput(ctx context.Context, twitterAccount *da
 	}
 
 	return nil
+}
+
+func (b *Backend) Input(ctx context.Context, inputID int32) (*data.Input, error) {
+	input := &data.Input{}
+	if err := b.db.GetContext(ctx, input, `
+		SELECT * FROM fieldkit.input WHERE id = $1
+		`, inputID); err != nil {
+		return nil, err
+	}
+
+	return input, nil
 }
 
 func (b *Backend) UpdateInput(ctx context.Context, input *data.Input) error {
@@ -168,6 +185,65 @@ func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accou
 	}
 
 	return TwitterAccountInputs, nil
+}
+
+func (b *Backend) AddFieldkitInput(ctx context.Context, fieldkitInput *data.FieldkitInput) error {
+	return b.db.NamedGetContext(ctx, fieldkitInput, `
+		INSERT INTO fieldkit.input_fieldkit (input_id) VALUES (:id) RETURNING input_id AS id
+		`, fieldkitInput)
+}
+
+func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *data.FieldkitBinary) error {
+	_, err := b.db.ExecContext(ctx, `
+		INSERT INTO fieldkit.fieldkit_binary (id, input_id, fields) VALUES ($1, $2, $3)
+			ON CONFLICT (id, input_id)
+				DO UPDATE SET fields = $3
+		`, fieldkitBinary.ID, fieldkitBinary.InputID, pq.Array(fieldkitBinary.Fields))
+	return err
+}
+
+func (b *Backend) FieldkitInput(ctx context.Context, inputID int32) (*data.FieldkitInput, error) {
+	fieldkitInput := &data.FieldkitInput{}
+	if err := b.db.GetContext(ctx, fieldkitInput, `
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+			FROM fieldkit.input_fieldkit AS if
+				JOIN fieldkit.input AS i ON i.id = if.input_id
+					WHERE i.id = $1
+		`, inputID); err != nil {
+		return nil, err
+	}
+
+	return fieldkitInput, nil
+}
+
+func (b *Backend) ListFieldkitInputs(ctx context.Context, project, expedition string) ([]*data.FieldkitInput, error) {
+	fieldkitInput := []*data.FieldkitInput{}
+	if err := b.db.SelectContext(ctx, &fieldkitInput, `
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+			FROM fieldkit.input_fieldkit AS if
+				JOIN fieldkit.input AS i ON i.id = if.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE p.slug = $1 AND e.slug = $2
+		`, project, expedition); err != nil {
+		return nil, err
+	}
+
+	return fieldkitInput, nil
+}
+
+func (b *Backend) ListFieldkitInputsByID(ctx context.Context, expeditionID int32) ([]*data.FieldkitInput, error) {
+	fieldkitInputs := []*data.FieldkitInput{}
+	if err := b.db.SelectContext(ctx, &fieldkitInputs, `
+		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+			FROM fieldkit.input_fieldkit AS if
+				JOIN fieldkit.input AS i ON i.id = if.input_id
+					WHERE i.expedition_id = $1
+			`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return fieldkitInputs, nil
 }
 
 func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {

@@ -75,20 +75,6 @@ var _ = Resource("twitter", func() {
 		})
 	})
 
-	Action("update", func() {
-		Routing(PATCH("inputs/twitter-accounts/:input_id"))
-		Description("Get a Twitter account input")
-		Params(func() {
-			Param("input_id", Integer)
-			Required("input_id")
-		})
-		Payload(UpdateTwitterAccountPayload)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(TwitterAccount)
-		})
-	})
-
 	Action("list", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts"))
 		Description("List an expedition's Twitter account inputs")

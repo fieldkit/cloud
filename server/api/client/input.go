@@ -8,6 +8,7 @@
 package client
 
 import (
+	"bytes"
 	"fmt"
 	"golang.org/x/net/context"
 	"net/http"
@@ -73,6 +74,44 @@ func (c *Client) NewListIDInputRequest(ctx context.Context, path string) (*http.
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// UpdateInputPath computes a request path to the update action of input.
+func UpdateInputPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/%s", param0)
+}
+
+// Update an input
+func (c *Client) UpdateInput(ctx context.Context, path string, payload *UpdateInputPayload) (*http.Response, error) {
+	req, err := c.NewUpdateInputRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateInputRequest create the request corresponding to the update action endpoint of the input resource.
+func (c *Client) NewUpdateInputRequest(ctx context.Context, path string, payload *UpdateInputPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

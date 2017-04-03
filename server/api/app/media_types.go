@@ -124,6 +124,77 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
+// FieldkitInput media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input+json; view=default
+type FieldkitInput struct {
+	ExpeditionID int  `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int  `form:"id" json:"id" xml:"id"`
+	TeamID       *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the FieldkitInput media type instance.
+func (mt *FieldkitInput) Validate() (err error) {
+
+	return
+}
+
+// FieldkitInputCollection is the media type for an array of FieldkitInput (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input+json; type=collection; view=default
+type FieldkitInputCollection []*FieldkitInput
+
+// Validate validates the FieldkitInputCollection media type instance.
+func (mt FieldkitInputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// FieldkitBinary media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input_binary+json; view=default
+type FieldkitBinary struct {
+	Fields  []string `form:"fields" json:"fields" xml:"fields"`
+	ID      int      `form:"id" json:"id" xml:"id"`
+	InputID int      `form:"input_id" json:"input_id" xml:"input_id"`
+}
+
+// Validate validates the FieldkitBinary media type instance.
+func (mt *FieldkitBinary) Validate() (err error) {
+
+	if mt.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	for _, e := range mt.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// FieldkitInputs media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_inputs+json; view=default
+type FieldkitInputs struct {
+	FieldkitInputs FieldkitInputCollection `form:"fieldkit_inputs" json:"fieldkit_inputs" xml:"fieldkit_inputs"`
+}
+
+// Validate validates the FieldkitInputs media type instance.
+func (mt *FieldkitInputs) Validate() (err error) {
+	if mt.FieldkitInputs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fieldkit_inputs"))
+	}
+	return
+}
+
 // Input media type (default view)
 //
 // Identifier: application/vnd.app.input+json; view=default

@@ -531,6 +531,233 @@ func (ctx *UpdateExpeditionContext) BadRequest() error {
 	return nil
 }
 
+// AddFieldkitContext provides the fieldkit add action context.
+type AddFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewAddFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller add action.
+func NewAddFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddFieldkitContext) OK(r *FieldkitInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetIDFieldkitContext provides the fieldkit get id action context.
+type GetIDFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewGetIDFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller get id action.
+func NewGetIDFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDFieldkitContext) OK(r *FieldkitInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListFieldkitContext provides the fieldkit list action context.
+type ListFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller list action.
+func NewListFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListFieldkitContext) OK(r *FieldkitInputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_inputs+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDFieldkitContext provides the fieldkit list id action context.
+type ListIDFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListIDFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller list id action.
+func NewListIDFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDFieldkitContext) OK(r *FieldkitInputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_inputs+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// SetBinaryFieldkitContext provides the fieldkit set binary action context.
+type SetBinaryFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	BinaryID int
+	InputID  int
+	Payload  *SetFieldkitBinaryPayload
+}
+
+// NewSetBinaryFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller set binary action.
+func NewSetBinaryFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SetBinaryFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SetBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramBinaryID := req.Params["binary_id"]
+	if len(paramBinaryID) > 0 {
+		rawBinaryID := paramBinaryID[0]
+		if binaryID, err2 := strconv.Atoi(rawBinaryID); err2 == nil {
+			rctx.BinaryID = binaryID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("binary_id", rawBinaryID, "integer"))
+		}
+		if rctx.BinaryID > 32767 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`binary_id`, rctx.BinaryID, 32767, false))
+		}
+	}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SetBinaryFieldkitContext) OK(r *FieldkitBinary) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_input_binary+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SetBinaryFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListInputContext provides the input list action context.
 type ListInputContext struct {
 	context.Context
@@ -617,6 +844,48 @@ func (ctx *ListIDInputContext) OK(r *Inputs) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListIDInputContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateInputContext provides the input update action context.
+type UpdateInputContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+	Payload *UpdateInputPayload
+}
+
+// NewUpdateInputContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input controller update action.
+func NewUpdateInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateInputContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateInputContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateInputContext) OK(r *Input) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateInputContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -1840,48 +2109,6 @@ func (ctx *ListIDTwitterContext) OK(r *TwitterAccounts) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListIDTwitterContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// UpdateTwitterContext provides the twitter update action context.
-type UpdateTwitterContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-	Payload *UpdateTwitterAccountPayload
-}
-
-// NewUpdateTwitterContext parses the incoming request URL and body, performs validations and creates the
-// context used by the twitter controller update action.
-func NewUpdateTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateTwitterContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := UpdateTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *UpdateTwitterContext) OK(r *TwitterAccount) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateTwitterContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

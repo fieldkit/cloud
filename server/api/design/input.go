@@ -22,6 +22,12 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 	})
 })
 
+var UpdateInputPayload = Type("UpdateInputPayload", func() {
+	Reference(Input)
+	Attribute("team_id")
+	Attribute("user_id")
+})
+
 var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 	TypeName("Inputs")
 	Attributes(func() {
@@ -35,6 +41,20 @@ var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 var _ = Resource("input", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
+	})
+
+	Action("update", func() {
+		Routing(PATCH("inputs/:input_id"))
+		Description("Update an input")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Payload(UpdateInputPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Input)
+		})
 	})
 
 	Action("list", func() {

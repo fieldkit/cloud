@@ -250,6 +250,12 @@ func main() {
 	c10 := api.NewPictureController(service)
 	app.MountPictureController(service, c10)
 
+	// Mount "twitter" controller
+	c11 := api.NewFieldkitController(service, api.FieldkitControllerOptions{
+		Backend: backend,
+	})
+	app.MountFieldkitController(service, c11)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {

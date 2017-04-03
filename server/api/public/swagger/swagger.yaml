@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      user_id: 3.9070423e+18
+      user_id: 5.239963e+18
     properties:
       user_id:
-        example: 3.9070423e+18
+        example: 5.239963e+18
         format: int64
         type: integer
     required:
@@ -15,18 +15,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Et hic sunt.
-      name: Fugit nobis ea dolores.
-      slug: hgbrltfvtq
+      description: Iste expedita libero.
+      name: Est praesentium.
+      slug: 87ez0kvi3i
     properties:
       description:
-        example: Et hic sunt.
+        example: Iste expedita libero.
         type: string
       name:
-        example: Fugit nobis ea dolores.
+        example: Est praesentium.
         type: string
       slug:
-        example: hgbrltfvtq
+        example: 87ez0kvi3i
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -38,14 +38,14 @@ definitions:
     type: object
   AddMemberPayload:
     example:
-      role: Libero laboriosam est.
-      user_id: 9.087875e+17
+      role: Error et.
+      user_id: 3.1106553e+18
     properties:
       role:
-        example: Libero laboriosam est.
+        example: Error et.
         type: string
       user_id:
-        example: 9.087875e+17
+        example: 3.1106553e+18
         format: int64
         type: integer
     required:
@@ -55,18 +55,18 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Fuga architecto nobis omnis.
-      name: Quia id.
-      slug: 56gahfdgby
+      description: Sint excepturi rerum deleniti rem sint.
+      name: Ad laboriosam voluptatem explicabo magnam sunt.
+      slug: d200jaucku
     properties:
       description:
-        example: Fuga architecto nobis omnis.
+        example: Sint excepturi rerum deleniti rem sint.
         type: string
       name:
-        example: Quia id.
+        example: Ad laboriosam voluptatem explicabo magnam sunt.
         type: string
       slug:
-        example: 56gahfdgby
+        example: d200jaucku
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -78,20 +78,20 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Omnis sint.
-      name: y52dmi76ci
-      slug: gd200jauck
+      description: Consequatur non nisi dolor autem sint vitae.
+      name: 5prgjkna1y
+      slug: 38ourowl9c
     properties:
       description:
-        example: Omnis sint.
+        example: Consequatur non nisi dolor autem sint vitae.
         type: string
       name:
-        example: y52dmi76ci
+        example: 5prgjkna1y
         maxLength: 256
         pattern: \S
         type: string
       slug:
-        example: gd200jauck
+        example: 38ourowl9c
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -103,34 +103,34 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      bio: Non nisi dolor autem sint.
-      email: roxanne.hessel@conroyhirthe.info
-      invite_token: Molestiae distinctio.
-      name: fq1e5q3b6z
-      password: j4q26y98iw
-      username: onufpoe7n4
+      bio: Sed quisquam pariatur molestiae illo officiis.
+      email: theo.swaniawski@runolfsdottir.net
+      invite_token: Qui eos maxime consequatur ut odio aperiam.
+      name: aketl8qkue
+      password: 63hu9e7amb
+      username: iuahxosx7r
     properties:
       bio:
-        example: Non nisi dolor autem sint.
+        example: Sed quisquam pariatur molestiae illo officiis.
         type: string
       email:
-        example: roxanne.hessel@conroyhirthe.info
+        example: theo.swaniawski@runolfsdottir.net
         format: email
         type: string
       invite_token:
-        example: Molestiae distinctio.
+        example: Qui eos maxime consequatur ut odio aperiam.
         type: string
       name:
-        example: fq1e5q3b6z
+        example: aketl8qkue
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: j4q26y98iw
+        example: 63hu9e7amb
         minLength: 10
         type: string
       username:
-        example: onufpoe7n4
+        example: iuahxosx7r
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -202,10 +202,6 @@ definitions:
         id: 1.2402411e+18
         name: Saepe facilis quis blanditiis recusandae est.
         slug: ap0fuesxsv
-      - description: Qui possimus porro quaerat.
-        id: 1.2402411e+18
-        name: Saepe facilis quis blanditiis recusandae est.
-        slug: ap0fuesxsv
     properties:
       expeditions:
         $ref: '#/definitions/ExpeditionCollection'
@@ -213,22 +209,149 @@ definitions:
     - expeditions
     title: 'Mediatype identifier: application/vnd.app.expeditions+json; view=default'
     type: object
+  FieldkitBinary:
+    description: FieldkitBinary media type (default view)
+    example:
+      fields:
+      - float32
+      - float32
+      - float32
+      id: 2.2726114e+18
+      input_id: 1.966706e+18
+    properties:
+      fields:
+        example:
+        - float32
+        - float32
+        - float32
+        items:
+          enum:
+          - varint
+          - uvarint
+          - float32
+          - float64
+          example: float32
+          type: string
+        type: array
+      id:
+        example: 2.2726114e+18
+        format: int64
+        type: integer
+      input_id:
+        example: 1.966706e+18
+        format: int64
+        type: integer
+    required:
+    - id
+    - input_id
+    - fields
+    title: 'Mediatype identifier: application/vnd.app.fieldkit_input_binary+json;
+      view=default'
+    type: object
+  FieldkitInput:
+    description: FieldkitInput media type (default view)
+    example:
+      expedition_id: 7.5825324e+18
+      id: 4.464267e+18
+      team_id: 3.6825135e+17
+      user_id: 1.06074567e+18
+    properties:
+      expedition_id:
+        example: 7.5825324e+18
+        format: int64
+        type: integer
+      id:
+        example: 4.464267e+18
+        format: int64
+        type: integer
+      team_id:
+        example: 3.6825135e+17
+        format: int64
+        type: integer
+      user_id:
+        example: 1.06074567e+18
+        format: int64
+        type: integer
+    required:
+    - id
+    - expedition_id
+    title: 'Mediatype identifier: application/vnd.app.fieldkit_input+json; view=default'
+    type: object
+  FieldkitInputCollection:
+    description: FieldkitInputCollection is the media type for an array of FieldkitInput
+      (default view)
+    example:
+    - expedition_id: 7.5825324e+18
+      id: 4.464267e+18
+      team_id: 3.6825135e+17
+      user_id: 1.06074567e+18
+    - expedition_id: 7.5825324e+18
+      id: 4.464267e+18
+      team_id: 3.6825135e+17
+      user_id: 1.06074567e+18
+    - expedition_id: 7.5825324e+18
+      id: 4.464267e+18
+      team_id: 3.6825135e+17
+      user_id: 1.06074567e+18
+    items:
+      $ref: '#/definitions/FieldkitInput'
+    title: 'Mediatype identifier: application/vnd.app.fieldkit_input+json; type=collection;
+      view=default'
+    type: array
+  FieldkitInputs:
+    description: FieldkitInputs media type (default view)
+    example:
+      fieldkit_inputs:
+      - expedition_id: 7.5825324e+18
+        id: 4.464267e+18
+        team_id: 3.6825135e+17
+        user_id: 1.06074567e+18
+    properties:
+      fieldkit_inputs:
+        $ref: '#/definitions/FieldkitInputCollection'
+    required:
+    - fieldkit_inputs
+    title: 'Mediatype identifier: application/vnd.app.fieldkit_inputs+json; view=default'
+    type: object
+  Input:
+    description: Input media type (default view)
+    example:
+      expedition_id: 8.369166e+18
+      id: 5.950821e+18
+      team_id: 1.4511461e+16
+      user_id: 8.241352e+18
+    properties:
+      expedition_id:
+        example: 8.369166e+18
+        format: int64
+        type: integer
+      id:
+        example: 5.950821e+18
+        format: int64
+        type: integer
+      team_id:
+        example: 1.4511461e+16
+        format: int64
+        type: integer
+      user_id:
+        example: 8.241352e+18
+        format: int64
+        type: integer
+    required:
+    - id
+    - expedition_id
+    title: 'Mediatype identifier: application/vnd.app.input+json; view=default'
+    type: object
   Inputs:
     description: Inputs media type (default view)
     example:
       twitter_accounts:
-      - expedition_id: 4.8286455e+18
-        id: 2.4394763e+18
-        screen_name: Error dignissimos.
-        team_id: 8.369166e+18
-        twitter_account_id: 5.950821e+18
-        user_id: 1.4511461e+16
-      - expedition_id: 4.8286455e+18
-        id: 2.4394763e+18
-        screen_name: Error dignissimos.
-        team_id: 8.369166e+18
-        twitter_account_id: 5.950821e+18
-        user_id: 1.4511461e+16
+      - expedition_id: 8.531526e+17
+        id: 7.202539e+18
+        screen_name: Perspiciatis quasi error voluptatem et.
+        team_id: 6.684198e+18
+        twitter_account_id: 5.521901e+17
+        user_id: 1.7504376e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -237,10 +360,10 @@ definitions:
   Location:
     description: Location media type (default view)
     example:
-      location: http://tillmanlangosh.net/kiarra_ritchie
+      location: http://olson.info/lula
     properties:
       location:
-        example: http://tillmanlangosh.net/kiarra_ritchie
+        example: http://olson.info/lula
         format: uri
         type: string
     required:
@@ -249,15 +372,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: t477aketl8
-      username: kueb63hu9e
+      password: w265h606ar
+      username: bwtu6d712l
     properties:
       password:
-        example: t477aketl8
+        example: w265h606ar
         minLength: 10
         type: string
       username:
-        example: kueb63hu9e
+        example: bwtu6d712l
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -269,23 +392,23 @@ definitions:
   Project:
     description: Project media type (default view)
     example:
-      description: Quidem quis fugit commodi ut.
-      id: 5.380881e+18
-      name: Aperiam amet.
-      slug: s8qw8bg1wa
+      description: Laboriosam soluta quia.
+      id: 5.508071e+18
+      name: Quam est amet ipsam reprehenderit totam.
+      slug: ht4idr480b
     properties:
       description:
-        example: Quidem quis fugit commodi ut.
+        example: Laboriosam soluta quia.
         type: string
       id:
-        example: 5.380881e+18
+        example: 5.508071e+18
         format: int64
         type: integer
       name:
-        example: Aperiam amet.
+        example: Quam est amet ipsam reprehenderit totam.
         type: string
       slug:
-        example: s8qw8bg1wa
+        example: ht4idr480b
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -351,14 +474,10 @@ definitions:
     description: ProjectCollection is the media type for an array of Project (default
       view)
     example:
-    - description: Quidem quis fugit commodi ut.
-      id: 5.380881e+18
-      name: Aperiam amet.
-      slug: s8qw8bg1wa
-    - description: Quidem quis fugit commodi ut.
-      id: 5.380881e+18
-      name: Aperiam amet.
-      slug: s8qw8bg1wa
+    - description: Laboriosam soluta quia.
+      id: 5.508071e+18
+      name: Quam est amet ipsam reprehenderit totam.
+      slug: ht4idr480b
     items:
       $ref: '#/definitions/Project'
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
@@ -368,14 +487,10 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Quidem quis fugit commodi ut.
-        id: 5.380881e+18
-        name: Aperiam amet.
-        slug: s8qw8bg1wa
-      - description: Quidem quis fugit commodi ut.
-        id: 5.380881e+18
-        name: Aperiam amet.
-        slug: s8qw8bg1wa
+      - description: Laboriosam soluta quia.
+        id: 5.508071e+18
+        name: Quam est amet ipsam reprehenderit totam.
+        slug: ht4idr480b
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -385,37 +500,60 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Qui odit sed id vitae est.
+      refresh_token: Animi quisquam amet.
     properties:
       refresh_token:
-        example: Qui odit sed id vitae est.
+        example: Animi quisquam amet.
         type: string
     required:
     - refresh_token
     title: RefreshUserPayload
     type: object
+  SetFieldkitBinaryPayload:
+    example:
+      fields:
+      - float32
+      - float32
+    properties:
+      fields:
+        example:
+        - float32
+        - float32
+        items:
+          enum:
+          - varint
+          - uvarint
+          - float32
+          - float64
+          example: float32
+          type: string
+        type: array
+    required:
+    - fields
+    title: SetFieldkitBinaryPayload
+    type: object
   Team:
     description: Team media type (default view)
     example:
-      description: Impedit hic dolore quidem.
-      id: 4.4710917e+18
-      name: 480bux7jxe
-      slug: 7unsz2rbp8
+      description: Harum doloribus.
+      id: 9.023151e+18
+      name: 7unsz2rbp8
+      slug: py7qrfgzsl
     properties:
       description:
-        example: Impedit hic dolore quidem.
+        example: Harum doloribus.
         type: string
       id:
-        example: 4.4710917e+18
+        example: 9.023151e+18
         format: int64
         type: integer
       name:
-        example: 480bux7jxe
+        example: 7unsz2rbp8
         maxLength: 256
         pattern: \S
         type: string
       slug:
-        example: 7unsz2rbp8
+        example: py7qrfgzsl
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -429,18 +567,14 @@ definitions:
   TeamCollection:
     description: TeamCollection is the media type for an array of Team (default view)
     example:
-    - description: Impedit hic dolore quidem.
-      id: 4.4710917e+18
-      name: 480bux7jxe
-      slug: 7unsz2rbp8
-    - description: Impedit hic dolore quidem.
-      id: 4.4710917e+18
-      name: 480bux7jxe
-      slug: 7unsz2rbp8
-    - description: Impedit hic dolore quidem.
-      id: 4.4710917e+18
-      name: 480bux7jxe
-      slug: 7unsz2rbp8
+    - description: Harum doloribus.
+      id: 9.023151e+18
+      name: 7unsz2rbp8
+      slug: py7qrfgzsl
+    - description: Harum doloribus.
+      id: 9.023151e+18
+      name: 7unsz2rbp8
+      slug: py7qrfgzsl
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
@@ -449,19 +583,19 @@ definitions:
   TeamMember:
     description: TeamMember media type (default view)
     example:
-      role: Sapiente ipsa expedita qui eum enim deleniti.
-      team_id: 5.113906e+18
-      user_id: 6.1010993e+18
+      role: Fugit commodi ut qui.
+      team_id: 7.552777e+18
+      user_id: 5.1553956e+18
     properties:
       role:
-        example: Sapiente ipsa expedita qui eum enim deleniti.
+        example: Fugit commodi ut qui.
         type: string
       team_id:
-        example: 5.113906e+18
+        example: 7.552777e+18
         format: int64
         type: integer
       user_id:
-        example: 6.1010993e+18
+        example: 5.1553956e+18
         format: int64
         type: integer
     required:
@@ -474,9 +608,15 @@ definitions:
     description: TeamMemberCollection is the media type for an array of TeamMember
       (default view)
     example:
-    - role: Sapiente ipsa expedita qui eum enim deleniti.
-      team_id: 5.113906e+18
-      user_id: 6.1010993e+18
+    - role: Fugit commodi ut qui.
+      team_id: 7.552777e+18
+      user_id: 5.1553956e+18
+    - role: Fugit commodi ut qui.
+      team_id: 7.552777e+18
+      user_id: 5.1553956e+18
+    - role: Fugit commodi ut qui.
+      team_id: 7.552777e+18
+      user_id: 5.1553956e+18
     items:
       $ref: '#/definitions/TeamMember'
     title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
@@ -486,12 +626,12 @@ definitions:
     description: TeamMembers media type (default view)
     example:
       members:
-      - role: Sapiente ipsa expedita qui eum enim deleniti.
-        team_id: 5.113906e+18
-        user_id: 6.1010993e+18
-      - role: Sapiente ipsa expedita qui eum enim deleniti.
-        team_id: 5.113906e+18
-        user_id: 6.1010993e+18
+      - role: Fugit commodi ut qui.
+        team_id: 7.552777e+18
+        user_id: 5.1553956e+18
+      - role: Fugit commodi ut qui.
+        team_id: 7.552777e+18
+        user_id: 5.1553956e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -503,18 +643,18 @@ definitions:
     description: Teams media type (default view)
     example:
       teams:
-      - description: Impedit hic dolore quidem.
-        id: 4.4710917e+18
-        name: 480bux7jxe
-        slug: 7unsz2rbp8
-      - description: Impedit hic dolore quidem.
-        id: 4.4710917e+18
-        name: 480bux7jxe
-        slug: 7unsz2rbp8
-      - description: Impedit hic dolore quidem.
-        id: 4.4710917e+18
-        name: 480bux7jxe
-        slug: 7unsz2rbp8
+      - description: Harum doloribus.
+        id: 9.023151e+18
+        name: 7unsz2rbp8
+        slug: py7qrfgzsl
+      - description: Harum doloribus.
+        id: 9.023151e+18
+        name: 7unsz2rbp8
+        slug: py7qrfgzsl
+      - description: Harum doloribus.
+        id: 9.023151e+18
+        name: 7unsz2rbp8
+        slug: py7qrfgzsl
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -525,34 +665,34 @@ definitions:
   TwitterAccount:
     description: TwitterAccount media type (default view)
     example:
-      expedition_id: 4.8286455e+18
-      id: 2.4394763e+18
-      screen_name: Error dignissimos.
-      team_id: 8.369166e+18
-      twitter_account_id: 5.950821e+18
-      user_id: 1.4511461e+16
+      expedition_id: 8.531526e+17
+      id: 7.202539e+18
+      screen_name: Perspiciatis quasi error voluptatem et.
+      team_id: 6.684198e+18
+      twitter_account_id: 5.521901e+17
+      user_id: 1.7504376e+18
     properties:
       expedition_id:
-        example: 4.8286455e+18
+        example: 8.531526e+17
         format: int64
         type: integer
       id:
-        example: 2.4394763e+18
+        example: 7.202539e+18
         format: int64
         type: integer
       screen_name:
-        example: Error dignissimos.
+        example: Perspiciatis quasi error voluptatem et.
         type: string
       team_id:
-        example: 8.369166e+18
+        example: 6.684198e+18
         format: int64
         type: integer
       twitter_account_id:
-        example: 5.950821e+18
+        example: 5.521901e+17
         format: int64
         type: integer
       user_id:
-        example: 1.4511461e+16
+        example: 1.7504376e+18
         format: int64
         type: integer
     required:
@@ -566,18 +706,12 @@ definitions:
     description: TwitterAccountCollection is the media type for an array of TwitterAccount
       (default view)
     example:
-    - expedition_id: 4.8286455e+18
-      id: 2.4394763e+18
-      screen_name: Error dignissimos.
-      team_id: 8.369166e+18
-      twitter_account_id: 5.950821e+18
-      user_id: 1.4511461e+16
-    - expedition_id: 4.8286455e+18
-      id: 2.4394763e+18
-      screen_name: Error dignissimos.
-      team_id: 8.369166e+18
-      twitter_account_id: 5.950821e+18
-      user_id: 1.4511461e+16
+    - expedition_id: 8.531526e+17
+      id: 7.202539e+18
+      screen_name: Perspiciatis quasi error voluptatem et.
+      team_id: 6.684198e+18
+      twitter_account_id: 5.521901e+17
+      user_id: 1.7504376e+18
     items:
       $ref: '#/definitions/TwitterAccount'
     title: 'Mediatype identifier: application/vnd.app.twitter_account+json; type=collection;
@@ -587,24 +721,18 @@ definitions:
     description: TwitterAccounts media type (default view)
     example:
       twitter_accounts:
-      - expedition_id: 4.8286455e+18
-        id: 2.4394763e+18
-        screen_name: Error dignissimos.
-        team_id: 8.369166e+18
-        twitter_account_id: 5.950821e+18
-        user_id: 1.4511461e+16
-      - expedition_id: 4.8286455e+18
-        id: 2.4394763e+18
-        screen_name: Error dignissimos.
-        team_id: 8.369166e+18
-        twitter_account_id: 5.950821e+18
-        user_id: 1.4511461e+16
-      - expedition_id: 4.8286455e+18
-        id: 2.4394763e+18
-        screen_name: Error dignissimos.
-        team_id: 8.369166e+18
-        twitter_account_id: 5.950821e+18
-        user_id: 1.4511461e+16
+      - expedition_id: 8.531526e+17
+        id: 7.202539e+18
+        screen_name: Perspiciatis quasi error voluptatem et.
+        team_id: 6.684198e+18
+        twitter_account_id: 5.521901e+17
+        user_id: 1.7504376e+18
+      - expedition_id: 8.531526e+17
+        id: 7.202539e+18
+        screen_name: Perspiciatis quasi error voluptatem et.
+        team_id: 6.684198e+18
+        twitter_account_id: 5.521901e+17
+        user_id: 1.7504376e+18
     properties:
       twitter_accounts:
         $ref: '#/definitions/TwitterAccountCollection'
@@ -612,53 +740,53 @@ definitions:
     - twitter_accounts
     title: 'Mediatype identifier: application/vnd.app.twitter_accounts+json; view=default'
     type: object
+  UpdateInputPayload:
+    example:
+      team_id: 7.2464166e+18
+      user_id: 7.5265205e+18
+    properties:
+      team_id:
+        example: 7.2464166e+18
+        format: int64
+        type: integer
+      user_id:
+        example: 7.5265205e+18
+        format: int64
+        type: integer
+    title: UpdateInputPayload
+    type: object
   UpdateMemberPayload:
     example:
-      role: Cum iusto iusto quia.
+      role: Quas voluptates ad consectetur occaecati occaecati.
     properties:
       role:
-        example: Cum iusto iusto quia.
+        example: Quas voluptates ad consectetur occaecati occaecati.
         type: string
     required:
     - role
     title: UpdateMemberPayload
     type: object
-  UpdateTwitterAccountPayload:
-    example:
-      team_id: 3.9431288e+18
-      user_id: 7.990431e+18
-    properties:
-      team_id:
-        example: 3.9431288e+18
-        format: int64
-        type: integer
-      user_id:
-        example: 7.990431e+18
-        format: int64
-        type: integer
-    title: UpdateTwitterAccountPayload
-    type: object
   UpdateUserPayload:
     example:
-      bio: Odit necessitatibus non veritatis velit unde reiciendis.
-      email: dean@zboncakcummerata.net
-      name: v0uepd168s
-      username: lx8rzq05j6
+      bio: Vero ut aliquid.
+      email: adella_pouros@nicolas.org
+      name: oe9agp8lep
+      username: 9p8qr0lxt2
     properties:
       bio:
-        example: Odit necessitatibus non veritatis velit unde reiciendis.
+        example: Vero ut aliquid.
         type: string
       email:
-        example: dean@zboncakcummerata.net
+        example: adella_pouros@nicolas.org
         format: email
         type: string
       name:
-        example: v0uepd168s
+        example: oe9agp8lep
         maxLength: 256
         pattern: \S
         type: string
       username:
-        example: lx8rzq05j6
+        example: 9p8qr0lxt2
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -672,30 +800,30 @@ definitions:
   User:
     description: User media type (default view)
     example:
-      bio: Dolores quo suscipit.
-      email: garnet.mccullough@leffler.biz
-      id: 7.801653e+18
-      name: 6hce00voeb
-      username: eo5qmtbwjv
+      bio: Soluta odio eum quis ut repellendus ratione.
+      email: conor_brakus@johnsupton.biz
+      id: 7.695198e+17
+      name: wjv73wy8mr
+      username: k1msmhgbrl
     properties:
       bio:
-        example: Dolores quo suscipit.
+        example: Soluta odio eum quis ut repellendus ratione.
         type: string
       email:
-        example: garnet.mccullough@leffler.biz
+        example: conor_brakus@johnsupton.biz
         format: email
         type: string
       id:
-        example: 7.801653e+18
+        example: 7.695198e+17
         format: int64
         type: integer
       name:
-        example: 6hce00voeb
+        example: wjv73wy8mr
         maxLength: 256
         pattern: \S
         type: string
       username:
-        example: eo5qmtbwjv
+        example: k1msmhgbrl
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -710,16 +838,21 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - bio: Dolores quo suscipit.
-      email: garnet.mccullough@leffler.biz
-      id: 7.801653e+18
-      name: 6hce00voeb
-      username: eo5qmtbwjv
-    - bio: Dolores quo suscipit.
-      email: garnet.mccullough@leffler.biz
-      id: 7.801653e+18
-      name: 6hce00voeb
-      username: eo5qmtbwjv
+    - bio: Soluta odio eum quis ut repellendus ratione.
+      email: conor_brakus@johnsupton.biz
+      id: 7.695198e+17
+      name: wjv73wy8mr
+      username: k1msmhgbrl
+    - bio: Soluta odio eum quis ut repellendus ratione.
+      email: conor_brakus@johnsupton.biz
+      id: 7.695198e+17
+      name: wjv73wy8mr
+      username: k1msmhgbrl
+    - bio: Soluta odio eum quis ut repellendus ratione.
+      email: conor_brakus@johnsupton.biz
+      id: 7.695198e+17
+      name: wjv73wy8mr
+      username: k1msmhgbrl
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -729,16 +862,21 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - bio: Dolores quo suscipit.
-        email: garnet.mccullough@leffler.biz
-        id: 7.801653e+18
-        name: 6hce00voeb
-        username: eo5qmtbwjv
-      - bio: Dolores quo suscipit.
-        email: garnet.mccullough@leffler.biz
-        id: 7.801653e+18
-        name: 6hce00voeb
-        username: eo5qmtbwjv
+      - bio: Soluta odio eum quis ut repellendus ratione.
+        email: conor_brakus@johnsupton.biz
+        id: 7.695198e+17
+        name: wjv73wy8mr
+        username: k1msmhgbrl
+      - bio: Soluta odio eum quis ut repellendus ratione.
+        email: conor_brakus@johnsupton.biz
+        id: 7.695198e+17
+        name: wjv73wy8mr
+        username: k1msmhgbrl
+      - bio: Soluta odio eum quis ut repellendus ratione.
+        email: conor_brakus@johnsupton.biz
+        id: 7.695198e+17
+        name: wjv73wy8mr
+        username: k1msmhgbrl
     properties:
       users:
         $ref: '#/definitions/UserCollection'
@@ -883,6 +1021,65 @@ paths:
       summary: list id input
       tags:
       - input
+  /expeditions/{expedition_id}/inputs/fieldkits:
+    get:
+      description: |-
+        List an expedition's Fieldkit inputs
+
+        Required security scopes:
+          * `api:access`
+      operationId: fieldkit#list id
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.fieldkit_inputs+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FieldkitInputs'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list id fieldkit
+      tags:
+      - fieldkit
+    post:
+      description: |-
+        Add a Fieldkit input
+
+        Required security scopes:
+          * `api:access`
+      operationId: fieldkit#add
+      parameters:
+      - in: path
+        name: expedition_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.fieldkit_input+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FieldkitInput'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add fieldkit
+      tags:
+      - fieldkit
   /expeditions/{expedition_id}/inputs/twitter-accounts:
     get:
       description: |-
@@ -1027,6 +1224,111 @@ paths:
       summary: add team
       tags:
       - team
+  /inputs/{input_id}:
+    patch:
+      description: |-
+        Update an input
+
+        Required security scopes:
+          * `api:access`
+      operationId: input#update
+      parameters:
+      - in: path
+        name: input_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateInputPayload'
+      produces:
+      - application/vnd.app.input+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Input'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update input
+      tags:
+      - input
+  /inputs/fieldkits/{input_id}:
+    get:
+      description: |-
+        Get a Fieldkit input
+
+        Required security scopes:
+          * `api:access`
+      operationId: fieldkit#get id
+      parameters:
+      - in: path
+        name: input_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.fieldkit_input+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FieldkitInput'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get id fieldkit
+      tags:
+      - fieldkit
+  /inputs/fieldkits/{input_id}/binary/{binary_id}:
+    put:
+      description: |-
+        Set a Fieldkit binary format
+
+        Required security scopes:
+          * `api:access`
+      operationId: fieldkit#set binary
+      parameters:
+      - in: path
+        maximum: 32767
+        name: binary_id
+        required: true
+        type: integer
+      - in: path
+        name: input_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SetFieldkitBinaryPayload'
+      produces:
+      - application/vnd.app.fieldkit_input_binary+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FieldkitBinary'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: set binary fieldkit
+      tags:
+      - fieldkit
   /inputs/twitter-accounts/{input_id}:
     get:
       description: |-
@@ -1055,40 +1357,6 @@ paths:
       - jwt:
         - api:access
       summary: get id twitter
-      tags:
-      - twitter
-    patch:
-      description: |-
-        Get a Twitter account input
-
-        Required security scopes:
-          * `api:access`
-      operationId: twitter#update
-      parameters:
-      - in: path
-        name: input_id
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/UpdateTwitterAccountPayload'
-      produces:
-      - application/vnd.app.twitter_account+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/TwitterAccount'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: update twitter
       tags:
       - twitter
   /login:
@@ -1405,6 +1673,44 @@ paths:
       summary: list input
       tags:
       - input
+  /projects/@/{project}/expeditions/@/{expedition}/inputs/fieldkits:
+    get:
+      description: |-
+        List an expedition's Fieldkit inputs
+
+        Required security scopes:
+          * `api:access`
+      operationId: fieldkit#list
+      parameters:
+      - description: Expedition slug
+        in: path
+        name: expedition
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      - description: Project slug
+        in: path
+        name: project
+        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.fieldkit_inputs+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FieldkitInputs'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list fieldkit
+      tags:
+      - fieldkit
   /projects/@/{project}/expeditions/@/{expedition}/inputs/twitter-accounts:
     get:
       description: |-

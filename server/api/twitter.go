@@ -106,29 +106,6 @@ func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
 	return ctx.OK(TwitterAccountType(twitterAccount))
 }
 
-func (c *TwitterController) Update(ctx *app.UpdateTwitterContext) error {
-	twitterAccount, err := c.options.Backend.TwitterAccountInput(ctx, int32(ctx.InputID))
-	if err != nil {
-		return err
-	}
-
-	if ctx.Payload.TeamID != nil {
-		teamID := int32(*ctx.Payload.TeamID)
-		twitterAccount.TeamID = &teamID
-	}
-
-	if ctx.Payload.UserID != nil {
-		userID := int32(*ctx.Payload.UserID)
-		twitterAccount.UserID = &userID
-	}
-
-	if err := c.options.Backend.UpdateInput(ctx, &twitterAccount.Input); err != nil {
-		return err
-	}
-
-	return ctx.OK(TwitterAccountType(twitterAccount))
-}
-
 func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
 	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
