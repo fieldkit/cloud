@@ -65,24 +65,54 @@ export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
-export type APITwitterInputCreateResponse = {
+export type APITwitterInputCreateResponse = {|
   location: string;
-};
+|};
 
-export type APIBaseInput = {
+export type APIMutableInput = {|
+  team_id?: number;
+  user_id?: number;
+|};
+
+export type APIBaseInput = {|
   id: number;
   expedition_id: number;
-};
+  ...APIMutableInput;
+|};
 
-export type APITwitterInput = {
-  ...$Exact<APIBaseInput>;
+export type APITwitterInput = {|
+  ...APIBaseInput;
   screen_name: string;
   twitter_account_id: number;
-};
+|};
 
-export type APIInputs = {
+export type APIInputs = {|
   twitter_accounts?: APITwitterInput[]
-}
+|};
+
+export type APINewFieldkitInput = {|
+  // None for now!
+|};
+
+export type APIFieldkitInput = {|
+  ...APIBaseInput;
+|};
+
+export type APIFieldkitBinaryFieldType = 'varint' | 'uvarint' | 'float32' | 'float64';
+
+export type APINewFieldkitInputBinary = {|
+  fields: APIFieldkitBinaryFieldType[];
+|};
+
+export type APIFieldkitInputBinary = {|
+  ...APINewFieldkitInputBinary;
+  id: number;
+  input_id: number;
+|};
+
+export type APIFieldkitInputs = {|
+  fieldkit_inputs: APIFieldkitInput[];
+|};
 
 export type APINewTeam = {
   name: string;
