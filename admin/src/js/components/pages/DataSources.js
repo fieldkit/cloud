@@ -11,7 +11,7 @@ import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 import { RouteOrLoading } from '../shared/RequiredRoute';
 
-import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APINewTwitterInput, APINewFieldkitInput, APITeam, APIMember, APIUser } from '../../api/types';
+import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APINewTwitterInput, APINewFieldkitInput, APITeam, APIMember, APIUser, APIMutableInput } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -86,7 +86,7 @@ export class DataSources extends Component {
     }
   }  
 
-  async onTwitterCreate(event, t: APINewTwitterInput) {
+  async onTwitterCreate(t: APINewTwitterInput) {
     const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, t);
     if (res.type === 'ok') {
       const redirect = res.payload.location;
@@ -111,21 +111,21 @@ export class DataSources extends Component {
 
   render() {
     const { expedition, match } = this.props;
-    const { twitter_accounts, fieldkit_inputs } = this.state.inputs;
+    const { twitter_account_inputs, fieldkit_inputs } = this.state.inputs;
     const { users } = this.state;
 
     return (
       <div className="data-sources-page">
 
-
-      <Route path={`${match.url}/add-fieldkit-input`} render={props =>
+      <Route path={`${match.url}/add-input/:inputType`} render={props =>
         <ReactModal isOpen={true} contentLabel="Add Fieldkit Input" className="modal" overlayClassName="modal-overlay">
           <h2>Add Fieldkit Input</h2>
           <InputForm
             expeditionId={props.match.params.expeditionId}
             users={users}
+            inputType={props.match.params.inputType}
             onCancel={() => this.props.history.push(`${match.url}`)}
-            onSave={this.onFieldkitCreate.bind(this)} 
+            onSave={ (props.match.params.inputType === 'twitter') ? this.onTwitterCreate.bind(this) : this.onFieldkitCreate.bind(this)} 
             saveText="Add" />
         </ReactModal> } />    
 
@@ -133,7 +133,7 @@ export class DataSources extends Component {
 
         <div className="input-section">
           <h3>Twitter</h3>
-          { twitter_accounts && twitter_accounts.length > 0 &&
+          { twitter_account_inputs && twitter_account_inputs.length > 0 &&
             <table>
               <tbody>
                 <tr>
@@ -141,16 +141,16 @@ export class DataSources extends Component {
                   <th>Binding</th>
                   <th></th>
                 </tr>
-              { twitter_accounts.map((t, i) =>
+              { twitter_account_inputs.map((t, i) =>
                 <tr key={i} className="input-item">
-                  <td>{t.screen_name}</td>
+                  <td>{t.name}</td>
                   <td>None</td>
                   {/* TODO: hook up */}
                   <td><a href="#">Delete</a></td>
                 </tr> )}
               </tbody>
             </table> }
-          <button className="add-button" onClick={this.onTwitterCreate.bind(this)}>Add Twitter Account</button>
+          <Link className="button" to={`${match.url}/add-input/twitter`}>Add Twitter Account</Link>
 
           <h3>Fieldkit Sensors</h3>
           { fieldkit_inputs && fieldkit_inputs.length > 0 &&
@@ -161,9 +161,9 @@ export class DataSources extends Component {
                   <th>Binding</th>
                   <th></th>
                 </tr>
-              { fieldkit_inputs.map((t, i) =>
+              { fieldkit_inputs.map((f, i) =>
                 <tr key={i} className="input-item">
-                  <td>{t.name}</td>
+                  <td>{f.name}</td>
                   <td>None</td>
                   {/* TODO: hook up */}
                   <td><a href="#">Delete</a></td>
@@ -171,7 +171,7 @@ export class DataSources extends Component {
               </tbody>
             </table> }
 
-          <Link className="button" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
+          <Link className="button" to={`${match.url}/add-input/fieldkit`}>Add Fieldkit Input</Link>
         </div>
       </div>
     )

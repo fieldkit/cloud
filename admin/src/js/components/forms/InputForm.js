@@ -5,16 +5,17 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput } from '../../api/types';
+import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput } from '../../api/types';
 
 type Props = {
   fieldkitInput?: ?APIFieldkitInput,
   users: APIUser[],
+  inputType: string,
 
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (f: APINewFieldkitInput) => Promise<?APIErrors>;
+  onSave: (i: APINewFieldkitInput | APINewTwitterInput) => Promise<?APIErrors>;
 }
 
 export class InputForm extends Component {

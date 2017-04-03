@@ -92,7 +92,7 @@ export type APITwitterInput = {|
 |};
 
 export type APIInputs = {
-  twitter_accounts?: APITwitterInput[],
+  twitter_account_inputs?: APITwitterInput[],
   fieldkit_inputs?: APIFieldkitInput[]
 };
 
