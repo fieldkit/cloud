@@ -28,8 +28,9 @@ export class DataSources extends Component {
   state: {
     inputs: APIInputs,
     teams: APITeam[],
-    members: { [teamId: number]: APIMember[] },
-    users: APIUser[]
+    // members: { [teamId: number]: APIMember[] },
+    members: APIMember[],
+    users: {[id: number]: APIUser},
   }
 
   constructor(props: Props) {
@@ -37,8 +38,9 @@ export class DataSources extends Component {
     this.state = {
       inputs: {},
       teams: [],
-      members: {},
-      users: []
+      // members: {},
+      members: [],
+      users: {}
     }
 
     this.loadInputs();
@@ -67,12 +69,16 @@ export class DataSources extends Component {
   async loadMembers(teamId: number) {
     const membersRes = await FKApiClient.get().getMembers(teamId);
     if (membersRes.type === 'ok' && membersRes.payload) {
-      const { members } = this.state;
-      members[teamId] = membersRes.payload.members;
-      this.setState({members: members});
-      for (const member of members[teamId]) {
+      const members = this.state.members.slice();
+
+      membersRes.payload.members.forEach(member =>
+        !members.find(m => m.user_id === member.user_id) &&
+          members.push(member)
+      );
+      for (const member of members) {
         await this.loadMemberName(teamId, member.user_id);
-      }      
+      }
+      this.setState({members: members});    
     }
   }
 

@@ -73,7 +73,7 @@ export class Teams extends Component {
       this.setState({members: members});
       for (const member of members[teamId]) {
         await this.loadMemberName(teamId, member.user_id);
-      }      
+      }
     }
   }
 
