@@ -81,6 +81,10 @@ export type APIBaseInput = {|
   ...APIMutableInput;
 |};
 
+export type APINewTwitterInput = {|
+  name: string
+|};
+
 export type APITwitterInput = {|
   ...APIBaseInput;
   screen_name: string;
@@ -93,7 +97,7 @@ export type APIInputs = {
 };
 
 export type APINewFieldkitInput = {|
-  // None for now!
+  name: string
 |};
 
 export type APIFieldkitInput = {|

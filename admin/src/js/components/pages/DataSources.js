@@ -7,11 +7,11 @@ import _ from 'lodash'
 import log from 'loglevel';
 
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
-import { FieldkitInputForm } from '../forms/FieldkitInputForm';
+import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 import { RouteOrLoading } from '../shared/RequiredRoute';
 
-import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APITeam, APIMember, APIUser } from '../../api/types';
+import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APINewTwitterInput, APINewFieldkitInput, APITeam, APIMember, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -86,8 +86,8 @@ export class DataSources extends Component {
     }
   }  
 
-  async onTwitterCreate(event) {
-    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id);
+  async onTwitterCreate(event, t: APINewTwitterInput) {
+    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, t);
     if (res.type === 'ok') {
       const redirect = res.payload.location;
       window.location = redirect;
@@ -96,10 +96,9 @@ export class DataSources extends Component {
     }
   }
 
-  async onFieldkitCreate(event) {
+  async onFieldkitCreate(f: APINewFieldkitInput) {
     const { expedition, match } = this.props;
-    const fieldkitInput = {};
-    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, fieldkitInput);
+    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, f);
     console.log(fieldkitRes);
     if (fieldkitRes.type === 'ok') {
       console.log(fieldkitRes.payload);
@@ -122,7 +121,7 @@ export class DataSources extends Component {
       <Route path={`${match.url}/add-fieldkit-input`} render={props =>
         <ReactModal isOpen={true} contentLabel="Add Fieldkit Input" className="modal" overlayClassName="modal-overlay">
           <h2>Add Fieldkit Input</h2>
-          <FieldkitInputForm
+          <InputForm
             expeditionId={props.match.params.expeditionId}
             users={users}
             onCancel={() => this.props.history.push(`${match.url}`)}
@@ -152,7 +151,27 @@ export class DataSources extends Component {
               </tbody>
             </table> }
           <button className="add-button" onClick={this.onTwitterCreate.bind(this)}>Add Twitter Account</button>
-          <Link className="button secondary" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
+
+          <h3>Fieldkit Sensors</h3>
+          { fieldkit_inputs && fieldkit_inputs.length > 0 &&
+            <table>
+              <tbody>
+                <tr>
+                  <th>Name</th>
+                  <th>Binding</th>
+                  <th></th>
+                </tr>
+              { fieldkit_inputs.map((t, i) =>
+                <tr key={i} className="input-item">
+                  <td>{t.name}</td>
+                  <td>None</td>
+                  {/* TODO: hook up */}
+                  <td><a href="#">Delete</a></td>
+                </tr> )}
+              </tbody>
+            </table> }
+
+          <Link className="button" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
         </div>
       </div>
     )

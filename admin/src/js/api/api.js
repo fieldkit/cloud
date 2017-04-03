@@ -19,6 +19,7 @@ import type {
   APIExpeditions,
   APIMutableInput,
   APIBaseInput,
+  APINewTwitterInput,
   APITwitterInput,
   APITwitterInputCreateResponse,
   APIFieldkitInput,
@@ -288,8 +289,8 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
   }
 
-  createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`)
+  createTwitterInput(expeditionId: number, twitterInput: APINewTwitterInput): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`, twitterInput)
   }
 
   createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {

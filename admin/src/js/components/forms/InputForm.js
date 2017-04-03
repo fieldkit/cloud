@@ -14,10 +14,10 @@ type Props = {
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (e?: APINewFieldkitInput) => Promise<?APIErrors>;
+  onSave: (f: APINewFieldkitInput) => Promise<?APIErrors>;
 }
 
-export class FieldkitInputForm extends Component {
+export class InputForm extends Component {
   props: Props;
 
   /*flow-include
@@ -53,8 +53,9 @@ export class FieldkitInputForm extends Component {
     });
   }
 
-  async save(fieldkitInput?: APINewFieldkitInput) {
-    const errors = await this.props.onSave(fieldkitInput);
+  async save() {
+    const { name } = this.state;
+    const errors = await this.props.onSave({name: name});
     if (errors) {
       this.setState({ errors });
     }
