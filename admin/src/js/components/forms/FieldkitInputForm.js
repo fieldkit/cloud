@@ -5,10 +5,11 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIFieldkitInput, APINewFieldkitInput } from '../../api/types';
+import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput } from '../../api/types';
 
 type Props = {
   fieldkitInput?: ?APIFieldkitInput,
+  users: APIUser[],
 
   cancelText?: string;
   saveText?: ?string;
@@ -22,6 +23,7 @@ export class FieldkitInputForm extends Component {
   /*flow-include
   state: {
     ...$Exact<APIFieldkitInput>,  
+    users: APIUser[],
     saveDisabled: boolean,
     errors: ?APIErrors
   };
@@ -33,6 +35,7 @@ export class FieldkitInputForm extends Component {
       user_id: -1,
       name: '',
       ...props.fieldkitInput,
+      users: [],
       saveDisabled: false,
       errors: null
     }
@@ -44,6 +47,7 @@ export class FieldkitInputForm extends Component {
       user_id: -1,
       name: '',
       ...nextProps.fieldkitInput,
+      users: nextProps.users,
       saveDisabled: false,
       errors: null
     });

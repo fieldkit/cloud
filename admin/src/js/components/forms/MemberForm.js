@@ -53,10 +53,6 @@ export class MemberForm extends Component {
   }
 
   async loadUsers() {
-    /* TO DO:
-      remove already added members from this list.
-      Could probably pass current members in the props from the
-      Teams table and use componentWillReceiveProps to set the state */
     const usersRes = await FKApiClient.get().getUsers();
     if (usersRes.type === 'ok' && usersRes.payload) {
       const membersIds = this.props.members.map(member =>

@@ -153,6 +153,7 @@ export class FKApiClient extends JWTAPIClient {
           return { type: 'err', errors: APIFakeOtherError };
         }
       } else {
+        log.error(e);
         const APIFakeOtherError: APIErrors = {
           code: 'UnknownError',
           detail: e.msg,

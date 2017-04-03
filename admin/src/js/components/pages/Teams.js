@@ -83,10 +83,11 @@ export class Teams extends Component {
       const { users } = this.state;
       if(!users[teamId]){
         users[teamId] = [];
-      }users[teamId].push(userRes.payload);
+      }
+      users[teamId].push(userRes.payload);
       this.setState({users: users});
-    }    
-  }  
+    }
+  }
 
   async onTeamCreate(e: APINewTeam) {
 

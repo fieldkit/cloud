@@ -11,7 +11,7 @@ import { FieldkitInputForm } from '../forms/FieldkitInputForm';
 import { FKApiClient } from '../../api/api';
 import { RouteOrLoading } from '../shared/RequiredRoute';
 
-import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse } from '../../api/types';
+import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APITeam, APIMember, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
@@ -25,16 +25,23 @@ type Props = {
 export class DataSources extends Component {
   props: Props;
   state: {
-    inputs: APIInputs
+    inputs: APIInputs,
+    teams: APITeam[],
+    members: { [teamId: number]: APIMember[] },
+    users: APIUser[]
   }
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      inputs: {}
+      inputs: {},
+      teams: [],
+      members: {},
+      users: []
     }
 
     this.loadInputs();
+    this.loadTeams();
   }
 
   async loadInputs() {
@@ -44,6 +51,40 @@ export class DataSources extends Component {
       console.log(inputsRes.payload);
     }
   }
+
+  async loadTeams() {
+    const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
+    if (teamsRes.type === 'ok' && teamsRes.payload) {
+      const { teams } = teamsRes.payload;
+      this.setState({ teams: teams });
+      for (const team of teams) {
+        await this.loadMembers(team.id);
+      }
+    }
+  }
+
+  async loadMembers(teamId: number) {
+    const membersRes = await FKApiClient.get().getMembers(teamId);
+    if (membersRes.type === 'ok' && membersRes.payload) {
+      const { members } = this.state;
+      members[teamId] = membersRes.payload.members;
+      this.setState({members: members});
+      for (const member of members[teamId]) {
+        await this.loadMemberName(teamId, member.user_id);
+      }      
+    }
+  }
+
+  async loadMemberName(teamId: number, userId: number){
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      if(userRes.payload && !users.find(user => userRes.payload)){
+        users.push(userRes.payload);
+      }
+      this.setState({users: users});
+    }
+  }  
 
   async onTwitterCreate(event) {
     const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id);
@@ -57,7 +98,8 @@ export class DataSources extends Component {
 
   async onFieldkitCreate(event) {
     const { expedition, match } = this.props;
-    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, event);
+    const fieldkitInput = {};
+    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, fieldkitInput);
     console.log(fieldkitRes);
     if (fieldkitRes.type === 'ok') {
       console.log(fieldkitRes.payload);
@@ -70,7 +112,8 @@ export class DataSources extends Component {
 
   render() {
     const { expedition, match } = this.props;
-    const { twitter_accounts } = this.state.inputs;
+    const { twitter_accounts, fieldkit_inputs } = this.state.inputs;
+    const { users } = this.state;
 
     return (
       <div className="data-sources-page">
@@ -81,6 +124,7 @@ export class DataSources extends Component {
           <h2>Add Fieldkit Input</h2>
           <FieldkitInputForm
             expeditionId={props.match.params.expeditionId}
+            users={users}
             onCancel={() => this.props.history.push(`${match.url}`)}
             onSave={this.onFieldkitCreate.bind(this)} 
             saveText="Add" />
