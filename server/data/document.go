@@ -28,7 +28,7 @@ func (l *Location) Coordinates() []float64 {
 	return coordinates[:]
 }
 
-func (l *Location) Scan(data []byte) error {
+func (l *Location) Scan(data interface{}) error {
 	point := &geo.Point{}
 	if err := point.Scan(data); err != nil {
 		return err
