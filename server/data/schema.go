@@ -48,7 +48,7 @@ func (s *JSONSchema) UnmarshalGo(jsonData interface{}) error {
 }
 
 func (s *JSONSchema) Scan(data interface{}) error {
-	if data, ok := data.(type); ok {
+	if data, ok := data.([]byte); ok {
 		return s.UnmarshalJSON(data)
 	}
 
