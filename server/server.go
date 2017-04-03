@@ -262,6 +262,12 @@ func main() {
 	})
 	app.MountSchemaController(service, c12)
 
+	// Mount "document" controller
+	c13 := api.NewDocumentController(service, api.DocumentControllerOptions{
+		Backend: backend,
+	})
+	app.MountDocumentController(service, c13)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {

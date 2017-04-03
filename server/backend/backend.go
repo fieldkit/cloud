@@ -298,6 +298,36 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 	return schemaID, nil
 }
 
+func (b *Backend) ListDocuments(ctx context.Context, project, expedition string) ([]*data.Document, error) {
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.*
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE p.slug = $1 AND e.slug = $2
+		`, project, expedition); err != nil {
+		return nil, err
+	}
+
+	return documents, nil
+}
+
+func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.*
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+					WHERE i.expedition_id = $1
+		`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return documents, nil
+}
+
 func (b *Backend) TwitterListCredentialer() *TwitterListCredentialer {
 	return &TwitterListCredentialer{b}
 }
