@@ -83,6 +83,10 @@ export class APIClient {
     return this.exec('PATCH', path, { body, headers });
   }
 
+  put(path: string, body?: FormData | string | null, headers: Object = {}): Promise<Response> {
+    return this.exec('PUT', path, { body, headers });
+  }
+
   get(path: string, params?: Object, headers: Object = {}): Promise<Response> {
     return this.exec('GET', path, { params, headers });
   }
@@ -113,6 +117,14 @@ export class APIClient {
   }
 
   async patchJSON(path: string, body?: Object, headers: Object = {}): Promise<any> {
+    const res = await this.patch(path, JSON.stringify(body), headers);
+    if (res.status === 204) {
+      return null
+    }
+    return res.json();
+  }
+
+  async putJSON(path: string, body?: Object, headers: Object = {}): Promise<any> {
     const res = await this.patch(path, JSON.stringify(body), headers);
     if (res.status === 204) {
       return null

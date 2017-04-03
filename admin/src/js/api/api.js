@@ -17,8 +17,15 @@ import type {
   APIExpedition,
   APINewExpedition,
   APIExpeditions,
+  APIMutableInput,
+  APIBaseInput,
   APITwitterInput,
   APITwitterInputCreateResponse,
+  APIFieldkitInput,
+  APIFieldkitInputs,
+  APINewFieldkitInput,
+  APINewFieldkitInputBinary,
+  APIFieldkitInputBinary,
   APIInputs,
   APITeam,
   APINewTeam,
@@ -177,6 +184,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.execWithErrors(this.patchJSON(endpoint, values));
   }
 
+  putWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.putJSON(endpoint, values));
+  }
+
   signUp(u: APINewUser): Promise<FKAPIResponse<APIUser>> {
     return this.postWithErrors('/users', u);
   }
@@ -250,6 +261,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.patchWithErrors(`/expeditions/${expeditionId}`, values)
   }
 
+  updateInput(inputId: number, inputData: APIMutableInput): Promise<FKAPIResponse<APIBaseInput>> {
+    return this.patchWithErrors(`/inputs/${inputId}`, inputData);
+  }
+
   getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
     return this.getWithErrors(`/expeditions/${expeditionId}/inputs`)
   }
@@ -264,6 +279,22 @@ export class FKApiClient extends JWTAPIClient {
 
   createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
     return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`)
+  }
+
+  createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`, fieldkitInput);
+  }
+
+  getFieldkitInput(inputId: number): Promise<FKAPIResponse<APIFieldkitInput>> {
+    return this.getWithErrors(`/inputs/fieldkits/${inputId}`);
+  }
+
+  getFieldkitsByExpeditionId(expeditionId: number): Promise<FKAPIResponse<APIFieldkitInputs>> {
+    return this.getWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`);
+  }
+
+  getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
+    return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {

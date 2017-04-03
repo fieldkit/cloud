@@ -14,7 +14,7 @@ services:
       - FIELDKIT_ADDR=:8080
       - FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
   postgres:
-    image: postgres:9.6.2-alpine
+    image: mdillon/postgis:9.6-alpine
     environment:
       - POSTGRES_USER=fieldkit
       - POSTGRES_PASSWORD=password
