@@ -167,6 +167,128 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// FieldkitInput media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input+json; view=default
+type FieldkitInput struct {
+	ExpeditionID int  `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int  `form:"id" json:"id" xml:"id"`
+	TeamID       *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the FieldkitInput media type instance.
+func (mt *FieldkitInput) Validate() (err error) {
+
+	return
+}
+
+// DecodeFieldkitInput decodes the FieldkitInput instance encoded in resp body.
+func (c *Client) DecodeFieldkitInput(resp *http.Response) (*FieldkitInput, error) {
+	var decoded FieldkitInput
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FieldkitInputCollection is the media type for an array of FieldkitInput (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input+json; type=collection; view=default
+type FieldkitInputCollection []*FieldkitInput
+
+// Validate validates the FieldkitInputCollection media type instance.
+func (mt FieldkitInputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeFieldkitInputCollection decodes the FieldkitInputCollection instance encoded in resp body.
+func (c *Client) DecodeFieldkitInputCollection(resp *http.Response) (FieldkitInputCollection, error) {
+	var decoded FieldkitInputCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// FieldkitBinary media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_input_binary+json; view=default
+type FieldkitBinary struct {
+	Fields  []string `form:"fields" json:"fields" xml:"fields"`
+	ID      int      `form:"id" json:"id" xml:"id"`
+	InputID int      `form:"input_id" json:"input_id" xml:"input_id"`
+}
+
+// Validate validates the FieldkitBinary media type instance.
+func (mt *FieldkitBinary) Validate() (err error) {
+
+	if mt.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	for _, e := range mt.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// DecodeFieldkitBinary decodes the FieldkitBinary instance encoded in resp body.
+func (c *Client) DecodeFieldkitBinary(resp *http.Response) (*FieldkitBinary, error) {
+	var decoded FieldkitBinary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FieldkitInputs media type (default view)
+//
+// Identifier: application/vnd.app.fieldkit_inputs+json; view=default
+type FieldkitInputs struct {
+	FieldkitInputs FieldkitInputCollection `form:"fieldkit_inputs" json:"fieldkit_inputs" xml:"fieldkit_inputs"`
+}
+
+// Validate validates the FieldkitInputs media type instance.
+func (mt *FieldkitInputs) Validate() (err error) {
+	if mt.FieldkitInputs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fieldkit_inputs"))
+	}
+	return
+}
+
+// DecodeFieldkitInputs decodes the FieldkitInputs instance encoded in resp body.
+func (c *Client) DecodeFieldkitInputs(resp *http.Response) (*FieldkitInputs, error) {
+	var decoded FieldkitInputs
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// Input media type (default view)
+//
+// Identifier: application/vnd.app.input+json; view=default
+type Input struct {
+	ExpeditionID int  `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int  `form:"id" json:"id" xml:"id"`
+	TeamID       *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the Input media type instance.
+func (mt *Input) Validate() (err error) {
+
+	return
+}
+
+// DecodeInput decodes the Input instance encoded in resp body.
+func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
+	var decoded Input
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default
@@ -475,7 +597,9 @@ type TwitterAccount struct {
 	ExpeditionID     int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
 	ID               int    `form:"id" json:"id" xml:"id"`
 	ScreenName       string `form:"screen_name" json:"screen_name" xml:"screen_name"`
+	TeamID           *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
 	TwitterAccountID int    `form:"twitter_account_id" json:"twitter_account_id" xml:"twitter_account_id"`
+	UserID           *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // Validate validates the TwitterAccount media type instance.

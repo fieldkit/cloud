@@ -7,9 +7,13 @@ type TwitterOAuth struct {
 }
 
 type TwitterAccount struct {
-	Input
 	TwitterAccountID int64  `db:"twitter_account_id"`
 	ScreenName       string `db:"screen_name"`
 	AccessToken      string `db:"access_token"`
 	AccessSecret     string `db:"access_secret"`
+}
+
+type TwitterAccountInput struct {
+	Input
+	TwitterAccount
 }

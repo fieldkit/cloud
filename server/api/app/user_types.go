@@ -526,6 +526,99 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// setFieldkitBinaryPayload user type.
+type setFieldkitBinaryPayload struct {
+	Fields []string `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
+}
+
+// Validate validates the setFieldkitBinaryPayload type instance.
+func (ut *setFieldkitBinaryPayload) Validate() (err error) {
+	if ut.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	for _, e := range ut.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// Publicize creates SetFieldkitBinaryPayload from setFieldkitBinaryPayload
+func (ut *setFieldkitBinaryPayload) Publicize() *SetFieldkitBinaryPayload {
+	var pub SetFieldkitBinaryPayload
+	if ut.Fields != nil {
+		pub.Fields = ut.Fields
+	}
+	return &pub
+}
+
+// SetFieldkitBinaryPayload user type.
+type SetFieldkitBinaryPayload struct {
+	Fields []string `form:"fields" json:"fields" xml:"fields"`
+}
+
+// Validate validates the SetFieldkitBinaryPayload type instance.
+func (ut *SetFieldkitBinaryPayload) Validate() (err error) {
+	if ut.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	for _, e := range ut.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// updateFieldkitInputPayload user type.
+type updateFieldkitInputPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateFieldkitInputPayload from updateFieldkitInputPayload
+func (ut *updateFieldkitInputPayload) Publicize() *UpdateFieldkitInputPayload {
+	var pub UpdateFieldkitInputPayload
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateFieldkitInputPayload user type.
+type UpdateFieldkitInputPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// updateInputPayload user type.
+type updateInputPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateInputPayload from updateInputPayload
+func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
+	var pub UpdateInputPayload
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateInputPayload user type.
+type UpdateInputPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
 // updateMemberPayload user type.
 type updateMemberPayload struct {
 	Role *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
@@ -559,6 +652,30 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
 	}
 	return
+}
+
+// updateTwitterAccountPayload user type.
+type updateTwitterAccountPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateTwitterAccountPayload from updateTwitterAccountPayload
+func (ut *updateTwitterAccountPayload) Publicize() *UpdateTwitterAccountPayload {
+	var pub UpdateTwitterAccountPayload
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateTwitterAccountPayload user type.
+type UpdateTwitterAccountPayload struct {
+	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // updateUserPayload user type.

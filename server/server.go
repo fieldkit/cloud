@@ -27,6 +27,8 @@ import (
 	"github.com/O-C-R/fieldkit/server/api/app"
 	"github.com/O-C-R/fieldkit/server/backend"
 	"github.com/O-C-R/fieldkit/server/email"
+	"github.com/O-C-R/fieldkit/server/social"
+	"github.com/O-C-R/fieldkit/server/social/twitter"
 )
 
 type Config struct {
@@ -166,6 +168,23 @@ func main() {
 		panic(err)
 	}
 
+	// TWITTER
+	if flag.Arg(0) == "twitter" {
+		twitterListCredentialer := backend.TwitterListCredentialer()
+		social.Twitter(social.TwitterOptions{
+			Backend: backend,
+			StreamOptions: twitter.StreamOptions{
+				UserLister:       twitterListCredentialer,
+				UserCredentialer: twitterListCredentialer,
+				ConsumerKey:      config.TwitterConsumerKey,
+				ConsumerSecret:   config.TwitterConsumerSecret,
+				Domain:           config.Domain,
+			},
+		})
+
+		os.Exit(0)
+	}
+
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
 	app.MountSwaggerController(service, c)
@@ -230,6 +249,12 @@ func main() {
 	// Mount "picture" controller
 	c10 := api.NewPictureController(service)
 	app.MountPictureController(service, c10)
+
+	// Mount "twitter" controller
+	c11 := api.NewFieldkitController(service, api.FieldkitControllerOptions{
+		Backend: backend,
+	})
+	app.MountFieldkitController(service, c11)
 
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
