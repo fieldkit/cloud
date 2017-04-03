@@ -10,6 +10,7 @@ import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { InputForm } from '../forms/InputForm';
 import { FKApiClient } from '../../api/api';
 import { RouteOrLoading } from '../shared/RequiredRoute';
+import { RemoveIcon, EditIcon } from '../icons/Icons'
 
 import type { APIProject, APIExpedition, APINewExpedition, APIInputs, APITwitterInputCreateResponse, APINewTwitterInput, APINewFieldkitInput, APITeam, APIMember, APIUser, APIMutableInput } from '../../api/types';
 
@@ -134,39 +135,64 @@ export class DataSources extends Component {
         <div className="input-section">
           <h3>Twitter</h3>
           { twitter_account_inputs && twitter_account_inputs.length > 0 &&
-            <table>
-              <tbody>
+            <table className="twitter-account-inputs-table">
+              <thead>
                 <tr>
                   <th>Username</th>
                   <th>Binding</th>
                   <th></th>
+                  <th></th>                  
                 </tr>
+              </thead>                
+              <tbody>
               { twitter_account_inputs.map((t, i) =>
                 <tr key={i} className="input-item">
                   <td>{t.name}</td>
                   <td>None</td>
-                  {/* TODO: hook up */}
-                  <td><a href="#">Delete</a></td>
+                  <td>
+                    <div className="bt-icon medium">
+                      <EditIcon />
+                    </div>
+                  </td>
+                  <td>
+                    <div className="bt-icon medium">
+                      <RemoveIcon />
+                    </div>
+                  </td>
                 </tr> )}
               </tbody>
             </table> }
           <Link className="button" to={`${match.url}/add-input/twitter`}>Add Twitter Account</Link>
 
+          <br/>
+          <br/>          
+
           <h3>Fieldkit Sensors</h3>
           { fieldkit_inputs && fieldkit_inputs.length > 0 &&
-            <table>
-              <tbody>
+            <table className="fieldkit-inputs-table">
+              <thead>
                 <tr>
                   <th>Name</th>
                   <th>Binding</th>
                   <th></th>
+                  <th></th>                  
                 </tr>
+              </thead>                
+              <tbody>                
               { fieldkit_inputs.map((f, i) =>
                 <tr key={i} className="input-item">
                   <td>{f.name}</td>
                   <td>None</td>
-                  {/* TODO: hook up */}
-                  <td><a href="#">Delete</a></td>
+                  <td>
+                    <div className="bt-icon medium">
+                      <EditIcon />
+                    </div>
+                  </td>
+                  <td>
+                    <div className="bt-icon medium">
+                      <RemoveIcon />
+                    </div>
+                  </td>
                 </tr> )}
               </tbody>
             </table> }
