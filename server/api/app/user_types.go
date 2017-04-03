@@ -264,6 +264,33 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addSchemaPayload user type.
+type addSchemaPayload struct {
+	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+}
+
+// Validate validates the addSchemaPayload type instance.
+func (ut *addSchemaPayload) Validate() (err error) {
+	if ut.JSONSchema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	return
+}
+
+// Publicize creates AddSchemaPayload from addSchemaPayload
+func (ut *addSchemaPayload) Publicize() *AddSchemaPayload {
+	var pub AddSchemaPayload
+	if ut.JSONSchema != nil {
+		pub.JSONSchema = *ut.JSONSchema
+	}
+	return &pub
+}
+
+// AddSchemaPayload user type.
+type AddSchemaPayload struct {
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+}
+
 // addTeamPayload user type.
 type addTeamPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
@@ -727,6 +754,38 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
 	}
 	return
+}
+
+// updateSchemaPayload user type.
+type updateSchemaPayload struct {
+	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+	ProjectID  *int         `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// Validate validates the updateSchemaPayload type instance.
+func (ut *updateSchemaPayload) Validate() (err error) {
+	if ut.JSONSchema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	return
+}
+
+// Publicize creates UpdateSchemaPayload from updateSchemaPayload
+func (ut *updateSchemaPayload) Publicize() *UpdateSchemaPayload {
+	var pub UpdateSchemaPayload
+	if ut.JSONSchema != nil {
+		pub.JSONSchema = *ut.JSONSchema
+	}
+	if ut.ProjectID != nil {
+		pub.ProjectID = ut.ProjectID
+	}
+	return &pub
+}
+
+// UpdateSchemaPayload user type.
+type UpdateSchemaPayload struct {
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
 }
 
 // updateTwitterAccountInputPayload user type.

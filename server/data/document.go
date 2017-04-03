@@ -23,7 +23,12 @@ func NewLocation(longitude, latitude float64) *Location {
 	}
 }
 
-func (l *Location) Scan(data []byte) error {
+func (l *Location) Coordinates() []float64 {
+	coordinates := l.point.ToArray()
+	return coordinates[:]
+}
+
+func (l *Location) Scan(data interface{}) error {
 	point := &geo.Point{}
 	if err := point.Scan(data); err != nil {
 		return err

@@ -80,6 +80,93 @@ func (c *Client) DecodeProjectAdministrators(resp *http.Response) (*ProjectAdmin
 	return &decoded, err
 }
 
+// Document media type (default view)
+//
+// Identifier: application/vnd.app.document+json; view=default
+type Document struct {
+	Data      interface{} `form:"data" json:"data" xml:"data"`
+	ID        string      `form:"id" json:"id" xml:"id"`
+	InputID   int         `form:"input_id" json:"input_id" xml:"input_id"`
+	Location  *Point      `form:"location" json:"location" xml:"location"`
+	TeamID    *int        `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	Timestamp int         `form:"timestamp" json:"timestamp" xml:"timestamp"`
+	UserID    *int        `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the Document media type instance.
+func (mt *Document) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+
+	if mt.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
+	}
+
+	if mt.Location != nil {
+		if err2 := mt.Location.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeDocument decodes the Document instance encoded in resp body.
+func (c *Client) DecodeDocument(resp *http.Response) (*Document, error) {
+	var decoded Document
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DocumentCollection is the media type for an array of Document (default view)
+//
+// Identifier: application/vnd.app.document+json; type=collection; view=default
+type DocumentCollection []*Document
+
+// Validate validates the DocumentCollection media type instance.
+func (mt DocumentCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDocumentCollection decodes the DocumentCollection instance encoded in resp body.
+func (c *Client) DecodeDocumentCollection(resp *http.Response) (DocumentCollection, error) {
+	var decoded DocumentCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Documents media type (default view)
+//
+// Identifier: application/vnd.app.documents+json; view=default
+type Documents struct {
+	Documents DocumentCollection `form:"documents" json:"documents" xml:"documents"`
+}
+
+// Validate validates the Documents media type instance.
+func (mt *Documents) Validate() (err error) {
+	if mt.Documents == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "documents"))
+	}
+	if err2 := mt.Documents.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeDocuments decodes the Documents instance encoded in resp body.
+func (c *Client) DecodeDocuments(resp *http.Response) (*Documents, error) {
+	var decoded Documents
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Expedition media type (default view)
 //
 // Identifier: application/vnd.app.expedition+json; view=default
@@ -425,6 +512,41 @@ func (c *Client) DecodeTeamMembers(resp *http.Response) (*TeamMembers, error) {
 	return &decoded, err
 }
 
+// Point media type (default view)
+//
+// Identifier: application/vnd.app.point+json; view=default
+type Point struct {
+	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Type        string    `form:"type" json:"type" xml:"type"`
+}
+
+// Validate validates the Point media type instance.
+func (mt *Point) Validate() (err error) {
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
+	if mt.Coordinates == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
+	}
+	if len(mt.Coordinates) < 2 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.coordinates`, mt.Coordinates, len(mt.Coordinates), 2, true))
+	}
+	if len(mt.Coordinates) > 2 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.coordinates`, mt.Coordinates, len(mt.Coordinates), 2, false))
+	}
+	if !(mt.Type == "Point") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.type`, mt.Type, []interface{}{"Point"}))
+	}
+	return
+}
+
+// DecodePoint decodes the Point instance encoded in resp body.
+func (c *Client) DecodePoint(resp *http.Response) (*Point, error) {
+	var decoded Point
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Project media type (default view)
 //
 // Identifier: application/vnd.app.project+json; view=default
@@ -508,6 +630,66 @@ func (mt *Projects) Validate() (err error) {
 // DecodeProjects decodes the Projects instance encoded in resp body.
 func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 	var decoded Projects
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// Schema media type (default view)
+//
+// Identifier: application/vnd.app.schema+json; view=default
+type Schema struct {
+	ID         int         `form:"id" json:"id" xml:"id"`
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// Validate validates the Schema media type instance.
+func (mt *Schema) Validate() (err error) {
+
+	return
+}
+
+// DecodeSchema decodes the Schema instance encoded in resp body.
+func (c *Client) DecodeSchema(resp *http.Response) (*Schema, error) {
+	var decoded Schema
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// SchemaCollection is the media type for an array of Schema (default view)
+//
+// Identifier: application/vnd.app.schema+json; type=collection; view=default
+type SchemaCollection []*Schema
+
+// Validate validates the SchemaCollection media type instance.
+func (mt SchemaCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeSchemaCollection decodes the SchemaCollection instance encoded in resp body.
+func (c *Client) DecodeSchemaCollection(resp *http.Response) (SchemaCollection, error) {
+	var decoded SchemaCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Schemas media type (default view)
+//
+// Identifier: application/vnd.app.schemas+json; view=default
+type Schemas struct {
+	Schemas SchemaCollection `form:"schemas,omitempty" json:"schemas,omitempty" xml:"schemas,omitempty"`
+}
+
+// DecodeSchemas decodes the Schemas instance encoded in resp body.
+func (c *Client) DecodeSchemas(resp *http.Response) (*Schemas, error) {
+	var decoded Schemas
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
