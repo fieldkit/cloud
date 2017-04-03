@@ -235,6 +235,46 @@ func (b *Backend) ListFieldkitInputsByID(ctx context.Context, expeditionID int32
 	return fieldkitInputs, nil
 }
 
+func (b *Backend) AddSchema(ctx context.Context, fieldkitInput *data.Schema) error {
+	return b.db.NamedGetContext(ctx, fieldkitInput, `
+		INSERT INTO fieldkit.schema (project_id, json_schema) VALUES (:project_id, :json_schema) RETURNING *
+		`, fieldkitInput)
+}
+
+func (b *Backend) UpdateSchema(ctx context.Context, fieldkitInput *data.Schema) error {
+	return b.db.NamedGetContext(ctx, fieldkitInput, `
+		UPDATE fieldkit.schema SET project_id = :project_id, json_schema = :json_schema RETURNING *
+		`, fieldkitInput)
+}
+
+func (b *Backend) ListSchemas(ctx context.Context, project string) ([]*data.Schema, error) {
+	schemas := []*data.Schema{}
+	if err := b.db.SelectContext(ctx, &schemas, `
+		SELECT s.*
+			FROM fieldkit.schema AS s
+				JOIN fieldkit.project AS p ON p.id = s.project_id
+					WHERE p.slug = $1
+		`, project); err != nil {
+		return nil, err
+	}
+
+	return schemas, nil
+}
+
+func (b *Backend) ListSchemasByID(ctx context.Context, projectID int32) ([]*data.Schema, error) {
+	schemas := []*data.Schema{}
+	if err := b.db.SelectContext(ctx, &schemas, `
+		SELECT s.*
+			FROM fieldkit.schema AS s
+				JOIN fieldkit.project AS p ON p.id = s.project_id
+					WHERE s.project_id = $1
+			`, projectID); err != nil {
+		return nil, err
+	}
+
+	return schemas, nil
+}
+
 func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {
 	_, err := b.db.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data)
@@ -256,6 +296,36 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 	}
 
 	return schemaID, nil
+}
+
+func (b *Backend) ListDocuments(ctx context.Context, project, expedition string) ([]*data.Document, error) {
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.*
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE p.slug = $1 AND e.slug = $2
+		`, project, expedition); err != nil {
+		return nil, err
+	}
+
+	return documents, nil
+}
+
+func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.*
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+					WHERE i.expedition_id = $1
+		`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return documents, nil
 }
 
 func (b *Backend) TwitterListCredentialer() *TwitterListCredentialer {
