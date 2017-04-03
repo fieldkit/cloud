@@ -24,8 +24,6 @@ import type {
   APIFieldkitInput,
   APIFieldkitInputs,
   APINewFieldkitInput,
-  APINewFieldkitInputBinary,
-  APIFieldkitInputBinary,
   APIInputs,
   APITeam,
   APINewTeam,

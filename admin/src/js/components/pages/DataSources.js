@@ -7,7 +7,7 @@ import _ from 'lodash'
 import log from 'loglevel';
 
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
-// import { InputForm } from '../forms/InputForm';
+import { FieldkitInputForm } from '../forms/FieldkitInputForm';
 import { FKApiClient } from '../../api/api';
 import { RouteOrLoading } from '../shared/RequiredRoute';
 
@@ -40,7 +40,8 @@ export class DataSources extends Component {
   async loadInputs() {
     const inputsRes = await FKApiClient.get().getExpeditionInputs(this.props.expedition.id);
     if (inputsRes.type === 'ok') {
-      this.setState({ inputs: inputsRes.payload })
+      this.setState({ inputs: inputsRes.payload });
+      console.log(inputsRes.payload);
     }
   }
 
@@ -54,11 +55,37 @@ export class DataSources extends Component {
     }
   }
 
+  async onFieldkitCreate(event) {
+    const { expedition, match } = this.props;
+    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, event);
+    console.log(fieldkitRes);
+    if (fieldkitRes.type === 'ok') {
+      console.log(fieldkitRes.payload);
+      await this.loadInputs();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return fieldkitRes.errors
+    }
+  }
+
   render() {
+    const { expedition, match } = this.props;
     const { twitter_accounts } = this.state.inputs;
 
     return (
       <div className="data-sources-page">
+
+
+      <Route path={`${match.url}/add-fieldkit-input`} render={props =>
+        <ReactModal isOpen={true} contentLabel="Add Fieldkit Input" className="modal" overlayClassName="modal-overlay">
+          <h2>Add Fieldkit Input</h2>
+          <FieldkitInputForm
+            expeditionId={props.match.params.expeditionId}
+            onCancel={() => this.props.history.push(`${match.url}`)}
+            onSave={this.onFieldkitCreate.bind(this)} 
+            saveText="Add" />
+        </ReactModal> } />    
+
         <h1>Data Sources</h1>
 
         <div className="input-section">
@@ -81,6 +108,7 @@ export class DataSources extends Component {
               </tbody>
             </table> }
           <button className="add-button" onClick={this.onTwitterCreate.bind(this)}>Add Twitter Account</button>
+          <Link className="button secondary" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
         </div>
       </div>
     )

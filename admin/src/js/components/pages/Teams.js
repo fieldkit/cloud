@@ -237,7 +237,7 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdd.bind(this)} 
               saveText="Add" />
-          </ReactModal> } />          
+          </ReactModal> } />      
 
         <Route path={`${match.url}/:teamId/edit`} render={props =>
           <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
@@ -293,7 +293,7 @@ export class Teams extends Component {
                   onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
-              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
 
           </div> ) }
         { teams.length === 0 &&
