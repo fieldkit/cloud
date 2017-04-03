@@ -115,6 +115,8 @@ type (
 
 	// AddFieldkitCommand is the command line data structure for the add action of fieldkit
 	AddFieldkitCommand struct {
+		Payload      string
+		ContentType  string
 		ExpeditionID int
 		PrettyPrint  bool
 	}
@@ -345,6 +347,8 @@ type (
 
 	// AddTwitterCommand is the command line data structure for the add action of twitter
 	AddTwitterCommand struct {
+		Payload      string
+		ContentType  string
 		ExpeditionID int
 		PrettyPrint  bool
 	}
@@ -462,7 +466,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 Payload example:
 
 {
-   "user_id": 5239962713520830587
+   "user_id": 7246416408234745933
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp41.Run(c, args) },
 	}
@@ -478,9 +482,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Iste expedita libero.",
-   "name": "Est praesentium.",
-   "slug": "87ez0kvi3i"
+   "description": "Aliquam error et asperiores qui quas.",
+   "name": "Ad consectetur occaecati occaecati omnis sint.",
+   "slug": "y52dmi76ci"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp42.Run(c, args) },
 	}
@@ -491,7 +495,14 @@ Payload example:
 	sub = &cobra.Command{
 		Use:   `fieldkit ["/expeditions/EXPEDITION_ID/inputs/fieldkits"]`,
 		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp43.Run(c, args) },
+		Long: `
+
+Payload example:
+
+{
+   "name": "Debitis rerum rerum."
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp43.Run(c, args) },
 	}
 	tmp43.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp43.PrettyPrint, "pp", false, "Pretty print response body")
@@ -505,8 +516,8 @@ Payload example:
 Payload example:
 
 {
-   "role": "Error et.",
-   "user_id": 3110655148300381942
+   "role": "Consequatur magni et vitae itaque.",
+   "user_id": 1700089837844634184
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp44.Run(c, args) },
 	}
@@ -522,9 +533,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Sint excepturi rerum deleniti rem sint.",
-   "name": "Ad laboriosam voluptatem explicabo magnam sunt.",
-   "slug": "d200jaucku"
+   "description": "Corrupti ipsum fugit.",
+   "name": "Odio vel tempore.",
+   "slug": "1y638ourow"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp45.Run(c, args) },
 	}
@@ -540,9 +551,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Consequatur non nisi dolor autem sint vitae.",
-   "name": "5prgjkna1y",
-   "slug": "38ourowl9c"
+   "description": "Doloremque aut dolore sed quisquam pariatur molestiae.",
+   "name": "u72r0oh0sp",
+   "slug": "jjvebfq1e5"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp46.Run(c, args) },
 	}
@@ -553,7 +564,14 @@ Payload example:
 	sub = &cobra.Command{
 		Use:   `twitter ["/expeditions/EXPEDITION_ID/inputs/twitter-accounts"]`,
 		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp47.Run(c, args) },
+		Long: `
+
+Payload example:
+
+{
+   "name": "Et sed dolorem consequatur quidem sed."
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp47.Run(c, args) },
 	}
 	tmp47.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp47.PrettyPrint, "pp", false, "Pretty print response body")
@@ -567,12 +585,12 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Sed quisquam pariatur molestiae illo officiis.",
-   "email": "theo.swaniawski@runolfsdottir.net",
-   "invite_token": "Qui eos maxime consequatur ut odio aperiam.",
-   "name": "aketl8qkue",
-   "password": "63hu9e7amb",
-   "username": "iuahxosx7r"
+   "bio": "Vel expedita impedit et incidunt illo voluptatem.",
+   "email": "christop.hyatt@cummings.org",
+   "invite_token": "Odit necessitatibus non veritatis velit unde reiciendis.",
+   "name": "w265h606ar",
+   "password": "bwtu6d712l",
+   "username": "h80jxqftx2"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp48.Run(c, args) },
 	}
@@ -971,8 +989,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "w265h606ar",
-   "username": "bwtu6d712l"
+   "password": "gp59zqliv0",
+   "username": "epd168s1lx"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp86.Run(c, args) },
 	}
@@ -1021,7 +1039,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Animi quisquam amet."
+   "refresh_token": "Voluptatum odit eum qui magnam minima cupiditate."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp89.Run(c, args) },
 	}
@@ -1043,8 +1061,7 @@ Payload example:
 
 {
    "fields": [
-      "float32",
-      "float32"
+      "float64"
    ]
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp90.Run(c, args) },
@@ -1066,9 +1083,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Iste expedita libero.",
-   "name": "Est praesentium.",
-   "slug": "87ez0kvi3i"
+   "description": "Aliquam error et asperiores qui quas.",
+   "name": "Ad consectetur occaecati occaecati omnis sint.",
+   "slug": "y52dmi76ci"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp91.Run(c, args) },
 	}
@@ -1084,8 +1101,8 @@ Payload example:
 Payload example:
 
 {
-   "team_id": 7246416408234745933,
-   "user_id": 7526520248844345336
+   "team_id": 7880554031425777044,
+   "user_id": 298894248160175503
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp92.Run(c, args) },
 	}
@@ -1101,7 +1118,7 @@ Payload example:
 Payload example:
 
 {
-   "role": "Quas voluptates ad consectetur occaecati occaecati."
+   "role": "Nisi dolor autem sint vitae."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp93.Run(c, args) },
 	}
@@ -1117,9 +1134,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Sint excepturi rerum deleniti rem sint.",
-   "name": "Ad laboriosam voluptatem explicabo magnam sunt.",
-   "slug": "d200jaucku"
+   "description": "Corrupti ipsum fugit.",
+   "name": "Odio vel tempore.",
+   "slug": "1y638ourow"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp94.Run(c, args) },
 	}
@@ -1135,9 +1152,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Consequatur non nisi dolor autem sint vitae.",
-   "name": "5prgjkna1y",
-   "slug": "38ourowl9c"
+   "description": "Doloremque aut dolore sed quisquam pariatur molestiae.",
+   "name": "u72r0oh0sp",
+   "slug": "jjvebfq1e5"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp95.Run(c, args) },
 	}
@@ -1153,10 +1170,10 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Vero ut aliquid.",
-   "email": "adella_pouros@nicolas.org",
-   "name": "oe9agp8lep",
-   "username": "9p8qr0lxt2"
+   "bio": "Impedit placeat consequatur quod eum veniam sequi.",
+   "email": "wayne@baucherdman.biz",
+   "name": "ik2mv0074l",
+   "username": "7q76xcws9v"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp96.Run(c, args) },
 	}
@@ -1759,9 +1776,16 @@ func (cmd *AddFieldkitCommand) Run(c *client.Client, args []string) error {
 	} else {
 		path = fmt.Sprintf("/expeditions/%v/inputs/fieldkits", cmd.ExpeditionID)
 	}
+	var payload client.AddFieldkitInputPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AddFieldkit(ctx, path)
+	resp, err := c.AddFieldkit(ctx, path, &payload)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1773,6 +1797,8 @@ func (cmd *AddFieldkitCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *AddFieldkitCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var expeditionID int
 	cc.Flags().IntVar(&cmd.ExpeditionID, "expedition_id", expeditionID, ``)
 }
@@ -2659,9 +2685,16 @@ func (cmd *AddTwitterCommand) Run(c *client.Client, args []string) error {
 	} else {
 		path = fmt.Sprintf("/expeditions/%v/inputs/twitter-accounts", cmd.ExpeditionID)
 	}
+	var payload client.AddTwitterAccountInputPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AddTwitter(ctx, path)
+	resp, err := c.AddTwitter(ctx, path, &payload)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2673,6 +2706,8 @@ func (cmd *AddTwitterCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *AddTwitterCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var expeditionID int
 	cc.Flags().IntVar(&cmd.ExpeditionID, "expedition_id", expeditionID, ``)
 }

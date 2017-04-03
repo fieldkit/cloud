@@ -74,17 +74,23 @@ func (c *InputController) List(ctx *app.ListInputContext) error {
 	}
 
 	return ctx.OK(&app.Inputs{
-		TwitterAccounts: TwitterAccountsType(inputs).TwitterAccounts,
+		TwitterAccountInputs: TwitterAccountInputsType(inputs).TwitterAccountInputs,
 	})
 }
 
 func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
-	inputs, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
+	twitterAccountInputs, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
+	if err != nil {
+		return err
+	}
+
+	fieldkitInputs, err := c.options.Backend.ListFieldkitInputsByID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}
 
 	return ctx.OK(&app.Inputs{
-		TwitterAccounts: TwitterAccountsType(inputs).TwitterAccounts,
+		TwitterAccountInputs: TwitterAccountInputsType(twitterAccountInputs).TwitterAccountInputs,
+		FieldkitInputs:       FieldkitInputsType(fieldkitInputs).FieldkitInputs,
 	})
 }

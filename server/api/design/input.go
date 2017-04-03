@@ -10,13 +10,15 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("expedition_id", Integer)
+		Attribute("name", String)
 		Attribute("team_id", Integer)
 		Attribute("user_id", Integer)
-		Required("id", "expedition_id")
+		Required("id", "expedition_id", "name")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("expedition_id")
+		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
 	})
@@ -31,10 +33,12 @@ var UpdateInputPayload = Type("UpdateInputPayload", func() {
 var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 	TypeName("Inputs")
 	Attributes(func() {
-		Attribute("twitter_accounts", CollectionOf(TwitterAccount))
+		Attribute("twitter_account_inputs", CollectionOf(TwitterAccountInput))
+		Attribute("fieldkit_inputs", CollectionOf(FieldkitInput))
 	})
 	View("default", func() {
-		Attribute("twitter_accounts")
+		Attribute("twitter_account_inputs")
+		Attribute("fieldkit_inputs")
 	})
 })
 

@@ -537,6 +537,7 @@ type AddFieldkitContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ExpeditionID int
+	Payload      *AddFieldkitInputPayload
 }
 
 // NewAddFieldkitContext parses the incoming request URL and body, performs validations and creates the
@@ -1900,6 +1901,7 @@ type AddTwitterContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ExpeditionID int
+	Payload      *AddTwitterAccountInputPayload
 }
 
 // NewAddTwitterContext parses the incoming request URL and body, performs validations and creates the
@@ -2012,8 +2014,8 @@ func NewGetIDTwitterContext(ctx context.Context, r *http.Request, service *goa.S
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *GetIDTwitterContext) OK(r *TwitterAccount) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account+json")
+func (ctx *GetIDTwitterContext) OK(r *TwitterAccountInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_input+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -2061,8 +2063,8 @@ func NewListTwitterContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListTwitterContext) OK(r *TwitterAccounts) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_accounts+json")
+func (ctx *ListTwitterContext) OK(r *TwitterAccountInputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_intputs+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -2102,8 +2104,8 @@ func NewListIDTwitterContext(ctx context.Context, r *http.Request, service *goa.
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListIDTwitterContext) OK(r *TwitterAccounts) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_accounts+json")
+func (ctx *ListIDTwitterContext) OK(r *TwitterAccountInputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_intputs+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 

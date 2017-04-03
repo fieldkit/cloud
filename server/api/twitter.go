@@ -11,10 +11,11 @@ import (
 	"github.com/O-C-R/fieldkit/server/data"
 )
 
-func TwitterAccountType(twitterAccount *data.TwitterAccountInput) *app.TwitterAccount {
-	twitterAccountType := &app.TwitterAccount{
+func TwitterAccountInputType(twitterAccount *data.TwitterAccountInput) *app.TwitterAccountInput {
+	twitterAccountType := &app.TwitterAccountInput{
 		ID:               int(twitterAccount.ID),
 		ExpeditionID:     int(twitterAccount.ExpeditionID),
+		Name:             twitterAccount.Name,
 		TwitterAccountID: int(twitterAccount.TwitterAccountID),
 		ScreenName:       twitterAccount.ScreenName,
 	}
@@ -32,14 +33,14 @@ func TwitterAccountType(twitterAccount *data.TwitterAccountInput) *app.TwitterAc
 	return twitterAccountType
 }
 
-func TwitterAccountsType(twitterAccounts []*data.TwitterAccountInput) *app.TwitterAccounts {
-	twitterAccountsCollection := make([]*app.TwitterAccount, len(twitterAccounts))
+func TwitterAccountInputsType(twitterAccounts []*data.TwitterAccountInput) *app.TwitterAccountInputs {
+	twitterAccountsCollection := make([]*app.TwitterAccountInput, len(twitterAccounts))
 	for i, twitterAccount := range twitterAccounts {
-		twitterAccountsCollection[i] = TwitterAccountType(twitterAccount)
+		twitterAccountsCollection[i] = TwitterAccountInputType(twitterAccount)
 	}
 
-	return &app.TwitterAccounts{
-		TwitterAccounts: twitterAccountsCollection,
+	return &app.TwitterAccountInputs{
+		TwitterAccountInputs: twitterAccountsCollection,
 	}
 }
 
@@ -71,13 +72,18 @@ func NewTwitterController(service *goa.Service, options TwitterControllerOptions
 }
 
 func (c *TwitterController) Add(ctx *app.AddTwitterContext) error {
-	var err error
-	twitterOAuth := &data.TwitterOAuth{}
-	twitterOAuth.InputID, err = c.options.Backend.AddInputID(ctx, int32(ctx.ExpeditionID))
-	if err != nil {
+	input := &data.Input{}
+	input.ExpeditionID = int32(ctx.ExpeditionID)
+	input.Name = ctx.Payload.Name
+	if err := c.options.Backend.AddInput(ctx, input); err != nil {
 		return err
 	}
 
+	twitterOAuth := &data.TwitterOAuth{
+		InputID: input.ID,
+	}
+
+	var err error
 	twitterOAuth.RequestToken, twitterOAuth.RequestSecret, err = c.config.RequestToken()
 	if err != nil {
 		return err
@@ -103,7 +109,7 @@ func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountType(twitterAccount))
+	return ctx.OK(TwitterAccountInputType(twitterAccount))
 }
 
 func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
@@ -112,7 +118,7 @@ func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountsType(twitterAccounts))
+	return ctx.OK(TwitterAccountInputsType(twitterAccounts))
 }
 
 func (c *TwitterController) List(ctx *app.ListTwitterContext) error {
@@ -121,7 +127,7 @@ func (c *TwitterController) List(ctx *app.ListTwitterContext) error {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountsType(twitterAccounts))
+	return ctx.OK(TwitterAccountInputsType(twitterAccounts))
 }
 
 func (c *TwitterController) Callback(ctx *app.CallbackTwitterContext) error {

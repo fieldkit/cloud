@@ -12,6 +12,7 @@ func FieldkitInputType(fieldkitInput *data.FieldkitInput) *app.FieldkitInput {
 	fieldkitInputType := &app.FieldkitInput{
 		ID:           int(fieldkitInput.ID),
 		ExpeditionID: int(fieldkitInput.ExpeditionID),
+		Name:         fieldkitInput.Name,
 	}
 
 	if fieldkitInput.TeamID != nil {
@@ -66,6 +67,7 @@ func NewFieldkitController(service *goa.Service, options FieldkitControllerOptio
 func (c *FieldkitController) Add(ctx *app.AddFieldkitContext) error {
 	fieldkitInput := &data.FieldkitInput{}
 	fieldkitInput.ExpeditionID = int32(ctx.ExpeditionID)
+	fieldkitInput.Name = ctx.Payload.Name
 	if err := c.options.Backend.AddInput(ctx, &fieldkitInput.Input); err != nil {
 		return err
 	}

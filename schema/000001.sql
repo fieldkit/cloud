@@ -75,6 +75,7 @@ CREATE TABLE fieldkit.team_user (
 CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
+	name varchar(256) NOT NULL,
 	team_id int REFERENCES fieldkit.team (id), 
 	user_id int REFERENCES fieldkit.user (id),
 	active boolean NOT NULL DEFAULT false

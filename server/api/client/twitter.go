@@ -8,6 +8,7 @@
 package client
 
 import (
+	"bytes"
 	"fmt"
 	"golang.org/x/net/context"
 	"net/http"
@@ -23,8 +24,8 @@ func AddTwitterPath(expeditionID int) string {
 }
 
 // Add a Twitter account input
-func (c *Client) AddTwitter(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewAddTwitterRequest(ctx, path)
+func (c *Client) AddTwitter(ctx context.Context, path string, payload *AddTwitterAccountInputPayload) (*http.Response, error) {
+	req, err := c.NewAddTwitterRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -32,13 +33,18 @@ func (c *Client) AddTwitter(ctx context.Context, path string) (*http.Response, e
 }
 
 // NewAddTwitterRequest create the request corresponding to the add action endpoint of the twitter resource.
-func (c *Client) NewAddTwitterRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewAddTwitterRequest(ctx context.Context, path string, payload *AddTwitterAccountInputPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("POST", u.String(), nil)
+	req, err := http.NewRequest("POST", u.String(), &body)
 	if err != nil {
 		return nil, err
 	}

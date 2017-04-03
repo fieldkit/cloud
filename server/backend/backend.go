@@ -26,19 +26,8 @@ func New(url string) (*Backend, error) {
 
 func (b *Backend) AddInput(ctx context.Context, input *data.Input) error {
 	return b.db.NamedGetContext(ctx, input, `
-		INSERT INTO fieldkit.input (expedition_id) VALUES (:expedition_id) RETURNING *
+		INSERT INTO fieldkit.input (expedition_id, name) VALUES (:expedition_id, :name) RETURNING *
 		`, input)
-}
-
-func (b *Backend) AddInputID(ctx context.Context, expeditionID int32) (int32, error) {
-	var inputID int32
-	if err := b.db.GetContext(ctx, &inputID, `
-		INSERT INTO fieldkit.input (expedition_id) VALUES ($1) RETURNING id
-		`, expeditionID); err != nil {
-		return int32(0), err
-	}
-
-	return inputID, nil
 }
 
 func (b *Backend) AddTwitterOAuth(ctx context.Context, twitterOAuth *data.TwitterOAuth) error {
@@ -105,7 +94,7 @@ func (b *Backend) Input(ctx context.Context, inputID int32) (*data.Input, error)
 func (b *Backend) UpdateInput(ctx context.Context, input *data.Input) error {
 	if _, err := b.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.input
-			SET team_id = :team_id, user_id = :user_id
+			SET name = :name, team_id = :team_id, user_id = :user_id
 				WHERE id = :id
 		`, input); err != nil {
 		return err
@@ -117,7 +106,7 @@ func (b *Backend) UpdateInput(ctx context.Context, input *data.Input) error {
 func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data.TwitterAccountInput, error) {
 	twitterAccount := &data.TwitterAccountInput{}
 	if err := b.db.GetContext(ctx, twitterAccount, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name
+		SELECT i.*, ita.twitter_account_id, ta.screen_name
 			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -132,7 +121,7 @@ func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data
 func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedition string) ([]*data.TwitterAccountInput, error) {
 	twitterAccounts := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -149,7 +138,7 @@ func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedit
 func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
 	TwitterAccountInputs := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -175,7 +164,7 @@ func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccou
 func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountInput, error) {
 	TwitterAccountInputs := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
@@ -205,7 +194,7 @@ func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *da
 func (b *Backend) FieldkitInput(ctx context.Context, inputID int32) (*data.FieldkitInput, error) {
 	fieldkitInput := &data.FieldkitInput{}
 	if err := b.db.GetContext(ctx, fieldkitInput, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+		SELECT i.*
 			FROM fieldkit.input_fieldkit AS if
 				JOIN fieldkit.input AS i ON i.id = if.input_id
 					WHERE i.id = $1
@@ -219,7 +208,7 @@ func (b *Backend) FieldkitInput(ctx context.Context, inputID int32) (*data.Field
 func (b *Backend) ListFieldkitInputs(ctx context.Context, project, expedition string) ([]*data.FieldkitInput, error) {
 	fieldkitInput := []*data.FieldkitInput{}
 	if err := b.db.SelectContext(ctx, &fieldkitInput, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+		SELECT i.*
 			FROM fieldkit.input_fieldkit AS if
 				JOIN fieldkit.input AS i ON i.id = if.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
@@ -235,7 +224,7 @@ func (b *Backend) ListFieldkitInputs(ctx context.Context, project, expedition st
 func (b *Backend) ListFieldkitInputsByID(ctx context.Context, expeditionID int32) ([]*data.FieldkitInput, error) {
 	fieldkitInputs := []*data.FieldkitInput{}
 	if err := b.db.SelectContext(ctx, &fieldkitInputs, `
-		SELECT i.id, i.expedition_id, i.team_id, i.user_id
+		SELECT i.*
 			FROM fieldkit.input_fieldkit AS if
 				JOIN fieldkit.input AS i ON i.id = if.input_id
 					WHERE i.expedition_id = $1
