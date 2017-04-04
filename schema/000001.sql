@@ -109,8 +109,10 @@ CREATE TYPE fieldkit_binary_field AS ENUM ('varint', 'uvarint', 'float32', 'floa
 
 CREATE TABLE fieldkit.fieldkit_binary (
 	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+	schema_id int REFERENCES fieldkit.schema (id) ON DELETE CASCADE NOT NULL,
 	id smallint NOT NULL,
 	fields fieldkit_binary_field[] NOT NULL,
+	mapper jsonb NOT NULL,
 	UNIQUE (input_id, id)
 );
 

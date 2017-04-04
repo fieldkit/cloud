@@ -625,13 +625,21 @@ func (ut *LoginPayload) Validate() (err error) {
 
 // setFieldkitBinaryPayload user type.
 type setFieldkitBinaryPayload struct {
-	Fields []string `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
+	Fields   []string          `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
+	Mapper   map[string]string `form:"mapper,omitempty" json:"mapper,omitempty" xml:"mapper,omitempty"`
+	SchemaID *int              `form:"schema_id,omitempty" json:"schema_id,omitempty" xml:"schema_id,omitempty"`
 }
 
 // Validate validates the setFieldkitBinaryPayload type instance.
 func (ut *setFieldkitBinaryPayload) Validate() (err error) {
+	if ut.SchemaID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schema_id"))
+	}
 	if ut.Fields == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	if ut.Mapper == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
 	}
 	for _, e := range ut.Fields {
 		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
@@ -647,18 +655,30 @@ func (ut *setFieldkitBinaryPayload) Publicize() *SetFieldkitBinaryPayload {
 	if ut.Fields != nil {
 		pub.Fields = ut.Fields
 	}
+	if ut.Mapper != nil {
+		pub.Mapper = ut.Mapper
+	}
+	if ut.SchemaID != nil {
+		pub.SchemaID = *ut.SchemaID
+	}
 	return &pub
 }
 
 // SetFieldkitBinaryPayload user type.
 type SetFieldkitBinaryPayload struct {
-	Fields []string `form:"fields" json:"fields" xml:"fields"`
+	Fields   []string          `form:"fields" json:"fields" xml:"fields"`
+	Mapper   map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
+	SchemaID int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
 }
 
 // Validate validates the SetFieldkitBinaryPayload type instance.
 func (ut *SetFieldkitBinaryPayload) Validate() (err error) {
+
 	if ut.Fields == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	if ut.Mapper == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
 	}
 	for _, e := range ut.Fields {
 		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
