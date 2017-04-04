@@ -80,9 +80,6 @@ func (c *Client) NewGetProjectRequest(ctx context.Context, path string) (*http.R
 	if err != nil {
 		return nil, err
 	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
-	}
 	return req, nil
 }
 
