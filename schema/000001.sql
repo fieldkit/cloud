@@ -103,6 +103,16 @@ CREATE TABLE fieldkit.input_twitter_account (
 	twitter_account_id bigint REFERENCES fieldkit.twitter_account (id) ON DELETE CASCADE NOT NULL
 );
 
+-- schema
+
+CREATE TABLE fieldkit.schema (
+	id serial PRIMARY KEY,
+	project_id integer REFERENCES fieldkit.project (id),
+	json_schema jsonb NOT NULL
+);
+
+CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
+
 -- fieldkit
 
 CREATE TYPE fieldkit_binary_field AS ENUM ('varint', 'uvarint', 'float32', 'float64');
@@ -119,16 +129,6 @@ CREATE TABLE fieldkit.fieldkit_binary (
 CREATE TABLE fieldkit.input_fieldkit (
 	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY
 );
-
--- schema
-
-CREATE TABLE fieldkit.schema (
-	id serial PRIMARY KEY,
-	project_id integer REFERENCES fieldkit.project (id),
-	json_schema jsonb NOT NULL
-);
-
-CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
 
 -- documents
 
