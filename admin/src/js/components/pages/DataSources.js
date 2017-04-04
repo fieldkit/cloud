@@ -89,8 +89,10 @@ export class DataSources extends Component {
     }
   }  
 
-  async onTwitterCreate(t: APINewTwitterInput) {
-    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, t);
+  async onTwitterCreate(i: APIMutableInput) {
+    const { name } = i;
+    const newTwitterInput = {name: name};
+    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, newTwitterInput);
     if (res.type === 'ok') {
       const redirect = res.payload.location;
       window.location = redirect;
@@ -99,9 +101,11 @@ export class DataSources extends Component {
     }
   }
 
-  async onFieldkitCreate(f: APINewFieldkitInput) {
+  async onFieldkitCreate(i: APIMutableInput) {
+    const { name } = i;
+    const newFieldkitInput = {name: name};    
     const { expedition, match } = this.props;
-    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, f);
+    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, newFieldkitInput);
     if (fieldkitRes.type === 'ok') {
       await this.loadInputs();
       this.props.history.push(`${match.url}`);
@@ -110,14 +114,15 @@ export class DataSources extends Component {
     }
   }
 
-  async onInputUpdate(inputId: number, inputData: APIMutableInput) {
-    // updateInput(): Promise<FKAPIResponse<APIBaseInput>> {
-    // const teamRes = await FKApiClient.get().updateTeam(teamId, team);
-    // if(teamRes.type === 'ok' && teamRes.payload) {
-    //   await this.loadTeams();
-    // } else {
-    //   return teamRes.errors;
-    // }
+  async onInputUpdate(inputId: number, i: APIMutableInput) {
+    const { match } =this.props;
+    const inputRes = await FKApiClient.get().updateInput(inputId, i);
+    if(inputRes.type === 'ok' && inputRes.payload) {
+      await this.loadInputs();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return inputRes.errors;
+    }
   }
 
   getInputById (id: number): ?APIMutableInput {
@@ -134,6 +139,14 @@ export class DataSources extends Component {
           };        
         }
       }
+    }
+  }
+
+  getTeamById (id: number): ?string {
+    const { teams } = this.state;
+    const team = teams.find(team => team.id === id);
+    if(team){
+      return team.name;
     }
   }
 
@@ -178,8 +191,8 @@ export class DataSources extends Component {
             teams={teams}
             input={this.getInputById(parseInt(props.match.params.inputId))}
             onCancel={() => this.props.history.push(`${match.url}`)}
-            onSave={ (props.match.params.inputType === 'twitter') ? this.onTwitterCreate.bind(this) : this.onFieldkitCreate.bind(this)} 
-            saveText="Add" />
+            onSave={this.onInputUpdate.bind(this, parseInt(props.match.params.inputId))}
+            saveText="Save" />
         </ReactModal> } />        
 
         <h1>Data Sources</h1>
@@ -197,12 +210,17 @@ export class DataSources extends Component {
                 </tr>
               </thead>                
               <tbody>
-              { twitter_account_inputs.map((t, i) =>
+              { twitter_account_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
-                  <td>{t.name}</td>
-                  <td>None</td>
+                  <td>{input.name}</td>
                   <td>
-                    <Link className="bt-icon medium" to={`${match.url}/${t.id}/edit`}>
+                    { input.team_id && teams &&
+                      this.getTeamById(input.team_id) }
+                    { input.user_id && users[input.user_id] &&
+                      users[input.user_id].name }
+                  </td>
+                  <td>
+                    <Link className="bt-icon medium" to={`${match.url}/${input.id}/edit`}>
                       <EditIcon />
                     </Link>
                   </td>
@@ -231,12 +249,17 @@ export class DataSources extends Component {
                 </tr>
               </thead>                
               <tbody>                
-              { fieldkit_inputs.map((f, i) =>
+              { fieldkit_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
-                  <td>{f.name}</td>
-                  <td>None</td>
+                  <td>{input.name}</td>
                   <td>
-                    <Link className="bt-icon medium" to={`${match.url}/${f.id}/edit`}>
+                    { input.team_id && teams &&
+                      this.getTeamById(input.team_id) }
+                    { input.user_id && users[input.user_id] &&
+                      users[input.user_id].name }
+                  </td>
+                  <td>
+                    <Link className="bt-icon medium" to={`${match.url}/${input.id}/edit`}>
                       <EditIcon />
                     </Link>
                   </td>

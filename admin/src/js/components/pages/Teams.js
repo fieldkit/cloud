@@ -102,8 +102,8 @@ export class Teams extends Component {
     }
   }
 
-  async onTeamUpdate(teamId: number, team: APINewTeam) {
-    const teamRes = await FKApiClient.get().updateTeam(teamId, team);
+  async onTeamUpdate(teamId: number, t: APINewTeam) {
+    const teamRes = await FKApiClient.get().updateTeam(teamId, t);
     if(teamRes.type === 'ok' && teamRes.payload) {
       await this.loadTeams();
     } else {
