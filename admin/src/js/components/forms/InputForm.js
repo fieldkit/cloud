@@ -8,10 +8,9 @@ import { errorsFor, slugify } from '../../common/util';
 import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput, APITeam } from '../../api/types';
 
 type Props = {
-  fieldkitInput?: ?APIFieldkitInput,
+  input?: ?APIMutableInput,
   users: {[id: number]: APIUser},
   teams: APITeam[],
-  inputType: string,
 
   cancelText?: string;
   saveText?: ?string;
@@ -24,7 +23,7 @@ export class InputForm extends Component {
 
   /*flow-include
   state: {
-    ...$Exact<APIFieldkitInput>,  
+    ...$Exact<APIMutableInput>,  
     users: {[id: number]: APIUser},
     teams: APITeam[],
     saveDisabled: boolean,
@@ -37,7 +36,7 @@ export class InputForm extends Component {
       team_id: -1,
       user_id: -1,
       name: '',
-      ...props.fieldkitInput,
+      ...props.input,
       users: props.users,
       teams: props.teams,
       saveDisabled: false,
@@ -50,7 +49,7 @@ export class InputForm extends Component {
       team_id: -1,
       user_id: -1,
       name: '',
-      ...nextProps.fieldkitInput,
+      ...nextProps.input,
       users: nextProps.users,
       teams: nextProps.teams,
       saveDisabled: false,
@@ -75,7 +74,9 @@ export class InputForm extends Component {
   }
 
   render () {
-    let { users, teams, name } = this.state;
+    const { input } = this.props;
+    const { users, teams } = this.state;
+
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -89,7 +90,7 @@ export class InputForm extends Component {
           { errorsFor(this.state.errors, 'name') }
         </div>
 
-        { name &&
+        { input &&
           <div>
             <div className="form-group">
               <label htmlFor="user_id">Member</label>

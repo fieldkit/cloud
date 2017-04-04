@@ -102,6 +102,15 @@ export class Teams extends Component {
     }
   }
 
+  async onTeamUpdate(teamId: number, team: APINewTeam) {
+    const teamRes = await FKApiClient.get().updateTeam(teamId, team);
+    if(teamRes.type === 'ok' && teamRes.payload) {
+      await this.loadTeams();
+    } else {
+      return teamRes.errors;
+    }
+  }  
+
   startTeamDelete(t: APITeam) {
     const teamId = t.id;
     this.setState({
@@ -197,15 +206,6 @@ export class Teams extends Component {
       await this.loadMembers(teamId);      
     } else {
       return memberRes.errors;
-    }
-  }
-
-  async onTeamUpdate(teamId: number, team: APINewTeam) {
-    const teamRes = await FKApiClient.get().updateTeam(teamId, team);
-    if(teamRes.type === 'ok' && teamRes.payload) {
-      await this.loadTeams();
-    } else {
-      return teamRes.errors;
     }
   }
 

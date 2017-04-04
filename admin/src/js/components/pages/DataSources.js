@@ -110,6 +110,33 @@ export class DataSources extends Component {
     }
   }
 
+  async onInputUpdate(inputId: number, inputData: APIMutableInput) {
+    // updateInput(): Promise<FKAPIResponse<APIBaseInput>> {
+    // const teamRes = await FKApiClient.get().updateTeam(teamId, team);
+    // if(teamRes.type === 'ok' && teamRes.payload) {
+    //   await this.loadTeams();
+    // } else {
+    //   return teamRes.errors;
+    // }
+  }
+
+  getInputById (id: number): ?APIMutableInput {
+    const { inputs } = this.state;
+    for(let inputType in inputs){
+      if(inputs[inputType]){
+        const twitterInput = inputs[inputType].find(input => input.id === id);
+        if(twitterInput){
+          const { name, team_id, user_id } = twitterInput;  
+          return {
+            name: name,
+            team_id: team_id,
+            user_id: user_id
+          };        
+        }
+      }
+    }
+  }
+
   render() {
     const { expedition, match } = this.props;
     const { twitter_account_inputs, fieldkit_inputs } = this.state.inputs;
@@ -118,18 +145,42 @@ export class DataSources extends Component {
     return (
       <div className="data-sources-page">
 
-      <Route path={`${match.url}/add-input/:inputType`} render={props =>
+      <Route path={`${match.url}/add-fieldkit-input`} render={props =>
         <ReactModal isOpen={true} contentLabel="Add Fieldkit Input" className="modal" overlayClassName="modal-overlay">
           <h2>Add Fieldkit Input</h2>
           <InputForm
             expeditionId={props.match.params.expeditionId}
             users={users}
             teams={teams}
-            inputType={props.match.params.inputType}
+            onCancel={() => this.props.history.push(`${match.url}`)}
+            onSave={this.onFieldkitCreate.bind(this)}
+            saveText="Add" />
+        </ReactModal> } />
+
+      <Route path={`${match.url}/add-twitter-input`} render={props =>
+        <ReactModal isOpen={true} contentLabel="Add Twitter Input" className="modal" overlayClassName="modal-overlay">
+          <h2>Add Twitter Input</h2>
+          <InputForm
+            expeditionId={props.match.params.expeditionId}
+            users={users}
+            teams={teams}
+            onCancel={() => this.props.history.push(`${match.url}`)}
+            onSave={this.onTwitterCreate.bind(this)}
+            saveText="Add" />
+        </ReactModal> } />
+
+      <Route path={`${match.url}/:inputId/edit`} render={props =>
+        <ReactModal isOpen={true} contentLabel="Edit Input" className="modal" overlayClassName="modal-overlay">
+          <h2>Edit Input</h2>
+          <InputForm
+            expeditionId={props.match.params.expeditionId}
+            users={users}
+            teams={teams}
+            input={this.getInputById(parseInt(props.match.params.inputId))}
             onCancel={() => this.props.history.push(`${match.url}`)}
             onSave={ (props.match.params.inputType === 'twitter') ? this.onTwitterCreate.bind(this) : this.onFieldkitCreate.bind(this)} 
             saveText="Add" />
-        </ReactModal> } />    
+        </ReactModal> } />        
 
         <h1>Data Sources</h1>
 
@@ -151,9 +202,9 @@ export class DataSources extends Component {
                   <td>{t.name}</td>
                   <td>None</td>
                   <td>
-                    <div className="bt-icon medium">
+                    <Link className="bt-icon medium" to={`${match.url}/${t.id}/edit`}>
                       <EditIcon />
-                    </div>
+                    </Link>
                   </td>
                   <td>
                     <div className="bt-icon medium">
@@ -163,7 +214,7 @@ export class DataSources extends Component {
                 </tr> )}
               </tbody>
             </table> }
-          <Link className="button" to={`${match.url}/add-input/twitter`}>Add Twitter Account</Link>
+          <Link className="button" to={`${match.url}/add-twitter-input`}>Add Twitter Account</Link>
 
           <br/>
           <br/>          
@@ -185,9 +236,9 @@ export class DataSources extends Component {
                   <td>{f.name}</td>
                   <td>None</td>
                   <td>
-                    <div className="bt-icon medium">
+                    <Link className="bt-icon medium" to={`${match.url}/${f.id}/edit`}>
                       <EditIcon />
-                    </div>
+                    </Link>
                   </td>
                   <td>
                     <div className="bt-icon medium">
@@ -198,7 +249,7 @@ export class DataSources extends Component {
               </tbody>
             </table> }
 
-          <Link className="button" to={`${match.url}/add-input/fieldkit`}>Add Fieldkit Input</Link>
+          <Link className="button" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
         </div>
       </div>
     )
