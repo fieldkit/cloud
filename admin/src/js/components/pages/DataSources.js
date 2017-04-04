@@ -49,7 +49,6 @@ export class DataSources extends Component {
     const inputsRes = await FKApiClient.get().getExpeditionInputs(this.props.expedition.id);
     if (inputsRes.type === 'ok') {
       this.setState({ inputs: inputsRes.payload });
-      console.log(inputsRes.payload);
     }
   }
 
@@ -103,9 +102,7 @@ export class DataSources extends Component {
   async onFieldkitCreate(f: APINewFieldkitInput) {
     const { expedition, match } = this.props;
     const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, f);
-    console.log(fieldkitRes);
     if (fieldkitRes.type === 'ok') {
-      console.log(fieldkitRes.payload);
       await this.loadInputs();
       this.props.history.push(`${match.url}`);
     } else {
