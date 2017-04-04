@@ -184,10 +184,10 @@ func (b *Backend) AddFieldkitInput(ctx context.Context, fieldkitInput *data.Fiel
 
 func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *data.FieldkitBinary) error {
 	_, err := b.db.ExecContext(ctx, `
-		INSERT INTO fieldkit.fieldkit_binary (id, input_id, fields) VALUES ($1, $2, $3)
+		INSERT INTO fieldkit.fieldkit_binary (id, input_id, schema_id, fields, mapper) VALUES ($1, $2, $3, $4, $5)
 			ON CONFLICT (id, input_id)
-				DO UPDATE SET fields = $3
-		`, fieldkitBinary.ID, fieldkitBinary.InputID, pq.Array(fieldkitBinary.Fields))
+				DO UPDATE SET schema_id = $3, fields = $4, mapper = $5
+		`, fieldkitBinary.ID, fieldkitBinary.InputID, fieldkitBinary.SchemaID, pq.Array(fieldkitBinary.Fields), fieldkitBinary.Mapper)
 	return err
 }
 

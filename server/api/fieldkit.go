@@ -41,9 +41,11 @@ func FieldkitInputsType(fieldkitInputs []*data.FieldkitInput) *app.FieldkitInput
 
 func FieldkitBinaryType(fieldkitBinary *data.FieldkitBinary) *app.FieldkitBinary {
 	return &app.FieldkitBinary{
-		ID:      int(fieldkitBinary.ID),
-		InputID: int(fieldkitBinary.InputID),
-		Fields:  fieldkitBinary.Fields,
+		ID:       int(fieldkitBinary.ID),
+		InputID:  int(fieldkitBinary.InputID),
+		SchemaID: int(fieldkitBinary.SchemaID),
+		Fields:   fieldkitBinary.Fields,
+		Mapper:   fieldkitBinary.Mapper.Pointers(),
 	}
 }
 
@@ -81,9 +83,11 @@ func (c *FieldkitController) Add(ctx *app.AddFieldkitContext) error {
 
 func (c *FieldkitController) SetBinary(ctx *app.SetBinaryFieldkitContext) error {
 	fieldkitBinary := &data.FieldkitBinary{
-		ID:      int16(ctx.BinaryID),
-		InputID: int32(ctx.InputID),
-		Fields:  ctx.Payload.Fields,
+		ID:       uint16(ctx.BinaryID),
+		InputID:  int32(ctx.InputID),
+		SchemaID: int32(ctx.Payload.SchemaID),
+		Fields:   ctx.Payload.Fields,
+		Mapper:   data.NewMapper(ctx.Payload.Mapper),
 	}
 
 	if err := c.options.Backend.SetFieldkitInputBinary(ctx, fieldkitBinary); err != nil {
