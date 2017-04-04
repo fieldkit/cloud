@@ -83,16 +83,17 @@ export class Teams extends Component {
       const { users } = this.state;
       if(!users[teamId]){
         users[teamId] = [];
-      }users[teamId].push(userRes.payload);
+      }
+      users[teamId].push(userRes.payload);
       this.setState({users: users});
-    }    
-  }  
+    }
+  }
 
-  async onTeamCreate(e: APINewTeam) {
+  async onTeamCreate(t: APINewTeam) {
 
     const { expedition, match } = this.props;
 
-    const teamRes = await FKApiClient.get().createTeam(expedition.id, e);
+    const teamRes = await FKApiClient.get().createTeam(expedition.id, t);
     if (teamRes.type === 'ok') {
       await this.loadTeams();
       this.props.history.push(`${match.url}`);
@@ -101,11 +102,11 @@ export class Teams extends Component {
     }
   }
 
-  startTeamDelete(e: APITeam) {
-    const teamId = e.id;
+  startTeamDelete(t: APITeam) {
+    const teamId = t.id;
     this.setState({
       teamDeletion: {
-        contents: <span>Are you sure you want to delete the <strong>{e.name}</strong> team?</span>,
+        contents: <span>Are you sure you want to delete the <strong>{t.name}</strong> team?</span>,
         teamId
       }
     })
@@ -131,9 +132,9 @@ export class Teams extends Component {
     this.setState({ teamDeletion: null });
   }
 
-  async onMemberAdd(teamId: number, e: APINewMember) {
+  async onMemberAdd(teamId: number, m: APINewMember) {
     const { match } = this.props;
-    const memberRes = await FKApiClient.get().addMember(teamId, e);
+    const memberRes = await FKApiClient.get().addMember(teamId, m);
     if (memberRes.type === 'ok') {
       await this.loadTeams();
       this.props.history.push(`${match.url}`);
@@ -237,7 +238,7 @@ export class Teams extends Component {
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onMemberAdd.bind(this)} 
               saveText="Add" />
-          </ReactModal> } />          
+          </ReactModal> } />      
 
         <Route path={`${match.url}/:teamId/edit`} render={props =>
           <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
@@ -293,7 +294,7 @@ export class Teams extends Component {
                   onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
-              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>                
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
 
           </div> ) }
         { teams.length === 0 &&

@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react'
 import type { APIMember, APIUser, APIErrors, APIBaseMember } from '../../api/types';
-
 import { RemoveIcon, EditIcon } from '../icons/Icons'
 
 type Props = {
@@ -126,7 +125,7 @@ export class MembersTable extends Component {
                     onBlur={this.handleBlur.bind(this)}/>
                   <div id={member.user_id} className={'bt-icon medium ' + (member.user_id === user_id ? 'disabled' : '') } onClick={this.startMemberEdit.bind(this, member.user_id)}>
                     <EditIcon />
-                  </div>                        
+                  </div>
                 </td>
                 <td>
                   <div className="bt-icon medium" onClick={this.delete.bind(this, member.user_id)}>
