@@ -103,6 +103,16 @@ CREATE TABLE fieldkit.input_twitter_account (
 	twitter_account_id bigint REFERENCES fieldkit.twitter_account (id) ON DELETE CASCADE NOT NULL
 );
 
+-- schema
+
+CREATE TABLE fieldkit.schema (
+	id serial PRIMARY KEY,
+	project_id integer REFERENCES fieldkit.project (id),
+	json_schema jsonb NOT NULL
+);
+
+CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
+
 -- fieldkit
 
 CREATE TYPE fieldkit_binary_field AS ENUM ('varint', 'uvarint', 'float32', 'float64');
@@ -113,22 +123,14 @@ CREATE TABLE fieldkit.fieldkit_binary (
 	id smallint NOT NULL,
 	fields fieldkit_binary_field[] NOT NULL,
 	mapper jsonb NOT NULL,
+	longitude varchar,
+	latitude varchar,
 	UNIQUE (input_id, id)
 );
 
 CREATE TABLE fieldkit.input_fieldkit (
 	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY
 );
-
--- schema
-
-CREATE TABLE fieldkit.schema (
-	id serial PRIMARY KEY,
-	project_id integer REFERENCES fieldkit.project (id),
-	json_schema jsonb NOT NULL
-);
-
-CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
 
 -- documents
 
@@ -142,3 +144,9 @@ CREATE TABLE fieldkit.document (
 	location geometry(POINT, 4326) NOT NULL,
 	data jsonb NOT NULL
 );
+
+-- grants
+
+GRANT USAGE ON SCHEMA fieldkit TO server;
+GRANT ALL ON ALL TABLES IN SCHEMA fieldkit TO server;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA fieldkit TO server;

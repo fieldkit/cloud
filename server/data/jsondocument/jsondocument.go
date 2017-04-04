@@ -33,6 +33,24 @@ func arrayIndex(index string) int {
 	return int(uint64Index)
 }
 
+func UnmarshalGo(data interface{}) (*Document, error) {
+	d := &Document{}
+	if err := d.UnmarshalGo(data); err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+func UnmarshalJSON(data []byte) (*Document, error) {
+	d := &Document{}
+	if err := d.UnmarshalJSON(data); err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
 type Document struct {
 	data interface{}
 }

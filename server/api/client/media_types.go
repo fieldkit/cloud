@@ -309,11 +309,13 @@ func (c *Client) DecodeFieldkitInputCollection(resp *http.Response) (FieldkitInp
 //
 // Identifier: application/vnd.app.fieldkit_input_binary+json; view=default
 type FieldkitBinary struct {
-	Fields   []string          `form:"fields" json:"fields" xml:"fields"`
-	ID       int               `form:"id" json:"id" xml:"id"`
-	InputID  int               `form:"input_id" json:"input_id" xml:"input_id"`
-	Mapper   map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
-	SchemaID int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
+	Fields    []string          `form:"fields" json:"fields" xml:"fields"`
+	ID        int               `form:"id" json:"id" xml:"id"`
+	InputID   int               `form:"input_id" json:"input_id" xml:"input_id"`
+	Latitude  *string           `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
+	Longitude *string           `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
+	Mapper    map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
+	SchemaID  int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
 }
 
 // Validate validates the FieldkitBinary media type instance.

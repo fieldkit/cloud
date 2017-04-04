@@ -68,7 +68,7 @@ func (c *TeamController) Update(ctx *app.UpdateTeamContext) error {
 		Description: ctx.Payload.Description,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, team, "UPDATE fieldkit.team expedition_id = :expedition_id, name = :name, slug = :slug, description = :description) WHERE id = :id RETURNING *", team); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, team, "UPDATE fieldkit.team SET name = :name, slug = :slug, description = :description WHERE id = :id RETURNING *", team); err != nil {
 		return err
 	}
 
