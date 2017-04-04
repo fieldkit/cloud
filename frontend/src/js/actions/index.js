@@ -149,9 +149,10 @@ export function requestExpedition (expeditionID) {
                 const documentMap = {}
                 resDocuments
                   .forEach((d, i) => {
+                    d.data.type = 'Feature';
                     d.data.id = d.id
-                    d.data.date = d.data.date * 1000
-                    if (!d.data.geometry) d.data.geometry = d.data.Geometry
+                    d.data.date = d.timestamp * 1000
+                    if (!d.data.geometry) d.data.geometry = d.location
                     documentMap[d.id] = d.data
                   })
                 const documents = I.fromJS(documentMap)
@@ -227,8 +228,9 @@ export function requestExpedition (expeditionID) {
         }
       })
       .catch(error => {
-        console.log('Project or expedition could not be found')
-        window.location.replace('https://fieldkit.org')
+        console.error(error)
+        // console.log('Project or expedition could not be found')
+        // window.location.replace('https://fieldkit.org')
       }) 
   }
 }

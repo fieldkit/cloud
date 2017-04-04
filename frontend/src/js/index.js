@@ -38,7 +38,7 @@ const routes = (
   >
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
-        const expeditionID = 'okavango'
+        const expeditionID = 'expedition01'
         replace({
           pathname: '/' + expeditionID,
           state: { nextPathname: nextState.location.pathname }
