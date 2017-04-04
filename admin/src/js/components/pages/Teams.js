@@ -30,6 +30,7 @@ export class Teams extends Component {
     teams: APITeam[],
     members: { [teamId: number]: APIMember[] },
     users: { [teamId: number]: APIUser[] },
+    userPictures: {[userId: number]: string},
     teamDeletion: ?{
       contents: React$Element<*>;
       teamId: number;
@@ -47,6 +48,7 @@ export class Teams extends Component {
       teams: [],
       members: {},
       users: {},
+      userPictures: {},
       teamDeletion: null,
       memberDeletion: null
     }
@@ -86,6 +88,17 @@ export class Teams extends Component {
       }
       users[teamId].push(userRes.payload);
       this.setState({users: users});
+      await this.loadMemberPicture(userId);
+    }
+  }
+
+
+  async loadMemberPicture(userId: number) {
+    const { users, userPictures } = this.state;
+    const userRes = await FKApiClient.get().userPictureUrl(userId);
+    if (userRes) {
+      userPictures[userId] = userRes;
+      this.setState({userPictures: userPictures});
     }
   }
 
@@ -216,7 +229,7 @@ export class Teams extends Component {
 
   render() {
     const { match } = this.props;
-    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
+    const { teams, members, users, userPictures, memberDeletion, teamDeletion } = this.state;
 
     return (
       <div className="teams">
@@ -290,6 +303,7 @@ export class Teams extends Component {
                   teamId={team.id}
                   members={members[team.id]}
                   users={users[team.id]}
+                  userPictures={userPictures}
                   onDelete={this.startMemberDelete.bind(this)} 
                   onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&

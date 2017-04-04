@@ -38,7 +38,7 @@ export class ProjectSettings extends Component {
   state: {
     administrators: APIAdministrator[],
     users: {[id: number]: APIUser},
-    userPictures: {[userId: number]: string},    
+    userPictures: {[userId: number]: string},
     administratorDeletion: ?{
       contents: React$Element<*>;
       userId: number;
@@ -76,7 +76,7 @@ export class ProjectSettings extends Component {
       const { users } = this.state;
       users[userId] = userRes.payload;
       this.setState({users: users});
-       await this.loadAdministratorPicture(userId);
+      await this.loadAdministratorPicture(userId);
     }
   }
 
