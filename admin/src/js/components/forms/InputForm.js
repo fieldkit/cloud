@@ -5,11 +5,12 @@ import React, { Component } from 'react'
 import { FormContainer } from '../containers/FormContainer';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput } from '../../api/types';
+import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput, APITeam } from '../../api/types';
 
 type Props = {
   fieldkitInput?: ?APIFieldkitInput,
-  users: APIUser[],
+  users: {[id: number]: APIUser},
+  teams: APITeam[],
   inputType: string,
 
   cancelText?: string;
@@ -24,7 +25,8 @@ export class InputForm extends Component {
   /*flow-include
   state: {
     ...$Exact<APIFieldkitInput>,  
-    users: APIUser[],
+    users: {[id: number]: APIUser},
+    teams: APITeam[],
     saveDisabled: boolean,
     errors: ?APIErrors
   };
@@ -36,22 +38,26 @@ export class InputForm extends Component {
       user_id: -1,
       name: '',
       ...props.fieldkitInput,
-      users: [],
+      users: {},
+      teams: [],
       saveDisabled: false,
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
+    console.log(nextProps.users);
     this.setState({
       team_id: -1,
       user_id: -1,
       name: '',
       ...nextProps.fieldkitInput,
       users: nextProps.users,
+      teams: nextProps.teams,
       saveDisabled: false,
       errors: null
     });
+    console.log(this.state.users);
   }
 
   async save() {
@@ -71,6 +77,7 @@ export class InputForm extends Component {
   }
 
   render () {
+    const { users, teams } = this.state;
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -82,6 +89,16 @@ export class InputForm extends Component {
           <label htmlFor="name">Name</label>
           <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleInputChange.bind(this)} />
           { errorsFor(this.state.errors, 'name') }
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="user_id">Member</label>
+          <select name="user_id"  className='lg' value={this.state.user_id} onChange={this.handleInputChange.bind(this)}>
+            <option value={null}>Select a user</option>
+            { Object.keys(users).map(id => 
+              <option key={id} value={id}>{users[id].username}</option>) }
+          </select>
+          { errorsFor(this.state.errors, 'user_id') }          
         </div>
       </FormContainer>
     )

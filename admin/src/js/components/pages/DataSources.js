@@ -28,7 +28,6 @@ export class DataSources extends Component {
   state: {
     inputs: APIInputs,
     teams: APITeam[],
-    // members: { [teamId: number]: APIMember[] },
     members: APIMember[],
     users: {[id: number]: APIUser},
   }
@@ -38,7 +37,6 @@ export class DataSources extends Component {
     this.state = {
       inputs: {},
       teams: [],
-      // members: {},
       members: [],
       users: {}
     }
@@ -75,10 +73,10 @@ export class DataSources extends Component {
         !members.find(m => m.user_id === member.user_id) &&
           members.push(member)
       );
+      this.setState({members: members});
       for (const member of members) {
         await this.loadMemberName(teamId, member.user_id);
       }
-      this.setState({members: members});    
     }
   }
 
@@ -86,9 +84,8 @@ export class DataSources extends Component {
     const userRes = await FKApiClient.get().getUserById(userId);
     if (userRes.type === 'ok' && userRes.payload) {
       const { users } = this.state;
-      if(userRes.payload && !users.find(user => userRes.payload)){
-        users.push(userRes.payload);
-      }
+      const userId = userRes.payload.id;
+      users[userId] = userRes.payload;
       this.setState({users: users});
     }
   }  
@@ -119,7 +116,7 @@ export class DataSources extends Component {
   render() {
     const { expedition, match } = this.props;
     const { twitter_account_inputs, fieldkit_inputs } = this.state.inputs;
-    const { users } = this.state;
+    const { users, teams } = this.state;
 
     return (
       <div className="data-sources-page">
@@ -130,6 +127,7 @@ export class DataSources extends Component {
           <InputForm
             expeditionId={props.match.params.expeditionId}
             users={users}
+            teams={teams}
             inputType={props.match.params.inputType}
             onCancel={() => this.props.history.push(`${match.url}`)}
             onSave={ (props.match.params.inputType === 'twitter') ? this.onTwitterCreate.bind(this) : this.onFieldkitCreate.bind(this)} 
