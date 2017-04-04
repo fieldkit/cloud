@@ -21,8 +21,7 @@ class FKApiClient {
       let res
       try {
         res = await fetch(url.toString(), {
-          method: 'GET',
-          credentials: 'include'
+          method: 'GET'
         })
       } catch (e) {
         console.log('Threw while GETing', url.toString(), e)
@@ -61,7 +60,6 @@ class FKApiClient {
       try {
         res = await fetch(url.toString(), {
           method: 'POST',
-          credentials: 'include',
           body
         })
       } catch (e) {
@@ -97,27 +95,31 @@ class FKApiClient {
   }
 
   async getProject (projectID) {
-    const res = await this.getJSON('/api/project/' + projectID)
+    const res = await this.getJSON('/projects/@/' + projectID)
     return res
   }
 
   async getExpeditions (projectID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expeditions')
-    return res
+    const res = await this.getJSON('/projects/@/' + projectID + '/expeditions')
+    return res.expeditions
   }
 
   async getExpedition (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID)
+    const res = await this.getJSON('/projects/@/' + projectID + '/expeditions/@/' + expeditionID)
     return res
   }
 
   async getDocuments (projectID, expeditionID) {
-    const res = await this.getJSON('/api/project/' + projectID + '/expedition/' + expeditionID + '/documents')
-    return res
+    const res = await this.getJSON('/projects/@/' + projectID + '/expeditions/@/' + expeditionID + '/documents')
+    return res.documents
   }
 }
 
-// TODO switch back as soon as we can collect data locally
-// const hostname = location.hostname.split('.')[location.hostname.split('.').length-1] === 'localhost' ? 'http://localhost:8080' : 'https://fieldkit.org'
-const hostname = 'https://fieldkit.org'
-export default new FKApiClient(hostname)
+let API_HOST = 'https://fieldkit.org';
+if (process.env.NODE_ENV === 'development') {
+  API_HOST = 'http://localhost:8080';
+} else if (process.env.NODE_ENV === 'staging' || window.location.hostname.endsWith('fieldkit.team')) {
+  API_HOST = 'https://api.fieldkit.team';
+}
+
+export default new FKApiClient(API_HOST)

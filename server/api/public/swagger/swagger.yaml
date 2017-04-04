@@ -178,7 +178,7 @@ definitions:
   Document:
     description: Document media type (default view)
     example:
-      data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+      data: 75306398-8bec-4e58-8efa-eaf676f372cb
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -191,7 +191,7 @@ definitions:
       user_id: 2.319954e+18
     properties:
       data:
-        example: aa17b2c2-886e-41af-b459-c772aaff6a1a
+        example: 75306398-8bec-4e58-8efa-eaf676f372cb
       id:
         example: Possimus porro quaerat in qui.
         type: string
@@ -225,7 +225,7 @@ definitions:
     description: DocumentCollection is the media type for an array of Document (default
       view)
     example:
-    - data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+    - data: 75306398-8bec-4e58-8efa-eaf676f372cb
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -236,7 +236,7 @@ definitions:
       team_id: 7.1933954e+18
       timestamp: 9.0560484e+18
       user_id: 2.319954e+18
-    - data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+    - data: 75306398-8bec-4e58-8efa-eaf676f372cb
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -256,7 +256,7 @@ definitions:
     description: Documents media type (default view)
     example:
       documents:
-      - data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+      - data: 75306398-8bec-4e58-8efa-eaf676f372cb
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -267,7 +267,7 @@ definitions:
         team_id: 7.1933954e+18
         timestamp: 9.0560484e+18
         user_id: 2.319954e+18
-      - data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+      - data: 75306398-8bec-4e58-8efa-eaf676f372cb
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -278,7 +278,7 @@ definitions:
         team_id: 7.1933954e+18
         timestamp: 9.0560484e+18
         user_id: 2.319954e+18
-      - data: aa17b2c2-886e-41af-b459-c772aaff6a1a
+      - data: 75306398-8bec-4e58-8efa-eaf676f372cb
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -741,7 +741,7 @@ definitions:
     description: Schema media type (default view)
     example:
       id: 3.9715237e+18
-      json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+      json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
       project_id: 4.0215089e+18
     properties:
       id:
@@ -749,7 +749,7 @@ definitions:
         format: int64
         type: integer
       json_schema:
-        example: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+        example: 40ae3e0c-8235-4e5e-a502-a331f35025e1
       project_id:
         example: 4.0215089e+18
         format: int64
@@ -764,13 +764,13 @@ definitions:
       view)
     example:
     - id: 3.9715237e+18
-      json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+      json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
       project_id: 4.0215089e+18
     - id: 3.9715237e+18
-      json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+      json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
       project_id: 4.0215089e+18
     - id: 3.9715237e+18
-      json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+      json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
       project_id: 4.0215089e+18
     items:
       $ref: '#/definitions/Schema'
@@ -782,13 +782,13 @@ definitions:
     example:
       schemas:
       - id: 3.9715237e+18
-        json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+        json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
         project_id: 4.0215089e+18
       - id: 3.9715237e+18
-        json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+        json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
         project_id: 4.0215089e+18
       - id: 3.9715237e+18
-        json_schema: db6cd7c1-5b65-4d8a-b187-d876e2616cca
+        json_schema: 40ae3e0c-8235-4e5e-a502-a331f35025e1
         project_id: 4.0215089e+18
     properties:
       schemas:
@@ -1827,11 +1827,7 @@ paths:
       - project
   /projects/@/{project}:
     get:
-      description: |-
-        Get a project
-
-        Required security scopes:
-          * `api:access`
+      description: Get a project
       operationId: project#get
       parameters:
       - description: Project slug
@@ -1851,9 +1847,6 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: get project
       tags:
       - project
@@ -1927,11 +1920,7 @@ paths:
       - administrator
   /projects/@/{project}/expeditions:
     get:
-      description: |-
-        List a project's expeditions
-
-        Required security scopes:
-          * `api:access`
+      description: List a project's expeditions
       operationId: expedition#list
       parameters:
       - description: Project slug
@@ -1951,19 +1940,12 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: list expedition
       tags:
       - expedition
   /projects/@/{project}/expeditions/@/{expedition}:
     get:
-      description: |-
-        Add an expedition
-
-        Required security scopes:
-          * `api:access`
+      description: Add an expedition
       operationId: expedition#get
       parameters:
       - description: Expedition slug
@@ -1989,9 +1971,6 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: get expedition
       tags:
       - expedition

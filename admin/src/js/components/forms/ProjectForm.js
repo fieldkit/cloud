@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
-import { errorsFor, slugify } from '../../common/util';
+import { errorsFor, slugify, fkHost } from '../../common/util';
 
 import type { APIErrors, APINewProject } from '../../api/types';
 
@@ -103,7 +103,7 @@ export class ProjectForm extends Component {
           <p className="url">
             <input type="text" name="slug" className='slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
             {/* TODO: replace with something that handles alternative domains */}
-            <span className="domain">.fieldkit.org/</span>
+            <span className="domain">.${fkHost()}/</span>
           </p>
           { errorsFor(this.state.errors, 'path') }
         </div>

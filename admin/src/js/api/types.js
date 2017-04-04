@@ -72,6 +72,7 @@ export type APITwitterInputCreateResponse = {|
 export type APIMutableInput = {|
   team_id?: number;
   user_id?: number;
+  name: string;
 |};
 
 export type APIBaseInput = {|
@@ -80,18 +81,23 @@ export type APIBaseInput = {|
   ...APIMutableInput;
 |};
 
+export type APINewTwitterInput = {|
+  name: string
+|};
+
 export type APITwitterInput = {|
   ...APIBaseInput;
   screen_name: string;
   twitter_account_id: number;
 |};
 
-export type APIInputs = {|
-  twitter_accounts?: APITwitterInput[]
-|};
+export type APIInputs = {
+  twitter_account_inputs?: APITwitterInput[],
+  fieldkit_inputs?: APIFieldkitInput[]
+};
 
 export type APINewFieldkitInput = {|
-  // None for now!
+  name: string
 |};
 
 export type APIFieldkitInput = {|

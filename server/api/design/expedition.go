@@ -77,6 +77,7 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("get", func() {
+		NoSecurity()
 		Routing(GET("projects/@/:project/expeditions/@/:expedition"))
 		Description("Add an expedition")
 		Params(func() {
@@ -109,6 +110,7 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("list", func() {
+		NoSecurity()
 		Routing(GET("projects/@/:project/expeditions"))
 		Description("List a project's expeditions")
 		Params(func() {

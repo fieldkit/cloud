@@ -36,6 +36,13 @@ export class Projects extends Component {
     }
   }
 
+  async getProjectPictureUrl(projectId: number){
+    const projectRes = await FKApiClient.get().projectPictureUrl(projectId);
+    if (projectRes.type === 'ok' && projectRes.payload) {
+      return projectRes.payload;
+    }
+  }
+
   render () {
     const { projects, match } = this.props;
 

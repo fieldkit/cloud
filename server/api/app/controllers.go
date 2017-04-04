@@ -12,6 +12,7 @@ import (
 	"github.com/goadesign/goa/cors"
 	"golang.org/x/net/context"
 	"net/http"
+	"regexp"
 )
 
 // initService sets up the service encoders, decoders and mux.
@@ -156,6 +157,7 @@ func MountAdministratorController(service *goa.Service, ctrl AdministratorContro
 
 // handleAdministratorOrigin applies the CORS response headers corresponding to the origin.
 func handleAdministratorOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -163,7 +165,7 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -292,6 +294,7 @@ func MountDocumentController(service *goa.Service, ctrl DocumentController) {
 
 // handleDocumentOrigin applies the CORS response headers corresponding to the origin.
 func handleDocumentOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -299,7 +302,7 @@ func handleDocumentOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -424,10 +427,9 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 		}
 		return ctrl.Get(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleExpeditionOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition", ctrl.MuxHandler("Get", h, nil))
-	service.LogInfo("mount", "ctrl", "Expedition", "action", "Get", "route", "GET /projects/@/:project/expeditions/@/:expedition", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "Get", "route", "GET /projects/@/:project/expeditions/@/:expedition")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -458,10 +460,9 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleExpeditionOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions", ctrl.MuxHandler("List", h, nil))
-	service.LogInfo("mount", "ctrl", "Expedition", "action", "List", "route", "GET /projects/@/:project/expeditions", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Expedition", "action", "List", "route", "GET /projects/@/:project/expeditions")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -506,6 +507,7 @@ func MountExpeditionController(service *goa.Service, ctrl ExpeditionController) 
 
 // handleExpeditionOrigin applies the CORS response headers corresponding to the origin.
 func handleExpeditionOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -513,7 +515,7 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -732,6 +734,7 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 
 // handleFieldkitOrigin applies the CORS response headers corresponding to the origin.
 func handleFieldkitOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -739,7 +742,7 @@ func handleFieldkitOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -915,6 +918,7 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 
 // handleInputOrigin applies the CORS response headers corresponding to the origin.
 func handleInputOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -922,7 +926,7 @@ func handleInputOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1157,6 +1161,7 @@ func MountMemberController(service *goa.Service, ctrl MemberController) {
 
 // handleMemberOrigin applies the CORS response headers corresponding to the origin.
 func handleMemberOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1164,7 +1169,7 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1331,6 +1336,7 @@ func MountPictureController(service *goa.Service, ctrl PictureController) {
 
 // handlePictureOrigin applies the CORS response headers corresponding to the origin.
 func handlePictureOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1338,7 +1344,7 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1463,10 +1469,9 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 		}
 		return ctrl.Get(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project", ctrl.MuxHandler("Get", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "Get", "route", "GET /projects/@/:project", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Project", "action", "Get", "route", "GET /projects/@/:project")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1545,6 +1550,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 
 // handleProjectOrigin applies the CORS response headers corresponding to the origin.
 func handleProjectOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1552,7 +1558,7 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1752,6 +1758,7 @@ func MountSchemaController(service *goa.Service, ctrl SchemaController) {
 
 // handleSchemaOrigin applies the CORS response headers corresponding to the origin.
 func handleSchemaOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1759,7 +1766,7 @@ func handleSchemaOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1875,6 +1882,7 @@ func MountSwaggerController(service *goa.Service, ctrl SwaggerController) {
 
 // handleSwaggerOrigin applies the CORS response headers corresponding to the origin.
 func handleSwaggerOrigin(h goa.Handler) goa.Handler {
+	spec1 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1892,7 +1900,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec1) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2117,6 +2125,7 @@ func MountTeamController(service *goa.Service, ctrl TeamController) {
 
 // handleTeamOrigin applies the CORS response headers corresponding to the origin.
 func handleTeamOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -2124,7 +2133,7 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2336,6 +2345,7 @@ func MountTwitterController(service *goa.Service, ctrl TwitterController) {
 
 // handleTwitterOrigin applies the CORS response headers corresponding to the origin.
 func handleTwitterOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -2343,7 +2353,7 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2649,6 +2659,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 
 // handleUserOrigin applies the CORS response headers corresponding to the origin.
 func handleUserOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -2656,7 +2667,7 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")

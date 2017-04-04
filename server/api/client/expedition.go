@@ -82,9 +82,6 @@ func (c *Client) NewGetExpeditionRequest(ctx context.Context, path string) (*htt
 	if err != nil {
 		return nil, err
 	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
-	}
 	return req, nil
 }
 
@@ -147,9 +144,6 @@ func (c *Client) NewListExpeditionRequest(ctx context.Context, path string) (*ht
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
 	}
 	return req, nil
 }
