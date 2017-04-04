@@ -19,13 +19,12 @@ import type {
   APIExpeditions,
   APIMutableInput,
   APIBaseInput,
+  APINewTwitterInput,
   APITwitterInput,
   APITwitterInputCreateResponse,
   APIFieldkitInput,
   APIFieldkitInputs,
   APINewFieldkitInput,
-  APINewFieldkitInputBinary,
-  APIFieldkitInputBinary,
   APIInputs,
   APITeam,
   APINewTeam,
@@ -155,6 +154,7 @@ export class FKApiClient extends JWTAPIClient {
           return { type: 'err', errors: APIFakeOtherError };
         }
       } else {
+        log.error(e);
         const APIFakeOtherError: APIErrors = {
           code: 'UnknownError',
           detail: e.msg,
@@ -205,6 +205,10 @@ export class FKApiClient extends JWTAPIClient {
     this.onSignout();
   }
 
+  userPictureUrl(userId: number): string {
+    return `${this.baseUrl}/users/${userId}/picture`;
+  }
+
   getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
     return this.getWithErrors('/user');
   }
@@ -225,6 +229,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors('/users');
   }
 
+  projectPictureUrl(projectId: number): string {
+    return `${this.baseUrl}/projects/${projectId}/picture`;
+  }
+
   getProjects(): Promise<FKAPIResponse<APIProjects>> {
     return this.getWithErrors('/projects')
   }
@@ -243,6 +251,10 @@ export class FKApiClient extends JWTAPIClient {
 
   updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
     return this.patchWithErrors(`/projects/${projectId}`, values)
+  }
+
+  expeditionPictureUrl(expeditionId: number): string {
+    return `${this.baseUrl}/expeditions/${expeditionId}/picture`;
   }
 
   getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
@@ -277,8 +289,8 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
   }
 
-  createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`)
+  createTwitterInput(expeditionId: number, twitterInput: APINewTwitterInput): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`, twitterInput)
   }
 
   createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {
