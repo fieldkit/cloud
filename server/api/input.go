@@ -12,6 +12,7 @@ func InputType(input *data.Input) *app.Input {
 	inputType := &app.Input{
 		ID:           int(input.ID),
 		ExpeditionID: int(input.ExpeditionID),
+		Name:         input.Name,
 	}
 
 	if input.TeamID != nil {
@@ -50,14 +51,20 @@ func (c *InputController) Update(ctx *app.UpdateInputContext) error {
 		return err
 	}
 
+	input.Name = ctx.Payload.Name
+
 	if ctx.Payload.TeamID != nil {
 		teamID := int32(*ctx.Payload.TeamID)
 		input.TeamID = &teamID
+	} else {
+		input.TeamID = nil
 	}
 
 	if ctx.Payload.UserID != nil {
 		userID := int32(*ctx.Payload.UserID)
 		input.UserID = &userID
+	} else {
+		input.UserID = nil
 	}
 
 	if err := c.options.Backend.UpdateInput(ctx, input); err != nil {

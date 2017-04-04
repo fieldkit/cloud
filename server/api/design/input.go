@@ -26,8 +26,10 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 
 var UpdateInputPayload = Type("UpdateInputPayload", func() {
 	Reference(Input)
+	Attribute("name")
 	Attribute("team_id")
 	Attribute("user_id")
+	Required("name")
 })
 
 var Inputs = MediaType("application/vnd.app.inputs+json", func() {

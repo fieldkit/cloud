@@ -1040,6 +1040,11 @@ func unmarshalUpdateInputPayload(ctx context.Context, service *goa.Service, req 
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
 	goa.ContextRequest(ctx).Payload = payload.Publicize()
 	return nil
 }
