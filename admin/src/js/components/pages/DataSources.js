@@ -48,6 +48,7 @@ export class DataSources extends Component {
   async loadInputs() {
     const inputsRes = await FKApiClient.get().getExpeditionInputs(this.props.expedition.id);
     if (inputsRes.type === 'ok') {
+      console.log(inputsRes.payload);
       this.setState({ inputs: inputsRes.payload });
     }
   }
@@ -116,7 +117,18 @@ export class DataSources extends Component {
 
   async onInputUpdate(inputId: number, i: APIMutableInput) {
     const { match } =this.props;
-    const inputRes = await FKApiClient.get().updateInput(inputId, i);
+    const input = {};
+    input.name = i.name;
+    if (!isNaN(i.team_id)) {
+      console.log('we have a team');
+      input.team_id = i.team_id;
+    }
+    if (!isNaN(i.user_id)) {
+      console.log('we have a member');
+      input.user_id = i.user_id;
+    }
+    console.log(input);
+    const inputRes = await FKApiClient.get().updateInput(inputId, input);
     if(inputRes.type === 'ok' && inputRes.payload) {
       await this.loadInputs();
       this.props.history.push(`${match.url}`);
@@ -203,7 +215,8 @@ export class DataSources extends Component {
             <table className="twitter-account-inputs-table">
               <thead>
                 <tr>
-                  <th>Username</th>
+                  <th>Name</th>                
+                  <th>Handle</th>
                   <th>Binding</th>
                   <th></th>
                   <th></th>                  
@@ -213,6 +226,7 @@ export class DataSources extends Component {
               { twitter_account_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
                   <td>{input.name}</td>
+                  <td>{input.screen_name}</td>                  
                   <td>
                     { input.team_id && teams &&
                       this.getTeamById(input.team_id) }

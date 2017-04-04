@@ -26,7 +26,7 @@ export class InputForm extends Component {
     ...$Exact<APIMutableInput>,  
     users: {[id: number]: APIUser},
     teams: APITeam[],
-    bindingType: string,
+    bindingType: ?string,
     saveDisabled: boolean,
     errors: ?APIErrors
   };
@@ -61,18 +61,27 @@ export class InputForm extends Component {
     });
   }
 
-  getBindingType(props: Props): string{
+  resetInputBinding(bindingType: string) {
+    if(bindingType === 'team') {
+      this.setState({user_id: undefined});
+    } else if (bindingType === 'member') {
+      this.setState({team_id: undefined});
+    }
+  }
+
+  getBindingType(props: Props): ?string{
     const { input } = this.props;
-    if(props.input){
-      return props.input.team_id ? "team" : "member";
-    }else{
-      return ""
+    if(input){
+      if(input.team_id) {
+        return 'team';
+      } else if (input.user_id) {
+        return 'member';
+      }
     }
   }
 
   async save(inputId?: number) {
     const { name, team_id, user_id } = this.state;
-    const input = { name: name };
     const errors = await this.props.onSave({
       name: name,
       team_id: parseInt(team_id),
@@ -89,11 +98,15 @@ export class InputForm extends Component {
     const name = target.name;
 
     this.setState({ [name]: value });
+
+    if(name === "bindingType"){
+      this.resetInputBinding(value);
+    }    
   }
 
   render () {
     const { input } = this.props;
-    const { users, teams, bindingType } = this.state;
+    const { users, teams, name, bindingType, team_id, user_id, errors } = this.state;
 
     return (
       <FormContainer
@@ -104,16 +117,16 @@ export class InputForm extends Component {
 
         <div className="form-group">
           <label htmlFor="name">Name</label>
-          <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(this.state.errors, 'name') }
+          <input type="text" name="name" className="lg" value={name} onChange={this.handleInputChange.bind(this)} />
+          { errorsFor(errors, 'name') }
         </div>
 
         { input &&
           <div>
             <div className="form-group">
               <label htmlFor="bindingType">Bind input to</label>
-              <select name="bindingType"  value={this.state.bindingType} onChange={this.handleInputChange.bind(this)}>
-                <option value={""}>Select</option>
+              <select name="bindingType"  value={bindingType} onChange={this.handleInputChange.bind(this)}>
+                <option disabled selected>Select</option>
                 <option value={"team"}>Team</option>
                 <option value={"member"}>Member</option>
               </select>
@@ -122,23 +135,23 @@ export class InputForm extends Component {
             { bindingType === "team" &&
               <div className="form-group">
                 <label htmlFor="team_id">Team</label>
-                <select name="team_id" value={this.state.team_id} onChange={this.handleInputChange.bind(this)}>
-                  <option value={null}>Select a team</option>
+                <select name="team_id" value={team_id} onChange={this.handleInputChange.bind(this)}>
+                  <option disabled selected>Select a team</option>
                   { teams.map((team, i) => 
                     <option key={i} value={team.id}>{team.name}</option>) }
                 </select>
-                { errorsFor(this.state.errors, 'team_id') }          
+                { errorsFor(errors, 'team_id') }          
               </div>
             }
             { bindingType === "member" &&
               <div className="form-group">
                 <label htmlFor="user_id">Member</label>
-                <select name="user_id" value={this.state.user_id} onChange={this.handleInputChange.bind(this)}>
-                  <option value={null}>Select a member</option>
+                <select name="user_id" value={user_id} onChange={this.handleInputChange.bind(this)}>
+                  <option disabled selected>Select a member</option>
                   { Object.keys(users).map(id => 
                     <option key={id} value={id}>{users[id].username}</option>) }
                 </select>
-                { errorsFor(this.state.errors, 'user_id') }          
+                { errorsFor(errors, 'user_id') }          
               </div>
             }
           
