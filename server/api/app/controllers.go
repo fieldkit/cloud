@@ -622,6 +622,8 @@ type FieldkitController interface {
 	GetID(*GetIDFieldkitContext) error
 	List(*ListFieldkitContext) error
 	ListID(*ListIDFieldkitContext) error
+	SendBinary(*SendBinaryFieldkitContext) error
+	SendCsv(*SendCsvFieldkitContext) error
 	SetBinary(*SetBinaryFieldkitContext) error
 }
 
@@ -632,6 +634,8 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/binary", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/csv", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/binary/:binary_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -707,6 +711,40 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 	h = handleFieldkitOrigin(h)
 	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs/fieldkits", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSendBinaryFieldkitContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SendBinary(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldkitOrigin(h)
+	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/binary", ctrl.MuxHandler("SendBinary", h, nil))
+	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendBinary", "route", "POST /inputs/fieldkits/:input_id/send/binary", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSendCsvFieldkitContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SendCsv(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldkitOrigin(h)
+	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/csv", ctrl.MuxHandler("SendCsv", h, nil))
+	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendCsv", "route", "POST /inputs/fieldkits/:input_id/send/csv", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -61,6 +61,8 @@ var FieldkitBinary = MediaType("application/vnd.app.fieldkit_input_binary+json",
 			Enum("varint", "uvarint", "float32", "float64")
 		}))
 		Attribute("mapper", HashOf(String, String))
+		Attribute("longitude", String)
+		Attribute("latitude", String)
 		Required("id", "input_id", "schema_id", "fields", "mapper")
 	})
 	View("default", func() {
@@ -69,6 +71,8 @@ var FieldkitBinary = MediaType("application/vnd.app.fieldkit_input_binary+json",
 		Attribute("schema_id")
 		Attribute("fields")
 		Attribute("mapper")
+		Attribute("longitude")
+		Attribute("latitude")
 	})
 })
 
@@ -127,6 +131,28 @@ var _ = Resource("fieldkit", func() {
 		Response(OK, func() {
 			Media(FieldkitBinary)
 		})
+	})
+
+	Action("send csv", func() {
+		Routing(POST("inputs/fieldkits/:input_id/send/csv"))
+		Description("Send CSV data")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Response(BadRequest)
+		Response(NoContent)
+	})
+
+	Action("send binary", func() {
+		Routing(POST("inputs/fieldkits/:input_id/send/binary"))
+		Description("Send binary data")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Response(BadRequest)
+		Response(NoContent)
 	})
 
 	Action("list", func() {
