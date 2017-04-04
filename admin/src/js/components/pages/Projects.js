@@ -27,13 +27,13 @@ type Props = {
 export class Projects extends Component {
   props: $Exact<Props>;
   state: {
-    pictures: {[projectId: number]: string}
+    projectPictures: {[projectId: number]: string}
   }
 
   constructor(props: Props) {
     super(props)
     this.state = {
-      pictures: {}
+      projectPictures: {}
     }
     this.loadProjectsPictures();
   }
@@ -44,14 +44,15 @@ export class Projects extends Component {
 
   async loadProjectsPictures (){
     const { projects } = this.props;
-    const { pictures } = this.state;
+    const { projectPictures } = this.state;
 
     for (const project of projects) {
       const projectRes = await FKApiClient.get().projectPictureUrl(project.id);
       if (projectRes) {
-        pictures[project.id] = projectRes;
+        projectPictures[project.id] = projectRes;
       }
     }
+    this.setState({projectPictures: projectPictures});    
   }
 
   async onProjectCreate(p: APINewProject) {
@@ -65,7 +66,7 @@ export class Projects extends Component {
 
   render () {
     const { projects, match } = this.props;
-    const { pictures } = this.state;
+    const { projectPictures } = this.state;
 
     return (
       <div className="projects">
@@ -81,7 +82,7 @@ export class Projects extends Component {
         { projects.map((p, i) =>
           <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects"
             style={{
-              backgroundImage: 'url(' + pictures[p.id] + ')'
+              backgroundImage: 'url(' + projectPictures[p.id] + ')'
             }}>
             <h4>{p.name}</h4>
           </Link> )}
