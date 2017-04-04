@@ -56,22 +56,28 @@ var FieldkitBinary = MediaType("application/vnd.app.fieldkit_input_binary+json",
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("input_id", Integer)
+		Attribute("schema_id", Integer)
 		Attribute("fields", ArrayOf(String, func() {
 			Enum("varint", "uvarint", "float32", "float64")
 		}))
-		Required("id", "input_id", "fields")
+		Attribute("mapper", HashOf(String, String))
+		Required("id", "input_id", "schema_id", "fields", "mapper")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("input_id")
+		Attribute("schema_id")
 		Attribute("fields")
+		Attribute("mapper")
 	})
 })
 
 var SetFieldkitBinaryPayload = Type("SetFieldkitBinaryPayload", func() {
 	Reference(FieldkitBinary)
+	Attribute("schema_id")
 	Attribute("fields")
-	Required("fields")
+	Attribute("mapper")
+	Required("schema_id", "fields", "mapper")
 })
 
 var _ = Resource("fieldkit", func() {

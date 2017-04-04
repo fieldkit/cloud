@@ -14,6 +14,7 @@ import log from 'loglevel';
 
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
+import { fkHost } from '../common/util';
 
 import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
@@ -90,7 +91,7 @@ export class Main extends Component {
       promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeProject = null;
     } else if (!newProjectSlug) {
-      promises.push(this.loadProjects());      
+      promises.push(this.loadProjects());
       stateChange.activeProject = null;
     }
 
@@ -265,7 +266,7 @@ export class Main extends Component {
                       <ArrowDownIcon />
                     </div>
                     <span>{activeProject.name}</span>
-                    <a className="bt-icon small" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
+                    <a className="bt-icon small" href={`//${activeProject.slug}.${fkHost()}/`} alt="go to project`" target="_blank">
                       <OpenInNewIcon />
                     </a>
                   </p>
@@ -280,7 +281,7 @@ export class Main extends Component {
                 <h5>Expedition</h5>
                   <p className="expedition-name">
                     <span>{activeExpedition.name}</span>
-                    <a className="bt-icon medium" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
+                    <a className="bt-icon medium" href={`//${activeProject.slug}.${fkHost()}/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
                       <OpenInNewIcon />

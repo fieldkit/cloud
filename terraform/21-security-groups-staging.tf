@@ -7,7 +7,7 @@ resource "aws_security_group" "fieldkit-server-staging-alb" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["24.103.10.214/32", "54.48.89.64/32"]
+    cidr_blocks = ["24.103.10.214/32", "52.44.84.69/32"]
   }
 
   egress {

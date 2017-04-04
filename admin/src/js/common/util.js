@@ -41,3 +41,7 @@ export function joinPath(basePath: string, ...parts: string[]): string {
   }
   return `${basePath}/${nextParts}`;
 }
+
+export function fkHost(): string {
+  return window.location.hostname;
+}

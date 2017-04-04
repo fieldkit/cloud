@@ -91,6 +91,13 @@ module.exports = {
       context: path.join(__dirname),
       manifest: require('./src/vendors/dll/vendor-manifest.json')
     }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': (function(){
+          return JSON.stringify(process.env.NODE_ENV)
+        })()
+      }
+    }),
     new HtmlWebpackPlugin({
       title: 'FIELDKIT',
       filename: 'index.html',

@@ -231,9 +231,11 @@ func (mt FieldkitInputCollection) Validate() (err error) {
 //
 // Identifier: application/vnd.app.fieldkit_input_binary+json; view=default
 type FieldkitBinary struct {
-	Fields  []string `form:"fields" json:"fields" xml:"fields"`
-	ID      int      `form:"id" json:"id" xml:"id"`
-	InputID int      `form:"input_id" json:"input_id" xml:"input_id"`
+	Fields   []string          `form:"fields" json:"fields" xml:"fields"`
+	ID       int               `form:"id" json:"id" xml:"id"`
+	InputID  int               `form:"input_id" json:"input_id" xml:"input_id"`
+	Mapper   map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
+	SchemaID int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
 }
 
 // Validate validates the FieldkitBinary media type instance.
@@ -241,6 +243,9 @@ func (mt *FieldkitBinary) Validate() (err error) {
 
 	if mt.Fields == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	if mt.Mapper == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
 	}
 	for _, e := range mt.Fields {
 		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {

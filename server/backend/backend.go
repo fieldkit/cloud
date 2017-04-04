@@ -184,10 +184,10 @@ func (b *Backend) AddFieldkitInput(ctx context.Context, fieldkitInput *data.Fiel
 
 func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *data.FieldkitBinary) error {
 	_, err := b.db.ExecContext(ctx, `
-		INSERT INTO fieldkit.fieldkit_binary (id, input_id, fields) VALUES ($1, $2, $3)
+		INSERT INTO fieldkit.fieldkit_binary (id, input_id, schema_id, fields, mapper) VALUES ($1, $2, $3, $4, $5)
 			ON CONFLICT (id, input_id)
-				DO UPDATE SET fields = $3
-		`, fieldkitBinary.ID, fieldkitBinary.InputID, pq.Array(fieldkitBinary.Fields))
+				DO UPDATE SET schema_id = $3, fields = $4, mapper = $5
+		`, fieldkitBinary.ID, fieldkitBinary.InputID, fieldkitBinary.SchemaID, pq.Array(fieldkitBinary.Fields), fieldkitBinary.Mapper)
 	return err
 }
 
@@ -301,7 +301,7 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 func (b *Backend) ListDocuments(ctx context.Context, project, expedition string) ([]*data.Document, error) {
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.*
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
 			FROM fieldkit.document AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
@@ -317,7 +317,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project, expedition string)
 func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.*
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
 			FROM fieldkit.document AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 					WHERE i.expedition_id = $1

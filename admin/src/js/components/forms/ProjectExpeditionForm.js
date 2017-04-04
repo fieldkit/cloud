@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
 import { FormItem } from './FormItem';
-import { errorsFor, slugify } from '../../common/util';
+import { errorsFor, slugify, fkHost } from '../../common/util';
 
 import type { APIErrors, APINewExpedition } from '../../api/types';
 
@@ -108,7 +108,7 @@ export class ProjectExpeditionForm extends Component {
           <p className="label">Your expedition will be available at the following address:</p>
           <p className="url">
             {/* TODO: replace with something that handles alternative domains */}
-            {`https://${projectSlug}.fieldkit.org/${slug}`}
+            {`//${projectSlug}.${fkHost()}/${slug}`}
           </p>
         </div>
 
