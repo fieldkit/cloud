@@ -526,9 +526,10 @@ table {
     height: $baseline-height*15;
     margin-bottom: $col-gutter;
     vertical-align: top;
-    background-color: $gray-5;
+    background-color: $gray-4;
     background-repeat: no-repeat;
     background-position: center; 
+    background-blend-mode: color-burn;
     // background-size: cover;
 
     &.projects {
