@@ -33,6 +33,7 @@ export class InputForm extends Component {
   */  
   constructor(props: Props) {
     super(props)
+
     this.state = {
       team_id: -1,
       user_id: -1,
@@ -40,7 +41,7 @@ export class InputForm extends Component {
       ...props.input,
       users: props.users,
       teams: props.teams,
-      bindingType: '',
+      bindingType:  this.getBindingType(props),
       saveDisabled: false,
       errors: null
     }
@@ -54,10 +55,19 @@ export class InputForm extends Component {
       ...nextProps.input,
       users: nextProps.users,
       teams: nextProps.teams,
-      bindingType: '',      
+      bindingType: this.getBindingType(nextProps),
       saveDisabled: false,
       errors: null
     });
+  }
+
+  getBindingType(props: Props): string{
+    const { input } = this.props;
+    if(props.input){
+      return props.input.team_id ? "team" : "member";
+    }else{
+      return ""
+    }
   }
 
   async save(inputId?: number) {
