@@ -26,6 +26,33 @@ type Props = {
 
 export class Projects extends Component {
   props: $Exact<Props>;
+  state: {
+    pictures: {[projectId: number]: string}
+  }
+
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      pictures: {}
+    }
+    this.loadProjectsPictures();
+  }
+
+  componentWillReceiveProps (nextProps: Props) {
+    this.loadProjectsPictures();
+  }
+
+  async loadProjectsPictures (){
+    const { projects } = this.props;
+    const { pictures } = this.state;
+
+    for (const project of projects) {
+      const projectRes = await FKApiClient.get().projectPictureUrl(project.id);
+      if (projectRes) {
+        pictures[project.id] = projectRes;
+      }
+    }
+  }
 
   async onProjectCreate(p: APINewProject) {
     const project = await FKApiClient.get().createProject(p);
@@ -36,15 +63,9 @@ export class Projects extends Component {
     }
   }
 
-  async getProjectPictureUrl(projectId: number){
-    const projectRes = await FKApiClient.get().projectPictureUrl(projectId);
-    if (projectRes.type === 'ok' && projectRes.payload) {
-      return projectRes.payload;
-    }
-  }
-
   render () {
     const { projects, match } = this.props;
+    const { pictures } = this.state;
 
     return (
       <div className="projects">
@@ -58,7 +79,10 @@ export class Projects extends Component {
         <h1>Projects</h1>
         <div id="projects" className="gallery-list projects">
         { projects.map((p, i) =>
-          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects">
+          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects"
+            style={{
+              backgroundImage: 'url(' + pictures[p.id] + ')'
+            }}>
             <h4>{p.name}</h4>
           </Link> )}
         { projects.length === 0 &&

@@ -527,6 +527,9 @@ table {
     margin-bottom: $col-gutter;
     vertical-align: top;
     background-color: $gray-5;
+    background-repeat: no-repeat;
+    background-position: center; 
+    // background-size: cover;
 
     &.projects {
       width: 100%;
