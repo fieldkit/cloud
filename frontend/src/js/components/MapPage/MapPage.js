@@ -2,6 +2,7 @@
 import React, { PropTypes } from 'react'
 import ControlPanelContainer from '../../containers/common/ControlPanel'
 import NotificationPanelContainer from '../../containers/MapPage/NotificationPanel'
+import DisclaimerPanelContainer from '../../containers/MapPage/DisclaimerPanel'
 
 class MapPage extends React.Component {
   render () {
@@ -16,6 +17,7 @@ class MapPage extends React.Component {
           <ControlPanelContainer/>
         }
         <NotificationPanelContainer/>
+        <DisclaimerPanelContainer/>
       </div>
     )
   }

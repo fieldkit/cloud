@@ -1,0 +1,10 @@
+.disclaimer-panel{
+  position: absolute;
+  right: 0;
+  top:calc(100vh - (2.487562189vh * 7.5));
+  width: $line-width * 18;
+  font-size:12px;
+  line-height:20px;
+  overflow: visible;
+  pointer-events: none;
+}
