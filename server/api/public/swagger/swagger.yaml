@@ -178,7 +178,7 @@ definitions:
   Document:
     description: Document media type (default view)
     example:
-      data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+      data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -191,7 +191,7 @@ definitions:
       user_id: 2.319954e+18
     properties:
       data:
-        example: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+        example: 12e4d472-332d-41d6-b4af-e61cc7f8c809
       id:
         example: Possimus porro quaerat in qui.
         type: string
@@ -225,7 +225,7 @@ definitions:
     description: DocumentCollection is the media type for an array of Document (default
       view)
     example:
-    - data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+    - data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -236,7 +236,7 @@ definitions:
       team_id: 7.1933954e+18
       timestamp: 9.0560484e+18
       user_id: 2.319954e+18
-    - data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+    - data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -256,7 +256,7 @@ definitions:
     description: Documents media type (default view)
     example:
       documents:
-      - data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+      - data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -267,7 +267,7 @@ definitions:
         team_id: 7.1933954e+18
         timestamp: 9.0560484e+18
         user_id: 2.319954e+18
-      - data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+      - data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -278,7 +278,7 @@ definitions:
         team_id: 7.1933954e+18
         timestamp: 9.0560484e+18
         user_id: 2.319954e+18
-      - data: ed6a73a6-14e7-4c07-9a1f-1450f489f437
+      - data: 12e4d472-332d-41d6-b4af-e61cc7f8c809
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -1773,11 +1773,7 @@ paths:
       - project
   /projects/@/{project}:
     get:
-      description: |-
-        Get a project
-
-        Required security scopes:
-          * `api:access`
+      description: Get a project
       operationId: project#get
       parameters:
       - description: Project slug
@@ -1797,9 +1793,6 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: get project
       tags:
       - project
@@ -1873,11 +1866,7 @@ paths:
       - administrator
   /projects/@/{project}/expeditions:
     get:
-      description: |-
-        List a project's expeditions
-
-        Required security scopes:
-          * `api:access`
+      description: List a project's expeditions
       operationId: expedition#list
       parameters:
       - description: Project slug
@@ -1897,19 +1886,12 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: list expedition
       tags:
       - expedition
   /projects/@/{project}/expeditions/@/{expedition}:
     get:
-      description: |-
-        Add an expedition
-
-        Required security scopes:
-          * `api:access`
+      description: Add an expedition
       operationId: expedition#get
       parameters:
       - description: Expedition slug
@@ -1935,9 +1917,6 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: get expedition
       tags:
       - expedition

@@ -74,6 +74,7 @@ var _ = Resource("project", func() {
 	})
 
 	Action("get", func() {
+		NoSecurity()
 		Routing(GET("projects/@/:project"))
 		Description("Get a project")
 		Params(func() {
