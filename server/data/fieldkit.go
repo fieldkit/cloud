@@ -1,24 +1,11 @@
 package data
 
 import (
-	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
-	"math"
+
+	"github.com/lib/pq"
 )
-
-type FieldkitBinary struct {
-	InputID  int32    `db:"input_id"`
-	SchemaID int32    `db:"schema_id"`
-	ID       uint16   `db:"id"`
-	Fields   []string `db:"fields"`
-	Mapper   *Mapper  `db:"mapper"`
-}
-
-type FieldkitInput struct {
-	Input
-}
 
 const (
 	VarintField  = "varint"
@@ -37,19 +24,39 @@ var (
 	}
 )
 
-// byteReader implements the io.ByteReader interface. It maintains a single-
+type FieldkitInput struct {
+	Input
+}
+
+type StringSlice []string
+
+func (s StringSlice) Scan(data interface{}) error {
+	return pq.Array(&s).Scan(data)
+}
+
+type FieldkitBinary struct {
+	InputID   int32    `db:"input_id"`
+	SchemaID  int32    `db:"schema_id"`
+	ID        uint16   `db:"id"`
+	Fields    []string `db:"fields"`
+	Mapper    *Mapper  `db:"mapper"`
+	Longitude *string  `db:"longitude"`
+	Latitude  *string  `db:"longitude"`
+}
+
+// ByteReader implements the io.ByteReader interface. It maintains a single-
 // byte buffer in order to avoid allocating a slice on every read.
-type byteReader struct {
+type ByteReader struct {
 	reader io.Reader
 	buffer [1]byte
 }
 
-func newByteReader(r io.Reader) *byteReader {
-	return &byteReader{reader: r}
+func NewByteReader(r io.Reader) *ByteReader {
+	return &ByteReader{reader: r}
 }
 
 // ReadByte reads and returns the next byte from the reader.
-func (r *byteReader) ReadByte() (byte, error) {
+func (r *ByteReader) ReadByte() (byte, error) {
 	_, err := io.ReadFull(r, r.buffer[:])
 	if err != nil {
 		return 0x0, err
@@ -58,88 +65,57 @@ func (r *byteReader) ReadByte() (byte, error) {
 	return r.buffer[0], nil
 }
 
-func (r *byteReader) Read(p []byte) (int, error) {
+func (r *ByteReader) Read(p []byte) (int, error) {
 	return r.reader.Read(p)
 }
 
-// FieldkitBinaryReader implements the MessageReader interface.
-type FieldkitBinaryReader struct {
-	reader         *byteReader
-	fieldkitBinary map[uint64]*FieldkitBinary
-}
+// // ReadMessage reads one message.
+// func (m *FieldkitBinary) ReadMessage(r *ByteReader) (interface{}, error) {
+// 	fieldValues := make([]interface{}, len(m.Fields))
+// 	for i, field := range m.Fields {
+// 		var fieldValue interface{}
 
-func NewFieldkitBinaryReader(r io.Reader) *FieldkitBinaryReader {
-	reader := &FieldkitBinaryReader{
-		reader:         newByteReader(r),
-		fieldkitBinary: make(map[uint64]*FieldkitBinary),
-	}
+// 		switch field {
+// 		case VarintField:
+// 			data, err := binary.ReadVarint(r)
+// 			if err != nil {
+// 				return nil, err
+// 			}
 
-	return reader
-}
+// 			fieldValue = float64(data)
 
-// AddFieldkitBinary registers a FieldkitBinary
-func (m *FieldkitBinaryReader) AddFieldkitBinary(fieldkitBinary *FieldkitBinary) error {
-	m.fieldkitBinary[uint64(fieldkitBinary.ID)] = fieldkitBinary
-	return nil
-}
+// 		case UvarintField:
+// 			data, err := binary.ReadUvarint(r)
+// 			if err != nil {
+// 				return nil, err
+// 			}
 
-// ReadMessage reads one message.
-func (m *FieldkitBinaryReader) ReadMessage() (interface{}, error) {
-	id, err := binary.ReadUvarint(m.reader)
-	if err != nil {
-		return nil, err
-	}
+// 			fieldValue = float64(data)
 
-	fieldkitBinary, ok := m.fieldkitBinary[id]
-	if !ok {
-		return nil, fmt.Errorf("unknown message type, %d", id)
-	}
+// 		case Float32Field:
+// 			data := make([]byte, 4)
+// 			if _, err := io.ReadFull(r, data); err != nil {
+// 				return nil, err
+// 			}
 
-	fieldValues := make([]interface{}, len(fieldkitBinary.Fields))
-	for i, field := range fieldkitBinary.Fields {
-		var fieldValue interface{}
+// 			number := float64(math.Float32frombits(binary.LittleEndian.Uint32(data)))
+// 			fieldValue = float64(number)
 
-		switch field {
-		case VarintField:
-			data, err := binary.ReadVarint(m.reader)
-			if err != nil {
-				return nil, err
-			}
+// 		case Float64Field:
+// 			data := make([]byte, 8)
+// 			if _, err := io.ReadFull(r, data); err != nil {
+// 				return nil, err
+// 			}
 
-			fieldValue = float64(data)
+// 			number := math.Float64frombits(binary.LittleEndian.Uint64(data))
+// 			fieldValue = float64(number)
 
-		case UvarintField:
-			data, err := binary.ReadUvarint(m.reader)
-			if err != nil {
-				return nil, err
-			}
+// 		default:
+// 			return nil, fmt.Errorf("unknown field type, %s", field)
+// 		}
 
-			fieldValue = float64(data)
+// 		fieldValues[i] = fieldValue
+// 	}
 
-		case Float32Field:
-			data := make([]byte, 4)
-			if _, err := io.ReadFull(m.reader, data); err != nil {
-				return nil, err
-			}
-
-			number := float64(math.Float32frombits(binary.LittleEndian.Uint32(data)))
-			fieldValue = float64(number)
-
-		case Float64Field:
-			data := make([]byte, 8)
-			if _, err := io.ReadFull(m.reader, data); err != nil {
-				return nil, err
-			}
-
-			number := math.Float64frombits(binary.LittleEndian.Uint64(data))
-			fieldValue = float64(number)
-
-		default:
-			return nil, fmt.Errorf("unknown field type, %s", field)
-		}
-
-		fieldValues[i] = fieldValue
-	}
-
-	return fieldkitBinary.Mapper.Map(fieldValues)
-}
+// 	return m.Mapper.Map(fieldValues)
+// }

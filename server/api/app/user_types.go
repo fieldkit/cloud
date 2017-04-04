@@ -719,13 +719,25 @@ type UpdateFieldkitInputPayload struct {
 
 // updateInputPayload user type.
 type updateInputPayload struct {
-	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the updateInputPayload type instance.
+func (ut *updateInputPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
 }
 
 // Publicize creates UpdateInputPayload from updateInputPayload
 func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
 	var pub UpdateInputPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
 	if ut.TeamID != nil {
 		pub.TeamID = ut.TeamID
 	}
@@ -737,8 +749,17 @@ func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
 
 // UpdateInputPayload user type.
 type UpdateInputPayload struct {
-	TeamID *int `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	Name   string `form:"name" json:"name" xml:"name"`
+	TeamID *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the UpdateInputPayload type instance.
+func (ut *UpdateInputPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
 }
 
 // updateMemberPayload user type.

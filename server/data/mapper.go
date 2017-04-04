@@ -28,25 +28,20 @@ func NewMapper(pointers map[string]string) *Mapper {
 	return m
 }
 
-func (m *Mapper) Map(src interface{}) (interface{}, error) {
-	srcJSONDocument := &jsondocument.Document{}
-	if err := srcJSONDocument.UnmarshalGo(src); err != nil {
-		return nil, err
-	}
-
-	dstJSONDocument := jsondocument.Object()
+func (m *Mapper) Map(src *jsondocument.Document) (*jsondocument.Document, error) {
+	dst := jsondocument.Object()
 	for dstPointer, srcPointer := range m.pointers {
-		value, err := srcJSONDocument.Document(srcPointer)
+		value, err := src.Document(srcPointer)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := dstJSONDocument.SetDocument(dstPointer, value); err != nil {
+		if err := dst.SetDocument(dstPointer, value); err != nil {
 			return nil, err
 		}
 	}
 
-	return dstJSONDocument.Interface(), nil
+	return dst, nil
 }
 
 func (m *Mapper) Pointers() map[string]string {

@@ -4,10 +4,10 @@ The AWS infrastructure for the project is managed using [Terraform](https://www.
 
 ## AWS credentials
 
-Terraform will use the AWS credentials for the local "floodwatch" profile. To set it up, use the [AWS Command Line Interface](https://aws.amazon.com/cli/).
+Terraform will use the AWS credentials for the local "fieldkit" profile. To set it up, use the [AWS Command Line Interface](https://aws.amazon.com/cli/).
 
 ```bash
-aws configure --profile floodwatch
+aws configure --profile fieldkit
 ```
 
 ## Execute a plan

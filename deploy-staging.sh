@@ -3,7 +3,7 @@ set -ex
 cd `dirname $0`
 
 deploy () {
-	scp fieldkit-staging.service core@$1:~/
+	scp services/fieldkit-staging.service core@$1:~/
 	ssh core@$1 '\
 		sudo mv ~/fieldkit-staging.service /etc/systemd/system/fieldkit.service  &&\
 		sudo systemctl daemon-reload &&\

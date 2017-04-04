@@ -191,6 +191,23 @@ func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *da
 	return err
 }
 
+func (b *Backend) FieldkitInputBinary(ctx context.Context, inputID int32, id uint16) (*data.FieldkitBinary, error) {
+	row, err := b.db.QueryxContext(ctx, `
+		SELECT id, input_id, schema_id, fields, mapper, longitude, latitude FROM fieldkit.fieldkit_binary WHERE input_id = $1 AND id = $2
+		`, inputID, id)
+	if err != nil {
+		return nil, err
+	}
+
+	row.Next()
+	fieldkitBinary := &data.FieldkitBinary{}
+	if err := row.Scan(&fieldkitBinary.ID, &fieldkitBinary.InputID, &fieldkitBinary.SchemaID, pq.Array(&fieldkitBinary.Fields), &fieldkitBinary.Mapper, &fieldkitBinary.Longitude, &fieldkitBinary.Latitude); err != nil {
+		return nil, err
+	}
+
+	return fieldkitBinary, nil
+}
+
 func (b *Backend) FieldkitInput(ctx context.Context, inputID int32) (*data.FieldkitInput, error) {
 	fieldkitInput := &data.FieldkitInput{}
 	if err := b.db.GetContext(ctx, fieldkitInput, `

@@ -154,6 +154,72 @@ func (c *Client) NewListIDFieldkitRequest(ctx context.Context, path string) (*ht
 	return req, nil
 }
 
+// SendBinaryFieldkitPath computes a request path to the send binary action of fieldkit.
+func SendBinaryFieldkitPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/fieldkits/%s/send/binary", param0)
+}
+
+// Send binary data
+func (c *Client) SendBinaryFieldkit(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSendBinaryFieldkitRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSendBinaryFieldkitRequest create the request corresponding to the send binary action endpoint of the fieldkit resource.
+func (c *Client) NewSendBinaryFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
+// SendCsvFieldkitPath computes a request path to the send csv action of fieldkit.
+func SendCsvFieldkitPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/fieldkits/%s/send/csv", param0)
+}
+
+// Send CSV data
+func (c *Client) SendCsvFieldkit(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSendCsvFieldkitRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSendCsvFieldkitRequest create the request corresponding to the send csv action endpoint of the fieldkit resource.
+func (c *Client) NewSendCsvFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		c.JWTSigner.Sign(req)
+	}
+	return req, nil
+}
+
 // SetBinaryFieldkitPath computes a request path to the set binary action of fieldkit.
 func SetBinaryFieldkitPath(inputID int, binaryID int) string {
 	param0 := strconv.Itoa(inputID)
