@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
+import { FormItem } from '../forms/FormItem';
 import { errorsFor, slugify } from '../../common/util';
 
 import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput, APITeam } from '../../api/types';
@@ -119,9 +120,15 @@ export class InputForm extends Component {
         cancelText={this.props.cancelText}>
 
         <div className="form-group">
-          <label htmlFor="name">Name</label>
-          <input type="text" name="name" className="lg" value={name} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(errors, 'name') }
+          <FormItem
+            labelText={'Name'}
+            name={'name'}
+            className={'lg'}
+            type={'text'}
+            value={name}
+            onChange={this.handleInputChange.bind(this)}
+            errors={errors}
+          />
         </div>
 
         { input &&

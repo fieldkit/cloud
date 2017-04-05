@@ -28,7 +28,6 @@ export class DataSources extends Component {
   state: {
     inputs: APIInputs,
     teams: APITeam[],
-    members: APIMember[],
     users: {[id: number]: APIUser},
   }
 
@@ -37,7 +36,6 @@ export class DataSources extends Component {
     this.state = {
       inputs: {},
       teams: [],
-      members: [],
       users: {}
     }
 
@@ -53,42 +51,49 @@ export class DataSources extends Component {
     }
   }
 
-  async loadTeams() {
-    const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
+async loadTeams() {
+    const { project, expedition } = this.props;
+    const teamsRes = await FKApiClient.get().getTeamsBySlugs(project.slug, expedition.slug);
     if (teamsRes.type === 'ok' && teamsRes.payload) {
       const { teams } = teamsRes.payload;
-      this.setState({ teams: teams });
-      for (const team of teams) {
-        await this.loadMembers(team.id);
-      }
-    }
-  }
-
-  async loadMembers(teamId: number) {
-    const membersRes = await FKApiClient.get().getMembers(teamId);
-    if (membersRes.type === 'ok' && membersRes.payload) {
-      const members = this.state.members.slice();
-
-      membersRes.payload.members.forEach(member =>
-        !members.find(m => m.user_id === member.user_id) &&
-          members.push(member)
-      );
-      this.setState({members: members});
-      for (const member of members) {
-        await this.loadMemberName(teamId, member.user_id);
-      }
-    }
-  }
-
-  async loadMemberName(teamId: number, userId: number){
-    const userRes = await FKApiClient.get().getUserById(userId);
-    if (userRes.type === 'ok' && userRes.payload) {
       const { users } = this.state;
-      const userId = userRes.payload.id;
-      users[userId] = userRes.payload;
-      this.setState({users: users});
+      const members: Set<number> = new Set();
+
+      for (const team of teams) {
+        const teamMembers = await this.loadMembers(team.id);
+        console.log(teamMembers);
+        for (const member of teamMembers) {
+          members.add(member);
+        }
+      }
+
+      for (const userId of members) {
+        const user = await this.loadUser(userId);
+        console.log(user);        
+        if (user) {
+          users[userId] = user;
+        }
+      }
+
+      this.setState({ teams, users });
     }
-  }  
+  }
+
+  // returns array of user ids
+  async loadMembers(teamId: number): Promise<number[]> {
+    const membersRes = await FKApiClient.get().getMembers(teamId);
+    if (membersRes.type !== 'ok') {
+      return [];
+    } else {}
+    return membersRes.payload.members.map(m => m.user_id);
+  }
+
+  async loadUser(userId: number): Promise<?APIUser> {
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok') {
+      return userRes.payload;
+    }
+  }
 
   async onTwitterCreate(i: APIMutableInput) {
     const { name } = i;
