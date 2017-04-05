@@ -24,7 +24,7 @@ class ControlPanel extends React.Component {
 
     const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
 
-    const sensorToggleTitle = showSensors ? "Hide Sensors" : "Show Sensors"
+    const sensorToggleTitle = !showSensors ? "Social + data" : "Only social"
     const sensorToggleClass = showSensors ? "control-panel_toggle-sensor" : "control-panel_toggle-sensor off"
     return (
       <div className="control-panel">
