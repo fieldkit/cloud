@@ -170,7 +170,7 @@ export default class WebGLOverlay extends Component {
                     linewidth={10}
                     opacity={0.7}
                     transparent={false}
-                    color={new Color('#ffffff')}
+                    color={new Color('#ff0000')}
                   >
                   </lineBasicMaterial>
                 </line>
