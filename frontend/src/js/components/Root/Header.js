@@ -10,9 +10,9 @@ class Header extends React.Component {
       expeditionName,
       currentPage,
       currentExpeditionID,
-      openExpeditionPanel
+      openExpeditionPanel,
+      projectID
     } = this.props
-
     return (
       <div className="header">
         <h1 className="header_title">
@@ -25,6 +25,7 @@ class Header extends React.Component {
         <Navigation
           currentExpeditionID={ currentExpeditionID }
           currentPage={ currentPage }
+          currentProjectID={ projectID }
         />
       </div>
     )

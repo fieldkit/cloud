@@ -62,7 +62,7 @@ class Root extends React.Component {
               {
                 !documents || documents.size === 0 &&
                 <div className="root_no-document">
-                  This expedition doesn't seem to have any document yet...
+                    This expedition doesn’t have any data yet.
                 </div>
               }
               { this.props.children }

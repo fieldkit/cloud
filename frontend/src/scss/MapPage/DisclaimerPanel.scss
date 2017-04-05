@@ -1,10 +1,24 @@
 .disclaimer-panel{
   position: absolute;
   right: 0;
-  top:calc(100vh - (2.487562189vh * 7.5));
+  top:calc(100vh - (2.487562189vh * 7.2));
   width: $line-width * 18;
-  font-size:12px;
-  line-height:20px;
+  font-size:9px;
+  line-height:14px;
   overflow: visible;
   pointer-events: none;
+
+  .b{
+    font-weight:bold;
+  }
 }
+.disclaimer-body{
+    width:73%;
+    display:inline-block;
+    margin-right:2%;
+}
+.disclaimer-logo{
+    width:25%;
+    display:inline-block;
+}
+
