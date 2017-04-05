@@ -58,7 +58,7 @@ export class Teams extends Component {
     const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
     if (teamsRes.type === 'ok' && teamsRes.payload) {
       const { teams } = teamsRes.payload;
-      this.setState({ teams: teams });
+      this.setState({ teams });
       for (const team of teams) {
         await this.loadMembers(team.id);
       }
@@ -70,10 +70,10 @@ export class Teams extends Component {
     if (membersRes.type === 'ok' && membersRes.payload) {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
-      this.setState({members: members});
+      this.setState({ members });
       for (const member of members[teamId]) {
         await this.loadMemberName(teamId, member.user_id);
-      }      
+      }
     }
   }
 
@@ -85,7 +85,7 @@ export class Teams extends Component {
         users[teamId] = [];
       }
       users[teamId].push(userRes.payload);
-      this.setState({users: users});
+      this.setState({ users });
     }
   }
 
@@ -101,6 +101,15 @@ export class Teams extends Component {
       return teamRes.errors;
     }
   }
+
+  async onTeamUpdate(teamId: number, t: APINewTeam) {
+    const teamRes = await FKApiClient.get().updateTeam(teamId, t);
+    if(teamRes.type === 'ok' && teamRes.payload) {
+      await this.loadTeams();
+    } else {
+      return teamRes.errors;
+    }
+  }  
 
   startTeamDelete(t: APITeam) {
     const teamId = t.id;
@@ -197,15 +206,6 @@ export class Teams extends Component {
       await this.loadMembers(teamId);      
     } else {
       return memberRes.errors;
-    }
-  }
-
-  async onTeamUpdate(teamId: number, team: APINewTeam) {
-    const teamRes = await FKApiClient.get().updateTeam(teamId, team);
-    if(teamRes.type === 'ok' && teamRes.payload) {
-      await this.loadTeams();
-    } else {
-      return teamRes.errors;
     }
   }
 

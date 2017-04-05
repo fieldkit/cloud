@@ -3,19 +3,20 @@
 import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
+import { FormItem } from '../forms/FormItem';
 import { errorsFor, slugify } from '../../common/util';
 
-import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput } from '../../api/types';
+import type { APIErrors, APIUser, APIFieldkitInput, APINewFieldkitInput, APIMutableInput, APINewTwitterInput, APITeam } from '../../api/types';
 
 type Props = {
-  fieldkitInput?: ?APIFieldkitInput,
-  users: APIUser[],
-  inputType: string,
+  input?: ?APIMutableInput,
+  users: {[id: number]: APIUser},
+  teams: APITeam[],
 
   cancelText?: string;
   saveText?: ?string;
   onCancel?: () => void;
-  onSave: (i: APINewFieldkitInput | APINewTwitterInput) => Promise<?APIErrors>;
+  onSave: (i: APIMutableInput) => Promise<?APIErrors>;
 }
 
 export class InputForm extends Component {
@@ -23,20 +24,25 @@ export class InputForm extends Component {
 
   /*flow-include
   state: {
-    ...$Exact<APIFieldkitInput>,  
-    users: APIUser[],
+    ...$Exact<APIMutableInput>,  
+    users: {[id: number]: APIUser},
+    teams: APITeam[],
+    bindingType: ?string,
     saveDisabled: boolean,
     errors: ?APIErrors
   };
   */  
   constructor(props: Props) {
     super(props)
+
     this.state = {
       team_id: -1,
       user_id: -1,
       name: '',
-      ...props.fieldkitInput,
-      users: [],
+      ...props.input,
+      users: props.users,
+      teams: props.teams,
+      bindingType:  this.getBindingType(props),
       saveDisabled: false,
       errors: null
     }
@@ -47,16 +53,37 @@ export class InputForm extends Component {
       team_id: -1,
       user_id: -1,
       name: '',
-      ...nextProps.fieldkitInput,
+      ...nextProps.input,
       users: nextProps.users,
+      teams: nextProps.teams,
+      bindingType: this.getBindingType(nextProps),
       saveDisabled: false,
       errors: null
     });
   }
 
-  async save() {
-    const { name } = this.state;
-    const errors = await this.props.onSave({name: name});
+  resetInputBinding(bindingType: string) {
+    if(bindingType === 'team') {
+      this.setState({user_id: undefined});
+    } else if (bindingType === 'member') {
+      this.setState({team_id: undefined});
+    }
+  }
+
+  getBindingType(props: Props): ?string{
+    const { input } = this.props;
+    if(input){
+      if(input.team_id) {
+        return 'team';
+      } else if (input.user_id) {
+        return 'member';
+      }
+    }
+  }
+
+  async save(inputId?: number) {
+    const { name, team_id, user_id } = this.state;
+    const errors = await this.props.onSave({ name, team_id, user_id }, inputId);
     if (errors) {
       this.setState({ errors });
     }
@@ -66,11 +93,29 @@ export class InputForm extends Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
+    this.setState({ [name]: value });
+  }
 
+  handleBindingTypeChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.resetInputBinding(value);
+    this.setState({ [name]: value });
+  }  
+
+  handleBindingChange(event) {
+    const target = event.target;
+    const name = target.name;    
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+    value = parseInt(value);
     this.setState({ [name]: value });
   }
 
   render () {
+    const { input } = this.props;
+    const { users, teams, name, bindingType, team_id, user_id, errors } = this.state;
+
     return (
       <FormContainer
         onSave={this.save.bind(this)}
@@ -79,10 +124,54 @@ export class InputForm extends Component {
         cancelText={this.props.cancelText}>
 
         <div className="form-group">
-          <label htmlFor="name">Name</label>
-          <input type="text" name="name" className="lg" value={this.state.name} onChange={this.handleInputChange.bind(this)} />
-          { errorsFor(this.state.errors, 'name') }
+          <FormItem
+            labelText={'Name'}
+            name={'name'}
+            className={'lg'}
+            type={'text'}
+            value={name}
+            onChange={this.handleInputChange.bind(this)}
+            errors={errors}
+          />
         </div>
+
+        { input &&
+          <div>
+            <div className="form-group">
+              <label htmlFor="bindingType">Bind input to</label>
+              <select name="bindingType"  value={bindingType} onChange={this.handleBindingTypeChange.bind(this)}>
+                <option disabled selected>Select</option>
+                <option value={"team"}>Team</option>
+                <option value={"member"}>Member</option>
+              </select>
+            </div>
+
+            { bindingType === "team" &&
+              <div className="form-group">
+                <label htmlFor="team_id">Team</label>
+                <select name="team_id" value={team_id} onChange={this.handleBindingChange.bind(this)}>
+                  <option disabled selected>Select a team</option>
+                  { teams.map((team, i) => 
+                    <option key={i} value={team.id}>{team.name}</option>) }
+                </select>
+                { errorsFor(errors, 'team_id') }          
+              </div>
+            }
+            { bindingType === "member" &&
+              <div className="form-group">
+                <label htmlFor="user_id">Member</label>
+                <select name="user_id" value={user_id} onChange={this.handleBindingChange.bind(this)}>
+                  <option disabled selected>Select a member</option>
+                  { Object.keys(users).map(id => 
+                    <option key={id} value={id}>{users[id].username}</option>) }
+                </select>
+                { errorsFor(errors, 'user_id') }          
+              </div>
+            }
+          
+          </div>
+        }
+
       </FormContainer>
     )
   }
