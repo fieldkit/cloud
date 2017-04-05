@@ -54,22 +54,26 @@ const mapStateToProps = (state, ownProps) => {
           const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
           readingPath[i] = [x,y]
         })
-
         currentDocuments.toList().forEach((d, i) => {
           const type = d.get('type')
           const position = d.getIn(['geometry', 'coordinates'])
-          const radius = 15
+          let radius = 15
           const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
           const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-          let color
+          let color, s
+          let delta = Math.abs(d.get("date") - currentDate)
+          if(delta < 100000){
+            radius = 15 + (10 * ((100000-delta)/100000))
+          }
+
           if(d.get("user")){
             color = new Color('#00aced')
           } else {
-            const speed = d.get("GPSSpeed")
+            const speed = d.get("GPSSpeed") || 0
             const r = Math.floor(speed > 1 ? 255 : 255 * speed)
             color = new Color(`rgb(${r},0,0)`) 
           }
-          
+
           particles[type].position[i * 3 + 0] = x
           particles[type].position[i * 3 + 1] = y
           particles[type].position[i * 3 + 2] = radius

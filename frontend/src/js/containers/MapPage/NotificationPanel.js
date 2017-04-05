@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
           .filter(d => state.expeditions.get('currentDocuments').includes(d.get('id')))
           .filter(d => Math.abs(d.get('date') - currentDate + 100000) < 200000)
           .sortBy(d => d.get('date'))
+          .slice(0,5)
       })
     )(state)
   }
