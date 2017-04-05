@@ -115,6 +115,7 @@ export class ProjectExpeditionForm extends Component {
             {`${fkProtocol()}//${projectSlug}.${fkHost()}/`}
             <input type="text" name="slug" className='slug' value={slug} onChange={this.handleSlugChange.bind(this)} />
           </p>
+          { errorsFor(errors, 'slug') }
         </div>
 
         <FormItem name="description" value={description} labelText="description" className="lg" onChange={this.handleInputChange.bind(this)} errors={errors} />

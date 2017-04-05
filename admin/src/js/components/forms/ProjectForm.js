@@ -110,7 +110,7 @@ export class ProjectForm extends Component {
             {/* TODO: replace with something that handles alternative domains */}
             <span className="domain">.{fkHost()}/</span>
           </p>
-          { errorsFor(this.state.errors, 'path') }
+          { errorsFor(this.state.errors, 'slug') }
         </div>
 
         <div className="form-group">
