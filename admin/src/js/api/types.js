@@ -108,6 +108,21 @@ export type APIFieldkitInputs = {|
   fieldkit_inputs: APIFieldkitInput[];
 |};
 
+export type APINewInputToken = {|
+  // None for now
+|};
+
+export type APIInputToken = {|
+  ...APINewInputToken;
+  expedition_id: number;
+  id: number;
+  token: string;
+|};
+
+export type APIInputTokens = {|
+  input_tokens: APIInputToken[];
+|};
+
 export type APINewTeam = {
   name: string;
   slug: string;

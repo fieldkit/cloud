@@ -25,6 +25,9 @@ import type {
   APIFieldkitInput,
   APIFieldkitInputs,
   APINewFieldkitInput,
+  APINewInputToken,
+  APIInputToken,
+  APIInputTokens,
   APIInputs,
   APITeam,
   APINewTeam,
@@ -307,6 +310,18 @@ export class FKApiClient extends JWTAPIClient {
 
   getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
     return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
+  }
+
+  getInputTokensBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputTokens>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/input-tokens`)
+  }
+
+  createInputToken(expeditionId: number, inputToken: APINewInputToken): Promise<FKAPIResponse<APIInputToken>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs-tokens`, inputToken)
+  }
+
+  deleteInputToken(inputTokenId: number): Promise<FKAPIResponse<void>> {
+    return this.delWithErrors(`/input-tokens/${inputTokenId}`)
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
