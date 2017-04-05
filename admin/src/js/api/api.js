@@ -312,12 +312,16 @@ export class FKApiClient extends JWTAPIClient {
     return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
   }
 
+  getExpeditionInputTokens(expeditionId: number): Promise<FKAPIResponse<APIInputTokens>> {
+    return this.getWithErrors(`/expeditions/${expeditionId}/input-tokens`)
+  }
+
   getInputTokensBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputTokens>> {
     return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/input-tokens`)
   }
 
   createInputToken(expeditionId: number, inputToken: APINewInputToken): Promise<FKAPIResponse<APIInputToken>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs-tokens`, inputToken)
+    return this.postWithErrors(`/expeditions/${expeditionId}/input-tokens`, inputToken)
   }
 
   deleteInputToken(inputTokenId: number): Promise<FKAPIResponse<void>> {
