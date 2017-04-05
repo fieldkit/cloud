@@ -307,7 +307,7 @@ export class Main extends Component {
           <Dropdown className="account-dropdown" ref="dropdown">
             <DropdownTrigger className="trigger">
               <div className="user-avatar small">
-                <img src={placeholderImage} alt="profile" />
+                <img src={user ? FKApiClient.get().userPictureUrl(user.id) : placeholderImage} alt="profile" />
               </div>
             </DropdownTrigger>
             <DropdownContent className="dropdown-contents">
