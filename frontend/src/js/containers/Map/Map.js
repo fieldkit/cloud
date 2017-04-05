@@ -26,7 +26,8 @@ const mapStateToProps = (state, ownProps) => {
         const viewport = _viewport.toJS()
         const currentDocuments = documents.filter(d => {
           return currentDocumentIDs.includes(d.get('id'))
-        })
+        }).sortBy(a => new Date(a.get("DateTime") || a.get("created_at")))
+        const pathDocs = currentDocuments.filter(d => ! d.get("user"))
         let focusedDocument = null
         let focusDistance = 25
         const particleCount = 1000
@@ -48,6 +49,12 @@ const mapStateToProps = (state, ownProps) => {
           }
         })
 
+        pathDocs.toList().forEach((d,i) => {
+          const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+          const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+          readingPath[i] = [x,y]
+        })
+
         currentDocuments.toList().forEach((d, i) => {
           const type = d.get('type')
           const position = d.getIn(['geometry', 'coordinates'])
@@ -64,7 +71,6 @@ const mapStateToProps = (state, ownProps) => {
           particles[type].color[i * 4 + 2] = color.b
           particles[type].color[i * 4 + 3] = 1
 
-          readingPath[i] = [x,y]
 
           const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
           if (distanceToMouse < focusDistance) {

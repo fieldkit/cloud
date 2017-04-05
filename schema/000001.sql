@@ -145,6 +145,21 @@ CREATE TABLE fieldkit.document (
 	data jsonb NOT NULL
 );
 
+-- user
+
+DO
+$body$
+BEGIN
+   IF NOT EXISTS (
+      SELECT *
+      FROM   pg_catalog.pg_user
+      WHERE  usename = 'server') THEN
+
+      CREATE ROLE server LOGIN PASSWORD 'changeme';
+   END IF;
+END
+$body$;
+
 -- grants
 
 GRANT USAGE ON SCHEMA fieldkit TO server;

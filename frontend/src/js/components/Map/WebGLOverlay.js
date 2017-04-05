@@ -5,7 +5,6 @@ import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
 
 import iconSensorReading from '../../../img/sighting.png'
 
-let i = 0;
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
@@ -93,9 +92,9 @@ export default class WebGLOverlay extends Component {
       bufferGeometries.particles[type].position.needsUpdate = true
       bufferGeometries.particles[type].color.array = particles[type].color
       bufferGeometries.particles[type].color.needsUpdate = true
-      bufferGeometries.line.position.array = bufferGeometries.particles[type].position.array.slice(0,new_documents_length*3)
+      bufferGeometries.line.position.array = particles[type].position
       bufferGeometries.line.position.needsUpdate = true
-      bufferGeometries.line.color.array = bufferGeometries.particles[type].color.array.slice(0,new_documents_length*4)
+      bufferGeometries.line.color.array = particles[type].color
       bufferGeometries.line.color.needsUpdate = true
     })
 
@@ -105,7 +104,6 @@ export default class WebGLOverlay extends Component {
   }
 
   render () {
-    if(i < 4){i++}
     const { project } = ViewportMercator(this.props)
     const { 
       width,
@@ -134,6 +132,17 @@ export default class WebGLOverlay extends Component {
       lookAt: new Vector3(left, top, 0)
     }
     const readingPath = bufferGeometries.line
+    let readingPath2 = {
+        position: new BufferAttribute(new Float32Array(248*3),3),
+        color: new BufferAttribute(new Float32Array(248*4),4),
+        index: new BufferAttribute(new Uint16Array(248),1),
+    }
+    readingPath2.position.array = bufferGeometries.particles.Feature.position.array.slice(0,248*3)
+    readingPath2.position.needsUpdate = true
+    readingPath2.color.array = bufferGeometries.particles.Feature.color.array.slice(0,248*4)
+    readingPath2.color.needsUpdate = true
+    readingPath2.index.array = bufferGeometries.particles.Feature.index.array.slice(0,248)
+    readingPath2.index.needsUpdate = true
 
     return (
       <div>
@@ -151,7 +160,7 @@ export default class WebGLOverlay extends Component {
                 { ...cameraProps }
               />
               { 
-                <line key="line" i={i}>
+                <line key="line">
                   <bufferGeometry
                     position={ readingPath.position }
                     color={ readingPath.color }
