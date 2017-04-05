@@ -95,6 +95,10 @@ func main() {
 			return errInvalidRequest(message, keyvals...)
 		}
 
+		if i := strings.LastIndex(attribute, "."); i != -1 {
+			attribute = attribute[i+1:]
+		}
+
 		return &goa.ErrorResponse{
 			Code:   "bad_request",
 			Detail: messageString,
