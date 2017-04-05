@@ -1,0 +1,234 @@
+{
+    "results": {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765813202764570625",
+                    "Retweet": false,
+                    "TweetID": 765813202764570625,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T09:31:10+0200",
+                    "t_utc": 1471419070,
+                    "Expedition": "okavango_16",
+                    "t_created": 1471420802.044331,
+                    "Member": "Steve",
+                    "Team": "RiverMain",
+                    "Text": "Mine mekoro laid out in the morning sun. These simple boats will be our world for the next 18 days. #okavango16 https://t.co/TWS0Iq70bF",
+                    "EstimatedGeometry": "ambit_geo",
+                    "FeatureType": "tweet",
+                    "Images": [
+                        {
+                            "Url": "http://pbs.twimg.com/media/CqC2byLXgAA8YWA.jpg"
+                        }
+                    ]
+                },
+                "id": "57b41982337e384b77cb52c5",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.37190974,
+                        -19.0850943,
+                        973.048
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765870015975391233",
+                    "Retweet": false,
+                    "TweetID": 765870015975391233,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T13:16:55+0200",
+                    "t_utc": 1471432615,
+                    "Team": "RiverMain",
+                    "Expedition": "okavango_16",
+                    "t_created": 1471435202.357161,
+                    "Member": "Steve",
+                    "Images": [
+                        {
+                            "Url": "http://pbs.twimg.com/media/CqDqVxMWEAENxBM.jpg"
+                        }
+                    ],
+                    "Text": "Launch! #okavango16 https://t.co/ukYwMHRsgK",
+                    "EstimatedGeometry": "ambit_geo",
+                    "FeatureType": "tweet"
+                },
+                "id": "57b451c2337e384ea8eaff0c",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.379189788976376,
+                        -19.069130033858265,
+                        981.381811023622
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765870662078570496",
+                    "Retweet": false,
+                    "TweetID": 765870662078570496,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T13:19:29+0200",
+                    "t_utc": 1471432769,
+                    "Team": "RiverMain",
+                    "Expedition": "okavango_16",
+                    "t_created": 1471435202.350982,
+                    "Member": "Steve",
+                    "Images": [
+                        {
+                            "Url": "http://pbs.twimg.com/media/CqDqAi1XYAASlzE.jpg"
+                        },
+                        {
+                            "Url": "http://pbs.twimg.com/media/CqDqPM6XgAAr4wd.jpg"
+                        },
+                        {
+                            "Url": "http://pbs.twimg.com/media/CqDqkzwW8AA7W-A.jpg"
+                        }
+                    ],
+                    "Text": "Moments before #okavango16 launch from Mopiri Research Camp, Etsha 6, Botswana @NatGeoExplorers @NatGeo https://t.co/uoIyESwVJZ",
+                    "EstimatedGeometry": "ambit_geo",
+                    "FeatureType": "tweet"
+                },
+                "id": "57b451c2337e384ea8eaff0b",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.3795334372093,
+                        -19.06913474651163,
+                        980.7281395348838
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765908336025931776",
+                    "Retweet": false,
+                    "TweetID": 765908336025931776,
+                    "Handle": "intotheokavango",
+                    "Team": "RiverMain",
+                    "DateTime": "2016-08-17T15:49:11+0200",
+                    "t_utc": 1471441751,
+                    "Expedition": "okavango_16",
+                    "t_created": 1471442402.23291,
+                    "Member": "Steve",
+                    "Images": [],
+                    "Text": "We spent our first day on #okavango16 navigating through tight papyrus canals and wide open lagoons. https://t.co/N20oXWRzce",
+                    "EstimatedGeometry": "beacon",
+                    "FeatureType": "tweet"
+                },
+                "id": "57b46de2337e38503927a41e",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.387844723104614,
+                        -19.05755054008999,
+                        null
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765935882113286144",
+                    "Retweet": false,
+                    "TweetID": 765935882113286144,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T17:38:39+0200",
+                    "t_utc": 1471448319,
+                    "Expedition": "okavango_16",
+                    "t_created": 1471449603.583223,
+                    "Member": "Steve",
+                    "Team": "RiverMain",
+                    "Text": "Right now! Join us for a live stream from Makwena Island, on day #1 of #okavango16! https://t.co/fiYh7y6xXQ",
+                    "EstimatedGeometry": "sighting",
+                    "FeatureType": "tweet",
+                    "Images": []
+                },
+                "id": "57b48a03337e3857acb0be42",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.38802749992194,
+                        -19.057032799429965,
+                        1029.9758360414085
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765968865117540357",
+                    "Retweet": false,
+                    "TweetID": 765968865117540357,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T19:49:43+0200",
+                    "t_utc": 1471456183,
+                    "Team": "RiverMain",
+                    "Expedition": "okavango_16",
+                    "t_created": 1471456803.007205,
+                    "Member": "Steve",
+                    "Images": [],
+                    "Text": "We're busy here in the production tent (our data office in the wilderness!) uploading and charging, and we're happy to take your questions!!",
+                    "EstimatedGeometry": "sighting",
+                    "FeatureType": "tweet"
+                },
+                "id": "57b4a623337e3860f87572bd",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.388055919288753,
+                        -19.05703782755285,
+                        1024.4616305403865
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {
+                    "Url": "https://twitter.com/intotheokavango/status/765983606321840129",
+                    "Retweet": false,
+                    "TweetID": 765983606321840129,
+                    "Handle": "intotheokavango",
+                    "DateTime": "2016-08-17T20:48:17+0200",
+                    "t_utc": 1471459697,
+                    "Team": "RiverMain",
+                    "Expedition": "okavango_16",
+                    "t_created": 1471460402.580125,
+                    "Member": "Steve",
+                    "Images": [],
+                    "Text": "Okavango Journal: Day 1 - https://t.co/vpFkzhGIXI #Okavango16",
+                    "EstimatedGeometry": "sighting",
+                    "FeatureType": "tweet"
+                },
+                "id": "57b4b432337e3861bb930e79",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        22.38806861838018,
+                        -19.057040074351402,
+                        1021.9976277262219
+                    ]
+                }
+            }
+        ]
+    },
+    "order": 1,
+    "resolution": "full",
+    "limit": 0,
+    "returned": 7,
+    "total": 7,
+    "filter": {
+        "Member": "Steve",
+        "t_utc": {
+            "$gt": 1471384800,
+            "$lt": 1471471200
+        },
+        "FeatureType": "tweet"
+    }
+}
