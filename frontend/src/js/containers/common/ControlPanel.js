@@ -13,12 +13,14 @@ const mapStateToProps = (state, ownProps) => {
       state => state.expeditions.get('playbackMode'),
       state => state.expeditions.get('focus'),
       state => state.expeditions.getIn(['viewport', 'zoom']),
-      (currentExpeditionID, currentDate, playbackMode, focus, zoom) => ({
+      state => state.expeditions.get('showSensors'),
+      (currentExpeditionID, currentDate, playbackMode, focus, zoom, showSensors) => ({
         currentExpeditionID,
         currentDate,
         playbackMode,
         focus,
-        zoom
+        zoom,
+        showSensors
       })
     )(state)
   }
@@ -37,6 +39,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     cancelAction () {
       return dispatch(actions.cancelAction())
+    },
+    toggleSensorData () {
+        return dispatch(actions.toggleSensorData())
     }
   }
 }

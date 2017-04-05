@@ -17,11 +17,15 @@ class ControlPanel extends React.Component {
       zoom,
       selectPlaybackMode,
       selectFocusType,
-      selectZoom
+      selectZoom,
+      toggleSensorData,
+      showSensors
     } = this.props
 
     const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
 
+    const sensorToggleTitle = showSensors ? "Hide Sensors" : "Show Sensors"
+    const sensorToggleClass = showSensors ? "control-panel_toggle-sensor" : "control-panel_toggle-sensor off"
     return (
       <div className="control-panel">
         <div className="control-panel_date-counter">
@@ -42,6 +46,12 @@ class ControlPanel extends React.Component {
               zoom={ zoom }
               selectZoom={ selectZoom }
             />
+            <div
+                className={sensorToggleClass}
+                onClick={ () => toggleSensorData() }
+            > 
+                {sensorToggleTitle} 
+            </div>
           </div>
         }
       </div>
