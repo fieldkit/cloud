@@ -70,8 +70,9 @@ const mapStateToProps = (state, ownProps) => {
             color = new Color('#00aced')
           } else {
             const speed = d.get("GPSSpeed") || 0
-            const r = Math.floor(speed > 1 ? 255 : 255 * speed)
-            color = new Color(`rgb(${r},0,0)`) 
+            const r = Math.floor(speed)
+            color = new Color('#D0462C') 
+            color.addScalar(speed/2)
           }
 
           particles[type].position[i * 3 + 0] = x
