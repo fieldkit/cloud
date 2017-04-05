@@ -84,8 +84,8 @@ export class InputForm extends Component {
     const { name, team_id, user_id } = this.state;
     const errors = await this.props.onSave({
       name: name,
-      team_id: parseInt(team_id),
-      user_id: parseInt(user_id)
+      team_id: team_id,
+      user_id: user_id
     }, inputId);
     if (errors) {
       this.setState({ errors });
@@ -94,14 +94,17 @@ export class InputForm extends Component {
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    this.setState({ [name]: value });
-
-    if(name === "bindingType"){
+    if (name === 'bindingType') {
       this.resetInputBinding(value);
-    }    
+    } else if (name === 'team_id' || name === 'user_id') {
+      value = parseInt(value);
+      console.log(value);
+    }
+
+    this.setState({ [name]: value });
   }
 
   render () {
