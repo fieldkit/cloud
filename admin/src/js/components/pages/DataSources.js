@@ -46,7 +46,6 @@ export class DataSources extends Component {
   async loadInputs() {
     const inputsRes = await FKApiClient.get().getExpeditionInputs(this.props.expedition.id);
     if (inputsRes.type === 'ok') {
-      console.log(inputsRes.payload);
       this.setState({ inputs: inputsRes.payload });
     }
   }
@@ -61,15 +60,13 @@ async loadTeams() {
 
       for (const team of teams) {
         const teamMembers = await this.loadMembers(team.id);
-        console.log(teamMembers);
         for (const member of teamMembers) {
           members.add(member);
         }
       }
 
       for (const userId of members) {
-        const user = await this.loadUser(userId);
-        console.log(user);        
+        const user = await this.loadUser(userId);   
         if (user) {
           users[userId] = user;
         }
@@ -125,14 +122,11 @@ async loadTeams() {
     const input = {};
     input.name = i.name;
     if (!isNaN(i.team_id)) {
-      console.log('we have a team');
       input.team_id = i.team_id;
     }
     if (!isNaN(i.user_id)) {
-      console.log('we have a member');
       input.user_id = i.user_id;
     }
-    console.log(input);
     const inputRes = await FKApiClient.get().updateInput(inputId, input);
     if(inputRes.type === 'ok' && inputRes.payload) {
       await this.loadInputs();
@@ -144,7 +138,7 @@ async loadTeams() {
 
   getInputById (id: number): ?APIMutableInput {
     const { inputs } = this.state;
-    for(let inputType in inputs){
+    for(const inputType in inputs){
       if(inputs[inputType]){
         const twitterInput = inputs[inputType].find(input => input.id === id);
         if(twitterInput){
@@ -159,7 +153,7 @@ async loadTeams() {
     }
   }
 
-  getTeamById (id: number): ?string {
+  getTeamNameById (id: number): ?string {
     const { teams } = this.state;
     const team = teams.find(team => team.id === id);
     if(team){
@@ -210,7 +204,7 @@ async loadTeams() {
             onCancel={() => this.props.history.push(`${match.url}`)}
             onSave={this.onInputUpdate.bind(this, parseInt(props.match.params.inputId))}
             saveText="Save" />
-        </ReactModal> } />        
+        </ReactModal> } />
 
         <h1>Data Sources</h1>
 
@@ -220,21 +214,21 @@ async loadTeams() {
             <table className="twitter-account-inputs-table">
               <thead>
                 <tr>
-                  <th>Name</th>                
+                  <th>Name</th>
                   <th>Handle</th>
                   <th>Binding</th>
                   <th></th>
-                  <th></th>                  
+                  <th></th>
                 </tr>
-              </thead>                
+              </thead>
               <tbody>
               { twitter_account_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
                   <td>{input.name}</td>
-                  <td>{input.screen_name}</td>                  
+                  <td>{input.screen_name}</td>
                   <td>
                     { input.team_id && teams &&
-                      this.getTeamById(input.team_id) }
+                      this.getTeamNameById(input.team_id) }
                     { input.user_id && users[input.user_id] &&
                       users[input.user_id].name }
                   </td>
@@ -254,7 +248,7 @@ async loadTeams() {
           <Link className="button" to={`${match.url}/add-twitter-input`}>Add Twitter Account</Link>
 
           <br/>
-          <br/>          
+          <br/>
 
           <h3>Fieldkit Sensors</h3>
           { fieldkit_inputs && fieldkit_inputs.length > 0 &&
@@ -264,16 +258,16 @@ async loadTeams() {
                   <th>Name</th>
                   <th>Binding</th>
                   <th></th>
-                  <th></th>                  
+                  <th></th>
                 </tr>
-              </thead>                
-              <tbody>                
+              </thead>
+              <tbody>
               { fieldkit_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
                   <td>{input.name}</td>
                   <td>
                     { input.team_id && teams &&
-                      this.getTeamById(input.team_id) }
+                      this.getTeamNameById(input.team_id) }
                     { input.user_id && users[input.user_id] &&
                       users[input.user_id].name }
                   </td>

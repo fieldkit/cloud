@@ -2,13 +2,13 @@
 
 import React, { Component } from 'react'
 import type { APIMember, APIUser, APIErrors, APIBaseMember } from '../../api/types';
+import { FKApiClient } from '../../api/api';
 import { RemoveIcon, EditIcon } from '../icons/Icons'
 
 type Props = {
   teamId: number,
   members: APIMember[],
   users: APIUser[],
-  userPictures: {[userId: number]: string},  
   onDelete: (teamId: number, userId: number) => Promise<?APIErrors>,
   onUpdate: (teamId: number, memberId: number, values: APIBaseMember) => Promise<?APIErrors>
 }
@@ -89,7 +89,7 @@ export class MembersTable extends Component {
   }
 
   render() {
-    const { teamId, members, userPictures } = this.props;
+    const { teamId, members } = this.props;
     let { users, user_id, role } = this.state
 
     return (
@@ -107,7 +107,7 @@ export class MembersTable extends Component {
               <tr key={i}>
                 <td>
                   <div className="user-avatar medium">
-                    <img src={userPictures[member.user_id]} />
+                    <img src={FKApiClient.get().userPictureUrl(member.user_id)} />
                   </div>
                 </td>
                 <td>

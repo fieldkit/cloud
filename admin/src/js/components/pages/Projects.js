@@ -26,34 +26,6 @@ type Props = {
 
 export class Projects extends Component {
   props: $Exact<Props>;
-  state: {
-    projectPictures: {[projectId: number]: string}
-  }
-
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      projectPictures: {}
-    }
-    this.loadProjectsPictures();
-  }
-
-  componentWillReceiveProps (nextProps: Props) {
-    this.loadProjectsPictures();
-  }
-
-  async loadProjectsPictures (){
-    const { projects } = this.props;
-    const { projectPictures } = this.state;
-
-    for (const project of projects) {
-      const projectRes = await FKApiClient.get().projectPictureUrl(project.id);
-      if (projectRes) {
-        projectPictures[project.id] = projectRes;
-      }
-    }
-    this.setState({ projectPictures });    
-  }
 
   async onProjectCreate(p: APINewProject) {
     const project = await FKApiClient.get().createProject(p);
@@ -66,7 +38,6 @@ export class Projects extends Component {
 
   render () {
     const { projects, match } = this.props;
-    const { projectPictures } = this.state;
 
     return (
       <div className="projects">
@@ -82,7 +53,7 @@ export class Projects extends Component {
         { projects.map((p, i) =>
           <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects"
             style={{
-              backgroundImage: 'url(' + projectPictures[p.id] + ')'
+              backgroundImage: 'url(' + FKApiClient.get().projectPictureUrl(p.id) + ')'
             }}>
             <h4>{p.name}</h4>
           </Link> )}

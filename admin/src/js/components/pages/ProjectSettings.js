@@ -39,7 +39,6 @@ export class ProjectSettings extends Component {
   state: {
     administrators: APIAdministrator[],
     users: {[id: number]: APIUser},
-    userPictures: {[userId: number]: string},
     administratorDeletion: ?{
       contents: React$Element<*>;
       userId: number;
@@ -52,7 +51,6 @@ export class ProjectSettings extends Component {
     this.state = {
       administrators: [],
       users: {},
-      userPictures: {},
       administratorDeletion: null
     };
 
@@ -77,16 +75,6 @@ export class ProjectSettings extends Component {
       const { users } = this.state;
       users[userId] = userRes.payload;
       this.setState({ users });
-      await this.loadAdministratorPicture(userId);
-    }
-  }
-
-  async loadAdministratorPicture(userId: number) {
-    const { users, userPictures } = this.state;
-    const userRes = await FKApiClient.get().userPictureUrl(userId);
-    if (userRes) {
-      userPictures[userId] = userRes;
-      this.setState({ userPictures });
     }
   }
 
@@ -160,7 +148,7 @@ export class ProjectSettings extends Component {
 
   render () {
     const { match, project, user } = this.props;
-    let { administrators, users, userPictures, administratorDeletion } = this.state;
+    let { administrators, users, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
     return (
@@ -219,7 +207,7 @@ export class ProjectSettings extends Component {
                 <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
-                      <img src={userPictures[administrator.user_id]} />
+                      <img src={FKApiClient.get().userPictureUrl(administrator.user_id)} />
                     </div>
                   </td>
                   <td>

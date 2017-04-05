@@ -23,36 +23,19 @@ type Props = {
 export class ProjectExpeditions extends Component {
   props: Props;
   state: {
-    expeditions: APIExpedition[],
-    expeditionPictures: {[expeditionId: number]: string}    
+    expeditions: APIExpedition[]
   }
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      expeditions: [],
-      expeditionPictures: {}
+      expeditions: []
     };
-    this.loadExpeditionPictures();
   }
 
   onComponentWillReceiveProps(nextProps: Props) {
     this.setState({expeditions: nextProps.expeditions});
-    this.loadExpeditionPictures();
-  }
-
-  async loadExpeditionPictures (){
-    const { expeditions } = this.props;
-    const { expeditionPictures } = this.state;
-
-    for (const expedition of expeditions) {
-      const expeditionRes = await FKApiClient.get().expeditionPictureUrl(expedition.id);
-      if (expeditionRes) {
-        expeditionPictures[expedition.id] = expeditionRes;
-      }
-    }
-    this.setState({ expeditionPictures });        
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
@@ -79,12 +62,11 @@ export class ProjectExpeditions extends Component {
     } else {
       this.props.onUpdate();
     }
-  }  
+  }
 
   render () {
     const { match, project } = this.props;
     const projectSlug = project.slug;
-    const { expeditionPictures } = this.state;    
 
     return (
       <div className="project">
@@ -102,7 +84,7 @@ export class ProjectExpeditions extends Component {
           { this.props.expeditions.map((e, i) =>
             <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item expeditions"
               style={{
-                backgroundImage: 'url(' + expeditionPictures[e.id] + ')'
+                backgroundImage: 'url(' + FKApiClient.get().expeditionPictureUrl(e.id) + ')'
               }}>
               <h4>{e.name}</h4>
             </Link> )}
