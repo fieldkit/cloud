@@ -394,6 +394,81 @@ func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
 	return &decoded, err
 }
 
+// InputToken media type (default view)
+//
+// Identifier: application/vnd.app.input_token+json; view=default
+type InputToken struct {
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Token        string `form:"token" json:"token" xml:"token"`
+}
+
+// Validate validates the InputToken media type instance.
+func (mt *InputToken) Validate() (err error) {
+
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+
+	return
+}
+
+// DecodeInputToken decodes the InputToken instance encoded in resp body.
+func (c *Client) DecodeInputToken(resp *http.Response) (*InputToken, error) {
+	var decoded InputToken
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// InputTokenCollection is the media type for an array of InputToken (default view)
+//
+// Identifier: application/vnd.app.input_token+json; type=collection; view=default
+type InputTokenCollection []*InputToken
+
+// Validate validates the InputTokenCollection media type instance.
+func (mt InputTokenCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeInputTokenCollection decodes the InputTokenCollection instance encoded in resp body.
+func (c *Client) DecodeInputTokenCollection(resp *http.Response) (InputTokenCollection, error) {
+	var decoded InputTokenCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// InputTokens media type (default view)
+//
+// Identifier: application/vnd.app.input_tokens+json; view=default
+type InputTokens struct {
+	InputTokens InputTokenCollection `form:"input_tokens" json:"input_tokens" xml:"input_tokens"`
+}
+
+// Validate validates the InputTokens media type instance.
+func (mt *InputTokens) Validate() (err error) {
+	if mt.InputTokens == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "input_tokens"))
+	}
+	if err2 := mt.InputTokens.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeInputTokens decodes the InputTokens instance encoded in resp body.
+func (c *Client) DecodeInputTokens(resp *http.Response) (*InputTokens, error) {
+	var decoded InputTokens
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default

@@ -83,6 +83,12 @@ CREATE TABLE fieldkit.input (
 	active boolean NOT NULL DEFAULT false
 );
 
+CREATE TABLE fieldkit.input_token (
+	id serial PRIMARY KEY,
+	token bytea NOT NULL UNIQUE,
+	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
+);
+
 -- twitter
 
 CREATE TABLE fieldkit.twitter_oauth (

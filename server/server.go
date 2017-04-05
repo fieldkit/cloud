@@ -268,6 +268,12 @@ func main() {
 	})
 	app.MountDocumentController(service, c13)
 
+	// Mount "input_token" controller
+	c14 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
+		Backend: backend,
+	})
+	app.MountInputTokenController(service, c14)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {

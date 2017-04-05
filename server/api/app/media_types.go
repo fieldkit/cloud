@@ -295,6 +295,60 @@ func (mt *Input) Validate() (err error) {
 	return
 }
 
+// InputToken media type (default view)
+//
+// Identifier: application/vnd.app.input_token+json; view=default
+type InputToken struct {
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Token        string `form:"token" json:"token" xml:"token"`
+}
+
+// Validate validates the InputToken media type instance.
+func (mt *InputToken) Validate() (err error) {
+
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+
+	return
+}
+
+// InputTokenCollection is the media type for an array of InputToken (default view)
+//
+// Identifier: application/vnd.app.input_token+json; type=collection; view=default
+type InputTokenCollection []*InputToken
+
+// Validate validates the InputTokenCollection media type instance.
+func (mt InputTokenCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// InputTokens media type (default view)
+//
+// Identifier: application/vnd.app.input_tokens+json; view=default
+type InputTokens struct {
+	InputTokens InputTokenCollection `form:"input_tokens" json:"input_tokens" xml:"input_tokens"`
+}
+
+// Validate validates the InputTokens media type instance.
+func (mt *InputTokens) Validate() (err error) {
+	if mt.InputTokens == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "input_tokens"))
+	}
+	if err2 := mt.InputTokens.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // Inputs media type (default view)
 //
 // Identifier: application/vnd.app.inputs+json; view=default

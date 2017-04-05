@@ -1063,6 +1063,178 @@ func (ctx *UpdateInputContext) BadRequest() error {
 	return nil
 }
 
+// AddInputTokenContext provides the input_token add action context.
+type AddInputTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewAddInputTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input_token controller add action.
+func NewAddInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddInputTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddInputTokenContext) OK(r *InputToken) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_token+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddInputTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteInputTokenContext provides the input_token delete action context.
+type DeleteInputTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputTokenID int
+}
+
+// NewDeleteInputTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input_token controller delete action.
+func NewDeleteInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteInputTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputTokenID := req.Params["input_token_id"]
+	if len(paramInputTokenID) > 0 {
+		rawInputTokenID := paramInputTokenID[0]
+		if inputTokenID, err2 := strconv.Atoi(rawInputTokenID); err2 == nil {
+			rctx.InputTokenID = inputTokenID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_token_id", rawInputTokenID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *DeleteInputTokenContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteInputTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListInputTokenContext provides the input_token list action context.
+type ListInputTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListInputTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input_token controller list action.
+func NewListInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListInputTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListInputTokenContext) OK(r *InputTokens) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_tokens+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListInputTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDInputTokenContext provides the input_token list id action context.
+type ListIDInputTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListIDInputTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input_token controller list id action.
+func NewListIDInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDInputTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDInputTokenContext) OK(r *InputTokens) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_tokens+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDInputTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddMemberContext provides the member add action context.
 type AddMemberContext struct {
 	context.Context
