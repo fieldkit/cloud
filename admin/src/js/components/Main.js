@@ -347,6 +347,7 @@ export class Main extends Component {
                 component={ProjectSettings}
                 required={[activeProject]}
                 project={activeProject}
+                user={user}
                 onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
                 path="/projects/:projectSlug"

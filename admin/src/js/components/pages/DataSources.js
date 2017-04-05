@@ -28,8 +28,7 @@ export class DataSources extends Component {
   state: {
     inputs: APIInputs,
     teams: APITeam[],
-    members: { [teamId: number]: APIMember[] },
-    users: APIUser[]
+    users: {[id: number]: APIUser},
   }
 
   constructor(props: Props) {
@@ -37,8 +36,7 @@ export class DataSources extends Component {
     this.state = {
       inputs: {},
       teams: [],
-      members: {},
-      users: []
+      users: {}
     }
 
     this.loadInputs();
@@ -49,46 +47,55 @@ export class DataSources extends Component {
     const inputsRes = await FKApiClient.get().getExpeditionInputs(this.props.expedition.id);
     if (inputsRes.type === 'ok') {
       this.setState({ inputs: inputsRes.payload });
-      console.log(inputsRes.payload);
     }
   }
 
-  async loadTeams() {
-    const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
+async loadTeams() {
+    const { project, expedition } = this.props;
+    const teamsRes = await FKApiClient.get().getTeamsBySlugs(project.slug, expedition.slug);
     if (teamsRes.type === 'ok' && teamsRes.payload) {
       const { teams } = teamsRes.payload;
-      this.setState({ teams: teams });
-      for (const team of teams) {
-        await this.loadMembers(team.id);
-      }
-    }
-  }
-
-  async loadMembers(teamId: number) {
-    const membersRes = await FKApiClient.get().getMembers(teamId);
-    if (membersRes.type === 'ok' && membersRes.payload) {
-      const { members } = this.state;
-      members[teamId] = membersRes.payload.members;
-      this.setState({members: members});
-      for (const member of members[teamId]) {
-        await this.loadMemberName(teamId, member.user_id);
-      }      
-    }
-  }
-
-  async loadMemberName(teamId: number, userId: number){
-    const userRes = await FKApiClient.get().getUserById(userId);
-    if (userRes.type === 'ok' && userRes.payload) {
       const { users } = this.state;
-      if(userRes.payload && !users.find(user => userRes.payload)){
-        users.push(userRes.payload);
-      }
-      this.setState({users: users});
-    }
-  }  
+      const members: Set<number> = new Set();
 
-  async onTwitterCreate(t: APINewTwitterInput) {
-    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, t);
+      for (const team of teams) {
+        const teamMembers = await this.loadMembers(team.id);
+        for (const member of teamMembers) {
+          members.add(member);
+        }
+      }
+
+      for (const userId of members) {
+        const user = await this.loadUser(userId);   
+        if (user) {
+          users[userId] = user;
+        }
+      }
+
+      this.setState({ teams, users });
+    }
+  }
+
+  // returns array of user ids
+  async loadMembers(teamId: number): Promise<number[]> {
+    const membersRes = await FKApiClient.get().getMembers(teamId);
+    if (membersRes.type !== 'ok') {
+      return [];
+    } else {}
+    return membersRes.payload.members.map(m => m.user_id);
+  }
+
+  async loadUser(userId: number): Promise<?APIUser> {
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok') {
+      return userRes.payload;
+    }
+  }
+
+  async onTwitterCreate(i: APIMutableInput) {
+    const { name } = i;
+    const newTwitterInput = {name: name};
+    const res = await FKApiClient.get().createTwitterInput(this.props.expedition.id, newTwitterInput);
     if (res.type === 'ok') {
       const redirect = res.payload.location;
       window.location = redirect;
@@ -97,12 +104,12 @@ export class DataSources extends Component {
     }
   }
 
-  async onFieldkitCreate(f: APINewFieldkitInput) {
+  async onFieldkitCreate(i: APIMutableInput) {
+    const { name } = i;
+    const newFieldkitInput = {name: name};    
     const { expedition, match } = this.props;
-    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, f);
-    console.log(fieldkitRes);
+    const fieldkitRes = await FKApiClient.get().createFieldkitInput(expedition.id, newFieldkitInput);
     if (fieldkitRes.type === 'ok') {
-      console.log(fieldkitRes.payload);
       await this.loadInputs();
       this.props.history.push(`${match.url}`);
     } else {
@@ -110,25 +117,94 @@ export class DataSources extends Component {
     }
   }
 
+  async onInputUpdate(inputId: number, i: APIMutableInput) {
+    const { match } =this.props;
+    const input = {};
+    input.name = i.name;
+    if (!isNaN(i.team_id)) {
+      input.team_id = i.team_id;
+    }
+    if (!isNaN(i.user_id)) {
+      input.user_id = i.user_id;
+    }
+    const inputRes = await FKApiClient.get().updateInput(inputId, input);
+    if(inputRes.type === 'ok' && inputRes.payload) {
+      await this.loadInputs();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return inputRes.errors;
+    }
+  }
+
+  getInputById (id: number): ?APIMutableInput {
+    const { inputs } = this.state;
+    for(const inputType in inputs){
+      if(inputs[inputType]){
+        const twitterInput = inputs[inputType].find(input => input.id === id);
+        if(twitterInput){
+          const { name, team_id, user_id } = twitterInput;  
+          return {
+            name: name,
+            team_id: team_id,
+            user_id: user_id
+          };        
+        }
+      }
+    }
+  }
+
+  getTeamNameById (id: number): ?string {
+    const { teams } = this.state;
+    const team = teams.find(team => team.id === id);
+    if(team){
+      return team.name;
+    }
+  }
+
   render() {
     const { expedition, match } = this.props;
     const { twitter_account_inputs, fieldkit_inputs } = this.state.inputs;
-    const { users } = this.state;
+    const { users, teams } = this.state;
 
     return (
       <div className="data-sources-page">
 
-      <Route path={`${match.url}/add-input/:inputType`} render={props =>
+      <Route path={`${match.url}/add-fieldkit-input`} render={props =>
         <ReactModal isOpen={true} contentLabel="Add Fieldkit Input" className="modal" overlayClassName="modal-overlay">
           <h2>Add Fieldkit Input</h2>
           <InputForm
             expeditionId={props.match.params.expeditionId}
             users={users}
-            inputType={props.match.params.inputType}
+            teams={teams}
             onCancel={() => this.props.history.push(`${match.url}`)}
-            onSave={ (props.match.params.inputType === 'twitter') ? this.onTwitterCreate.bind(this) : this.onFieldkitCreate.bind(this)} 
+            onSave={this.onFieldkitCreate.bind(this)}
             saveText="Add" />
-        </ReactModal> } />    
+        </ReactModal> } />
+
+      <Route path={`${match.url}/add-twitter-input`} render={props =>
+        <ReactModal isOpen={true} contentLabel="Add Twitter Input" className="modal" overlayClassName="modal-overlay">
+          <h2>Add Twitter Input</h2>
+          <InputForm
+            expeditionId={props.match.params.expeditionId}
+            users={users}
+            teams={teams}
+            onCancel={() => this.props.history.push(`${match.url}`)}
+            onSave={this.onTwitterCreate.bind(this)}
+            saveText="Add" />
+        </ReactModal> } />
+
+      <Route path={`${match.url}/:inputId/edit`} render={props =>
+        <ReactModal isOpen={true} contentLabel="Edit Input" className="modal" overlayClassName="modal-overlay">
+          <h2>Edit Input</h2>
+          <InputForm
+            expeditionId={props.match.params.expeditionId}
+            users={users}
+            teams={teams}
+            input={this.getInputById(parseInt(props.match.params.inputId))}
+            onCancel={() => this.props.history.push(`${match.url}`)}
+            onSave={this.onInputUpdate.bind(this, parseInt(props.match.params.inputId))}
+            saveText="Save" />
+        </ReactModal> } />
 
         <h1>Data Sources</h1>
 
@@ -138,21 +214,28 @@ export class DataSources extends Component {
             <table className="twitter-account-inputs-table">
               <thead>
                 <tr>
-                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Handle</th>
                   <th>Binding</th>
                   <th></th>
-                  <th></th>                  
+                  <th></th>
                 </tr>
-              </thead>                
+              </thead>
               <tbody>
-              { twitter_account_inputs.map((t, i) =>
+              { twitter_account_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
-                  <td>{t.name}</td>
-                  <td>None</td>
+                  <td>{input.name}</td>
+                  <td>{input.screen_name}</td>
                   <td>
-                    <div className="bt-icon medium">
+                    { input.team_id && teams &&
+                      this.getTeamNameById(input.team_id) }
+                    { input.user_id && users[input.user_id] &&
+                      users[input.user_id].name }
+                  </td>
+                  <td>
+                    <Link className="bt-icon medium" to={`${match.url}/${input.id}/edit`}>
                       <EditIcon />
-                    </div>
+                    </Link>
                   </td>
                   <td>
                     <div className="bt-icon medium">
@@ -162,10 +245,10 @@ export class DataSources extends Component {
                 </tr> )}
               </tbody>
             </table> }
-          <Link className="button" to={`${match.url}/add-input/twitter`}>Add Twitter Account</Link>
+          <Link className="button" to={`${match.url}/add-twitter-input`}>Add Twitter Account</Link>
 
           <br/>
-          <br/>          
+          <br/>
 
           <h3>Fieldkit Sensors</h3>
           { fieldkit_inputs && fieldkit_inputs.length > 0 &&
@@ -175,18 +258,23 @@ export class DataSources extends Component {
                   <th>Name</th>
                   <th>Binding</th>
                   <th></th>
-                  <th></th>                  
+                  <th></th>
                 </tr>
-              </thead>                
-              <tbody>                
-              { fieldkit_inputs.map((f, i) =>
+              </thead>
+              <tbody>
+              { fieldkit_inputs.map((input, i) =>
                 <tr key={i} className="input-item">
-                  <td>{f.name}</td>
-                  <td>None</td>
+                  <td>{input.name}</td>
                   <td>
-                    <div className="bt-icon medium">
+                    { input.team_id && teams &&
+                      this.getTeamNameById(input.team_id) }
+                    { input.user_id && users[input.user_id] &&
+                      users[input.user_id].name }
+                  </td>
+                  <td>
+                    <Link className="bt-icon medium" to={`${match.url}/${input.id}/edit`}>
                       <EditIcon />
-                    </div>
+                    </Link>
                   </td>
                   <td>
                     <div className="bt-icon medium">
@@ -197,7 +285,7 @@ export class DataSources extends Component {
               </tbody>
             </table> }
 
-          <Link className="button" to={`${match.url}/add-input/fieldkit`}>Add Fieldkit Input</Link>
+          <Link className="button" to={`${match.url}/add-fieldkit-input`}>Add Fieldkit Input</Link>
         </div>
       </div>
     )

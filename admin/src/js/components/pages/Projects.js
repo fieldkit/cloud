@@ -36,13 +36,6 @@ export class Projects extends Component {
     }
   }
 
-  async getProjectPictureUrl(projectId: number){
-    const projectRes = await FKApiClient.get().projectPictureUrl(projectId);
-    if (projectRes.type === 'ok' && projectRes.payload) {
-      return projectRes.payload;
-    }
-  }
-
   render () {
     const { projects, match } = this.props;
 
@@ -58,7 +51,10 @@ export class Projects extends Component {
         <h1>Projects</h1>
         <div id="projects" className="gallery-list projects">
         { projects.map((p, i) =>
-          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects">
+          <Link to={joinPath(match.url, 'projects', p.slug)} key={`project-${i}`} className="gallery-list-item projects"
+            style={{
+              backgroundImage: 'url(' + FKApiClient.get().projectPictureUrl(p.id) + ')'
+            }}>
             <h4>{p.name}</h4>
           </Link> )}
         { projects.length === 0 &&

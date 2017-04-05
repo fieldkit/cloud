@@ -24,6 +24,7 @@ import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, 
 
 type Props = {
   project: APIProject;
+  user: APIUser,
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
   onExpeditionCreate: () => void;
@@ -61,7 +62,7 @@ export class ProjectSettings extends Component {
     const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
-      this.setState({administrators: administrators});
+      this.setState({ administrators });
       for (const administrator of administrators) {
         await this.loadAdministratorName(administrator.user_id);
       }      
@@ -73,9 +74,9 @@ export class ProjectSettings extends Component {
     if (userRes.type === 'ok' && userRes.payload) {
       const { users } = this.state;
       users[userId] = userRes.payload;
-      this.setState({users: users});
-    }    
-  }  
+      this.setState({ users });
+    }
+  }
 
   async onExpeditionCreate(e: APINewExpedition) {
     const { match, project } = this.props;
@@ -146,7 +147,7 @@ export class ProjectSettings extends Component {
   }
 
   render () {
-    const { match, project } = this.props;
+    const { match, project, user } = this.props;
     let { administrators, users, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
@@ -206,20 +207,25 @@ export class ProjectSettings extends Component {
                 <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
-                      <img src={`/users/${administrator.user_id}/picture`} />
+                      <img src={FKApiClient.get().userPictureUrl(administrator.user_id)} />
                     </div>
                   </td>
                   <td>
                     {users[administrator.user_id] &&
                       <div>
-                        <p>{users[administrator.user_id].name}</p>
+                        <p>
+                          {users[administrator.user_id].name}
+                          {administrator.user_id === user.id &&
+                           <span> (you)</span>}
+                        </p>
                         <p className="type-small">{users[administrator.user_id].username}</p>
                         </div> }
                   </td>
                   <td>
+                    { administrator.user_id !== user.id &&
                     <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator.user_id, users[administrator.user_id])}>
                       <RemoveIcon />
-                    </div>
+                    </div> }
                   </td>
                 </tr> )}
               </tbody>

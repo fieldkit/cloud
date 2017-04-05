@@ -34,8 +34,8 @@ export class ProjectExpeditions extends Component {
     };
   }
 
-  onComponentWillReceiveProps(props: Props) {
-    this.setState({expeditions: props.expeditions});
+  onComponentWillReceiveProps(nextProps: Props) {
+    this.setState({expeditions: nextProps.expeditions});
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
@@ -62,7 +62,7 @@ export class ProjectExpeditions extends Component {
     } else {
       this.props.onUpdate();
     }
-  }  
+  }
 
   render () {
     const { match, project } = this.props;
@@ -82,7 +82,10 @@ export class ProjectExpeditions extends Component {
         <h1>Expeditions</h1>
         <div id="expeditions" className="gallery-list">
           { this.props.expeditions.map((e, i) =>
-            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item expeditions">
+            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item expeditions"
+              style={{
+                backgroundImage: 'url(' + FKApiClient.get().expeditionPictureUrl(e.id) + ')'
+              }}>
               <h4>{e.name}</h4>
             </Link> )}
           { this.props.expeditions.length === 0 &&

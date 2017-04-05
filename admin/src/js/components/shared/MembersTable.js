@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 import type { APIMember, APIUser, APIErrors, APIBaseMember } from '../../api/types';
+import { FKApiClient } from '../../api/api';
 import { RemoveIcon, EditIcon } from '../icons/Icons'
 
 type Props = {
@@ -67,8 +68,8 @@ export class MembersTable extends Component {
     }
   }
 
-  startMemberEdit(memberId: number) {
-    this.setState({user_id: memberId});
+  startMemberEdit(user_id: number) {
+    this.setState({ user_id });
   }
 
   handleBlur(){
@@ -106,6 +107,7 @@ export class MembersTable extends Component {
               <tr key={i}>
                 <td>
                   <div className="user-avatar medium">
+                    <img src={FKApiClient.get().userPictureUrl(member.user_id)} />
                   </div>
                 </td>
                 <td>
