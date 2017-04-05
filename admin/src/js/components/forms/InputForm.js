@@ -83,11 +83,7 @@ export class InputForm extends Component {
 
   async save(inputId?: number) {
     const { name, team_id, user_id } = this.state;
-    const errors = await this.props.onSave({
-      name: name,
-      team_id: team_id,
-      user_id: user_id
-    }, inputId);
+    const errors = await this.props.onSave({ name, team_id, user_id }, inputId);
     if (errors) {
       this.setState({ errors });
     }
@@ -95,16 +91,24 @@ export class InputForm extends Component {
 
   handleInputChange(event) {
     const target = event.target;
-    let value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
+    this.setState({ [name]: value });
+  }
 
-    if (name === 'bindingType') {
-      this.resetInputBinding(value);
-    } else if (name === 'team_id' || name === 'user_id') {
-      value = parseInt(value);
-      console.log(value);
-    }
+  handleBindingTypeChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.resetInputBinding(value);
+    this.setState({ [name]: value });
+  }  
 
+  handleBindingChange(event) {
+    const target = event.target;
+    const name = target.name;    
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+    value = parseInt(value);
     this.setState({ [name]: value });
   }
 
@@ -135,7 +139,7 @@ export class InputForm extends Component {
           <div>
             <div className="form-group">
               <label htmlFor="bindingType">Bind input to</label>
-              <select name="bindingType"  value={bindingType} onChange={this.handleInputChange.bind(this)}>
+              <select name="bindingType"  value={bindingType} onChange={this.handleBindingTypeChange.bind(this)}>
                 <option disabled selected>Select</option>
                 <option value={"team"}>Team</option>
                 <option value={"member"}>Member</option>
@@ -145,7 +149,7 @@ export class InputForm extends Component {
             { bindingType === "team" &&
               <div className="form-group">
                 <label htmlFor="team_id">Team</label>
-                <select name="team_id" value={team_id} onChange={this.handleInputChange.bind(this)}>
+                <select name="team_id" value={team_id} onChange={this.handleBindingChange.bind(this)}>
                   <option disabled selected>Select a team</option>
                   { teams.map((team, i) => 
                     <option key={i} value={team.id}>{team.name}</option>) }
@@ -156,7 +160,7 @@ export class InputForm extends Component {
             { bindingType === "member" &&
               <div className="form-group">
                 <label htmlFor="user_id">Member</label>
-                <select name="user_id" value={user_id} onChange={this.handleInputChange.bind(this)}>
+                <select name="user_id" value={user_id} onChange={this.handleBindingChange.bind(this)}>
                   <option disabled selected>Select a member</option>
                   { Object.keys(users).map(id => 
                     <option key={id} value={id}>{users[id].username}</option>) }
