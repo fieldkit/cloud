@@ -7,6 +7,7 @@ class Navigation extends React.Component {
 
     const {
       currentExpeditionID,
+      currentProjectID,
       currentPage
     } = this.props
 
@@ -33,11 +34,9 @@ class Navigation extends React.Component {
         <li 
           className={ 'navigation_link ' + (currentPage === 'data' ? 'active' : '') }
         >
-          <Link
-            to={ '/' + currentExpeditionID + '/data' }
-          >
+          <a href={ `https://api.fieldkit.team/projects/@/${currentProjectID}/expeditions/@/${currentExpeditionID}/documents` }>
             Data
-          </Link>
+          </a>
         </li>
       </ul>
     )
