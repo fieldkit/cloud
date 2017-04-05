@@ -5,6 +5,7 @@ import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
 
 import iconSensorReading from '../../../img/sighting.png'
 
+let i = 0;
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
@@ -19,6 +20,11 @@ export default class WebGLOverlay extends Component {
           index: new BufferAttribute(new Uint16Array(1000 * 1), 1),
           texture: new TextureLoader().load(('/' + iconSensorReading))
         }
+      },
+      line: {
+        position: new BufferAttribute(new Float32Array(0),3),
+        color: new BufferAttribute(new Float32Array(0),4),
+        index: new BufferAttribute(new Uint16Array(0),1)
       }
     }
     for (let k in bufferGeometries) {
@@ -66,31 +72,46 @@ export default class WebGLOverlay extends Component {
   componentWillReceiveProps (nextProps) {
     const { bufferGeometries } = this.state
     const {
-      particles
+      particles,
+      readingPath
     } = nextProps
-    
+    const old_documents_length = this.props.readingPath.length
+    const new_documents_length = nextProps.readingPath.length
+
+    if(old_documents_length !== new_documents_length){
+        let indexes = new Uint16Array(new_documents_length)
+        indexes = indexes.map((x,i) => i)
+
+        bufferGeometries.line.position = new BufferAttribute(new Float32Array(new_documents_length * 3), 3)
+        bufferGeometries.line.color = new BufferAttribute(new Float32Array(new_documents_length * 4), 4)
+        bufferGeometries.line.index = new BufferAttribute(indexes,1)
+        bufferGeometries.line.index.needsUpdate = true
+    }
 
     Object.keys(particles).forEach(type => {
       bufferGeometries.particles[type].position.array = particles[type].position
       bufferGeometries.particles[type].position.needsUpdate = true
       bufferGeometries.particles[type].color.array = particles[type].color
       bufferGeometries.particles[type].color.needsUpdate = true
+      bufferGeometries.line.position.array = bufferGeometries.particles[type].position.array.slice(0,new_documents_length*3)
+      bufferGeometries.line.position.needsUpdate = true
+      bufferGeometries.line.color.array = bufferGeometries.particles[type].color.array.slice(0,new_documents_length*4)
+      bufferGeometries.line.color.needsUpdate = true
     })
 
     this.setState({
-      ...this.state,
       bufferGeometries
     })
   }
 
   render () {
+    if(i < 4){i++}
     const { project } = ViewportMercator(this.props)
     const { 
       width,
       height,
       longitude,
-      latitude,
-      readingPath
+      latitude
     } = this.props
 
     const { 
@@ -112,6 +133,7 @@ export default class WebGLOverlay extends Component {
       position: new Vector3(left, top, 600),
       lookAt: new Vector3(left, top, 0)
     }
+    const readingPath = bufferGeometries.line
 
     return (
       <div>
@@ -128,14 +150,13 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 { ...cameraProps }
               />
-              { /*
-                !!readingPath &&
-                <line>
-                  <geometry
-                    vertices={readingPath}
-                    dynamic={true}
-                  >
-                  </geometry>
+              { 
+                <line key="line" i={i}>
+                  <bufferGeometry
+                    position={ readingPath.position }
+                    color={ readingPath.color }
+                    index={ readingPath.index }
+                  />
                   <lineBasicMaterial
                     linewidth={10}
                     opacity={0.7}
@@ -144,7 +165,6 @@ export default class WebGLOverlay extends Component {
                   >
                   </lineBasicMaterial>
                 </line>
-                */
               }
               {
                 Object.keys(bufferGeometries.particles).map(type => {
