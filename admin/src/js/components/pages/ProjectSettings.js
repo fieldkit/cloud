@@ -24,6 +24,7 @@ import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, 
 
 type Props = {
   project: APIProject;
+  user: APIUser,
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
   onExpeditionCreate: () => void;
@@ -158,7 +159,7 @@ export class ProjectSettings extends Component {
   }
 
   render () {
-    const { match, project } = this.props;
+    const { match, project, user } = this.props;
     let { administrators, users, userPictures, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
@@ -224,14 +225,19 @@ export class ProjectSettings extends Component {
                   <td>
                     {users[administrator.user_id] &&
                       <div>
-                        <p>{users[administrator.user_id].name}</p>
+                        <p>
+                          {users[administrator.user_id].name}
+                          {administrator.user_id === user.id &&
+                           <span> (you)</span>}
+                        </p>
                         <p className="type-small">{users[administrator.user_id].username}</p>
                         </div> }
                   </td>
                   <td>
+                    { administrator.user_id !== user.id &&
                     <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator.user_id, users[administrator.user_id])}>
                       <RemoveIcon />
-                    </div>
+                    </div> }
                   </td>
                 </tr> )}
               </tbody>
