@@ -530,16 +530,15 @@ table {
     background-repeat: no-repeat;
     background-position: center; 
     background-blend-mode: color-burn;
-    // background-size: cover;
 
     &.projects {
       width: 100%;
     }
     &.expeditions {
       width: calc((100% - #{$col-gutter})/2);
-      &:not(:first-child) {
-        margin-left: $col-gutter;
-      }      
+      &:nth-child(2n + 1){
+        margin-right: $col-gutter;
+      }
     }
     h4 {
       position: absolute;
