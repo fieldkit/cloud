@@ -54,4 +54,17 @@
         text-align: center;
       }
   }
+
+  &_toggle-sensor{
+    padding-left:10px;
+    color: white;
+    background-color: $color-accent;
+    cursor:pointer;
+    margin-top:10px;
+  }
+  
+  &_toggle-sensor.off{
+    color: $color-accent;
+    background-color: white;
+  }
 }
