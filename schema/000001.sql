@@ -86,7 +86,7 @@ CREATE TABLE fieldkit.input (
 CREATE TABLE fieldkit.input_token (
 	id serial PRIMARY KEY,
 	token bytea NOT NULL UNIQUE,
-	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
+	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL
 );
 
 -- twitter
