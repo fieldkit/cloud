@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
 import { FormItem } from './FormItem';
-import { errorsFor, slugify, fkHost } from '../../common/util';
+import { errorsFor, slugify, fkProtocol, fkHost } from '../../common/util';
 
 import type { APIErrors, APINewExpedition } from '../../api/types';
 
@@ -33,22 +33,27 @@ export class ProjectExpeditionForm extends Component {
 
   constructor(props: Props) {
     super(props)
+    const { name, slug, description } = props;
+
     this.state = {
-      name: this.props.name || '',
-      slug: this.props.slug || '',
-      description: this.props.description || '',
-      slugHasChanged: false,
+      name: name || '',
+      slug: slug || '',
+      description: description || '',
+      slugHasChanged: !!name && !!slug && slugify(name) != slug,
       saveDisabled: false,
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
+    const { name, slug, description } = nextProps;
+
     this.setState({
-      name: nextProps.name || '',
-      slug: nextProps.slug || '',
-      description: nextProps.description || '',
-      slugHasChanged: false,
+      name: name || '',
+      slug: slug || '',
+      description: description || '',
+      slugHasChanged: !!name && !!slug && slugify(name) != slug,
+      saveDisabled: false,
       errors: null
     });
   }
@@ -107,8 +112,8 @@ export class ProjectExpeditionForm extends Component {
         <div className="url-preview">
           <p className="label">Your expedition will be available at the following address:</p>
           <p className="url">
-            {/* TODO: replace with something that handles alternative domains */}
-            {`//${projectSlug}.${fkHost()}/${slug}`}
+            {`${fkProtocol()}//${projectSlug}.${fkHost()}/`}
+            <input type="text" name="slug" className='slug' value={slug} onChange={this.handleSlugChange.bind(this)} />
           </p>
         </div>
 

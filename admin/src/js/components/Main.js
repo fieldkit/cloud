@@ -208,7 +208,7 @@ export class Main extends Component {
     if (newSlug) {
       const projectSlug = this.projectSlug();
       if (projectSlug) {
-        this.props.history.replace(`/projects/${newSlug}/expeditions/${newSlug}`);
+        this.props.history.replace(`/projects/${projectSlug}/expeditions/${newSlug}`);
       } else {
         this.props.history.replace('/');
       }

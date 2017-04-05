@@ -30,6 +30,45 @@ func (b *Backend) AddInput(ctx context.Context, input *data.Input) error {
 		`, input)
 }
 
+func (b *Backend) AddInputToken(ctx context.Context, inputToken *data.InputToken) error {
+	return b.db.NamedGetContext(ctx, inputToken, `
+		INSERT INTO fieldkit.input_token (expedition_id, token) VALUES (:expedition_id, :token) RETURNING *
+		`, inputToken)
+}
+
+func (b *Backend) DeleteInputToken(ctx context.Context, inputTokenID int32) error {
+	_, err := b.db.ExecContext(ctx, `
+		DELETE FROM fieldkit.input_token WHERE id = $1
+		`, inputTokenID)
+	return err
+}
+
+func (b *Backend) ListInputTokens(ctx context.Context, project, expedition string) ([]*data.InputToken, error) {
+	inputTokens := []*data.InputToken{}
+	if err := b.db.SelectContext(ctx, &inputTokens, `
+		SELECT it.*
+			FROM fieldkit.input_token AS it
+				JOIN fieldkit.expedition AS e ON e.id = it.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE p.slug = $1 AND e.slug = $2
+		`, project, expedition); err != nil {
+		return nil, err
+	}
+
+	return inputTokens, nil
+}
+
+func (b *Backend) ListInputTokensID(ctx context.Context, expeditionID int32) ([]*data.InputToken, error) {
+	inputTokens := []*data.InputToken{}
+	if err := b.db.SelectContext(ctx, &inputTokens, `
+		SELECT it.* FROM fieldkit.input_token AS it WHERE it.expedition_id = $1
+		`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return inputTokens, nil
+}
+
 func (b *Backend) AddTwitterOAuth(ctx context.Context, twitterOAuth *data.TwitterOAuth) error {
 	_, err := b.db.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.twitter_oauth (input_id, request_token, request_secret)
