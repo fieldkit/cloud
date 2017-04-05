@@ -100,6 +100,14 @@ VALUES (
            WHERE username = 'eric-demo'), 'Navigator') ON CONFLICT DO NOTHING;
 
 
+DELETE FROM fieldkit.input
+WHERE expedition_id = (SELECT id
+                       FROM fieldkit.expedition
+                       WHERE slug = '2016'
+                       AND project_id = (SELECT id
+                                         FROM fieldkit.project
+                                         WHERE slug = 'okavango-demo'));
+
 INSERT INTO fieldkit.input (expedition_id, name, team_id, user_id, active)
 VALUES (
           (SELECT id
