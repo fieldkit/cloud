@@ -60,7 +60,7 @@ export class Teams extends Component {
     const teamsRes = await FKApiClient.get().getTeamsBySlugs(this.props.project.slug, this.props.expedition.slug);
     if (teamsRes.type === 'ok' && teamsRes.payload) {
       const { teams } = teamsRes.payload;
-      this.setState({ teams: teams });
+      this.setState({ teams });
       for (const team of teams) {
         await this.loadMembers(team.id);
       }
@@ -72,7 +72,7 @@ export class Teams extends Component {
     if (membersRes.type === 'ok' && membersRes.payload) {
       const { members } = this.state;
       members[teamId] = membersRes.payload.members;
-      this.setState({members: members});
+      this.setState({ members });
       for (const member of members[teamId]) {
         await this.loadMemberName(teamId, member.user_id);
       }
@@ -87,7 +87,7 @@ export class Teams extends Component {
         users[teamId] = [];
       }
       users[teamId].push(userRes.payload);
-      this.setState({users: users});
+      this.setState({ users });
       await this.loadMemberPicture(userId);
     }
   }
@@ -98,7 +98,7 @@ export class Teams extends Component {
     const userRes = await FKApiClient.get().userPictureUrl(userId);
     if (userRes) {
       userPictures[userId] = userRes;
-      this.setState({userPictures: userPictures});
+      this.setState({ userPictures });
     }
   }
 

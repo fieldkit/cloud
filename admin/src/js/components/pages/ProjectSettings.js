@@ -64,7 +64,7 @@ export class ProjectSettings extends Component {
     const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
-      this.setState({administrators: administrators});
+      this.setState({ administrators });
       for (const administrator of administrators) {
         await this.loadAdministratorName(administrator.user_id);
       }      
@@ -76,7 +76,7 @@ export class ProjectSettings extends Component {
     if (userRes.type === 'ok' && userRes.payload) {
       const { users } = this.state;
       users[userId] = userRes.payload;
-      this.setState({users: users});
+      this.setState({ users });
       await this.loadAdministratorPicture(userId);
     }
   }
@@ -86,7 +86,7 @@ export class ProjectSettings extends Component {
     const userRes = await FKApiClient.get().userPictureUrl(userId);
     if (userRes) {
       userPictures[userId] = userRes;
-      this.setState({userPictures: userPictures});
+      this.setState({ userPictures });
     }
   }
 

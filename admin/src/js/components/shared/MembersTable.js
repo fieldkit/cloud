@@ -68,8 +68,8 @@ export class MembersTable extends Component {
     }
   }
 
-  startMemberEdit(memberId: number) {
-    this.setState({user_id: memberId});
+  startMemberEdit(user_id: number) {
+    this.setState({ user_id });
   }
 
   handleBlur(){

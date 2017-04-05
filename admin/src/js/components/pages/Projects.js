@@ -52,7 +52,7 @@ export class Projects extends Component {
         projectPictures[project.id] = projectRes;
       }
     }
-    this.setState({projectPictures: projectPictures});    
+    this.setState({ projectPictures });    
   }
 
   async onProjectCreate(p: APINewProject) {

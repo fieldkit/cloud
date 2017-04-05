@@ -52,7 +52,7 @@ export class ProjectExpeditions extends Component {
         expeditionPictures[expedition.id] = expeditionRes;
       }
     }
-    this.setState({expeditionPictures: expeditionPictures});        
+    this.setState({ expeditionPictures });        
   }
 
   async onExpeditionCreate(e: APINewExpedition) {
