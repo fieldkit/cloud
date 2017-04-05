@@ -794,6 +794,88 @@ func (ctx *ListIDFieldkitContext) BadRequest() error {
 	return nil
 }
 
+// SendBinaryFieldkitContext provides the fieldkit send binary action context.
+type SendBinaryFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewSendBinaryFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller send binary action.
+func NewSendBinaryFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SendBinaryFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SendBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *SendBinaryFieldkitContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SendBinaryFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// SendCsvFieldkitContext provides the fieldkit send csv action context.
+type SendCsvFieldkitContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewSendCsvFieldkitContext parses the incoming request URL and body, performs validations and creates the
+// context used by the fieldkit controller send csv action.
+func NewSendCsvFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SendCsvFieldkitContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SendCsvFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *SendCsvFieldkitContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SendCsvFieldkitContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // SetBinaryFieldkitContext provides the fieldkit set binary action context.
 type SetBinaryFieldkitContext struct {
 	context.Context

@@ -123,6 +123,8 @@ CREATE TABLE fieldkit.fieldkit_binary (
 	id smallint NOT NULL,
 	fields fieldkit_binary_field[] NOT NULL,
 	mapper jsonb NOT NULL,
+	longitude varchar,
+	latitude varchar,
 	UNIQUE (input_id, id)
 );
 
@@ -142,3 +144,9 @@ CREATE TABLE fieldkit.document (
 	location geometry(POINT, 4326) NOT NULL,
 	data jsonb NOT NULL
 );
+
+-- grants
+
+GRANT USAGE ON SCHEMA fieldkit TO server;
+GRANT ALL ON ALL TABLES IN SCHEMA fieldkit TO server;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA fieldkit TO server;

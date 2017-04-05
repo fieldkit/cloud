@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -51,4 +52,14 @@ type Document struct {
 	Timestamp time.Time      `db:"timestamp"`
 	Location  *Location      `db:"location"`
 	Data      types.JSONText `db:"data"`
+}
+
+func (d *Document) SetData(data interface{}) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	d.Data = jsonData
+	return nil
 }

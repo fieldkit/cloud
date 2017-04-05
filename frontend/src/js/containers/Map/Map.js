@@ -40,6 +40,7 @@ const mapStateToProps = (state, ownProps) => {
 
         // particles and path
         const particles = {}
+        const readingPath = []
         documentTypes.forEach(id => {
           particles[id] = {
             position: new Float32Array(particleCount * 3),
@@ -62,6 +63,8 @@ const mapStateToProps = (state, ownProps) => {
           particles[type].color[i * 4 + 1] = color.g
           particles[type].color[i * 4 + 2] = color.b
           particles[type].color[i * 4 + 3] = 1
+
+          readingPath[i] = [x,y]
 
           const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
           if (distanceToMouse < focusDistance) {
@@ -89,7 +92,8 @@ const mapStateToProps = (state, ownProps) => {
           playbackMode,
           particles,
           focusedDocument,
-          focusType
+          focusType,
+          readingPath
         }
       }
     )(state)
