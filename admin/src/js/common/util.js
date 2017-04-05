@@ -21,8 +21,8 @@ export class BaseError {
 }
 
 export function errorsFor(errors: ?APIErrors, key: string): ?string {
-  if (errors && errors.meta[`response.${key}`]) {
-    return errors.meta[`response.${key}`];
+  if (errors && errors.meta[key]) {
+    return errors.meta[key];
   }
 }
 

@@ -134,30 +134,15 @@ export class FKApiClient extends JWTAPIClient {
       return { type: 'ok', payload: res };
     } catch (e) {
       if (e instanceof AuthenticationError) {
-        const APIFakeAuthError: APIErrors = {
-          code: 'AuthenticationError',
-          detail: 'Unauthorized',
-          id: '',
-          meta: {},
-          status: 401
-        };
-        return { type: 'err', errors: APIFakeAuthError };
-      } else if (e instanceof APIError) {
-        const APIFakeOtherError: APIErrors = {
-          code: 'UnknownAPIError',
-          detail: e.body || '',
-          id: '',
-          meta: {},
-          status: 500
-        }
+        this.onSignout();
+      }
 
-        try {
-          return { type: 'err', errors: APIFakeOtherError };
-        } catch (e2) {
-          return { type: 'err', errors: APIFakeOtherError };
-        }
+      if (e instanceof APIError) {
+        const jsonError = JSON.parse(e.body);
+        return { type: 'err', errors: jsonError };
       } else {
-        log.error(e);
+        log.error('Unknown error:', e);
+
         const APIFakeOtherError: APIErrors = {
           code: 'UnknownError',
           detail: e.msg,
@@ -165,7 +150,6 @@ export class FKApiClient extends JWTAPIClient {
           meta: {},
           status: 500
         }
-
         return { type: 'err', errors: APIFakeOtherError };
       }
     }
