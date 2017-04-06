@@ -1,0 +1,22 @@
+[Unit]
+Description=fieldkit-twitter
+Requires=docker.service
+After=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker kill fieldkit-twitter
+ExecStartPre=-/usr/bin/docker rm fieldkit-twitter
+ExecStartPre=/usr/bin/docker pull ocrnyc/fieldkit:develop
+ExecStart=/usr/bin/docker run \
+  --name=fieldkit-twitter \
+  --rm \
+  --read-only \
+  --env-file=/etc/fieldkit/fieldkit.env \
+  -v /usr/share/ca-certificates/:/etc/ssl/certs:ro \
+  ocrnyc/fieldkit:develop twitter
+ExecStop=/usr/bin/docker stop fieldkit-twitter
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
