@@ -10,6 +10,15 @@ import (
 	oauth1Twitter "github.com/dghubble/oauth1/twitter"
 )
 
+func Sleep(duration time.Duration, done <-chan struct{}) {
+	timer := time.NewTimer(duration)
+	select {
+	case <-timer.C:
+	case <-done:
+		timer.Stop()
+	}
+}
+
 // UserLister wraps the UserList method.
 type UserLister interface {
 	UserList() (ids []int64, err error)
@@ -76,6 +85,27 @@ func (l *Stream) userStream(id int64) (*twitter.Stream, error) {
 	})
 }
 
+func handleStream(stream *twitter.Stream, demux twitter.Demux, done <-chan struct{}) bool {
+	for {
+		select {
+		case <-done:
+			stream.Stop()
+			return true
+
+		case message, ok := <-stream.Messages:
+			if !ok {
+				Sleep(5*time.Second, done)
+				return false
+			}
+
+			log.Println(message)
+			demux.Handle(message)
+		}
+	}
+
+	return true
+}
+
 func (l *Stream) listenUser(id int64, done <-chan struct{}) {
 	defer l.waitgroup.Done()
 
@@ -86,25 +116,15 @@ func (l *Stream) listenUser(id int64, done <-chan struct{}) {
 
 	for {
 		stream, err := l.userStream(id)
+
 		if err != nil {
 			log.Println("!", "stream error:", err)
-			time.Sleep(time.Second * 5)
+			Sleep(time.Minute, done)
 			continue
 		}
 
-		for {
-			select {
-			case <-done:
-				stream.Stop()
-				return
-
-			case message, ok := <-stream.Messages:
-				if !ok {
-					break
-				}
-
-				demux.Handle(message)
-			}
+		if handleStream(stream, demux, done) {
+			return
 		}
 	}
 }
