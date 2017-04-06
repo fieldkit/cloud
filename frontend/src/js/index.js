@@ -38,11 +38,18 @@ const routes = (
   >
     <IndexRoute onEnter={(nextState, replace) => {
       if (nextState.location.pathname === '/') {
-        const expeditionID = 'expedition01'
-        replace({
-          pathname: '/' + expeditionID,
-          state: { nextPathname: nextState.location.pathname }
-        })
+        const projectID = location.hostname.split('.')[0]
+        FKApiClient.getExpeditions(projectID)
+          .then(resExpeditions => {
+            console.log('server response received:', resExpeditions)
+            if (!resExpeditions || resExpeditions.length == 0) {
+              console.log('expedition data empty');
+            } else {
+              const expedition = resExpeditions[0];
+              console.log('replacing')
+              browserHistory.push(`/${expedition.slug}`)
+            }
+          });
       }
     }} />
     <Route path=":expeditionID" onEnter={(state) => {
