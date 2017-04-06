@@ -2,6 +2,7 @@ import React, {PropTypes, Component} from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 import sensorIcon from '../../../img/icon-sensor-red.svg'
+import twitterIcon from '../../../img/icon-twitter.png'
 
 export default class WebGLOverlay extends Component {
   constructor (props) {
@@ -23,6 +24,23 @@ export default class WebGLOverlay extends Component {
       focusedDocument
     } = this.props
 
+      let title, body, icon, extra;
+      let d = focusedDocument;
+      if(focusedDocument){
+          if(d.get("user")){
+            title = `@${d.get("user").get("screen_name")}` 
+            body = d.get("text")
+            icon = `/${twitterIcon}`
+          } else {
+            title = `Sensor (${d.get("SampleType")})`
+            body = `GPS Speed: ${d.get("GPSSpeed")}`
+            icon = `/${sensorIcon}`
+          }
+      } else {
+            title = ""
+            body = ""
+            icon = ""
+      }
     return (
       <div
         className="dom-overlay"
@@ -49,10 +67,10 @@ export default class WebGLOverlay extends Component {
             >
               <div className="dom-overlay_popup_content">
                 <div className="dom-overlay_popup_content_icon">
-                  <img src={ '/' + sensorIcon } width="100%"/>
+                  <img src={ icon } width="100%"/>
                 </div>
-                <div>{focusedDocument.get('id')}</div>
-                <div>{focusedDocument.get('date')}</div>
+                <div className="dom-overlay_popup_title">{title}</div>
+                <div>{body}</div>
               </div>
             </div>
         }
