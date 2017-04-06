@@ -10,6 +10,10 @@ class Navigation extends React.Component {
       currentProjectID,
       currentPage
     } = this.props
+    
+    let apiDomain = document.location.host.match(/fieldkit\.org/) ?
+                        "https://api.fieldkit.org" :
+                        "https://api.fieldkit.team"
 
     return (
       <ul className="navigation">
@@ -34,7 +38,7 @@ class Navigation extends React.Component {
         <li 
           className={ 'navigation_link ' + (currentPage === 'data' ? 'active' : '') }
         >
-          <a href={ `https://api.fieldkit.team/projects/@/${currentProjectID}/expeditions/@/${currentExpeditionID}/documents` }>
+          <a href={ `${apiDomain}/projects/@/${currentProjectID}/expeditions/@/${currentExpeditionID}/documents` }>
             Data
           </a>
         </li>
