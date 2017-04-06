@@ -82,7 +82,7 @@ resource "aws_alb_target_group_attachment" "fieldkit-server-a" {
 
 resource "aws_route53_record" "api-data" {
   zone_id = "Z116TCZ3RT5Z2K"
-  name    = "api.data.fieldkit.org"
+  name    = "api.fieldkit.org"
   type    = "A"
 
   alias {
