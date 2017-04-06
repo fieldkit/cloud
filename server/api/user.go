@@ -11,6 +11,7 @@ import (
 	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/O-C-R/fieldkit/server/api/app"
+	"github.com/O-C-R/fieldkit/server/backend"
 	"github.com/O-C-R/fieldkit/server/data"
 	"github.com/O-C-R/fieldkit/server/email"
 )
@@ -52,6 +53,7 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 
 type UserControllerOptions struct {
 	Database   *sqlxcache.DB
+	Backend    *backend.Backend
 	Emailer    email.Emailer
 	JWTHMACKey []byte
 	Domain     string
@@ -71,6 +73,20 @@ func NewUserController(service *goa.Service, options UserControllerOptions) (*Us
 }
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(ctx.Payload.InviteToken)); err != nil {
+		return err
+	}
+
+	valid, err := c.options.Backend.CheckInviteToken(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return ctx.Unauthorized()
+	}
+
 	user := &data.User{
 		Name:     data.Name(ctx.Payload.Name),
 		Username: ctx.Payload.Username,
@@ -96,6 +112,10 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	}
 
 	if err := c.options.Emailer.SendValidationToken(user, validationToken); err != nil {
+		return err
+	}
+
+	if err := c.options.Backend.DeleteInviteToken(ctx, token); err != nil {
 		return err
 	}
 

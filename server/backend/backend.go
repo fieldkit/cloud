@@ -36,6 +36,17 @@ func (b *Backend) AddInputToken(ctx context.Context, inputToken *data.InputToken
 		`, inputToken)
 }
 
+func (b *Backend) CheckInviteToken(ctx context.Context, inviteToken data.Token) (bool, error) {
+	count := 0
+	if err := b.db.GetContext(ctx, &count, `
+		SELECT COUNT(*) FROM fieldkit.invite_token WHERE token = $1
+		`, inviteToken); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 func (b *Backend) DeleteInputToken(ctx context.Context, inputTokenID int32) error {
 	_, err := b.db.ExecContext(ctx, `
 		DELETE FROM fieldkit.input_token WHERE id = $1
@@ -108,6 +119,13 @@ func (b *Backend) DeleteTwitterOAuth(ctx context.Context, requestToken string) e
 	_, err := b.db.ExecContext(ctx, `
 		DELETE FROM fieldkit.twitter_oauth WHERE request_token = $1
 		`, requestToken)
+	return err
+}
+
+func (b *Backend) DeleteInviteToken(ctx context.Context, inviteToken data.Token) error {
+	_, err := b.db.ExecContext(ctx, `
+		DELETE FROM fieldkit.invite_token WHERE token = $1
+		`, inviteToken)
 	return err
 }
 

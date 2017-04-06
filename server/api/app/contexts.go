@@ -2684,6 +2684,12 @@ func (ctx *AddUserContext) BadRequest() error {
 	return nil
 }
 
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *AddUserContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
 // GetUserContext provides the user get action context.
 type GetUserContext struct {
 	context.Context

@@ -196,6 +196,7 @@ func main() {
 	// Mount "user" controller
 	c2, err := api.NewUserController(service, api.UserControllerOptions{
 		Database:   database,
+		Backend:    backend,
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
 		Domain:     config.Domain,
