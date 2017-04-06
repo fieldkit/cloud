@@ -58,6 +58,20 @@ func (b *Backend) ListInputTokens(ctx context.Context, project, expedition strin
 	return inputTokens, nil
 }
 
+func (b *Backend) CheckInputToken(ctx context.Context, inputID int32, token data.Token) (bool, error) {
+	count := 0
+	if err := b.db.GetContext(ctx, &count, `
+		SELECT COUNT(*)
+			FROM fieldkit.input_token AS it
+				JOIN fieldkit.input AS i ON i.expedition_id = it.expedition_id
+					WHERE i.id = $1 AND it.token = $2
+		`, inputID, token); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 func (b *Backend) ListInputTokensID(ctx context.Context, expeditionID int32) ([]*data.InputToken, error) {
 	inputTokens := []*data.InputToken{}
 	if err := b.db.SelectContext(ctx, &inputTokens, `

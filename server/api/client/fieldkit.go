@@ -162,8 +162,8 @@ func SendBinaryFieldkitPath(inputID int) string {
 }
 
 // Send binary data
-func (c *Client) SendBinaryFieldkit(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewSendBinaryFieldkitRequest(ctx, path)
+func (c *Client) SendBinaryFieldkit(ctx context.Context, path string, accessToken string) (*http.Response, error) {
+	req, err := c.NewSendBinaryFieldkitRequest(ctx, path, accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -171,12 +171,15 @@ func (c *Client) SendBinaryFieldkit(ctx context.Context, path string) (*http.Res
 }
 
 // NewSendBinaryFieldkitRequest create the request corresponding to the send binary action endpoint of the fieldkit resource.
-func (c *Client) NewSendBinaryFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewSendBinaryFieldkitRequest(ctx context.Context, path string, accessToken string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	values.Set("access_token", accessToken)
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -195,8 +198,8 @@ func SendCsvFieldkitPath(inputID int) string {
 }
 
 // Send CSV data
-func (c *Client) SendCsvFieldkit(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewSendCsvFieldkitRequest(ctx, path)
+func (c *Client) SendCsvFieldkit(ctx context.Context, path string, accessToken string) (*http.Response, error) {
+	req, err := c.NewSendCsvFieldkitRequest(ctx, path, accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -204,12 +207,15 @@ func (c *Client) SendCsvFieldkit(ctx context.Context, path string) (*http.Respon
 }
 
 // NewSendCsvFieldkitRequest create the request corresponding to the send csv action endpoint of the fieldkit resource.
-func (c *Client) NewSendCsvFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewSendCsvFieldkitRequest(ctx context.Context, path string, accessToken string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	values.Set("access_token", accessToken)
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err

@@ -799,7 +799,8 @@ type SendBinaryFieldkitContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	AccessToken string
+	InputID     int
 }
 
 // NewSendBinaryFieldkitContext parses the incoming request URL and body, performs validations and creates the
@@ -811,6 +812,13 @@ func NewSendBinaryFieldkitContext(ctx context.Context, r *http.Request, service 
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := SendBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramAccessToken := req.Params["access_token"]
+	if len(paramAccessToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("access_token"))
+	} else {
+		rawAccessToken := paramAccessToken[0]
+		rctx.AccessToken = rawAccessToken
+	}
 	paramInputID := req.Params["input_id"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
@@ -835,12 +843,19 @@ func (ctx *SendBinaryFieldkitContext) BadRequest() error {
 	return nil
 }
 
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *SendBinaryFieldkitContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
 // SendCsvFieldkitContext provides the fieldkit send csv action context.
 type SendCsvFieldkitContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	AccessToken string
+	InputID     int
 }
 
 // NewSendCsvFieldkitContext parses the incoming request URL and body, performs validations and creates the
@@ -852,6 +867,13 @@ func NewSendCsvFieldkitContext(ctx context.Context, r *http.Request, service *go
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := SendCsvFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramAccessToken := req.Params["access_token"]
+	if len(paramAccessToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("access_token"))
+	} else {
+		rawAccessToken := paramAccessToken[0]
+		rctx.AccessToken = rawAccessToken
+	}
 	paramInputID := req.Params["input_id"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
@@ -873,6 +895,12 @@ func (ctx *SendCsvFieldkitContext) NoContent() error {
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *SendCsvFieldkitContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *SendCsvFieldkitContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
 	return nil
 }
 

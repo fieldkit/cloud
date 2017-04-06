@@ -160,12 +160,14 @@ type (
 	// SendBinaryFieldkitCommand is the command line data structure for the send binary action of fieldkit
 	SendBinaryFieldkitCommand struct {
 		InputID     int
+		AccessToken string
 		PrettyPrint bool
 	}
 
 	// SendCsvFieldkitCommand is the command line data structure for the send csv action of fieldkit
 	SendCsvFieldkitCommand struct {
 		InputID     int
+		AccessToken string
 		PrettyPrint bool
 	}
 
@@ -2168,7 +2170,7 @@ func (cmd *SendBinaryFieldkitCommand) Run(c *client.Client, args []string) error
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.SendBinaryFieldkit(ctx, path)
+	resp, err := c.SendBinaryFieldkit(ctx, path, cmd.AccessToken)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2182,6 +2184,8 @@ func (cmd *SendBinaryFieldkitCommand) Run(c *client.Client, args []string) error
 func (cmd *SendBinaryFieldkitCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var inputID int
 	cc.Flags().IntVar(&cmd.InputID, "input_id", inputID, ``)
+	var accessToken string
+	cc.Flags().StringVar(&cmd.AccessToken, "access_token", accessToken, ``)
 }
 
 // Run makes the HTTP request corresponding to the SendCsvFieldkitCommand command.
@@ -2194,7 +2198,7 @@ func (cmd *SendCsvFieldkitCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.SendCsvFieldkit(ctx, path)
+	resp, err := c.SendCsvFieldkit(ctx, path, cmd.AccessToken)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2208,6 +2212,8 @@ func (cmd *SendCsvFieldkitCommand) Run(c *client.Client, args []string) error {
 func (cmd *SendCsvFieldkitCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var inputID int
 	cc.Flags().IntVar(&cmd.InputID, "input_id", inputID, ``)
+	var accessToken string
+	cc.Flags().StringVar(&cmd.AccessToken, "access_token", accessToken, ``)
 }
 
 // Run makes the HTTP request corresponding to the SetBinaryFieldkitCommand command.

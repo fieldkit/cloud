@@ -6,7 +6,7 @@ import (
 )
 
 var AddProjectAdministratorPayload = Type("AddAdministratorPayload", func() {
-	Attribute("user_id", Integer)
+	Attribute("user_id", Integer, func() {})
 	Required("user_id")
 })
 

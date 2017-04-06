@@ -138,8 +138,10 @@ var _ = Resource("fieldkit", func() {
 		Description("Send CSV data")
 		Params(func() {
 			Param("input_id", Integer)
-			Required("input_id")
+			Param("access_token", String)
+			Required("input_id", "access_token")
 		})
+		Response(Unauthorized)
 		Response(BadRequest)
 		Response(NoContent)
 	})
@@ -149,8 +151,10 @@ var _ = Resource("fieldkit", func() {
 		Description("Send binary data")
 		Params(func() {
 			Param("input_id", Integer)
-			Required("input_id")
+			Param("access_token", String)
+			Required("input_id", "access_token")
 		})
+		Response(Unauthorized)
 		Response(BadRequest)
 		Response(NoContent)
 	})

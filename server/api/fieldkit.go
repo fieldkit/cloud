@@ -176,6 +176,20 @@ func (c *FieldkitController) SendCsv(ctx *app.SendCsvFieldkitContext) error {
 		return err
 	}
 
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(ctx.AccessToken)); err != nil {
+		return err
+	}
+
+	valid, err := c.options.Backend.CheckInputToken(ctx, input.ID, token)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return ctx.Unauthorized()
+	}
+
 	// Iterate through the CSV.
 	reader := csv.NewReader(ctx.RequestData.Body)
 	for {
@@ -267,6 +281,20 @@ func (c *FieldkitController) SendBinary(ctx *app.SendBinaryFieldkitContext) erro
 	input, err := c.options.Backend.Input(ctx, int32(ctx.InputID))
 	if err != nil {
 		return err
+	}
+
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(ctx.AccessToken)); err != nil {
+		return err
+	}
+
+	valid, err := c.options.Backend.CheckInputToken(ctx, input.ID, token)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return ctx.Unauthorized()
 	}
 
 	reader := data.NewByteReader(ctx.RequestData.Body)
