@@ -29,9 +29,14 @@ class NotificationPanel extends React.Component {
                         } else {
                             extra = (<span></span>)
                         }
-                      } else {
+                      } else if (d.get("GPSSpeed")) {
                         title = `Sensor (${d.get("SampleType")})`
                         body = `GPS Speed: ${d.get("GPSSpeed")}`
+                        icon = `/${sensorIcon}`
+                        extra = (<span></span>)
+                      } else {
+                        title = `Conservify Sensor`
+                        body = "Humidity: " + d.get("hum")
                         icon = `/${sensorIcon}`
                         extra = (<span></span>)
                       }

@@ -31,9 +31,13 @@ export default class WebGLOverlay extends Component {
             title = `@${d.get("user").get("screen_name")}` 
             body = d.get("text")
             icon = `/${twitterIcon}`
-          } else {
+          } else if (d.get("GPSSpeed")) {
             title = `Sensor (${d.get("SampleType")})`
             body = `GPS Speed: ${d.get("GPSSpeed")}`
+            icon = `/${sensorIcon}`
+          } else {
+            title = "Conservify Sensor"
+            body = "Humidity: " + d.get("hum")
             icon = `/${sensorIcon}`
           }
       } else {
