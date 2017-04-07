@@ -178,7 +178,7 @@ definitions:
   Document:
     description: Document media type (default view)
     example:
-      data: cd30fb31-6f2c-42a0-b81f-d5f618fc1935
+      data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -191,7 +191,7 @@ definitions:
       user_id: 2.319954e+18
     properties:
       data:
-        example: cd30fb31-6f2c-42a0-b81f-d5f618fc1935
+        example: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
       id:
         example: Possimus porro quaerat in qui.
         type: string
@@ -225,7 +225,7 @@ definitions:
     description: DocumentCollection is the media type for an array of Document (default
       view)
     example:
-    - data: cd30fb31-6f2c-42a0-b81f-d5f618fc1935
+    - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -236,7 +236,7 @@ definitions:
       team_id: 7.1933954e+18
       timestamp: 9.0560484e+18
       user_id: 2.319954e+18
-    - data: cd30fb31-6f2c-42a0-b81f-d5f618fc1935
+    - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -256,7 +256,7 @@ definitions:
     description: Documents media type (default view)
     example:
       documents:
-      - data: cd30fb31-6f2c-42a0-b81f-d5f618fc1935
+      - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -1834,16 +1834,12 @@ paths:
       summary: set binary fieldkit
       tags:
       - fieldkit
-  /inputs/fieldkits/{input_id}/send/binary:
+  /inputs/fieldkits/{input_id}/send/binary/{access_token}:
     post:
-      description: |-
-        Send binary data
-
-        Required security scopes:
-          * `api:access`
+      description: Send binary data
       operationId: fieldkit#send binary
       parameters:
-      - in: query
+      - in: path
         name: access_token
         required: true
         type: string
@@ -1860,9 +1856,6 @@ paths:
           description: Unauthorized
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: send binary fieldkit
       tags:
       - fieldkit
