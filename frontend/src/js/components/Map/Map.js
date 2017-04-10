@@ -55,6 +55,7 @@ class Map extends React.Component {
       setViewport,
       particles,
       readingPath,
+      pointsPath,
       focusedDocument,
       openLightbox
     } = this.props
@@ -74,6 +75,7 @@ class Map extends React.Component {
             redraw={ this.redrawGLOverlay }
             particles={ particles }
             readingPath={ readingPath }
+            pointsPath={ pointsPath }
           />
           <DOMOverlay
             focusedDocument={ focusedDocument }

@@ -80,6 +80,7 @@
     "json5-loader": "^0.6.0",
     "jsx-loader": "^0.13.2",
     "nib": "^1.1.0",
+    "pixi.js": "^4.4.4",
     "react": "^15.4.1",
     "react-addons-css-transition-group": "^15.3.0",
     "react-contenteditable": "^2.0.1",

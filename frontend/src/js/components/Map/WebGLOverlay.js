@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import React3 from 'react-three-renderer'
 import ViewportMercator from 'viewport-mercator-project'
-import { Vector3, BufferAttribute, Color, TextureLoader } from 'three'
+import { Vector3, BufferAttribute, Color, VertexColors, TextureLoader } from 'three'
 
 import iconSensorReading from '../../../img/sighting.png'
 
@@ -19,6 +19,11 @@ export default class WebGLOverlay extends Component {
           index: new BufferAttribute(new Uint16Array(1000 * 1), 1),
           texture: new TextureLoader().load(('/' + iconSensorReading))
         }
+      },
+      points: {
+        position: new BufferAttribute(new Float32Array(0),3),
+        color: new BufferAttribute(new Float32Array(0),4),
+        index: new BufferAttribute(new Uint16Array(0),1)
       },
       line: {
         position: new BufferAttribute(new Float32Array(0),3),
@@ -72,30 +77,43 @@ export default class WebGLOverlay extends Component {
     const { bufferGeometries } = this.state
     const {
       particles,
+      pointsPath,
       readingPath
     } = nextProps
-    const old_documents_length = this.props.readingPath.length
-    const new_documents_length = nextProps.readingPath.length
+    const old_documents_length = this.props.pointsPath.length
+    const new_documents_length = nextProps.pointsPath.length
+    const new_reading_length = nextProps.readingPath.length
 
     if(old_documents_length !== new_documents_length){
-        let indexes = new Uint16Array(new_documents_length)
+        let indexes = new Uint16Array(new_reading_length)
         indexes = indexes.map((x,i) => i)
 
-        bufferGeometries.line.position = new BufferAttribute(new Float32Array(new_documents_length * 3), 3)
-        bufferGeometries.line.color = new BufferAttribute(new Float32Array(new_documents_length * 4), 4)
+        bufferGeometries.line.position = new BufferAttribute(new Float32Array(new_reading_length * 3), 3)
+        bufferGeometries.line.color = new BufferAttribute(new Float32Array(new_reading_length * 4), 4)
         bufferGeometries.line.index = new BufferAttribute(indexes,1)
-        bufferGeometries.line.index.needsUpdate = true
+
+        bufferGeometries.points.position = new BufferAttribute(new Float32Array(new_documents_length * 3), 3)
+        bufferGeometries.points.color = new BufferAttribute(new Float32Array(new_documents_length * 4), 4)
+        bufferGeometries.points.index = new BufferAttribute(new Uint16Array(new_documents_length),1)
     }
 
     Object.keys(particles).forEach(type => {
-      bufferGeometries.particles[type].position.array = particles[type].position
-      bufferGeometries.particles[type].position.needsUpdate = true
-      bufferGeometries.particles[type].color.array = particles[type].color
-      bufferGeometries.particles[type].color.needsUpdate = true
+      let uindexes = new Uint16Array(new_documents_length)
+      let indexes = nextProps.pointsPath.map((x,i) => [x[2],i])
+                                        .sort((b,a) => a[0] - b[0])
+                                        .forEach((x,i) => uindexes[i] = x[1])
+
       bufferGeometries.line.position.array = particles[type].position
       bufferGeometries.line.position.needsUpdate = true
       bufferGeometries.line.color.array = particles[type].color
       bufferGeometries.line.color.needsUpdate = true
+
+      bufferGeometries.points.position.array = particles[type].position
+      bufferGeometries.points.position.needsUpdate = true
+      bufferGeometries.points.color.array = particles[type].color
+      bufferGeometries.points.color.needsUpdate = true
+      bufferGeometries.points.index.array = uindexes
+      bufferGeometries.points.index.needsUpdate = true
     })
 
     this.setState({
@@ -132,17 +150,8 @@ export default class WebGLOverlay extends Component {
       lookAt: new Vector3(left, top, 0)
     }
     const readingPath = bufferGeometries.line
-    let readingPath2 = {
-        position: new BufferAttribute(new Float32Array(248*3),3),
-        color: new BufferAttribute(new Float32Array(248*4),4),
-        index: new BufferAttribute(new Uint16Array(248),1),
-    }
-    readingPath2.position.array = bufferGeometries.particles.Feature.position.array.slice(0,248*3)
-    readingPath2.position.needsUpdate = true
-    readingPath2.color.array = bufferGeometries.particles.Feature.color.array.slice(0,248*4)
-    readingPath2.color.needsUpdate = true
-    readingPath2.index.array = bufferGeometries.particles.Feature.index.array.slice(0,248)
-    readingPath2.index.needsUpdate = true
+    const points = bufferGeometries.points
+    const pixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1
 
     return (
       <div>
@@ -153,6 +162,7 @@ export default class WebGLOverlay extends Component {
             height={ height }
             alpha={ true }
             antialias={ true }
+            pixelRatio={ pixelRatio }
           >
             <scene>
               <orthographicCamera
@@ -181,21 +191,16 @@ export default class WebGLOverlay extends Component {
                   return (
                     <points key={ 'particles-' + type }>
                       <bufferGeometry
-                        position={ particles.position }
-                        color={ particles.color }
-                        index={ particles.index }
+                        position={ points.position }
+                        color={ points.color }
+                        index={ points.index }
                       />
-                      <shaderMaterial
-                        vertexShader={ shaders.particles.vertexShader}
-                        fragmentShader={ shaders.particles.fragmentShader}
-                        uniforms={{
-                          texture: { 
-                            type: 't',
-                            value: particles.texture 
-                          }
-                        }}
-                      >
-                      </shaderMaterial>
+                      <pointsMaterial 
+                        size={30}
+                        vertexColors={VertexColors}
+                        map={bufferGeometries.particles[type].texture}
+                        transparent={true}
+                      />
                     </points>
                   )
                 })
