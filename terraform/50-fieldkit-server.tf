@@ -58,17 +58,6 @@ resource "aws_alb_listener" "fieldkit-server" {
   }
 }
 
-resource "aws_alb_listener" "fieldkit-server-http" {
-  load_balancer_arn = "${aws_alb.fieldkit-server.arn}"
-  port              = "80"
-  protocol          = "HTTP"
-  
-  default_action {
-    target_group_arn = "${aws_alb_target_group.fieldkit-server.arn}"
-    type             = "forward"
-  }
-}
-
 resource "aws_alb_target_group" "fieldkit-server" {
   name     = "fieldkit-server"
   port     = 80
