@@ -1,6 +1,5 @@
-FROM node:7.5.0
+FROM node:7.8.0-alpine
 WORKDIR /usr/app
-RUN npm install -g yarn
 COPY ./package.json ./yarn.lock /usr/app/
 RUN yarn install
 COPY . /usr/app/

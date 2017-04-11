@@ -155,15 +155,16 @@ func (c *Client) NewListIDFieldkitRequest(ctx context.Context, path string) (*ht
 }
 
 // SendBinaryFieldkitPath computes a request path to the send binary action of fieldkit.
-func SendBinaryFieldkitPath(inputID int) string {
+func SendBinaryFieldkitPath(inputID int, accessToken string) string {
 	param0 := strconv.Itoa(inputID)
+	param1 := accessToken
 
-	return fmt.Sprintf("/inputs/fieldkits/%s/send/binary", param0)
+	return fmt.Sprintf("/inputs/fieldkits/%s/send/binary/%s", param0, param1)
 }
 
 // Send binary data
-func (c *Client) SendBinaryFieldkit(ctx context.Context, path string, accessToken string) (*http.Response, error) {
-	req, err := c.NewSendBinaryFieldkitRequest(ctx, path, accessToken)
+func (c *Client) SendBinaryFieldkit(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSendBinaryFieldkitRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -171,21 +172,15 @@ func (c *Client) SendBinaryFieldkit(ctx context.Context, path string, accessToke
 }
 
 // NewSendBinaryFieldkitRequest create the request corresponding to the send binary action endpoint of the fieldkit resource.
-func (c *Client) NewSendBinaryFieldkitRequest(ctx context.Context, path string, accessToken string) (*http.Request, error) {
+func (c *Client) NewSendBinaryFieldkitRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	values := u.Query()
-	values.Set("access_token", accessToken)
-	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		c.JWTSigner.Sign(req)
 	}
 	return req, nil
 }

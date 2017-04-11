@@ -813,9 +813,7 @@ func NewSendBinaryFieldkitContext(ctx context.Context, r *http.Request, service 
 	req.Request = r
 	rctx := SendBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramAccessToken := req.Params["access_token"]
-	if len(paramAccessToken) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("access_token"))
-	} else {
+	if len(paramAccessToken) > 0 {
 		rawAccessToken := paramAccessToken[0]
 		rctx.AccessToken = rawAccessToken
 	}

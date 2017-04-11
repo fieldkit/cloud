@@ -147,7 +147,8 @@ var _ = Resource("fieldkit", func() {
 	})
 
 	Action("send binary", func() {
-		Routing(POST("inputs/fieldkits/:input_id/send/binary"))
+		NoSecurity()
+		Routing(POST("inputs/fieldkits/:input_id/send/binary/:access_token"))
 		Description("Send binary data")
 		Params(func() {
 			Param("input_id", Integer)

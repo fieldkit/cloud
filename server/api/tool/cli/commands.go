@@ -159,8 +159,8 @@ type (
 
 	// SendBinaryFieldkitCommand is the command line data structure for the send binary action of fieldkit
 	SendBinaryFieldkitCommand struct {
-		InputID     int
 		AccessToken string
+		InputID     int
 		PrettyPrint bool
 	}
 
@@ -1226,7 +1226,7 @@ Payload example:
 	}
 	tmp108 := new(SendBinaryFieldkitCommand)
 	sub = &cobra.Command{
-		Use:   `fieldkit ["/inputs/fieldkits/INPUT_ID/send/binary"]`,
+		Use:   `fieldkit ["/inputs/fieldkits/INPUT_ID/send/binary/ACCESS_TOKEN"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp108.Run(c, args) },
 	}
@@ -2166,11 +2166,11 @@ func (cmd *SendBinaryFieldkitCommand) Run(c *client.Client, args []string) error
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/inputs/fieldkits/%v/send/binary", cmd.InputID)
+		path = fmt.Sprintf("/inputs/fieldkits/%v/send/binary/%v", cmd.InputID, url.QueryEscape(cmd.AccessToken))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.SendBinaryFieldkit(ctx, path, cmd.AccessToken)
+	resp, err := c.SendBinaryFieldkit(ctx, path)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2182,10 +2182,10 @@ func (cmd *SendBinaryFieldkitCommand) Run(c *client.Client, args []string) error
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *SendBinaryFieldkitCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var inputID int
-	cc.Flags().IntVar(&cmd.InputID, "input_id", inputID, ``)
 	var accessToken string
 	cc.Flags().StringVar(&cmd.AccessToken, "access_token", accessToken, ``)
+	var inputID int
+	cc.Flags().IntVar(&cmd.InputID, "input_id", inputID, ``)
 }
 
 // Run makes the HTTP request corresponding to the SendCsvFieldkitCommand command.

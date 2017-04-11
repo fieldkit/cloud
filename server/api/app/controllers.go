@@ -634,7 +634,7 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/binary", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/binary/:access_token", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/csv", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/binary/:binary_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 
@@ -724,10 +724,9 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 		}
 		return ctrl.SendBinary(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleFieldkitOrigin(h)
-	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/binary", ctrl.MuxHandler("SendBinary", h, nil))
-	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendBinary", "route", "POST /inputs/fieldkits/:input_id/send/binary", "security", "jwt")
+	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/binary/:access_token", ctrl.MuxHandler("SendBinary", h, nil))
+	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendBinary", "route", "POST /inputs/fieldkits/:input_id/send/binary/:access_token")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
