@@ -1,7 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import React3 from 'react-three-renderer'
 import ViewportMercator from 'viewport-mercator-project'
-import { Vector3, BufferAttribute, Color, VertexColors, TextureLoader } from 'three'
+import { Vector2, Vector3, BufferAttribute, Color, VertexColors, TextureLoader, Geometry } from 'three'
+import {MeshLine, MeshLineMaterial} from 'three.meshline'
 
 import iconSensorReading from '../../../img/sighting.png'
 
@@ -39,42 +40,17 @@ export default class WebGLOverlay extends Component {
       }
     }
 
-    const shaders = {
-      particles: {
-        vertexShader: [
-          'attribute vec4 color;',
-          'varying vec4 vColor;',
-          'void main() {',
-          '    vColor = color;',
-          '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
-          '    gl_PointSize = float( position.z );',
-          '    gl_Position = projectionMatrix * mvPosition;',
-          '}'
-        ].join('\n'),
-        fragmentShader: [
-          'varying vec4 vColor;',
-          'uniform sampler2D texture;',
-          'vec4 vFragColor;',
-          'void main() {',
-          '    vFragColor = vColor * texture2D( texture, gl_PointCoord );',
-          '    if (vFragColor.w > 0.25) {',
-          '      gl_FragColor = vFragColor;',
-          '    } else {',
-          '      discard;',
-          '    }',
-          '}'
-        ].join('\n')
-      }
-    }
-    
+    let {width, height} = this.props
+
     this.state = {
-      shaders,
-      bufferGeometries
+      bufferGeometries,
+      meshLine: new MeshLine(),
+      meshLineMaterial: new MeshLineMaterial({lineWidth: 0.025, resolution: new Vector2(width,height), sizeAttenuation: 0, near: 1, far: 5000})
     }
   }
 
   componentWillReceiveProps (nextProps) {
-    const { bufferGeometries } = this.state
+    const { bufferGeometries, meshLine, meshLineMaterial } = this.state
     const {
       particles,
       pointsPath,
@@ -97,6 +73,17 @@ export default class WebGLOverlay extends Component {
         bufferGeometries.points.index = new BufferAttribute(new Uint16Array(new_documents_length),1)
     }
 
+    let geometry =  new Geometry();
+    console.log(1)
+    readingPath.forEach((p) => {
+        let [x,y,z,d] = p
+        let v = new Vector3(x,y,15)
+        geometry.vertices.push(v)
+    })
+     
+    var line = new MeshLine();
+    line.setGeometry(geometry)
+
     Object.keys(particles).forEach(type => {
       let uindexes = new Uint16Array(new_documents_length)
       let indexes = nextProps.pointsPath.map((x,i) => [x[2],i])
@@ -116,8 +103,10 @@ export default class WebGLOverlay extends Component {
       bufferGeometries.points.index.needsUpdate = true
     })
 
+
     this.setState({
-      bufferGeometries
+      bufferGeometries,
+      meshLine: line
     })
   }
 
@@ -132,7 +121,8 @@ export default class WebGLOverlay extends Component {
 
     const { 
       bufferGeometries,
-      shaders
+      meshLine,
+      meshLineMaterial
      } = this.state
 
     const point = project([longitude, latitude])
@@ -169,22 +159,7 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 { ...cameraProps }
               />
-              { 
-                <line key="line">
-                  <bufferGeometry
-                    position={ readingPath.position }
-                    color={ readingPath.color }
-                    index={ readingPath.index }
-                  />
-                  <lineBasicMaterial
-                    linewidth={10}
-                    opacity={0.7}
-                    transparent={false}
-                    color={new Color('#ff0000')}
-                  >
-                  </lineBasicMaterial>
-                </line>
-              }
+              <mesh geometry={ meshLine.geometry } material={ meshLineMaterial }/>
               {
                 Object.keys(bufferGeometries.particles).map(type => {
                   const particles = bufferGeometries.particles[type]

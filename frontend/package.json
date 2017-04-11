@@ -101,6 +101,7 @@
     "slug": "^0.9.1",
     "style-loader": "0.13.1",
     "three": "^0.82.1",
+    "three.meshline": "^1.0.3",
     "transform-loader": "^0.2.3",
     "url-loader": "0.5.7",
     "viewport-mercator-project": "^2.1.0",
