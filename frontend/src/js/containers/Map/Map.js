@@ -27,7 +27,7 @@ const mapStateToProps = (state, ownProps) => {
         const currentDocuments = documents.filter(d => {
           return currentDocumentIDs.includes(d.get('id'))
         }).sortBy(a => new Date(a.get("DateTime") || a.get("created_at")))
-        const pathDocs = currentDocuments.filter(d => ! d.get("user"))
+        const pathDocs = currentDocuments
         let focusedDocument = null
         let focusDistance = 25
         const particleCount = 1000
@@ -42,6 +42,7 @@ const mapStateToProps = (state, ownProps) => {
         // particles and path
         const particles = {}
         const readingPath = []
+        const pointsPath = []
         documentTypes.forEach(id => {
           particles[id] = {
             position: new Float32Array(particleCount * 3),
@@ -52,9 +53,19 @@ const mapStateToProps = (state, ownProps) => {
         pathDocs.toList().forEach((d,i) => {
           const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
           const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-          readingPath[i] = [x,y]
+          const z = Math.abs(d.get("date") - currentDate)
+          pointsPath[i] = [x,y,z,d]
         })
-        currentDocuments.toList().forEach((d, i) => {
+        pathDocs.toList()
+                .filter(d => ! d.get("user"))
+                .forEach((d,i) => {
+                  const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+                  const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+                  const z = Math.abs(d.get("date") - currentDate)
+                  readingPath[i] = [x,y,z,d]
+                })
+        currentDocuments.toList()
+                        .forEach((d, i) => {
           const type = d.get('type')
           const position = d.getIn(['geometry', 'coordinates'])
           let radius = 15
@@ -63,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
           let color, s
           let delta = Math.abs(d.get("date") - currentDate)
           if(delta < 100000){
-            radius = 15 + (10 * ((100000-delta)/100000))
+            radius = 15 + (202 * ((100000-delta)/100000))
           }
 
           if(d.get("user")){
@@ -111,7 +122,8 @@ const mapStateToProps = (state, ownProps) => {
           particles,
           focusedDocument,
           focusType,
-          readingPath
+          readingPath,
+          pointsPath
         }
       }
     )(state)
