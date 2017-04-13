@@ -25,6 +25,10 @@ CREATE TABLE fieldkit.refresh_token (
 	expires timestamp NOT NULL
 );
 
+CREATE TABLE fieldkit.invite_token (
+	token bytea PRIMARY KEY
+);
+
 -- project
 
 CREATE TABLE fieldkit.project (
