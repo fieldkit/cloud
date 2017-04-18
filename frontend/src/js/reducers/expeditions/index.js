@@ -1,7 +1,6 @@
 
 import * as actions from '../../actions'
 import I from 'immutable'
-import slug from 'slug'
 import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 
@@ -17,6 +16,7 @@ export const initialState = I.fromJS({
   currentPage: 'map',
   currentExpedition: '',
   playbackMode: 'pause',
+  showSensors: true,
   focus: {
     type: 'expedition',
     id: null
@@ -174,6 +174,12 @@ const expeditionReducer = (state = initialState, action) => {
         .setIn(['viewport', 'zoom'], action.zoom)
         .setIn(['focus', 'type'], 'manual')
         .set('playbackMode', 'pause')
+    }
+    
+    case actions.TOGGLE_SENSOR_DATA: {
+      let sensors_on = state.get('showSensors')
+      return state
+        .set('showSensors', ! sensors_on)
     }
 
     case actions.SET_MOUSE_POSITION: {

@@ -14,15 +14,17 @@ import type {
 import { ProjectForm } from '../forms/ProjectForm';
 import { ProjectExpeditionForm } from '../forms/ProjectExpeditionForm';
 import { AdministratorForm } from '../forms/AdministratorForm';
+import { FormContainer } from '../containers/FormContainer';
 import { FKApiClient } from '../../api/api';
 
-import removeImg from '../../../img/icons/icon-remove-small.png'
+import { RemoveIcon } from '../icons/Icons'
 import '../../../css/projectsettings.css'
 
-import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition } from '../../api/types';
+import type { APIProject, APINewProject, APINewAdministrator, APIAdministrator, APINewExpedition, APIUser } from '../../api/types';
 
 type Props = {
   project: APIProject;
+  user: APIUser,
   administrators: APIAdministrator[];
   onUpdate: (newSlug: ?string) => void;
   onExpeditionCreate: () => void;
@@ -35,14 +37,21 @@ type Props = {
 export class ProjectSettings extends Component {
   props: $Exact<Props>;
   state: {
-    administrators: APIAdministrator[]
+    administrators: APIAdministrator[],
+    users: {[id: number]: APIUser},
+    administratorDeletion: ?{
+      contents: React$Element<*>;
+      userId: number;
+    }
   }
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      administrators: []
+      administrators: [],
+      users: {},
+      administratorDeletion: null
     };
 
     this.loadAdministrators();
@@ -53,7 +62,19 @@ export class ProjectSettings extends Component {
     const administratorsRes = await FKApiClient.get().getAdministrators(project.id);
     if (administratorsRes.type === 'ok' && administratorsRes.payload) {
       const administrators = administratorsRes.payload.administrators;
-      this.setState({administrators: administrators});
+      this.setState({ administrators });
+      for (const administrator of administrators) {
+        await this.loadAdministratorName(administrator.user_id);
+      }      
+    }
+  }
+
+  async loadAdministratorName(userId: number){
+    const userRes = await FKApiClient.get().getUserById(userId);
+    if (userRes.type === 'ok' && userRes.payload) {
+      const { users } = this.state;
+      users[userId] = userRes.payload;
+      this.setState({ users });
     }
   }
 
@@ -79,15 +100,35 @@ export class ProjectSettings extends Component {
     }
   }
 
-  async onAdministratorDelete(e: APIAdministrator) {
-    const { match } = this.props;
-    const administratorRes = await FKApiClient.get().deleteAdministrator(e.project_id, e.user_id);
-    if (administratorRes.type === 'ok') {
-      await this.loadAdministrators();
-      this.props.history.push(`${match.url}`);
-    } else {
-      return administratorRes.errors;
+  startAdministratorDelete(userId: number, e: APIUser) {
+    const { project } = this.props;
+    this.setState({
+      administratorDeletion: {
+        contents: <span>Are you sure you want to remove <strong>{e.name}</strong> from <strong>{project.name}</strong>?</span>,
+        userId
+      }
+    })
+  }
+
+  async confirmAdministratorDelete() {
+    const { project, match } = this.props;
+    const { administratorDeletion } = this.state;
+
+    if (administratorDeletion) {
+      const { userId } = administratorDeletion;
+
+      const administratorRes = await FKApiClient.get().deleteAdministrator(project.id, userId);
+      if (administratorRes.type === 'ok') {
+        await this.loadAdministrators();
+        this.props.history.push(`${match.url}`);
+      } else {
+        return administratorRes.errors;
+      }
     }
+  }
+
+  cancelAdministratorDelete() {
+    this.setState({ administratorDeletion: null });
   }
 
   async onProjectSave(project: APINewProject) {
@@ -106,22 +147,35 @@ export class ProjectSettings extends Component {
   }
 
   render () {
-    const { match, project } = this.props;
-    let { administrators } = this.state;
+    const { match, project, user } = this.props;
+    let { administrators, users, administratorDeletion } = this.state;
     const projectSlug = project.slug;
 
     return (
       <div className="project">
 
         <Route path={`${match.url}/add-administrator`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Add Users">
-            <h2>Add Users</h2>
+          <ReactModal isOpen={true} contentLabel="Add Users" className="modal" overlayClassName="modal-overlay">
+            <h2>Add User</h2>
             <AdministratorForm
               project={project}
               administrators={this.state.administrators}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onAdministratorAdd.bind(this)} />
+              onSave={this.onAdministratorAdd.bind(this)} 
+              saveText="Add" />
           </ReactModal> } />
+
+        { administratorDeletion &&
+          <ReactModal isOpen={true} contentLabel="Remove User" className="modal" overlayClassName="modal-overlay">
+            <h2>Remove User</h2>
+              <FormContainer
+                onSave={this.confirmAdministratorDelete.bind(this)}
+                onCancel={this.cancelAdministratorDelete.bind(this)}
+                saveText="Confirm"
+              >            
+                <div>{administratorDeletion.contents}</div>
+              </FormContainer>
+          </ReactModal> }
 
         <h1>Project Settings</h1>
         <div className="row">
@@ -149,26 +203,35 @@ export class ProjectSettings extends Component {
                 </tr>
               </thead>
               <tbody>
-              { administrators.map(administrator =>
-                <tr>
+              { administrators.map((administrator, i) =>
+                <tr key={i}>
                   <td>
                     <div className="user-avatar medium">
-                      <img />
+                      <img src={FKApiClient.get().userPictureUrl(administrator.user_id)} />
                     </div>
                   </td>
                   <td>
-                    {administrator.user_id}
+                    {users[administrator.user_id] &&
+                      <div>
+                        <p>
+                          {users[administrator.user_id].name}
+                          {administrator.user_id === user.id &&
+                           <span> (you)</span>}
+                        </p>
+                        <p className="type-small">{users[administrator.user_id].username}</p>
+                        </div> }
                   </td>
                   <td>
-                    <div className="bt-icon" onClick={this.onAdministratorDelete.bind(this, administrator)}>
-                      <img src={removeImg} alt="external link" />
-                    </div>
+                    { administrator.user_id !== user.id &&
+                    <div className="bt-icon medium" onClick={this.startAdministratorDelete.bind(this, administrator.user_id, users[administrator.user_id])}>
+                      <RemoveIcon />
+                    </div> }
                   </td>
                 </tr> )}
               </tbody>
             </table>
 
-            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add Users</Link>
+            <Link className="button secondary" to={`${match.url}/add-administrator`}>Add User</Link>
           </div>
         </div>
       </div>

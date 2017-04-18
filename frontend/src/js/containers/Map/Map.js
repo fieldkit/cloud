@@ -26,7 +26,8 @@ const mapStateToProps = (state, ownProps) => {
         const viewport = _viewport.toJS()
         const currentDocuments = documents.filter(d => {
           return currentDocumentIDs.includes(d.get('id'))
-        })
+        }).sortBy(a => new Date(a.get("DateTime") || a.get("created_at")))
+        const pathDocs = currentDocuments
         let focusedDocument = null
         let focusDistance = 25
         const particleCount = 1000
@@ -40,6 +41,8 @@ const mapStateToProps = (state, ownProps) => {
 
         // particles and path
         const particles = {}
+        const readingPath = []
+        const pointsPath = []
         documentTypes.forEach(id => {
           particles[id] = {
             position: new Float32Array(particleCount * 3),
@@ -47,14 +50,42 @@ const mapStateToProps = (state, ownProps) => {
           }
         })
 
-        currentDocuments.toList().forEach((d, i) => {
-          const type = d.get('type')
-          const position = d.getIn(['geometry', 'coordinates'])
-          const radius = 15
+        pathDocs.toList().forEach((d,i) => {
           const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
           const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-          const color = new Color('#ffffff')
-          
+          const z = Math.abs(d.get("date") - currentDate)
+          pointsPath[i] = [x,y,z,d]
+        })
+        pathDocs.toList()
+                .filter(d => ! d.get("user"))
+                .forEach((d,i) => {
+                  const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+                  const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+                  const z = Math.abs(d.get("date") - currentDate)
+                  readingPath[i] = [x,y,z,d]
+                })
+        currentDocuments.toList()
+                        .forEach((d, i) => {
+          const type = d.get('type')
+          const position = d.getIn(['geometry', 'coordinates'])
+          let radius = 15
+          const x = window.innerWidth * ((d.getIn(['geometry', 'coordinates', 1]) - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0]))
+          const y = window.innerHeight * ((d.getIn(['geometry', 'coordinates', 0]) - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+          let color, s
+          let delta = Math.abs(d.get("date") - currentDate)
+          if(delta < 100000){
+            radius = 15 + (202 * ((100000-delta)/100000))
+          }
+
+          if(d.get("user")){
+            color = new Color('#00aced')
+          } else {
+            const speed = d.get("GPSSpeed") || 0
+            const r = Math.floor(speed)
+            color = new Color('#D0462C') 
+            color.addScalar(speed/2)
+          }
+
           particles[type].position[i * 3 + 0] = x
           particles[type].position[i * 3 + 1] = y
           particles[type].position[i * 3 + 2] = radius
@@ -62,6 +93,7 @@ const mapStateToProps = (state, ownProps) => {
           particles[type].color[i * 4 + 1] = color.g
           particles[type].color[i * 4 + 2] = color.b
           particles[type].color[i * 4 + 3] = 1
+
 
           const distanceToMouse = Math.sqrt(Math.pow(x - mousePosition.get(0), 2) + Math.pow(y - mousePosition.get(1), 2))
           if (distanceToMouse < focusDistance) {
@@ -89,7 +121,9 @@ const mapStateToProps = (state, ownProps) => {
           playbackMode,
           particles,
           focusedDocument,
-          focusType
+          focusType,
+          readingPath,
+          pointsPath
         }
       }
     )(state)

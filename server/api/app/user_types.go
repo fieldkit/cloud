@@ -112,6 +112,41 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	return
 }
 
+// addFieldkitInputPayload user type.
+type addFieldkitInputPayload struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// Validate validates the addFieldkitInputPayload type instance.
+func (ut *addFieldkitInputPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// Publicize creates AddFieldkitInputPayload from addFieldkitInputPayload
+func (ut *addFieldkitInputPayload) Publicize() *AddFieldkitInputPayload {
+	var pub AddFieldkitInputPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	return &pub
+}
+
+// AddFieldkitInputPayload user type.
+type AddFieldkitInputPayload struct {
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// Validate validates the AddFieldkitInputPayload type instance.
+func (ut *AddFieldkitInputPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
 // addMemberPayload user type.
 type addMemberPayload struct {
 	Role   *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
@@ -229,6 +264,33 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addSchemaPayload user type.
+type addSchemaPayload struct {
+	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+}
+
+// Validate validates the addSchemaPayload type instance.
+func (ut *addSchemaPayload) Validate() (err error) {
+	if ut.JSONSchema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	return
+}
+
+// Publicize creates AddSchemaPayload from addSchemaPayload
+func (ut *addSchemaPayload) Publicize() *AddSchemaPayload {
+	var pub AddSchemaPayload
+	if ut.JSONSchema != nil {
+		pub.JSONSchema = *ut.JSONSchema
+	}
+	return &pub
+}
+
+// AddSchemaPayload user type.
+type AddSchemaPayload struct {
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+}
+
 // addTeamPayload user type.
 type addTeamPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
@@ -314,6 +376,41 @@ func (ut *AddTeamPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Slug) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, ut.Slug, utf8.RuneCountInString(ut.Slug), 40, false))
+	}
+	return
+}
+
+// addTwitterAccountInputPayload user type.
+type addTwitterAccountInputPayload struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// Validate validates the addTwitterAccountInputPayload type instance.
+func (ut *addTwitterAccountInputPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// Publicize creates AddTwitterAccountInputPayload from addTwitterAccountInputPayload
+func (ut *addTwitterAccountInputPayload) Publicize() *AddTwitterAccountInputPayload {
+	var pub AddTwitterAccountInputPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	return &pub
+}
+
+// AddTwitterAccountInputPayload user type.
+type AddTwitterAccountInputPayload struct {
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// Validate validates the AddTwitterAccountInputPayload type instance.
+func (ut *AddTwitterAccountInputPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
 	return
 }
@@ -526,6 +623,145 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// setFieldkitBinaryPayload user type.
+type setFieldkitBinaryPayload struct {
+	Fields   []string          `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
+	Mapper   map[string]string `form:"mapper,omitempty" json:"mapper,omitempty" xml:"mapper,omitempty"`
+	SchemaID *int              `form:"schema_id,omitempty" json:"schema_id,omitempty" xml:"schema_id,omitempty"`
+}
+
+// Validate validates the setFieldkitBinaryPayload type instance.
+func (ut *setFieldkitBinaryPayload) Validate() (err error) {
+	if ut.SchemaID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schema_id"))
+	}
+	if ut.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	if ut.Mapper == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
+	}
+	for _, e := range ut.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// Publicize creates SetFieldkitBinaryPayload from setFieldkitBinaryPayload
+func (ut *setFieldkitBinaryPayload) Publicize() *SetFieldkitBinaryPayload {
+	var pub SetFieldkitBinaryPayload
+	if ut.Fields != nil {
+		pub.Fields = ut.Fields
+	}
+	if ut.Mapper != nil {
+		pub.Mapper = ut.Mapper
+	}
+	if ut.SchemaID != nil {
+		pub.SchemaID = *ut.SchemaID
+	}
+	return &pub
+}
+
+// SetFieldkitBinaryPayload user type.
+type SetFieldkitBinaryPayload struct {
+	Fields   []string          `form:"fields" json:"fields" xml:"fields"`
+	Mapper   map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
+	SchemaID int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
+}
+
+// Validate validates the SetFieldkitBinaryPayload type instance.
+func (ut *SetFieldkitBinaryPayload) Validate() (err error) {
+
+	if ut.Fields == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
+	}
+	if ut.Mapper == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
+	}
+	for _, e := range ut.Fields {
+		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
+		}
+	}
+	return
+}
+
+// updateFieldkitInputPayload user type.
+type updateFieldkitInputPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateFieldkitInputPayload from updateFieldkitInputPayload
+func (ut *updateFieldkitInputPayload) Publicize() *UpdateFieldkitInputPayload {
+	var pub UpdateFieldkitInputPayload
+	if ut.Name != nil {
+		pub.Name = ut.Name
+	}
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateFieldkitInputPayload user type.
+type UpdateFieldkitInputPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// updateInputPayload user type.
+type updateInputPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the updateInputPayload type instance.
+func (ut *updateInputPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// Publicize creates UpdateInputPayload from updateInputPayload
+func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
+	var pub UpdateInputPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateInputPayload user type.
+type UpdateInputPayload struct {
+	Name   string `form:"name" json:"name" xml:"name"`
+	TeamID *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the UpdateInputPayload type instance.
+func (ut *UpdateInputPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
 // updateMemberPayload user type.
 type updateMemberPayload struct {
 	Role *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
@@ -559,6 +795,67 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
 	}
 	return
+}
+
+// updateSchemaPayload user type.
+type updateSchemaPayload struct {
+	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+	ProjectID  *int         `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// Validate validates the updateSchemaPayload type instance.
+func (ut *updateSchemaPayload) Validate() (err error) {
+	if ut.JSONSchema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	return
+}
+
+// Publicize creates UpdateSchemaPayload from updateSchemaPayload
+func (ut *updateSchemaPayload) Publicize() *UpdateSchemaPayload {
+	var pub UpdateSchemaPayload
+	if ut.JSONSchema != nil {
+		pub.JSONSchema = *ut.JSONSchema
+	}
+	if ut.ProjectID != nil {
+		pub.ProjectID = ut.ProjectID
+	}
+	return &pub
+}
+
+// UpdateSchemaPayload user type.
+type UpdateSchemaPayload struct {
+	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
+}
+
+// updateTwitterAccountInputPayload user type.
+type updateTwitterAccountInputPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Publicize creates UpdateTwitterAccountInputPayload from updateTwitterAccountInputPayload
+func (ut *updateTwitterAccountInputPayload) Publicize() *UpdateTwitterAccountInputPayload {
+	var pub UpdateTwitterAccountInputPayload
+	if ut.Name != nil {
+		pub.Name = ut.Name
+	}
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateTwitterAccountInputPayload user type.
+type UpdateTwitterAccountInputPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // updateUserPayload user type.

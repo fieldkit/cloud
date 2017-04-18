@@ -7,6 +7,15 @@
   overflow: visible;
   pointer-events: none;
 
+  &_title{
+        font-weight:bold;
+  }
+
+  &_twitter-media{
+    margin-top:10px;
+    width:100%;
+  }
+    
   &_post {
     height: auto;
     opacity: 1;
@@ -14,7 +23,7 @@
     transition: opacity 0.2s, max-height 0.5s ease-in-out, margin-bottom 0.2s ease-in;
     overflow: visible;
     pointer-events: auto;
-    
+
     &.transition-enter {
       opacity: 0.01;
       max-height: 0px;

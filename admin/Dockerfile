@@ -1,4 +1,4 @@
-FROM node:7.7.4-alpine
+FROM node:7.9.0-alpine
 WORKDIR /usr/app
 COPY ./package.json ./yarn.lock /usr/app/
 RUN yarn install

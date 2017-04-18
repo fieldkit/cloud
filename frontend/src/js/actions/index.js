@@ -17,6 +17,7 @@ export const UPDATE_DATE = 'UPDATE_DATE'
 export const SELECT_PLAYBACK_MODE = 'SELECT_PLAYBACK_MODE'
 export const SELECT_FOCUS_TYPE = 'SELECT_FOCUS_TYPE'
 export const SELECT_ZOOM = 'SELECT_ZOOM'
+export const TOGGLE_SENSOR_DATA = 'TOGGLE_SENSOR_DATA'
 export const JUMP_TO = 'JUMP_TO'
 export const SET_MOUSE_POSITION = 'SET_MOUSE_POSITION'
 export const SET_ZOOM = 'SET_ZOOM'
@@ -149,9 +150,10 @@ export function requestExpedition (expeditionID) {
                 const documentMap = {}
                 resDocuments
                   .forEach((d, i) => {
+                    d.data.type = 'Feature';
                     d.data.id = d.id
-                    d.data.date = d.data.date * 1000
-                    if (!d.data.geometry) d.data.geometry = d.data.Geometry
+                    d.data.date = d.timestamp * 1000
+                    if (!d.data.geometry) d.data.geometry = d.location
                     documentMap[d.id] = d.data
                   })
                 const documents = I.fromJS(documentMap)
@@ -227,8 +229,9 @@ export function requestExpedition (expeditionID) {
         }
       })
       .catch(error => {
-        console.log('Project or expedition could not be found')
-        window.location.replace('https://fieldkit.org')
+        console.error(error)
+        // console.log('Project or expedition could not be found')
+        // window.location.replace('https://fieldkit.org')
       }) 
   }
 }
@@ -277,6 +280,14 @@ export function selectZoom (zoom) {
     dispatch({
       type: SELECT_ZOOM,
       zoom
+    })
+  }
+}
+
+export function toggleSensorData () {
+  return function (dispatch, getState) {
+    dispatch({
+      type: TOGGLE_SENSOR_DATA
     })
   }
 }

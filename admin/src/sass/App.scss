@@ -53,6 +53,7 @@ $avatar-size-medium: $baseline-height*3.5;
 $avatar-size-small: $baseline-height*2.5;
 
 $icon-size-small: $baseline-height;
+$icon-size-medium: $baseline-height*1.5;
 
 $modal-width: 618px;
 
@@ -98,17 +99,17 @@ $gray-5: rgb(248, 248, 248);
 
 // Variables
 // $font-serif: 'Merriweather', serif;
-$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-// $font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
+// $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
 
 // Styles
 @mixin type-h1 {
   font-size: 36px;
   line-height: $baseline-height*4;
   font-family: $font-sans;
-  // font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-bottom: $baseline-height*2;
 
   @include for-phone-down {
@@ -177,6 +178,7 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: $baseline-height*2;
   font-family: $font-sans;
+  color: $gray-3;
 }
 
 @mixin type-button {
@@ -233,7 +235,9 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
     &:disabled {
-      background-color: $color-6;
+      background-color: $gray-4;
+      border-color: $gray-4;
+      box-shadow: none;
     }
 
   // Secondary button
@@ -254,7 +258,9 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
     &:disabled {
-
+      color: $gray-4;
+      border-color: $gray-4;
+      box-shadow: none;
     }
   }
 }
@@ -341,31 +347,53 @@ h4  { @include type-h4; }
 h5  { @include type-h5; }
 .type-small { @include type-small; }
 
+strong, b {
+  font-weight: 600;
+}
+
 button, .button {
 
-  // Primary button
   &:not(.bt-icon){
+    // Primary button    
     @include button();
-  }
-
-  // Secondary button
-  &.cancel, &.secondary {
-    @include button(false);
+    // Secondary button
+    &.cancel, &.secondary {
+      @include button(false);
+    }    
   }
 }
 
 // Icon button
 .bt-icon {
   display: inline-block;
-  width: $icon-size-small;
-  height: $icon-size-small;
+  vertical-align: middle;
   cursor: pointer;
+
+  &.small{
+    width: $icon-size-small;
+    height: $icon-size-small;
+  }
+
+  &.medium{
+    width: $icon-size-medium;
+    height: $icon-size-medium;
+  }
+
   &:not(:first-child){
     margin-left: $elements-padding;
   }
-  img {
+
+  svg {
     width: 100%;
     height: auto;
+    vertical-align: top;
+    fill: $gray-2;    
+  }
+
+  &.disabled {
+    svg {
+      fill: $gray-3;
+    }
   }
 }
 
@@ -373,11 +401,15 @@ input[type="submit"] {
   @include button();
 }
 
-input[type="text"], input[type="email"], input[type="password"], input[type="username"] {
+input[type="text"], input[type="email"], input[type="password"], input[type="username"], select {
   @include form;
   &.lg {
     width: 100%;
   }
+}
+
+select {
+  height: $baseline-height*2.5;
 }
 
 label, .label {
@@ -469,13 +501,16 @@ table {
   margin-bottom: $baseline-height*1.5;
   .accordion-row {
     &.expanded{
-      padding: $elements-padding;
+      padding: $elements-padding*2;
       border: 2px solid $gray-4;
       border-radius: 3px;
     }
     .accordion-row-header {
-      button{
-        float: right;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      nav{
+        flex-wrap: wrap;
         margin-right: 0;
       }
     }
@@ -483,18 +518,33 @@ table {
 }
 
 .gallery-list {
-  @extend .row;
   margin-bottom: $baseline-height*1.5;
+  width: 100%;
   .gallery-list-item {
-    @extend .two-columns;
-    position: relative;    
+    position: relative;
+    display: inline-block;
     height: $baseline-height*15;
-    background-color: $gray-5;
+    margin-bottom: $col-gutter;
+    vertical-align: top;
+    background-color: $gray-4;
+    background-repeat: no-repeat;
+    background-position: center; 
+    background-blend-mode: color-burn;
+
+    &.projects {
+      width: 100%;
+    }
+    &.expeditions {
+      width: calc((100% - #{$col-gutter})/2);
+      &:nth-child(2n + 1){
+        margin-right: $col-gutter;
+      }
+    }
     h4 {
       position: absolute;
       left: $elements-padding;
       bottom: $elements-padding;
-    }
+    }    
   }
 }
 
@@ -526,8 +576,7 @@ table {
 
     .form-footer {
       text-align: right;
-      margin-top: $baseline-height*2;
+      margin-top: $baseline-height*3;
     }
   }
-
 }

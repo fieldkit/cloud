@@ -65,24 +65,63 @@ export type APIExpeditions = {
   expeditions: APIExpedition[]
 }
 
-export type APITwitterInputCreateResponse = {
+export type APITwitterInputCreateResponse = {|
   location: string;
-};
+|};
 
-export type APIBaseInput = {
+export type APIMutableInput = {|
+  team_id?: number;
+  user_id?: number;
+  name: string;
+|};
+
+export type APIBaseInput = {|
   id: number;
   expedition_id: number;
-};
+  ...APIMutableInput;
+|};
 
-export type APITwitterInput = {
-  ...$Exact<APIBaseInput>;
+export type APINewTwitterInput = {|
+  name: string
+|};
+
+export type APITwitterInput = {|
+  ...APIBaseInput;
   screen_name: string;
   twitter_account_id: number;
-};
+|};
 
 export type APIInputs = {
-  twitter_accounts?: APITwitterInput[]
-}
+  twitter_account_inputs?: APITwitterInput[],
+  fieldkit_inputs?: APIFieldkitInput[]
+};
+
+export type APINewFieldkitInput = {|
+  name: string
+|};
+
+export type APIFieldkitInput = {|
+  ...APIBaseInput;
+|};
+
+export type APIFieldkitInputs = {|
+  fieldkit_inputs: APIFieldkitInput[];
+|};
+
+export type APINewInputToken = {|
+  // None for now
+|};
+
+export type APIInputToken = {|
+  ...APINewInputToken;
+  expedition_id: number;
+  id: number;
+  token: string;
+|};
+
+export type APIInputTokens = {|
+  input_tokens: APIInputToken[];
+|};
 
 export type APINewTeam = {
   name: string;

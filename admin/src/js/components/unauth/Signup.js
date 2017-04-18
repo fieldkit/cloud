@@ -27,13 +27,13 @@ export class Signup extends Component {
   }
 
   async onSubmit(event) {
-    event.preventDefault()
+    event.preventDefault();
     const response = await FKApiClient.get().signUp({
       email: this.refs.email.value,
+      name: this.refs.name.value,
       username: this.refs.username.value,
       password: this.refs.password.value,
       invite_token: this.refs.invite.value,
-      name: '',
       bio: ''
     });
     if (response.type === 'err') {
@@ -66,6 +66,12 @@ export class Signup extends Component {
                 <label htmlFor="email">Email</label>
                 <input ref="email" id="email" name="email" type="email" placeholder="explorer@email.com" />
                 { errorsFor(this.state.errors, 'email') }
+              </div>
+
+              <div className="group">
+                <label htmlFor="name">name</label>
+                <input ref="name" id="name" name="name" type="text" placeholder="explorer123" />
+                { errorsFor(this.state.errors, 'name') }
               </div>
 
               <div className="group">

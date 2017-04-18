@@ -27,6 +27,8 @@ import (
 	"github.com/O-C-R/fieldkit/server/api/app"
 	"github.com/O-C-R/fieldkit/server/backend"
 	"github.com/O-C-R/fieldkit/server/email"
+	"github.com/O-C-R/fieldkit/server/social"
+	"github.com/O-C-R/fieldkit/server/social/twitter"
 )
 
 type Config struct {
@@ -91,6 +93,10 @@ func main() {
 		attribute, ok := keyvals[1].(string)
 		if !ok {
 			return errInvalidRequest(message, keyvals...)
+		}
+
+		if i := strings.LastIndex(attribute, "."); i != -1 {
+			attribute = attribute[i+1:]
 		}
 
 		return &goa.ErrorResponse{
@@ -166,6 +172,23 @@ func main() {
 		panic(err)
 	}
 
+	// TWITTER
+	if flag.Arg(0) == "twitter" {
+		twitterListCredentialer := backend.TwitterListCredentialer()
+		social.Twitter(social.TwitterOptions{
+			Backend: backend,
+			StreamOptions: twitter.StreamOptions{
+				UserLister:       twitterListCredentialer,
+				UserCredentialer: twitterListCredentialer,
+				ConsumerKey:      config.TwitterConsumerKey,
+				ConsumerSecret:   config.TwitterConsumerSecret,
+				Domain:           config.Domain,
+			},
+		})
+
+		os.Exit(0)
+	}
+
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
 	app.MountSwaggerController(service, c)
@@ -173,6 +196,7 @@ func main() {
 	// Mount "user" controller
 	c2, err := api.NewUserController(service, api.UserControllerOptions{
 		Database:   database,
+		Backend:    backend,
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
 		Domain:     config.Domain,
@@ -230,6 +254,30 @@ func main() {
 	// Mount "picture" controller
 	c10 := api.NewPictureController(service)
 	app.MountPictureController(service, c10)
+
+	// Mount "twitter" controller
+	c11 := api.NewFieldkitController(service, api.FieldkitControllerOptions{
+		Backend: backend,
+	})
+	app.MountFieldkitController(service, c11)
+
+	// Mount "schema" controller
+	c12 := api.NewSchemaController(service, api.SchemaControllerOptions{
+		Backend: backend,
+	})
+	app.MountSchemaController(service, c12)
+
+	// Mount "document" controller
+	c13 := api.NewDocumentController(service, api.DocumentControllerOptions{
+		Backend: backend,
+	})
+	app.MountDocumentController(service, c13)
+
+	// Mount "input_token" controller
+	c14 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
+		Backend: backend,
+	})
+	app.MountInputTokenController(service, c14)
 
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "scripts": {
     "start": "webpack-dev-server --inline --hot --config webpack.dev.js",
+    "dev": "NODE_ENV=development yarn start",
+    "staging": "NODE_ENV=staging yarn start",
+    "prod": "NODE_ENV=production yarn start",
     "build": "NODE_ENV=production webpack",
     "dll": "webpack --inline --config webpack.dll.js"
   },
@@ -77,6 +80,7 @@
     "json5-loader": "^0.6.0",
     "jsx-loader": "^0.13.2",
     "nib": "^1.1.0",
+    "pixi.js": "^4.4.4",
     "react": "^15.4.1",
     "react-addons-css-transition-group": "^15.3.0",
     "react-contenteditable": "^2.0.1",
@@ -97,6 +101,7 @@
     "slug": "^0.9.1",
     "style-loader": "0.13.1",
     "three": "^0.82.1",
+    "three.meshline": "^1.0.3",
     "transform-loader": "^0.2.3",
     "url-loader": "0.5.7",
     "viewport-mercator-project": "^2.1.0",

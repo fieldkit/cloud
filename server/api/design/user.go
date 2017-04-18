@@ -135,6 +135,7 @@ var _ = Resource("user", func() {
 		Description("Add a user")
 		NoSecurity()
 		Payload(AddUserPayload)
+		Response(Unauthorized)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(User)

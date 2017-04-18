@@ -102,6 +102,13 @@ $contents-width: 834px;
         }
       }
 
+      .bt-icon {
+        margin-right: $elements-padding;        
+        svg {
+          fill: white;
+        }
+      }
+
       .sidebar-nav {
         a {
           padding-left: $elements-padding*4;
@@ -162,6 +169,7 @@ $contents-width: 834px;
 
   .dropdown-contents {
     position: absolute;
+    z-index: 1000;
     width: 180px;
     top: $avatar-size-small + 10px;
     right: 0;

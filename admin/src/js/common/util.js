@@ -21,8 +21,8 @@ export class BaseError {
 }
 
 export function errorsFor(errors: ?APIErrors, key: string): ?string {
-  if (errors && errors.meta[`response.${key}`]) {
-    return errors.meta[`response.${key}`];
+  if (errors && errors.meta[key]) {
+    return errors.meta[key];
   }
 }
 
@@ -40,4 +40,12 @@ export function joinPath(basePath: string, ...parts: string[]): string {
     basePath = basePath.substr(0, basePath.length - 1);
   }
   return `${basePath}/${nextParts}`;
+}
+
+export function fkProtocol(): string {
+  return window.location.protocol;
+}
+
+export function fkHost(): string {
+  return window.location.hostname;
 }

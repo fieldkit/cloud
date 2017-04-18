@@ -9,6 +9,7 @@ import (
 
 var (
 	invalidTokenError = errors.New("invalid token")
+	tokenEncoding     = base64.URLEncoding.WithPadding(base64.NoPadding)
 )
 
 type Token []byte
@@ -31,15 +32,15 @@ func (t *Token) UnmarshalBinary(data []byte) error {
 
 // MarshalText returns a base64-encoded slice of bytes.
 func (t Token) MarshalText() (text []byte, err error) {
-	data := make([]byte, base64.URLEncoding.EncodedLen(len(t)))
+	data := make([]byte, tokenEncoding.EncodedLen(len(t)))
 	base64.URLEncoding.Encode(data, t)
 	return data, nil
 }
 
 // UnmarshalText sets the value of the Token based on a base64-encoded slice of bytes.
 func (t *Token) UnmarshalText(text []byte) error {
-	data := make([]byte, base64.URLEncoding.DecodedLen(len(text)))
-	n, err := base64.URLEncoding.Decode(data, text)
+	data := make([]byte, tokenEncoding.DecodedLen(len(text)))
+	n, err := tokenEncoding.Decode(data, text)
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,7 @@ func (t *Token) UnmarshalText(text []byte) error {
 
 // String returns a base64-encoded string.
 func (t Token) String() string {
-	return base64.URLEncoding.EncodeToString(t)
+	return tokenEncoding.EncodeToString(t)
 }
 
 // Scan sets the value of the Token based on an interface.

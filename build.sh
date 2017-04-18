@@ -38,7 +38,7 @@ ENV FIELDKIT_FRONTEND_ROOT=/frontend
 ENV FIELDKIT_LANDING_ROOT=/landing
 COPY . /
 EXPOSE 80
-CMD ["/server"]' > build/Dockerfile
+ENTRYPOINT ["/server"]' > build/Dockerfile
 
 if [ $1 = "production" ]; then
 	DOCKER_TAG=latest

@@ -11,23 +11,36 @@ import (
 	"github.com/O-C-R/fieldkit/server/data"
 )
 
-func TwitterAccountType(twitterAccount *data.TwitterAccount) *app.TwitterAccount {
-	return &app.TwitterAccount{
+func TwitterAccountInputType(twitterAccount *data.TwitterAccountInput) *app.TwitterAccountInput {
+	twitterAccountType := &app.TwitterAccountInput{
 		ID:               int(twitterAccount.ID),
 		ExpeditionID:     int(twitterAccount.ExpeditionID),
+		Name:             twitterAccount.Name,
 		TwitterAccountID: int(twitterAccount.TwitterAccountID),
 		ScreenName:       twitterAccount.ScreenName,
 	}
-}
 
-func TwitterAccountsType(twitterAccounts []*data.TwitterAccount) *app.TwitterAccounts {
-	twitterAccountsCollection := make([]*app.TwitterAccount, len(twitterAccounts))
-	for i, twitterAccount := range twitterAccounts {
-		twitterAccountsCollection[i] = TwitterAccountType(twitterAccount)
+	if twitterAccount.TeamID != nil {
+		teamID := int(*twitterAccount.TeamID)
+		twitterAccountType.TeamID = &teamID
 	}
 
-	return &app.TwitterAccounts{
-		TwitterAccounts: twitterAccountsCollection,
+	if twitterAccount.UserID != nil {
+		userID := int(*twitterAccount.UserID)
+		twitterAccountType.UserID = &userID
+	}
+
+	return twitterAccountType
+}
+
+func TwitterAccountInputsType(twitterAccounts []*data.TwitterAccountInput) *app.TwitterAccountInputs {
+	twitterAccountsCollection := make([]*app.TwitterAccountInput, len(twitterAccounts))
+	for i, twitterAccount := range twitterAccounts {
+		twitterAccountsCollection[i] = TwitterAccountInputType(twitterAccount)
+	}
+
+	return &app.TwitterAccountInputs{
+		TwitterAccountInputs: twitterAccountsCollection,
 	}
 }
 
@@ -59,13 +72,18 @@ func NewTwitterController(service *goa.Service, options TwitterControllerOptions
 }
 
 func (c *TwitterController) Add(ctx *app.AddTwitterContext) error {
-	var err error
-	twitterOAuth := &data.TwitterOAuth{}
-	twitterOAuth.InputID, err = c.options.Backend.AddInputID(ctx, int32(ctx.ExpeditionID))
-	if err != nil {
+	input := &data.Input{}
+	input.ExpeditionID = int32(ctx.ExpeditionID)
+	input.Name = ctx.Payload.Name
+	if err := c.options.Backend.AddInput(ctx, input); err != nil {
 		return err
 	}
 
+	twitterOAuth := &data.TwitterOAuth{
+		InputID: input.ID,
+	}
+
+	var err error
 	twitterOAuth.RequestToken, twitterOAuth.RequestSecret, err = c.config.RequestToken()
 	if err != nil {
 		return err
@@ -86,30 +104,30 @@ func (c *TwitterController) Add(ctx *app.AddTwitterContext) error {
 }
 
 func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
-	twitterAccount, err := c.options.Backend.TwitterAccount(ctx, int32(ctx.InputID))
+	twitterAccount, err := c.options.Backend.TwitterAccountInput(ctx, int32(ctx.InputID))
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountType(twitterAccount))
+	return ctx.OK(TwitterAccountInputType(twitterAccount))
 }
 
 func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccountsByID(ctx, int32(ctx.ExpeditionID))
+	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountsType(twitterAccounts))
+	return ctx.OK(TwitterAccountInputsType(twitterAccounts))
 }
 
 func (c *TwitterController) List(ctx *app.ListTwitterContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccounts(ctx, ctx.Project, ctx.Expedition)
+	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputs(ctx, ctx.Project, ctx.Expedition)
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(TwitterAccountsType(twitterAccounts))
+	return ctx.OK(TwitterAccountInputsType(twitterAccounts))
 }
 
 func (c *TwitterController) Callback(ctx *app.CallbackTwitterContext) error {
@@ -123,25 +141,22 @@ func (c *TwitterController) Callback(ctx *app.CallbackTwitterContext) error {
 		return err
 	}
 
-	accessToken, accessSecret, err := c.config.AccessToken(requestToken, twitterOAuth.RequestSecret, verifier)
+	twitterAccountInput := &data.TwitterAccountInput{}
+	twitterAccountInput.ID = twitterOAuth.InputID
+	twitterAccountInput.AccessToken, twitterAccountInput.AccessSecret, err = c.config.AccessToken(requestToken, twitterOAuth.RequestSecret, verifier)
 	if err != nil {
 		return err
 	}
 
-	client := twitter.NewClient(c.config.Client(ctx, oauth1.NewToken(accessToken, accessSecret)))
+	client := twitter.NewClient(c.config.Client(ctx, oauth1.NewToken(twitterAccountInput.AccessToken, twitterAccountInput.AccessSecret)))
 	user, _, err := client.Accounts.VerifyCredentials(&twitter.AccountVerifyParams{})
 	if err != nil {
 		return err
 	}
 
-	twitterAccount := &data.TwitterAccount{
-		TwitterAccountID: user.ID,
-		ScreenName:       user.ScreenName,
-		AccessToken:      accessToken,
-		AccessSecret:     accessSecret,
-	}
-
-	if err := c.options.Backend.AddTwitterAccount(ctx, twitterAccount); err != nil {
+	twitterAccountInput.TwitterAccountID = user.ID
+	twitterAccountInput.ScreenName = user.ScreenName
+	if err := c.options.Backend.AddTwitterAccountInput(ctx, twitterAccountInput); err != nil {
 		return err
 	}
 

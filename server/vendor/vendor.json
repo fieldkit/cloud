@@ -420,6 +420,12 @@
 			"revisionTime": "2017-03-08T17:16:22Z"
 		},
 		{
+			"checksumSHA1": "q+dertYFOBviMOPcBLeMtXPHh6U=",
+			"path": "github.com/jmoiron/sqlx/types",
+			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
+			"revisionTime": "2017-03-08T17:16:22Z"
+		},
+		{
 			"checksumSHA1": "pyUcq4sKKVm0KzBSZIPpHsmDF6k=",
 			"path": "github.com/kelseyhightower/envconfig",
 			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
@@ -468,6 +474,18 @@
 			"revisionTime": "2016-04-19T07:20:36Z"
 		},
 		{
+			"checksumSHA1": "TTtSE7f8JlF5bwwOI/M2jSKQMyU=",
+			"path": "github.com/paulmach/go.geo",
+			"revision": "b160a6efed6c2a8af1b59ce870dd8802056fcad5",
+			"revisionTime": "2017-03-21T18:35:34Z"
+		},
+		{
+			"checksumSHA1": "i5DYjDaR52hXzynKeIW6RZY/4yI=",
+			"path": "github.com/paulmach/go.geojson",
+			"revision": "40612a87147b9cf5cd0e397ced54d89e623647ff",
+			"revisionTime": "2017-03-27T17:05:36Z"
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
@@ -484,6 +502,24 @@
 			"path": "github.com/spf13/pflag",
 			"revision": "9ff6c6923cfffbcd502984b8e0c80539a94968b7",
 			"revisionTime": "2017-01-30T21:42:45Z"
+		},
+		{
+			"checksumSHA1": "B9K+5clCq0PU8n8/utbKT0QjQyU=",
+			"path": "github.com/xeipuuv/gojsonpointer",
+			"revision": "6fe8760cad3569743d51ddbb243b26f8456742dc",
+			"revisionTime": "2017-02-25T23:34:18Z"
+		},
+		{
+			"checksumSHA1": "pSoUW+qY6LwIJ5lFwGohPU5HUpg=",
+			"path": "github.com/xeipuuv/gojsonreference",
+			"revision": "e02fc20de94c78484cd5ffb007f8af96be030a45",
+			"revisionTime": "2015-08-08T06:50:54Z"
+		},
+		{
+			"checksumSHA1": "5+YVBClSfR0M/M/G5JI2cG7G+ak=",
+			"path": "github.com/xeipuuv/gojsonschema",
+			"revision": "702b404897d4364af44dc8dcabc9815947942325",
+			"revisionTime": "2017-03-24T00:22:21Z"
 		},
 		{
 			"checksumSHA1": "0Gpx49mdQXAyAQkFPePuDsRhESI=",

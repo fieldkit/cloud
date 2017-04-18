@@ -5,7 +5,28 @@ import (
 
 	"github.com/O-C-R/fieldkit/server/api/app"
 	"github.com/O-C-R/fieldkit/server/backend"
+	"github.com/O-C-R/fieldkit/server/data"
 )
+
+func InputType(input *data.Input) *app.Input {
+	inputType := &app.Input{
+		ID:           int(input.ID),
+		ExpeditionID: int(input.ExpeditionID),
+		Name:         input.Name,
+	}
+
+	if input.TeamID != nil {
+		teamID := int(*input.TeamID)
+		inputType.TeamID = &teamID
+	}
+
+	if input.UserID != nil {
+		userID := int(*input.UserID)
+		inputType.UserID = &userID
+	}
+
+	return inputType
+}
 
 type InputControllerOptions struct {
 	Backend *backend.Backend
@@ -24,24 +45,59 @@ func NewInputController(service *goa.Service, options InputControllerOptions) *I
 	}
 }
 
+func (c *InputController) Update(ctx *app.UpdateInputContext) error {
+	input, err := c.options.Backend.Input(ctx, int32(ctx.InputID))
+	if err != nil {
+		return err
+	}
+
+	input.Name = ctx.Payload.Name
+
+	if ctx.Payload.TeamID != nil {
+		teamID := int32(*ctx.Payload.TeamID)
+		input.TeamID = &teamID
+	} else {
+		input.TeamID = nil
+	}
+
+	if ctx.Payload.UserID != nil {
+		userID := int32(*ctx.Payload.UserID)
+		input.UserID = &userID
+	} else {
+		input.UserID = nil
+	}
+
+	if err := c.options.Backend.UpdateInput(ctx, input); err != nil {
+		return err
+	}
+
+	return ctx.OK(InputType(input))
+}
+
 func (c *InputController) List(ctx *app.ListInputContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccounts(ctx, ctx.Project, ctx.Expedition)
+	inputs, err := c.options.Backend.ListTwitterAccountInputs(ctx, ctx.Project, ctx.Expedition)
 	if err != nil {
 		return err
 	}
 
 	return ctx.OK(&app.Inputs{
-		TwitterAccounts: TwitterAccountsType(twitterAccounts).TwitterAccounts,
+		TwitterAccountInputs: TwitterAccountInputsType(inputs).TwitterAccountInputs,
 	})
 }
 
 func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccountsByID(ctx, int32(ctx.ExpeditionID))
+	twitterAccountInputs, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
+	if err != nil {
+		return err
+	}
+
+	fieldkitInputs, err := c.options.Backend.ListFieldkitInputsByID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}
 
 	return ctx.OK(&app.Inputs{
-		TwitterAccounts: TwitterAccountsType(twitterAccounts).TwitterAccounts,
+		TwitterAccountInputs: TwitterAccountInputsType(twitterAccountInputs).TwitterAccountInputs,
+		FieldkitInputs:       FieldkitInputsType(fieldkitInputs).FieldkitInputs,
 	})
 }

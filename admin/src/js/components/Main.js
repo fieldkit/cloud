@@ -14,6 +14,7 @@ import log from 'loglevel';
 
 import { FKApiClient } from '../api/api';
 import type { APIUser, APIProject, APIExpedition } from '../api/types';
+import { fkHost } from '../common/util';
 
 import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
@@ -28,6 +29,8 @@ import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
 import '../../css/main.css'
+
+import { HamburgerIcon, OpenInNewIcon, ArrowDownIcon } from './icons/Icons'
 
 type Props = {
   match: RouterMatch;
@@ -85,9 +88,10 @@ export class Main extends Component {
 
     if (projectSlug != newProjectSlug) {
       promises.push(this.loadActiveProject(newProjectSlug));
-      promises.push(this.loadProjects());
+      promises.push(this.loadExpeditions(newProjectSlug));
       stateChange.activeProject = null;
     } else if (!newProjectSlug) {
+      promises.push(this.loadProjects());
       stateChange.activeProject = null;
     }
 
@@ -112,6 +116,11 @@ export class Main extends Component {
 
   expeditionSlug(): ?string {
     return this.props.match.params.expeditionSlug;
+  }
+
+  async onUserUpdate (user: APIUser) {
+    log.debug('main -> onUserUpdate');
+    this.setState({user: user});
   }
 
   async loadUser() {
@@ -199,7 +208,7 @@ export class Main extends Component {
     if (newSlug) {
       const projectSlug = this.projectSlug();
       if (projectSlug) {
-        this.props.history.replace(`/projects/${newSlug}/expeditions/${newSlug}`);
+        this.props.history.replace(`/projects/${projectSlug}/expeditions/${newSlug}`);
       } else {
         this.props.history.replace('/');
       }
@@ -244,13 +253,21 @@ export class Main extends Component {
           <div className="sidebar">
             <div className="sidebar-section project-section">
               <h5>Projects</h5>
-              <Link to={`/`}>All</Link>
+              <Link to={`/`}>
+                <div className="bt-icon medium">
+                  <HamburgerIcon />
+                </div>
+                All
+              </Link>
               { activeProject &&
                 <div>
                   <p className="project-name">
+                    <div className="bt-icon medium">
+                      <ArrowDownIcon />
+                    </div>
                     <span>{activeProject.name}</span>
-                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/`} alt="go to project`" target="_blank">
-                      <img src={externalLinkImg} alt="external link" />
+                    <a className="bt-icon small" href={`//${activeProject.slug}.${fkHost()}/`} alt="go to project`" target="_blank">
+                      <OpenInNewIcon />
                     </a>
                   </p>
                   <div className="sidebar-nav">
@@ -264,10 +281,10 @@ export class Main extends Component {
                 <h5>Expedition</h5>
                   <p className="expedition-name">
                     <span>{activeExpedition.name}</span>
-                    <a className="bt-icon" href={`https://${activeProject.slug}.fieldkit.org/${activeExpedition.slug}`}
+                    <a className="bt-icon medium" href={`//${activeProject.slug}.${fkHost()}/${activeExpedition.slug}`}
                       alt="go to expedition"
                       target="_blank">
-                      <img src={externalLinkImg} alt="external link" />
+                      <OpenInNewIcon />
                     </a>
                   </p>
                   <div className="sidebar-nav">
@@ -290,7 +307,7 @@ export class Main extends Component {
           <Dropdown className="account-dropdown" ref="dropdown">
             <DropdownTrigger className="trigger">
               <div className="user-avatar small">
-                <img src={placeholderImage} alt="profile" />
+                <img src={user ? FKApiClient.get().userPictureUrl(user.id) : placeholderImage} alt="profile" />
               </div>
             </DropdownTrigger>
             <DropdownContent className="dropdown-contents">
@@ -330,6 +347,7 @@ export class Main extends Component {
                 component={ProjectSettings}
                 required={[activeProject]}
                 project={activeProject}
+                user={user}
                 onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
                 path="/projects/:projectSlug"
@@ -343,7 +361,8 @@ export class Main extends Component {
                 path="/profile"
                 component={Profile}
                 required={[user]}
-                user={user} />
+                user={user}
+                onUpdate={this.onUserUpdate.bind(this)} />
               <RouteOrLoading
                 path="/"
                 component={Projects}

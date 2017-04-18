@@ -7,7 +7,7 @@ resource "aws_security_group" "ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["24.103.10.214/32"]
+    cidr_blocks = ["24.103.10.214/32", "52.44.84.69/32"]
   }
 
   egress {

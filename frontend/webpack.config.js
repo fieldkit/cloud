@@ -99,10 +99,10 @@ module.exports = {
       }
     }),
     new webpack.optimize.UglifyJsPlugin({ 
-      minimize: true,
+      minimize: false,
       comments: false,
       mangle: false,
-      sourcemap: false
+      sourcemap: true
     }),
     new webpack.DefinePlugin({
       'process.env': {

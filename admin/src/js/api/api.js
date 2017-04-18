@@ -17,8 +17,17 @@ import type {
   APIExpedition,
   APINewExpedition,
   APIExpeditions,
+  APIMutableInput,
+  APIBaseInput,
+  APINewTwitterInput,
   APITwitterInput,
   APITwitterInputCreateResponse,
+  APIFieldkitInput,
+  APIFieldkitInputs,
+  APINewFieldkitInput,
+  APINewInputToken,
+  APIInputToken,
+  APIInputTokens,
   APIInputs,
   APITeam,
   APINewTeam,
@@ -125,29 +134,15 @@ export class FKApiClient extends JWTAPIClient {
       return { type: 'ok', payload: res };
     } catch (e) {
       if (e instanceof AuthenticationError) {
-        const APIFakeAuthError: APIErrors = {
-          code: 'AuthenticationError',
-          detail: 'Unauthorized',
-          id: '',
-          meta: {},
-          status: 401
-        };
-        return { type: 'err', errors: APIFakeAuthError };
-      } else if (e instanceof APIError) {
-        const APIFakeOtherError: APIErrors = {
-          code: 'UnknownAPIError',
-          detail: e.body || '',
-          id: '',
-          meta: {},
-          status: 500
-        }
+        this.onSignout();
+      }
 
-        try {
-          return { type: 'err', errors: APIFakeOtherError };
-        } catch (e2) {
-          return { type: 'err', errors: APIFakeOtherError };
-        }
+      if (e instanceof APIError) {
+        const jsonError = JSON.parse(e.body);
+        return { type: 'err', errors: jsonError };
       } else {
+        log.error('Unknown error:', e);
+
         const APIFakeOtherError: APIErrors = {
           code: 'UnknownError',
           detail: e.msg,
@@ -155,7 +150,6 @@ export class FKApiClient extends JWTAPIClient {
           meta: {},
           status: 500
         }
-
         return { type: 'err', errors: APIFakeOtherError };
       }
     }
@@ -177,6 +171,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.execWithErrors(this.patchJSON(endpoint, values));
   }
 
+  putWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+    return this.execWithErrors(this.putJSON(endpoint, values));
+  }
+
   signUp(u: APINewUser): Promise<FKAPIResponse<APIUser>> {
     return this.postWithErrors('/users', u);
   }
@@ -192,6 +190,10 @@ export class FKApiClient extends JWTAPIClient {
   async signOut(): Promise<void> {
     await this.postForm('/logout')
     this.onSignout();
+  }
+
+  userPictureUrl(userId: number): string {
+    return `${this.baseUrl}/users/${userId}/picture`;
   }
 
   getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
@@ -214,6 +216,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors('/users');
   }
 
+  projectPictureUrl(projectId: number): string {
+    return `${this.baseUrl}/projects/${projectId}/picture`;
+  }
+
   getProjects(): Promise<FKAPIResponse<APIProjects>> {
     return this.getWithErrors('/projects')
   }
@@ -234,6 +240,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.patchWithErrors(`/projects/${projectId}`, values)
   }
 
+  expeditionPictureUrl(expeditionId: number): string {
+    return `${this.baseUrl}/expeditions/${expeditionId}/picture`;
+  }
+
   getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
     return this.getWithErrors(`/projects/@/${projectSlug}/expeditions`)
   }
@@ -250,6 +260,10 @@ export class FKApiClient extends JWTAPIClient {
     return this.patchWithErrors(`/expeditions/${expeditionId}`, values)
   }
 
+  updateInput(inputId: number, inputData: APIMutableInput): Promise<FKAPIResponse<APIBaseInput>> {
+    return this.patchWithErrors(`/inputs/${inputId}`, inputData);
+  }
+
   getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
     return this.getWithErrors(`/expeditions/${expeditionId}/inputs`)
   }
@@ -262,8 +276,40 @@ export class FKApiClient extends JWTAPIClient {
     return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
   }
 
-  createTwitterInput(expeditionId: number): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`)
+  createTwitterInput(expeditionId: number, twitterInput: APINewTwitterInput): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`, twitterInput)
+  }
+
+  createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`, fieldkitInput);
+  }
+
+  getFieldkitInput(inputId: number): Promise<FKAPIResponse<APIFieldkitInput>> {
+    return this.getWithErrors(`/inputs/fieldkits/${inputId}`);
+  }
+
+  getFieldkitsByExpeditionId(expeditionId: number): Promise<FKAPIResponse<APIFieldkitInputs>> {
+    return this.getWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`);
+  }
+
+  getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
+    return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
+  }
+
+  getExpeditionInputTokens(expeditionId: number): Promise<FKAPIResponse<APIInputTokens>> {
+    return this.getWithErrors(`/expeditions/${expeditionId}/input-tokens`)
+  }
+
+  getInputTokensBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputTokens>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/input-tokens`)
+  }
+
+  createInputToken(expeditionId: number, inputToken: APINewInputToken): Promise<FKAPIResponse<APIInputToken>> {
+    return this.postWithErrors(`/expeditions/${expeditionId}/input-tokens`, inputToken)
+  }
+
+  deleteInputToken(inputTokenId: number): Promise<FKAPIResponse<void>> {
+    return this.delWithErrors(`/input-tokens/${inputTokenId}`)
   }
 
   getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
@@ -280,6 +326,10 @@ export class FKApiClient extends JWTAPIClient {
 
   deleteTeam(teamId: number): Promise<FKAPIResponse<APIMember>> {
     return this.delWithErrors(`/teams/${teamId}`)
+  }
+
+  updateTeam(teamId: number, values: APINewTeam): Promise<FKAPIResponse<APINewTeam>> {
+    return this.patchWithErrors(`/teams/${teamId}`, values)
   }
 
   addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
@@ -303,7 +353,7 @@ export class FKApiClient extends JWTAPIClient {
   }
 
   updateMember(teamId: number, userId: number, values: APIBaseMember): Promise<FKAPIResponse<APIMember>> {
-    return this.postWithErrors(`/teams/${teamId}/member/${userId}`, values)
+    return this.patchWithErrors(`/teams/${teamId}/members/${userId}`, values)
   }
 
   getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {

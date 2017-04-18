@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 
 import { FormContainer } from '../containers/FormContainer';
-import { errorsFor, slugify } from '../../common/util';
+import { errorsFor, slugify, fkHost } from '../../common/util';
 
 import type { APIErrors, APINewProject } from '../../api/types';
 
@@ -31,22 +31,27 @@ export class ProjectForm extends Component {
 
   constructor(props: Props) {
     super(props)
+    const { name, slug, description } = props;
+
     this.state = {
-      name: this.props.name || '',
-      slug: this.props.slug || '',
-      description: this.props.description || '',
-      slugHasChanged: false,
+      name: name || '',
+      slug: slug || '',
+      description: description || '',
+      slugHasChanged: !!name && !!slug && slugify(name) != slug,
       saveDisabled: false,
       errors: null
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
+    const { name, slug, description } = nextProps;
+
     this.setState({
-      name: nextProps.name || '',
-      slug: nextProps.slug || '',
-      description: nextProps.description || '',
-      slugHasChanged: false,
+      name: name || '',
+      slug: slug || '',
+      description: description || '',
+      slugHasChanged: !!name && !!slug && slugify(name) != slug,
+      saveDisabled: false,
       errors: null
     });
   }
@@ -103,9 +108,9 @@ export class ProjectForm extends Component {
           <p className="url">
             <input type="text" name="slug" className='slug' value={this.state.slug} onChange={this.handleSlugChange.bind(this)} />
             {/* TODO: replace with something that handles alternative domains */}
-            <span className="domain">.fieldkit.org/</span>
+            <span className="domain">.{fkHost()}/</span>
           </p>
-          { errorsFor(this.state.errors, 'path') }
+          { errorsFor(this.state.errors, 'slug') }
         </div>
 
         <div className="form-group">
