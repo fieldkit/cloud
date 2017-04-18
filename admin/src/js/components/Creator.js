@@ -55,55 +55,95 @@ type Collection = {
 
 type GuidFilter = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "contains";
     query: number[];
 }
 
 type StringFilter = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "contains" | "does not contain" | "matches" | "exists";
     query: string;
 }
 
 type NumFilter = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "GT" | "LT" | "EQ" | "notch";
     query: number;
 }
 
 type GeoFilter = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "within" | "not within";
     query: Object
 }
 type DateFilter = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "before" | "after" | "within";
     date: number;
     within: number;
 }
 type StringMod = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "gsub";
     query: string;
 }
 type NumMod = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "round";
 }
 type GeoMod = {
     id: number;
-    key: string;
+    attribute: string;
     operation: "copy from" | "jitter";
     source_collection: string;
     filters: number[];
+}
+
+export class StringFilterComponent extends Component {
+    props: StringFilter;
+
+    constructor(props: StringFilter) {
+        super(props);
+    }
+
+    render() {
+        const operations = ["contains","does not contain","matches","exists"].map(o => <option value={o}>{o.toUpperCase()}</option>)
+        
+        return (
+            <div className="fk-filter fk-guidfilter">
+                <div className="filter-title-bar">
+                    <span>{this.props.attribute}</span>
+                    <div className="filter-title-controls">
+                        <span className="filter-icon"></span>
+                        <span className="filter-closer"></span>
+                    </div>
+                </div>
+                <div className="filter-body">
+                    <div>
+                        <span className="filter-body-label">Operation: </span>
+                        <select className="filter-body-select">
+                            {operations}
+                        </select>
+                    </div>
+                    <div>
+                        <span className="filter-body-label">Value: </span>
+                        <input className="filter-body-input"/>
+                    </div>
+                    <div className="filter-body-buttons">
+                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-save">Save</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 }
 
 export class Creator extends Component {
@@ -312,8 +352,15 @@ export class Creator extends Component {
       expeditions = expeditions.filter(e => e.id !== activeExpedition.id);
     }
 
+    const test_string_filter = {
+        id: 0,
+        attribute: "username",
+        operation: "matches",
+        query: ""
+    }
+
     return (
-        <div>HELLO WORLD</div>
+        <StringFilterComponent {...test_string_filter}/>
     )
   }
 }
