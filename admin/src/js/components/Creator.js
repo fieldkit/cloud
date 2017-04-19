@@ -107,7 +107,10 @@ type GeoMod = {
 }
 
 export class StringFilterComponent extends Component {
-    props: StringFilter;
+    props: {
+        data: StringFilter;
+        options: [string, string][];
+    }
 
     constructor(props: StringFilter) {
         super(props);
@@ -115,11 +118,27 @@ export class StringFilterComponent extends Component {
 
     render() {
         const operations = ["contains","does not contain","matches","exists"].map(o => <option value={o}>{o.toUpperCase()}</option>)
+        const data = this.props.data
+        let value_field 
+        if(this.props.options.length > 0){
+            let options = this.props.options.map(([id,name]) => {
+                return (
+                    <option value={name}>{name}</option>
+                )
+            })
+            value_field = (
+                <select className="value-body-select" value={data.query}>
+                    {options}
+                </select>
+            )
+        } else {
+            value_field = <input className="filter-body-input" value={data.query}/>
+        }
         
         return (
             <div className="fk-filter fk-guidfilter">
                 <div className="filter-title-bar">
-                    <span>{this.props.attribute}</span>
+                    <span>{data.attribute}</span>
                     <div className="filter-title-controls">
                         <span className="filter-icon"></span>
                         <span className="filter-closer"></span>
@@ -128,13 +147,13 @@ export class StringFilterComponent extends Component {
                 <div className="filter-body">
                     <div>
                         <span className="filter-body-label">Operation: </span>
-                        <select className="filter-body-select">
+                        <select className="filter-body-select" value={data.operation}>
                             {operations}
                         </select>
                     </div>
                     <div>
                         <span className="filter-body-label">Value: </span>
-                        <input className="filter-body-input"/>
+                        {value_field}
                     </div>
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel">Delete</button>
@@ -356,11 +375,14 @@ export class Creator extends Component {
         id: 0,
         attribute: "username",
         operation: "matches",
-        query: ""
+        query: "bar"
     }
 
     return (
-        <StringFilterComponent {...test_string_filter}/>
+        <div>
+            <StringFilterComponent data={test_string_filter} options={[]}/>
+            <StringFilterComponent data={test_string_filter} options={[["foo","bar"]]}/>
+        </div>
     )
   }
 }
