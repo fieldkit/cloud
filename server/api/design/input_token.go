@@ -64,14 +64,8 @@ var _ = Resource("input_token", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/input-tokens"))
 		Description("List an expedition's input tokens")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Expedition slug")
-			})
+			Param("project", String, ProjectSlug)
+			Param("expedition", String, ExpeditionSlug)
 			Required("project", "expedition")
 		})
 		Response(BadRequest)

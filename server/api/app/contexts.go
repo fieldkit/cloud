@@ -12,6 +12,7 @@ import (
 	"github.com/goadesign/goa"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 )
 
 // AddAdministratorContext provides the administrator add action context.
@@ -139,6 +140,9 @@ func NewGetAdministratorContext(ctx context.Context, r *http.Request, service *g
 		rctx.Username = rawUsername
 		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
 			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Username) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1404,6 +1408,9 @@ func NewGetMemberContext(ctx context.Context, r *http.Request, service *goa.Serv
 		rctx.Username = rawUsername
 		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
 			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Username) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
 		}
 	}
 	return &rctx, err

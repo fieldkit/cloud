@@ -43,8 +43,7 @@ type (
 	// GetAdministratorCommand is the command line data structure for the get action of administrator
 	GetAdministratorCommand struct {
 		// Project slug
-		Project string
-		// Username
+		Project     string
 		Username    string
 		PrettyPrint bool
 	}
@@ -252,8 +251,7 @@ type (
 		// Project slug
 		Project string
 		// Team slug
-		Team string
-		// Team slug
+		Team        string
 		Username    string
 		PrettyPrint bool
 	}
@@ -396,7 +394,7 @@ type (
 		Expedition string
 		// Project slug
 		Project string
-		// Project slug
+		// Team slug
 		Team        string
 		PrettyPrint bool
 	}
@@ -1732,7 +1730,7 @@ func (cmd *GetAdministratorCommand) RegisterFlags(cc *cobra.Command, c *client.C
 	var project string
 	cc.Flags().StringVar(&cmd.Project, "project", project, `Project slug`)
 	var username string
-	cc.Flags().StringVar(&cmd.Username, "username", username, `Username`)
+	cc.Flags().StringVar(&cmd.Username, "username", username, ``)
 }
 
 // Run makes the HTTP request corresponding to the GetIDAdministratorCommand command.
@@ -2540,7 +2538,7 @@ func (cmd *GetMemberCommand) RegisterFlags(cc *cobra.Command, c *client.Client) 
 	var team string
 	cc.Flags().StringVar(&cmd.Team, "team", team, `Team slug`)
 	var username string
-	cc.Flags().StringVar(&cmd.Username, "username", username, `Team slug`)
+	cc.Flags().StringVar(&cmd.Username, "username", username, ``)
 }
 
 // Run makes the HTTP request corresponding to the GetIDMemberCommand command.
@@ -3120,7 +3118,7 @@ func (cmd *GetTeamCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var project string
 	cc.Flags().StringVar(&cmd.Project, "project", project, `Project slug`)
 	var team string
-	cc.Flags().StringVar(&cmd.Team, "team", team, `Project slug`)
+	cc.Flags().StringVar(&cmd.Team, "team", team, `Team slug`)
 }
 
 // Run makes the HTTP request corresponding to the GetIDTeamCommand command.

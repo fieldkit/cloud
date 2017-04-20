@@ -80,10 +80,7 @@ var _ = Resource("schema", func() {
 		Routing(GET("projects/@/:project/schemas"))
 		Description("List a project's schemas")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
-				Description("Project slug")
-			})
+			Param("project", String, ProjectSlug)
 			Required("project")
 		})
 		Response(BadRequest)
