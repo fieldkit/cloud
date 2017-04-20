@@ -4,6 +4,11 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+const (
+	UsernamePattern = `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`
+	SlugPattern     = `^[\da-z]+(?:-[\da-z]+)*$`
+)
+
 var cors = func() {
 	Headers("Authorization")
 	Expose("Authorization")
@@ -41,3 +46,26 @@ var Location = MediaType("application/vnd.app.location+json", func() {
 		Attribute("location")
 	})
 })
+
+var (
+	Username = func() {
+		Pattern(UsernamePattern)
+		Description("Username")
+		MaxLength(40)
+	}
+	ProjectSlug = func() {
+		Pattern(SlugPattern)
+		Description("Project slug")
+		MaxLength(40)
+	}
+	ExpeditionSlug = func() {
+		Pattern(SlugPattern)
+		Description("Expedition slug")
+		MaxLength(40)
+	}
+	TeamSlug = func() {
+		Pattern(SlugPattern)
+		Description("Team slug")
+		MaxLength(40)
+	}
+)

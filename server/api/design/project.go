@@ -78,10 +78,7 @@ var _ = Resource("project", func() {
 		Routing(GET("projects/@/:project"))
 		Description("Get a project")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
+			Param("project", String, ProjectSlug)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

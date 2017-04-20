@@ -67,14 +67,8 @@ var _ = Resource("input", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs"))
 		Description("List a project's inputs")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
-				Description("Expedition slug")
-			})
+			Param("project", String, ProjectSlug)
+			Param("expedition", String, ExpeditionSlug)
 			Required("project", "expedition")
 		})
 		Response(BadRequest)

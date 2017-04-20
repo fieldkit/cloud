@@ -218,164 +218,164 @@
 			"revisionTime": "2017-03-15T21:01:39Z"
 		},
 		{
-			"checksumSHA1": "HfrmEEVaKYVKaKs/VpieLR05QXg=",
+			"checksumSHA1": "WEYMoPraOcV4Q3W+GIBg1NX4rwk=",
 			"path": "github.com/goadesign/goa",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "0tJWaojgHp+zEKRHaCErvqFa4Ac=",
+			"checksumSHA1": "PGoTMcDO7cHUY6JQ3aUdjC898aA=",
 			"path": "github.com/goadesign/goa/client",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "Sf/0bt+aQfG4ng+Y061mu37KegI=",
+			"checksumSHA1": "kiRPo3VA0HRvIvZTpt/iL4JdlVo=",
 			"path": "github.com/goadesign/goa/cors",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "N9e4In31FUb2sBbJC34LcCVnpT4=",
+			"checksumSHA1": "jvQ3kDBbIILTWfih7IEy1WwE51Y=",
 			"path": "github.com/goadesign/goa/design",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "IYTOMLcbNqqMBtbbK5cLfE0cUsI=",
+			"checksumSHA1": "zK+d52qtapmNH4RmEu20qUuLs8M=",
 			"path": "github.com/goadesign/goa/design/apidsl",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "vjHDK/WYZZQTsYjAdYWMd0ak+PA=",
 			"path": "github.com/goadesign/goa/dslengine",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "CJiEQgZnqNM0PmTQNjH1wNfhJc4=",
+			"checksumSHA1": "Q1f16XG7mNR4IP/uJ8lyp2ezUDY=",
 			"path": "github.com/goadesign/goa/goagen/codegen",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "S4KpARuc07kDr9WDBy3ot4K10WM=",
+			"checksumSHA1": "8lEii0hShTY6L35BVvj3g2ykn0U=",
 			"path": "github.com/goadesign/goa/goagen/gen_app",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "TE7vYTl2YFsW+YCe9+iGYfoTBRc=",
+			"checksumSHA1": "rGoClVLXOlpXdN6I1iHUVe4+/UA=",
 			"path": "github.com/goadesign/goa/goagen/gen_client",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "7yKsANg2G1FQlSP/HjVHnGyAoSc=",
 			"path": "github.com/goadesign/goa/goagen/gen_js",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
+			"revisionTime": "2017-04-14T09:20:37Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "iZTsvTXtEUU/w2XETwKejpDK6pM=",
 			"path": "github.com/goadesign/goa/goagen/gen_main",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
+			"revisionTime": "2017-04-14T09:20:37Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "kOFvEeXTYr8YEd8Ubr6uLdVbig0=",
 			"path": "github.com/goadesign/goa/goagen/gen_schema",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "6yc7Lh3p/KlZ5QgXPjTulOjNAsI=",
 			"path": "github.com/goadesign/goa/goagen/gen_swagger",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "GVW4KouC9RUAjuJeMGquFAOZkzI=",
 			"path": "github.com/goadesign/goa/goagen/utils",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "i5dwcaoGLDOQpIFmJMRiZN3GJsM=",
 			"path": "github.com/goadesign/goa/goatest",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
+			"revisionTime": "2017-04-14T09:20:37Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "TF/seU3c05O1WqGd6+DMifDUMhQ=",
+			"checksumSHA1": "qLcgVydyJ3ezc4tT67c4vo4jj40=",
 			"path": "github.com/goadesign/goa/middleware",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "RhQWPRubgKAPv6ZgD6ZFDFE0R8c=",
+			"checksumSHA1": "PpQUB1d15bSMeOHFHt9e5i8sj4Y=",
 			"path": "github.com/goadesign/goa/middleware/gzip",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "LFVJizmsana7b4joSzuUUXNPWEU=",
+			"checksumSHA1": "UbQBXMXZ7jvlAK+VvPuElZ62U4Q=",
 			"path": "github.com/goadesign/goa/middleware/security/jwt",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "zWFNNTZHErN63ltN+9xIqWPNYGY=",
 			"path": "github.com/goadesign/goa/uuid",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "LqlieDP4eDgIeAd0X2m8+w0zBH4=",
+			"checksumSHA1": "MzciBV4y4i7kyFIt1sfW0Nh7SAg=",
 			"path": "github.com/goadesign/goa/version",
-			"revision": "cc9e31748d9ebf63903431a808ee3ef7c491dc3a",
-			"revisionTime": "2017-03-15T07:43:11Z",
-			"version": "=v1",
-			"versionExact": "v1"
+			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
+			"revisionTime": "2017-04-17T18:24:04Z",
+			"version": "=v1.2.0",
+			"versionExact": "v1.2.0"
 		},
 		{
 			"checksumSHA1": "aJ/kX/eCUlrCJBZ26Hwh/RXzAIw=",

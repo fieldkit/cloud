@@ -69,14 +69,8 @@ var _ = Resource("administrator", func() {
 	Action("get", func() {
 		Routing(GET("projects/@/:project/administrators/@/:username"))
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("username", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Username")
-			})
+			Param("project", String, ProjectSlug)
+			Param("username", String, Username)
 		})
 		Description("Get an administrator")
 		Response(OK, func() {
@@ -101,10 +95,7 @@ var _ = Resource("administrator", func() {
 		Routing(GET("projects/@/:project/administrators"))
 		Description("List an project's administrators")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
+			Param("project", String, ProjectSlug)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
