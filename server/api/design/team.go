@@ -97,18 +97,9 @@ var _ = Resource("team", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team"))
 		Description("Add a team")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Expedition slug")
-			})
-			Param("team", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
+			Param("project", String, ProjectSlug)
+			Param("expedition", String, ExpeditionSlug)
+			Param("team", String, TeamSlug)
 			Required("project", "expedition", "team")
 		})
 		Response(BadRequest)
@@ -134,14 +125,8 @@ var _ = Resource("team", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams"))
 		Description("List an expedition's teams")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Expedition slug")
-			})
+			Param("project", String, ProjectSlug)
+			Param("expedition", String, ExpeditionSlug)
 			Required("project", "expedition")
 		})
 		Response(BadRequest)

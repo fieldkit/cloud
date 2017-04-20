@@ -178,7 +178,7 @@ definitions:
   Document:
     description: Document media type (default view)
     example:
-      data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
+      data: 152cf519-ad5d-47ee-984f-e7eae92eb847
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -191,7 +191,7 @@ definitions:
       user_id: 2.319954e+18
     properties:
       data:
-        example: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
+        example: 152cf519-ad5d-47ee-984f-e7eae92eb847
       id:
         example: Possimus porro quaerat in qui.
         type: string
@@ -225,7 +225,7 @@ definitions:
     description: DocumentCollection is the media type for an array of Document (default
       view)
     example:
-    - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
+    - data: 152cf519-ad5d-47ee-984f-e7eae92eb847
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -236,7 +236,7 @@ definitions:
       team_id: 7.1933954e+18
       timestamp: 9.0560484e+18
       user_id: 2.319954e+18
-    - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
+    - data: 152cf519-ad5d-47ee-984f-e7eae92eb847
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -256,7 +256,7 @@ definitions:
     description: Documents media type (default view)
     example:
       documents:
-      - data: ed0a2b7c-ce94-4a49-a678-328f441f0b8c
+      - data: 152cf519-ad5d-47ee-984f-e7eae92eb847
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:
@@ -2099,8 +2099,8 @@ paths:
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
-      - description: Username
-        in: path
+      - in: path
+        maxLength: 40
         name: username
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
@@ -2418,7 +2418,7 @@ paths:
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
-      - description: Project slug
+      - description: Team slug
         in: path
         name: team
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
@@ -2512,8 +2512,8 @@ paths:
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true
         type: string
-      - description: Team slug
-        in: path
+      - in: path
+        maxLength: 40
         name: username
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         required: true

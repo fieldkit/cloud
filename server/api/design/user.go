@@ -13,10 +13,7 @@ var AddUserPayload = Type("AddUserPayload", func() {
 	Attribute("email", String, func() {
 		Format("email")
 	})
-	Attribute("username", String, func() {
-		Pattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`)
-		MaxLength(40)
-	})
+	Attribute("username", String, Username)
 	Attribute("password", String, func() {
 		MinLength(10)
 	})

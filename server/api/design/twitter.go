@@ -89,14 +89,8 @@ var _ = Resource("twitter", func() {
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts"))
 		Description("List an expedition's Twitter account inputs")
 		Params(func() {
-			Param("project", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Project slug")
-			})
-			Param("expedition", String, func() {
-				Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-				Description("Expedition slug")
-			})
+			Param("project", String, ProjectSlug)
+			Param("expedition", String, ExpeditionSlug)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
