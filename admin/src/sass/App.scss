@@ -83,8 +83,8 @@ $modal-width: 618px;
 }
 
 //---------------------- COLOR -----------------------//
-$color-1: rgb(194, 38, 0);
-$color-2: rgb(223, 37, 13);
+$color-1: #A01818;
+$color-2: #B71C1C;
 $color-3: rgb(236, 17, 52);
 $color-4: rgb(249, 189, 82);
 $color-5: rgb(255, 229, 169);
@@ -99,15 +99,13 @@ $gray-5: rgb(248, 248, 248);
 
 // Variables
 // $font-serif: 'Merriweather', serif;
-// $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-sans: sans-serif, "Helvetica Neue", Helvetica, Arial;
+$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 // Styles
 @mixin type-h1 {
   font-size: 36px;
   line-height: $baseline-height*4;
   font-family: $font-sans;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
   letter-spacing: 1px;
   margin-bottom: $baseline-height*2;
