@@ -247,7 +247,7 @@ export class Main extends Component {
 
     return (
       <div className="main">
-        <div className="header row">
+        <div className="page-header row">
 
           <div className="top-bar container">
 
@@ -296,8 +296,8 @@ export class Main extends Component {
           { activeProject && !activeExpedition &&
           <div className="nav-bar row">
             <div className="container navigation-tabs">
-              <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
-              <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}`}><span>Expeditions</span></NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/settings`}><span>Settings</span></NavLink>
             </div>
           </div>
           }
@@ -305,17 +305,18 @@ export class Main extends Component {
           { activeProject && activeExpedition &&
           <div className="nav-bar row">
             <div className="container navigation-tabs">
-              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
-              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
-              <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}><span>Data Sources</span></NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}><span>Teams</span></NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}><span>Settings</span></NavLink>
             </div>
           </div>
           }
 
         </div>
 
-        <div className="content row">
-          <div className="container">
+        <div className="page-body row">
+        
+          <div className="container content">
 
             <Switch>
               <RouteOrLoading
@@ -365,14 +366,11 @@ export class Main extends Component {
                 projects={projects}
                 onProjectCreate={this.onProjectCreate.bind(this)} />
             </Switch>
-
           </div>
-        </div>
 
-        <div className="row">
-          <footer className="footer container">
+          <footer className="footer">
             <Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
-          </footer>
+          </footer>       
         </div>
       </div>
     )
