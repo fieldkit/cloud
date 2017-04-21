@@ -28,12 +28,12 @@ export class StringFilterComponent extends Component {
                 )
             })
             value_field = (
-                <select className="value-body-select" value={data.query} onChange={(e) => creator.updateStringFilter(data,{"query":e.target.value})}>
+                <select className="value-body-select" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}>
                     {options}
                 </select>
             )
         } else {
-            value_field = <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateStringFilter(data,{"query":e.target.value})}/>
+            value_field = <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}/>
         }
         
         return (
@@ -48,7 +48,7 @@ export class StringFilterComponent extends Component {
                 <div className="filter-body">
                     <div>
                         <span className="filter-body-label">Operation: </span>
-                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateStringFilter(data,{"operation":e.target.value})}>
+                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>
                     </div>
@@ -57,7 +57,7 @@ export class StringFilterComponent extends Component {
                         {value_field}
                     </div>
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>
@@ -92,16 +92,16 @@ export class NumFilterComponent extends Component {
                 <div className="filter-body">
                     <div>
                         <span className="filter-body-label">Operation: </span>
-                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateNumFilter(data,{"operation":e.target.value})}>
+                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>
                     </div>
                     <div>
                         <span className="filter-body-label">Value: </span>
-                        <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateNumFilter(data,{"query":e.target.value})}/>
+                        <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}/>
                     </div>
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>
@@ -143,17 +143,17 @@ export class DateFilterComponent extends Component {
                 <div className="filter-body">
                     <div>
                         <span className="filter-body-label">Operation: </span>
-                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateDateFilter(data,{"operation":e.target.value})}>
+                        <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>
                     </div>
                     <div>
                         <span className="filter-body-label">Date: </span>
-                        <input className="filter-body-input" value={data.date} onChange={(e) => creator.updateNumFilter(data,{"date":e.target.value})}/>
+                        <input className="filter-body-input" value={data.date} onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}/>
                     </div>
                     {withinput}
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>

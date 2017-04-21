@@ -10,7 +10,7 @@ import type {
   RouterHistory
 } from 'react-router-dom';
 
-import type {Collection, StringFilter, DateFilter, NumFilter} from './Collection';
+import type {Attr, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from './Collection';
 import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from './Collection';
 
 import log from 'loglevel';
@@ -60,8 +60,9 @@ function emptyCollection() : Collection {
     }
 }
 
+
 export class Creator extends Component {
-  attributes: { [string]: string[] };
+  attributes: { [string]: Attr };
   props: Props;
   state: {
     loading: boolean,
@@ -79,10 +80,26 @@ export class Creator extends Component {
     super(props);
 
     this.attributes = {
-        "message": [],
-        "user": ["@eric","@othererik","@gabriel"],
-        "humidity": [],
-        "created": []
+        "message": {
+            name: "message",
+            options: [],
+            type: "string"
+        },
+        "user": {
+            name: "user",
+            options: ["@eric","@othererik","@gabriel"],
+            type: "string"
+        },
+        "humidity": {
+            name: "humidity",
+            options: [],
+            type: "num"
+        },
+        "created": {
+            name: "created",
+            options: [],
+            type: "date"
+        }
     }
     this.state = {
       loading: true,
@@ -215,54 +232,52 @@ export class Creator extends Component {
     this.refs.dropdown.hide();
   }
 
-  addStringFilter(attr: string) {
+  addFilter(attr: string) {
     let collection = cloneCollection(this.state.collection);
-    const attributes = this.attributes;
-    const new_filter = emptyStringFilter(collection, attr, attributes[attr]);
-    collection.string_filters.push(new_filter)
-    collection.filters.push(new_filter.id)
-
-    this.setState({collection})
+    const attribute = this.attributes[attr];
+    let new_filter;
+    if(attribute.type === "string"){
+        new_filter = emptyStringFilter(collection, attribute);
+        collection.string_filters.push(new_filter)
+    } else if (attribute.type === "num"){
+        new_filter = emptyNumFilter(collection, attribute);
+        collection.num_filters.push(new_filter)
+    } else if (attribute.type === "date"){
+        new_filter = emptyDateFilter(collection, attribute);
+        collection.date_filters.push(new_filter)
+    }
+    if(new_filter){
+        collection.filters.push(new_filter.id)
+        this.setState({collection})
+    }
   }
 
-  updateStringFilter(s: StringFilter, update:  $Supertype<StringFilter>) {
-      let filter = Object.assign(s,update)
+  updateFilter:FilterFn = (filter, update) => {
+      let new_filter = Object.assign(filter,update)
       let collection = cloneCollection(this.state.collection)
-      collection.string_filters = collection.string_filters.map(f => f.id === filter.id ? filter : f)
+      if(new_filter.type === "string"){
+        collection.string_filters = collection.string_filters.filter(f => f.id !== new_filter.id)
+        collection.string_filters.push(new_filter)
+      } else if (filter.type === "date") {
+        collection.date_filters = collection.date_filters.filter(f => f.id !== new_filter.id)
+        collection.date_filters.push(new_filter)
+      } else if (new_filter.type === "num") {
+        collection.num_filters = collection.num_filters.filter(f => f.id !== new_filter.id)
+        collection.num_filters.push(new_filter)
+      }
       this.setState({collection})
   }
-  
-  addNumFilter(attr: string) {
-    let collection = cloneCollection(this.state.collection);
-    const attributes = this.attributes;
-    const new_filter = emptyNumFilter(collection, attr, attributes[attr]);
-    collection.num_filters.push(new_filter)
-    collection.filters.push(new_filter.id)
 
-    this.setState({collection})
-  }
-  
-  updateNumFilter(s: NumFilter, update:  $Supertype<NumFilter>) {
-      let filter = Object.assign(s,update)
+  deleteFilter(f: Filter){
       let collection = cloneCollection(this.state.collection)
-      collection.num_filters = collection.num_filters.map(f => f.id === filter.id ? filter : f)
-      this.setState({collection})
-  }
-
-  addDateFilter(attr: string) {
-    let collection = cloneCollection(this.state.collection);
-    const attributes = this.attributes;
-    const new_filter = emptyDateFilter(collection, attr, attributes[attr]);
-    collection.date_filters.push(new_filter)
-    collection.filters.push(new_filter.id)
-
-    this.setState({collection})
-  }
-
-  updateDateFilter(s: DateFilter, update:  $Supertype<DateFilter>) {
-      let filter = Object.assign(s,update)
-      let collection = cloneCollection(this.state.collection)
-      collection.date_filters = collection.date_filters.map(f => f.id === filter.id ? filter : f)
+      if(f.type === "string"){
+        collection.string_filters = collection.string_filters.filter(cf => cf.id !== f.id)
+      } else if(f.type === "num"){
+        collection.num_filters = collection.num_filters.filter(cf => cf.id !== f.id)
+      } else if(f.type === "date"){
+        collection.date_filters = collection.date_filters.filter(cf => cf.id !== f.id)
+      }
+      collection.filters = collection.filters.filter(cf => cf !== f.id) 
       this.setState({collection})
   }
 
@@ -298,10 +313,10 @@ export class Creator extends Component {
     return (
         <div>
             {filters}
-            <button onClick={() => this.addStringFilter("message")}>Add Message Filter</button>
-            <button onClick={() => this.addStringFilter("user")}>Add User Filter</button>
-            <button onClick={() => this.addNumFilter("humidity")}>Add Humidity Filter</button>
-            <button onClick={() => this.addDateFilter("created")}>Add Date Filter</button>
+            <button onClick={() => this.addFilter("message")}>Add Message Filter</button>
+            <button onClick={() => this.addFilter("user")}>Add User Filter</button>
+            <button onClick={() => this.addFilter("humidity")}>Add Humidity Filter</button>
+            <button onClick={() => this.addFilter("created")}>Add Date Filter</button>
         </div>
     )
   }
