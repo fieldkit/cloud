@@ -1,6 +1,5 @@
 @import 'App';
 
-$sidebar-width: 240px;
 $contents-width: 834px;
 
 .main {
@@ -22,22 +21,31 @@ $contents-width: 834px;
   }
 }
 
-.row {
-  width: 100%;
-}
-
 .container {
   text-align: left;
   margin: 0px auto;
+  height: 100%;
 }
 
 
 .header {
-  background-color: rgb(233, 230, 223);
-  padding-top: 35px;
-  height: 90px;
+  background-color: #A01818;
+  height: $baseline-height * 4;
   #logo {
-    width: 120px;
+    display: inline-block;
+    height: $baseline-height * 2;
+    position: absolute;
+    top: 0;
+    left: $elements-padding;
+    margin-top: $baseline-height;
+
+    @media (max-width: 1400px) {
+      position: static;
+    }
+
+    img {
+      height: 100%;
+    }
   }
 }
 
@@ -162,8 +170,15 @@ $contents-width: 834px;
 }
 
 .account-dropdown {
-  position: relative;
-  float: right;
+  position: absolute;
+  top: 0;
+  right: $elements-padding;
+  margin-top: $baseline-height;
+
+  @media (max-width: 1400px) {
+    float: right;  
+    position: relative;
+  }  
 
   a {
     cursor: pointer; 

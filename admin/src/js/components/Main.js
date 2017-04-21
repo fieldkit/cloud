@@ -271,7 +271,8 @@ export class Main extends Component {
               </DropdownContent>
             </Dropdown>
 
-            <Link to="/"><img src={fieldkitLogo} alt="fieldkit logo" id="logo" /></Link>  
+            <Link to="/" id="logo"><img src={fieldkitLogo} alt="fieldkit logo"/></Link>  
+            <span>Test</span>
           </div>
         </div>
 
