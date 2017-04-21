@@ -15,6 +15,26 @@ export type Collection = {
 	geo_mods: GeoMod[];
 }
 
+export type StringAttr = {
+    name: string;
+    options: string[];
+    type: "string";
+}
+
+export type NumAttr = {
+    name: string;
+    options: number[];
+    type: "num";
+}
+
+export type DateAttr = {
+    name: string;
+    options: number[];
+    type: "date";
+}
+
+export type Attr = StringAttr | NumAttr | DateAttr
+
 export function cloneCollection(c: Collection): Collection {
     return {
         name: c.name,
@@ -37,36 +57,40 @@ function getNextId(c: Collection): number{
     return max > -1 ? max + 1 : 0;
 }
 
-export function emptyStringFilter(c: Collection, attr: string, opts: string[]): StringFilter {
+export function emptyStringFilter(c: Collection, attr: StringAttr): StringFilter {
     let next_id = getNextId(c);
     return {
         id: next_id,
-        attribute: attr,
+        attribute: attr.name,
         operation: "contains",
         query: "",
-        options: opts
+        options: attr.options,
+        type: "string"
     }
 }
 
-export function emptyNumFilter(c: Collection, attr: string): NumFilter {
+export function emptyNumFilter(c: Collection, attr: NumAttr): NumFilter {
     let next_id = getNextId(c);
     return {
         id: next_id,
-        attribute: attr,
+        attribute: attr.name,
         operation: "GT",
         query: 3,
+        type: "num"
     }
 }
 
-export function emptyDateFilter(c: Collection, attr: string): DateFilter {
+export function emptyDateFilter(c: Collection, attr: DateAttr): DateFilter {
     let next_id = getNextId(c);
-    return {
+    let f = {
         id: next_id,
-        attribute: attr,
+        attribute: attr.name,
         operation: "before",
         date: 0,
-        within: 0
+        within: 0,
+        type: "date"
     }
+    return f
 }
 
 export type GuidFilter = {
@@ -74,6 +98,7 @@ export type GuidFilter = {
     attribute: string;
     operation: "contains";
     query: number[];
+    type: "guid";
 }
 
 export type StringFilter = {
@@ -82,6 +107,7 @@ export type StringFilter = {
     operation: "contains" | "does not contain" | "matches" | "exists";
     query: string;
     options: string[];
+    type: "string";
 }
 
 export type NumFilter = {
@@ -89,13 +115,15 @@ export type NumFilter = {
     attribute: string;
     operation: "GT" | "LT" | "EQ" | "notch";
     query: number;
+    type: "num";
 }
 
 export type GeoFilter = {
     id: number;
     attribute: string;
     operation: "within" | "not within";
-    query: Object
+    query: Object;
+    type: "geo";
 }
 
 export type DateFilter = {
@@ -104,17 +132,26 @@ export type DateFilter = {
     operation: "before" | "after" | "within";
     date: number;
     within: number;
+    type: "date";
 }
+
+export type Filter = NumFilter | StringFilter | DateFilter
+export type FilterFn = (filter: StringFilter, update: $Shape<StringFilter>) => void |
+                       (filter: NumFilter, update: $Shape<NumFilter>) => void |
+                       (filter: DateFilter, update: $Shape<DateFilter>) => void
+
 export type StringMod = {
     id: number;
     attribute: string;
     operation: "gsub";
     query: string;
+    type: "string";
 }
 export type NumMod = {
     id: number;
     attribute: string;
     operation: "round";
+    type: "num";
 }
 export type GeoMod = {
     id: number;
@@ -122,4 +159,5 @@ export type GeoMod = {
     operation: "copy from" | "jitter";
     source_collection: string;
     filters: number[];
+    type: "geo";
 }
