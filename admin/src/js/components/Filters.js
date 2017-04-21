@@ -57,7 +57,7 @@ export class StringFilterComponent extends Component {
                         {value_field}
                     </div>
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteStringFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ export class NumFilterComponent extends Component {
                         <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateNumFilter(data,{"query":e.target.value})}/>
                     </div>
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteNumFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>
@@ -153,7 +153,7 @@ export class DateFilterComponent extends Component {
                     </div>
                     {withinput}
                     <div className="filter-body-buttons">
-                        <button className="filter-body-cancel">Delete</button>
+                        <button className="filter-body-cancel" onClick={() => creator.deleteDateFilter(data)}>Delete</button>
                         <button className="filter-body-save">Save</button>
                     </div>
                 </div>

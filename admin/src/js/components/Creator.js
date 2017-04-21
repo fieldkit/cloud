@@ -225,10 +225,17 @@ export class Creator extends Component {
     this.setState({collection})
   }
 
-  updateStringFilter(s: StringFilter, update:  $Supertype<StringFilter>) {
+  updateStringFilter(s: StringFilter, update:  $Shape<StringFilter>) {
       let filter = Object.assign(s,update)
       let collection = cloneCollection(this.state.collection)
       collection.string_filters = collection.string_filters.map(f => f.id === filter.id ? filter : f)
+      this.setState({collection})
+  }
+
+  deleteStringFilter(s: StringFilter){
+      let collection = cloneCollection(this.state.collection)
+      collection.string_filters = collection.string_filters.filter(f => f.id !== s.id)
+     collection.filters = collection.filters.filter(f => f !== s.id) 
       this.setState({collection})
   }
   
@@ -242,10 +249,17 @@ export class Creator extends Component {
     this.setState({collection})
   }
   
-  updateNumFilter(s: NumFilter, update:  $Supertype<NumFilter>) {
+  updateNumFilter(s: NumFilter, update:  $Shape<NumFilter>) {
       let filter = Object.assign(s,update)
       let collection = cloneCollection(this.state.collection)
       collection.num_filters = collection.num_filters.map(f => f.id === filter.id ? filter : f)
+      this.setState({collection})
+  }
+  
+  deleteNumFilter(s: NumFilter){
+      let collection = cloneCollection(this.state.collection)
+      collection.num_filters = collection.num_filters.filter(f => f.id !== s.id)
+     collection.filters = collection.filters.filter(f => f !== s.id) 
       this.setState({collection})
   }
 
@@ -259,13 +273,19 @@ export class Creator extends Component {
     this.setState({collection})
   }
 
-  updateDateFilter(s: DateFilter, update:  $Supertype<DateFilter>) {
+  updateDateFilter(s: DateFilter, update:  $Shape<DateFilter>) {
       let filter = Object.assign(s,update)
       let collection = cloneCollection(this.state.collection)
       collection.date_filters = collection.date_filters.map(f => f.id === filter.id ? filter : f)
       this.setState({collection})
   }
 
+  deleteDateFilter(s: DateFilter){
+      let collection = cloneCollection(this.state.collection)
+      collection.date_filters = collection.date_filters.filter(f => f.id !== s.id)
+     collection.filters = collection.filters.filter(f => f !== s.id) 
+      this.setState({collection})
+  }
   render() {
     const {
       user,
