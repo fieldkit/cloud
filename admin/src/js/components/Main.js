@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import { ArrowRightIcon } from './icons/Icons'
 
 import type {
   Match as RouterMatch,
@@ -25,7 +26,7 @@ import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
 import { Profile } from './pages/Profile';
 
-import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
+import fieldkitLogo from '../../img/logos/fieldkit-logo-white.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
 import '../../css/main.css'
@@ -246,82 +247,77 @@ export class Main extends Component {
 
     return (
       <div className="main">
-        <div className="left">
-          <div className="logo-area">
-            <Link to="/"><img src={fieldkitLogo} alt="fieldkit logo" /></Link>
-          </div>
-          <div className="sidebar">
-            <div className="sidebar-section project-section">
-              <h5>Projects</h5>
-              <Link to={`/`}>
-                <div className="bt-icon medium">
-                  <HamburgerIcon />
+        <div className="page-header row">
+
+          <div className="top-bar container">
+
+            <Dropdown className="account-dropdown" ref="dropdown">
+              <DropdownTrigger className="trigger">
+                <div className="user-avatar small">
+                  <img src={user ? FKApiClient.get().userPictureUrl(user.id) : placeholderImage} alt="profile" />
                 </div>
-                All
-              </Link>
-              { activeProject &&
-                <div>
-                  <p className="project-name">
+              </DropdownTrigger>
+              <DropdownContent className="dropdown-contents">
+                <div className="user">
+                  <div className="name">
+                    {user ? user.name : ''}
+                  </div>
+                  <div className="username">
+                    {user ? user.username : ''}
+                  </div>
+                </div>
+                <div className="nav">
+                  <Link to="/profile" onClick={this.handleLinkClick.bind(this)}>Profile</Link>
+                  <Link to="/logout">Logout</Link>
+                </div>
+              </DropdownContent>
+            </Dropdown>
+
+            <Link to="/" id="logo"><img src={fieldkitLogo} alt="fieldkit logo"/></Link>  
+            { activeProject &&
+              <div className="breadcrumbs">
+                <div className="project-name">
+                  <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
+                </div>
+                { activeExpedition &&
+                  <div className="expedition-name-container">
                     <div className="bt-icon medium">
-                      <ArrowDownIcon />
+                      <ArrowRightIcon />
                     </div>
-                    <span>{activeProject.name}</span>
-                    <a className="bt-icon small" href={`//${activeProject.slug}.${fkHost()}/`} alt="go to project`" target="_blank">
-                      <OpenInNewIcon />
-                    </a>
-                  </p>
-                  <div className="sidebar-nav">
-                    <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
-                    <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+                    <div className="expedition-name">
+                      <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
+                    </div>
                   </div>
-                </div> }
-            </div>
-            {activeProject && activeExpedition &&
-              <div className="sidebar-section expedition-section">
-                <h5>Expedition</h5>
-                  <p className="expedition-name">
-                    <span>{activeExpedition.name}</span>
-                    <a className="bt-icon medium" href={`//${activeProject.slug}.${fkHost()}/${activeExpedition.slug}`}
-                      alt="go to expedition"
-                      target="_blank">
-                      <OpenInNewIcon />
-                    </a>
-                  </p>
-                  <div className="sidebar-nav">
-                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
-                    <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
-                    <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
-                    {/* <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/website`}>Website</NavLink> */}
-                  </div>
+                }
               </div>
-              }
+            }
           </div>
 
+          { activeProject && !activeExpedition &&
+          <div className="nav-bar row">
+            <div className="container navigation-tabs">
+              <NavLink exact to={`/projects/${activeProject.slug}`}><span>Expeditions</span></NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/settings`}><span>Settings</span></NavLink>
+            </div>
+          </div>
+          }
 
-          <footer>
-            <Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
-          </footer>
+          { activeProject && activeExpedition &&
+          <div className="nav-bar row">
+            <div className="container navigation-tabs">
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}><span>Data Sources</span></NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}><span>Teams</span></NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}><span>Settings</span></NavLink>
+            </div>
+          </div>
+          }
+
         </div>
 
-        <div className="right">
-          <Dropdown className="account-dropdown" ref="dropdown">
-            <DropdownTrigger className="trigger">
-              <div className="user-avatar small">
-                <img src={user ? FKApiClient.get().userPictureUrl(user.id) : placeholderImage} alt="profile" />
-              </div>
-            </DropdownTrigger>
-            <DropdownContent className="dropdown-contents">
-              <div className="header">
-                Signed in as <strong>{user ? user.username : ''}</strong>
-              </div>
-              <div className="nav">
-                <Link to="/profile" onClick={this.handleLinkClick.bind(this)}>Profile</Link>
-                <Link to="/logout">Logout</Link>
-              </div>
-            </DropdownContent>
-          </Dropdown>
+        <div className="page-body row">
+        
+          <div className="container content">
 
-          <div className="contents">
             <Switch>
               <RouteOrLoading
                 path="/projects/:projectSlug/expeditions/:expeditionSlug/teams"
@@ -371,6 +367,10 @@ export class Main extends Component {
                 onProjectCreate={this.onProjectCreate.bind(this)} />
             </Switch>
           </div>
+
+          <footer className="footer">
+            <Link to="/help">Help</Link> {}- <Link to="/contact">Contact Us</Link> - <Link to="/privacy">Privacy Policy</Link>
+          </footer>       
         </div>
       </div>
     )
