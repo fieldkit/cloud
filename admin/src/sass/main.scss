@@ -35,11 +35,13 @@ $contents-width: 834px;
 
   #logo {
     display: inline-block;
-    height: $baseline-height * 2;
+    height: $baseline-height * 4;
     position: absolute;
     top: 0;
     left: $col-gutter;
-    margin-top: $baseline-height;
+    padding: $baseline-height 0;
+    margin-right: $col-gutter;
+    vertical-align: top;
 
     @media (max-width: 1400px) {
       position: static;
@@ -54,6 +56,8 @@ $contents-width: 834px;
 
     display: inline-block;
     @include type-intro;
+    height: $baseline-height * 4;
+    line-height: $baseline-height * 4;
 
     a:link, a:visited, a:hover, a:active {
       color: white;
@@ -63,9 +67,17 @@ $contents-width: 834px;
       display: inline-block;
     }
 
-    .expedition-name {
+    .expedition-name-container {
       display: inline-block;
-      font-weight: 600;
+
+      svg {
+        fill: white;
+      }
+
+      .expedition-name {
+        display: inline-block;
+        font-weight: 600;
+      }
     }
   }
 }

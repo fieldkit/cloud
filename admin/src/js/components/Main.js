@@ -26,7 +26,7 @@ import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
 import { Profile } from './pages/Profile';
 
-import fieldkitLogo from '../../img/logos/fieldkit-logo-red.svg';
+import fieldkitLogo from '../../img/logos/fieldkit-logo-white.svg';
 import placeholderImage from '../../img/profile_placeholder.svg'
 import externalLinkImg from '../../img/icons/icon-external-link.png'
 import '../../css/main.css'
@@ -279,8 +279,10 @@ export class Main extends Component {
                   <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
                 </div>
                 { activeExpedition &&
-                  <div>
-                    <ArrowRightIcon />
+                  <div className="expedition-name-container">
+                    <div className="bt-icon medium">
+                      <ArrowRightIcon />
+                    </div>
                     <div className="expedition-name">
                       <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
                     </div>
