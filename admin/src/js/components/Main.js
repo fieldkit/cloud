@@ -248,7 +248,8 @@ export class Main extends Component {
     return (
       <div className="main">
         <div className="header row">
-          <div className="container">
+
+          <div className="top-bar container">
 
             <Dropdown className="account-dropdown" ref="dropdown">
               <DropdownTrigger className="trigger">
@@ -291,26 +292,27 @@ export class Main extends Component {
               </div>
             }
           </div>
-        </div>
 
-        { activeProject && !activeExpedition &&
-        <div className="project-navigation navigation row">
-          <div className="container navigation-tabs">
-            <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
-            <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+          { activeProject && !activeExpedition &&
+          <div className="nav-bar row">
+            <div className="container navigation-tabs">
+              <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
+            </div>
           </div>
-        </div>
-        }
+          }
 
-        { activeProject && activeExpedition &&
-        <div className="expedition-navigation navigation row">
-          <div className="container navigation-tabs">
-            <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
-            <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
-            <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
+          { activeProject && activeExpedition &&
+          <div className="nav-bar row">
+            <div className="container navigation-tabs">
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
+              <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}`}>Settings</NavLink>
+            </div>
           </div>
+          }
+
         </div>
-        }
 
         <div className="content row">
           <div className="container">

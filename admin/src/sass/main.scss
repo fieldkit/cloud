@@ -30,86 +30,90 @@ $contents-width: 834px;
 
 .header {
   
-  background-color: #A01818;
-  height: $baseline-height * 4;
+  background-color: #A01818;  
+  @include shadow(8px);
 
-  #logo {
-    display: inline-block;
-    height: $baseline-height * 4;
-    position: absolute;
-    top: 0;
-    left: $col-gutter;
-    padding: $baseline-height 0;
-    margin-right: $col-gutter;
-    vertical-align: top;
+  .top-bar {
 
-    @media (max-width: 1400px) {
-      position: static;
-    }
+    height: $baseline-height * 4;    
 
-    img {
-      height: 100%;
-    }
-  }
-
-  .breadcrumbs {
-
-    display: inline-block;
-    @include type-intro;
-    height: $baseline-height * 4;
-    line-height: $baseline-height * 4;
-
-    a:link, a:visited, a:hover, a:active {
-      color: white;
-    }    
-
-    .project-name {
+    #logo {
       display: inline-block;
-    }
+      height: $baseline-height * 4;
+      position: absolute;
+      top: 0;
+      left: $col-gutter;
+      padding: $baseline-height 0;
+      margin-right: $col-gutter;
+      vertical-align: top;
 
-    .expedition-name-container {
-      display: inline-block;
-
-      svg {
-        fill: white;
+      @media (max-width: 1400px) {
+        position: static;
       }
 
-      .expedition-name {
+      img {
+        height: 100%;
+      }
+    }
+
+    .breadcrumbs {
+
+      display: inline-block;
+      @include type-intro;
+      height: $baseline-height * 4;
+      line-height: $baseline-height * 4;
+
+      a:link, a:visited, a:hover, a:active {
+        color: white;
+      }
+
+      .project-name {
         display: inline-block;
-        font-weight: 600;
+      }
+
+      .expedition-name-container {
+        display: inline-block;
+
+        svg {
+          fill: white;
+        }
+
+        .expedition-name {
+          display: inline-block;
+          font-weight: 600;
+        }
+      }
+    }    
+  }
+
+  .nav-bar {
+    height: 56px;
+    background-color: #B71C1C;
+
+
+
+    .navigation-tabs {
+      padding-top: 30px;
+
+      a {
+        display: inline-block;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 4px 4px 0px 0px;
+        border-bottom: none;
+        padding-top: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 8px;
+        margin-right: 12px;
+        background-color: white;
+        font-size: .9em;
       }
     }
   }
-}
-
-.navigation {
-  box-shadow: 0px 0px 5px rgba(0,0,0,.12);
-  border-bottom: 1px solid rgba(0,0,0,.12);
-  padding-top: 50px;
-
-  .navigation-tabs {
-    padding-top: 30px;
-
-    a {
-      display: inline-block;
-      border: 1px solid rgba(0,0,0,.15);
-      border-radius: 4px 4px 0px 0px;
-      border-bottom: none;
-      padding-top: 5px;
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 8px;
-      margin-right: 12px;
-      background-color: white;
-      font-size: .9em;
-    }
-  }
-}
-
-.expedition-navigation {
-
 
 }
+
+
 
 .content {
   padding-top: 40px;
