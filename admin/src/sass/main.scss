@@ -36,7 +36,7 @@ $contents-width: 834px;
     height: $baseline-height * 2;
     position: absolute;
     top: 0;
-    left: $elements-padding;
+    left: $col-gutter;
     margin-top: $baseline-height;
 
     @media (max-width: 1400px) {
@@ -172,8 +172,8 @@ $contents-width: 834px;
 .account-dropdown {
   position: absolute;
   top: 0;
-  right: $elements-padding;
-  margin-top: $baseline-height;
+  right: $col-gutter;
+  margin-top: $baseline-height*0.75;
 
   @media (max-width: 1400px) {
     float: right;  

@@ -272,7 +272,18 @@ export class Main extends Component {
             </Dropdown>
 
             <Link to="/" id="logo"><img src={fieldkitLogo} alt="fieldkit logo"/></Link>  
-            <span>Test</span>
+            { activeProject &&
+              <div>
+                <div className="project-name">
+                  <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
+                </div>
+                { activeExpedition &&
+                  <div className="expedition-name">
+                    <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
+                  </div>              
+                }
+              </div>
+            }
           </div>
         </div>
 
