@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import { ArrowRightIcon } from './icons/Icons'
 
 import type {
   Match as RouterMatch,
@@ -273,14 +274,17 @@ export class Main extends Component {
 
             <Link to="/" id="logo"><img src={fieldkitLogo} alt="fieldkit logo"/></Link>  
             { activeProject &&
-              <div>
+              <div className="breadcrumbs">
                 <div className="project-name">
                   <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
                 </div>
                 { activeExpedition &&
-                  <div className="expedition-name">
-                    <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
-                  </div>              
+                  <div>
+                    <ArrowRightIcon />
+                    <div className="expedition-name">
+                      <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
+                    </div>
+                  </div>
                 }
               </div>
             }
@@ -289,11 +293,6 @@ export class Main extends Component {
 
         { activeProject && !activeExpedition &&
         <div className="project-navigation navigation row">
-          <div className="container">
-            <div className="project-name">
-              <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
-            </div>
-          </div>
           <div className="container navigation-tabs">
             <NavLink exact to={`/projects/${activeProject.slug}`}>Expeditions</NavLink>
             <NavLink to={`/projects/${activeProject.slug}/settings`}>Settings</NavLink>
@@ -303,14 +302,6 @@ export class Main extends Component {
 
         { activeProject && activeExpedition &&
         <div className="expedition-navigation navigation row">
-          <div className="container">
-            <div className="project-name">
-              <NavLink exact to={`/projects/${activeProject.slug}`}>{activeProject.name}</NavLink>
-            </div>
-            <div className="expedition-name">
-              <NavLink exact to={`/projects/${activeProject.slug}/expeditions/{activeExpedition.slug}`}>{activeExpedition.name}</NavLink>
-            </div>
-          </div>
           <div className="container navigation-tabs">
             <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/datasources`}>Data Sources</NavLink>
             <NavLink to={`/projects/${activeProject.slug}/expeditions/${activeExpedition.slug}/teams`}>Teams</NavLink>

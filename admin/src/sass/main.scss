@@ -29,8 +29,10 @@ $contents-width: 834px;
 
 
 .header {
+  
   background-color: #A01818;
   height: $baseline-height * 4;
+
   #logo {
     display: inline-block;
     height: $baseline-height * 2;
@@ -45,6 +47,25 @@ $contents-width: 834px;
 
     img {
       height: 100%;
+    }
+  }
+
+  .breadcrumbs {
+
+    display: inline-block;
+    @include type-intro;
+
+    a:link, a:visited, a:hover, a:active {
+      color: white;
+    }    
+
+    .project-name {
+      display: inline-block;
+    }
+
+    .expedition-name {
+      display: inline-block;
+      font-weight: 600;
     }
   }
 }
@@ -73,38 +94,9 @@ $contents-width: 834px;
   }
 }
 
-.project-navigation {
-
-  .project-name {
-    display: block;
-    font-weight: 400;
-    font-size: 1.7em;
-  }
-}
-
 .expedition-navigation {
 
-  .project-name {
-    display: inline-block;
-    font-weight: 300;
-    font-size: 1.7em;
-  }
 
-  .expedition-name:before {
-    content: "/";
-    font-weight: 400;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-size: 1em;
-    color: rgba(0,0,0,.4);
-  }
-
-  .expedition-name {
-    display: inline-block;
-    font-weight: 400;
-    border-radius: 5px;
-    font-size: 1.7em;
-  }
 }
 
 .content {
