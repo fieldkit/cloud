@@ -281,6 +281,12 @@ export class Creator extends Component {
       this.setState({collection})
   }
 
+  save(){
+    const {collection} = this.state;
+
+    console.log(JSON.stringify(collection,null,' '))
+  }
+
   render() {
     const {
       user,
@@ -320,6 +326,7 @@ export class Creator extends Component {
         <div>
             {filters}
             {buttons}
+            <button onClick={() => this.save()}>Save Filters</button>
         </div>
     )
   }
