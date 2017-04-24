@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { AddIcon } from './icons/Icons'
+import type { APIErrors } from '../api/types';
 
 import type {
   Match as RouterMatch,
@@ -73,7 +74,8 @@ export class Creator extends Component {
     expeditions: ?APIExpedition[],
     activeProject: ?APIProject,
     activeExpedition: ?APIExpedition,
-    collection: Collection
+    collection: Collection,
+    errors: ?APIErrors
   }
 
   constructor(props: Props) {
@@ -110,7 +112,8 @@ export class Creator extends Component {
       expeditions: [],
       activeProject: null,
       activeExpedition: null,
-      collection: emptyCollection()
+      collection: emptyCollection(),
+      errors: null
     }
 
     Promise.all([
@@ -292,7 +295,8 @@ export class Creator extends Component {
     const {
       user,
       activeProject,
-      activeExpedition
+      activeExpedition,
+      errors
     } = this.state;
 
     let {
@@ -304,13 +308,13 @@ export class Creator extends Component {
     let component_lookup : { [number]: Object } = {};
 
     collection.num_filters.forEach((f,i) => {
-        component_lookup[f.id] = <NumFilterComponent creator={this} data={f} key={"n-" + i}/>
+        component_lookup[f.id] = <NumFilterComponent creator={this} data={f} key={"n-" + i} errors={errors}/>
     })
     collection.string_filters.forEach((f,i) => {
-        component_lookup[f.id] = <StringFilterComponent creator={this} data={f} key={"s-" + i}/>
+        component_lookup[f.id] = <StringFilterComponent creator={this} data={f} key={"s-" + i} errors={errors}/>
     })
     collection.date_filters.forEach((f,i) => {
-        component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i}/>
+        component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i} errors={errors}/>
     })
     
    let filters_by_attribute = Object.keys(this.attributes).reduce((m,attr_name) => {
@@ -321,10 +325,8 @@ export class Creator extends Component {
        options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
      }
      const attribute_row = (
-         <div key={"filter-" + attr_name} className="filter-row-header">
-            <span class="filter-row-name">{attr_name}</span>
-            {options}
-            
+         <div key={"filter-" + attr_name} className="accordion-row-header">
+            <h4>{attr_name}</h4>            
             <button className="secondary" onClick={() => this.addFilter(attr_name)}>
               <div className="bt-icon medium">
                 <AddIcon />
@@ -350,28 +352,17 @@ export class Creator extends Component {
      
     const components = Object.entries(filters_by_attribute).map(([attr,components]) => {
         return (
-          <tr>
-            <td>
-              <div className="attr-row" key={attr}>
-                  {components}
-              </div>
-            </td>
-          </tr>
+          <div className="accordion-row expanded" key={attr}>
+              {components}
+          </div>
         )
     })
     
     return (
-        <div>
-          <table className="creator-table">
-            <thead>
-              <tr>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {components}
-            </tbody>
-          </table>
+        <div className="row">
+          <div className="accordion">
+            {components}
+          </div>
           <button onClick={() => this.save()}>Save Filters</button>
         </div>
     )

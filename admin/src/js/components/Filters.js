@@ -2,8 +2,8 @@
 
 import React, { Component } from 'react'
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
-
-import { HamburgerIcon, OpenInNewIcon, ArrowDownIcon } from './icons/Icons'
+import { FormItem } from './forms/FormItem'
+import type { APIErrors } from '../api/types';
 
 import type {StringFilter, DateFilter, NumFilter} from './Collection'
 
@@ -48,16 +48,9 @@ export class StringFilterComponent extends Component {
         
         return (
             <div className="fk-filter fk-guidfilter" key={data.id}>
-                <div className="filter-title-bar">
-                    <span>{data.attribute}</span>
-                    <div className="filter-title-controls">
-                        <span className="filter-icon"></span>
-                        <span className="filter-closer"></span>
-                    </div>
-                </div>
                 <div className="filter-body">
                     <div>
-                        <span className="filter-body-label">Operation: </span>
+                        <span className="filter-body-label">Condition: </span>
                         <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>
@@ -78,6 +71,7 @@ export class NumFilterComponent extends Component {
     props: {
         data: NumFilter;
         creator: Object;
+        errors: ?APIErrors;
     }
 
     constructor(props: NumFilter) {
@@ -86,28 +80,26 @@ export class NumFilterComponent extends Component {
 
     render() {
         const operations = ["GT","LT","EQ","notch"].map((o,i) => <option value={o} key={i}>{o.toUpperCase()}</option>)
-        const {creator,data} = this.props
+        const { creator, data, errors } = this.props
         
         return (
             <div className="fk-filter fk-guidfilter">
-                <div className="filter-title-bar">
-                    <span>{data.attribute}</span>
-                    <div className="filter-title-controls">
-                        <span className="filter-icon"></span>
-                        <span className="filter-closer"></span>
-                    </div>
-                </div>
                 <div className="filter-body">
                     <div>
-                        <span className="filter-body-label">Operation: </span>
+                        <span className="filter-body-label">Condition: </span>
                         <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>
                     </div>
-                    <div>
-                        <span className="filter-body-label">Value: </span>
-                        <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}/>
-                    </div>
+                    <FormItem
+                      labelText={'Value'}
+                      name={'value'}
+                      className={'value'}
+                      type={'number'}
+                      value={data.query}
+                      errors={errors}
+                      onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
+                    />
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
                     </div>
@@ -140,16 +132,9 @@ export class DateFilterComponent extends Component {
         
         return (
             <div className="fk-filter fk-guidfilter">
-                <div className="filter-title-bar">
-                    <span>{data.attribute}</span>
-                    <div className="filter-title-controls">
-                        <span className="filter-icon"></span>
-                        <span className="filter-closer"></span>
-                    </div>
-                </div>
                 <div className="filter-body">
                     <div>
-                        <span className="filter-body-label">Operation: </span>
+                        <span className="filter-body-label">Condition: </span>
                         <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
                             {operations}
                         </select>

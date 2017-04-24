@@ -11,7 +11,7 @@ type Props = {
   className: string;
   type?: string;
   ref?: string;
-  value: string;
+  value: string | number;
   errors: ?APIErrors;
   onChange?: (e: any) => void;
 }
