@@ -281,6 +281,12 @@ export class Creator extends Component {
       this.setState({collection})
   }
 
+  save(){
+    const {collection} = this.state;
+
+    console.log(JSON.stringify(collection,null,' '))
+  }
+
   render() {
     const {
       user,
@@ -308,15 +314,19 @@ export class Creator extends Component {
     
     const filters = collection.filters.map((f) => {
         return component_lookup[f]
-    }) 
+    })
+
+    const buttons = Object.keys(this.attributes).map((a) => {
+        return (
+            <button onClick={() => this.addFilter(a)}>Add {a} Filter</button>
+        )
+    })
 
     return (
         <div>
             {filters}
-            <button onClick={() => this.addFilter("message")}>Add Message Filter</button>
-            <button onClick={() => this.addFilter("user")}>Add User Filter</button>
-            <button onClick={() => this.addFilter("humidity")}>Add Humidity Filter</button>
-            <button onClick={() => this.addFilter("created")}>Add Date Filter</button>
+            {buttons}
+            <button onClick={() => this.save()}>Save Filters</button>
         </div>
     )
   }
