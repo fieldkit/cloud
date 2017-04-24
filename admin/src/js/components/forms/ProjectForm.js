@@ -69,7 +69,7 @@ export class ProjectForm extends Component {
 
   handleNameChange(event) {
     const v = event.target.value;
-    let stateUpdate = { name: v };
+    let stateUpdate = { name: v, saveDisabled: false };
     if (!this.state.slugHasChanged) {
       stateUpdate = { slug: slugify(v), ...stateUpdate };
     }
@@ -78,7 +78,7 @@ export class ProjectForm extends Component {
 
   handleSlugChange(event) {
     const v = event.target.value;
-    this.setState({ slug: v, slugHasChanged: true });
+    this.setState({ slug: v, slugHasChanged: true, saveDisabled: false });
   }
 
   handleInputChange(event) {

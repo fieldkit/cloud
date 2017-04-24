@@ -21,19 +21,29 @@ export class StringFilterComponent extends Component {
         const operations = ["contains","does not contain","matches","exists"].map((o,i) => <option value={o} key={i}>{o.toUpperCase()}</option>)
         const {data,creator} = this.props
         let value_field 
-        if(data.options.length > 0){
+        if(data.operation === "exists"){
+            value_field = null
+        } else if(data.options.length > 0){
             let options = data.options.map((name,i) => {
                 return (
                     <option value={name} key={i}>{name}</option>
                 )
             })
             value_field = (
-                <select className="value-body-select" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}>
-                    {options}
-                </select>
+                <div>
+                    <span className="filter-body-label">Value: </span>
+                    <select className="value-body-select" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}>
+                        {options}
+                    </select>
+                </div>
             )
         } else {
-            value_field = <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}/>
+            value_field = (
+                <div>
+                    <span className="filter-body-label">Value: </span>
+                    <input className="filter-body-input" value={data.query} onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}/>
+                </div>
+            )
         }
         
         return (
@@ -53,12 +63,10 @@ export class StringFilterComponent extends Component {
                         </select>
                     </div>
                     <div>
-                        <span className="filter-body-label">Value: </span>
                         {value_field}
                     </div>
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>
@@ -102,7 +110,6 @@ export class NumFilterComponent extends Component {
                     </div>
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>
@@ -154,7 +161,6 @@ export class DateFilterComponent extends Component {
                     {withinput}
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>

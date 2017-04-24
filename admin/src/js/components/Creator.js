@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import { AddIcon } from './icons/Icons'
 
 import type {
   Match as RouterMatch,
@@ -11,7 +12,7 @@ import type {
 } from 'react-router-dom';
 
 import type {Attr, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from './Collection';
-import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from './Collection';
+import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from './Collection';
 
 import log from 'loglevel';
 
@@ -281,6 +282,12 @@ export class Creator extends Component {
       this.setState({collection})
   }
 
+  save(){
+    const {collection} = this.state;
+
+    console.log(JSON.stringify(collection,null,' '))
+  }
+
   render() {
     const {
       user,
@@ -306,17 +313,66 @@ export class Creator extends Component {
         component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i}/>
     })
     
-    const filters = collection.filters.map((f) => {
-        return component_lookup[f]
-    }) 
+   let filters_by_attribute = Object.keys(this.attributes).reduce((m,attr_name) => {
+     const attr = this.attributes[attr_name]
+     const {type,options} = attr
+     let options_block = null
+     if(options.length > 0){
+       options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
+     }
+     const attribute_row = (
+         <div key={"filter-" + attr_name} className="filter-row-header">
+            <span class="filter-row-name">{attr_name}</span>
+            {options}
+            
+            <button className="secondary" onClick={() => this.addFilter(attr_name)}>
+              <div className="bt-icon medium">
+                <AddIcon />
+              </div>
+              Add Filter
+            </button>
+         </div>
+     )
 
+     let buttons: Object[] = [attribute_row]
+     collection.filters.forEach((f) => {
+        const component = component_lookup[f]
+        if(component){
+            const {attribute} = component.props.data
+            if(attr_name === attribute){
+                buttons.push(component)
+            } 
+        }
+     })
+     m[attr_name] = buttons
+     return m
+   },{})
+     
+    const components = Object.entries(filters_by_attribute).map(([attr,components]) => {
+        return (
+          <tr>
+            <td>
+              <div className="attr-row" key={attr}>
+                  {components}
+              </div>
+            </td>
+          </tr>
+        )
+    })
+    
     return (
         <div>
-            {filters}
-            <button onClick={() => this.addFilter("message")}>Add Message Filter</button>
-            <button onClick={() => this.addFilter("user")}>Add User Filter</button>
-            <button onClick={() => this.addFilter("humidity")}>Add Humidity Filter</button>
-            <button onClick={() => this.addFilter("created")}>Add Date Filter</button>
+          <table className="creator-table">
+            <thead>
+              <tr>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {components}
+            </tbody>
+          </table>
+          <button onClick={() => this.save()}>Save Filters</button>
         </div>
     )
   }
