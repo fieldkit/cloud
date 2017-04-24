@@ -11,7 +11,7 @@ import type {
 } from 'react-router-dom';
 
 import type {Attr, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from './Collection';
-import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from './Collection';
+import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from './Collection';
 
 import log from 'loglevel';
 
@@ -312,20 +312,47 @@ export class Creator extends Component {
         component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i}/>
     })
     
-    const filters = collection.filters.map((f) => {
-        return component_lookup[f]
-    })
+   let filters_by_attribute = Object.keys(this.attributes).reduce((m,attr_name) => {
+     const attr = this.attributes[attr_name]
+     const {type,options} = attr
+     let options_block = null
+     if(options.length > 0){
+       options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
+     }
+     const attribute_row = (
+         <div key={"filter-" + attr_name} className="filter-row-header">
+            <span class="filter-row-name">{attr_name}</span>
+            {options}
+            
+            <button onClick={() => this.addFilter(attr_name)}>Add {attr_name} Filter</button>
+         </div>
+     )
 
-    const buttons = Object.keys(this.attributes).map((a) => {
+     let buttons: Object[] = [attribute_row]
+     collection.filters.forEach((f) => {
+        const component = component_lookup[f]
+        if(component){
+            const {attribute} = component.props.data
+            if(attr_name === attribute){
+                buttons.push(component)
+            } 
+        }
+     })
+     m[attr_name] = buttons
+     return m
+   },{})
+     
+    const components = Object.entries(filters_by_attribute).map(([attr,components]) => {
         return (
-            <button onClick={() => this.addFilter(a)}>Add {a} Filter</button>
+            <div className="attr-row" key={attr}>
+                {components}
+            </div>
         )
     })
-
+    
     return (
         <div>
-            {filters}
-            {buttons}
+            {components}
             <button onClick={() => this.save()}>Save Filters</button>
         </div>
     )

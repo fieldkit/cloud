@@ -35,6 +35,18 @@ export type DateAttr = {
 
 export type Attr = StringAttr | NumAttr | DateAttr
 
+export function stringifyOptions(attr: Attr): string {
+    if(attr.type === "string"){
+        return attr.options.join(", ")
+    } else if (attr.type === "num"){
+        return attr.options.map(n => n.toString()).join(", ")
+    } else if (attr.type === "date"){
+        return attr.options.map(n => n.toString()).join(", ")
+    }
+
+    return ""
+}
+
 export function cloneCollection(c: Collection): Collection {
     return {
         name: c.name,

@@ -67,7 +67,6 @@ export class StringFilterComponent extends Component {
                     </div>
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>
@@ -111,7 +110,6 @@ export class NumFilterComponent extends Component {
                     </div>
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>
@@ -163,7 +161,6 @@ export class DateFilterComponent extends Component {
                     {withinput}
                     <div className="filter-body-buttons">
                         <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
-                        <button className="filter-body-save">Save</button>
                     </div>
                 </div>
             </div>
