@@ -219,6 +219,8 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: white;
     background-color: $color-2;
     @include shadow(1px);
+    
+    .bt-icon { svg { fill: white; } }
 
     &:hover {
       background-color: lighten($color-2, 12%);
@@ -233,15 +235,9 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
     &:disabled {
-      background-color: $gray-4;
-      border-color: $gray-4;
+      background-color: $gray-3;
+      border-color: $gray-3;
       box-shadow: none;
-    }
-
-    .bt-icon {
-      svg {
-        fill: white;
-      }
     }
 
   // Secondary button
@@ -249,28 +245,28 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: $color-2;
     background-color: white;
 
+    .bt-icon { svg { fill: $color-2; } }    
+
     &:hover {
+      $hover-color-2: lighten($color-2, 12%);
       background-color: white;
-      color: lighten($color-2, 12%);
-      border-color: lighten($color-2, 12%);
+      color: $hover-color-2;
+      border-color: $hover-color-2;
+      .bt-icon { svg { fill: $hover-color-2; } }
     }
 
     &:active {
+      $active-color-2: lighten($color-2, 24%);
       background-color: white;
-      color: lighten($color-2, 24%);
-      border-color: lighten($color-2, 24%);
+      color: $active-color-2;
+      border-color: $active-color-2;
+      .bt-icon { svg { fill: $active-color-2; } }
     }
 
     &:disabled {
-      color: $gray-4;
-      border-color: $gray-4;
+      color: $gray-3;
+      border-color: $gray-3;
       box-shadow: none;
-    }
-
-    .bt-icon {
-      svg {
-        fill: $color-2;
-      }
     }
   }
 }
