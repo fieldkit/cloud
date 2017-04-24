@@ -197,12 +197,11 @@ export class Main extends Component {
     log.debug('onProjectUpdate', newSlug);
     if (newSlug) {
       this.props.history.replace(`/projects/${newSlug}/settings`);
-    } else {
-      await Promise.all([
-        this.loadProjects(),
-        this.loadActiveProject(this.projectSlug())
-      ]);
     }
+    await Promise.all([
+      this.loadProjects(),
+      this.loadActiveProject(this.projectSlug())
+    ]);
   }
 
   async onExpeditionUpdate(newSlug: ?string = null) {
