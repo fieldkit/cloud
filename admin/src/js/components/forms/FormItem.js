@@ -8,7 +8,7 @@ import type { APIErrors } from '../../api/types';
 type Props = {
   labelText: string;
   name: string;
-  className: string;
+  className?: string;
   type?: string;
   ref?: string;
   value: string | number;

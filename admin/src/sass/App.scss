@@ -407,7 +407,7 @@ input[type="submit"] {
   @include button();
 }
 
-input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="username"], select {
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="username"], select {
   @include form;
   &.lg {
     width: 100%;

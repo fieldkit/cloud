@@ -125,7 +125,7 @@ export type StringFilter = {
 export type NumFilter = {
     id: number;
     attribute: string;
-    operation: "GT" | "LT" | "EQ" | "notch";
+    operation: "GT" | "LT" | "EQ";
     query: number;
     type: "num";
 }
