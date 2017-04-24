@@ -55,7 +55,7 @@ export class StringFilterComponent extends Component {
       <div className="fk-filter fk-guidfilter" key={data.id}>
         <div className="filter-body">
           <div>
-            <span className="filter-body-label">Condition: </span>
+            <span className="filter-body-label">Condition </span>
             <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
               {operations}
             </select>
@@ -91,7 +91,7 @@ export class NumFilterComponent extends Component {
       <div className="fk-filter fk-guidfilter">
         <div className="filter-body">
           <div>
-            <span className="filter-body-label">Condition: </span>
+            <span className="filter-body-label">Condition </span>
             <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
               {operations}
             </select>
@@ -133,7 +133,7 @@ export class DateFilterComponent extends Component {
       <div className="fk-filter fk-guidfilter">
         <div className="filter-body">
           <div>
-            <span className="filter-body-label">Condition: </span>
+            <span className="filter-body-label">Condition </span>
             <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
               {operations}
             </select>
