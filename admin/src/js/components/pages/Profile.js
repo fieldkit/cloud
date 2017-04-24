@@ -142,9 +142,9 @@ export class Profile extends Component {
 
             <div className="password-form">
               <h3>Change Password</h3>
-              <FormItem labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} className="lg" />
-              <FormItem labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} className="lg" />
-              <FormItem labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} className="lg" />
+              <FormItem type="password" labelText="Old Password" name="oldPassword" value={oldPassword} errors={errors} onChange={onChange} className="lg" />
+              <FormItem type="password" labelText="New Password" name="newPassword" value={newPassword} errors={errors} onChange={onChange} className="lg" />
+              <FormItem type="password" labelText="Confirm New Password" name="newPasswordConfirmation" value={newPasswordConfirmation} errors={errors} onChange={onChange} className="lg" />
               <input type="submit" onClick={this.onPasswordChange.bind(this)} value="Change Password" />
             </div>
           </div>
