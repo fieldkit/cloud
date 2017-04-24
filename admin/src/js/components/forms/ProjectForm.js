@@ -38,7 +38,7 @@ export class ProjectForm extends Component {
       slug: slug || '',
       description: description || '',
       slugHasChanged: !!name && !!slug && slugify(name) != slug,
-      saveDisabled: false,
+      saveDisabled: true,
       errors: null
     }
   }
@@ -51,7 +51,7 @@ export class ProjectForm extends Component {
       slug: slug || '',
       description: description || '',
       slugHasChanged: !!name && !!slug && slugify(name) != slug,
-      saveDisabled: false,
+      saveDisabled: true,
       errors: null
     });
   }
@@ -85,17 +85,19 @@ export class ProjectForm extends Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-
     this.setState({ [name]: value });
+    this.setState({ saveDisabled: false });
   }
 
   render() {
+    const { saveDisabled } = this.state;
     return (
       <FormContainer
         onSave={this.save.bind(this)}
         onCancel={this.props.onCancel}
         saveText={this.props.saveText}
-        cancelText={this.props.cancelText}>
+        cancelText={this.props.cancelText}
+        saveDisabled={saveDisabled}>
 
         <div className="form-group">
           <label htmlFor="name">Name</label>
