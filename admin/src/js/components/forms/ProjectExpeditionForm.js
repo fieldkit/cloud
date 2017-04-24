@@ -40,7 +40,7 @@ export class ProjectExpeditionForm extends Component {
       slug: slug || '',
       description: description || '',
       slugHasChanged: !!name && !!slug && slugify(name) != slug,
-      saveDisabled: false,
+      saveDisabled: true,
       errors: null
     }
   }
@@ -53,7 +53,7 @@ export class ProjectExpeditionForm extends Component {
       slug: slug || '',
       description: description || '',
       slugHasChanged: !!name && !!slug && slugify(name) != slug,
-      saveDisabled: false,
+      saveDisabled: true,
       errors: null
     });
   }
@@ -71,7 +71,7 @@ export class ProjectExpeditionForm extends Component {
 
   handleNameChange(event) {
     const v = event.target.value;
-    let stateUpdate = { name: v };
+    let stateUpdate = { name: v, saveDisabled: false };
     if (!this.state.slugHasChanged) {
       stateUpdate = { slug: slugify(v), ...stateUpdate };
     }
@@ -80,7 +80,7 @@ export class ProjectExpeditionForm extends Component {
 
   handleSlugChange(event) {
     const v = event.target.value;
-    this.setState({ slug: v, slugHasChanged: true });
+    this.setState({ slug: v, slugHasChanged: true, saveDisabled: false });
   }
 
   handleInputChange(event) {
@@ -88,7 +88,7 @@ export class ProjectExpeditionForm extends Component {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    this.setState({ [name]: value });
+    this.setState({ [name]: value, saveDisabled: false });
   }
 
   render () {
@@ -97,7 +97,8 @@ export class ProjectExpeditionForm extends Component {
       name,
       slug,
       description,
-      errors
+      errors,
+      saveDisabled
     } = this.state;
 
     return (
@@ -105,7 +106,8 @@ export class ProjectExpeditionForm extends Component {
         onSave={this.save.bind(this)}
         onCancel={this.props.onCancel}
         saveText={this.props.saveText}
-        cancelText={this.props.cancelText}>
+        cancelText={this.props.cancelText}
+        saveDisabled={saveDisabled}>
 
         <FormItem name="name" value={name} labelText="name" className="lg" onChange={this.handleNameChange.bind(this)} errors={errors} />
 
