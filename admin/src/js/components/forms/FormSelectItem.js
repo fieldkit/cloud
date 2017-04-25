@@ -8,6 +8,7 @@ import type { APIErrors } from '../../api/types';
 type Props = {
   labelText: string;
   name: string;
+  inline?: boolean;
   className?: string;
   ref?: string;
   value: string | number;
@@ -21,6 +22,7 @@ export class FormSelectItem extends Component<void, $Exact<Props>, void> {
   render() {
     const {
       name,
+      inline,
       className,
       labelText,
       ref,
@@ -32,10 +34,10 @@ export class FormSelectItem extends Component<void, $Exact<Props>, void> {
     } = this.props;
 
     return (
-      <div className="form-group">
+      <div className={inline ? 'form-group inline' : 'form-group' }>
         <label htmlFor={name}>{labelText}</label>
         <select name={name}  className={className} value={value} onChange={onChange}>
-          <option value={null}>{firstOptionText}</option>
+          <option value={null} disabled>{firstOptionText}</option>
           { options.map((o, i) => 
             <option key={i} value={o.value}>{o.text}</option>) }
         </select>

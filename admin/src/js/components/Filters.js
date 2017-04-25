@@ -34,6 +34,7 @@ export class StringFilterComponent extends Component {
           labelText={'Value'}
           name={'value'}
           value={data.query}
+          inline={true}
           firstOptionText={'Select'}
           options= {options}
           errors={errors}
@@ -45,8 +46,8 @@ export class StringFilterComponent extends Component {
         <FormItem
           labelText={'Value'}
           name={'value'}
-          className={'value'}
           value={data.query}
+          inline={true}
           errors={errors}
           onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
         />
@@ -60,20 +61,13 @@ export class StringFilterComponent extends Component {
             labelText={'Condition'}
             name={'condition'}
             value={data.operation}
+            inline={true}
             firstOptionText={'Select'}
             options= {operations}
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
-          />        
-          {/*<div>
-                      <span className="filter-body-label">Condition </span>
-                      <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
-                        {operations}
-                      </select>
-                    </div>*/}
-          <div>
-            {value_field}
-          </div>
+          />
+          {value_field}
           <div className="filter-body-buttons">
             <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
           </div>
@@ -95,24 +89,28 @@ export class NumFilterComponent extends Component {
   }
 
   render() {
-    const operations = ["GT","LT","EQ","notch"].map((o,i) => <option value={o} key={i}>{o.toUpperCase()}</option>)
+    const operations = ["GT","LT","EQ","notch"].map((o,i) => { return { value: o, text: o } })
     const { creator, data, errors } = this.props
     
     return (
       <div className="fk-filter fk-guidfilter">
         <div className="filter-body">
-          <div>
-            <span className="filter-body-label">Condition </span>
-            <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
-              {operations}
-            </select>
-          </div>
+          <FormSelectItem
+            labelText={'Condition'}
+            name={'condition'}
+            value={data.operation}
+            inline={true}
+            firstOptionText={'Select'}
+            options= {operations}
+            errors={errors}
+            onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
+          />
           <FormItem
             labelText={'Value'}
             name={'value'}
-            className={'value'}
             type={'number'}
             value={data.query}
+            inline={true}
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
           />
@@ -137,23 +135,28 @@ export class DateFilterComponent extends Component {
   }
 
   render() {
-    const operations = ["before","after","within"].map((o,i) => <option value={o} key={i}>{o}</option>)
+    const operations = ["before","after","within"].map((o,i) => { return { value: o, text: o } })
     const { data, creator, errors } = this.props
     
     return (
       <div className="fk-filter fk-guidfilter">
         <div className="filter-body">
-          <div>
-            <span className="filter-body-label">Condition </span>
-            <select className="filter-body-select" value={data.operation} onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}>
-              {operations}
-            </select>
-          </div>
+          <FormSelectItem
+            labelText={'Condition'}
+            name={'condition'}
+            value={data.operation}
+            inline={true}
+            firstOptionText={'Select'}
+            options= {operations}
+            errors={errors}
+            onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
+          />
           <FormItem
             labelText={data.operation === 'within' && 'Start Date' || 'Date'}
             name={'date'}
             type={'date'}
             value={data.date}
+            inline={true}
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}
           />
@@ -163,6 +166,7 @@ export class DateFilterComponent extends Component {
               name={'date'}
               type={'date'}
               value={data.within}
+              inline={true}
               errors={errors}
               onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}
             />        

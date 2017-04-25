@@ -425,8 +425,13 @@ label, .label {
 }
 
 .form-group, .url-preview {
-  display: block;
-  margin-bottom: $baseline-height*1.5;
+  margin-bottom: $baseline-height*1.5;  
+  &.inline {
+    display: inline-block;
+    &:not(:first-child) {
+      margin-left: $elements-padding;
+    }
+  }
 }
 
 .user-avatar {
