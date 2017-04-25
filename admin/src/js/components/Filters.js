@@ -1,7 +1,6 @@
 /* @flow */
 
 import React, { Component } from 'react'
-import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
 import type { APIErrors } from '../api/types';
@@ -13,10 +12,6 @@ export class StringFilterComponent extends Component {
     data: StringFilter;
     creator: Object;
     errors: ?APIErrors;        
-  }
-
-  constructor(props: StringFilter) {
-    super(props);
   }
 
   render() {
@@ -36,7 +31,7 @@ export class StringFilterComponent extends Component {
           value={data.query}
           inline={true}
           firstOptionText={'Select'}
-          options= {options}
+          options={options}
           errors={errors}
           onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
         />
@@ -63,7 +58,7 @@ export class StringFilterComponent extends Component {
             value={data.operation}
             inline={true}
             firstOptionText={'Select'}
-            options= {operations}
+            options={operations}
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
           />
@@ -84,10 +79,6 @@ export class NumFilterComponent extends Component {
     errors: ?APIErrors;
   }
 
-  constructor(props: NumFilter) {
-    super(props);
-  }
-
   render() {
     const operations = ["GT","LT","EQ","notch"].map((o,i) => { return { value: o, text: o } })
     const { creator, data, errors } = this.props
@@ -101,7 +92,7 @@ export class NumFilterComponent extends Component {
             value={data.operation}
             inline={true}
             firstOptionText={'Select'}
-            options= {operations}
+            options={operations}
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
           />
@@ -130,10 +121,6 @@ export class DateFilterComponent extends Component {
     errors: ?APIErrors;        
   }
 
-  constructor(props: NumFilter) {
-    super(props);
-  }
-
   render() {
     const operations = ["before","after","within"].map((o,i) => { return { value: o, text: o } })
     const { data, creator, errors } = this.props
@@ -147,12 +134,12 @@ export class DateFilterComponent extends Component {
             value={data.operation}
             inline={true}
             firstOptionText={'Select'}
-            options= {operations}
+            options={operations}
             errors={errors}
-            onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
+            onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
           />
           <FormItem
-            labelText={data.operation === 'within' && 'Start Date' || 'Date'}
+            labelText={data.operation === 'within' ? 'Start Date' : 'Date'}
             name={'date'}
             type={'date'}
             value={data.date}
