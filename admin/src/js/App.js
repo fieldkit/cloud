@@ -10,6 +10,7 @@ import { Signup } from './components/unauth/Signup';
 
 import { Main } from './components/Main';
 import { Creator } from './components/Creator'; 
+import { Viz } from './components/Viz'; 
 
 import '../css/App.css';
 
@@ -58,6 +59,7 @@ export class App extends Component {
           <Route exact path="/signout" render={() => this.signOut()} />
 
           <PrivateRoute path="/creator" component={Creator} />
+          <PrivateRoute path="/viz" component={Viz} />
           <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Main} />
           <PrivateRoute path="/projects/:projectSlug" component={Main} />
           <PrivateRoute path="/" component={Main} />
