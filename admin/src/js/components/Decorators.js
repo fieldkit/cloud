@@ -4,7 +4,7 @@ import { SketchPicker } from 'react-color';
 import ColorBrewer from 'colorbrewer';
 import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
-import { prop } from 'safety-lens/es2015'
+import { prop, _1, _2 } from 'safety-lens/es2015'
 
 export type Stop = {
     location: number;
@@ -87,13 +87,42 @@ export class PointDecoratorComponent extends Component {
     props: {initial_state: PointDecorator}
     state: {data: PointDecorator, schemer_open: boolean}
     toggleColorType: () => void
+    toggleSizeType: () => void
+    setLowerSize: (Object) => void
+    setUpperSize: (Object) => void
+    setSprite: (Object) => void
 
     constructor(props: PointDecoratorProps){
         super(props)
         this.state = {data: this.props.initial_state, schemer_open: false}
         this.toggleColorType = this.toggleColorType.bind(this)
+        this.toggleSizeType = this.toggleSizeType.bind(this)
+        this.setSprite = this.setSprite.bind(this)
+    }
+   
+    setLowerSize(e:Object){
+        let {data} = this.state;
+        const value = Number(e.target.value);
+        const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_1)
+        data = updatePointDecorator(size_lens,value,data)
+        this.setState({data})
     }
     
+    setUpperSize(e:Object){
+        let {data} = this.state;
+        const value = Number(e.target.value);
+        const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_2)
+        data = updatePointDecorator(size_lens,value,data)
+        this.setState({data})
+    }
+
+    setSprite(e: Object){
+        let {data} = this.state;
+        const value = e.target.value;
+        data = updatePointDecorator(_pointDecoratorPointsSprite,value,data)
+        this.setState({data})
+    }
+
     toggleColorType(){
         const {data} = this.state;
         if(data.points.color.type === "constant"){
@@ -101,6 +130,17 @@ export class PointDecoratorComponent extends Component {
         } else {
             this.setConstantColor(data.points.color.colors[0].color) 
         }
+    }
+    
+    toggleSizeType(){
+        let {data} = this.state;
+        let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
+        if(data.points.size.type === "constant"){
+            data = updatePointDecorator(size_lens,"linear",data)
+        } else {
+            data = updatePointDecorator(size_lens,"constant",data)
+        }
+        this.setState({data})
     }
 
     setBrewerColors(brewer_colors: string[]){
@@ -145,7 +185,8 @@ export class PointDecoratorComponent extends Component {
     render(){
        const {data} = this.state;
        const collections = null
-       let color 
+       let color,size; 
+
        if( data.points.color.type === "constant"){
          color = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>
        } else {
@@ -177,7 +218,17 @@ export class PointDecoratorComponent extends Component {
             </div>
          )
        }
-       const size = null
+
+       if(data.points.size.type === "constant"){
+         size = <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
+       } else {
+         size = (
+             <div>
+                 <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
+                 <input value={data.points.size.bounds[1]} onChange={e => this.setUpperSize(e)}/>
+             </div>
+         )
+       }
         
        return (
            <div className="point-decorator">
@@ -197,14 +248,15 @@ export class PointDecoratorComponent extends Component {
                 </div>
                 <div className="decorator-row">
                     <span className="decorator-row-label">Size: </span>
-                    <select value={data.points.size.type}>
+                    <select value={data.points.size.type} onChange={this.toggleSizeType}>
                         <option value="constant">constant</option>
                         <option value="linear">linear</option>
                     </select>
+                    {size}
                 </div>
                 <div className="decorator-row">
                     <span className="decorator-row-label">Sprite: </span>
-                    <input value={data.points.sprite}/>
+                    <input value={data.points.sprite} onChange={this.setSprite}/>
                 </div>
            </div>
        )
