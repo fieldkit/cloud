@@ -7,6 +7,7 @@
     "jwt-decode": "^2.1.0",
     "lodash": "^4.17.4",
     "loglevel": "^1.4.1",
+    "rc-collapse": "^1.7.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-modal": "^1.7.3",

@@ -12,6 +12,9 @@ import '../../../css/teams.css'
 
 import { FormContainer } from '../containers/FormContainer';
 
+import Collapse, { Panel } from 'rc-collapse';
+import 'rc-collapse/assets/index.css';
+
 import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIBaseMember, APIUser } from '../../api/types';
 
 type Props = {
@@ -301,6 +304,36 @@ export class Teams extends Component {
           <span className="empty">No teams</span> }
         </div>
         <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
+
+        <Collapse>
+          { teams.map((team, i) =>
+            <Panel
+              showArrow={false}
+              headerClass=""
+              header={
+              <div className="accordion-row-header">
+                <h4>{team.name}</h4>
+                <div className="nav">
+                  <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
+                  <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                </div>
+              </div>}
+            >
+              <p>{team.description}</p>
+              { members[team.id] && members[team.id].length > 0 &&
+                <MembersTable
+                  teamId={team.id}
+                  members={members[team.id]}
+                  users={users[team.id]}
+                  onDelete={this.startMemberDelete.bind(this)} 
+                  onUpdate={this.confirmMemberUpdate.bind(this)}/> }
+              { (!members[team.id] || members[team.id].length === 0) &&
+                <p className="empty">This team has no members yet.</p> }
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>              
+            </Panel>
+            )
+          }
+        </Collapse>        
       </div>
     )
   }
