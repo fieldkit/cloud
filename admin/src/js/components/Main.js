@@ -212,12 +212,11 @@ export class Main extends Component {
       } else {
         this.props.history.replace('/');
       }
-    } else {
-      await Promise.all([
-        this.loadExpeditions(this.projectSlug()),
-        this.loadActiveExpedition(this.projectSlug(), this.expeditionSlug())
-      ]);
     }
+    await Promise.all([
+      this.loadExpeditions(this.projectSlug()),
+      this.loadActiveExpedition(this.projectSlug(), this.expeditionSlug())
+    ]);
   }
 
   handleLinkClick() {

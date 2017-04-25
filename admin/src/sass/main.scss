@@ -204,6 +204,7 @@ $footer-height: $baseline-height * 3;
   @media (max-width: 1400px) {
     float: right;  
     position: relative;
+    right: 0;
   }  
 
   a {

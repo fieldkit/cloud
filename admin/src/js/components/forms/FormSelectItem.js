@@ -10,32 +10,39 @@ type Props = {
   name: string;
   inline?: boolean;
   className?: string;
-  type?: string;
   ref?: string;
   value: string | number;
+  firstOptionText: string;
+  options: {value: number | string, text: string}[];
   errors: ?APIErrors;
   onChange?: (e: any) => void;
 }
 
-export class FormItem extends Component<void, $Exact<Props>, void> {
+export class FormSelectItem extends Component<void, $Exact<Props>, void> {
   render() {
     const {
       name,
       inline,
       className,
       labelText,
-      type,
       ref,
       value,
+      firstOptionText,
+      options,
       errors,
       onChange
     } = this.props;
 
     return (
       <div className={inline ? 'form-group inline' : 'form-group' }>
-        <label htmlFor={name}>{labelText}</label>
-        <input ref={ref} name={name} type={type || 'text'} value={value} onChange={onChange}/>
-        { errorsFor(errors, name) }
+        { labelText &&
+          <label htmlFor={name}>{labelText}</label> }
+        <select name={name}  className={className} value={value} onChange={onChange}>
+          <option value={null} disabled>{firstOptionText}</option>
+          { options.map((o, i) => 
+            <option key={i} value={o.value}>{o.text}</option>) }
+        </select>
+        { errorsFor(errors, name) }          
       </div>
     );
   }
