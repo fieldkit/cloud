@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
 import type { APIErrors } from '../api/types';
+import { RemoveIcon } from './icons/Icons'
 
 import type {StringFilter, DateFilter, NumFilter} from './Collection'
 
@@ -63,8 +64,8 @@ export class StringFilterComponent extends Component {
             onChange={(e) => creator.updateFilter(data,{"operation":e.target.value})}
           />
           {value_field}
-          <div className="filter-body-buttons">
-            <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
+          <div className="bt-icon medium"  onClick={() => creator.deleteFilter(data)}>
+            <RemoveIcon />
           </div>
         </div>
       </div>
@@ -105,8 +106,8 @@ export class NumFilterComponent extends Component {
             errors={errors}
             onChange={(e) => creator.updateFilter(data,{"query":e.target.value})}
           />
-          <div className="filter-body-buttons">
-            <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
+          <div className="bt-icon medium"  onClick={() => creator.deleteFilter(data)}>
+            <RemoveIcon />
           </div>
         </div>
       </div>
@@ -148,18 +149,20 @@ export class DateFilterComponent extends Component {
             onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}
           />
           { data.operation === 'within' &&
-            <FormItem
-              labelText={'End Date'}
-              name={'date'}
-              type={'date'}
-              value={data.within}
-              inline={true}
-              errors={errors}
-              onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}
-            />        
+            <span> and
+              <FormItem
+                labelText={'End Date'}
+                name={'date'}
+                type={'date'}
+                value={data.within}
+                inline={true}
+                errors={errors}
+                onChange={(e) => creator.updateFilter(data,{"date":e.target.value})}
+              />
+            </span>
           }
-          <div className="filter-body-buttons">
-            <button className="filter-body-cancel" onClick={() => creator.deleteFilter(data)}>Delete</button>
+          <div className="bt-icon medium"  onClick={() => creator.deleteFilter(data)}>
+            <RemoveIcon />
           </div>
         </div>
       </div>

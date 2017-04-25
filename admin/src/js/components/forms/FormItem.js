@@ -6,7 +6,7 @@ import { errorsFor } from '../../common/util';
 import type { APIErrors } from '../../api/types';
 
 type Props = {
-  labelText: string;
+  labelText?: string;
   name: string;
   inline?: boolean;
   className?: string;

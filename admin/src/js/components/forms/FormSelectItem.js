@@ -6,7 +6,7 @@ import { errorsFor } from '../../common/util';
 import type { APIErrors } from '../../api/types';
 
 type Props = {
-  labelText: string;
+  labelText?: string;
   name: string;
   inline?: boolean;
   className?: string;
@@ -35,7 +35,8 @@ export class FormSelectItem extends Component<void, $Exact<Props>, void> {
 
     return (
       <div className={inline ? 'form-group inline' : 'form-group' }>
-        <label htmlFor={name}>{labelText}</label>
+        { labelText &&
+          <label htmlFor={name}>{labelText}</label> }
         <select name={name}  className={className} value={value} onChange={onChange}>
           <option value={null} disabled>{firstOptionText}</option>
           { options.map((o, i) => 
