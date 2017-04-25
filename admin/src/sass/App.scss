@@ -93,7 +93,7 @@ $gray-1: rgb(50, 50, 50);
 $gray-2: rgb(90, 90, 90);
 $gray-3: rgb(170, 170, 170);
 $gray-4: rgb(236, 236, 236);
-$gray-5: rgb(248, 248, 248);
+$gray-5: rgb(242, 242, 242);
 
 //-------------------- TYPOGRAPHY --------------------//
 
@@ -496,7 +496,6 @@ table {
       transition-duration: 0.5s;
       &:hover {
         background-color: $gray-4;
-        // background-color: lighten($gray-1, 50%);
       }
       td {
         vertical-align: middle;
@@ -515,40 +514,41 @@ table {
   border-bottom: 2px solid $gray-4;
 }
 
-// .accordion {
-//   margin-bottom: $baseline-height*1.5;
-//   .accordion-row {
-//     &.expanded{
-//       padding: $elements-padding*2;
-//       border: 2px solid $gray-4;
-//       border-radius: 3px;
-//     }
-//     .accordion-row-header {
-//       .accordion-row-header-node {
-//         width: 100%;
-//         display: flex;
-//         flex-direction: row;
-//         justify-content: space-between;
-//         nav{
-//           flex-wrap: wrap;
-//           margin-right: 0;
-//         }
-//       }
-//     }
-//   }
-// }
-
-.accordion {
+.rc-collapse {
   margin-bottom: $baseline-height*1.5;
+  border-width: 2px 0 0 0;
+  border-style: solid;
+  border-color: $gray-4;
 
-  .accordion-row-header-node {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    nav{
-      flex-wrap: wrap;
-      margin-right: 0;
+  .rc-collapse-item {
+    background-color: white;
+    border-radius: 0;
+    border-top: 2px;
+    border-style: solid;
+    border-color: $gray-4;
+
+    &.rc-collapse-item-active {
+      border-width: 2px;
+
+      .rc-collapse-header {
+        background-color: $gray-5;
+      }
     }
+  }
+
+  .accordion-row-header {
+    display: inline-block;
+    height: $baseline-height*5;
+
+    .accordion-row-header-contents {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      nav{
+        flex-wrap: wrap;
+        margin-right: 0;
+      }
+    }    
   }
 }
 

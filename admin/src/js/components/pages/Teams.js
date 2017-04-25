@@ -280,13 +280,15 @@ export class Teams extends Component {
         <Collapse className="accordion">
           { teams.map((team, i) =>
             <Panel
-              headerClass="accordion-row-header"
+              className={"accordion-row"}
               header={
-              <div className="accordion-row-header-node">
-                <h4>{team.name}</h4>
-                <div className="nav">
-                  <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
-                  <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+              <div className="accordion-row-header">
+                <div className="accordion-row-header-contents">
+                  <h4>{team.name}</h4>
+                  <div className="nav">
+                    <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
+                    <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                  </div>
                 </div>
               </div>}
             >
