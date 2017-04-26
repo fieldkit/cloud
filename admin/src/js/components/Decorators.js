@@ -210,8 +210,7 @@ export class PointDecoratorComponent extends Component {
       colorDropdownTrigger = (
         <div className="selected-color">
           <div className="color-thumb" style={{ backgroundColor: data.points.color.colors[0].color }}></div>
-        </div>
-      )
+        </div>)
       colorDropdownContent = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>;
     
     } else {
