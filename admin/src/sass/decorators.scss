@@ -1,0 +1,6 @@
+@import 'App';
+
+.color-form {
+  @include form;
+  width: $baseline-height*2.5;
+}

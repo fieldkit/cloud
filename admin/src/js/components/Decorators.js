@@ -6,9 +6,11 @@ import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
 import { prop, _1, _2 } from 'safety-lens/es2015'
 
+import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
 import type { APIErrors } from '../api/types';
+import '../../css/decorators.css'
 
 export type Stop = {
   location: number;
@@ -93,7 +95,6 @@ export class PointDecoratorComponent extends Component {
   }
   state: {
     data: PointDecorator,
-    schemer_open: boolean,
     errors: ?APIErrors
   }
   toggleColorType: () => void
@@ -106,7 +107,6 @@ export class PointDecoratorComponent extends Component {
     super(props)
     this.state = {
       data: this.props.initial_state,
-      schemer_open: false,
       errors: null
     }
     this.toggleColorType = this.toggleColorType.bind(this)
@@ -184,7 +184,6 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = updatePointDecorator(color_lens,colors,this.state.data)
     data = updatePointDecorator(color_type_lens,"linear",data)
-    this.setState({data, schemer_open: false})
   }
 
   setConstantColor(color: string){
@@ -193,49 +192,60 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = updatePointDecorator(color_lens,new_color,this.state.data)
     data = updatePointDecorator(color_type_lens,"constant",data)
-    this.setState({data, schemer_open:false})
   }
 
   render(){
     const { data, errors } = this.state;
     const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
     const collections = null
-    let color,size; 
+    let colorDropdownTrigger, colorDropdownContent, size; 
+    const divStyle = {
+      backgroundColor: data.points.color.colors[0].color
+    }
 
     if( data.points.color.type === "constant"){
-    color = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>
+    
+      colorDropdownTrigger = <div className="color-form" style={divStyle}></div>;
+      colorDropdownContent = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>;
+    
     } else {
-    let brewer_selections = Object.keys(ColorBrewer).map((k) => {
-      let scheme = ColorBrewer[k][5]
-      return (
-        <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
-          {scheme.map((hex,i) => {
-            return (
-              <div className='color-thumb' style={{backgroundColor:hex}} key={i}></div>
-            )
-          })}
-        </div>
-      )
-    })
-    color = (
-      <div>
-        {data.points.color.colors.map((c,i) => {
-          return (
-            <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
-          )
-        })}
+
+      let brewer_selections = Object.keys(ColorBrewer).map((k) => {
+        let scheme = ColorBrewer[k][5]
+        return (
+          <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
+            {scheme.map((hex,i) => {
+              return (
+                <div className='color-thumb' style={{backgroundColor:hex}} key={i}></div>
+              )
+            })}
+          </div>
+        )
+      });
+
+      colorDropdownTrigger = (
         <div>
-          <button className="brewer-title" onClick={() => this.setState({schemer_open: true})}>Select Color Scheme</button>
-          <div className="brewer-schemes" style={{display: this.state.schemer_open ? "block" : "none"}}>
+          {data.points.color.colors.map((c,i) => {
+              return (
+                <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
+              )
+            })
+          }
+        </div>
+      );
+
+      colorDropdownContent = (
+        <div>
+          <div className="brewer-schemes">
             {brewer_selections}
           </div>
-        </div>
-      </div>
-    )
+        </div>        
+      )
     }
     
     return (
       <div className="point-decorator">
+
         <div className="decorator-row">
           <div className="decorator-row-label">Source: </div>
           <select>
@@ -253,7 +263,14 @@ export class PointDecoratorComponent extends Component {
             errors={errors}
             onChange={this.toggleColorType}
           />
-          {color}
+          <Dropdown className="color-dropdown" ref="color-dropdown">
+            <DropdownTrigger className="trigger">
+              { colorDropdownTrigger }
+            </DropdownTrigger>
+            <DropdownContent className="dropdown-contents">
+              { colorDropdownContent }
+            </DropdownContent>
+          </Dropdown>          
         </div>
         <div className="decorator-row">
           <FormSelectItem

@@ -421,10 +421,6 @@ input[type="text"], input[type="email"], input[type="password"], input[type="num
   }
 }
 
-// select {
-//   height: $baseline-height*2.5;
-// }
-
 label, .label {
   @include type-body-2;
   display: block;
