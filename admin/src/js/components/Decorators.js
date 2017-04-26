@@ -140,7 +140,7 @@ export class PointDecoratorComponent extends Component {
   toggleColorType(){
     const {data} = this.state;
     if(data.points.color.type === "constant"){
-      this.setBrewerColors(ColorBrewer.Reds[5]) 
+      this.setBrewerColors(ColorBrewer.Reds[5])
     } else {
       this.setConstantColor(data.points.color.colors[0].color) 
     }
@@ -184,6 +184,7 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = updatePointDecorator(color_lens,colors,this.state.data)
     data = updatePointDecorator(color_type_lens,"linear",data)
+    this.setState({data})
   }
 
   setConstantColor(color: string){
@@ -192,6 +193,7 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = updatePointDecorator(color_lens,new_color,this.state.data)
     data = updatePointDecorator(color_type_lens,"constant",data)
+    this.setState({data})
   }
 
   render(){

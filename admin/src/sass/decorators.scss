@@ -4,3 +4,23 @@
   @include form;
   width: $baseline-height*2.5;
 }
+
+.color-thumb{
+  display:inline-block;
+  width:25px;
+  height:15px;
+}
+
+.brewer-schemes{
+  position:absolute;
+  background:white;
+  padding:10px;
+}
+
+.brewer-selection{
+  display:inline-block;
+  padding:5px;
+  border:1px solid #cecece;
+  margin:5px;
+  cursor:pointer;
+}
