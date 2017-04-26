@@ -7,8 +7,6 @@ import type { Lens, Lens_ } from 'safety-lens'
 import { get, set } from 'safety-lens'
 import { prop } from 'safety-lens/es2015'
 
-import '../../css/Viz.css';
-
 import type {
   Match as RouterMatch,
   Location as RouterLocation,
