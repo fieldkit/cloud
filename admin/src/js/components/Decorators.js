@@ -112,7 +112,7 @@ export class PointDecoratorComponent extends Component {
         data = updatePointDecorator(lens,value,data)
         this.setState({data})
     }
-  
+
     setSize(e:Object){
         const value = Number(e.target.value);
         const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds)
@@ -124,7 +124,7 @@ export class PointDecoratorComponent extends Component {
         const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_1)
         this.update(size_lens,value)
     }
-    
+
     setUpperSize(e:Object){
         const value = Number(e.target.value);
         const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_2)
@@ -144,7 +144,7 @@ export class PointDecoratorComponent extends Component {
             this.setConstantColor(data.points.color.colors[0].color) 
         }
     }
-    
+
     toggleSizeType(){
         let {data} = this.state;
         let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
@@ -159,7 +159,7 @@ export class PointDecoratorComponent extends Component {
         let color_length = brewer_colors.length || 0,
             step: number, 
             colors: Stop[];
-            
+
         if(color_length > 1){
             step = 1/(color_length - 1)
             colors = brewer_colors.map((c,i) => { 
@@ -234,7 +234,7 @@ export class PointDecoratorComponent extends Component {
                 </div>
             )
          })
-         
+
 
          color = (
             <div>
@@ -273,7 +273,7 @@ export class PointDecoratorComponent extends Component {
              </div>
          )
        }
-        
+
        return (
            <div className="point-decorator">
                 <div className="decorator-row">
