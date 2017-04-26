@@ -232,38 +232,6 @@ export class PointDecoratorComponent extends Component {
       </div>
     )
     }
-
-    if(data.points.size.type === "constant"){
-      size =  <FormItem
-                labelText={'Value'}
-                name={'value'}
-                value={data.points.size.bounds[0]}
-                inline={true}
-                errors={errors}
-                onChange={e => this.setLowerSize(e)}
-              />
-    } else {
-      size = (
-         <div>
-          <FormItem
-            labelText={'Min'}
-            name={'lower-size'}
-            value={data.points.size.bounds[0]}
-            inline={true}
-            errors={errors}
-            onChange={e => this.setLowerSize(e)}
-          />
-          <FormItem
-            labelText={'Max'}
-            name={'upper-size'}
-            value={data.points.size.bounds[1]}
-            inline={true}
-            errors={errors}
-            onChange={e => this.setUpperSize(e)}
-          />
-         </div>
-      )
-    }
     
     return (
       <div className="point-decorator">
@@ -300,6 +268,16 @@ export class PointDecoratorComponent extends Component {
             errors={errors}
             onChange={e => this.setLowerSize(e)}
           />
+          { data.points.size.type !== "constant" &&
+            <FormItem
+              labelText={'Max'}
+              name={'upper-size'}
+              value={data.points.size.bounds[1]}
+              inline={true}
+              errors={errors}
+              onChange={e => this.setUpperSize(e)}
+            />          
+          }
         </div>
         <div className="decorator-row">
           <FormItem
