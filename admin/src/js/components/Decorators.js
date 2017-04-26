@@ -5,6 +5,7 @@ import ColorBrewer from 'colorbrewer';
 import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
 import { prop, _1, _2 } from 'safety-lens/es2015'
+import type {Attr} from './Collection';
 
 export type Stop = {
     location: number;
@@ -79,18 +80,22 @@ export function emptyPointDecorator(): PointDecorator{
 
 export type Decorator = PointDecorator
 type PointDecoratorProps = {
-    intial_state: PointDecorator
+    initial_state: PointDecorator;
+    attributes: {[string]: Attr};
 }
 
 
 export class PointDecoratorComponent extends Component {
-    props: {initial_state: PointDecorator}
+    props: PointDecoratorProps
     state: {data: PointDecorator, schemer_open: boolean}
     toggleColorType: () => void
     toggleSizeType: () => void
     setLowerSize: (Object) => void
     setUpperSize: (Object) => void
+    setSize: (Object) => void
     setSprite: (Object) => void
+    updateSizeDataKey: (Object) => void
+    updateColorDataKey: (Object) => void
 
     constructor(props: PointDecoratorProps){
         super(props)
@@ -98,29 +103,37 @@ export class PointDecoratorComponent extends Component {
         this.toggleColorType = this.toggleColorType.bind(this)
         this.toggleSizeType = this.toggleSizeType.bind(this)
         this.setSprite = this.setSprite.bind(this)
+        this.updateSizeDataKey = this.updateSizeDataKey.bind(this)
+        this.updateColorDataKey = this.updateColorDataKey.bind(this)
     }
-   
-    setLowerSize(e:Object){
+
+    update<A>(lens: Lens_<PointDecorator,A>,value:A): void{
         let {data} = this.state;
+        data = updatePointDecorator(lens,value,data)
+        this.setState({data})
+    }
+  
+    setSize(e:Object){
+        const value = Number(e.target.value);
+        const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds)
+        this.update(size_lens,[value,value])
+    }
+
+    setLowerSize(e:Object){
         const value = Number(e.target.value);
         const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_1)
-        data = updatePointDecorator(size_lens,value,data)
-        this.setState({data})
+        this.update(size_lens,value)
     }
     
     setUpperSize(e:Object){
-        let {data} = this.state;
         const value = Number(e.target.value);
         const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_2)
-        data = updatePointDecorator(size_lens,value,data)
-        this.setState({data})
+        this.update(size_lens,value)
     }
 
     setSprite(e: Object){
-        let {data} = this.state;
         const value = e.target.value;
-        data = updatePointDecorator(_pointDecoratorPointsSprite,value,data)
-        this.setState({data})
+        this.update(_pointDecoratorPointsSprite,value)
     }
 
     toggleColorType(){
@@ -136,11 +149,10 @@ export class PointDecoratorComponent extends Component {
         let {data} = this.state;
         let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
         if(data.points.size.type === "constant"){
-            data = updatePointDecorator(size_lens,"linear",data)
+            this.update(size_lens,"linear")
         } else {
-            data = updatePointDecorator(size_lens,"constant",data)
+            this.update(size_lens,"constant")
         }
-        this.setState({data})
     }
 
     setBrewerColors(brewer_colors: string[]){
@@ -182,16 +194,36 @@ export class PointDecoratorComponent extends Component {
         this.setState({data, schemer_open:false})
     }
 
+    updateSizeDataKey(e: Object){
+        const value = e.target.value;
+        const size_lens = compose(_pointDecoratorPointsSize,_sizeDataKey)
+        this.update(size_lens,value)
+    }
+
+    updateColorDataKey(e: Object){
+        const value = e.target.value;
+        const color_lens = compose(_pointDecoratorPointsColor,_colorDataKey)
+        this.update(color_lens,value)
+    }
+
     render(){
        const {data} = this.state;
+       const {attributes} = this.props;
        const collections = null
+       const target_attrs = Object.keys(attributes).filter(a => attributes[a].type === "num")
+                                  .map((a) => {
+                                    const attr = attributes[a];                 
+                                    return (
+                                        <option value="{attr.name}">{attr.name}</option>
+                                    )
+                                })
        let color,size; 
 
        if( data.points.color.type === "constant"){
          color = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>
        } else {
-         let brewer_selections = Object.keys(ColorBrewer).map((k) => {
-            let scheme = ColorBrewer[k][5]
+         const brewer_selections = Object.keys(ColorBrewer).map((k) => {
+            const scheme = ColorBrewer[k][5]
             return (
                 <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
                     {scheme.map((hex,i) => {
@@ -202,8 +234,15 @@ export class PointDecoratorComponent extends Component {
                 </div>
             )
          })
+         
+
          color = (
             <div>
+                <h4>Based on:</h4>
+                <select value={data.points.color.data_key} onChange={this.updateColorDataKey}>
+                    {target_attrs}
+                </select>
+                <h4>Color: </h4>
                 {data.points.color.colors.map((c,i) => {
                     return (
                         <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
@@ -220,10 +259,15 @@ export class PointDecoratorComponent extends Component {
        }
 
        if(data.points.size.type === "constant"){
-         size = <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
+         size = <input value={data.points.size.bounds[0]} onChange={e => this.setSize(e)}/>
        } else {
          size = (
              <div>
+                <h4>Based on</h4>
+                <select value={data.points.size.data_key} onChange={this.updateSizeDataKey}>
+                    {target_attrs}
+                </select>
+                <h4>Max/min</h4>
                  <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
                  <input value={data.points.size.bounds[1]} onChange={e => this.setUpperSize(e)}/>
              </div>
