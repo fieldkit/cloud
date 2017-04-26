@@ -198,6 +198,7 @@ export class PointDecoratorComponent extends Component {
 
   render(){
     const { data, errors } = this.state;
+    const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
     const collections = null
     let color,size; 
 
@@ -242,11 +243,16 @@ export class PointDecoratorComponent extends Component {
           </select>
         </div>
         <div className="decorator-row">
-          <span className="decorator-row-label">Color: </span>
-          <select value={data.points.color.type} onChange={this.toggleColorType}>
-            <option value="constant">constant</option>
-            <option value="linear">linear</option>
-          </select>
+          <FormSelectItem
+            labelText={'Color'}
+            name={'color'}
+            value={data.points.color.type}
+            inline={true}
+            firstOptionText={'Select'}
+            options={options}
+            errors={errors}
+            onChange={this.toggleColorType}
+          />
           {color}
         </div>
         <div className="decorator-row">
@@ -256,7 +262,7 @@ export class PointDecoratorComponent extends Component {
             value={data.points.size.type}
             inline={true}
             firstOptionText={'Select'}
-            options={[{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}]}
+            options={options}
             errors={errors}
             onChange={this.toggleSizeType}
           />
