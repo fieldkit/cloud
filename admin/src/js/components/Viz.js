@@ -230,9 +230,9 @@ export class Viz extends Component {
     } = this.state;
 
     return (
-        <div>
-            <PointDecoratorComponent initial_state={emptyPointDecorator()} attributes={this.attributes}/>
-        </div>
+      <div>
+        <PointDecoratorComponent initial_state={emptyPointDecorator()} attributes={this.attributes}/>
+      </div>
     )
   }
 }
