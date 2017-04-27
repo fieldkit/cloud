@@ -185,7 +185,6 @@ export class ProjectSettings extends Component {
               name={project ? project.name : undefined}
               slug={project ? project.slug : undefined}
               description={project ? project.description : undefined}
-
               onSave={this.onProjectSave.bind(this)} />
           </div>
           <div className="two-columns">

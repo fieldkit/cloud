@@ -89,7 +89,7 @@ export class ProjectExpeditions extends Component {
               <h4>{e.name}</h4>
             </Link> )}
           { this.props.expeditions.length === 0 &&
-            <span className="empty">You don't have any expeditions yet.</span> }
+            <span className="empty">This project doesn't have any expeditions yet.</span> }
         </div>
         <Link to={`${match.url}/new-expedition`} className="button">Create new expedition</Link>
       </div>

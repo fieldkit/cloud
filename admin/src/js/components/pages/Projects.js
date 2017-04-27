@@ -28,9 +28,11 @@ export class Projects extends Component {
   props: $Exact<Props>;
 
   async onProjectCreate(p: APINewProject) {
+    const { match } = this.props;
     const project = await FKApiClient.get().createProject(p);
     if (project.type === 'ok') {
       this.props.onProjectCreate();
+      this.props.history.push(joinPath(match.url, 'projects', p.slug));
     } else {
       return project.errors;
     }

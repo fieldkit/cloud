@@ -1,5 +1,4 @@
 @import 'App';
-@import 'Viz';
 
 $contents-width: 834px;
 $top-bar-height: $baseline-height * 4;
@@ -204,6 +203,7 @@ $footer-height: $baseline-height * 3;
   @media (max-width: 1400px) {
     float: right;  
     position: relative;
+    right: 0;
   }  
 
   a {

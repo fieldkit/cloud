@@ -7,8 +7,6 @@ import type { Lens, Lens_ } from 'safety-lens'
 import { get, set } from 'safety-lens'
 import { prop } from 'safety-lens/es2015'
 
-import '../../css/Viz.css';
-
 import type {
   Match as RouterMatch,
   Location as RouterLocation,
@@ -232,9 +230,9 @@ export class Viz extends Component {
     } = this.state;
 
     return (
-        <div>
-            <PointDecoratorComponent initial_state={emptyPointDecorator()} attributes={this.attributes}/>
-        </div>
+      <div>
+        <PointDecoratorComponent initial_state={emptyPointDecorator()} attributes={this.attributes}/>
+      </div>
     )
   }
 }

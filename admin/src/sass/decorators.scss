@@ -1,0 +1,42 @@
+@import 'App';
+
+.dropdown {
+  &.color-dropdown {
+    vertical-align: middle;
+  }
+}
+
+.selected-color {
+  background-color: white;
+  border: 1px solid $gray-4;
+  border-radius: 3px;
+  padding: $elements-padding/2;
+  margin-left: $elements-padding*2;    
+  line-height: 0;
+  cursor:pointer;
+}
+
+.brewer-schemes{
+  background-color: white;
+  @include shadow(8px);
+  overflow-y: auto;
+  height: $baseline-height*22;
+
+  .brewer-selection{
+    @extend .table-border;
+    padding: $elements-padding;
+    cursor:pointer;
+  }
+}
+
+.color-thumb{
+  display:inline-block;
+  width: $baseline-height*2.5 - $elements-padding;
+  height: $baseline-height*2.5 - $elements-padding;
+  padding: 0;
+  margin: 0;
+  vertical-align: top;
+}  
+
+
+

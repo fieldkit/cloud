@@ -9,6 +9,7 @@
     "jwt-decode": "^2.1.0",
     "lodash": "^4.17.4",
     "loglevel": "^1.4.1",
+    "rc-collapse": "^1.7.2",
     "react": "^15.4.2",
     "react-color": "^2.11.4",
     "react-dom": "^15.4.2",
