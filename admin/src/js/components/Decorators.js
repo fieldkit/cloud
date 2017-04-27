@@ -298,15 +298,16 @@ export class PointDecoratorComponent extends Component {
             onChange={this.toggleColorType}
           />
           { data.points.color.type !== "constant" &&
+
             <FormSelectItem
               labelText={'Based on'}
-              name={'attr'}
-              value={data.points.size.data_key}
+              name={'color-data-key'}
+              value={data.points.color.data_key}
               inline={true}
               firstOptionText={'Select'}
               options={target_attrs}
               errors={errors}
-              onChange={this.updateSizeDataKey}
+              onChange={this.updateColorDataKey}
             />          
 
           }
@@ -342,6 +343,16 @@ export class PointDecoratorComponent extends Component {
           }
           { data.points.size.type !== "constant" &&
             <div>
+              <FormSelectItem
+                labelText={'Based on'}
+                name={'side-data-key'}
+                value={data.points.size.data_key}
+                inline={true}
+                firstOptionText={'Select'}
+                options={target_attrs}
+                errors={errors}
+                onChange={this.updateSizeDataKey}
+              />             
               <FormItem
                 labelText={'Value'}
                 name={'value'}
