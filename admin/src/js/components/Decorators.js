@@ -225,7 +225,7 @@ export class PointDecoratorComponent extends Component {
                                  .map((a) => {
                                    const attr = attributes[a];                 
                                    return (
-                                       <option value="{attr.name}">{attr.name}</option>
+                                    {value: attr.name, text: attr.name}
                                    )
                                })    
     const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
@@ -298,12 +298,17 @@ export class PointDecoratorComponent extends Component {
             onChange={this.toggleColorType}
           />
           { data.points.color.type !== "constant" &&
-            <div>
-              <h4>Based on</h4>
-              <select value={data.points.size.data_key} onChange={this.updateSizeDataKey}>
-                {target_attrs}
-              </select> 
-            </div>
+            <FormSelectItem
+              labelText={'Based on'}
+              name={'attr'}
+              value={data.points.size.data_key}
+              inline={true}
+              firstOptionText={'Select'}
+              options={target_attrs}
+              errors={errors}
+              onChange={this.updateSizeDataKey}
+            />          
+
           }
           <Dropdown className="color-dropdown" ref="color-dropdown">
             <DropdownTrigger className="trigger">
@@ -325,14 +330,16 @@ export class PointDecoratorComponent extends Component {
             errors={errors}
             onChange={this.toggleSizeType}
           />
-          <FormItem
-            labelText={'Value'}
-            name={'value'}
-            value={data.points.size.bounds[0]}
-            inline={true}
-            errors={errors}
-            onChange={e => this.setSize(e)}
-          />
+          { data.points.size.type === "constant" &&
+            <FormItem
+              labelText={'Value'}
+              name={'value'}
+              value={data.points.size.bounds[0]}
+              inline={true}
+              errors={errors}
+              onChange={e => this.setSize(e)}
+            />
+          }
           { data.points.size.type !== "constant" &&
             <div>
               <FormItem

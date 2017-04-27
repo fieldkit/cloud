@@ -11,7 +11,7 @@ type Props = {
   inline?: boolean;
   className?: string;
   ref?: string;
-  value: string | number;
+  value: string | number | null;
   firstOptionText: string;
   options: {value: number | string, text: string}[];
   errors: ?APIErrors;
