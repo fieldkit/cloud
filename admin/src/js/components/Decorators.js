@@ -1,11 +1,17 @@
 /* @flow */
- import React, { Component } from 'react'
- import { SketchPicker } from 'react-color';
- import ColorBrewer from 'colorbrewer';
-  import type { Lens, Lens_ } from 'safety-lens'
-  import { get, set, compose } from 'safety-lens'
-  import { prop, _1, _2 } from 'safety-lens/es2015'
- import type {Attr} from './Collection';
+import React, { Component } from 'react'
+import { SketchPicker } from 'react-color';
+import ColorBrewer from 'colorbrewer';
+import type { Lens, Lens_ } from 'safety-lens'
+import { get, set, compose } from 'safety-lens'
+import { prop, _1, _2 } from 'safety-lens/es2015'
+import type {Attr} from './Collection';
+
+import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import { FormItem } from './forms/FormItem'
+import { FormSelectItem } from './forms/FormSelectItem'
+import type { APIErrors } from '../api/types';
+import '../../css/decorators.css'
   
   export type Stop = {
       location: number;
@@ -88,7 +94,11 @@
   export class PointDecoratorComponent extends Component {
   props: {initial_state: PointDecorator}
      props: PointDecoratorProps
-      state: {data: PointDecorator, schemer_open: boolean}
+      state: {
+        data: PointDecorator,
+        schemer_open: boolean,
+        errors: ?APIErrors
+      }
       toggleColorType: () => void
       toggleSizeType: () => void
       setLowerSize: (Object) => void
@@ -100,15 +110,17 @@
   
       constructor(props: PointDecoratorProps){
           super(props)
-          this.state = {data: this.props.initial_state, schemer_open: false}
+          this.state = {
+            data: this.props.initial_state,
+            schemer_open: false,
+            errors: null
+          }
           this.toggleColorType = this.toggleColorType.bind(this)
           this.toggleSizeType = this.toggleSizeType.bind(this)
           this.setSprite = this.setSprite.bind(this)
          this.updateSizeDataKey = this.updateSizeDataKey.bind(this)
          this.updateColorDataKey = this.updateColorDataKey.bind(this)
       }
-   
-   setLowerSize(e:Object){
  
      update<A>(lens: Lens_<PointDecorator,A>,value:A): void{
           let {data} = this.state;
@@ -123,6 +135,7 @@
      }
  
      setLowerSize(e:Object){
+      let {data} = this.state;
           const value = Number(e.target.value);
           const size_lens = compose(_pointDecoratorPointsSize,_sizeBounds,_1)
        data = updatePointDecorator(size_lens,value,data)
@@ -221,105 +234,144 @@
      }
  
       render(){
-         const {data} = this.state;
-        const {attributes} = this.props;
-         const collections = null
-        const target_attrs = Object.keys(attributes).filter(a => attributes[a].type === "num")
-                                   .map((a) => {
-                                     const attr = attributes[a];                 
-                                     return (
-                                         <option value="{attr.name}">{attr.name}</option>
-                                     )
-                                 })
-         let color,size; 
-  
-         if( data.points.color.type === "constant"){
-           color = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>
-         } else {
-       let brewer_selections = Object.keys(ColorBrewer).map((k) => {
-          let scheme = ColorBrewer[k][5]
-          const brewer_selections = Object.keys(ColorBrewer).map((k) => {
-             const scheme = ColorBrewer[k][5]
-              return (
-                  <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
-                      {scheme.map((hex,i) => {
-                         return (
-                             <div className='color-thumb' style={{backgroundColor:hex}} key={i}></div>
-                         )
-                     })}
-                  </div>
-              )
-           })
-          
- 
-           color = (
-              <div>
-                 <h4>Based on:</h4>
-                 <select value={data.points.color.data_key} onChange={this.updateColorDataKey}>
-                     {target_attrs}
-                 </select>
-                 <h4>Color: </h4>
-                  {data.points.color.colors.map((c,i) => {
-                      return (
-                          <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
-                     )
-                 })}
-                 <div>
-                     <button className="brewer-title" onClick={() => this.setState({schemer_open: true})}>Select Color Scheme</button>
-                     <div className="brewer-schemes" style={{display: this.state.schemer_open ? "block" : "none"}}>
-                         {brewer_selections}
-                     </div>
-                 </div>
-             </div>
-          )
-         }
-  
-         if(data.points.size.type === "constant"){
-         size = <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
-          size = <input value={data.points.size.bounds[0]} onChange={e => this.setSize(e)}/>
-         } else {
-           size = (
-               <div>
-                 <h4>Based on</h4>
-                 <select value={data.points.size.data_key} onChange={this.updateSizeDataKey}>
-                     {target_attrs}
-                 </select>
-                 <h4>Max/min</h4>
-                   <input value={data.points.size.bounds[0]} onChange={e => this.setLowerSize(e)}/>
-                   <input value={data.points.size.bounds[1]} onChange={e => this.setUpperSize(e)}/>
-               </div>
-          )
-        }
-         
+    const { data, errors } = this.state;
+    const {attributes} = this.props;
+      const target_attrs = Object.keys(attributes).filter(a => attributes[a].type === "num")
+                                 .map((a) => {
+                                   const attr = attributes[a];                 
+                                   return (
+                                       <option value="{attr.name}">{attr.name}</option>
+                                   )
+                               })    
+    const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
+    const collections = null
+    let colorDropdownTrigger, colorDropdownContent, size; 
+    const divStyle = {
+      backgroundColor: data.points.color.colors[0].color
+    }
+
+    if( data.points.color.type === "constant"){
+    
+      colorDropdownTrigger = (
+        <div className="selected-color">
+          <div className="color-thumb" style={{ backgroundColor: data.points.color.colors[0].color }}></div>
+        </div>
+      )
+      colorDropdownContent = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>;
+    
+    } else {
+
+
+      let brewer_selections = Object.keys(ColorBrewer).map((k) => {
+        let scheme = ColorBrewer[k][5]
         return (
-            <div className="point-decorator">
-                 <div className="decorator-row">
-                     <div className="decorator-row-label">Source: </div>
-                     <select>
-                         {collections}
-                     </select>
-                 </div>
-                 <div className="decorator-row">
-                     <span className="decorator-row-label">Color: </span>
-                     <select value={data.points.color.type} onChange={this.toggleColorType}>
-                         <option value="constant">constant</option>
-                         <option value="linear">linear</option>
-                     </select>
-                     {color}
-                 </div>
-                 <div className="decorator-row">
-                     <span className="decorator-row-label">Size: </span>
-                     <select value={data.points.size.type} onChange={this.toggleSizeType}>
-                         <option value="constant">constant</option>
-                         <option value="linear">linear</option>
-                     </select>
-                     {size}
-                 </div>
-                 <div className="decorator-row">
-                     <span className="decorator-row-label">Sprite: </span>
-                     <input value={data.points.sprite} onChange={this.setSprite}/>
-                 </div>
-            </div>
+          <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
+            {scheme.map((hex,i) => {
+              return (
+                <div className='color-thumb' style={{backgroundColor:hex}} key={i}></div>
+              )
+            })}
+          </div>
         )
-     }
- }
+      });
+
+      colorDropdownTrigger = (
+        <div className="selected-color">
+          {data.points.color.colors.map((c,i) => {
+              return (
+                <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
+              )
+            })
+          }
+        </div>
+      );
+
+      colorDropdownContent = (
+        <div>
+          <div className="brewer-schemes">
+            {brewer_selections}
+          </div>
+        </div>        
+      )
+    }
+    
+    return (
+      <div className="point-decorator">
+
+        <div className="decorator-row">
+          <div className="decorator-row-label">Source: </div>
+          <select>
+            {collections}
+          </select>
+        </div>
+        <div className="decorator-row">
+          <FormSelectItem
+            labelText={'Color'}
+            name={'color'}
+            value={data.points.color.type}
+            inline={true}
+            firstOptionText={'Select'}
+            options={options}
+            errors={errors}
+            onChange={this.toggleColorType}
+          />
+          { data.points.color.type !== "constant" &&
+            <div>
+              <h4>Based on</h4>
+              <select value={data.points.size.data_key} onChange={this.updateSizeDataKey}>
+                {target_attrs}
+              </select> 
+            </div>
+          }
+          <Dropdown className="color-dropdown" ref="color-dropdown">
+            <DropdownTrigger className="trigger">
+              { colorDropdownTrigger }
+            </DropdownTrigger>
+            <DropdownContent className="dropdown-contents">
+              { colorDropdownContent }
+            </DropdownContent>
+          </Dropdown>          
+        </div>
+        <div className="decorator-row">
+          <FormSelectItem
+            labelText={'Size'}
+            name={'size'}
+            value={data.points.size.type}
+            inline={true}
+            firstOptionText={'Select'}
+            options={options}
+            errors={errors}
+            onChange={this.toggleSizeType}
+          />
+          <FormItem
+            labelText={'Value'}
+            name={'value'}
+            value={data.points.size.bounds[0]}
+            inline={true}
+            errors={errors}
+            onChange={e => this.setLowerSize(e)}
+          />
+          { data.points.size.type !== "constant" &&
+            <FormItem
+              labelText={'Max'}
+              name={'upper-size'}
+              value={data.points.size.bounds[1]}
+              inline={true}
+              errors={errors}
+              onChange={e => this.setUpperSize(e)}
+            />          
+          }
+        </div>
+        <div className="decorator-row">
+          <FormItem
+            labelText={'Sprite'}
+            name={'sprite'}
+            value={data.points.sprite}
+            errors={errors}
+            onChange={this.setSprite}
+          />
+        </div>
+      </div>
+    )
+  }
+}
