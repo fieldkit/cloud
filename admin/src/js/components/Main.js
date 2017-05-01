@@ -21,6 +21,8 @@ import { RouteOrLoading } from './shared/RequiredRoute';
 import { Projects } from './pages/Projects';
 import { ProjectExpeditions } from './pages/ProjectExpeditions';
 import { ProjectSettings } from './pages/ProjectSettings';
+import { ProjectCollections } from './pages/ProjectCollections';
+import { ProjectVisualizations } from './pages/ProjectVisualizations';
 import { Expedition } from './pages/Expedition'
 import { Teams } from './pages/Teams';
 import { DataSources } from './pages/DataSources';
@@ -295,6 +297,8 @@ export class Main extends Component {
           <div className="nav-bar row">
             <div className="container navigation-tabs">
               <NavLink exact to={`/projects/${activeProject.slug}`}><span>Expeditions</span></NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}/collections`}><span>Collections</span></NavLink>
+              <NavLink exact to={`/projects/${activeProject.slug}/visualizations`}><span>Visualizations</span></NavLink>
               <NavLink to={`/projects/${activeProject.slug}/settings`}><span>Settings</span></NavLink>
             </div>
           </div>
@@ -343,6 +347,16 @@ export class Main extends Component {
                 project={activeProject}
                 user={user}
                 onUpdate={this.onProjectUpdate.bind(this)} />
+              <RouteOrLoading
+                path="/projects/:projectSlug/collections"
+                component={ProjectCollections}
+                required={[activeProject]}
+                project={activeProject}/>
+              <RouteOrLoading
+                path="/projects/:projectSlug/visualizations"
+                component={ProjectVisualizations}
+                required={[activeProject]}
+                project={activeProject}/>
               <RouteOrLoading
                 path="/projects/:projectSlug"
                 component={ProjectExpeditions}
