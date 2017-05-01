@@ -106,99 +106,61 @@ export class ProjectCollections extends Component {
     this.setState({ collectionDeletion: null });
   }
 
+  getCollectionById (id: number): ?APICollection {
+    const { collections } = this.state;
+    return collections.find(collection => collection.id === id);
+  }  
+
   render() {
-    const { match } = this.props;
-    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
+    const { match, expeditions, members, users } = this.props;
+    const { collections, collectionDeletion } = this.state;
 
     return (
-      <div className="teams">
+      <div className="collections">
 
-        <Route path={`${match.url}/new-team`} render={() =>
-          <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
-            <h2>Create New Team</h2>
-            <TeamForm
+        <Route path={`${match.url}/new-collection`} render={() =>
+          <ReactModal isOpen={true} contentLabel="Create New Collection" className="modal" overlayClassName="modal-overlay">
+            <h2>Create New Collection</h2>
+            <ProjectCollectionsForm
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onTeamCreate.bind(this)} />
+              onSave={this.onCollectionCreate.bind(this)} />
           </ReactModal> } />
 
-        <Route path={`${match.url}/:teamId/add-member`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
-            <h2>Add Member</h2>
-            <MemberForm
-              teamId={props.match.params.teamId}
-              members={this.state.members[props.match.params.teamId]}
+        <Route path={`${match.url}/:collectionId/edit`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Edit Collection" className="modal" overlayClassName="modal-overlay">
+            <ProjectCollectionsForm
+              collection={this.getCollectionById(parseInt(props.match.params.collectionId))}
               onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onMemberAdd.bind(this)} 
-              saveText="Add" />
-          </ReactModal> } />      
-
-        <Route path={`${match.url}/:teamId/edit`} render={props =>
-          <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
-            <TeamForm
-              team={this.getTeamById(parseInt(props.match.params.teamId))}
-              onCancel={() => this.props.history.push(`${match.url}`)}
-              onSave={this.onTeamUpdate.bind(this, parseInt(props.match.params.teamId))} />
+              onSave={this.onCollectionUpdate.bind(this, parseInt(props.match.params.collectionId))} />
           </ReactModal> } />          
 
-        { teamDeletion &&
-          <ReactModal isOpen={true} contentLabel="Delete Team" className="modal" overlayClassName="modal-overlay">
+        { collectionDeletion &&
+          <ReactModal isOpen={true} contentLabel="Delete Collection" className="modal" overlayClassName="modal-overlay">
             <h2>Delete Team</h2>
             <FormContainer
-              onSave={this.confirmTeamDelete.bind(this)}
-              onCancel={this.cancelTeamDelete.bind(this)}
+              onSave={this.confirmCollectionDelete.bind(this)}
+              onCancel={this.confirmCollectionDelete.bind(this)}
               saveText="Confirm"
             >
-              <div>{teamDeletion.contents}</div>
+              <div>{collectionDeletion.contents}</div>
             </FormContainer>
           </ReactModal> }
 
-        { memberDeletion &&
-          <ReactModal isOpen={true} contentLabel="Remove Member" className="modal" overlayClassName="modal-overlay">
-            <h2>Remove Member</h2>
-            <FormContainer
-              onSave={this.confirmMemberDelete.bind(this)}
-              onCancel={this.cancelMemberDelete.bind(this)}
-              saveText="Confirm"
-            >
-              <div>{memberDeletion.contents}</div>
-            </FormContainer>
-          </ReactModal> }
-
-        <h1>Teams</h1>
-
-        <Collapse className="accordion">
-          { teams.map((team, i) =>
-            <Panel
-              className={"accordion-row"}
-              header={
-              <div className="accordion-row-header">
-                <div className="accordion-row-header-contents">
-                  <h4>{team.name}</h4>
-                  <div className="nav">
-                    <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
-                    <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
-                  </div>
-                </div>
-              </div>}
-            >
-              <p>{team.description}</p>
-              { members[team.id] && members[team.id].length > 0 &&
-                <MembersTable
-                  teamId={team.id}
-                  members={members[team.id]}
-                  users={users[team.id]}
-                  onDelete={this.startMemberDelete.bind(this)} 
-                  onUpdate={this.confirmMemberUpdate.bind(this)}/> }
-              { (!members[team.id] || members[team.id].length === 0) &&
-                <p className="empty">This team has no members yet.</p> }
-              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>              
-            </Panel>
-            )
-          }
-        </Collapse>   
-        { teams.length === 0 &&
-          <span className="empty">Your expedition doesn't have any teams yet.</span> }
-        <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
+        <h1>Collections</h1>
+        { collections.map((collection, i) =>
+          <div className="accordion-row-header">
+            <div className="accordion-row-header-contents">
+              <h4>{collection.name}</h4>
+              <div className="nav">
+                <Link className="button secondary" to={`${match.url}/${collection.id}/edit`}>Edit</Link>
+                <button className="secondary" onClick={this.startCollectionDelete.bind(this, collection)}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+        { collections.length === 0 &&
+          <span className="empty">Your project doesn't have any collections yet.</span> }
+        <Link className="button" to={`${match.url}/new-collection`}>Create New Collection</Link>
       </div>
     )
   }

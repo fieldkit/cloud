@@ -132,7 +132,7 @@ export class Teams extends Component {
 
       const teamRes = await FKApiClient.get().deleteTeam(teamId);
       if (teamRes.type === 'ok') {
-        await this.loadTeams(teamId);
+        await this.loadTeams();
         this.setState({ teamDeletion: null })
       } else {
         // TODO: show errors somewhere
@@ -214,7 +214,7 @@ export class Teams extends Component {
 
   getTeamById (id: number): ?APITeam {
     const { teams } = this.state;
-    return this.state.teams.find(team => team.id === id);
+    return teams.find(team => team.id === id);
   }
 
   render() {
