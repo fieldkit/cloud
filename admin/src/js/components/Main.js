@@ -344,6 +344,11 @@ export class Main extends Component {
                 user={user}
                 onUpdate={this.onProjectUpdate.bind(this)} />
               <RouteOrLoading
+                path="/projects/:projectSlug/collections"
+                
+                required={[activeProject]}
+                project={activeProject}/>                
+              <RouteOrLoading
                 path="/projects/:projectSlug"
                 component={ProjectExpeditions}
                 required={[activeProject, expeditions]}
