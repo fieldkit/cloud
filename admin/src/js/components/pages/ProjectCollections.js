@@ -1,238 +1,205 @@
-/* @flow */
+// @flow weak
 
 import React, { Component } from 'react'
-import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
-import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
-import { AddIcon } from '../icons/Icons'
-import type { APIErrors } from '../../api/types';
+import { Route, Link } from 'react-router-dom'
+import ReactModal from 'react-modal';
 
-import type {
-  Match as RouterMatch,
-  Location as RouterLocation,
-  RouterHistory
-} from 'react-router-dom';
-
-import type {Attr, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from '../Collection';
-import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from '../Collection';
-
-import log from 'loglevel';
-
+import { ProjectCollectionsForm } from '../forms/ProjectCollectionsForm';
 import { FKApiClient } from '../../api/api';
-import type { APIProject } from '../../api/types';
+import { FormContainer } from '../containers/FormContainer';
+import Collapse, { Panel } from 'rc-collapse';
+import 'rc-collapse/assets/index.css';
 
-import { StringFilterComponent, NumFilterComponent, DateFilterComponent } from '../forms/FiltersForm'
+import type { APIProject, APIExpedition, APIUser, APITeam, APIMember, APICollection, APINewCollection } from '../../api/types';
 
 type Props = {
-  match: RouterMatch;
-  location: RouterLocation;
-  history: RouterHistory;
-}
+  project: APIProject;
+  expeditions: APIExpedition[],
+  teams: APITeam[],
+  members: APIMember[],
+  users: APIUser[],
 
-function emptyCollection() : Collection {
-  return {
-    name: "",
-    id: "",
-    filters: [],
-    guid_filters: [],
-    string_filters: [],
-    num_filters: [],
-    geo_filters: [],
-    date_filters: [],
-    mods: [],
-    string_mods: [],
-    num_mods: [],
-    geo_mods: []
-  }
+  match: Object;
+  location: Object;
+  history: Object;
 }
-
 
 export class ProjectCollections extends Component {
-  attributes: { [string]: Attr };
+
   props: Props;
   state: {
-    activeProject: ?APIProject,
-    collection: Collection,
-    errors: ?APIErrors
+    collections: APICollection[],
+    collectionDeletion: ?{
+      contents: React$Element<*>;
+      collectionId: number;
+    }
   }
 
-  constructor(props: Props) {
-    
+  constructor (props: Props) {
     super(props);
-
-    this.attributes = {
-      "message": {
-        name: "message",
-        options: [],
-        type: "string"
-      },
-      "user": {
-        name: "user",
-        options: ["@eric","@othererik","@gabriel"],
-        type: "string"
-      },
-      "humidity": {
-        name: "humidity",
-        options: [],
-        type: "num"
-      },
-      "created": {
-        name: "created",
-        options: [],
-        type: "date"
-      }
-    }
-
     this.state = {
-      activeProject: null,
-      collection: emptyCollection(),
-      errors: null
+      collections: [],
+      collectionDeletion: null
     }
 
-    this.loadActiveProject(this.projectSlug());
+    this.loadCollections();
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  async loadCollections() {
+    // TO-DO
+    // const collectionRes = await FKApiClient.get().getCollectionsBySlugs(this.props.project.slug);
+    // if (collectionsRes.type === 'ok' && collectionsRes.payload) {
+    //   const { collections } = collectionsRes.payload;
+    //   this.setState({ collections });
+    // }
   }
 
-  projectSlug(): ?string {
-    return this.props.match.params.projectSlug;
+  async onCollectionCreate(c: APINewCollection) {
+    // TO-DO
+    // const { project, match } = this.props;
+    // const collectionRes = await FKApiClient.get().createCollection(project.id, c);
+    // if (collectionRes.type === 'ok') {
+    //   await this.loadCollections();
+    //   this.props.history.push(`${match.url}`);
+    // } else {
+    //   return collectionRes.errors;
+    // }
   }
 
-  async loadActiveProject(projectSlug: ?string ) {
-    log.debug('main -> loadActiveProject', projectSlug);
-    if (projectSlug) {
-      const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type === 'ok') {
-        this.setState({ activeProject: projectRes.payload });
+  async onTeamUpdate(collectionId: number, c: APINewCollection) {
+    // TO-DO
+    // const collectionRes = await FKApiClient.get().updateCollection(collectionId, c);
+    // if(collectionRes.type === 'ok' && collectionRes.payload) {
+    //   await this.loadCollections();
+    // } else {
+    //   return collectionRes.errors;
+    // }
+  }  
+
+  startCollectionDelete(c: APICollection) {
+    const collectionId = c.id;
+    this.setState({
+      collectionDeletion: {
+        contents: <span>Are you sure you want to delete the <strong>{c.name}</strong> collection?</span>,
+        collectionId
       }
-    } else {
-      this.setState({ activeProject: null });
-    }
+    })
   }
 
-  handleLinkClick() {
-    this.refs.dropdown.hide();
-  }
+  async confirmCollectionDelete() {
+    const { collectionDeletion } = this.state;
 
-  addFilter(attr: string) {
-    let collection = cloneCollection(this.state.collection);
-    const attribute = this.attributes[attr];
-    let new_filter;
-    if(attribute.type === "string"){
-      new_filter = emptyStringFilter(collection, attribute);
-      collection.string_filters.push(new_filter)
-    } else if (attribute.type === "num"){
-      new_filter = emptyNumFilter(collection, attribute);
-      collection.num_filters.push(new_filter)
-    } else if (attribute.type === "date"){
-      new_filter = emptyDateFilter(collection, attribute);
-      collection.date_filters.push(new_filter)
-    }
-    if(new_filter){
-      collection.filters.push(new_filter.id)
-      this.setState({collection})
+    if (collectionDeletion) {
+      const { collectionId } = collectionDeletion;
+
+      const collectionRes = await FKApiClient.get().deleteCollection(collectionId);
+      if (collectionRes.type === 'ok') {
+        await this.loadCollections();
+        this.setState({ collectionDeletion: null })
+      } else {
+        // TODO: show errors somewhere
+      }
     }
   }
-
-  updateFilter:FilterFn = (filter, update) => {
-    let new_filter = Object.assign(filter,update)
-    let collection = cloneCollection(this.state.collection)
-    if(new_filter.type === "string"){
-      collection.string_filters = collection.string_filters.filter(f => f.id !== new_filter.id)
-      collection.string_filters.push(new_filter)
-    } else if (filter.type === "date") {
-      collection.date_filters = collection.date_filters.filter(f => f.id !== new_filter.id)
-      collection.date_filters.push(new_filter)
-    } else if (new_filter.type === "num") {
-      collection.num_filters = collection.num_filters.filter(f => f.id !== new_filter.id)
-      collection.num_filters.push(new_filter)
-    }
-    this.setState({collection})
-  }
-
-  deleteFilter(f: Filter){
-    let collection = cloneCollection(this.state.collection)
-    if(f.type === "string"){
-      collection.string_filters = collection.string_filters.filter(cf => cf.id !== f.id)
-    } else if(f.type === "num"){
-      collection.num_filters = collection.num_filters.filter(cf => cf.id !== f.id)
-    } else if(f.type === "date"){
-      collection.date_filters = collection.date_filters.filter(cf => cf.id !== f.id)
-    }
-    collection.filters = collection.filters.filter(cf => cf !== f.id) 
-    this.setState({collection})
-  }
-
-  save(){
-    const {collection} = this.state;
-
-    console.log(JSON.stringify(collection,null,' '))
+  
+  cancelCollectionDelete() {
+    this.setState({ collectionDeletion: null });
   }
 
   render() {
-    const { activeProject, errors } = this.state;
-    let { collection } = this.state;
+    const { match } = this.props;
+    const { teams, members, users, memberDeletion, teamDeletion } = this.state;
 
-    let component_lookup : { [number]: Object } = {};
-
-    collection.num_filters.forEach((f,i) => {
-        component_lookup[f.id] = <NumFilterComponent creator={this} data={f} key={"n-" + i} errors={errors}/>
-    })
-    collection.string_filters.forEach((f,i) => {
-        component_lookup[f.id] = <StringFilterComponent creator={this} data={f} key={"s-" + i} errors={errors}/>
-    })
-    collection.date_filters.forEach((f,i) => {
-        component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i} errors={errors}/>
-    })
-    
-    let filters_by_attribute = Object.keys(this.attributes).reduce((m,attr_name) => {
-      const attr = this.attributes[attr_name]
-      const { type,options } = attr
-      let options_block = null
-      if(options.length > 0) {
-        options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
-      }
-      const attribute_row = (
-        <div key={"filter-" + attr_name} className="accordion-row-header">
-          <h4>{attr_name}</h4>            
-          <button className="secondary" onClick={() => this.addFilter(attr_name)}>
-            <div className="bt-icon medium">
-              <AddIcon />
-            </div>
-            Add Filter
-          </button>
-        </div>
-      )
-
-      let buttons: Object[] = [attribute_row]
-      collection.filters.forEach((f) => {
-        const component = component_lookup[f]
-        if(component){
-          const {attribute} = component.props.data
-          if(attr_name === attribute){
-            buttons.push(component)
-          }
-        }
-      })
-      m[attr_name] = buttons
-      return m
-    },{})
-     
-    const components = Object.entries(filters_by_attribute).map(([attr,components]) => {
-        return (
-          <div className="accordion-row expanded" key={attr}>
-            {components}
-          </div>
-        )
-    })
-    
     return (
-        <div className="row">
-          <div className="accordion">
-            {components}
-          </div>
-          <button onClick={() => this.save()}>Save Filters</button>
-        </div>
+      <div className="teams">
+
+        <Route path={`${match.url}/new-team`} render={() =>
+          <ReactModal isOpen={true} contentLabel="Create New Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Create New Team</h2>
+            <TeamForm
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onTeamCreate.bind(this)} />
+          </ReactModal> } />
+
+        <Route path={`${match.url}/:teamId/add-member`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Add Members" className="modal" overlayClassName="modal-overlay">
+            <h2>Add Member</h2>
+            <MemberForm
+              teamId={props.match.params.teamId}
+              members={this.state.members[props.match.params.teamId]}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onMemberAdd.bind(this)} 
+              saveText="Add" />
+          </ReactModal> } />      
+
+        <Route path={`${match.url}/:teamId/edit`} render={props =>
+          <ReactModal isOpen={true} contentLabel="Edit Team" className="modal" overlayClassName="modal-overlay">
+            <TeamForm
+              team={this.getTeamById(parseInt(props.match.params.teamId))}
+              onCancel={() => this.props.history.push(`${match.url}`)}
+              onSave={this.onTeamUpdate.bind(this, parseInt(props.match.params.teamId))} />
+          </ReactModal> } />          
+
+        { teamDeletion &&
+          <ReactModal isOpen={true} contentLabel="Delete Team" className="modal" overlayClassName="modal-overlay">
+            <h2>Delete Team</h2>
+            <FormContainer
+              onSave={this.confirmTeamDelete.bind(this)}
+              onCancel={this.cancelTeamDelete.bind(this)}
+              saveText="Confirm"
+            >
+              <div>{teamDeletion.contents}</div>
+            </FormContainer>
+          </ReactModal> }
+
+        { memberDeletion &&
+          <ReactModal isOpen={true} contentLabel="Remove Member" className="modal" overlayClassName="modal-overlay">
+            <h2>Remove Member</h2>
+            <FormContainer
+              onSave={this.confirmMemberDelete.bind(this)}
+              onCancel={this.cancelMemberDelete.bind(this)}
+              saveText="Confirm"
+            >
+              <div>{memberDeletion.contents}</div>
+            </FormContainer>
+          </ReactModal> }
+
+        <h1>Teams</h1>
+
+        <Collapse className="accordion">
+          { teams.map((team, i) =>
+            <Panel
+              className={"accordion-row"}
+              header={
+              <div className="accordion-row-header">
+                <div className="accordion-row-header-contents">
+                  <h4>{team.name}</h4>
+                  <div className="nav">
+                    <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
+                    <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                  </div>
+                </div>
+              </div>}
+            >
+              <p>{team.description}</p>
+              { members[team.id] && members[team.id].length > 0 &&
+                <MembersTable
+                  teamId={team.id}
+                  members={members[team.id]}
+                  users={users[team.id]}
+                  onDelete={this.startMemberDelete.bind(this)} 
+                  onUpdate={this.confirmMemberUpdate.bind(this)}/> }
+              { (!members[team.id] || members[team.id].length === 0) &&
+                <p className="empty">This team has no members yet.</p> }
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>              
+            </Panel>
+            )
+          }
+        </Collapse>   
+        { teams.length === 0 &&
+          <span className="empty">Your expedition doesn't have any teams yet.</span> }
+        <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
+      </div>
     )
   }
 }

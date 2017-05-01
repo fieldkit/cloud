@@ -46,7 +46,7 @@ function emptyCollection() : Collection {
 }
 
 
-export class ProjectCollections extends Component {
+export class ProjectCollectionsForm extends Component {
   attributes: { [string]: Attr };
   props: Props;
   state: {
