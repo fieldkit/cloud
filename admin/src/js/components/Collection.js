@@ -1,5 +1,14 @@
 /* @flow */
 
+export type ProjectData = {
+    expeditions: Expedition,
+    bindings: Binding[],
+    doctypes: Doctype[],
+    attributes: Attr[] 
+}
+
+export type Target = "expedition" | "binding" | "doctype" | "attribute"
+
 export type Collection = {
   name: string;
   id: string;
@@ -19,21 +28,30 @@ export type StringAttr = {
   name: string;
   options: string[];
   type: "string";
+  target: Target;
 }
 
 export type NumAttr = {
   name: string;
   options: number[];
   type: "num";
+  target: Target;
 }
 
 export type DateAttr = {
   name: string;
   options: number[];
   type: "date";
+  target: Target;
 }
 
 export type Attr = StringAttr | NumAttr | DateAttr
+
+export type Expedition = StringAttr
+
+export type Binding = StringAttr
+
+export type Doctype = StringAttr
 
 export function stringifyOptions(attr: Attr): string {
   if(attr.type === "string"){
@@ -77,7 +95,8 @@ export function emptyStringFilter(c: Collection, attr: StringAttr): StringFilter
     operation: "contains",
     query: "",
     options: attr.options,
-    type: "string"
+    type: "string",
+    target: attr.target
   }
 }
 
@@ -88,7 +107,8 @@ export function emptyNumFilter(c: Collection, attr: NumAttr): NumFilter {
     attribute: attr.name,
     operation: "GT",
     query: 3,
-    type: "num"
+    type: "num",
+    target: attr.target
   }
 }
 
@@ -100,7 +120,8 @@ export function emptyDateFilter(c: Collection, attr: DateAttr): DateFilter {
     operation: "before",
     date: 0,
     within: 0,
-    type: "date"
+    type: "date",
+    target: attr.target
   }
   return f
 }
@@ -120,6 +141,7 @@ export type StringFilter = {
   query: string;
   options: string[];
   type: "string";
+  target: Target;
 }
 
 export type NumFilter = {
@@ -128,6 +150,7 @@ export type NumFilter = {
   operation: "GT" | "LT" | "EQ";
   query: number;
   type: "num";
+  target: Target;
 }
 
 export type GeoFilter = {
@@ -136,6 +159,7 @@ export type GeoFilter = {
   operation: "within" | "not within";
   query: Object;
   type: "geo";
+  target: Target;
 }
 
 export type DateFilter = {
@@ -145,6 +169,7 @@ export type DateFilter = {
   date: number;
   within: number;
   type: "date";
+  target: Target;
 }
 
 export type Filter = NumFilter | StringFilter | DateFilter

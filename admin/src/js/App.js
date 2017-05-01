@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-d
 
 import { FKApiClient } from './api/api';
 
+import { ProjectCollectionsForm } from './components/forms/ProjectCollectionsForm';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
 
@@ -54,6 +55,7 @@ export class App extends Component {
         <Switch>
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
+          <Route exact path="/form_test" component={ProjectCollectionsForm} />
           <Route exact path="/signout" render={() => this.signOut()} />
           <PrivateRoute path="/projects/:projectSlug/expeditions/:expeditionSlug" component={Main} />
           <PrivateRoute path="/projects/:projectSlug" component={Main} />
