@@ -10,14 +10,11 @@ import { FormContainer } from '../containers/FormContainer';
 import Collapse, { Panel } from 'rc-collapse';
 import 'rc-collapse/assets/index.css';
 
-import type { APIProject, APIExpedition, APIUser, APITeam, APIMember, APICollection, APINewCollection } from '../../api/types';
+import type { APIProject, APIExpedition, APICollection, APINewCollection } from '../../api/types';
 
 type Props = {
   project: APIProject;
   expeditions: APIExpedition[],
-  teams: APITeam[],
-  members: APIMember[],
-  users: APIUser[],
 
   match: Object;
   location: Object;
@@ -46,34 +43,31 @@ export class ProjectCollections extends Component {
   }
 
   async loadCollections() {
-    // TO-DO
-    // const collectionRes = await FKApiClient.get().getCollectionsBySlugs(this.props.project.slug);
-    // if (collectionsRes.type === 'ok' && collectionsRes.payload) {
-    //   const { collections } = collectionsRes.payload;
-    //   this.setState({ collections });
-    // }
+    const collectionsRes = await FKApiClient.get().getCollectionsByProjectSlug(this.props.project.slug);
+    if (collectionsRes.type === 'ok' && collectionsRes.payload) {
+      const { collections } = collectionsRes.payload;
+      this.setState({ collections });
+    }
   }
 
   async onCollectionCreate(c: APINewCollection) {
-    // TO-DO
-    // const { project, match } = this.props;
-    // const collectionRes = await FKApiClient.get().createCollection(project.id, c);
-    // if (collectionRes.type === 'ok') {
-    //   await this.loadCollections();
-    //   this.props.history.push(`${match.url}`);
-    // } else {
-    //   return collectionRes.errors;
-    // }
+    const { project, match } = this.props;
+    const collectionRes = await FKApiClient.get().createCollection(project.id, c);
+    if (collectionRes.type === 'ok') {
+      await this.loadCollections();
+      this.props.history.push(`${match.url}`);
+    } else {
+      return collectionRes.errors;
+    }
   }
 
-  async onTeamUpdate(collectionId: number, c: APINewCollection) {
-    // TO-DO
-    // const collectionRes = await FKApiClient.get().updateCollection(collectionId, c);
-    // if(collectionRes.type === 'ok' && collectionRes.payload) {
-    //   await this.loadCollections();
-    // } else {
-    //   return collectionRes.errors;
-    // }
+  async onCollectionUpdate(collectionId: number, c: APINewCollection) {
+    const collectionRes = await FKApiClient.get().updateCollection(collectionId, c);
+    if(collectionRes.type === 'ok' && collectionRes.payload) {
+      await this.loadCollections();
+    } else {
+      return collectionRes.errors;
+    }
   }  
 
   startCollectionDelete(c: APICollection) {
@@ -112,7 +106,7 @@ export class ProjectCollections extends Component {
   }  
 
   render() {
-    const { match, expeditions, members, users } = this.props;
+    const { match, expeditions } = this.props;
     const { collections, collectionDeletion } = this.state;
 
     return (
