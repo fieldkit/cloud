@@ -1,12 +1,12 @@
 /* @flow */
 
 import React, { Component } from 'react'
-import { FormItem } from './forms/FormItem'
-import { FormSelectItem } from './forms/FormSelectItem'
-import type { APIErrors } from '../api/types';
-import { RemoveIcon } from './icons/Icons'
+import { FormItem } from './FormItem'
+import { FormSelectItem } from './FormSelectItem'
+import type { APIErrors } from '../../api/types';
+import { RemoveIcon } from '../icons/Icons'
 
-import type {StringFilter, DateFilter, NumFilter} from './Collection'
+import type {StringFilter, DateFilter, NumFilter} from '../Collection'
 
 export class StringFilterComponent extends Component {
   props: {
