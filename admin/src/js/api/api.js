@@ -38,7 +38,10 @@ import type {
   APIMembers,
   APIAdministrator,
   APINewAdministrator,
-  APIAdministrators
+  APIAdministrators,
+  APINewCollection,
+  APICollection,
+  APICollections
 } from './types';
 
 export type FKAPIOKResponse<T> = {
@@ -324,12 +327,28 @@ export class FKApiClient extends JWTAPIClient {
     return this.postWithErrors(`/expeditions/${expeditionId}/teams`, values)
   }
 
-  deleteTeam(teamId: number): Promise<FKAPIResponse<APIMember>> {
+  deleteTeam(teamId: number): Promise<FKAPIResponse<APITeam>> {
     return this.delWithErrors(`/teams/${teamId}`)
   }
 
   updateTeam(teamId: number, values: APINewTeam): Promise<FKAPIResponse<APINewTeam>> {
     return this.patchWithErrors(`/teams/${teamId}`, values)
+  }
+
+  getCollectionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APICollections>> {
+    return this.getWithErrors(`/projects/@/${projectSlug}/collections`)
+  }
+
+  createCollection(projectId: number, values: APINewCollection): Promise<FKAPIResponse<APICollection>> {
+    return this.postWithErrors(`/projects/${projectId}/collection`, values)
+  }
+
+  deleteCollection(collectionId: number): Promise<FKAPIResponse<APICollection>> {
+    return this.delWithErrors(`/collections/${collectionId}`)
+  }
+
+  updateCollection(collectionId: number, values: APINewCollection): Promise<FKAPIResponse<APINewCollection>> {
+    return this.patchWithErrors(`/collections/${collectionId}`, values)
   }
 
   addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {

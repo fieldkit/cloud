@@ -24,7 +24,7 @@ type Props = {
 export class MemberForm extends Component {
   props: Props;
   state: {
-    users: APIUser[],    
+    users: APIUser[],
     userId: number,
     role: string,
     saveDisabled: boolean,

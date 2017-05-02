@@ -1,19 +1,13 @@
 /* @flow */
 
 import React, { Component } from 'react'
+import { FormContainer } from '../containers/FormContainer';
+import type { APIErrors, APICollection, APINewCollection } from '../../api/types';
 import { AddIcon } from '../icons/Icons'
-import type { APIErrors } from '../../api/types';
-
-import type {
-  Match as RouterMatch,
-  Location as RouterLocation,
-  RouterHistory
-} from 'react-router-dom';
+import log from 'loglevel';
 
 import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../Collection';
 import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from '../Collection';
-
-import log from 'loglevel';
 
 import { FKApiClient } from '../../api/api';
 import type { APIProject } from '../../api/types';
@@ -21,10 +15,13 @@ import type { APIProject } from '../../api/types';
 import { StringFilterComponent, NumFilterComponent, DateFilterComponent } from '../forms/FiltersForm'
 
 type Props = {
-  match: RouterMatch;
-  location: RouterLocation;
-  history: RouterHistory;
-}
+  collection?: ?APICollection,
+
+  cancelText?: string;
+  saveText?: ?string;
+  onCancel?: () => void;
+  onSave: (c: APINewCollection, collectionId?: number) => Promise<?APIErrors>;
+};
 
 function emptyCollection() : Collection {
   return {
@@ -43,18 +40,15 @@ function emptyCollection() : Collection {
   }
 }
 
-
 export class ProjectCollectionsForm extends Component {
   projectData: ProjectData;
   props: Props;
   state: {
-    activeProject: ?APIProject,
     collection: Collection,
     errors: ?APIErrors
   }
 
   constructor(props: Props) {
-    
     super(props);
 
     this.projectData = {
@@ -95,19 +89,12 @@ export class ProjectCollectionsForm extends Component {
     }
 
     this.state = {
-      activeProject: null,
       collection: emptyCollection(),
       errors: null
     }
-
-    this.loadActiveProject(this.projectSlug());
   }
 
   componentWillReceiveProps(nextProps: Props) {
-  }
-
-  projectSlug(): ?string {
-    return this.props.match.params.projectSlug;
   }
 
   getAttrRow(attr: Attr, component_lookup:  { [number]: Object }, target: Target): * {
@@ -131,28 +118,12 @@ export class ProjectCollectionsForm extends Component {
             buttons.push(component)
           }
         }
-      })
-      return (
-        <div className="accordion-row expanded" key={attr.name}>
-            {buttons}
-        </div>
-      )
-  }
-
-  async loadActiveProject(projectSlug: ?string ) {
-    log.debug('main -> loadActiveProject', projectSlug);
-    if (projectSlug) {
-      const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type === 'ok') {
-        this.setState({ activeProject: projectRes.payload });
-      }
-    } else {
-      this.setState({ activeProject: null });
-    }
-  }
-
-  handleLinkClick() {
-    this.refs.dropdown.hide();
+    })
+    return (
+      <div className="accordion-row expanded" key={attr.name}>
+          {buttons}
+      </div>
+    )
   }
 
   addFilter(name: string, target: Target) {
@@ -217,10 +188,14 @@ export class ProjectCollectionsForm extends Component {
     this.setState({collection})
   }
 
-  save(){
-    const {collection} = this.state;
-
-    console.log(JSON.stringify(collection,null,' '))
+  save() {
+    const { collection } = this.state;
+    console.log(JSON.stringify(collection,null,' '));
+    // TO-DO
+    // const errors = await this.props.onSave(collection);
+    // if (errors) {
+    //   this.setState({ errors });
+    // }
   }
 
   render() {
@@ -253,9 +228,13 @@ export class ProjectCollectionsForm extends Component {
     },{})
     
     let expedition_filter = this.getAttrRow(projectData.expeditions, component_lookup, "expedition")
-    
+
     return (
-        <div className="row">
+      <FormContainer
+        onSave={this.save.bind(this)}
+        onCancel={this.props.onCancel}
+        saveText={this.props.saveText}
+        cancelText={this.props.cancelText}>
           <div className="accordion">
             {expedition_filter}
           </div>
@@ -268,8 +247,7 @@ export class ProjectCollectionsForm extends Component {
           <div className="accordion">
             {filters_by_attribute}
           </div>
-          <button onClick={() => this.save()}>Save Filters</button>
-        </div>
+      </FormContainer>
     )
   }
 }

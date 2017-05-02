@@ -168,3 +168,16 @@ export type APIMember = {
 export type APIMembers = {
   members: APIMember[]
 }
+
+export type APINewCollection = {
+  name: string,
+}
+
+export type APICollection = {
+  id: number,
+  ...$Exact<APINewCollection>;  
+}
+
+export type APICollections = {
+  collections: APICollection[]
+}

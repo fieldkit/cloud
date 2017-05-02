@@ -350,7 +350,7 @@ export class Main extends Component {
               <RouteOrLoading
                 path="/projects/:projectSlug/collections"
                 component={ProjectCollections}
-                required={[activeProject]}
+                required={[activeProject, expeditions]}
                 project={activeProject}/>
               <RouteOrLoading
                 path="/projects/:projectSlug/visualizations"
