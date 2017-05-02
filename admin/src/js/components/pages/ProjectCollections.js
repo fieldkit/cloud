@@ -142,19 +142,21 @@ export class ProjectCollections extends Component {
           </ReactModal> }
 
         <h1>Collections</h1>
-        { collections.map((collection, i) =>
-          <div className="accordion-row-header">
-            <div className="accordion-row-header-contents">
-              <h4>{collection.name}</h4>
-              <div className="nav">
-                <Link className="button secondary" to={`${match.url}/${collection.id}/edit`}>Edit</Link>
-                <button className="secondary" onClick={this.startCollectionDelete.bind(this, collection)}>Delete</button>
+        <div id="collections">
+          { collections.map((collection, i) =>
+            <div className="accordion-row-header">
+              <div className="accordion-row-header-contents">
+                <h4>{collection.name}</h4>
+                <div className="nav">
+                  <Link className="button secondary" to={`${match.url}/${collection.id}/edit`}>Edit</Link>
+                  <button className="secondary" onClick={this.startCollectionDelete.bind(this, collection)}>Delete</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        { collections.length === 0 &&
-          <span className="empty">Your project doesn't have any collections yet.</span> }
+          )}
+          { collections.length === 0 &&
+            <span className="empty">This project doesn't have any collections yet.</span> }
+        </div>
         <Link className="button" to={`${match.url}/new-collection`}>Create New Collection</Link>
       </div>
     )
