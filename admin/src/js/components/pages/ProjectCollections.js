@@ -5,7 +5,6 @@ import { Route, Link } from 'react-router-dom'
 import ReactModal from 'react-modal';
 
 import { ProjectCollectionsForm } from '../forms/ProjectCollectionsForm';
-import { PCForm } from '../forms/PCForm';
 import { FKApiClient } from '../../api/api';
 import { FormContainer } from '../containers/FormContainer';
 import Collapse, { Panel } from 'rc-collapse';
@@ -116,14 +115,14 @@ export class ProjectCollections extends Component {
         <Route path={`${match.url}/new-collection`} render={() =>
           <ReactModal isOpen={true} contentLabel="Create New Collection" className="modal" overlayClassName="modal-overlay">
             <h2>Create New Collection</h2>
-            <PCForm
+            <ProjectCollectionsForm
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onCollectionCreate.bind(this)} />
           </ReactModal> } />
 
         <Route path={`${match.url}/:collectionId/edit`} render={props =>
           <ReactModal isOpen={true} contentLabel="Edit Collection" className="modal" overlayClassName="modal-overlay">
-            <PCForm
+            <ProjectCollectionsForm
               collection={this.getCollectionById(parseInt(props.match.params.collectionId))}
               onCancel={() => this.props.history.push(`${match.url}`)}
               onSave={this.onCollectionUpdate.bind(this, parseInt(props.match.params.collectionId))} />

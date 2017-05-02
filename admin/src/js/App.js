@@ -2,12 +2,9 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
-
 import { FKApiClient } from './api/api';
-
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
-
 import { Main } from './components/Main';
 
 import '../css/App.css';

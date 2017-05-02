@@ -1,32 +1,23 @@
 /* @flow */
 
 import React, { Component } from 'react'
-import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
-import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import { FormContainer } from '../containers/FormContainer';
+import type { APIErrors, APICollection, APINewCollection } from '../../api/types';
 import { AddIcon } from '../icons/Icons'
-import type { APIErrors } from '../../api/types';
-
-import type {
-  Match as RouterMatch,
-  Location as RouterLocation,
-  RouterHistory
-} from 'react-router-dom';
-
-import type {Attr, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from '../Collection';
-import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from '../Collection';
-
 import log from 'loglevel';
 
-import { FKApiClient } from '../../api/api';
-import type { APIProject } from '../../api/types';
-
+import type {Attr, Target, ProjectData, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from '../Collection';
+import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from '../Collection';
 import { StringFilterComponent, NumFilterComponent, DateFilterComponent } from '../forms/FiltersForm'
 
 type Props = {
-  match: RouterMatch;
-  location: RouterLocation;
-  history: RouterHistory;
-}
+  collection?: ?APICollection,
+
+  cancelText?: string;
+  saveText?: ?string;
+  onCancel?: () => void;
+  onSave: (c: APINewCollection, collectionId?: number) => Promise<?APIErrors>;
+};
 
 function emptyCollection() : Collection {
   return {
@@ -45,79 +36,114 @@ function emptyCollection() : Collection {
   }
 }
 
-
 export class ProjectCollectionsForm extends Component {
-  attributes: { [string]: Attr };
+  projectData: ProjectData;
   props: Props;
   state: {
-    activeProject: ?APIProject,
     collection: Collection,
     errors: ?APIErrors
   }
 
   constructor(props: Props) {
-    
     super(props);
 
-    this.attributes = {
-      "message": {
-        name: "message",
-        options: [],
-        type: "string"
+    this.projectData = {
+      expeditions: {
+        name: "expedition",
+        options: ["ITO 2015","ITO 2016","ITO 2017"],
+        type: "string",
+        target: "expedition"
       },
-      "user": {
-        name: "user",
-        options: ["@eric","@othererik","@gabriel"],
-        type: "string"
-      },
-      "humidity": {
-        name: "humidity",
-        options: [],
-        type: "num"
-      },
-      "created": {
-        name: "created",
-        options: [],
-        type: "date"
-      }
+      bindings: [],
+      doctypes: [],
+      attributes: [
+        {
+          name: "message",
+          options: [],
+          type: "string",
+          target: "attribute"
+        },
+        {
+          name: "user",
+          options: ["@eric","@othererik","@gabriel"],
+          type: "string",
+          target: "attribute"
+        },
+        {
+          name: "humidity",
+          options: [],
+          type: "num",
+          target: "attribute"
+        },
+        {
+          name: "created",
+          options: [],
+          type: "date",
+          target: "attribute"
+        }
+      ]
     }
 
     this.state = {
-      activeProject: null,
       collection: emptyCollection(),
       errors: null
     }
-
-    this.loadActiveProject(this.projectSlug());
   }
 
   componentWillReceiveProps(nextProps: Props) {
   }
 
-  projectSlug(): ?string {
-    return this.props.match.params.projectSlug;
-  }
-
-  async loadActiveProject(projectSlug: ?string ) {
-    log.debug('main -> loadActiveProject', projectSlug);
-    if (projectSlug) {
-      const projectRes = await FKApiClient.get().getProjectBySlug(projectSlug);
-      if (projectRes.type === 'ok') {
-        this.setState({ activeProject: projectRes.payload });
-      }
-    } else {
-      this.setState({ activeProject: null });
+  getAttrRow(attr: Attr, component_lookup:  { [number]: Object }, target: Target): * {
+    const { type,options } = attr
+    let options_block = null
+    if(options.length > 0) {
+      options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
     }
+    const attribute_row = (
+      <div key={"filter-" + attr.name} className="accordion-row-header">
+        <h4>{attr.name}</h4>            
+        <button className="secondary" onClick={() => this.addFilter(attr.name,target)}>
+          <div className="bt-icon medium">
+            <AddIcon />
+          </div>
+          Add Filter
+        </button>
+      </div>
+    )
+    let buttons: Object[] = [attribute_row]
+    this.state.collection.filters.forEach((f) => {
+      const component = component_lookup[f]
+      if(component){
+        const {attribute} = component.props.data
+        if(attr.name === attribute){
+          buttons.push(component)
+        }
+      }
+    })
+    return (
+      <div className="accordion-row expanded" key={attr.name}>
+          {buttons}
+      </div>
+    )
   }
 
-  handleLinkClick() {
-    this.refs.dropdown.hide();
-  }
-
-  addFilter(attr: string) {
-    let collection = cloneCollection(this.state.collection);
-    const attribute = this.attributes[attr];
+  addFilter(name: string, target: Target) {
+    let attribute;
     let new_filter;
+    const project_data = this.projectData;
+    if(target === "expedition"){
+      attribute = project_data.expeditions
+    } else if(target === "binding"){
+      attribute = project_data.bindings.find(b => b.name === name)
+    } else if(target === "doctype"){
+      attribute = project_data.doctypes.find(d => d.name === name)
+    } else if(target === "attribute"){
+      attribute = project_data.attributes.find(a => a.name === name) 
+    } else {
+      throw "Incompatible target"
+    }
+    if(!attribute){return}
+    let collection = cloneCollection(this.state.collection);
     if(attribute.type === "string"){
       new_filter = emptyStringFilter(collection, attribute);
       collection.string_filters.push(new_filter)
@@ -163,14 +189,19 @@ export class ProjectCollectionsForm extends Component {
     this.setState({collection})
   }
 
-  save(){
-    const {collection} = this.state;
-
-    console.log(JSON.stringify(collection,null,' '))
+  save() {
+    const { collection } = this.state;
+    console.log(JSON.stringify(collection,null,' '));
+    // TO-DO
+    // const errors = await this.props.onSave(collection);
+    // if (errors) {
+    //   this.setState({ errors });
+    // }
   }
 
   render() {
-    const { activeProject, errors } = this.state;
+    const projectData = this.projectData;
+    const { errors } = this.state;
     let { collection } = this.state;
 
     let component_lookup : { [number]: Object } = {};
@@ -185,54 +216,39 @@ export class ProjectCollectionsForm extends Component {
         component_lookup[f.id] = <DateFilterComponent creator={this} data={f} key={"d-" + i} errors={errors}/>
     })
     
-    let filters_by_attribute = Object.keys(this.attributes).reduce((m,attr_name) => {
-      const attr = this.attributes[attr_name]
-      const { type,options } = attr
-      let options_block = null
-      if(options.length > 0) {
-        options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
-      }
-      const attribute_row = (
-        <div key={"filter-" + attr_name} className="accordion-row-header">
-          <h4>{attr_name}</h4>            
-          <button className="secondary" onClick={() => this.addFilter(attr_name)}>
-            <div className="bt-icon medium">
-              <AddIcon />
-            </div>
-            Add Filter
-          </button>
-        </div>
-      )
-
-      let buttons: Object[] = [attribute_row]
-      collection.filters.forEach((f) => {
-        const component = component_lookup[f]
-        if(component){
-          const {attribute} = component.props.data
-          if(attr_name === attribute){
-            buttons.push(component)
-          }
-        }
-      })
-      m[attr_name] = buttons
-      return m
+    let filters_by_attribute = projectData.attributes.map((attr) => {
+      return this.getAttrRow(attr, component_lookup, "attribute")
     },{})
-     
-    const components = Object.entries(filters_by_attribute).map(([attr,components]) => {
-        return (
-          <div className="accordion-row expanded" key={attr}>
-            {components}
-          </div>
-        )
-    })
     
+    let filters_by_binding = projectData.bindings.map((attr) => {
+      return this.getAttrRow(attr, component_lookup, "binding")
+    },{})
+    
+    let filters_by_doctype = projectData.doctypes.map((attr) => {
+      return this.getAttrRow(attr, component_lookup, "doctype")
+    },{})
+    
+    let expedition_filter = this.getAttrRow(projectData.expeditions, component_lookup, "expedition")
+
     return (
-        <div className="row">
+      <FormContainer
+        onSave={this.save.bind(this)}
+        onCancel={this.props.onCancel}
+        saveText={this.props.saveText}
+        cancelText={this.props.cancelText}>
           <div className="accordion">
-            {components}
+            {expedition_filter}
           </div>
-          <button onClick={() => this.save()}>Save Filters</button>
-        </div>
+          <div className="accordion">
+            {filters_by_binding}
+          </div>
+          <div className="accordion">
+            {filters_by_doctype}
+          </div>
+          <div className="accordion">
+            {filters_by_attribute}
+          </div>
+      </FormContainer>
     )
   }
 }

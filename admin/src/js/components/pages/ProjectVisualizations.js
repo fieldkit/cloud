@@ -1,4 +1,3 @@
-/* @flow */
 
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
