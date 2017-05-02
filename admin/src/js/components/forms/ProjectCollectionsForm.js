@@ -1,8 +1,6 @@
 /* @flow */
 
 import React, { Component } from 'react'
-import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
-import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { AddIcon } from '../icons/Icons'
 import type { APIErrors } from '../../api/types';
 
@@ -12,8 +10,8 @@ import type {
   RouterHistory
 } from 'react-router-dom';
 
-import type {Attr, Target, ProjectData, Collection, Filter, FilterFn, StringFilter, DateFilter, NumFilter} from '../Collection';
-import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter, stringifyOptions} from '../Collection';
+import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../Collection';
+import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from '../Collection';
 
 import log from 'loglevel';
 
@@ -113,11 +111,6 @@ export class ProjectCollectionsForm extends Component {
   }
 
   getAttrRow(attr: Attr, component_lookup:  { [number]: Object }, target: Target): * {
-      const { type,options } = attr
-      let options_block = null
-      if(options.length > 0) {
-        options_block = <span className="filter-row-options">{stringifyOptions(attr)}</span> 
-      }
       const attribute_row = (
         <div key={"filter-" + attr.name} className="accordion-row-header">
           <h4>{attr.name}</h4>            
@@ -175,7 +168,7 @@ export class ProjectCollectionsForm extends Component {
     } else if(target === "attribute"){
       attribute = project_data.attributes.find(a => a.name === name) 
     } else {
-      throw "Incompatible target"
+      throw new Error("Incompatible target")
     }
     if(!attribute){return}
     let collection = cloneCollection(this.state.collection);
@@ -232,7 +225,7 @@ export class ProjectCollectionsForm extends Component {
 
   render() {
     const projectData = this.projectData;
-    const { activeProject, errors } = this.state;
+    const { errors } = this.state;
     let { collection } = this.state;
 
     let component_lookup : { [number]: Object } = {};
