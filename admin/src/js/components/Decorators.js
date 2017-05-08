@@ -6,11 +6,12 @@ import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
 import { prop, _1, _2 } from 'safety-lens/es2015'
 import type {Attr, ProjectData} from './Collection';
+import ReactModal from 'react-modal';
 
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
-import {  GroupByComponent } from './forms/VizForm'
+import {  GroupByComponent, EditSelectionOperationComponent } from './forms/VizForm'
 import type { APIErrors } from '../api/types';
 import '../../css/decorators.css'
   
@@ -101,26 +102,18 @@ export const _groupingOperationOp: Lens_<GroupingOperation,GroupingOperationType
 export const _groupingOperationParam: Lens_<GroupingOperation,?number> = prop("parameter")
 export const _groupingOperationAttribute: Lens_<GroupingOperation,Attr> = prop("source_attribute")
 
-export type Op =
-   ["avg"]                |
-   ["max"]                |
-   ["min"]                |
-   ["median"]             |
-   ["first"]              |
-   ["last"]               |
-   ["sum"]                |
-   ["count"]              |
-   ["match_count",RegEx]  ;
+export type Op = "avg" | "max" | "min" | "median" | "first" | "last" | "sum" | "count"
 
 export type SelectionOperation = {
+  id: number;
   value_name: string;
   source_attribute: Attr;
   operation: Op;
 }
 
-const _selectionOperationName: Lens_<SelectionOperation,string> = prop("value_name")
-const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute")
-const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation")
+export const _selectionOperationName: Lens_<SelectionOperation,string> = prop("value_name")
+export const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute")
+export const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation")
 
 type RegEx = string;
 
@@ -161,14 +154,16 @@ export class VizComponent extends Component {
   props: VizProps
   state: {
     data: Viz,
-    errors: ?APIErrors
+    errors: ?APIErrors,
+    modal_open: boolean
   }
 
   constructor(props: VizProps){
     super(props)
     this.state = {
       data: this.props.initial_state,
-      errors: null
+      errors: null,
+      modal_open: false
     }
   }
 
@@ -183,11 +178,41 @@ export class VizComponent extends Component {
     return this.props.project_data.attributes
   }
 
+  newSelectionID(): number{
+    const {data} = this.state
+    const selections = data.selection_operations.map(s => s.id)
+    return Math.max(...selections) + 1
+  }
+
+  addSelection(selection: SelectionOperation){
+    let selections = this.state.data.selection_operations.slice(0)
+    selections.push(selection)
+    this.update(_selectionOperations,selections)
+    this.setState({modal_open: false})
+  }
+
   render(){
-    const {data,errors} = this.state
+    const {data,errors,modal_open} = this.state
+    const default_attribute = this.getCollectionAttributes()[0]
+    const new_selection = {id: this.newSelectionID(), value_name: "", source_attribute: default_attribute, operation: "avg"}
+    const selections = data.selection_operations.map((s,i) => {
+      return <span key={i}>{s.value_name}</span>
+    })
     return(
       <div>
-        <GroupByComponent data={data} errors={errors} creator={this} />
+        <div>
+          <GroupByComponent data={data} errors={errors} creator={this} />
+        </div>
+        <div>
+          <span>Selections:</span>
+          <div>
+            {selections}
+          </div>
+          <button onClick={() => this.setState({modal_open: ! modal_open})}>Add Selection</button>
+          <ReactModal isOpen={modal_open}>
+            <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/> 
+          </ReactModal>
+        </div>
       </div>
     )
   }
