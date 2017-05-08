@@ -1,4 +1,4 @@
-
+/* @flow */
 import React, { Component } from 'react'
 import { Switch, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
@@ -12,9 +12,9 @@ import type {
   RouterHistory
 } from 'react-router-dom';
 
-import type {Attr} from '../Collection';
+import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../Collection';
 import type {Decorator, PointDecorator} from "../Decorators.js"
-import {PointDecoratorComponent, emptyPointDecorator} from "../Decorators.js"
+import {VizComponent, emptyViz, PointDecoratorComponent, emptyPointDecorator} from "../Decorators.js"
 import log from 'loglevel';
 
 import { FKApiClient } from '../../api/api';
@@ -31,7 +31,7 @@ type Props = {
 }
 
 export class ProjectVisualizations extends Component {
-  attributes: { [string]: Attr };
+  projectData: ProjectData;
   props: Props;
   state: {
     activeProject: ?APIProject
@@ -41,27 +41,41 @@ export class ProjectVisualizations extends Component {
     
     super(props);
 
-    this.attributes = {
-        "message": {
-            name: "message",
-            options: [],
-            type: "string"
+    this.projectData = {
+      expeditions: {
+        name: "expedition",
+        options: ["ITO 2015","ITO 2016","ITO 2017"],
+        type: "string",
+        target: "expedition"
+      },
+      bindings: [],
+      doctypes: [],
+      attributes: [
+        {
+          name: "message",
+          options: [],
+          type: "string",
+          target: "attribute"
         },
-        "user": {
-            name: "user",
-            options: ["@eric","@othererik","@gabriel"],
-            type: "string"
+        {
+          name: "user",
+          options: ["@eric","@othererik","@gabriel"],
+          type: "string",
+          target: "attribute"
         },
-        "humidity": {
-            name: "humidity",
-            options: [],
-            type: "num"
+        {
+          name: "humidity",
+          options: [],
+          type: "num",
+          target: "attribute"
         },
-        "created": {
-            name: "created",
-            options: [],
-            type: "date"
+        {
+          name: "created",
+          options: [],
+          type: "date",
+          target: "attribute"
         }
+      ]
     }
     this.state = {
       activeProject: null
@@ -95,10 +109,11 @@ export class ProjectVisualizations extends Component {
 
   render() {
     const { activeProject } = this.state;
+    const first_attr = this.projectData.attributes[0]
 
     return (
       <div>
-        <PointDecoratorComponent initial_state={emptyPointDecorator()} attributes={this.attributes}/>
+        <VizComponent initial_state={emptyViz(first_attr)} project_data={this.projectData}/>
       </div>
     )
   }

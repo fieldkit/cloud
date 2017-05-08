@@ -5,11 +5,12 @@ import ColorBrewer from 'colorbrewer';
 import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
 import { prop, _1, _2 } from 'safety-lens/es2015'
-import type {Attr} from './Collection';
+import type {Attr, ProjectData} from './Collection';
 
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
+import {  GroupByComponent } from './forms/VizForm'
 import type { APIErrors } from '../api/types';
 import '../../css/decorators.css'
   
@@ -85,17 +86,122 @@ export function emptyPointDecorator(): PointDecorator{
 }
 
 export type Decorator = PointDecorator
+export const _groupingOperation: Lens_<Viz,GroupingOperation> = prop("grouping_operation")
+export const _selectionOperations: Lens_<Viz,SelectionOperation[]> = prop("selection_operations")
+export const _decorator: Lens_<Viz,Decorator> = prop("decorator")
+
+export type GroupingOperationType = "equal" | "within" | "peak"
+export type GroupingOperation = {
+  operation: GroupingOperationType;
+  parameter: ?number;
+  source_attribute: Attr;
+}
+
+export const _groupingOperationOp: Lens_<GroupingOperation,GroupingOperationType> = prop("operation")
+export const _groupingOperationParam: Lens_<GroupingOperation,?number> = prop("parameter")
+export const _groupingOperationAttribute: Lens_<GroupingOperation,Attr> = prop("source_attribute")
+
+export type Op =
+   ["avg"]                |
+   ["max"]                |
+   ["min"]                |
+   ["median"]             |
+   ["first"]              |
+   ["last"]               |
+   ["sum"]                |
+   ["count"]              |
+   ["match_count",RegEx]  ;
+
+export type SelectionOperation = {
+  value_name: string;
+  source_attribute: Attr;
+  operation: Op;
+}
+
+const _selectionOperationName: Lens_<SelectionOperation,string> = prop("value_name")
+const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute")
+const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation")
+
+type RegEx = string;
+
 type PointDecoratorProps = {
    initial_state: PointDecorator;
-   attributes: {[string]: Attr};
+   project_data: ProjectData;
+}
+
+export type Viz = {
+  grouping_operation: GroupingOperation;
+  selection_operations: SelectionOperation[];
+  decorator: Decorator
+}
+
+export function updateViz<A>(l: Lens_<Viz,A>,value:A,viz:Viz):Viz{
+  return set(l,value,viz)
+}
+
+export function emptyViz(a: Attr): Viz{
+  return {
+    grouping_operation: {
+      operation: "equal",
+      parameter: null,
+      source_attribute: a
+    },
+    selection_operations: [],
+    decorator: emptyPointDecorator()
+  }
+}
+
+
+type VizProps = {
+   initial_state: Viz;
+   project_data: ProjectData;
+}
+
+export class VizComponent extends Component {
+  props: VizProps
+  state: {
+    data: Viz,
+    errors: ?APIErrors
+  }
+
+  constructor(props: VizProps){
+    super(props)
+    this.state = {
+      data: this.props.initial_state,
+      errors: null
+    }
+  }
+
+  update<A>(lens: Lens_<Viz,A>,value:A): void{
+    let {data} = this.state;
+    data = updateViz(lens,value,data)
+    this.setState({data})
+  }
+
+  getCollectionAttributes(): Attr[]{
+    // TODO: CONNECT TO ACTUAL COLLECTIONS
+    return this.props.project_data.attributes
+  }
+
+  render(){
+    const {data,errors} = this.state
+    return(
+      <div>
+        <GroupByComponent data={data} errors={errors} creator={this} />
+      </div>
+    )
+  }
 }
   
-  
 export class PointDecoratorComponent extends Component {
-  props: PointDecoratorProps
   state: {
-    data: PointDecorator,
     errors: ?APIErrors
+  }
+  props: {
+    data: PointDecorator,
+    project_data: ProjectData,
+    viz: Viz,
+    update: *
   }
   toggleColorType: () => void
   toggleSizeType: () => void
@@ -108,10 +214,7 @@ export class PointDecoratorComponent extends Component {
 
   constructor(props: PointDecoratorProps){
     super(props)
-    this.state = {
-      data: this.props.initial_state,
-      errors: null
-    }
+
     this.toggleColorType = this.toggleColorType.bind(this)
     this.toggleSizeType = this.toggleSizeType.bind(this)
     this.setSprite = this.setSprite.bind(this)
@@ -120,9 +223,9 @@ export class PointDecoratorComponent extends Component {
   }
 
   update<A>(lens: Lens_<PointDecorator,A>,value:A): void{
-    let {data} = this.state;
+    let {data} = this.props;
     data = updatePointDecorator(lens,value,data)
-    this.setState({data})
+    this.props.update(_decorator,data)
   }
 
   setSize(e:Object){
@@ -149,7 +252,7 @@ export class PointDecoratorComponent extends Component {
   }
 
   toggleColorType(){
-    const {data} = this.state;
+    const {data} = this.props;
     if(data.points.color.type === "constant"){
       this.setBrewerColors(ColorBrewer.Reds[5]) 
     } else {
@@ -158,7 +261,7 @@ export class PointDecoratorComponent extends Component {
   }
 
   toggleSizeType(){
-    let {data} = this.state;
+    let {data} = this.props;
     let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
     if(data.points.size.type === "constant"){
       this.update(size_lens,"linear")
@@ -192,18 +295,18 @@ export class PointDecoratorComponent extends Component {
   setLinearColor(colors: Stop[]){
     let color_lens = compose(_pointDecoratorPointsColor,_colorColors)
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
-    let data = updatePointDecorator(color_lens,colors,this.state.data)
+    let data = updatePointDecorator(color_lens,colors,this.props.data)
     data = updatePointDecorator(color_type_lens,"linear",data)
-    this.setState({data})
+    this.props.update(_decorator,data)
   }
 
   setConstantColor(color: string){
     let new_color = [{location: 0, color: color}]
     let color_lens = compose(_pointDecoratorPointsColor,_colorColors)
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
-    let data = updatePointDecorator(color_lens,new_color,this.state.data)
+    let data = updatePointDecorator(color_lens,new_color,this.props.data)
     data = updatePointDecorator(color_type_lens,"constant",data)
-    this.setState({data})
+    this.props.update(_decorator,data)
   }
 
   updateSizeDataKey(e: Object){
@@ -219,13 +322,12 @@ export class PointDecoratorComponent extends Component {
   }
 
   render(){
-    const { data, errors } = this.state;
-    const {attributes} = this.props;
-    const target_attrs = Object.keys(attributes).filter(a => attributes[a].type === "num")
+    const { errors } = this.state;
+    const { project_data, data } = this.props;
+    const target_attrs = project_data.attributes.filter(a => a.type === "num")
                                  .map((a) => {
-                                   const attr = attributes[a];                 
                                    return (
-                                    {value: attr.name, text: attr.name}
+                                    {value: a.name, text: a.name}
                                    )
                                })    
     const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
