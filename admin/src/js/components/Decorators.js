@@ -181,7 +181,8 @@ export class VizComponent extends Component {
   newSelectionID(): number{
     const {data} = this.state
     const selections = data.selection_operations.map(s => s.id)
-    return Math.max(...selections) + 1
+    const max = Math.max(...selections)
+    return max > -1 ? max : 0
   }
 
   addSelection(selection: SelectionOperation){
@@ -191,13 +192,27 @@ export class VizComponent extends Component {
     this.setState({modal_open: false})
   }
 
+  deleteSelection(selection_id: number){
+    let selections = this.state.data.selection_operations.slice(0)
+    selections = selections.filter(s => s.id !== selection_id)
+    this.update(_selectionOperations,selections)
+  }
+
   render(){
     const {data,errors,modal_open} = this.state
     const default_attribute = this.getCollectionAttributes()[0]
     const new_selection = {id: this.newSelectionID(), value_name: "", source_attribute: default_attribute, operation: "avg"}
     const selections = data.selection_operations.map((s,i) => {
-      return <span key={i}>{s.value_name}</span>
+      return <span key={i} className="selection" data-selection-id={s.id}>
+          {s.value_name}
+          <span className="selection-deleter" onClick={() => this.deleteSelection(s.id)}>&times;</span>
+        </span>
     })
+    let decorator_component;
+    if(data.decorator.type === "point"){
+      decorator_component = <PointDecoratorComponent viz={data} creator={this}/>
+    }
+      
     return(
       <div>
         <div>
@@ -213,6 +228,7 @@ export class VizComponent extends Component {
             <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/> 
           </ReactModal>
         </div>
+        {decorator_component}
       </div>
     )
   }
@@ -223,10 +239,8 @@ export class PointDecoratorComponent extends Component {
     errors: ?APIErrors
   }
   props: {
-    data: PointDecorator,
-    project_data: ProjectData,
     viz: Viz,
-    update: *
+    creator: Object
   }
   toggleColorType: () => void
   toggleSizeType: () => void
@@ -245,12 +259,15 @@ export class PointDecoratorComponent extends Component {
     this.setSprite = this.setSprite.bind(this)
     this.updateSizeDataKey = this.updateSizeDataKey.bind(this)
     this.updateColorDataKey = this.updateColorDataKey.bind(this)
+    this.state = {
+      errors: null
+    }
   }
 
   update<A>(lens: Lens_<PointDecorator,A>,value:A): void{
-    let {data} = this.props;
+    let data = this.props.viz.decorator;
     data = updatePointDecorator(lens,value,data)
-    this.props.update(_decorator,data)
+    this.props.creator.update(_decorator,data)
   }
 
   setSize(e:Object){
@@ -277,7 +294,7 @@ export class PointDecoratorComponent extends Component {
   }
 
   toggleColorType(){
-    const {data} = this.props;
+    const data = this.props.viz.decorator;
     if(data.points.color.type === "constant"){
       this.setBrewerColors(ColorBrewer.Reds[5]) 
     } else {
@@ -286,7 +303,7 @@ export class PointDecoratorComponent extends Component {
   }
 
   toggleSizeType(){
-    let {data} = this.props;
+    const data = this.props.viz.decorator;
     let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
     if(data.points.size.type === "constant"){
       this.update(size_lens,"linear")
@@ -320,18 +337,20 @@ export class PointDecoratorComponent extends Component {
   setLinearColor(colors: Stop[]){
     let color_lens = compose(_pointDecoratorPointsColor,_colorColors)
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
-    let data = updatePointDecorator(color_lens,colors,this.props.data)
+    let data = this.props.viz.decorator;
+    data = updatePointDecorator(color_lens,colors,data)
     data = updatePointDecorator(color_type_lens,"linear",data)
-    this.props.update(_decorator,data)
+    this.props.creator.update(_decorator,data)
   }
 
   setConstantColor(color: string){
     let new_color = [{location: 0, color: color}]
     let color_lens = compose(_pointDecoratorPointsColor,_colorColors)
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
-    let data = updatePointDecorator(color_lens,new_color,this.props.data)
+    let data = this.props.viz.decorator;
+    data = updatePointDecorator(color_lens,new_color,data)
     data = updatePointDecorator(color_type_lens,"constant",data)
-    this.props.update(_decorator,data)
+    this.props.creator.update(_decorator,data)
   }
 
   updateSizeDataKey(e: Object){
@@ -348,14 +367,17 @@ export class PointDecoratorComponent extends Component {
 
   render(){
     const { errors } = this.state;
-    const { project_data, data } = this.props;
-    const target_attrs = project_data.attributes.filter(a => a.type === "num")
-                                 .map((a) => {
-                                   return (
-                                    {value: a.name, text: a.name}
-                                   )
-                               })    
-    const options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
+    const {viz} = this.props
+    const data = viz.decorator;
+    const target_attrs = viz.selection_operations.map((s) => {
+      return {value: s.id, text: s.value_name}
+    })
+    let options;
+    if(viz.selection_operations.length > 0){
+      options = [{value: 'constant', text: 'constant'}, {value: 'linear', text: 'linear'}];
+    } else {
+      options = [{value: 'constant', text: 'constant'}];
+    }
     const collections = null
     let colorDropdownTrigger, colorDropdownContent, size; 
 
@@ -407,12 +429,6 @@ export class PointDecoratorComponent extends Component {
     return (
       <div className="point-decorator">
 
-        <div className="decorator-row">
-          <div className="decorator-row-label">Source: </div>
-          <select>
-            {collections}
-          </select>
-        </div>
         <div className="decorator-row">
           <FormSelectItem
             labelText={'Color'}
