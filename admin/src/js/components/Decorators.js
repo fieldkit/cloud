@@ -182,7 +182,7 @@ export class VizComponent extends Component {
     const {data} = this.state
     const selections = data.selection_operations.map(s => s.id)
     const max = Math.max(...selections)
-    return max > -1 ? max : 0
+    return max > -1 ? max + 1 : 0
   }
 
   addSelection(selection: SelectionOperation){
@@ -445,7 +445,7 @@ export class PointDecoratorComponent extends Component {
             <FormSelectItem
               labelText={'Based on'}
               name={'color-data-key'}
-              value={data.points.color.data_key}
+              value={data.points.color.data_key || ""}
               inline={true}
               firstOptionText={'Select'}
               options={target_attrs}
@@ -489,7 +489,7 @@ export class PointDecoratorComponent extends Component {
               <FormSelectItem
                 labelText={'Based on'}
                 name={'side-data-key'}
-                value={data.points.size.data_key}
+                value={data.points.size.data_key || ""}
                 inline={true}
                 firstOptionText={'Select'}
                 options={target_attrs}
