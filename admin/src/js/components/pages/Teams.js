@@ -12,6 +12,9 @@ import '../../../css/teams.css'
 
 import { FormContainer } from '../containers/FormContainer';
 
+import Collapse, { Panel } from 'rc-collapse';
+import 'rc-collapse/assets/index.css';
+
 import type { APIProject, APIExpedition, APITeam, APINewTeam, APINewMember, APIMember, APIBaseMember, APIUser } from '../../api/types';
 
 type Props = {
@@ -129,7 +132,7 @@ export class Teams extends Component {
 
       const teamRes = await FKApiClient.get().deleteTeam(teamId);
       if (teamRes.type === 'ok') {
-        await this.loadTeams(teamId);
+        await this.loadTeams();
         this.setState({ teamDeletion: null })
       } else {
         // TODO: show errors somewhere
@@ -211,7 +214,7 @@ export class Teams extends Component {
 
   getTeamById (id: number): ?APITeam {
     const { teams } = this.state;
-    return this.state.teams.find(team => team.id === id);
+    return teams.find(team => team.id === id);
   }
 
   render() {
@@ -274,16 +277,21 @@ export class Teams extends Component {
 
         <h1>Teams</h1>
 
-        <div className="accordion">
-        { teams.map((team, i) =>
-          <div key={i} className="accordion-row expanded">
+        <Collapse className="accordion">
+          { teams.map((team, i) =>
+            <Panel
+              className={"accordion-row"}
+              header={
               <div className="accordion-row-header">
-                <h4>{team.name}</h4>
-                <div className="nav">
-                  <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
-                  <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                <div className="accordion-row-header-contents">
+                  <h4>{team.name}</h4>
+                  <div className="nav">
+                    <Link className="button secondary" to={`${match.url}/${team.id}/edit`}>Edit</Link>
+                    <button className="secondary" onClick={this.startTeamDelete.bind(this, team)}>Delete</button>
+                  </div>
                 </div>
-              </div>
+              </div>}
+            >
               <p>{team.description}</p>
               { members[team.id] && members[team.id].length > 0 &&
                 <MembersTable
@@ -294,12 +302,13 @@ export class Teams extends Component {
                   onUpdate={this.confirmMemberUpdate.bind(this)}/> }
               { (!members[team.id] || members[team.id].length === 0) &&
                 <p className="empty">This team has no members yet.</p> }
-              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>
-
-          </div> ) }
+              <Link className="button secondary" to={`${match.url}/${team.id}/add-member`}>Add Member</Link>              
+            </Panel>
+            )
+          }
+        </Collapse>   
         { teams.length === 0 &&
-          <span className="empty">No teams</span> }
-        </div>
+          <span className="empty">Your expedition doesn't have any teams yet.</span> }
         <Link className="button" to={`${match.url}/new-team`}>Create New Team</Link>
       </div>
     )

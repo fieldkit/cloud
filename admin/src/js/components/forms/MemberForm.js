@@ -8,6 +8,8 @@ import { errorsFor, slugify } from '../../common/util';
 import type { APIErrors, APIUser, APINewMember, APIMember } from '../../api/types';
 import { FKApiClient } from '../../api/api';
 
+import { FormSelectItem } from './FormSelectItem'
+
 type Props = {
   teamId: number,
   member?: APIMember,
@@ -22,7 +24,7 @@ type Props = {
 export class MemberForm extends Component {
   props: Props;
   state: {
-    users: APIUser[],    
+    users: APIUser[],
     userId: number,
     role: string,
     saveDisabled: boolean,
@@ -82,7 +84,10 @@ export class MemberForm extends Component {
   }
 
   render () {
-    const { users } = this.state;
+    const { users, errors } = this.state;
+    const options = users.map((user, i) => {
+      return {value: user.id, text: user.username}
+    });
 
     return (
       <FormContainer
@@ -91,15 +96,16 @@ export class MemberForm extends Component {
         saveText={this.props.saveText}
         cancelText={this.props.cancelText}>
 
-        <div className="form-group">
-          <label htmlFor="userId">Member</label>
-          <select name="userId"  className='lg' value={this.state.userId} onChange={this.handleInputChange.bind(this)}>
-            <option value={null}>Select a user</option>
-            { users.map((user, i) => 
-              <option key={i} value={user.id}>{user.username}</option>) }
-          </select>
-          { errorsFor(this.state.errors, 'userId') }          
-        </div>
+        <FormSelectItem
+          labelText={'Member'}
+          name={'userId'}
+          className={'lg'}
+          value={this.state.userId}
+          firstOptionText={'Select a user'}
+          options= {options}
+          errors={errors}
+          onChange={this.handleInputChange.bind(this)}
+        />
 
         <div className="form-group">
           <label htmlFor="role">Role</label>
