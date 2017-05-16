@@ -23,7 +23,6 @@ export type Size = {
 }
 
 export type PointDecorator = {
-  collection_id: string;
   points: {
     color: Color,
     size: Size,
@@ -35,7 +34,6 @@ export type PointDecorator = {
 
 export function emptyPointDecorator(): PointDecorator{
   return {
-    collection_id: "",
     points: {
       color: {
         type: "constant",
@@ -74,6 +72,7 @@ export type SelectionOperation = {
 }
 
 export type Viz = {
+  source_collections: string[];
   grouping_operation: GroupingOperation;
   selection_operations: SelectionOperation[];
   decorator: Decorator
@@ -87,7 +86,8 @@ export function emptyViz(a: Attr): Viz{
       source_attribute: a
     },
     selection_operations: [],
-    decorator: emptyPointDecorator()
+    decorator: emptyPointDecorator(),
+    source_collections: []
   }
 }
 
