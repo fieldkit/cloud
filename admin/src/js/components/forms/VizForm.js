@@ -8,7 +8,7 @@ import { FormSelectItem } from './FormSelectItem'
 import type { APIErrors } from '../../api/types';
 import { RemoveIcon } from '../icons/Icons'
 
-import type {Viz, SelectionOperation} from '../Decorators.js'
+import type {Viz, SelectionOperation} from '../../types/VizTypes'
 import {_groupingOperation, _groupingOperationOp, _groupingOperationAttribute, _groupingOperationParam, _selectionOperationName, _selectionOperationOp, _selectionOperationSource} from '../Decorators.js'
 
 export class EditSelectionOperationComponent extends Component {

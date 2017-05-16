@@ -6,7 +6,7 @@ import type { APIErrors, APICollection, APINewCollection } from '../../api/types
 import { AddIcon } from '../icons/Icons'
 import log from 'loglevel';
 
-import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../Collection';
+import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../../types/CollectionTypes';
 import {cloneCollection, emptyStringFilter, emptyNumFilter, emptyDateFilter} from '../Collection';
 
 import { FKApiClient } from '../../api/api';

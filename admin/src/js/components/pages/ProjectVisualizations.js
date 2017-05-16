@@ -12,9 +12,10 @@ import type {
   RouterHistory
 } from 'react-router-dom';
 
-import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../Collection';
-import type {Decorator, PointDecorator} from "../Decorators.js"
-import {VizComponent, emptyViz, PointDecoratorComponent, emptyPointDecorator} from "../Decorators.js"
+import type {Attr, Target, ProjectData, Collection, Filter, FilterFn} from '../../types/CollectionTypes';
+import type {Decorator, PointDecorator} from "../../types/VizTypes"
+import {emptyViz, emptyPointDecorator} from "../../types/VizTypes"
+import {VizComponent, PointDecoratorComponent} from "../Decorators.js"
 import log from 'loglevel';
 
 import { FKApiClient } from '../../api/api';

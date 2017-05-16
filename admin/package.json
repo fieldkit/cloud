@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "chokidar": "^1.7.0",
     "colorbrewer": "^1.0.0",
     "immutable": "^3.8.1",
     "js-base64": "^2.1.9",

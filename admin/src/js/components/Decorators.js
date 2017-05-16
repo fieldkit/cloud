@@ -5,7 +5,7 @@ import ColorBrewer from 'colorbrewer';
 import type { Lens, Lens_ } from 'safety-lens'
 import { get, set, compose } from 'safety-lens'
 import { prop, _1, _2 } from 'safety-lens/es2015'
-import type {Attr, ProjectData} from './Collection';
+import type {Attr, ProjectData} from '../types/CollectionTypes';
 import ReactModal from 'react-modal';
 
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
@@ -13,47 +13,19 @@ import { FormItem } from './forms/FormItem'
 import { FormSelectItem } from './forms/FormSelectItem'
 import {  GroupByComponent, EditSelectionOperationComponent } from './forms/VizForm'
 import type { APIErrors } from '../api/types';
+import type { Stop, InterpolationType, Color, Size, PointDecorator, Decorator, Viz, GroupingOperation, SelectionOperation, GroupingOperationType, Op} from '../types/VizTypes'
+import { emptyPointDecorator, emptyViz } from '../types/VizTypes'
+
 import '../../css/decorators.css'
   
-export type Stop = {
-  location: number;
-  color: string;
-}
-
-export type InterpolationType = "constant" | "linear"
-
-export type Color = {
-  type: InterpolationType;
-  colors: Stop[];
-  data_key: ?string;
-  bounds: ?[number,number];
-}
-
 const _colorType: Lens_<Color,InterpolationType> = prop("type")
 const _colorColors: Lens_<Color,Stop[]> = prop("colors")
 const _colorDataKey: Lens_<Color,?string> = prop("data_key")
 const _colorBounds: Lens_<Color,?[number,number]> = prop("bounds")
 
-export type Size = {
-  type: InterpolationType;
-  data_key: ?string;
-  bounds: [number,number];
-}
-
 const _sizeType: Lens_<Size,InterpolationType> = prop("type")
 const _sizeDataKey: Lens_<Size,?string> = prop("data_key")
 const _sizeBounds: Lens_<Size,[number,number]> = prop("bounds")
-
-export type PointDecorator = {
-  collection_id: string;
-  points: {
-    color: Color,
-    size: Size,
-    sprite: string
-  };
-  title: string;
-  type: "point";
-}
 
 const _pointDecoratorPointsColor: Lens_<PointDecorator,Color> = compose(prop("points"),prop("color"))
 const _pointDecoratorPointsSize: Lens_<PointDecorator,Size> = compose(prop("points"),prop("size"))
@@ -64,86 +36,28 @@ export function updatePointDecorator<A>(l: Lens_<PointDecorator,A>,value:A,p:Poi
   return set(l,value,p)
 }
 
-export function emptyPointDecorator(): PointDecorator{
-  return {
-    collection_id: "",
-    points: {
-      color: {
-        type: "constant",
-        colors: [{location: 0, color: "#ff0000"}],
-        data_key: null,
-        bounds: null
-      },
-      size: {
-        type: "constant",
-        data_key: null,
-        bounds: [15,15]
-      },
-      sprite: "circle.png"
-    },
-    title: "",
-    type: "point"
-  }
-}
-
-export type Decorator = PointDecorator
 export const _groupingOperation: Lens_<Viz,GroupingOperation> = prop("grouping_operation")
 export const _selectionOperations: Lens_<Viz,SelectionOperation[]> = prop("selection_operations")
 export const _decorator: Lens_<Viz,Decorator> = prop("decorator")
-
-export type GroupingOperationType = "equal" | "within" | "peak"
-export type GroupingOperation = {
-  operation: GroupingOperationType;
-  parameter: ?number;
-  source_attribute: Attr;
-}
 
 export const _groupingOperationOp: Lens_<GroupingOperation,GroupingOperationType> = prop("operation")
 export const _groupingOperationParam: Lens_<GroupingOperation,?number> = prop("parameter")
 export const _groupingOperationAttribute: Lens_<GroupingOperation,Attr> = prop("source_attribute")
 
-export type Op = "avg" | "max" | "min" | "median" | "first" | "last" | "sum" | "count"
-
-export type SelectionOperation = {
-  id: number;
-  value_name: string;
-  source_attribute: Attr;
-  operation: Op;
-}
 
 export const _selectionOperationName: Lens_<SelectionOperation,string> = prop("value_name")
 export const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute")
 export const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation")
-
-type RegEx = string;
 
 type PointDecoratorProps = {
    initial_state: PointDecorator;
    project_data: ProjectData;
 }
 
-export type Viz = {
-  grouping_operation: GroupingOperation;
-  selection_operations: SelectionOperation[];
-  decorator: Decorator
-}
 
 export function updateViz<A>(l: Lens_<Viz,A>,value:A,viz:Viz):Viz{
   return set(l,value,viz)
 }
-
-export function emptyViz(a: Attr): Viz{
-  return {
-    grouping_operation: {
-      operation: "equal",
-      parameter: null,
-      source_attribute: a
-    },
-    selection_operations: [],
-    decorator: emptyPointDecorator()
-  }
-}
-
 
 type VizProps = {
    initial_state: Viz;

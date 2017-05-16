@@ -1,0 +1,8 @@
+[ignore]
+
+[include]
+../admin/src/js/types
+
+[libs]
+
+[options]
