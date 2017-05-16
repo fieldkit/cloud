@@ -28,7 +28,7 @@ steps:
   id: 'build-dir'
 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['run', '-v', '/workspace/build:/build', 'server-build', 'sh', '-c', 'cp -r $GOPATH/bin/server /build/ && mkdir /build/api && cp -r api/public /build/api/']
+  args: ['run', '-v', '/workspace/build:/build', 'server-build', 'sh', '-c', 'cp -r /go/bin/server /build/ && mkdir /build/api && cp -r api/public /build/api/']
   waitFor: ['build-dir', 'server']
 
 - name: 'gcr.io/cloud-builders/docker'
