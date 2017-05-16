@@ -85,7 +85,8 @@ func main() {
 				flowClass.Properties[i].Type = "string"
 				flowClass.Properties[i].Default = "''"
 			case "TYPE_MESSAGE":
-				flowClass.Properties[i].Type = strings.TrimPrefix(messageTypeField.GetTypeName(), ".")
+				typeName := strings.Split(messageTypeField.GetTypeName(), ".")
+				flowClass.Properties[i].Type = typeName[len(typeName)-1]
 				flowClass.Properties[i].Message = true
 			}
 		}

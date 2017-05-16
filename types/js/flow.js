@@ -44,16 +44,16 @@ type FieldkitType = {
   timestamp?: number,
   cell_voltage?: number,
   state_of_charge?: number,
-  location?: fieldkit.LocationType,
-  weather_station?: fieldkit.WeatherStationType,
+  location?: LocationType,
+  weather_station?: WeatherStationType,
 }
 
 export class Fieldkit {
   timestamp: number;
   cell_voltage: number;
   state_of_charge: number;
-  location: ?fieldkit.Location;
-  weather_station: ?fieldkit.WeatherStation;
+  location: ?Location;
+  weather_station: ?WeatherStation;
   constructor(obj: FieldkitType){
     this.timestamp = obj.timestamp ?
       this.timestamp = obj.timestamp : 0
@@ -62,8 +62,8 @@ export class Fieldkit {
     this.state_of_charge = obj.state_of_charge ?
       this.state_of_charge = obj.state_of_charge : 0
     this.location = obj.location ?
-      new fieldkit.Location(obj.location) : null
+      new Location(obj.location) : null
     this.weather_station = obj.weather_station ?
-      new fieldkit.WeatherStation(obj.weather_station) : null
+      new WeatherStation(obj.weather_station) : null
   }
 }
