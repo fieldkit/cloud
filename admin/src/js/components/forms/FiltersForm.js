@@ -6,7 +6,7 @@ import { FormSelectItem } from './FormSelectItem'
 import type { APIErrors } from '../../api/types';
 import { RemoveIcon } from '../icons/Icons'
 
-import type {StringFilter, DateFilter, NumFilter} from '../Collection'
+import type {StringFilter, DateFilter, NumFilter} from '../../types/CollectionTypes'
 
 export class StringFilterComponent extends Component {
   props: {
