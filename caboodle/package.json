@@ -10,7 +10,8 @@
     "chai": "^3.5.0",
     "chokidar-cli": "^1.2.0",
     "flow-bin": "^0.46.0",
-    "mocha": "^3.4.1"
+    "mocha": "^3.4.1",
+    "ramda": "^0.23.0"
   },
   "browserify": {
     "transform": [

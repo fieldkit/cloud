@@ -2,6 +2,7 @@
 
 [include]
 ../admin/src/js/types
+../types/js
 
 [libs]
 
