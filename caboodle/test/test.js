@@ -1,5 +1,5 @@
 import { expect, config } from 'chai';
-import { avgSelection, countSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker } from '../lib/caboodle' 
+import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker } from '../lib/caboodle' 
 
 describe('Selection Functions', () => {  
   it('Average Groups Correctly', () => {
@@ -28,6 +28,40 @@ describe('Selection Functions', () => {
     const selection_fn = countSelection(test_selection)
 
     expect(selection_fn(test_data)).to.equal(expectedResult);
+  });
+  
+  it('Simple Strings Correctly', () => {
+    const test_selection = {
+      id: 1,
+      value_name: "test_value",
+      source_attribute: "source",
+      operation: "simple_string"
+    }
+    const test_data = [{source: "foo"}, {source: "bar"}, {source: "baz"}]
+    const test_data_2 = [{source: 1}, {source: "bar"}, {source: "baz"}]
+    const test_data_3 = []
+    const selection_fn = simpleStringSelection(test_selection)
+
+    expect(selection_fn(test_data)).to.equal("foo");
+    expect(selection_fn(test_data_2)).to.equal("bar");
+    expect(selection_fn(test_data_3)).to.equal("");
+  });
+  
+  it('Simple Nums Correctly', () => {
+    const test_selection = {
+      id: 1,
+      value_name: "test_value",
+      source_attribute: "source",
+      operation: "simple_num"
+    }
+    const test_data = [{source: 1}, {source: 2}, {source: 3}]
+    const test_data_2 = [{source: "1"}, {source: 2}, {source: 3}]
+    const test_data_3 = []
+    const selection_fn = simpleNumSelection(test_selection)
+
+    expect(selection_fn(test_data)).to.equal(1);
+    expect(selection_fn(test_data_2)).to.equal(2);
+    expect(selection_fn(test_data_3)).to.equal(0);
   });
 });
 

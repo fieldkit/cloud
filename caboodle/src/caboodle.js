@@ -73,8 +73,24 @@ export function countSelection(s: SelectionOperation): SelectionFn<number>{
   }
 }
 
+export function simpleStringSelection(s: SelectionOperation): SelectionFn<string>{
+  return (group) => {
+    const first_string_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "string")
+    return first_string_datum ? first_string_datum[s.source_attribute] : ""
+  }
+}
+
+export function simpleNumSelection(s: SelectionOperation): SelectionFn<number>{
+  return (group) => {
+    const first_num_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "number")
+    return first_num_datum ? first_num_datum[s.source_attribute] : 0
+  }
+}
+
 export const selectionFactories = {
   "avg": avgSelection,
+  "simple_string": simpleStringSelection,
+  "simple_num": simpleNumSelection,
   "max": countSelection,
   "min": countSelection,
   "median": countSelection,
@@ -86,7 +102,7 @@ export const selectionFactories = {
 
 export function makeSelection(selection: SelectionOperation): SelectionTx{
   const selection_factory = selectionFactories[selection.operation]
-  const selection_fn:SelectionFn<number> = selection_factory(selection)
+  const selection_fn:SelectionFn<*> = selection_factory(selection)
 
   return ({data, output}) => {
     output[selection.value_name] = selection_fn(data)
