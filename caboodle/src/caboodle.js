@@ -1,8 +1,11 @@
 /* @flow */
 
-import type {GroupingOperation, SelectionOperation} from '../../admin/src/js/types/VizTypes'
+import {Location} from './proto/flow'
+import type {GroupingOperation, SelectionOperation, Viz} from '../../admin/src/js/types/VizTypes'
 import type {Attr} from '../../admin/src/js/types/CollectionTypes'
 import R from 'ramda'
+require('es6-promise').polyfill();
+import 'isomorphic-fetch';
 
 export type Stream = Array<Object>
 export type GroupStream = Array<Array<Object>>
@@ -109,4 +112,98 @@ export function transform(streams: Stream[], grouping: GroupingOperation, select
   const selection_fn = getStreamTransformer(selections)
   const new_stream = selection_fn(grouping_fn(streams))
   return new_stream
+}
+
+type Registration = {
+  source_collections: string[],
+  callback: (Stream) => void,
+  processor: (Stream[]) => Stream,
+  id: number
+}
+
+export class Broker {
+  started: boolean;
+  registrations: Registration[];
+  api_root: string;
+  cache: {[number]: Stream}
+
+  constructor(api_root: string){
+    this.registrations = [];
+    this.started = false;
+    this.api_root = api_root;
+    this.cache = {}
+    return this;
+  }
+
+  overwriteRegCache(id: number, data: Stream){
+    this.cache[id] = data
+  }
+
+  getNewRegId(): number{
+    if(this.registrations.length === 0){
+      return 0
+    } else {
+      return Math.max(...this.registrations.map(r => r.id)) + 1
+    }
+  }
+
+  registerViz(viz: Viz, callback: (Array<Object>) => void){
+    this.register(viz.source_collections, viz.grouping_operation, viz.selection_operations, callback)
+  }
+
+  register(source_collections: string[], grouping: GroupingOperation, selections: SelectionOperation[], callback: (Array<Object>) => void){
+    if(this.started){
+      let error = new Error ("You cannot register with a broker once it has been started")
+      throw error
+    }
+    const grouping_fn = getGroupingFn(grouping)
+    const selection_fn = getStreamTransformer(selections)
+    const id = this.getNewRegId(this.registrations)
+    const new_registration = {
+      source_collections: source_collections,
+      processor: R.compose(selection_fn,grouping_fn),
+      id,
+      callback
+    }
+
+    this.registrations.push(new_registration)
+    return new_registration
+  }
+
+  getReq(collections: string[]): [string,Object]{
+    const url = ""
+    const req = {}
+    return [url,req]
+  }
+
+  request(){
+    this.registrations.forEach(({source_collections,processor,callback,id}) => {
+      const [url,req] = this.getReq(source_collections)
+      fetch(url,req)
+        .then((response) => {
+          if (response.status >= 200 && response.status < 300) {
+            return response
+          } else {
+            var error = new Error(response.statusText)
+            throw error
+          }
+        })
+        .then(response => response.json())
+        .then(data => this.handleResponse(id,data,processor,callback))
+    })  
+  }
+
+  handleResponse(reg_id: number, data: {streams: Stream[]}, processor: (Stream[]) => Stream, callback: (Stream) => void ) {
+    let new_data = processor(data.streams)
+    this.overwriteRegCache(reg_id, new_data) 
+    callback(new_data)
+    return new_data
+  }
+  
+  start(){
+    if(this.started){
+      throw "You cannot start an already-running broker."
+    } 
+    this.started = true
+  }
 }
