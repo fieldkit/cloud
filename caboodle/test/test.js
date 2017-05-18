@@ -1,5 +1,5 @@
 import { expect, config } from 'chai';
-import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection } from '../lib/caboodle' 
+import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection, generateSelectionsFromMap } from '../lib/caboodle' 
 import {Location} from '../lib/proto/flow'
 
 describe('Selection Functions', () => {  
@@ -111,6 +111,22 @@ describe('Selections', () => {
     let {data, output} = selection_tx({data: o_data, output: {}})
     const expectedResult = {test_value: 2}
     expect(output).to.deep.equal(expectedResult)
+  })
+
+  it('Correctly Generates a Simple Selection', () => {
+    const test_selection = generateSelectionsFromMap({
+      "foo": "number",
+      "bar": "string",
+      "baz": "location"
+    })
+
+    const expectedResult = [
+      {id: 0, value_name: "foo", source_attribute: "foo", operation: "simple_num"},
+      {id: 1, value_name: "bar", source_attribute: "bar", operation: "simple_string"},
+      {id: 2, value_name: "baz", source_attribute: "baz", operation: "simple_location"}
+    ]
+
+    expect(expectedResult).to.deep.equal(test_selection)
   })
 })
 

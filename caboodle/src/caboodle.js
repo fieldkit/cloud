@@ -17,6 +17,33 @@ type SelectionFactory<A> = (SelectionOperation) => SelectionFn<A>
 type TxData = {"data": Array<Object>, "output": Object}
 type SelectionTx = (TxData) => TxData
 
+export type SimpleSelectionType = "number" | "string" | "location"
+export type SelectionMap = {[string]: SimpleSelectionType}
+
+export function generateSelectionsFromMap(sm: SelectionMap): SelectionOperation[]{
+  return Object.keys(sm).map((sk,i) => {
+    let op;
+    let type = sm[sk]
+
+    if(type === "number"){
+      op = "simple_num"
+    } else if (type === "string"){
+      op = "simple_string"
+    } else if (type === "location"){
+      op = "simple_location"
+    } else {
+      throw `Simple Selection type ${type} not recognized`
+    }
+
+    return {
+      id: i,
+      value_name: sk,
+      source_attribute: sk,
+      operation: op
+    }
+  })
+}
+
 export const equalGrouping: GroupingFactory = (grouping) => {
   // TODO: ADD SOME SORTING
   return (streams) => {
