@@ -44,6 +44,27 @@ export function generateSelectionsFromMap(sm: SelectionMap): SelectionOperation[
   })
 }
 
+export function streamToGeoJSON(s: Stream, location_key: string): Object{
+  const features = s.filter(d => d[location_key] && d[location_key].hasOwnProperty("latitude"))
+                    .map((d) => {
+                      return {
+                        "type":"Feature",
+                        "properties":d,
+                        "geometry":{
+                          "type":"Point",
+                          "coordinates":[
+                            d[location_key].latitude,
+                            d[location_key].longitude
+                          ]
+                        }
+                      }
+                    })
+  return {
+    "type": "FeatureCollection",
+    "features": features
+  } 
+}
+
 export const equalGrouping: GroupingFactory = (grouping) => {
   // TODO: ADD SOME SORTING
   return (streams) => {
@@ -266,3 +287,5 @@ export class Broker {
     this.started = true
   }
 }
+
+

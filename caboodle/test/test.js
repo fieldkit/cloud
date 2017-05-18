@@ -1,5 +1,5 @@
 import { expect, config } from 'chai';
-import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection, generateSelectionsFromMap } from '../lib/caboodle' 
+import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection, generateSelectionsFromMap, streamToGeoJSON } from '../lib/caboodle' 
 import {Location} from '../lib/proto/flow'
 
 describe('Selection Functions', () => {  
@@ -255,4 +255,36 @@ describe('Broker', () => {
 
     expect(result).to.deep.equal(expectedResult);
   })
+})
+
+
+describe('GeoJSON', () => {  
+  it('Converts to GeoJSON correctly', () => {
+    const loc = new Location({latitude: 3, longitude: 4})
+    const loc_2 = new Location({latitude: 5, longitude: 6})
+    const test_data = [{loc:loc},{loc:loc_2}]
+    const geo_json = streamToGeoJSON(test_data,"loc")
+    const expectedResult = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {loc:loc},
+          "geometry":{
+            "type": "Point",
+            "coordinates": [3,4]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {loc:loc_2},
+          "geometry":{
+            "type": "Point",
+            "coordinates": [5,6]
+          }
+        }
+      ]
+    }
+    expect(geo_json).to.deep.equal(expectedResult);
+  });
 })
