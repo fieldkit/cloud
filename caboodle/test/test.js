@@ -1,5 +1,5 @@
 import { expect, config } from 'chai';
-import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker } from '../lib/caboodle' 
+import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, rawSelection } from '../lib/caboodle' 
 
 describe('Selection Functions', () => {  
   it('Average Groups Correctly', () => {
@@ -63,6 +63,19 @@ describe('Selection Functions', () => {
     expect(selection_fn(test_data_2)).to.equal(2);
     expect(selection_fn(test_data_3)).to.equal(0);
   });
+
+  it('Performs a Raw Selection', () => {
+    const test_selection = {
+      id: 1,
+      value_name: "test_value",
+      source_attribute: "",
+      operation: "raw"
+    }
+    const test_data = [{source: 1}, {source: 2}, {source: 3}]
+    const selection_fn = rawSelection(test_selection)
+
+    expect(selection_fn(test_data)).to.deep.equal(test_data);
+  })
 });
 
 describe('Selections', () => {

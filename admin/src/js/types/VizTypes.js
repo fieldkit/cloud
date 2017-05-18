@@ -62,7 +62,7 @@ export type GroupingOperation = {
   source_attribute: Attr;
 }
 
-export type Op = "avg" | "simple_string" | "simple_num" | "max" | "min" | "median" | "first" | "last" | "sum" | "count"
+export type Op = "avg" | "simple_string" | "simple_num" | "max" | "min" | "median" | "first" | "last" | "sum" | "count" | "raw"
 
 export type SelectionOperation = {
   id: number;

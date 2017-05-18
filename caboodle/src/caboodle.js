@@ -87,10 +87,17 @@ export function simpleNumSelection(s: SelectionOperation): SelectionFn<number>{
   }
 }
 
+export function rawSelection(s: SelectionOperation): SelectionFn<Array<Object>>{
+  return (group) => {
+    return group
+  }
+}
+
 export const selectionFactories = {
   "avg": avgSelection,
   "simple_string": simpleStringSelection,
   "simple_num": simpleNumSelection,
+  "raw": rawSelection,
   "max": countSelection,
   "min": countSelection,
   "median": countSelection,
