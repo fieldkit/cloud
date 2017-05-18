@@ -75,19 +75,27 @@ export function countSelection(s: SelectionOperation): SelectionFn<number>{
 
 export function simpleStringSelection(s: SelectionOperation): SelectionFn<string>{
   return (group) => {
-    const first_string_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "string")
+    const first_string_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "string" && d[s.source_attribute].length > 0)
     return first_string_datum ? first_string_datum[s.source_attribute] : ""
   }
 }
 
 export function simpleNumSelection(s: SelectionOperation): SelectionFn<number>{
   return (group) => {
-    const first_num_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "number")
+    const first_num_datum = group.find(d => d[s.source_attribute] && typeof(d[s.source_attribute]) == "number" && d[s.source_attribute] !== 0)
     return first_num_datum ? first_num_datum[s.source_attribute] : 0
   }
 }
 
-export function rawSelection(s: SelectionOperation): SelectionFn<Array<Object>>{
+export function simpleLocationSelection(s: SelectionOperation): SelectionFn<Location>{
+  return (group) => {
+    const first_loc_datum = group.find(d => d[s.source_attribute] && d[s.source_attribute].hasOwnProperty("latitude") && d[s.source_attribute].latitude !== 0)
+    return first_loc_datum ? first_loc_datum[s.source_attribute] : new Location({latitude: 0, longitude: 0, altitude: 0})
+  }
+}
+
+
+export function wholeGroupSelection(s: SelectionOperation): SelectionFn<Array<Object>>{
   return (group) => {
     return group
   }
@@ -97,7 +105,8 @@ export const selectionFactories = {
   "avg": avgSelection,
   "simple_string": simpleStringSelection,
   "simple_num": simpleNumSelection,
-  "raw": rawSelection,
+  "simple_location": simpleLocationSelection,
+  "whole_group": wholeGroupSelection,
   "max": countSelection,
   "min": countSelection,
   "median": countSelection,

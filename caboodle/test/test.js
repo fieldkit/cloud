@@ -1,5 +1,6 @@
 import { expect, config } from 'chai';
-import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, rawSelection } from '../lib/caboodle' 
+import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection } from '../lib/caboodle' 
+import {Location} from '../lib/proto/flow'
 
 describe('Selection Functions', () => {  
   it('Average Groups Correctly', () => {
@@ -63,16 +64,35 @@ describe('Selection Functions', () => {
     expect(selection_fn(test_data_2)).to.equal(2);
     expect(selection_fn(test_data_3)).to.equal(0);
   });
+  
+  it('Simple Locs Correctly', () => {
+    const test_selection = {
+      id: 1,
+      value_name: "test_value",
+      source_attribute: "source",
+      operation: "simple_location"
+    }
+    const loc = new Location({latitude: 3, longitude: 4})
+    const empty_loc = new Location({latitude: 0, longitude: 0, altitude: 0})
+    const test_data = [{source: loc}, {source: "bar"}, {source: "baz"}]
+    const test_data_2 = [{source: 1}, {source: loc}, {source: "baz"}]
+    const test_data_3 = []
+    const selection_fn = simpleLocationSelection(test_selection)
 
-  it('Performs a Raw Selection', () => {
+    expect(selection_fn(test_data)).to.deep.equal(loc);
+    expect(selection_fn(test_data_2)).to.deep.equal(loc);
+    expect(selection_fn(test_data_3)).to.deep.equal(empty_loc);
+  });
+
+  it('Performs a Whole Group Selection', () => {
     const test_selection = {
       id: 1,
       value_name: "test_value",
       source_attribute: "",
-      operation: "raw"
+      operation: "whole_group"
     }
     const test_data = [{source: 1}, {source: 2}, {source: 3}]
-    const selection_fn = rawSelection(test_selection)
+    const selection_fn = wholeGroupSelection(test_selection)
 
     expect(selection_fn(test_data)).to.deep.equal(test_data);
   })
