@@ -36,6 +36,7 @@ export function updatePointDecorator<A>(l: Lens_<PointDecorator,A>,value:A,p:Poi
   return set(l,value,p)
 }
 
+export const _sourceCollections: Lens_<Viz,string[]> = prop("source_collections")
 export const _groupingOperation: Lens_<Viz,GroupingOperation> = prop("grouping_operation")
 export const _selectionOperations: Lens_<Viz,SelectionOperation[]> = prop("selection_operations")
 export const _decorator: Lens_<Viz,Decorator> = prop("decorator")

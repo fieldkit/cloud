@@ -16,6 +16,7 @@
     "react-dom": "^15.4.2",
     "react-modal": "^1.7.3",
     "react-router-dom": "^4.0.0",
+    "react-select": "^1.0.0-rc.4",
     "react-simple-dropdown": "^2.0.0",
     "safety-lens": "^1.5.0",
     "slug": "^0.9.1",
