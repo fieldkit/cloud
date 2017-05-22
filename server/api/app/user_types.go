@@ -264,33 +264,6 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
-// addSchemaPayload user type.
-type addSchemaPayload struct {
-	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
-}
-
-// Validate validates the addSchemaPayload type instance.
-func (ut *addSchemaPayload) Validate() (err error) {
-	if ut.JSONSchema == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
-	}
-	return
-}
-
-// Publicize creates AddSchemaPayload from addSchemaPayload
-func (ut *addSchemaPayload) Publicize() *AddSchemaPayload {
-	var pub AddSchemaPayload
-	if ut.JSONSchema != nil {
-		pub.JSONSchema = *ut.JSONSchema
-	}
-	return &pub
-}
-
-// AddSchemaPayload user type.
-type AddSchemaPayload struct {
-	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
-}
-
 // addTeamPayload user type.
 type addTeamPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
@@ -422,7 +395,8 @@ type addUserPayload struct {
 	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Password    *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
-	Username    *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// Username
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
 // Validate validates the addUserPayload type instance.
@@ -466,8 +440,8 @@ func (ut *addUserPayload) Validate() (err error) {
 		}
 	}
 	if ut.Username != nil {
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, *ut.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 		}
 	}
 	if ut.Username != nil {
@@ -509,7 +483,8 @@ type AddUserPayload struct {
 	InviteToken string `form:"invite_token" json:"invite_token" xml:"invite_token"`
 	Name        string `form:"name" json:"name" xml:"name"`
 	Password    string `form:"password" json:"password" xml:"password"`
-	Username    string `form:"username" json:"username" xml:"username"`
+	// Username
+	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the AddUserPayload type instance.
@@ -544,8 +519,8 @@ func (ut *AddUserPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Password) < 10 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
 	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, ut.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 	}
 	if utf8.RuneCountInString(ut.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
@@ -556,6 +531,7 @@ func (ut *AddUserPayload) Validate() (err error) {
 // loginPayload user type.
 type loginPayload struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	// Username
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
@@ -573,8 +549,8 @@ func (ut *loginPayload) Validate() (err error) {
 		}
 	}
 	if ut.Username != nil {
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, *ut.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 		}
 	}
 	if ut.Username != nil {
@@ -600,6 +576,7 @@ func (ut *loginPayload) Publicize() *LoginPayload {
 // LoginPayload user type.
 type LoginPayload struct {
 	Password string `form:"password" json:"password" xml:"password"`
+	// Username
 	Username string `form:"username" json:"username" xml:"username"`
 }
 
@@ -614,76 +591,11 @@ func (ut *LoginPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Password) < 10 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
 	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, ut.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 	}
 	if utf8.RuneCountInString(ut.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
-	}
-	return
-}
-
-// setFieldkitBinaryPayload user type.
-type setFieldkitBinaryPayload struct {
-	Fields   []string          `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
-	Mapper   map[string]string `form:"mapper,omitempty" json:"mapper,omitempty" xml:"mapper,omitempty"`
-	SchemaID *int              `form:"schema_id,omitempty" json:"schema_id,omitempty" xml:"schema_id,omitempty"`
-}
-
-// Validate validates the setFieldkitBinaryPayload type instance.
-func (ut *setFieldkitBinaryPayload) Validate() (err error) {
-	if ut.SchemaID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schema_id"))
-	}
-	if ut.Fields == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
-	}
-	if ut.Mapper == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
-	}
-	for _, e := range ut.Fields {
-		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
-		}
-	}
-	return
-}
-
-// Publicize creates SetFieldkitBinaryPayload from setFieldkitBinaryPayload
-func (ut *setFieldkitBinaryPayload) Publicize() *SetFieldkitBinaryPayload {
-	var pub SetFieldkitBinaryPayload
-	if ut.Fields != nil {
-		pub.Fields = ut.Fields
-	}
-	if ut.Mapper != nil {
-		pub.Mapper = ut.Mapper
-	}
-	if ut.SchemaID != nil {
-		pub.SchemaID = *ut.SchemaID
-	}
-	return &pub
-}
-
-// SetFieldkitBinaryPayload user type.
-type SetFieldkitBinaryPayload struct {
-	Fields   []string          `form:"fields" json:"fields" xml:"fields"`
-	Mapper   map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
-	SchemaID int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
-}
-
-// Validate validates the SetFieldkitBinaryPayload type instance.
-func (ut *SetFieldkitBinaryPayload) Validate() (err error) {
-
-	if ut.Fields == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
-	}
-	if ut.Mapper == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
-	}
-	for _, e := range ut.Fields {
-		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
-		}
 	}
 	return
 }
@@ -797,38 +709,6 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 	return
 }
 
-// updateSchemaPayload user type.
-type updateSchemaPayload struct {
-	JSONSchema *interface{} `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
-	ProjectID  *int         `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
-}
-
-// Validate validates the updateSchemaPayload type instance.
-func (ut *updateSchemaPayload) Validate() (err error) {
-	if ut.JSONSchema == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
-	}
-	return
-}
-
-// Publicize creates UpdateSchemaPayload from updateSchemaPayload
-func (ut *updateSchemaPayload) Publicize() *UpdateSchemaPayload {
-	var pub UpdateSchemaPayload
-	if ut.JSONSchema != nil {
-		pub.JSONSchema = *ut.JSONSchema
-	}
-	if ut.ProjectID != nil {
-		pub.ProjectID = ut.ProjectID
-	}
-	return &pub
-}
-
-// UpdateSchemaPayload user type.
-type UpdateSchemaPayload struct {
-	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
-	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
-}
-
 // updateTwitterAccountInputPayload user type.
 type updateTwitterAccountInputPayload struct {
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
@@ -860,9 +740,10 @@ type UpdateTwitterAccountInputPayload struct {
 
 // updateUserPayload user type.
 type updateUserPayload struct {
-	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Bio   *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Username
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
@@ -896,8 +777,8 @@ func (ut *updateUserPayload) Validate() (err error) {
 		}
 	}
 	if ut.Username != nil {
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, *ut.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, *ut.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, *ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 		}
 	}
 	if ut.Username != nil {
@@ -928,9 +809,10 @@ func (ut *updateUserPayload) Publicize() *UpdateUserPayload {
 
 // UpdateUserPayload user type.
 type UpdateUserPayload struct {
-	Bio      string `form:"bio" json:"bio" xml:"bio"`
-	Email    string `form:"email" json:"email" xml:"email"`
-	Name     string `form:"name" json:"name" xml:"name"`
+	Bio   string `form:"bio" json:"bio" xml:"bio"`
+	Email string `form:"email" json:"email" xml:"email"`
+	Name  string `form:"name" json:"name" xml:"name"`
+	// Username
 	Username string `form:"username" json:"username" xml:"username"`
 }
 
@@ -957,8 +839,8 @@ func (ut *UpdateUserPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
 	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, ut.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, ut.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 	}
 	if utf8.RuneCountInString(ut.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))

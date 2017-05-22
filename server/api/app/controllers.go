@@ -622,9 +622,6 @@ type FieldkitController interface {
 	GetID(*GetIDFieldkitContext) error
 	List(*ListFieldkitContext) error
 	ListID(*ListIDFieldkitContext) error
-	SendBinary(*SendBinaryFieldkitContext) error
-	SendCsv(*SendCsvFieldkitContext) error
-	SetBinary(*SetBinaryFieldkitContext) error
 }
 
 // MountFieldkitController "mounts" a Fieldkit resource controller on the given service.
@@ -634,9 +631,6 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/fieldkits", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/binary/:access_token", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/send/csv", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/inputs/fieldkits/:input_id/binary/:binary_id", ctrl.MuxHandler("preflight", handleFieldkitOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -711,62 +705,6 @@ func MountFieldkitController(service *goa.Service, ctrl FieldkitController) {
 	h = handleFieldkitOrigin(h)
 	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs/fieldkits", ctrl.MuxHandler("ListID", h, nil))
 	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs/fieldkits", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewSendBinaryFieldkitContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.SendBinary(rctx)
-	}
-	h = handleFieldkitOrigin(h)
-	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/binary/:access_token", ctrl.MuxHandler("SendBinary", h, nil))
-	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendBinary", "route", "POST /inputs/fieldkits/:input_id/send/binary/:access_token")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewSendCsvFieldkitContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.SendCsv(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleFieldkitOrigin(h)
-	service.Mux.Handle("POST", "/inputs/fieldkits/:input_id/send/csv", ctrl.MuxHandler("SendCsv", h, nil))
-	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SendCsv", "route", "POST /inputs/fieldkits/:input_id/send/csv", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewSetBinaryFieldkitContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*SetFieldkitBinaryPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.SetBinary(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleFieldkitOrigin(h)
-	service.Mux.Handle("PUT", "/inputs/fieldkits/:input_id/binary/:binary_id", ctrl.MuxHandler("SetBinary", h, unmarshalSetBinaryFieldkitPayload))
-	service.LogInfo("mount", "ctrl", "Fieldkit", "action", "SetBinary", "route", "PUT /inputs/fieldkits/:input_id/binary/:binary_id", "security", "jwt")
 }
 
 // handleFieldkitOrigin applies the CORS response headers corresponding to the origin.
@@ -852,21 +790,6 @@ func handleFieldkitOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddFieldkitPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddFieldkitPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addFieldkitInputPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
-}
-
-// unmarshalSetBinaryFieldkitPayload unmarshals the request body into the context request data Payload field.
-func unmarshalSetBinaryFieldkitPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &setFieldkitBinaryPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -1860,204 +1783,6 @@ func unmarshalUpdateProjectPayload(ctx context.Context, service *goa.Service, re
 	if err := payload.Validate(); err != nil {
 		// Initialize payload with private data structure so it can be logged
 		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
-}
-
-// SchemaController is the controller interface for the Schema actions.
-type SchemaController interface {
-	goa.Muxer
-	Add(*AddSchemaContext) error
-	List(*ListSchemaContext) error
-	ListID(*ListIDSchemaContext) error
-	Update(*UpdateSchemaContext) error
-}
-
-// MountSchemaController "mounts" a Schema resource controller on the given service.
-func MountSchemaController(service *goa.Service, ctrl SchemaController) {
-	initService(service)
-	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/projects/:project_id/schemas", ctrl.MuxHandler("preflight", handleSchemaOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/@/:project/schemas", ctrl.MuxHandler("preflight", handleSchemaOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/schemas/:schema_id", ctrl.MuxHandler("preflight", handleSchemaOrigin(cors.HandlePreflight()), nil))
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewAddSchemaContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*AddSchemaPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Add(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleSchemaOrigin(h)
-	service.Mux.Handle("POST", "/projects/:project_id/schemas", ctrl.MuxHandler("Add", h, unmarshalAddSchemaPayload))
-	service.LogInfo("mount", "ctrl", "Schema", "action", "Add", "route", "POST /projects/:project_id/schemas", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewListSchemaContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.List(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleSchemaOrigin(h)
-	service.Mux.Handle("GET", "/projects/@/:project/schemas", ctrl.MuxHandler("List", h, nil))
-	service.LogInfo("mount", "ctrl", "Schema", "action", "List", "route", "GET /projects/@/:project/schemas", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewListIDSchemaContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.ListID(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleSchemaOrigin(h)
-	service.Mux.Handle("GET", "/projects/:project_id/schemas", ctrl.MuxHandler("ListID", h, nil))
-	service.LogInfo("mount", "ctrl", "Schema", "action", "ListID", "route", "GET /projects/:project_id/schemas", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewUpdateSchemaContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*UpdateSchemaPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Update(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleSchemaOrigin(h)
-	service.Mux.Handle("PATCH", "/schemas/:schema_id", ctrl.MuxHandler("Update", h, unmarshalUpdateSchemaPayload))
-	service.LogInfo("mount", "ctrl", "Schema", "action", "Update", "route", "PATCH /schemas/:schema_id", "security", "jwt")
-}
-
-// handleSchemaOrigin applies the CORS response headers corresponding to the origin.
-func handleSchemaOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?localhost:\\d+")
-
-	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		origin := req.Header.Get("Origin")
-		if origin == "" {
-			// Not a CORS request
-			return h(ctx, rw, req)
-		}
-		if cors.MatchOriginRegexp(origin, spec0) {
-			ctx = goa.WithLogContext(ctx, "origin", origin)
-			rw.Header().Set("Access-Control-Allow-Origin", origin)
-			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
-			rw.Header().Set("Access-Control-Allow-Credentials", "false")
-			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
-				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
-			}
-			return h(ctx, rw, req)
-		}
-		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
-			ctx = goa.WithLogContext(ctx, "origin", origin)
-			rw.Header().Set("Access-Control-Allow-Origin", origin)
-			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
-			rw.Header().Set("Access-Control-Allow-Credentials", "false")
-			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
-				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
-			}
-			return h(ctx, rw, req)
-		}
-		if cors.MatchOrigin(origin, "https://*.fieldkit.team") {
-			ctx = goa.WithLogContext(ctx, "origin", origin)
-			rw.Header().Set("Access-Control-Allow-Origin", origin)
-			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
-			rw.Header().Set("Access-Control-Allow-Credentials", "false")
-			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
-				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
-			}
-			return h(ctx, rw, req)
-		}
-		if cors.MatchOrigin(origin, "https://fieldkit.org") {
-			ctx = goa.WithLogContext(ctx, "origin", origin)
-			rw.Header().Set("Access-Control-Allow-Origin", origin)
-			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
-			rw.Header().Set("Access-Control-Allow-Credentials", "false")
-			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
-				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
-			}
-			return h(ctx, rw, req)
-		}
-		if cors.MatchOrigin(origin, "https://fieldkit.team") {
-			ctx = goa.WithLogContext(ctx, "origin", origin)
-			rw.Header().Set("Access-Control-Allow-Origin", origin)
-			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
-			rw.Header().Set("Access-Control-Allow-Credentials", "false")
-			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
-				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
-			}
-			return h(ctx, rw, req)
-		}
-
-		return h(ctx, rw, req)
-	}
-}
-
-// unmarshalAddSchemaPayload unmarshals the request body into the context request data Payload field.
-func unmarshalAddSchemaPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &addSchemaPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
-}
-
-// unmarshalUpdateSchemaPayload unmarshals the request body into the context request data Payload field.
-func unmarshalUpdateSchemaPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &updateSchemaPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
 	goa.ContextRequest(ctx).Payload = payload.Publicize()

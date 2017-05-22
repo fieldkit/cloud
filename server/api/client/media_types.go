@@ -305,43 +305,6 @@ func (c *Client) DecodeFieldkitInputCollection(resp *http.Response) (FieldkitInp
 	return decoded, err
 }
 
-// FieldkitBinary media type (default view)
-//
-// Identifier: application/vnd.app.fieldkit_input_binary+json; view=default
-type FieldkitBinary struct {
-	Fields    []string          `form:"fields" json:"fields" xml:"fields"`
-	ID        int               `form:"id" json:"id" xml:"id"`
-	InputID   int               `form:"input_id" json:"input_id" xml:"input_id"`
-	Latitude  *string           `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
-	Longitude *string           `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
-	Mapper    map[string]string `form:"mapper" json:"mapper" xml:"mapper"`
-	SchemaID  int               `form:"schema_id" json:"schema_id" xml:"schema_id"`
-}
-
-// Validate validates the FieldkitBinary media type instance.
-func (mt *FieldkitBinary) Validate() (err error) {
-
-	if mt.Fields == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fields"))
-	}
-	if mt.Mapper == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mapper"))
-	}
-	for _, e := range mt.Fields {
-		if !(e == "varint" || e == "uvarint" || e == "float32" || e == "float64") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.fields[*]`, e, []interface{}{"varint", "uvarint", "float32", "float64"}))
-		}
-	}
-	return
-}
-
-// DecodeFieldkitBinary decodes the FieldkitBinary instance encoded in resp body.
-func (c *Client) DecodeFieldkitBinary(resp *http.Response) (*FieldkitBinary, error) {
-	var decoded FieldkitBinary
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
 // FieldkitInputs media type (default view)
 //
 // Identifier: application/vnd.app.fieldkit_inputs+json; view=default
@@ -716,66 +679,6 @@ func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 	return &decoded, err
 }
 
-// Schema media type (default view)
-//
-// Identifier: application/vnd.app.schema+json; view=default
-type Schema struct {
-	ID         int         `form:"id" json:"id" xml:"id"`
-	JSONSchema interface{} `form:"json_schema" json:"json_schema" xml:"json_schema"`
-	ProjectID  *int        `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
-}
-
-// Validate validates the Schema media type instance.
-func (mt *Schema) Validate() (err error) {
-
-	return
-}
-
-// DecodeSchema decodes the Schema instance encoded in resp body.
-func (c *Client) DecodeSchema(resp *http.Response) (*Schema, error) {
-	var decoded Schema
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// SchemaCollection is the media type for an array of Schema (default view)
-//
-// Identifier: application/vnd.app.schema+json; type=collection; view=default
-type SchemaCollection []*Schema
-
-// Validate validates the SchemaCollection media type instance.
-func (mt SchemaCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DecodeSchemaCollection decodes the SchemaCollection instance encoded in resp body.
-func (c *Client) DecodeSchemaCollection(resp *http.Response) (SchemaCollection, error) {
-	var decoded SchemaCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
-// Schemas media type (default view)
-//
-// Identifier: application/vnd.app.schemas+json; view=default
-type Schemas struct {
-	Schemas SchemaCollection `form:"schemas,omitempty" json:"schemas,omitempty" xml:"schemas,omitempty"`
-}
-
-// DecodeSchemas decodes the Schemas instance encoded in resp body.
-func (c *Client) DecodeSchemas(resp *http.Response) (*Schemas, error) {
-	var decoded Schemas
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default
@@ -955,10 +858,11 @@ func (c *Client) DecodeTwitterAccountInputs(resp *http.Response) (*TwitterAccoun
 //
 // Identifier: application/vnd.app.user+json; view=default
 type User struct {
-	Bio      string `form:"bio" json:"bio" xml:"bio"`
-	Email    string `form:"email" json:"email" xml:"email"`
-	ID       int    `form:"id" json:"id" xml:"id"`
-	Name     string `form:"name" json:"name" xml:"name"`
+	Bio   string `form:"bio" json:"bio" xml:"bio"`
+	Email string `form:"email" json:"email" xml:"email"`
+	ID    int    `form:"id" json:"id" xml:"id"`
+	Name  string `form:"name" json:"name" xml:"name"`
+	// Username
 	Username string `form:"username" json:"username" xml:"username"`
 }
 
@@ -986,8 +890,8 @@ func (mt *User) Validate() (err error) {
 	if utf8.RuneCountInString(mt.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 256, false))
 	}
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, mt.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, mt.Username); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, mt.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 	}
 	if utf8.RuneCountInString(mt.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, mt.Username, utf8.RuneCountInString(mt.Username), 40, false))
