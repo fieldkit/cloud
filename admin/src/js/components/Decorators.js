@@ -17,7 +17,7 @@ import type { Stop, InterpolationType, Color, Size, PointDecorator, Decorator, V
 import { emptyPointDecorator, emptyViz } from '../types/VizTypes'
 
 import '../../css/decorators.css'
-  
+
 const _colorType: Lens_<Color,InterpolationType> = prop("type")
 const _colorColors: Lens_<Color,Stop[]> = prop("colors")
 const _colorDataKey: Lens_<Color,?string> = prop("data_key")
@@ -127,7 +127,7 @@ export class VizComponent extends Component {
     if(data.decorator.type === "point"){
       decorator_component = <PointDecoratorComponent viz={data} creator={this}/>
     }
-      
+
     return(
       <div>
         <div>
@@ -140,7 +140,7 @@ export class VizComponent extends Component {
           </div>
           <button onClick={() => this.setState({modal_open: ! modal_open})}>Add Selection</button>
           <ReactModal isOpen={modal_open}>
-            <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/> 
+            <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/>
           </ReactModal>
         </div>
         {decorator_component}
@@ -148,7 +148,7 @@ export class VizComponent extends Component {
     )
   }
 }
-  
+
 export class PointDecoratorComponent extends Component {
   state: {
     errors: ?APIErrors
@@ -211,9 +211,9 @@ export class PointDecoratorComponent extends Component {
   toggleColorType(){
     const data = this.props.viz.decorator;
     if(data.points.color.type === "constant"){
-      this.setBrewerColors(ColorBrewer.Reds[5]) 
+      this.setBrewerColors(ColorBrewer.Reds[5])
     } else {
-      this.setConstantColor(data.points.color.colors[0].color) 
+      this.setConstantColor(data.points.color.colors[0].color)
     }
   }
 
@@ -229,12 +229,12 @@ export class PointDecoratorComponent extends Component {
 
   setBrewerColors(brewer_colors: string[]){
     let color_length = brewer_colors.length || 0,
-    step: number, 
+    step: number,
     colors: Stop[];
 
     if(color_length > 1){
       step = 1/(color_length - 1)
-      colors = brewer_colors.map((c,i) => { 
+      colors = brewer_colors.map((c,i) => {
         let location
         if(i < color_length - 1){
           location = i*step;
@@ -242,7 +242,7 @@ export class PointDecoratorComponent extends Component {
           location = 1.0
         }
         return {location, color: c}
-      })  
+      })
       this.setLinearColor(colors)
     } else if (color_length === 1){
       this.setConstantColor(brewer_colors[0])
@@ -294,17 +294,17 @@ export class PointDecoratorComponent extends Component {
       options = [{value: 'constant', text: 'constant'}];
     }
     const collections = null
-    let colorDropdownTrigger, colorDropdownContent, size; 
+    let colorDropdownTrigger, colorDropdownContent, size;
 
     if( data.points.color.type === "constant"){
-    
+
       colorDropdownTrigger = (
         <div className="selected-color">
           <div className="color-thumb" style={{ backgroundColor: data.points.color.colors[0].color }}></div>
         </div>
       )
       colorDropdownContent = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>;
-    
+
     } else {
 
 
@@ -337,10 +337,10 @@ export class PointDecoratorComponent extends Component {
           <div className="brewer-schemes">
             {brewer_selections}
           </div>
-        </div>        
+        </div>
       )
     }
-    
+
     return (
       <div className="point-decorator">
 
@@ -366,7 +366,7 @@ export class PointDecoratorComponent extends Component {
               options={target_attrs}
               errors={errors}
               onChange={this.updateColorDataKey}
-            />          
+            />
 
           }
           <Dropdown className="color-dropdown" ref="color-dropdown">
@@ -376,7 +376,7 @@ export class PointDecoratorComponent extends Component {
             <DropdownContent className="dropdown-contents">
               { colorDropdownContent }
             </DropdownContent>
-          </Dropdown>          
+          </Dropdown>
         </div>
         <div className="decorator-row">
           <FormSelectItem
@@ -410,7 +410,7 @@ export class PointDecoratorComponent extends Component {
                 options={target_attrs}
                 errors={errors}
                 onChange={this.updateSizeDataKey}
-              />             
+              />
               <FormItem
                 labelText={'Value'}
                 name={'value'}
@@ -418,7 +418,7 @@ export class PointDecoratorComponent extends Component {
                 inline={true}
                 errors={errors}
                 onChange={e => this.setLowerSize(e)}
-              />          
+              />
               <FormItem
                 labelText={'Max'}
                 name={'upper-size'}
@@ -427,7 +427,7 @@ export class PointDecoratorComponent extends Component {
                 errors={errors}
                 onChange={e => this.setUpperSize(e)}
               />
-            </div>        
+            </div>
           }
         </div>
         <div className="decorator-row">

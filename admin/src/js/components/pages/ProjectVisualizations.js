@@ -39,7 +39,7 @@ export class ProjectVisualizations extends Component {
   }
 
   constructor(props: Props) {
-    
+
     super(props);
 
     this.projectData = {
@@ -113,7 +113,7 @@ export class ProjectVisualizations extends Component {
     const first_attr = this.projectData.attributes[0]
 
     return (
-      <div>
+      <div className="visualizations">
         <VizComponent initial_state={emptyViz(first_attr)} project_data={this.projectData}/>
       </div>
     )

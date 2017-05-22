@@ -213,13 +213,13 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   .bt-icon {
     margin-right: $elements-padding/2;
-  }  
+  }
 
   @if $primary == true {
     color: white;
     background-color: $color-2;
     @include shadow(1px);
-    
+
     .bt-icon { svg { fill: white; } }
 
     &:hover {
@@ -245,7 +245,7 @@ $font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: $color-2;
     background-color: white;
 
-    .bt-icon { svg { fill: $color-2; } }    
+    .bt-icon { svg { fill: $color-2; } }
 
     &:hover {
       $hover-color-2: lighten($color-2, 12%);
@@ -367,12 +367,12 @@ strong, b {
 button, .button {
 
   &:not(.bt-icon){
-    // Primary button    
+    // Primary button
     @include button();
     // Secondary button
     &.cancel, &.secondary {
       @include button(false);
-    }    
+    }
   }
 }
 
@@ -400,7 +400,7 @@ button, .button {
     width: 100%;
     height: auto;
     vertical-align: top;
-    fill: $gray-2;    
+    fill: $gray-2;
   }
 
   &.disabled {
@@ -428,7 +428,7 @@ label, .label {
 }
 
 .form-group, .url-preview {
-  margin-bottom: $baseline-height*1.5;  
+  margin-bottom: $baseline-height*1.5;
   &.inline {
     display: inline-block;
     &:not(:first-child) {
@@ -443,17 +443,17 @@ label, .label {
   &.small {
     width: $avatar-size-small;
     height: $avatar-size-small;
-    border-radius: $avatar-size-small;    
-  }  
+    border-radius: $avatar-size-small;
+  }
   &.medium {
     width: $avatar-size-medium;
     height: $avatar-size-medium;
-    border-radius: $avatar-size-medium;    
+    border-radius: $avatar-size-medium;
   }
   img {
     max-width: 100%;
     max-height: 100%;
-  }  
+  }
 }
 
 table {
@@ -483,7 +483,7 @@ table {
         }
       }
     }
-  }  
+  }
 
   tbody {
     tr {
@@ -500,7 +500,7 @@ table {
         }
         &:last-child {
           padding-right: $elements-padding;
-        }        
+        }
       }
     }
   }
@@ -526,7 +526,7 @@ table {
     .rc-collapse-header {
       height: $baseline-height*5;
       line-height: $baseline-height*5;
-    }    
+    }
 
     &.rc-collapse-item-active {
       border-width: 2px;
@@ -537,7 +537,7 @@ table {
         .accordion-row-header {
 
           .accordion-row-header-contents {
-            
+
             .nav{
               display: flex;
             }
@@ -559,8 +559,8 @@ table {
           display: none;
           text-indent: 0;
         }
-      }    
-    }    
+      }
+    }
   }
 }
 
@@ -575,7 +575,7 @@ table {
     vertical-align: top;
     background-color: $gray-4;
     background-repeat: no-repeat;
-    background-position: center; 
+    background-position: center;
     background-blend-mode: color-burn;
 
     &.projects {
@@ -591,7 +591,7 @@ table {
       position: absolute;
       left: $elements-padding;
       bottom: $elements-padding;
-    }    
+    }
   }
 }
 

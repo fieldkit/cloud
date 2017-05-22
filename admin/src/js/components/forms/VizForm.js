@@ -29,7 +29,7 @@ export class EditSelectionOperationComponent extends Component {
   updateSelectionOperation: (Object) => void
 
   constructor(props: *){
-    super(props) 
+    super(props)
     this.state = props.initial_state
 
     this.updateSelectionName = this.updateSelectionName.bind(this)
@@ -38,13 +38,13 @@ export class EditSelectionOperationComponent extends Component {
   }
 
 
-  
+
   updateSelectionName(e: Object){
     const value = e.target.value
     const new_state = set(_selectionOperationName,value,this.state)
     this.setState(new_state)
   }
-  
+
   updateSelectionSource(e: Object){
     let attr_name = e.target.value
     let attr = this.props.creator.getCollectionAttributes().find(a => a.name === attr_name)
@@ -53,7 +53,7 @@ export class EditSelectionOperationComponent extends Component {
       this.setState(new_state)
     }
   }
-  
+
   updateSelectionOperation(e: Object){
     const value = e.target.value
     const new_state = set(_selectionOperationOp,value,this.state)
@@ -119,7 +119,7 @@ export class EditSelectionOperationComponent extends Component {
 export class GroupByComponent extends Component {
   props: {
     data: Viz;
-    errors: ?APIErrors;        
+    errors: ?APIErrors;
     creator: Object;
   }
 
@@ -131,7 +131,7 @@ export class GroupByComponent extends Component {
   updateGroupingAttribute: (Object) => void
   updateGroupingParameter: (Object) => void
   updateSelectedCollections: (Object) => void
-  
+
 
   constructor(props: *){
     super(props)
@@ -150,7 +150,7 @@ export class GroupByComponent extends Component {
     let op = e.target.value
     if(op === "equal" || op === "within" || op === "peak"){
       const lens = compose(_groupingOperation, _groupingOperationOp)
-      this.props.creator.update(lens,op) 
+      this.props.creator.update(lens,op)
     }
   }
 
@@ -162,19 +162,19 @@ export class GroupByComponent extends Component {
       this.props.creator.update(lens,attr)
     }
   }
-  
+
   updateGroupingParameter(e: Object){
     let value = e.target.value
     const lens = compose(_groupingOperation, _groupingOperationParam)
     this.props.creator.update(lens,value)
   }
-// NOTE: CHANGE FROM PROJECT ATTRS TO SUM OVER COLLECTIONS 
+// NOTE: CHANGE FROM PROJECT ATTRS TO SUM OVER COLLECTIONS
   render() {
     const {data, errors, creator} = this.props
     const {grouping_operation } = data
     const grouping_ops = [
-      {text: "equal", value: "equal"}, 
-      {text:"within", value: "within"}, 
+      {text: "equal", value: "equal"},
+      {text:"within", value: "within"},
       {text: "peak", value: "peak"}
     ]
     const grouping_attrs = this.props.creator.getCollectionAttributes().map((a) => {
@@ -182,23 +182,23 @@ export class GroupByComponent extends Component {
     })
 
     const collection_options = [
-      {value: '1', label: 'Collection 1'},
-      {value: '2', label: 'Collection 2'},
-      {value: '3', label: 'Collection 3'}
+      {value: 1, label: 'Collection 1'},
+      {value: 2, label: 'Collection 2'},
+      {value: 3, label: 'Collection 3'}
     ]
     const selected_collections = ""
-    
+
     return (
       <div>
         <div>
           <div>
             <MultiSelect
-              labelKey={'Source Collections'}
               name={'source_collection'}
               value={selected_collections}
-              options={collection_options}
-              mutiple={true}
               onChange={this.updateSelectedCollections}
+              multiple={true}
+              options={collection_options}
+
             />
           </div>
           <FormSelectItem
