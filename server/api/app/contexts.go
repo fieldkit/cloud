@@ -130,16 +130,19 @@ func NewGetAdministratorContext(ctx context.Context, r *http.Request, service *g
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	paramUsername := req.Params["username"]
 	if len(paramUsername) > 0 {
 		rawUsername := paramUsername[0]
 		rctx.Username = rawUsername
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, rctx.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 		}
 		if utf8.RuneCountInString(rctx.Username) > 40 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
@@ -220,8 +223,11 @@ func NewListAdministratorContext(ctx context.Context, r *http.Request, service *
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -302,16 +308,22 @@ func NewListDocumentContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -434,16 +446,22 @@ func NewGetExpeditionContext(ctx context.Context, r *http.Request, service *goa.
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -523,8 +541,11 @@ func NewListExpeditionContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -730,16 +751,22 @@ func NewListFieldkitContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -798,169 +825,6 @@ func (ctx *ListIDFieldkitContext) BadRequest() error {
 	return nil
 }
 
-// SendBinaryFieldkitContext provides the fieldkit send binary action context.
-type SendBinaryFieldkitContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	AccessToken string
-	InputID     int
-}
-
-// NewSendBinaryFieldkitContext parses the incoming request URL and body, performs validations and creates the
-// context used by the fieldkit controller send binary action.
-func NewSendBinaryFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SendBinaryFieldkitContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SendBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramAccessToken := req.Params["access_token"]
-	if len(paramAccessToken) > 0 {
-		rawAccessToken := paramAccessToken[0]
-		rctx.AccessToken = rawAccessToken
-	}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// NoContent sends a HTTP response with status code 204.
-func (ctx *SendBinaryFieldkitContext) NoContent() error {
-	ctx.ResponseData.WriteHeader(204)
-	return nil
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SendBinaryFieldkitContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *SendBinaryFieldkitContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
-
-// SendCsvFieldkitContext provides the fieldkit send csv action context.
-type SendCsvFieldkitContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	AccessToken string
-	InputID     int
-}
-
-// NewSendCsvFieldkitContext parses the incoming request URL and body, performs validations and creates the
-// context used by the fieldkit controller send csv action.
-func NewSendCsvFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SendCsvFieldkitContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SendCsvFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramAccessToken := req.Params["access_token"]
-	if len(paramAccessToken) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("access_token"))
-	} else {
-		rawAccessToken := paramAccessToken[0]
-		rctx.AccessToken = rawAccessToken
-	}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// NoContent sends a HTTP response with status code 204.
-func (ctx *SendCsvFieldkitContext) NoContent() error {
-	ctx.ResponseData.WriteHeader(204)
-	return nil
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SendCsvFieldkitContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *SendCsvFieldkitContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
-
-// SetBinaryFieldkitContext provides the fieldkit set binary action context.
-type SetBinaryFieldkitContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	BinaryID int
-	InputID  int
-	Payload  *SetFieldkitBinaryPayload
-}
-
-// NewSetBinaryFieldkitContext parses the incoming request URL and body, performs validations and creates the
-// context used by the fieldkit controller set binary action.
-func NewSetBinaryFieldkitContext(ctx context.Context, r *http.Request, service *goa.Service) (*SetBinaryFieldkitContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SetBinaryFieldkitContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramBinaryID := req.Params["binary_id"]
-	if len(paramBinaryID) > 0 {
-		rawBinaryID := paramBinaryID[0]
-		if binaryID, err2 := strconv.Atoi(rawBinaryID); err2 == nil {
-			rctx.BinaryID = binaryID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("binary_id", rawBinaryID, "integer"))
-		}
-		if rctx.BinaryID > 32767 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`binary_id`, rctx.BinaryID, 32767, false))
-		}
-	}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *SetBinaryFieldkitContext) OK(r *FieldkitBinary) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.fieldkit_input_binary+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SetBinaryFieldkitContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // ListInputContext provides the input list action context.
 type ListInputContext struct {
 	context.Context
@@ -983,16 +847,22 @@ func NewListInputContext(ctx context.Context, r *http.Request, service *goa.Serv
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1197,16 +1067,22 @@ func NewListInputTokenContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1382,32 +1258,41 @@ func NewGetMemberContext(ctx context.Context, r *http.Request, service *goa.Serv
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	paramTeam := req.Params["team"]
 	if len(paramTeam) > 0 {
 		rawTeam := paramTeam[0]
 		rctx.Team = rawTeam
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Team) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`team`, rctx.Team, utf8.RuneCountInString(rctx.Team), 40, false))
 		}
 	}
 	paramUsername := req.Params["username"]
 	if len(paramUsername) > 0 {
 		rawUsername := paramUsername[0]
 		rctx.Username = rawUsername
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, rctx.Username); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
 		}
 		if utf8.RuneCountInString(rctx.Username) > 40 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
@@ -1490,24 +1375,33 @@ func NewListMemberContext(ctx context.Context, r *http.Request, service *goa.Ser
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	paramTeam := req.Params["team"]
 	if len(paramTeam) > 0 {
 		rawTeam := paramTeam[0]
 		rctx.Team = rawTeam
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Team) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`team`, rctx.Team, utf8.RuneCountInString(rctx.Team), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1794,8 +1688,11 @@ func NewGetProjectContext(ctx context.Context, r *http.Request, service *goa.Ser
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1958,171 +1855,6 @@ func (ctx *UpdateProjectContext) BadRequest() error {
 	return nil
 }
 
-// AddSchemaContext provides the schema add action context.
-type AddSchemaContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ProjectID int
-	Payload   *AddSchemaPayload
-}
-
-// NewAddSchemaContext parses the incoming request URL and body, performs validations and creates the
-// context used by the schema controller add action.
-func NewAddSchemaContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddSchemaContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AddSchemaContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AddSchemaContext) OK(r *Schema) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.schema+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *AddSchemaContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListSchemaContext provides the schema list action context.
-type ListSchemaContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Project string
-}
-
-// NewListSchemaContext parses the incoming request URL and body, performs validations and creates the
-// context used by the schema controller list action.
-func NewListSchemaContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListSchemaContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListSchemaContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListSchemaContext) OK(r *Schemas) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.schemas+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListSchemaContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListIDSchemaContext provides the schema list id action context.
-type ListIDSchemaContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ProjectID int
-}
-
-// NewListIDSchemaContext parses the incoming request URL and body, performs validations and creates the
-// context used by the schema controller list id action.
-func NewListIDSchemaContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDSchemaContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListIDSchemaContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListIDSchemaContext) OK(r *Schemas) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.schemas+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListIDSchemaContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// UpdateSchemaContext provides the schema update action context.
-type UpdateSchemaContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	SchemaID int
-	Payload  *UpdateSchemaPayload
-}
-
-// NewUpdateSchemaContext parses the incoming request URL and body, performs validations and creates the
-// context used by the schema controller update action.
-func NewUpdateSchemaContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateSchemaContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := UpdateSchemaContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramSchemaID := req.Params["schema_id"]
-	if len(paramSchemaID) > 0 {
-		rawSchemaID := paramSchemaID[0]
-		if schemaID, err2 := strconv.Atoi(rawSchemaID); err2 == nil {
-			rctx.SchemaID = schemaID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("schema_id", rawSchemaID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *UpdateSchemaContext) OK(r *Schema) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.schema+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateSchemaContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // AddTeamContext provides the team add action context.
 type AddTeamContext struct {
 	context.Context
@@ -2229,24 +1961,33 @@ func NewGetTeamContext(ctx context.Context, r *http.Request, service *goa.Servic
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	paramTeam := req.Params["team"]
 	if len(paramTeam) > 0 {
 		rawTeam := paramTeam[0]
 		rctx.Team = rawTeam
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Team); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Team); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`team`, rctx.Team, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Team) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`team`, rctx.Team, utf8.RuneCountInString(rctx.Team), 40, false))
 		}
 	}
 	return &rctx, err
@@ -2327,16 +2068,22 @@ func NewListTeamContext(ctx context.Context, r *http.Request, service *goa.Servi
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err
@@ -2589,16 +2336,22 @@ func NewListTwitterContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
 		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
 		}
 	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
 		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
 		}
 	}
 	return &rctx, err

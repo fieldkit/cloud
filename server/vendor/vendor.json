@@ -290,22 +290,6 @@
 			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "7yKsANg2G1FQlSP/HjVHnGyAoSc=",
-			"path": "github.com/goadesign/goa/goagen/gen_js",
-			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
-			"revisionTime": "2017-04-14T09:20:37Z",
-			"version": "=v1.2.0",
-			"versionExact": "v1.2.0"
-		},
-		{
-			"checksumSHA1": "iZTsvTXtEUU/w2XETwKejpDK6pM=",
-			"path": "github.com/goadesign/goa/goagen/gen_main",
-			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
-			"revisionTime": "2017-04-14T09:20:37Z",
-			"version": "=v1.2.0",
-			"versionExact": "v1.2.0"
-		},
-		{
 			"checksumSHA1": "kOFvEeXTYr8YEd8Ubr6uLdVbig0=",
 			"path": "github.com/goadesign/goa/goagen/gen_schema",
 			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
@@ -326,14 +310,6 @@
 			"path": "github.com/goadesign/goa/goagen/utils",
 			"revision": "58f3177f36f2c50ee6119da92795e48bac6d6243",
 			"revisionTime": "2017-04-17T18:24:04Z",
-			"version": "=v1.2.0",
-			"versionExact": "v1.2.0"
-		},
-		{
-			"checksumSHA1": "i5dwcaoGLDOQpIFmJMRiZN3GJsM=",
-			"path": "github.com/goadesign/goa/goatest",
-			"revision": "d446b57f94d6e4a362ee455dd2e1a794f30cec4f",
-			"revisionTime": "2017-04-14T09:20:37Z",
 			"version": "=v1.2.0",
 			"versionExact": "v1.2.0"
 		},
