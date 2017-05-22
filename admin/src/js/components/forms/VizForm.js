@@ -7,9 +7,12 @@ import { FormItem } from './FormItem'
 import { FormSelectItem } from './FormSelectItem'
 import type { APIErrors } from '../../api/types';
 import { RemoveIcon } from '../icons/Icons'
+import MultiSelect from 'react-select';
 
 import type {Viz, SelectionOperation} from '../../types/VizTypes'
-import {_groupingOperation, _groupingOperationOp, _groupingOperationAttribute, _groupingOperationParam, _selectionOperationName, _selectionOperationOp, _selectionOperationSource} from '../Decorators.js'
+import {_sourceCollections, _groupingOperation, _groupingOperationOp, _groupingOperationAttribute, _groupingOperationParam, _selectionOperationName, _selectionOperationOp, _selectionOperationSource} from '../Decorators.js'
+
+import 'react-select/dist/react-select.css';
 
 export class EditSelectionOperationComponent extends Component {
   props: {
@@ -34,6 +37,8 @@ export class EditSelectionOperationComponent extends Component {
     this.updateSelectionOperation = this.updateSelectionOperation.bind(this)
   }
 
+
+  
   updateSelectionName(e: Object){
     const value = e.target.value
     const new_state = set(_selectionOperationName,value,this.state)
@@ -125,6 +130,7 @@ export class GroupByComponent extends Component {
   updateGroupingOperation: (Object) => void
   updateGroupingAttribute: (Object) => void
   updateGroupingParameter: (Object) => void
+  updateSelectedCollections: (Object) => void
   
 
   constructor(props: *){
@@ -132,7 +138,12 @@ export class GroupByComponent extends Component {
     this.updateGroupingOperation = this.updateGroupingOperation.bind(this)
     this.updateGroupingAttribute = this.updateGroupingAttribute.bind(this)
     this.updateGroupingParameter = this.updateGroupingParameter.bind(this)
+    this.updateSelectedCollections = this.updateSelectedCollections.bind(this)
 
+  }
+
+  updateSelectedCollections(e: Object){
+    console.log(e)
   }
 
   updateGroupingOperation(e: Object){
@@ -169,10 +180,27 @@ export class GroupByComponent extends Component {
     const grouping_attrs = this.props.creator.getCollectionAttributes().map((a) => {
       return {text: a.name, value: a.name}
     })
+
+    const collection_options = [
+      {value: '1', label: 'Collection 1'},
+      {value: '2', label: 'Collection 2'},
+      {value: '3', label: 'Collection 3'}
+    ]
+    const selected_collections = ""
     
     return (
       <div>
         <div>
+          <div>
+            <MultiSelect
+              labelKey={'Source Collections'}
+              name={'source_collection'}
+              value={selected_collections}
+              options={collection_options}
+              mutiple={true}
+              onChange={this.updateSelectedCollections}
+            />
+          </div>
           <FormSelectItem
             labelText={'Grouping Operation'}
             name={'grouping_operation'}
