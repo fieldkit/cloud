@@ -10,7 +10,7 @@ import { RemoveIcon } from '../icons/Icons'
 import MultiSelect from 'react-select';
 
 import type {Viz, SelectionOperation} from '../../types/VizTypes'
-import {_sourceCollections, _groupingOperation, _groupingOperationOp, _groupingOperationAttribute, _groupingOperationParam, _selectionOperationName, _selectionOperationOp, _selectionOperationSource} from '../Decorators.js'
+import {_groupingOperation, _groupingOperationOp, _groupingOperationAttribute, _groupingOperationParam, _selectionOperationName, _selectionOperationOp, _selectionOperationSource, _sourceCollections} from '../Decorators.js'
 
 import 'react-select/dist/react-select.css';
 
@@ -143,7 +143,8 @@ export class GroupByComponent extends Component {
   }
 
   updateSelectedCollections(e: Object){
-    console.log(e)
+    const ids = e.split(",")
+    this.props.creator.update(_sourceCollections,ids)
   }
 
   updateGroupingOperation(e: Object){
@@ -171,7 +172,7 @@ export class GroupByComponent extends Component {
 // NOTE: CHANGE FROM PROJECT ATTRS TO SUM OVER COLLECTIONS 
   render() {
     const {data, errors, creator} = this.props
-    const {grouping_operation } = data
+    const {grouping_operation,source_collections} = data
     const grouping_ops = [
       {text: "equal", value: "equal"}, 
       {text:"within", value: "within"}, 
@@ -186,18 +187,19 @@ export class GroupByComponent extends Component {
       {value: '2', label: 'Collection 2'},
       {value: '3', label: 'Collection 3'}
     ]
-    const selected_collections = ""
+    const selected_collections = source_collections.join(",")
     
     return (
       <div>
         <div>
           <div>
             <MultiSelect
-              labelKey={'Source Collections'}
               name={'source_collection'}
               value={selected_collections}
               options={collection_options}
-              mutiple={true}
+              multi={true}
+              simpleValue={true}
+              joinValues={true}
               onChange={this.updateSelectedCollections}
             />
           </div>
