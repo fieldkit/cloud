@@ -1,4 +1,4 @@
-/* @flow */
+// @flow
 
 type LocationType = {
   latitude?: number,
@@ -17,6 +17,13 @@ export class Location {
       this.longitude = obj.longitude : 0
     this.altitude = obj.altitude ?
       this.altitude = obj.altitude : 0
+  }
+  describe(): {[string]: string} {
+    return {
+        "latitude": "number",
+        "longitude": "number",
+        "altitude": "number",
+    }
   }
 }
 
@@ -37,6 +44,13 @@ export class WeatherStation {
       this.humidity = obj.humidity : 0
     this.pressure = obj.pressure ?
       this.pressure = obj.pressure : 0
+  }
+  describe(): {[string]: string} {
+    return {
+        "temperature": "number",
+        "humidity": "number",
+        "pressure": "number",
+    }
   }
 }
 
@@ -65,5 +79,14 @@ export class Fieldkit {
       new Location(obj.location) : null
     this.weather_station = obj.weather_station ?
       new WeatherStation(obj.weather_station) : null
+  }
+  describe(): {[string]: string} {
+    return {
+        "timestamp": "number",
+        "cell_voltage": "number",
+        "state_of_charge": "number",
+        "location": "Location",
+        "weather_station": "WeatherStation",
+    }
   }
 }

@@ -7,6 +7,8 @@ protogo: go/document/fieldkit
 
 protojs: js
 	protoc -I=$(SRC_DIR)/document/fieldkit --flow_out=js $(SRC_DIR)/document/fieldkit/*.proto
+	rm -rf ../caboodle/src/proto
+	cp -rf ./js ../caboodle/src/proto
 
 go/document/fieldkit:
 	mkdir -p go/document/fieldkit
