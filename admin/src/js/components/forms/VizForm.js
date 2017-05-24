@@ -193,6 +193,7 @@ export class GroupByComponent extends Component {
       <div>
         <div>
           <div>
+            <label>Source Collections:</label>
             <MultiSelect
               name={'source_collection'}
               value={selected_collections}
