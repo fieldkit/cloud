@@ -165,6 +165,7 @@ export class PointDecoratorComponent extends Component {
   setSprite: (Object) => void
   updateSizeDataKey: (Object) => void
   updateColorDataKey: (Object) => void
+  save: () => void
 
   constructor(props: PointDecoratorProps){
     super(props)
@@ -174,6 +175,7 @@ export class PointDecoratorComponent extends Component {
     this.setSprite = this.setSprite.bind(this)
     this.updateSizeDataKey = this.updateSizeDataKey.bind(this)
     this.updateColorDataKey = this.updateColorDataKey.bind(this)
+    this.save = this.save.bind(this)
     this.state = {
       errors: null
     }
@@ -206,6 +208,11 @@ export class PointDecoratorComponent extends Component {
   setSprite(e: Object){
     const value = e.target.value;
     this.update(_pointDecoratorPointsSprite,value)
+  }
+
+  save(){
+    let serialized_viz = JSON.stringify(this.props.viz) 
+    console.log(serialized_viz)
   }
 
   toggleColorType(){
@@ -439,6 +446,7 @@ export class PointDecoratorComponent extends Component {
             onChange={this.setSprite}
           />
         </div>
+        <button onClick={this.save}>Save Viz</button>
       </div>
     )
   }
