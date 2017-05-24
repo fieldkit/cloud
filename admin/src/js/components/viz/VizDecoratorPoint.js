@@ -1,155 +1,46 @@
 /* @flow */
 import React, { Component } from 'react'
 import { SketchPicker } from 'react-color';
-import ColorBrewer from 'colorbrewer';
-import type { Lens, Lens_ } from 'safety-lens'
-import { get, set, compose } from 'safety-lens'
-import { prop, _1, _2 } from 'safety-lens/es2015'
-import type {Attr, ProjectData} from '../types/CollectionTypes';
 import ReactModal from 'react-modal';
-
+import ColorBrewer from 'colorbrewer';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
-import { FormItem } from './forms/FormItem'
-import { FormSelectItem } from './forms/FormSelectItem'
-import {  GroupByComponent, EditSelectionOperationComponent } from './forms/VizForm'
-import type { APIErrors } from '../api/types';
-import type { Stop, InterpolationType, Color, Size, PointDecorator, Decorator, Viz, GroupingOperation, SelectionOperation, GroupingOperationType, Op} from '../types/VizTypes'
-import { emptyPointDecorator, emptyViz } from '../types/VizTypes'
+import type { Lens_ } from 'safety-lens';
+import { set, compose } from 'safety-lens';
+import { prop, _1, _2 } from 'safety-lens/es2015';
+import { FormItem } from '../forms/FormItem';
+import { FormSelectItem } from '../forms/FormSelectItem';
+import type { APIErrors } from '../../api/types';
+import type { ProjectData } from '../../types/CollectionTypes';
+import type { Stop, InterpolationType, Color, Size, PointDecorator, Decorator, Viz } from '../../types/VizTypes';
 
-import '../../css/decorators.css'
+import '../../../css/decorators.css';
 
-const _colorType: Lens_<Color,InterpolationType> = prop("type")
-const _colorColors: Lens_<Color,Stop[]> = prop("colors")
-const _colorDataKey: Lens_<Color,?string> = prop("data_key")
-const _colorBounds: Lens_<Color,?[number,number]> = prop("bounds")
+const _colorType: Lens_<Color,InterpolationType> = prop('type');
+const _colorColors: Lens_<Color,Stop[]> = prop('colors');
+const _colorDataKey: Lens_<Color,?string> = prop('data_key');
+const _colorBounds: Lens_<Color,?[number,number]> = prop('bounds');
 
-const _sizeType: Lens_<Size,InterpolationType> = prop("type")
-const _sizeDataKey: Lens_<Size,?string> = prop("data_key")
-const _sizeBounds: Lens_<Size,[number,number]> = prop("bounds")
+const _sizeType: Lens_<Size,InterpolationType> = prop('type');
+const _sizeDataKey: Lens_<Size,?string> = prop('data_key');
+const _sizeBounds: Lens_<Size,[number,number]> = prop('bounds');
 
-const _pointDecoratorPointsColor: Lens_<PointDecorator,Color> = compose(prop("points"),prop("color"))
-const _pointDecoratorPointsSize: Lens_<PointDecorator,Size> = compose(prop("points"),prop("size"))
-const _pointDecoratorPointsSprite: Lens_<PointDecorator,string> = compose(prop("points"),prop("sprite"))
-const _pointDecoratorTitle: Lens_<PointDecorator,string> = prop("title")
+const _pointDecoratorPointsColor: Lens_<PointDecorator,Color> = compose(prop('points'),prop('color'))
+const _pointDecoratorPointsSize: Lens_<PointDecorator,Size> = compose(prop('points'),prop('size'))
+const _pointDecoratorPointsSprite: Lens_<PointDecorator,string> = compose(prop('points'),prop('sprite'))
+const _pointDecoratorTitle: Lens_<PointDecorator,string> = prop('title')
 
 export function updatePointDecorator<A>(l: Lens_<PointDecorator,A>,value:A,p:PointDecorator):PointDecorator{
-  return set(l,value,p)
+  return set(l,value,p);
 }
 
-export const _sourceCollections: Lens_<Viz,string[]> = prop("source_collections")
-export const _groupingOperation: Lens_<Viz,GroupingOperation> = prop("grouping_operation")
-export const _selectionOperations: Lens_<Viz,SelectionOperation[]> = prop("selection_operations")
-export const _decorator: Lens_<Viz,Decorator> = prop("decorator")
-
-export const _groupingOperationOp: Lens_<GroupingOperation,GroupingOperationType> = prop("operation")
-export const _groupingOperationParam: Lens_<GroupingOperation,?number> = prop("parameter")
-export const _groupingOperationAttribute: Lens_<GroupingOperation,Attr> = prop("source_attribute")
-
-
-export const _selectionOperationName: Lens_<SelectionOperation,string> = prop("value_name")
-export const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute")
-export const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation")
+export const _decorator: Lens_<Viz,Decorator> = prop('decorator');
 
 type PointDecoratorProps = {
    initial_state: PointDecorator;
    project_data: ProjectData;
 }
 
-
-export function updateViz<A>(l: Lens_<Viz,A>,value:A,viz:Viz):Viz{
-  return set(l,value,viz)
-}
-
-type VizProps = {
-   initial_state: Viz;
-   project_data: ProjectData;
-}
-
-export class VizComponent extends Component {
-  props: VizProps
-  state: {
-    data: Viz,
-    errors: ?APIErrors,
-    modal_open: boolean
-  }
-
-  constructor(props: VizProps){
-    super(props)
-    this.state = {
-      data: this.props.initial_state,
-      errors: null,
-      modal_open: false
-    }
-  }
-
-  update<A>(lens: Lens_<Viz,A>,value:A): void{
-    let {data} = this.state;
-    data = updateViz(lens,value,data)
-    this.setState({data})
-  }
-
-  getCollectionAttributes(): Attr[]{
-    // TODO: CONNECT TO ACTUAL COLLECTIONS
-    return this.props.project_data.attributes
-  }
-
-  newSelectionID(): number{
-    const {data} = this.state
-    const selections = data.selection_operations.map(s => s.id)
-    const max = Math.max(...selections)
-    return max > -1 ? max + 1 : 0
-  }
-
-  addSelection(selection: SelectionOperation){
-    let selections = this.state.data.selection_operations.slice(0)
-    selections.push(selection)
-    this.update(_selectionOperations,selections)
-    this.setState({modal_open: false})
-  }
-
-  deleteSelection(selection_id: number){
-    let selections = this.state.data.selection_operations.slice(0)
-    selections = selections.filter(s => s.id !== selection_id)
-    this.update(_selectionOperations,selections)
-  }
-
-  render(){
-    const {data,errors,modal_open} = this.state
-    const default_attribute = this.getCollectionAttributes()[0]
-    const new_selection = {id: this.newSelectionID(), value_name: "", source_attribute: default_attribute, operation: "avg"}
-    const selections = data.selection_operations.map((s,i) => {
-      return <span key={i} className="selection" data-selection-id={s.id}>
-          {s.value_name}
-          <span className="selection-deleter" onClick={() => this.deleteSelection(s.id)}>&times;</span>
-        </span>
-    })
-    let decorator_component;
-    if(data.decorator.type === "point"){
-      decorator_component = <PointDecoratorComponent viz={data} creator={this}/>
-    }
-
-    return(
-      <div>
-        <div>
-          <GroupByComponent data={data} errors={errors} creator={this} />
-        </div>
-        <div>
-          <span>Selections:</span>
-          <div>
-            {selections}
-          </div>
-          <button onClick={() => this.setState({modal_open: ! modal_open})}>Add Selection</button>
-          <ReactModal isOpen={modal_open}>
-            <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/>
-          </ReactModal>
-        </div>
-        {decorator_component}
-      </div>
-    )
-  }
-}
-
-export class PointDecoratorComponent extends Component {
+export default class VizDecoratorPoint extends Component {
   state: {
     errors: ?APIErrors
   }
@@ -211,13 +102,13 @@ export class PointDecoratorComponent extends Component {
   }
 
   save(){
-    let serialized_viz = JSON.stringify(this.props.viz) 
+    let serialized_viz = JSON.stringify(this.props.viz)
     console.log(serialized_viz)
   }
 
   toggleColorType(){
     const data = this.props.viz.decorator;
-    if(data.points.color.type === "constant"){
+    if(data.points.color.type === 'constant'){
       this.setBrewerColors(ColorBrewer.Reds[5])
     } else {
       this.setConstantColor(data.points.color.colors[0].color)
@@ -227,10 +118,10 @@ export class PointDecoratorComponent extends Component {
   toggleSizeType(){
     const data = this.props.viz.decorator;
     let size_lens = compose(_pointDecoratorPointsSize,_sizeType)
-    if(data.points.size.type === "constant"){
-      this.update(size_lens,"linear")
+    if(data.points.size.type === 'constant'){
+      this.update(size_lens,'linear')
     } else {
-      this.update(size_lens,"constant")
+      this.update(size_lens,'constant')
     }
   }
 
@@ -261,7 +152,7 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = this.props.viz.decorator;
     data = updatePointDecorator(color_lens,colors,data)
-    data = updatePointDecorator(color_type_lens,"linear",data)
+    data = updatePointDecorator(color_type_lens,'linear',data)
     this.props.creator.update(_decorator,data)
   }
 
@@ -271,7 +162,7 @@ export class PointDecoratorComponent extends Component {
     let color_type_lens = compose(_pointDecoratorPointsColor,_colorType)
     let data = this.props.viz.decorator;
     data = updatePointDecorator(color_lens,new_color,data)
-    data = updatePointDecorator(color_type_lens,"constant",data)
+    data = updatePointDecorator(color_type_lens,'constant',data)
     this.props.creator.update(_decorator,data)
   }
 
@@ -303,11 +194,11 @@ export class PointDecoratorComponent extends Component {
     const collections = null
     let colorDropdownTrigger, colorDropdownContent, size;
 
-    if( data.points.color.type === "constant"){
+    if( data.points.color.type === 'constant'){
 
       colorDropdownTrigger = (
-        <div className="selected-color">
-          <div className="color-thumb" style={{ backgroundColor: data.points.color.colors[0].color }}></div>
+        <div className='selected-color'>
+          <div className='color-thumb' style={{ backgroundColor: data.points.color.colors[0].color }}></div>
         </div>
       )
       colorDropdownContent = <SketchPicker onChangeComplete={c => this.setConstantColor(c.hex)} color={data.points.color.colors[0].color} disableAlpha={true}/>;
@@ -318,7 +209,7 @@ export class PointDecoratorComponent extends Component {
       const brewer_selections = Object.keys(ColorBrewer).map((k) => {
         const scheme = ColorBrewer[k][5]
         return (
-          <div className="brewer-selection" key={k} onClick={() => this.setBrewerColors(scheme)}>
+          <div className='brewer-selection' key={k} onClick={() => this.setBrewerColors(scheme)}>
             {scheme.map((hex,i) => {
               return (
                 <div className='color-thumb' style={{backgroundColor:hex}} key={i}></div>
@@ -329,7 +220,7 @@ export class PointDecoratorComponent extends Component {
       });
 
       colorDropdownTrigger = (
-        <div className="selected-color">
+        <div className='selected-color'>
           {data.points.color.colors.map((c,i) => {
               return (
                 <div className='color-thumb' style={{backgroundColor:c.color}} key={i}></div>
@@ -341,7 +232,7 @@ export class PointDecoratorComponent extends Component {
 
       colorDropdownContent = (
         <div>
-          <div className="brewer-schemes">
+          <div className='brewer-schemes'>
             {brewer_selections}
           </div>
         </div>
@@ -349,9 +240,9 @@ export class PointDecoratorComponent extends Component {
     }
 
     return (
-      <div className="point-decorator">
+      <div className='point-decorator'>
 
-        <div className="decorator-row">
+        <div className='decorator-row'>
           <FormSelectItem
             labelText={'Color'}
             name={'color'}
@@ -362,12 +253,12 @@ export class PointDecoratorComponent extends Component {
             errors={errors}
             onChange={this.toggleColorType}
           />
-          { data.points.color.type !== "constant" &&
+          { data.points.color.type !== 'constant' &&
 
             <FormSelectItem
               labelText={'Based on'}
               name={'color-data-key'}
-              value={data.points.color.data_key || ""}
+              value={data.points.color.data_key || ''}
               inline={true}
               firstOptionText={'Select'}
               options={target_attrs}
@@ -376,16 +267,16 @@ export class PointDecoratorComponent extends Component {
             />
 
           }
-          <Dropdown className="color-dropdown" ref="color-dropdown">
-            <DropdownTrigger className="trigger">
+          <Dropdown className='color-dropdown' ref='color-dropdown'>
+            <DropdownTrigger className='trigger'>
               { colorDropdownTrigger }
             </DropdownTrigger>
-            <DropdownContent className="dropdown-contents">
+            <DropdownContent className='dropdown-contents'>
               { colorDropdownContent }
             </DropdownContent>
           </Dropdown>
         </div>
-        <div className="decorator-row">
+        <div className='decorator-row'>
           <FormSelectItem
             labelText={'Size'}
             name={'size'}
@@ -396,7 +287,7 @@ export class PointDecoratorComponent extends Component {
             errors={errors}
             onChange={this.toggleSizeType}
           />
-          { data.points.size.type === "constant" &&
+          { data.points.size.type === 'constant' &&
             <FormItem
               labelText={'Value'}
               name={'value'}
@@ -406,12 +297,12 @@ export class PointDecoratorComponent extends Component {
               onChange={e => this.setSize(e)}
             />
           }
-          { data.points.size.type !== "constant" &&
+          { data.points.size.type !== 'constant' &&
             <div>
               <FormSelectItem
                 labelText={'Based on'}
                 name={'side-data-key'}
-                value={data.points.size.data_key || ""}
+                value={data.points.size.data_key || ''}
                 inline={true}
                 firstOptionText={'Select'}
                 options={target_attrs}
@@ -437,7 +328,7 @@ export class PointDecoratorComponent extends Component {
             </div>
           }
         </div>
-        <div className="decorator-row">
+        <div className='decorator-row'>
           <FormItem
             labelText={'Sprite'}
             name={'sprite'}

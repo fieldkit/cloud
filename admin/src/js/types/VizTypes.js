@@ -32,27 +32,6 @@ export type PointDecorator = {
   type: "point";
 }
 
-export function emptyPointDecorator(): PointDecorator{
-  return {
-    points: {
-      color: {
-        type: "constant",
-        colors: [{location: 0, color: "#ff0000"}],
-        data_key: null,
-        bounds: null
-      },
-      size: {
-        type: "constant",
-        data_key: null,
-        bounds: [15,15]
-      },
-      sprite: "circle.png"
-    },
-    title: "",
-    type: "point"
-  }
-}
-
 export type Decorator = PointDecorator
 
 export type GroupingOperationType = "equal" | "within" | "peak"
@@ -77,18 +56,3 @@ export type Viz = {
   selection_operations: SelectionOperation[];
   decorator: Decorator
 }
-
-export function emptyViz(a: Attr): Viz{
-  return {
-    grouping_operation: {
-      operation: "equal",
-      parameter: null,
-      source_attribute: a
-    },
-    selection_operations: [],
-    decorator: emptyPointDecorator(),
-    source_collections: []
-  }
-}
-
-
