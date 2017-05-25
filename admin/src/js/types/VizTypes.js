@@ -26,6 +26,7 @@ export type PointDecorator = {
   points: {
     color: Color,
     size: Size,
+    location: string,
     sprite: string
   };
   title: string;
@@ -46,6 +47,7 @@ export function emptyPointDecorator(): PointDecorator{
         data_key: null,
         bounds: [15,15]
       },
+      location: "",
       sprite: "circle.png"
     },
     title: "",

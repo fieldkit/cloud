@@ -27,6 +27,7 @@ const _sizeType: Lens_<Size,InterpolationType> = prop("type")
 const _sizeDataKey: Lens_<Size,?string> = prop("data_key")
 const _sizeBounds: Lens_<Size,[number,number]> = prop("bounds")
 
+const _pointDecoratorPointsLocation: Lens_<PointDecorator,string> = compose(prop("points"),prop("location"))
 const _pointDecoratorPointsColor: Lens_<PointDecorator,Color> = compose(prop("points"),prop("color"))
 const _pointDecoratorPointsSize: Lens_<PointDecorator,Size> = compose(prop("points"),prop("size"))
 const _pointDecoratorPointsSprite: Lens_<PointDecorator,string> = compose(prop("points"),prop("sprite"))
@@ -139,7 +140,7 @@ export class VizComponent extends Component {
             {selections}
           </div>
           <button onClick={() => this.setState({modal_open: ! modal_open})}>Add Selection</button>
-          <ReactModal isOpen={modal_open}>
+          <ReactModal isOpen={modal_open} contentLabel="">
             <EditSelectionOperationComponent data={data} initial_state={new_selection} errors={errors} creator={this}/> 
           </ReactModal>
         </div>
@@ -162,6 +163,7 @@ export class PointDecoratorComponent extends Component {
   setLowerSize: (Object) => void
   setUpperSize: (Object) => void
   setSize: (Object) => void
+  setLocationKey: (Object) => void
   setSprite: (Object) => void
   updateSizeDataKey: (Object) => void
   updateColorDataKey: (Object) => void
@@ -173,6 +175,8 @@ export class PointDecoratorComponent extends Component {
     this.toggleColorType = this.toggleColorType.bind(this)
     this.toggleSizeType = this.toggleSizeType.bind(this)
     this.setSprite = this.setSprite.bind(this)
+    this.setSize = this.setSize.bind(this)
+    this.setLocationKey = this.setLocationKey.bind(this)
     this.updateSizeDataKey = this.updateSizeDataKey.bind(this)
     this.updateColorDataKey = this.updateColorDataKey.bind(this)
     this.save = this.save.bind(this)
@@ -185,6 +189,11 @@ export class PointDecoratorComponent extends Component {
     let data = this.props.viz.decorator;
     data = updatePointDecorator(lens,value,data)
     this.props.creator.update(_decorator,data)
+  }
+
+  setLocationKey(e:Object){
+    const value = String(e.target.value);
+    this.update(_pointDecoratorPointsLocation,value)
   }
 
   setSize(e:Object){
@@ -351,6 +360,18 @@ export class PointDecoratorComponent extends Component {
     return (
       <div className="point-decorator">
 
+        <div className="decorator-row">
+          <FormSelectItem
+            labelText={'Location'}
+            name={'location'}
+            value={data.points.location}
+            inline={false}
+            firstOptionText={'Select'}
+            options={target_attrs}
+            errors={errors}
+            onChange={this.setLocationKey}
+          />
+        </div>
         <div className="decorator-row">
           <FormSelectItem
             labelText={'Color'}
