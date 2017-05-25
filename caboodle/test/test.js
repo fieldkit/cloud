@@ -1,6 +1,6 @@
 import { expect, config } from 'chai';
 import { avgSelection, countSelection, simpleStringSelection, simpleNumSelection, makeSelection, equalGrouping, getGroupingFn, transform, Broker, wholeGroupSelection, simpleLocationSelection, generateSelectionsFromMap, streamToGeoJSON } from '../lib/caboodle' 
-import {Location} from '../lib/proto/flow'
+import {Location,Fieldkit} from '../lib/proto/flow'
 
 describe('Selection Functions', () => {  
   it('Average Groups Correctly', () => {
@@ -286,5 +286,15 @@ describe('GeoJSON', () => {
       ]
     }
     expect(geo_json).to.deep.equal(expectedResult);
+  });
+})
+
+describe('Gen', () => {
+  it('Describes all of a FieldKit correctly', () => {
+    const fk = new Fieldkit({timestamp: 1, cell_voltage: 2,weather_station: {temperature: 7,pressure: 9}})
+    const desc = fk.describeAll()
+    const expected_desc = {"timestamp": "number", "cell_voltage": "number", "weather_station": "WeatherStation", "weather_station.temperature": "number", "weather_station.pressure": "number"}
+    expect(desc).to.deep.equal(expected_desc)
+    console.log("DESC",desc)
   });
 })

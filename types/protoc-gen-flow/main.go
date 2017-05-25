@@ -35,6 +35,7 @@ export class {{.Name}} {
       {{if .Message }}new {{.Type}}(obj.{{.Name}}) : null{{else}}this.{{.Name}} = obj.{{.Name}} : {{.Default}}{{end}}
 {{- end}}
   }
+
   describe(): {[string]: string} {
     return {
       {{- range .Properties}}
@@ -42,6 +43,25 @@ export class {{.Name}} {
       {{- end}}
     }
   }
+
+  describeAll(ns: string = ""): {[string]: string} {
+    let fields = {}
+    let new_ns = ""
+    {{- range .Properties}}
+      if(this.{{.Name}}){
+        if(ns.length > 0){
+          fields[ns+".{{.Name}}"] = "{{.Type}}"
+        } else {
+          fields["{{.Name}}"] = "{{.Type}}"
+        }
+        {{if .Message }}
+          if(ns.length > 0){ new_ns = ns + ".{{.Name}}" } else { new_ns = "{{.Name}}" } 
+          Object.assign(fields,this.{{.Name}}.describeAll(new_ns))
+        {{end}}
+      }
+    {{- end}}
+    return fields
+  } 
 }
 {{end}}`
 )
