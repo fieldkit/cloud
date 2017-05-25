@@ -26,6 +26,7 @@ export type PointDecorator = {
   points: {
     color: Color,
     size: Size,
+    location: string,
     sprite: string
   };
   title: string;
@@ -46,6 +47,7 @@ export function emptyPointDecorator(): PointDecorator{
         data_key: null,
         bounds: [15,15]
       },
+      location: "",
       sprite: "circle.png"
     },
     title: "",
@@ -55,11 +57,13 @@ export function emptyPointDecorator(): PointDecorator{
 
 export type Decorator = PointDecorator
 
+export type Interpolation = ["geo",string]
 export type GroupingOperationType = "equal" | "within" | "peak"
 export type GroupingOperation = {
   operation: GroupingOperationType;
   parameter: ?number;
   source_attribute: Attr;
+  interpolations?: Interpolation[];
 }
 
 export type Op = "avg" | "simple_string" | "simple_num" | "simple_location" | "max" | "min" | "median" | "first" | "last" | "sum" | "count" | "whole_group"
