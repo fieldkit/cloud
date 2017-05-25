@@ -35,6 +35,13 @@ export class {{.Name}} {
       {{if .Message }}new {{.Type}}(obj.{{.Name}}) : null{{else}}this.{{.Name}} = obj.{{.Name}} : {{.Default}}{{end}}
 {{- end}}
   }
+  describe(): {[string]: string} {
+    return {
+      {{- range .Properties}}
+        "{{.Name}}": "{{.Type}}",
+      {{- end}}
+    }
+  }
 }
 {{end}}`
 )
