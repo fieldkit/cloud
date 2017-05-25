@@ -113,7 +113,7 @@ export default class VizComponent extends Component {
             Add Selection
           </button>
           <ReactModal contentLabel="New Selection" isOpen={modal_open}>
-            <Selection
+            <SelectionComponent
               data={data}
               initial_state={new_selection}
               errors={errors}
