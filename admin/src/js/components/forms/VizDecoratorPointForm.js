@@ -41,7 +41,7 @@ type PointDecoratorProps = {
    project_data: ProjectData;
 }
 
-export default class PointDecoratorComponent extends Component {
+export default class VizDecoratorPointForm extends Component {
   state: {
     errors: ?APIErrors
   }

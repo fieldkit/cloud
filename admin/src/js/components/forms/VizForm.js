@@ -4,9 +4,9 @@ import ReactModal from 'react-modal';
 import type { Lens_ } from 'safety-lens';
 import { set } from 'safety-lens'
 import { prop } from 'safety-lens/es2015'
-import PointDecoratorComponent from '../viz/PointDecoratorComponent';
-import GroupByComponent from '../viz/GroupByComponent';
-import SelectionComponent from '../viz/SelectionComponent';
+import VizDecoratorPointForm from './VizDecoratorPointForm';
+import VizGroupingForm from './VizGroupingForm';
+import VizSelectionForm from './VizSelectionForm';
 import type { ProjectData } from '../../types/CollectionTypes';
 import type { Viz, SelectionOperation } from '../../types/VizTypes';
 import type { APIErrors } from '../../api/types';
@@ -95,14 +95,14 @@ export default class VizComponent extends Component {
     let decorator_component;
     if (data.decorator.type === 'point') {
       decorator_component = (
-        <PointDecoratorComponent viz={data} creator={this} />
+        <VizDecoratorPointForm viz={data} creator={this} />
       );
     }
 
     return (
       <div>
         <div>
-          <GroupByComponent data={data} errors={errors} creator={this} />
+          <VizGroupingForm data={data} errors={errors} creator={this} />
         </div>
         <div>
           <span>Selections:</span>
@@ -113,7 +113,7 @@ export default class VizComponent extends Component {
             Add Selection
           </button>
           <ReactModal contentLabel="New Selection" isOpen={modal_open}>
-            <SelectionComponent
+            <VizSelectionForm
               data={data}
               initial_state={new_selection}
               errors={errors}
