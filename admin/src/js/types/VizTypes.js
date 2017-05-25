@@ -55,11 +55,13 @@ export function emptyPointDecorator(): PointDecorator{
 
 export type Decorator = PointDecorator
 
+export type Interpolation = ["geo",string]
 export type GroupingOperationType = "equal" | "within" | "peak"
 export type GroupingOperation = {
   operation: GroupingOperationType;
   parameter: ?number;
   source_attribute: Attr;
+  interpolations?: Interpolation[];
 }
 
 export type Op = "avg" | "simple_string" | "simple_num" | "simple_location" | "max" | "min" | "median" | "first" | "last" | "sum" | "count" | "whole_group"

@@ -1,7 +1,7 @@
 /* @flow */
 
 import {Location} from './proto/flow'
-import type {GroupingOperation, SelectionOperation, Viz} from '../../admin/src/js/types/VizTypes'
+import type {GroupingOperation, SelectionOperation, Viz, Interpolation} from '../../admin/src/js/types/VizTypes'
 import type {Attr} from '../../admin/src/js/types/CollectionTypes'
 import R from 'ramda'
 require('es6-promise').polyfill();
@@ -122,6 +122,7 @@ export const equalGrouping: GroupingFactory = (grouping) => {
     })
     let output = [] 
     Object.keys(dict).forEach(k => output.push(dict[k]))
+    output = runInterpolations(grouping,output)
     return output
   }
 }
@@ -129,14 +130,16 @@ export const equalGrouping: GroupingFactory = (grouping) => {
 // TODO
 export const withinGrouping: GroupingFactory = (grouping) => {
   return (streams) => {
-    return []
+    let output = []
+    return output
   }
 }
 
 // TODO
 export const peakGrouping: GroupingFactory = (grouping) => {
   return (streams) => {
-    return []
+    let output = []
+    return output
   }
 }
 
@@ -144,6 +147,23 @@ export const groupingFactories = {
   "equal": equalGrouping,
   "within": withinGrouping,
   "peak": peakGrouping
+}
+
+// TODO
+export function interpolate(stream: GroupStream, i: Interpolation): GroupStream {
+  if([0] === "geo"){
+    return stream
+  } else {
+    return stream
+  }
+}
+
+export function runInterpolations(g: GroupingOperation, stream: GroupStream): GroupStream{
+  if(g.interpolations && g.interpolations.length > 0){
+    return g.interpolations.reduce(interpolate,stream)     
+  } else {
+    return stream
+  }
 }
 
 /**
