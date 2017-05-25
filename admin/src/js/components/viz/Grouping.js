@@ -24,10 +24,6 @@ export default class Grouping extends Component {
     creator: Object,
   };
 
-  state: {
-    modal_open: boolean,
-  };
-
   updateGroupingOperation: Object => void;
   updateGroupingAttribute: Object => void;
   updateGroupingParameter: Object => void;

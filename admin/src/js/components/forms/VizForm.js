@@ -112,7 +112,7 @@ export default class VizComponent extends Component {
           <button onClick={() => this.setState({ modal_open: !modal_open })}>
             Add Selection
           </button>
-          <ReactModal isOpen={modal_open}>
+          <ReactModal contentLabel="New Selection" isOpen={modal_open}>
             <Selection
               data={data}
               initial_state={new_selection}
