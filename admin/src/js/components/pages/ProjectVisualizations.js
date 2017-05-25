@@ -39,6 +39,7 @@ function emptyPointDecorator(): PointDecorator{
         data_key: null,
         bounds: [15,15]
       },
+      location: '',      
       sprite: 'circle.png'
     },
     title: '',

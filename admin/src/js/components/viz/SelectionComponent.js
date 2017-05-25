@@ -12,7 +12,7 @@ export const _selectionOperationName: Lens_<SelectionOperation,string> = prop("v
 export const _selectionOperationSource: Lens_<SelectionOperation,Attr> = prop("source_attribute");
 export const _selectionOperationOp: Lens_<SelectionOperation,Op> = prop("operation");
 
-export default class Selection extends Component {
+export default class SelectionComponent extends Component {
   props: {
     data: Viz,
     errors: ?APIErrors,

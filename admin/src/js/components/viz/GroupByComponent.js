@@ -17,7 +17,7 @@ export const _groupingOperationOp: Lens_<GroupingOperation,GroupingOperationType
 export const _groupingOperationParam: Lens_<GroupingOperation,?number> = prop('parameter');
 export const _groupingOperationAttribute: Lens_<GroupingOperation,Attr> = prop('source_attribute');
 
-export default class Grouping extends Component {
+export default class GroupByComponent extends Component {
   props: {
     data: Viz,
     errors: ?APIErrors,
