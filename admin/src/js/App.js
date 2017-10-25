@@ -26,7 +26,7 @@ export class App extends Component {
   constructor(props) {
     super(props);
 
-    let API_HOST = 'https://api.fieldkit.org';
+    let API_HOST = 'http://api.fieldkit.org:8080';
     if (process.env.NODE_ENV === 'development') {
       API_HOST = 'http://localhost:8080';
     } else if (process.env.NODE_ENV === 'staging' || window.location.hostname.endsWith('fieldkit.team')) {

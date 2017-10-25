@@ -18,13 +18,14 @@ var cors = func() {
 var _ = API("fieldkit", func() {
 	Title("Fieldkit API")
 	Description("A one-click open platform for field researchers and explorers.")
-	Host("api.fieldkit.org")
+	Host("api.fieldkit.org:8080")
 	Scheme("https")
-	Origin("https://fieldkit.org", cors)
-	Origin("https://*.fieldkit.org", cors)
+	Origin("https://fieldkit.org:8080", cors)
+	Origin("https://*.fieldkit.org:8080", cors)
 	Origin("https://fieldkit.team", cors)
 	Origin("https://*.fieldkit.team", cors)
-	Origin("/(.+[.])?localhost:\\d+/", cors) // Dev
+	Origin("/(.+[.])?localhost:\\d+/", cors)    // Dev
+	Origin("/(.+[.])?fieldkit.org:\\d+/", cors) // Dev
 	Consumes("application/json")
 	Produces("application/json")
 })

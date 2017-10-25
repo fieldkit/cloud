@@ -28,3 +28,24 @@ INSERT INTO fieldkit.expedition (project_id, name, slug, description)
 		'demo-expedition',
 		'A demo expedition.'
 	);
+
+INSERT INTO fieldkit.project (name, slug, description)
+VALUES (
+'Www Project',
+'www',
+'A www project.'
+);
+
+INSERT INTO fieldkit.project_user (user_id, project_id)
+VALUES (
+(SELECT id FROM fieldkit.user WHERE username = 'demo-user'),
+(SELECT id FROM fieldkit.project WHERE slug = 'www')
+);
+
+INSERT INTO fieldkit.expedition (project_id, name, slug, description)
+VALUES (
+(SELECT id FROM fieldkit.project WHERE slug = 'www'),
+'Www Expedition',
+'www-expedition',
+'A www expedition.'
+);

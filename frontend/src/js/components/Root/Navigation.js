@@ -11,9 +11,7 @@ class Navigation extends React.Component {
       currentPage
     } = this.props
     
-    let apiDomain = document.location.host.match(/fieldkit\.org/) ?
-                        "https://api.fieldkit.org" :
-                        "https://api.fieldkit.team"
+    let apiDomain = "http://api.fieldkit.org:8080";
 
     return (
       <ul className="navigation">
