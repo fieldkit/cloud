@@ -59,4 +59,5 @@ else
 fi
 
 docker build -t ocrnyc/fieldkit:$DOCKER_TAG build
-docker push ocrnyc/fieldkit:$DOCKER_TAG
+
+# docker push ocrnyc/fieldkit:$DOCKER_TAG
