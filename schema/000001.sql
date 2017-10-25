@@ -82,7 +82,7 @@ CREATE TABLE fieldkit.input (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
 	name varchar(256) NOT NULL,
-	team_id int REFERENCES fieldkit.team (id),
+	team_id int REFERENCES fieldkit.team (id), 
 	user_id int REFERENCES fieldkit.user (id),
 	active boolean NOT NULL DEFAULT false
 );
@@ -116,9 +116,9 @@ CREATE TABLE fieldkit.input_twitter_account (
 -- schema
 
 CREATE TABLE fieldkit.schema (
-id serial PRIMARY KEY,
-project_id integer REFERENCES fieldkit.project (id),
-json_schema jsonb NOT NULL
+	id serial PRIMARY KEY,
+	project_id integer REFERENCES fieldkit.project (id),
+	json_schema jsonb NOT NULL
 );
 
 CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
@@ -128,14 +128,14 @@ CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
 CREATE TYPE fieldkit_binary_field AS ENUM ('varint', 'uvarint', 'float32', 'float64');
 
 CREATE TABLE fieldkit.fieldkit_binary (
-input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
-schema_id int REFERENCES fieldkit.schema (id) ON DELETE CASCADE NOT NULL,
-id smallint NOT NULL,
-fields fieldkit_binary_field[] NOT NULL,
-mapper jsonb NOT NULL,
-longitude varchar,
-latitude varchar,
-UNIQUE (input_id, id)
+	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+	schema_id int REFERENCES fieldkit.schema (id) ON DELETE CASCADE NOT NULL,
+	id smallint NOT NULL,
+	fields fieldkit_binary_field[] NOT NULL,
+	mapper jsonb NOT NULL,
+	longitude varchar,
+	latitude varchar,
+	UNIQUE (input_id, id)
 );
 
 CREATE TABLE fieldkit.input_fieldkit (
@@ -145,14 +145,14 @@ CREATE TABLE fieldkit.input_fieldkit (
 -- documents
 
 CREATE TABLE fieldkit.document (
-id bigserial PRIMARY KEY,
-input_id int REFERENCES fieldkit.input (id) NOT NULL,
-schema_id int REFERENCES fieldkit.schema (id) NOT NULL,
-team_id int REFERENCES fieldkit.team (id),
-user_id int REFERENCES fieldkit.user (id),
-timestamp timestamp NOT NULL,
-location geometry(POINT, 4326) NOT NULL,
-data jsonb NOT NULL
+	id bigserial PRIMARY KEY,
+	input_id int REFERENCES fieldkit.input (id) NOT NULL,
+	schema_id int REFERENCES fieldkit.schema (id) NOT NULL,
+	team_id int REFERENCES fieldkit.team (id), 
+	user_id int REFERENCES fieldkit.user (id),
+	timestamp timestamp NOT NULL,
+	location geometry(POINT, 4326) NOT NULL,
+	data jsonb NOT NULL
 );
 
 -- user
