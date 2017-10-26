@@ -2,8 +2,6 @@
 
 UID=`id -u $USER`
 
-echo $UID
-
 set -ex
 cd `dirname $0`
 
@@ -58,6 +56,6 @@ else
 	DOCKER_TAG=`git rev-parse --abbrev-ref HEAD`
 fi
 
-docker build -t ocrnyc/fieldkit:$DOCKER_TAG build
+docker build -t conservify/fk-cloud:$DOCKER_TAG build
 
-# docker push ocrnyc/fieldkit:$DOCKER_TAG
+docker push conservify/fk-cloud:$DOCKER_TAG
