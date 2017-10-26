@@ -1,25 +1,64 @@
-#+TITLE:	README for fk-cloud
-#+EMAIL:	jacob@conservify.org
-
-* fieldkit
-
-** Developer Instructions
-
-  sudo apt-get install docker.io docker-compose
-
-  ./build.sh
+#+TITLE:  README for fk-cloud 
+#+EMAIL:  jacob@conservify.org 
  
- 2) Add to /etc/hosts
-127.0.0.1       fieldkit.org
-127.0.0.1       api.fieldkit.org
-127.0.0.1       www.fieldkit.org
+* FieldKit 
+* Developer Instructions 
+*** Machine Setup
+    1. Necessary packages
+       sudo apt-get install docker.io docker-compose 
+       npm install -g yarn
+    2. Docker Setup
+       sudo gpasswd -a $USER docker
+       newgrp docker 
+       docker ps -a # testing
+    3. Add to /etc/hosts 
+       127.0.0.1       fieldkit.org 
+       127.0.0.1       api.fieldkit.org 
+       127.0.0.1       www.fieldkit.org 
+    4. Ensure you have the latest golang (>1.8)
 
-** Rebuilding API
-  # Rebuilding API
-  # Ensure you have the latest go. >1.8
+*** fieldkit.env 
+    FIELDKIT_ADMIN_ROOT=/admin
+    FIELDKIT_FRONTEND_ROOT=/frontend
+    FIELDKIT_LANDING_ROOT=/landing
+    FIELDKIT_DOMAIN=fieldkit.org:8080
 
-  go get -u github.com/goadesign/goa/..
-  
-  ge generate
-  # On error about missing API definition, I had to rename my vendor directory.
+*** Build
+    ./build.sh 
 
+*** Running
+    ./run-server.sh
+
+*** Rebuilding API
+    go get -u github.com/goadesign/goa/...
+
+    # You will need to have the source directory linked into your GOWORK path, like so:
+    cd ~/go/src
+    mkdir -p github.com/O-C-R
+    ln -sf ~/conservify/fk-cloud fieldkit
+
+    # From underneath that symlinked directory you can run:
+    go generate
+
+*** Common Problems
+**** On 'Missing API definition, make sure design is properly initialized' when running go generate
+     Rename vendor directory and rename back. Be sure and use Makefile if your branch has one.
+     https://github.com/goadesign/goa/issues/923
+
+**** On 'context related error' when running go generate
+     Check Golang version.
+
+**** On 'cannot find package "github.com/O-C-R/fieldkit/server/api/design"' when running go generate
+     cd ~/go/src
+     mkdir -p github.com/O-C-R
+     ln -sf ~/conservify/fk-cloud fieldkit
+
+**** Unable to find module fieldkit-api-client
+     Build the client module first. It'll get copied to node_modules as is.
+     
+     rm -rf node_modules && (cd ../api-client/js && yarn build) && yarn install
+
+**** On 'Go source file "/home/jlewallen/conservify/fieldkit/server/api/app/contexts.go" not in Go workspace, adjust GOPATH'
+     Run 'go generate' from under your GOPATH
+
+* EOF
