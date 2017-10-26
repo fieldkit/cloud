@@ -16,8 +16,8 @@ class NotificationPanel extends React.Component {
       currentDocuments
     } = this.props
 
-    let panels = currentDocuments
-                  .map(d => { 
+    let panels = Array.from(currentDocuments.values())
+                  .map((d, i) => { 
                       let title, body, icon, extra;
                       if(d.get("user")){
                         title = `@${d.get("user").get("screen_name")}` 
@@ -40,8 +40,9 @@ class NotificationPanel extends React.Component {
                         icon = `/${sensorIcon}`
                         extra = (<span></span>)
                       }
+
                       return (
-                          <div class="notification-panel_post">
+                          <div class="notification-panel_post" key={i}>
                             <div className="notification-panel_post_content">
                               <div className="notification-panel_post_content_icon">
                                 <img src={ icon } width="100%"/>
@@ -52,7 +53,7 @@ class NotificationPanel extends React.Component {
                             </div>
                           </div>
                       )
-                  })
+                   })
     
     return (
       <div className="notification-panel">

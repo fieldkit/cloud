@@ -74,6 +74,7 @@ class ExpeditionPanel extends React.Component {
                       </a>
                     )
                   })
+                  .values()
               }
             </ul>
             <div className="expedition-panel_content_body_separator"/>

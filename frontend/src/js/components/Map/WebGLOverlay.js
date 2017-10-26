@@ -74,7 +74,6 @@ export default class WebGLOverlay extends Component {
     }
 
     let geometry =  new Geometry();
-    console.log(1)
     readingPath.forEach((p) => {
         let [x,y,z,d] = p
         let v = new Vector3(x,y,15)
