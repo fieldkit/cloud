@@ -1,7 +1,7 @@
 package main
 
 func (sr *SchemaRepository) AddLegacySchemas() {
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-AT", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-AT", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -24,7 +24,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-WE", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-WE", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -44,7 +44,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-SO", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-SO", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -61,7 +61,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-LO", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-LO", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -76,7 +76,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-ST", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -115,7 +115,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-ST", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -155,7 +155,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("ROCKBLOCK-(\\d+)-1", &JsonMessageSchema{
+	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-1", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Latitude", Type: "float32"},
 			JsonSchemaField{Name: "Longitude", Type: "float32"},
@@ -168,7 +168,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 		},
 	})
 
-	sr.DefineSchema("PARTICLE-(\\d+)", &JsonMessageSchema{
+	sr.DefineSchema(ParticleProviderName+"-(\\d+)", &JsonMessageSchema{
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Battery Voltage", Type: "float32"},
 			JsonSchemaField{Name: "Battery Percentage", Type: "float32"},

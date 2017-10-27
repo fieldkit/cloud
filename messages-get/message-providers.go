@@ -14,6 +14,28 @@ import (
 	"unicode"
 )
 
+const (
+	FormUrlEncodedMimeType       = "x-www-form-urlencoded"
+	RockBlockProviderName        = "ROCKBLOCK"
+	RockBlockFormSerial          = "serial"
+	RockBlockFormData            = "data"
+	RockBlockFormDeviceType      = "device_type"
+	RockBlockFormDeviceTypeValue = "ROCKBLOCK"
+
+	TwilioProviderName = "TWILIO"
+	TwilioFormFrom     = "From"
+	TwilioFormData     = "Data"
+	TwilioFormSmsSid   = "SmsSid"
+
+	ParticleProviderName          = "PARTICLE"
+	ParticleFormCoreId            = "coreid"
+	ParticleFormData              = "data"
+	ParticleFormPublishedAt       = "published_at"
+	ParticleFormPublishedAtLayout = "2006-01-02T15:04:05Z"
+
+	LegacyStationNamePattern = "[A-Z][A-Z]"
+)
+
 type MessageId string
 
 type SchemaId string
@@ -45,18 +67,18 @@ type ParticleMessageProvider struct {
 }
 
 func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
-	coreId := strings.TrimSpace(i.Form.Get("coreid"))
-	trimmed := strings.TrimSpace(i.Form.Get("data"))
+	coreId := strings.TrimSpace(i.Form.Get(ParticleFormCoreId))
+	trimmed := strings.TrimSpace(i.Form.Get(ParticleFormData))
 	fields := strings.Split(trimmed, ",")
 
-	publishedAt, err := time.Parse("2006-01-02T15:04:05Z", strings.TrimSpace(i.Form.Get("published_at")))
+	publishedAt, err := time.Parse(ParticleFormPublishedAtLayout, strings.TrimSpace(i.Form.Get(ParticleFormPublishedAt)))
 	if err != nil {
 		return nil, err
 	}
 
 	nm = &NormalizedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
-		SchemaId:    MakeSchemaId("PARTICLE", coreId, ""),
+		SchemaId:    MakeSchemaId(ParticleProviderName, coreId, ""),
 		Time:        publishedAt,
 		ArrayValues: fields,
 	}
@@ -69,7 +91,7 @@ type TwilioMessageProvider struct {
 }
 
 func (i *TwilioMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
-	return normalizeCommaSeparated("TWILIO", i.Form.Get("From"), rmd, i.Form.Get("Body"))
+	return normalizeCommaSeparated(TwilioProviderName, i.Form.Get(TwilioFormFrom), rmd, i.Form.Get(TwilioFormData))
 }
 
 type RockBlockMessageProvider struct {
@@ -77,7 +99,7 @@ type RockBlockMessageProvider struct {
 }
 
 func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessageData, text string) (nm *NormalizedMessage, err error) {
-	stationNameRe := regexp.MustCompile("[A-Z][A-Z]")
+	stationNameRe := regexp.MustCompile(LegacyStationNamePattern)
 	trimmed := strings.TrimSpace(text)
 	fields := strings.Split(trimmed, ",")
 	if len(fields) < 2 {
@@ -141,12 +163,12 @@ func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, 
 
 // TODO: We should annotate incoming messages with information about their failure for logging/debugging.
 func (i *RockBlockMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
-	serial := i.Form.Get("serial")
+	serial := i.Form.Get(RockBlockFormSerial)
 	if len(serial) == 0 {
 		return
 	}
 
-	data := i.Form.Get("data")
+	data := i.Form.Get(RockBlockFormData)
 	if len(data) == 0 {
 		return
 	}
@@ -157,28 +179,28 @@ func (i *RockBlockMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *No
 	}
 
 	if unicode.IsPrint(rune(bytes[0])) {
-		return normalizeCommaSeparated("ROCKBLOCK", serial, rmd, string(bytes))
+		return normalizeCommaSeparated(RockBlockProviderName, serial, rmd, string(bytes))
 	}
 
-	return normalizeBinary("ROCKBLOCK", serial, rmd, bytes)
+	return normalizeBinary(RockBlockProviderName, serial, rmd, bytes)
 }
 
 func IdentifyMessageProvider(rmd *RawMessageData) (t MessageProvider, err error) {
-	if strings.Contains(rmd.Params.Headers.ContentType, "x-www-form-urlencoded") {
+	if strings.Contains(rmd.Params.Headers.ContentType, FormUrlEncodedMimeType) {
 		form, err := url.ParseQuery(rmd.RawBody)
 		if err != nil {
 			return nil, nil
 		}
 
-		if form.Get("device_type") == "ROCKBLOCK" {
+		if form.Get(RockBlockFormDeviceType) == RockBlockFormDeviceTypeValue {
 			t = &RockBlockMessageProvider{
 				MessageProviderBase: MessageProviderBase{Form: form},
 			}
-		} else if form.Get("coreid") != "" {
+		} else if form.Get(ParticleFormCoreId) != "" {
 			t = &ParticleMessageProvider{
 				MessageProviderBase: MessageProviderBase{Form: form},
 			}
-		} else if form.Get("SmsSid") != "" {
+		} else if form.Get(TwilioFormSmsSid) != "" {
 			t = &TwilioMessageProvider{
 				MessageProviderBase: MessageProviderBase{Form: form},
 			}
