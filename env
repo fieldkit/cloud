@@ -1,4 +1,4 @@
 export DATABASE_USER=fieldkit
 export DATABASE_PASSWORD=password
 export DATABASE_NAME=fieldkit
-export DATABASE_HOSTNAME=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test_postgres_1`
+export DATABASE_HOSTNAME=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ingestion_postgres_1`
