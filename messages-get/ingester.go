@@ -72,6 +72,7 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 			}
 		} else {
 			if true {
+				fmt.Printf("%s\n", raw.Data)
 				log.Printf("(%s)(%s)[Success]", nm.MessageId, nm.SchemaId)
 			}
 		}

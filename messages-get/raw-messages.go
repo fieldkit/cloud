@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	_ "fmt"
 	_ "github.com/lib/pq"
 	"os"
 )
