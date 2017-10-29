@@ -15,7 +15,8 @@ type JsonSchemaField struct {
 
 type JsonMessageSchema struct {
 	MessageSchema
-	Fields []JsonSchemaField
+	HasLocation bool
+	Fields      []JsonSchemaField
 }
 
 type TwitterMessageSchema struct {

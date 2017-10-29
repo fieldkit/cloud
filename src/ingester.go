@@ -4,17 +4,63 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 )
 
-func (i *MessageIngester) ApplySchema(nm *NormalizedMessage, ms *JsonMessageSchema) (err error) {
-	if len(nm.ArrayValues) != len(ms.Fields) {
-		return fmt.Errorf("%s: fields S=%v != M=%v", nm.SchemaId, len(ms.Fields), len(nm.ArrayValues))
-	}
-
-	return nil
+type FinalMessage struct {
+	Schema   *JsonMessageSchema
+	Location *Location
+	Fields   map[string]interface{}
 }
 
-func (i *MessageIngester) ApplySchemas(nm *NormalizedMessage, schemas []interface{}) (err error) {
+func parseLocation(m map[string]interface{}) (l *Location, err error) {
+	coordinates := make([]float32, 0)
+	for _, key := range []string{"latitude", "longitude", "altitude"} {
+		f, err := strconv.ParseFloat(m[key].(string), 32)
+		if err != nil {
+			return nil, err
+		}
+		coordinates = append(coordinates, float32(f))
+	}
+	return &Location{Coordinates: coordinates}, nil
+}
+
+func (i *MessageIngester) ApplySchema(nm *NormalizedMessage, ms *JsonMessageSchema) (fm *FinalMessage, err error) {
+	if len(nm.ArrayValues) != len(ms.Fields) {
+		return nil, fmt.Errorf("%s: fields S=%v != M=%v", nm.SchemaId, len(ms.Fields), len(nm.ArrayValues))
+	}
+
+	mapped := make(map[string]interface{})
+
+	for i, field := range ms.Fields {
+		mapped[ToSnake(field.Name)] = nm.ArrayValues[i]
+	}
+
+	stream, err := i.Streams.LookupMessageStream(nm.SchemaId)
+	if err != nil {
+		return nil, err
+	}
+
+	if ms.HasLocation {
+		l, err := parseLocation(mapped)
+		if err != nil {
+			return nil, fmt.Errorf("%s: unable to parse location.", nm.SchemaId)
+		}
+		stream.SetLocation(l)
+	}
+
+	stream.Update()
+
+	fm = &FinalMessage{
+		Schema:   ms,
+		Location: nil,
+		Fields:   mapped,
+	}
+
+	return
+}
+
+func (i *MessageIngester) ApplySchemas(nm *NormalizedMessage, schemas []interface{}) (fm *FinalMessage, err error) {
 	errors := make([]error, 0)
 
 	if len(schemas) == 0 {
@@ -24,17 +70,17 @@ func (i *MessageIngester) ApplySchemas(nm *NormalizedMessage, schemas []interfac
 	for _, schema := range schemas {
 		jsonSchema, ok := schema.(*JsonMessageSchema)
 		if ok {
-			applyErr := i.ApplySchema(nm, jsonSchema)
+			fm, applyErr := i.ApplySchema(nm, jsonSchema)
 			if applyErr != nil {
 				errors = append(errors, applyErr)
 			} else {
-				return
+				return fm, nil
 			}
 		} else {
 			log.Printf("Unexpected MessageSchema type: %v", schema)
 		}
 	}
-	return fmt.Errorf("Schemas failed: %v", errors)
+	return nil, fmt.Errorf("Schemas failed: %v", errors)
 }
 
 func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
@@ -63,7 +109,7 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 		if err != nil {
 			return err
 		}
-		err = i.ApplySchemas(nm, schemas)
+		fm, err := i.ApplySchemas(nm, schemas)
 		if err != nil {
 			if true {
 				log.Printf("(%s)(%s)[Error]: %v %s", nm.MessageId, nm.SchemaId, err, nm.ArrayValues)
@@ -72,10 +118,10 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 			}
 		} else {
 			if true {
-				fmt.Printf("%s\n", raw.Data)
 				log.Printf("(%s)(%s)[Success]", nm.MessageId, nm.SchemaId)
 			}
 		}
+		_ = fm
 	}
 
 	return nil
@@ -84,6 +130,7 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 type MessageIngester struct {
 	Handler
 	Schemas *SchemaRepository
+	Streams *MessageStreamRepository
 }
 
 func NewMessageIngester() *MessageIngester {
@@ -91,5 +138,6 @@ func NewMessageIngester() *MessageIngester {
 		Schemas: &SchemaRepository{
 			Map: make(map[SchemaId][]interface{}),
 		},
+		Streams: NewMessageStreamRepository(),
 	}
 }
