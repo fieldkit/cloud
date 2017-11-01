@@ -16,3 +16,8 @@ run: all env
 
 server:
 	docker-compose down && docker-compose up --build
+
+deps:
+	go get github.com/golang/protobuf/proto
+	go get github.com/lib/pq
+	go get github.com/aws/aws-sdk-go/aws
