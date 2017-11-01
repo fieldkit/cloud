@@ -11,6 +11,7 @@ type Location struct {
 }
 
 type MessageStream struct {
+	Id             SchemaId
 	LocationByTime map[int64]*Location
 }
 
@@ -33,6 +34,7 @@ func NewMessageStreamRepository() *MessageStreamRepository {
 func (msr *MessageStreamRepository) LookupMessageStream(id SchemaId) (ms *MessageStream, err error) {
 	if msr.Streams[id] == nil {
 		msr.Streams[id] = &MessageStream{
+			Id:             id,
 			LocationByTime: make(map[int64]*Location),
 		}
 		log.Printf("Created new MessageStream: %s", id)

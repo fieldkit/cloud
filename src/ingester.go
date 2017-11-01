@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type FinalMessage struct {
+type IngestedMessage struct {
 	Schema   *JsonMessageSchema
 	Time     *time.Time
 	Location *Location
@@ -54,7 +54,7 @@ func parseTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interfa
 	return
 }
 
-func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchema) (fm *FinalMessage, err error) {
+func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchema) (im *IngestedMessage, err error) {
 	if len(pm.ArrayValues) != len(ms.Fields) {
 		return nil, fmt.Errorf("%s: fields S=%v != M=%v", pm.SchemaId, len(ms.Fields), len(pm.ArrayValues))
 	}
@@ -83,7 +83,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		stream.SetLocation(time, location)
 	}
 
-	fm = &FinalMessage{
+	im = &IngestedMessage{
 		Schema:   ms,
 		Time:     time,
 		Location: nil,
@@ -93,7 +93,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 	return
 }
 
-func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface{}) (fm *FinalMessage, err error) {
+func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface{}) (im *IngestedMessage, err error) {
 	errors := make([]error, 0)
 
 	if len(schemas) == 0 {
@@ -103,11 +103,11 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 	for _, schema := range schemas {
 		jsonSchema, ok := schema.(*JsonMessageSchema)
 		if ok {
-			fm, applyErr := i.ApplySchema(pm, jsonSchema)
+			im, applyErr := i.ApplySchema(pm, jsonSchema)
 			if applyErr != nil {
 				errors = append(errors, applyErr)
 			} else {
-				return fm, nil
+				return im, nil
 			}
 		} else {
 			log.Printf("Unexpected MessageSchema type: %v", schema)
@@ -136,6 +136,9 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 	}
 
 	pm, err := mp.ProcessMessage(&rmd)
+	if err != nil {
+		log.Printf("(%s)[Error]: %v", rmd.Context.RequestId, err)
+	}
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
 		if err != nil {

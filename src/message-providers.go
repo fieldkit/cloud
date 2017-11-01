@@ -33,7 +33,8 @@ const (
 	ParticleFormPublishedAt       = "published_at"
 	ParticleFormPublishedAtLayout = "2006-01-02T15:04:05Z"
 
-	LegacyStationNamePattern = "[A-Z][A-Z]"
+	LegacyStationNamePattern = "[A-Z][A-Z0-9]"
+	LegacyMessageTypePattern = "(ST|WE|LO|AT|SO)"
 )
 
 type MessageId string
@@ -98,21 +99,38 @@ type RockBlockMessageProvider struct {
 	MessageProviderBase
 }
 
+// This will go away eventually.
+var LegacyMessageTypeRe = regexp.MustCompile(LegacyMessageTypePattern)
+var LegacyStationNameRe = regexp.MustCompile(LegacyStationNamePattern)
+
 func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessageData, text string) (pm *ProcessedMessage, err error) {
-	stationNameRe := regexp.MustCompile(LegacyStationNamePattern)
+	if len(text) == 0 {
+		return nil, fmt.Errorf("%s(Empty message)", provider)
+	}
+
 	trimmed := strings.TrimSpace(text)
 	fields := strings.Split(trimmed, ",")
 	if len(fields) < 2 {
-		return nil, fmt.Errorf("Not enough fields in comma separated message.")
+		return nil, fmt.Errorf("%s(Not enough fields: '%s')", provider, text)
 	}
-	maybeStationName := fields[2]
-	if !stationNameRe.MatchString(maybeStationName) {
-		return nil, fmt.Errorf("Invalid name: %s", maybeStationName)
+
+	maybeTime := fields[0]
+	maybeStationName := fields[1]
+	maybeMessageType := fields[2]
+
+	if _, timeGood := strconv.ParseInt(maybeTime, 10, 32); timeGood != nil {
+		return nil, fmt.Errorf("%s(Invalid legacy CSV time: '%s' from '%s')", provider, maybeTime, text)
+	}
+	if !LegacyMessageTypeRe.MatchString(maybeMessageType) {
+		return nil, fmt.Errorf("%s(Invalid legacy CSV type: '%s' from '%s')", provider, maybeMessageType, text)
+	}
+	if !LegacyStationNameRe.MatchString(maybeStationName) || !LegacyMessageTypeRe.MatchString(maybeMessageType) {
+		return nil, fmt.Errorf("%s(Invalid legacy CSV name: '%s' from '%s')", provider, maybeStationName, text)
 	}
 
 	pm = &ProcessedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
-		SchemaId:    MakeSchemaId(provider, schemaPrefix, maybeStationName),
+		SchemaId:    MakeSchemaId(provider, schemaPrefix, maybeMessageType),
 		ArrayValues: fields,
 	}
 
