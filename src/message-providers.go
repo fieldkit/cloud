@@ -47,7 +47,7 @@ func MakeSchemaId(provider string, device string, stream string) SchemaId {
 	return SchemaId(fmt.Sprintf("%s-%s", provider, device))
 }
 
-type NormalizedMessage struct {
+type ProcessedMessage struct {
 	MessageId   MessageId
 	SchemaId    SchemaId
 	Time        *time.Time
@@ -55,7 +55,7 @@ type NormalizedMessage struct {
 }
 
 type MessageProvider interface {
-	NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error)
+	NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error)
 }
 
 type MessageProviderBase struct {
@@ -66,7 +66,7 @@ type ParticleMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
+func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	coreId := strings.TrimSpace(i.Form.Get(ParticleFormCoreId))
 	trimmed := strings.TrimSpace(i.Form.Get(ParticleFormData))
 	fields := strings.Split(trimmed, ",")
@@ -76,7 +76,7 @@ func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *Nor
 		return nil, err
 	}
 
-	nm = &NormalizedMessage{
+	pm = &ProcessedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
 		SchemaId:    MakeSchemaId(ParticleProviderName, coreId, ""),
 		Time:        &publishedAt,
@@ -90,7 +90,7 @@ type TwilioMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *TwilioMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
+func (i *TwilioMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	return normalizeCommaSeparated(TwilioProviderName, i.Form.Get(TwilioFormFrom), rmd, i.Form.Get(TwilioFormData))
 }
 
@@ -98,7 +98,7 @@ type RockBlockMessageProvider struct {
 	MessageProviderBase
 }
 
-func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessageData, text string) (nm *NormalizedMessage, err error) {
+func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessageData, text string) (pm *ProcessedMessage, err error) {
 	stationNameRe := regexp.MustCompile(LegacyStationNamePattern)
 	trimmed := strings.TrimSpace(text)
 	fields := strings.Split(trimmed, ",")
@@ -110,7 +110,7 @@ func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessa
 		return nil, fmt.Errorf("Invalid name: %s", maybeStationName)
 	}
 
-	nm = &NormalizedMessage{
+	pm = &ProcessedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
 		SchemaId:    MakeSchemaId(provider, schemaPrefix, maybeStationName),
 		ArrayValues: fields,
@@ -119,7 +119,7 @@ func normalizeCommaSeparated(provider string, schemaPrefix string, rmd *RawMessa
 	return
 }
 
-func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, bytes []byte) (nm *NormalizedMessage, err error) {
+func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, bytes []byte) (pm *ProcessedMessage, err error) {
 	// This is a protobuf message or some other kind of similar low level binary.
 	buffer := proto.NewBuffer(bytes)
 
@@ -153,7 +153,7 @@ func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, 
 
 	time := time.Unix(int64(unix), 0)
 
-	nm = &NormalizedMessage{
+	pm = &ProcessedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
 		SchemaId:    MakeSchemaId(provider, schemaPrefix, strconv.Itoa(int(id))),
 		Time:        &time,
@@ -164,7 +164,7 @@ func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, 
 }
 
 // TODO: We should annotate incoming messages with information about their failure for logging/debugging.
-func (i *RockBlockMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *NormalizedMessage, err error) {
+func (i *RockBlockMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	serial := i.Form.Get(RockBlockFormSerial)
 	if len(serial) == 0 {
 		return
