@@ -6,7 +6,6 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -76,13 +75,15 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 	return nil, fmt.Errorf("Unexpected ContentType: %s", rmd.Params.Headers.ContentType)
 }
 
-func ProcessRawMessages(h Handler) error {
-	databaseHostname := os.Getenv("DATABASE_HOSTNAME")
-	databaseUser := os.Getenv("DATABASE_USER")
-	databasePassword := os.Getenv("DATABASE_PASSWORD")
-	databaseName := os.Getenv("DATABASE_NAME")
+type MessageDatabaseOptions struct {
+	Hostname string
+	User     string
+	Password string
+	Database string
+}
 
-	connectionString := "postgres://" + databaseUser + ":" + databasePassword + "@" + databaseHostname + "/" + databaseName + "?sslmode=disable"
+func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
+	connectionString := "postgres://" + o.User + ":" + o.Password + "@" + o.Hostname + "/" + o.Database + "?sslmode=disable"
 
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
