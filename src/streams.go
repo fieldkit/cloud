@@ -11,14 +11,13 @@ type Location struct {
 }
 
 type MessageStream struct {
-	Location *Location
+	LocationByTime map[int64]*Location
 }
 
-func (ms *MessageStream) SetLocation(l *Location) {
-	ms.Location = l
-}
-
-func (ms *MessageStream) Update() {
+// There is a chance that we've "moved" previous messages that have come in over
+// this stream. So this should eventually trigger a replaying of them.
+func (ms *MessageStream) SetLocation(t *time.Time, l *Location) {
+	ms.LocationByTime[t.Unix()] = l
 }
 
 type MessageStreamRepository struct {
@@ -33,7 +32,9 @@ func NewMessageStreamRepository() *MessageStreamRepository {
 
 func (msr *MessageStreamRepository) LookupMessageStream(id SchemaId) (ms *MessageStream, err error) {
 	if msr.Streams[id] == nil {
-		msr.Streams[id] = &MessageStream{}
+		msr.Streams[id] = &MessageStream{
+			LocationByTime: make(map[int64]*Location),
+		}
 		log.Printf("Created new MessageStream: %s", id)
 	}
 	ms = msr.Streams[id]

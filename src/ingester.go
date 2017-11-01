@@ -5,17 +5,26 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 )
 
 type FinalMessage struct {
 	Schema   *JsonMessageSchema
+	Time     *time.Time
 	Location *Location
 	Fields   map[string]interface{}
 }
 
-func parseLocation(m map[string]interface{}) (l *Location, err error) {
+const (
+	FieldNameLatitude  = "latitude"
+	FieldNameLongitude = "longitude"
+	FieldNameAltitude  = "altitude"
+	FieldNameTime      = "time"
+)
+
+func parseLocation(nm *NormalizedMessage, ms *JsonMessageSchema, m map[string]interface{}) (l *Location, err error) {
 	coordinates := make([]float32, 0)
-	for _, key := range []string{"latitude", "longitude", "altitude"} {
+	for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
 		f, err := strconv.ParseFloat(m[key].(string), 32)
 		if err != nil {
 			return nil, err
@@ -23,6 +32,26 @@ func parseLocation(m map[string]interface{}) (l *Location, err error) {
 		coordinates = append(coordinates, float32(f))
 	}
 	return &Location{Coordinates: coordinates}, nil
+}
+
+func parseTime(nm *NormalizedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
+	if ms.UseProviderTime {
+		t = nm.Time
+	} else {
+		if !ms.HasTime {
+			return nil, fmt.Errorf("%s: no time information.", nm.SchemaId)
+		}
+
+		raw := m[FieldNameTime].(string)
+		unix, err := strconv.ParseInt(raw, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		parsed := time.Unix(unix, 0)
+		t = &parsed
+	}
+
+	return
 }
 
 func (i *MessageIngester) ApplySchema(nm *NormalizedMessage, ms *JsonMessageSchema) (fm *FinalMessage, err error) {
@@ -41,18 +70,22 @@ func (i *MessageIngester) ApplySchema(nm *NormalizedMessage, ms *JsonMessageSche
 		return nil, err
 	}
 
+	time, err := parseTime(nm, ms, mapped)
+	if err != nil {
+		return nil, err
+	}
+
 	if ms.HasLocation {
-		l, err := parseLocation(mapped)
+		location, err := parseLocation(nm, ms, mapped)
 		if err != nil {
 			return nil, fmt.Errorf("%s: unable to parse location.", nm.SchemaId)
 		}
-		stream.SetLocation(l)
+		stream.SetLocation(time, location)
 	}
-
-	stream.Update()
 
 	fm = &FinalMessage{
 		Schema:   ms,
+		Time:     time,
 		Location: nil,
 		Fields:   mapped,
 	}

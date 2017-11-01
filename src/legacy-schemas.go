@@ -2,6 +2,7 @@ package main
 
 func (sr *SchemaRepository) AddLegacySchemas() {
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-AT", &JsonMessageSchema{
+		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -25,6 +26,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-WE", &JsonMessageSchema{
+		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -45,6 +47,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-SO", &JsonMessageSchema{
+		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -62,6 +65,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-LO", &JsonMessageSchema{
+		HasTime:     true,
 		HasLocation: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -78,6 +82,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
+		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -117,6 +122,7 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
+		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
 			JsonSchemaField{Name: "Station", Type: "string"},
@@ -157,7 +163,8 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-1", &JsonMessageSchema{
-		HasLocation: true,
+		UseProviderTime: true,
+		HasLocation:     true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Latitude", Type: "float32"},
 			JsonSchemaField{Name: "Longitude", Type: "float32"},
@@ -171,7 +178,8 @@ func (sr *SchemaRepository) AddLegacySchemas() {
 	})
 
 	sr.DefineSchema(ParticleProviderName+"-(\\d+)", &JsonMessageSchema{
-		HasLocation: true,
+		UseProviderTime: true,
+		HasLocation:     true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Battery Voltage", Type: "float32"},
 			JsonSchemaField{Name: "Battery Percentage", Type: "float32"},

@@ -50,7 +50,7 @@ func MakeSchemaId(provider string, device string, stream string) SchemaId {
 type NormalizedMessage struct {
 	MessageId   MessageId
 	SchemaId    SchemaId
-	Time        time.Time
+	Time        *time.Time
 	ArrayValues []string
 }
 
@@ -79,7 +79,7 @@ func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (nm *Nor
 	nm = &NormalizedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
 		SchemaId:    MakeSchemaId(ParticleProviderName, coreId, ""),
-		Time:        publishedAt,
+		Time:        &publishedAt,
 		ArrayValues: fields,
 	}
 
@@ -151,10 +151,12 @@ func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, 
 		values = append(values, fmt.Sprintf("%f", value))
 	}
 
+	time := time.Unix(int64(unix), 0)
+
 	nm = &NormalizedMessage{
 		MessageId:   MessageId(rmd.Context.RequestId),
 		SchemaId:    MakeSchemaId(provider, schemaPrefix, strconv.Itoa(int(id))),
-		Time:        time.Unix(int64(unix), 0),
+		Time:        &time,
 		ArrayValues: values,
 	}
 
