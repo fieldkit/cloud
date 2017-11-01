@@ -117,6 +117,8 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 }
 
 func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
+	i.Statistics.Processed += 1
+
 	rmd := RawMessageData{}
 	err := json.Unmarshal([]byte(raw.Data), &rmd)
 	if err != nil {
@@ -133,26 +135,24 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 		return nil
 	}
 
-	nm, err := mp.NormalizeMessage(&rmd)
-	if err != nil {
-		// log.Printf("%s(Error): %v", rmd.Context.RequestId, err)
-	}
-	if nm != nil {
-		schemas, err := i.Schemas.LookupSchema(nm.SchemaId)
+	pm, err := mp.ProcessMessage(&rmd)
+	if pm != nil {
+		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
 		if err != nil {
 			return err
 		}
-		fm, err := i.ApplySchemas(nm, schemas)
+		fm, err := i.ApplySchemas(pm, schemas)
 		if err != nil {
 			if true {
-				log.Printf("(%s)(%s)[Error]: %v %s", nm.MessageId, nm.SchemaId, err, nm.ArrayValues)
+				log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
 			} else {
-				log.Printf("(%s)(%s)[Error]: %v", nm.MessageId, nm.SchemaId, err)
+				log.Printf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
 			}
 		} else {
 			if true {
-				log.Printf("(%s)(%s)[Success]", nm.MessageId, nm.SchemaId)
+				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
+			i.Statistics.Successes += 1
 		}
 		_ = fm
 	}
@@ -160,10 +160,16 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 	return nil
 }
 
+type IngestionStatistics struct {
+	Processed uint64
+	Successes uint64
+}
+
 type MessageIngester struct {
 	Handler
-	Schemas *SchemaRepository
-	Streams *MessageStreamRepository
+	Schemas    *SchemaRepository
+	Streams    *MessageStreamRepository
+	Statistics IngestionStatistics
 }
 
 func NewMessageIngester() *MessageIngester {

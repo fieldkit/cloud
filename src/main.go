@@ -12,4 +12,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
+
+	log.Printf("Done: %+v {Failures:%d}", ingester.Statistics, ingester.Statistics.Processed-ingester.Statistics.Successes)
 }

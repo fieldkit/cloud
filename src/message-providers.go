@@ -55,7 +55,7 @@ type ProcessedMessage struct {
 }
 
 type MessageProvider interface {
-	NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error)
+	ProcessMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error)
 }
 
 type MessageProviderBase struct {
@@ -66,7 +66,7 @@ type ParticleMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *ParticleMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
+func (i *ParticleMessageProvider) ProcessMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	coreId := strings.TrimSpace(i.Form.Get(ParticleFormCoreId))
 	trimmed := strings.TrimSpace(i.Form.Get(ParticleFormData))
 	fields := strings.Split(trimmed, ",")
@@ -90,7 +90,7 @@ type TwilioMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *TwilioMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
+func (i *TwilioMessageProvider) ProcessMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	return normalizeCommaSeparated(TwilioProviderName, i.Form.Get(TwilioFormFrom), rmd, i.Form.Get(TwilioFormData))
 }
 
@@ -164,7 +164,7 @@ func normalizeBinary(provider string, schemaPrefix string, rmd *RawMessageData, 
 }
 
 // TODO: We should annotate incoming messages with information about their failure for logging/debugging.
-func (i *RockBlockMessageProvider) NormalizeMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
+func (i *RockBlockMessageProvider) ProcessMessage(rmd *RawMessageData) (pm *ProcessedMessage, err error) {
 	serial := i.Form.Get(RockBlockFormSerial)
 	if len(serial) == 0 {
 		return
