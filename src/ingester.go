@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -119,25 +118,19 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 	i.Statistics.Processed += 1
 
-	rmd := RawMessageData{}
-	err := json.Unmarshal([]byte(raw.Data), &rmd)
-	if err != nil {
-		return err
-	}
-
-	mp, err := IdentifyMessageProvider(&rmd)
+	mp, err := IdentifyMessageProvider(raw)
 	if err != nil {
 		return err
 	}
 	if mp == nil {
 		log.Printf("(%s)[Error]: No message provider: (UserAgent: %v) (ContentType: %s) Body: %s",
-			rmd.Context.RequestId, rmd.Params.Headers.UserAgent, rmd.Params.Headers.ContentType, raw.Data)
+			raw.Data.Context.RequestId, raw.Data.Params.Headers.UserAgent, raw.Data.Params.Headers.ContentType, raw.Data)
 		return nil
 	}
 
-	pm, err := mp.ProcessMessage(&rmd)
+	pm, err := mp.ProcessMessage(raw)
 	if err != nil {
-		log.Printf("(%s)[Error]: %v", rmd.Context.RequestId, err)
+		log.Printf("(%s)[Error]: %v", raw.Data.Context.RequestId, err)
 	}
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)

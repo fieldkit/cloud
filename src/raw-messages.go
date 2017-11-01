@@ -2,24 +2,17 @@ package main
 
 import (
 	"database/sql"
-	_ "fmt"
+	"encoding/json"
+	"fmt"
 	_ "github.com/lib/pq"
+	"net/url"
 	"os"
+	"strings"
 )
 
-type RawMessage struct {
+type RawMessageRow struct {
 	SqsId string
 	Data  string
-}
-
-type HandlerFunc func(raw *RawMessage) error
-
-func (f HandlerFunc) HandleMessage(raw *RawMessage) error {
-	return f(raw)
-}
-
-type Handler interface {
-	HandleMessage(raw *RawMessage) error
 }
 
 type RawMessageHeaders struct {
@@ -40,6 +33,47 @@ type RawMessageData struct {
 	RawBody string            `json:"body-raw"`
 	Params  RawMessageParams  `json:"params"`
 	Context RawMessageContext `json:"context"`
+}
+
+type RawMessage struct {
+	Row  *RawMessageRow
+	Data *RawMessageData
+	Form *url.Values
+}
+
+type HandlerFunc func(raw *RawMessage) error
+
+func (f HandlerFunc) HandleMessage(raw *RawMessage) error {
+	return f(raw)
+}
+
+type Handler interface {
+	HandleMessage(raw *RawMessage) error
+}
+
+func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
+	rmd := RawMessageData{}
+	err = json.Unmarshal([]byte(row.Data), &rmd)
+	if err != nil {
+		return nil, err
+	}
+
+	if strings.Contains(rmd.Params.Headers.ContentType, FormUrlEncodedMimeType) {
+		form, err := url.ParseQuery(rmd.RawBody)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to parse message content.")
+		}
+
+		raw = &RawMessage{
+			Row:  row,
+			Data: &rmd,
+			Form: &form,
+		}
+
+		return raw, nil
+	}
+
+	return nil, fmt.Errorf("Unexpected ContentType: %s", rmd.Params.Headers.ContentType)
 }
 
 func ProcessRawMessages(h Handler) error {
@@ -64,8 +98,14 @@ func ProcessRawMessages(h Handler) error {
 
 	defer rows.Close()
 	for rows.Next() {
-		raw := &RawMessage{}
-		rows.Scan(&raw.SqsId, &raw.Data)
+		row := &RawMessageRow{}
+		rows.Scan(&row.SqsId, &row.Data)
+
+		raw, err := CreateRawMessageFromRow(row)
+		if err != nil {
+			return err
+		}
+
 		err = h.HandleMessage(raw)
 		if err != nil {
 			return err
