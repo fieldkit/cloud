@@ -10,38 +10,38 @@ type Location struct {
 	Coordinates []float32
 }
 
-type MessageStream struct {
+type Stream struct {
 	Id             SchemaId
 	LocationByTime map[int64]*Location
 }
 
 // There is a chance that we've "moved" previous messages that have come in over
 // this stream. So this should eventually trigger a replaying of them.
-func (ms *MessageStream) SetLocation(t *time.Time, l *Location) {
+func (ms *Stream) SetLocation(t *time.Time, l *Location) {
 	ms.LocationByTime[t.Unix()] = l
 }
 
-type MessageStreamsRepository interface {
-	LookupMessageStream(id SchemaId) (ms *MessageStream, err error)
+type StreamsRepository interface {
+	LookupStream(id SchemaId) (ms *Stream, err error)
 }
 
-type InMemoryMessageStreams struct {
-	Streams map[SchemaId]*MessageStream
+type InMemoryStreams struct {
+	Streams map[SchemaId]*Stream
 }
 
-func NewInMemoryMessageStreams() MessageStreamsRepository {
-	return &InMemoryMessageStreams{
-		Streams: make(map[SchemaId]*MessageStream),
+func NewInMemoryStreams() StreamsRepository {
+	return &InMemoryStreams{
+		Streams: make(map[SchemaId]*Stream),
 	}
 }
 
-func (msr *InMemoryMessageStreams) LookupMessageStream(id SchemaId) (ms *MessageStream, err error) {
+func (msr *InMemoryStreams) LookupStream(id SchemaId) (ms *Stream, err error) {
 	if msr.Streams[id] == nil {
-		msr.Streams[id] = &MessageStream{
+		msr.Streams[id] = &Stream{
 			Id:             id,
 			LocationByTime: make(map[int64]*Location),
 		}
-		log.Printf("Created new MessageStream: %s", id)
+		log.Printf("Created new Stream: %s", id)
 	}
 	ms = msr.Streams[id]
 	return

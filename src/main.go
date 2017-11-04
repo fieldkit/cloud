@@ -8,7 +8,7 @@ import (
 func main() {
 	sr := NewInMemorySchemas()
 	AddLegacySchemas(sr)
-	streams := NewInMemoryMessageStreams()
+	streams := NewInMemoryStreams()
 	ingester := NewMessageIngester(sr, streams)
 
 	dbOptions := MessageDatabaseOptions{

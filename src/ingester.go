@@ -64,7 +64,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		mapped[ToSnake(field.Name)] = pm.ArrayValues[i]
 	}
 
-	stream, err := i.Streams.LookupMessageStream(pm.SchemaId)
+	stream, err := i.Streams.LookupStream(pm.SchemaId)
 	if err != nil {
 		return nil, err
 	}
@@ -164,11 +164,11 @@ type IngestionStatistics struct {
 type MessageIngester struct {
 	Handler
 	Schemas    SchemaRepository
-	Streams    MessageStreamsRepository
+	Streams    StreamsRepository
 	Statistics IngestionStatistics
 }
 
-func NewMessageIngester(sr SchemaRepository, streams MessageStreamsRepository) *MessageIngester {
+func NewMessageIngester(sr SchemaRepository, streams StreamsRepository) *MessageIngester {
 	return &MessageIngester{
 		Schemas: sr,
 		Streams: streams,
