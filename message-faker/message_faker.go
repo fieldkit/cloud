@@ -38,6 +38,7 @@ type IncomingSqsMessage struct {
 
 type options struct {
 	MessageId string
+	Token     string
 	Device    string
 	Stream    string
 }
@@ -46,6 +47,7 @@ func main() {
 	o := options{}
 
 	flag.StringVar(&o.MessageId, "id", "", "message id")
+	flag.StringVar(&o.Token, "token", "", "token")
 	flag.StringVar(&o.Device, "device", "", "device id")
 	flag.StringVar(&o.Stream, "stream", "", "stream id")
 
@@ -62,6 +64,14 @@ func main() {
 			log.Fatalf("Error generating UUID: %s", err)
 		}
 		o.MessageId = id.String()
+	}
+
+	if o.Token == "" {
+		id, err := uuid.NewV4()
+		if err != nil {
+			log.Fatalf("Error generating UUID: %s", err)
+		}
+		o.Token = id.String()
 	}
 
 	m := HttpJsonMessage{
@@ -84,7 +94,7 @@ func main() {
 		BodyRaw: string(bodyRaw),
 		Params: IncomingSqsMessageParams{
 			Path:        map[string]string{},
-			QueryString: map[string]string{},
+			QueryString: map[string]string{"token": o.Token},
 			Header: map[string]string{
 				"User-Agent":          UserAgent,
 				"FieldKit-Message-Id": o.MessageId,

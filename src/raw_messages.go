@@ -21,7 +21,8 @@ type RawMessageHeaders struct {
 }
 
 type RawMessageParams struct {
-	Headers RawMessageHeaders `json:"header"`
+	Headers     RawMessageHeaders `json:"header"`
+	QueryString map[string]string `json:"querystring"`
 }
 
 type RawMessageContext struct {

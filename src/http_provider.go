@@ -25,7 +25,13 @@ type HttpJsonMessage struct {
 }
 
 func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
-	return raw.Data.Params.Headers.ContentType == HttpProviderJsonContentType
+	if raw.Data.Params.Headers.ContentType == HttpProviderJsonContentType {
+		if raw.Data.Params.QueryString["token"] == "" {
+			return false
+		}
+		return true
+	}
+	return false
 }
 
 func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
