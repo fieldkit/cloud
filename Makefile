@@ -1,5 +1,5 @@
 BUILD=$(shell pwd)/build
-dirs=src sqs-tester sqs-worker
+dirs=src message-faker sqs-tester sqs-worker
 
 all:
 	mkdir -p $(BUILD)
