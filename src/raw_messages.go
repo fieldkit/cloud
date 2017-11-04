@@ -12,6 +12,7 @@ import (
 type RawMessageRow struct {
 	SqsId string
 	Data  string
+	Time  uint64
 }
 
 type RawMessageHeaders struct {
@@ -54,7 +55,7 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 	rmd := RawMessageData{}
 	err = json.Unmarshal([]byte(row.Data), &rmd)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Malformed RawMessage: %s", row.Data)
 	}
 
 	if rmd.Context.RequestId == "" {
@@ -106,7 +107,7 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 
 	defer db.Close()
 
-	rows, err := db.Query("SELECT sqs_id, data FROM messages_raw ORDER BY time")
+	rows, err := db.Query("SELECT sqs_id, data, time FROM messages_raw ORDER BY time")
 	if err != nil {
 		return err
 	}
@@ -114,18 +115,18 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 	defer rows.Close()
 	for rows.Next() {
 		row := &RawMessageRow{}
-		rows.Scan(&row.SqsId, &row.Data)
+		rows.Scan(&row.SqsId, &row.Data, &row.Time)
 
 		// fmt.Printf("%s,%s\n", row.SqsId, row.Data)
 
 		raw, err := CreateRawMessageFromRow(row)
 		if err != nil {
-			return err
+			return fmt.Errorf("(%s)[Error] %v", row.SqsId, err)
 		}
 
 		err = h.HandleMessage(raw)
 		if err != nil {
-			return err
+			return fmt.Errorf("(%s)[Error] %v", row.SqsId, err)
 		}
 	}
 
