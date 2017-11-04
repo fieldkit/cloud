@@ -21,3 +21,4 @@ deps:
 	go get github.com/golang/protobuf/proto
 	go get github.com/lib/pq
 	go get github.com/aws/aws-sdk-go/aws
+	go get github.com/nu7hatch/gouuid
