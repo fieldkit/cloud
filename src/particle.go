@@ -33,7 +33,7 @@ func (i *ParticleMessageProvider) ProcessMessage(raw *RawMessage) (pm *Processed
 
 	pm = &ProcessedMessage{
 		MessageId:   MessageId(raw.Data.Context.RequestId),
-		SchemaId:    MakeSchemaId(ParticleProviderName, coreId, ""),
+		SchemaId:    NewSchemaId(ParticleProviderName, coreId, ""),
 		Time:        &publishedAt,
 		ArrayValues: fields,
 	}

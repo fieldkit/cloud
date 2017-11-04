@@ -1,28 +1,10 @@
 package main
 
 import (
-	"regexp"
+	_ "regexp"
 )
 
 type MessageSchema struct {
-}
-
-type JsonSchemaField struct {
-	Name     string
-	Type     string
-	Optional bool
-}
-
-type JsonMessageSchema struct {
-	MessageSchema
-	HasTime         bool
-	UseProviderTime bool
-	HasLocation     bool
-	Fields          []JsonSchemaField
-}
-
-type TwitterMessageSchema struct {
-	MessageSchema
 }
 
 type SchemaRepository interface {
@@ -51,10 +33,8 @@ func (sr *InMemorySchemas) DefineSchema(id SchemaId, ms interface{}) (err error)
 func (sr *InMemorySchemas) LookupSchema(id SchemaId) (ms []interface{}, err error) {
 	ms = make([]interface{}, 0)
 
-	// TODO: This will become very slow, just to prove the concept.
 	for key, value := range sr.Map {
-		re := regexp.MustCompile(string(key))
-		if re.MatchString(string(id)) {
+		if key.Matches(id) {
 			ms = append(ms, value...)
 		}
 	}

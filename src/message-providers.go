@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
 
@@ -11,13 +12,47 @@ const (
 
 type MessageId string
 
-type SchemaId string
+type DeviceId struct {
+	Provider string
+	Id       string
+}
 
-func MakeSchemaId(provider string, device string, stream string) SchemaId {
-	if len(stream) > 0 {
-		return SchemaId(fmt.Sprintf("%s-%s-%s", provider, device, stream))
+type SchemaId struct {
+	Device DeviceId
+	Stream string
+}
+
+func (s SchemaId) ToString() string {
+	if s.Stream == "" {
+		return fmt.Sprintf("%s-%s", s.Device.Provider, s.Device.Id)
 	}
-	return SchemaId(fmt.Sprintf("%s-%s", provider, device))
+	return fmt.Sprintf("%s-%s-%s", s.Device.Provider, s.Device.Id, s.Stream)
+}
+
+func NewSchemaId(provider string, device string, stream string) SchemaId {
+	return SchemaId{
+		Device: DeviceId{
+			Provider: provider,
+			Id:       device,
+		},
+		Stream: stream,
+	}
+}
+
+func (s SchemaId) Matches(o SchemaId) bool {
+	if s.Device.Provider != o.Device.Provider {
+		return false
+	}
+	re := regexp.MustCompile(s.Device.Id)
+	if !re.MatchString(o.Device.Id) {
+		return false
+	}
+
+	if s.Stream != "" && s.Stream != o.Stream {
+		return false
+	}
+
+	return true
 }
 
 type ProcessedMessage struct {

@@ -1,7 +1,7 @@
 package main
 
 func AddLegacySchemas(sr SchemaRepository) {
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-AT", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "AT"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -25,7 +25,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-WE", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "WE"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -46,7 +46,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-SO", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "SO"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -64,7 +64,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-LO", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "LO"), &JsonMessageSchema{
 		HasTime:     true,
 		HasLocation: true,
 		Fields: []JsonSchemaField{
@@ -81,7 +81,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "ST"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -121,7 +121,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-ST", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "ST"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -162,7 +162,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-1", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "1"), &JsonMessageSchema{
 		UseProviderTime: true,
 		HasLocation:     true,
 		Fields: []JsonSchemaField{
@@ -177,7 +177,7 @@ func AddLegacySchemas(sr SchemaRepository) {
 		},
 	})
 
-	sr.DefineSchema(ParticleProviderName+"-(\\d+)", &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(ParticleProviderName, "(\\d+)", ""), &JsonMessageSchema{
 		UseProviderTime: true,
 		HasLocation:     true,
 		Fields: []JsonSchemaField{
