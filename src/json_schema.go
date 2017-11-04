@@ -8,8 +8,9 @@ type JsonSchemaField struct {
 
 type JsonMessageSchema struct {
 	MessageSchema
-	HasTime         bool
-	UseProviderTime bool
-	HasLocation     bool
-	Fields          []JsonSchemaField
+	UseProviderTime     bool
+	UseProviderLocation bool
+	HasTime             bool
+	HasLocation         bool
+	Fields              []JsonSchemaField
 }

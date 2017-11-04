@@ -21,19 +21,7 @@ const (
 	FieldNameTime      = "time"
 )
 
-func parseLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (l *Location, err error) {
-	coordinates := make([]float32, 0)
-	for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
-		f, err := strconv.ParseFloat(m[key].(string), 32)
-		if err != nil {
-			return nil, err
-		}
-		coordinates = append(coordinates, float32(f))
-	}
-	return &Location{Coordinates: coordinates}, nil
-}
-
-func parseTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
+func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
 	if ms.UseProviderTime {
 		t = pm.Time
 	} else {
@@ -53,8 +41,29 @@ func parseTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interfa
 	return
 }
 
+func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (l *Location, err error) {
+	coordinates := make([]float32, 0)
+	if ms.UseProviderLocation {
+		coordinates = pm.Location
+	}
+	if ms.HasLocation {
+		for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
+			f, err := strconv.ParseFloat(m[key].(string), 32)
+			if err != nil {
+				return nil, err
+			}
+			coordinates = append(coordinates, float32(f))
+		}
+	}
+	if len(coordinates) < 2 {
+		return nil, nil
+	}
+	return &Location{Coordinates: coordinates}, nil
+}
+
 func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchema) (im *IngestedMessage, err error) {
-	if len(pm.ArrayValues) != len(ms.Fields) {
+	// This works MapValues, too as they'll be zero for now.
+	if pm.ArrayValues != nil && len(pm.ArrayValues) != len(ms.Fields) {
 		return nil, fmt.Errorf("%s: fields S=%v != M=%v", pm.SchemaId, len(ms.Fields), len(pm.ArrayValues))
 	}
 
@@ -64,28 +73,39 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		mapped[ToSnake(field.Name)] = pm.ArrayValues[i]
 	}
 
+	if pm.MapValues != nil {
+		for k, v := range pm.MapValues {
+			mapped[k] = v
+		}
+	}
+
 	stream, err := i.Streams.LookupStream(pm.SchemaId)
 	if err != nil {
 		return nil, err
 	}
 
-	time, err := parseTime(pm, ms, mapped)
+	time, err := determineTime(pm, ms, mapped)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: unable to parse time (%s)", pm.SchemaId, err)
 	}
 
-	if ms.HasLocation {
-		location, err := parseLocation(pm, ms, mapped)
-		if err != nil {
-			return nil, fmt.Errorf("%s: unable to parse location.", pm.SchemaId)
-		}
+	location, err := determineLocation(pm, ms, mapped)
+	if err != nil {
+		return nil, fmt.Errorf("%s: unable to parse location (%s)", pm.SchemaId, err)
+	}
+	if location != nil {
 		stream.SetLocation(time, location)
 	}
 
+	if !stream.HasLocation() {
+		// return nil, fmt.Errorf("%s: stream has no location, yet.", pm.SchemaId)
+	}
+
+	lastLocation := stream.GetLocation()
 	im = &IngestedMessage{
 		Schema:   ms,
 		Time:     time,
-		Location: nil,
+		Location: lastLocation,
 		Fields:   mapped,
 	}
 
@@ -146,7 +166,8 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 			}
 		} else {
 			if true {
-				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				// log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				log.Printf("(%s)(%s)[Success] %+v", pm.MessageId, pm.SchemaId, fm)
 			}
 			i.Statistics.Successes += 1
 		}

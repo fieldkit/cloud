@@ -191,4 +191,10 @@ func AddLegacySchemas(sr SchemaRepository) {
 			JsonSchemaField{Name: "Has Fix", Type: "boolean"},
 		},
 	})
+
+	sr.DefineSchema(NewSchemaId(HttpProviderName, "(\\S+)", ""), &JsonMessageSchema{
+		UseProviderTime:     true,
+		UseProviderLocation: true,
+		Fields:              []JsonSchemaField{},
+	})
 }

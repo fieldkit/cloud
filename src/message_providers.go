@@ -8,6 +8,7 @@ import (
 
 const (
 	FormUrlEncodedMimeType = "x-www-form-urlencoded"
+	JsonMimeType           = "json"
 )
 
 type MessageId string
@@ -59,7 +60,9 @@ type ProcessedMessage struct {
 	MessageId   MessageId
 	SchemaId    SchemaId
 	Time        *time.Time
+	Location    []float32
 	ArrayValues []string
+	MapValues   map[string]string
 }
 
 type MessageProvider interface {
@@ -74,6 +77,7 @@ var AllProviders = []MessageProvider{
 	&RockBlockMessageProvider{},
 	&TwilioMessageProvider{},
 	&ParticleMessageProvider{},
+	&HttpMessageProvider{},
 }
 
 func IdentifyMessageProvider(raw *RawMessage) (t MessageProvider, err error) {

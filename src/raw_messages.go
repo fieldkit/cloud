@@ -57,16 +57,30 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 		return nil, err
 	}
 
+	if rmd.Context.RequestId == "" {
+		return nil, fmt.Errorf("Malformed RawMessage: Context missing RequestId.")
+	}
+
 	if strings.Contains(rmd.Params.Headers.ContentType, FormUrlEncodedMimeType) {
 		form, err := url.ParseQuery(rmd.RawBody)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to parse message content.")
+			return nil, fmt.Errorf("Malformed RawMessage: RawBody invalid for %s.", rmd.Params.Headers.ContentType)
 		}
 
 		raw = &RawMessage{
 			Row:  row,
 			Data: &rmd,
 			Form: &form,
+		}
+
+		return raw, nil
+	}
+
+	if strings.Contains(rmd.Params.Headers.ContentType, JsonMimeType) {
+		raw = &RawMessage{
+			Row:  row,
+			Data: &rmd,
+			Form: &url.Values{},
 		}
 
 		return raw, nil
@@ -92,7 +106,8 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 
 	defer db.Close()
 
-	rows, err := db.Query("SELECT sqs_id, data FROM messages_raw ORDER BY time")
+	// rows, err := db.Query("SELECT sqs_id, data FROM messages_raw ORDER BY time")
+	rows, err := db.Query("SELECT sqs_id, data FROM messages_raw WHERE sqs_id = '1ce607e2-ea9b-40d6-6e6a-f15d076751f0' ORDER BY time")
 	if err != nil {
 		return err
 	}
@@ -101,6 +116,8 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 	for rows.Next() {
 		row := &RawMessageRow{}
 		rows.Scan(&row.SqsId, &row.Data)
+
+		// fmt.Printf("%s,%s\n", row.SqsId, row.Data)
 
 		raw, err := CreateRawMessageFromRow(row)
 		if err != nil {
