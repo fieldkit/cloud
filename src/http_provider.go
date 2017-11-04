@@ -46,6 +46,10 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 			return nil, fmt.Errorf("Malformed HttpJsonMessage. Device is required.")
 		}
 
+		if len(message.Location) < 2 {
+			return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
+		}
+
 		messageTime := time.Unix(message.Time, 0)
 
 		pm = &ProcessedMessage{
