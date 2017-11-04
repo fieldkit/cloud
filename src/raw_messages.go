@@ -106,8 +106,7 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 
 	defer db.Close()
 
-	// rows, err := db.Query("SELECT sqs_id, data FROM messages_raw ORDER BY time")
-	rows, err := db.Query("SELECT sqs_id, data FROM messages_raw WHERE sqs_id = '1ce607e2-ea9b-40d6-6e6a-f15d076751f0' ORDER BY time")
+	rows, err := db.Query("SELECT sqs_id, data FROM messages_raw ORDER BY time")
 	if err != nil {
 		return err
 	}
