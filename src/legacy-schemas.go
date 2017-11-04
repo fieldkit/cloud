@@ -1,6 +1,6 @@
 package main
 
-func (sr *SchemaRepository) AddLegacySchemas() {
+func AddLegacySchemas(sr SchemaRepository) {
 	sr.DefineSchema(RockBlockProviderName+"-(\\d+)-AT", &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{

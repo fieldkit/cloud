@@ -21,17 +21,21 @@ func (ms *MessageStream) SetLocation(t *time.Time, l *Location) {
 	ms.LocationByTime[t.Unix()] = l
 }
 
-type MessageStreamRepository struct {
+type MessageStreamsRepository interface {
+	LookupMessageStream(id SchemaId) (ms *MessageStream, err error)
+}
+
+type InMemoryMessageStreams struct {
 	Streams map[SchemaId]*MessageStream
 }
 
-func NewMessageStreamRepository() *MessageStreamRepository {
-	return &MessageStreamRepository{
+func NewInMemoryMessageStreams() MessageStreamsRepository {
+	return &InMemoryMessageStreams{
 		Streams: make(map[SchemaId]*MessageStream),
 	}
 }
 
-func (msr *MessageStreamRepository) LookupMessageStream(id SchemaId) (ms *MessageStream, err error) {
+func (msr *InMemoryMessageStreams) LookupMessageStream(id SchemaId) (ms *MessageStream, err error) {
 	if msr.Streams[id] == nil {
 		msr.Streams[id] = &MessageStream{
 			Id:             id,

@@ -6,8 +6,10 @@ import (
 )
 
 func main() {
-	ingester := NewMessageIngester()
-	ingester.Schemas.AddLegacySchemas()
+	sr := NewInMemorySchemas()
+	AddLegacySchemas(sr)
+	streams := NewInMemoryMessageStreams()
+	ingester := NewMessageIngester(sr, streams)
 
 	dbOptions := MessageDatabaseOptions{
 		Hostname: os.Getenv("DATABASE_HOSTNAME"),

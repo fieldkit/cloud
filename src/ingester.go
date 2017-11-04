@@ -163,16 +163,14 @@ type IngestionStatistics struct {
 
 type MessageIngester struct {
 	Handler
-	Schemas    *SchemaRepository
-	Streams    *MessageStreamRepository
+	Schemas    SchemaRepository
+	Streams    MessageStreamsRepository
 	Statistics IngestionStatistics
 }
 
-func NewMessageIngester() *MessageIngester {
+func NewMessageIngester(sr SchemaRepository, streams MessageStreamsRepository) *MessageIngester {
 	return &MessageIngester{
-		Schemas: &SchemaRepository{
-			Map: make(map[SchemaId][]interface{}),
-		},
-		Streams: NewMessageStreamRepository(),
+		Schemas: sr,
+		Streams: streams,
 	}
 }
