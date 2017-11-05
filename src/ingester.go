@@ -79,26 +79,28 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		}
 	}
 
-	stream, err := i.Streams.LookupStream(pm.SchemaId)
+	// TODO: Eventually we'll be able to link a secondary 'Location' stream
+	// to any other stream.
+	stream, err := i.Streams.LookupStream(pm.SchemaId.Device)
 	if err != nil {
 		return nil, err
 	}
 
 	time, err := determineTime(pm, ms, mapped)
 	if err != nil {
-		return nil, fmt.Errorf("%s: unable to parse time (%s)", pm.SchemaId, err)
+		return nil, fmt.Errorf("%s: Unable to get time (%s)", pm.SchemaId, err)
 	}
 
 	location, err := determineLocation(pm, ms, mapped)
 	if err != nil {
-		return nil, fmt.Errorf("%s: unable to parse location (%s)", pm.SchemaId, err)
+		return nil, fmt.Errorf("%s: Unable to get location (%s)", pm.SchemaId, err)
 	}
 	if location != nil {
 		stream.SetLocation(time, location)
 	}
 
 	if !stream.HasLocation() {
-		// return nil, fmt.Errorf("%s: stream has no location, yet.", pm.SchemaId)
+		return nil, fmt.Errorf("%s: Stream has no location, yet.", pm.SchemaId.Device)
 	}
 
 	lastLocation := stream.GetLocation()

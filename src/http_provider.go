@@ -14,6 +14,7 @@ const (
 	HttpProviderName            = "HTTP"
 	HttpProviderJsonContentType = "application/vnd.fk.message+json"
 	HttpProviderFormContentType = "application/vnd.fk.message+x-www-form-urlencoded"
+	HttpProviderTokenKey        = "token"
 )
 
 type HttpJsonMessage struct {
@@ -26,7 +27,7 @@ type HttpJsonMessage struct {
 
 func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
 	if raw.Data.Params.Headers.ContentType == HttpProviderJsonContentType {
-		if raw.Data.Params.QueryString["token"] == "" {
+		if raw.Data.Params.QueryString[HttpProviderTokenKey] == "" {
 			return false
 		}
 		return true

@@ -18,7 +18,7 @@ func (a LocationTimes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a LocationTimes) Less(i, j int) bool { return a[i] < a[j] }
 
 type Stream struct {
-	Id                  SchemaId
+	Id                  DeviceId
 	LocationChangeTimes LocationTimes
 	LocationByTime      map[int64]*Location
 }
@@ -32,31 +32,31 @@ func (ms *Stream) SetLocation(t *time.Time, l *Location) {
 }
 
 func (ms *Stream) HasLocation() bool {
-	return false
+	return len(ms.LocationChangeTimes) > 0
 }
 
 func (ms *Stream) GetLocation() (l *Location) {
-	if len(ms.LocationChangeTimes) == 0 {
+	if !ms.HasLocation() {
 		return nil
 	}
 	return ms.LocationByTime[ms.LocationChangeTimes[len(ms.LocationChangeTimes)-1]]
 }
 
 type StreamsRepository interface {
-	LookupStream(id SchemaId) (ms *Stream, err error)
+	LookupStream(id DeviceId) (ms *Stream, err error)
 }
 
 type InMemoryStreams struct {
-	Streams map[SchemaId]*Stream
+	Streams map[DeviceId]*Stream
 }
 
 func NewInMemoryStreams() StreamsRepository {
 	return &InMemoryStreams{
-		Streams: make(map[SchemaId]*Stream),
+		Streams: make(map[DeviceId]*Stream),
 	}
 }
 
-func (msr *InMemoryStreams) LookupStream(id SchemaId) (ms *Stream, err error) {
+func (msr *InMemoryStreams) LookupStream(id DeviceId) (ms *Stream, err error) {
 	if msr.Streams[id] == nil {
 		msr.Streams[id] = &Stream{
 			Id:             id,
