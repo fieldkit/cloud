@@ -8,9 +8,9 @@ import (
 )
 
 type RawMessageRow struct {
-	SqsId string
-	Data  string
-	Time  uint64
+	Id   string
+	Data string
+	Time uint64
 }
 
 type HandlerFunc func(raw *RawMessage) error
@@ -19,14 +19,16 @@ func (f HandlerFunc) HandleMessage(raw *RawMessage) error {
 	return f(raw)
 }
 
-type Handler interface {
+type RawMessageHandler interface {
 	HandleMessage(raw *RawMessage) error
 }
 
 type RawMessage struct {
-	Row  *RawMessageRow
-	Data *SqsMessage
-	Form *url.Values
+	RequestId   string
+	RawBody     string
+	ContentType string
+	QueryString *url.Values
+	Form        *url.Values
 }
 
 func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
@@ -40,30 +42,31 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 		return nil, fmt.Errorf("Malformed RawMessage: Context missing RequestId.")
 	}
 
+	form := &url.Values{}
+	queryString := &url.Values{}
+	for k, v := range rmd.Params.QueryString {
+		queryString.Add(k, v)
+	}
+
 	if strings.Contains(rmd.Params.Headers.ContentType, FormUrlEncodedMimeType) {
-		form, err := url.ParseQuery(rmd.RawBody)
+		parsedForm, err := url.ParseQuery(rmd.RawBody)
 		if err != nil {
 			return nil, fmt.Errorf("Malformed RawMessage: RawBody invalid for %s.", rmd.Params.Headers.ContentType)
 		}
+		form = &parsedForm
+	} else if strings.Contains(rmd.Params.Headers.ContentType, JsonMimeType) {
 
-		raw = &RawMessage{
-			Row:  row,
-			Data: &rmd,
-			Form: &form,
-		}
-
-		return raw, nil
+	} else {
+		return nil, fmt.Errorf("Unexpected ContentType: %s", rmd.Params.Headers.ContentType)
 	}
 
-	if strings.Contains(rmd.Params.Headers.ContentType, JsonMimeType) {
-		raw = &RawMessage{
-			Row:  row,
-			Data: &rmd,
-			Form: &url.Values{},
-		}
-
-		return raw, nil
+	raw = &RawMessage{
+		RequestId:   rmd.Context.RequestId,
+		RawBody:     rmd.RawBody,
+		ContentType: rmd.Params.Headers.ContentType,
+		QueryString: queryString,
+		Form:        form,
 	}
 
-	return nil, fmt.Errorf("Unexpected ContentType: %s", rmd.Params.Headers.ContentType)
+	return
 }

@@ -46,7 +46,7 @@ func normalizeCommaSeparated(provider string, schemaPrefix string, raw *RawMessa
 	}
 
 	pm = &ProcessedMessage{
-		MessageId:   MessageId(raw.Data.Context.RequestId),
+		MessageId:   MessageId(raw.RequestId),
 		SchemaId:    NewSchemaId(provider, schemaPrefix, maybeMessageType),
 		ArrayValues: fields,
 	}
@@ -89,7 +89,7 @@ func normalizeBinary(provider string, schemaPrefix string, raw *RawMessage, byte
 	time := time.Unix(int64(unix), 0)
 
 	pm = &ProcessedMessage{
-		MessageId:   MessageId(raw.Data.Context.RequestId),
+		MessageId:   MessageId(raw.RequestId),
 		SchemaId:    NewSchemaId(provider, schemaPrefix, strconv.Itoa(int(id))),
 		Time:        &time,
 		ArrayValues: values,

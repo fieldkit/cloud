@@ -26,8 +26,8 @@ type HttpJsonMessage struct {
 }
 
 func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
-	if raw.Data.Params.Headers.ContentType == HttpProviderJsonContentType {
-		if raw.Data.Params.QueryString[HttpProviderTokenKey] == "" {
+	if raw.ContentType == HttpProviderJsonContentType {
+		if raw.QueryString.Get(HttpProviderTokenKey) == "" {
 			return false
 		}
 		return true
@@ -36,9 +36,9 @@ func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
 }
 
 func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
-	if raw.Data.Params.Headers.ContentType == HttpProviderJsonContentType {
+	if raw.ContentType == HttpProviderJsonContentType {
 		message := HttpJsonMessage{}
-		err = json.Unmarshal([]byte(raw.Data.RawBody), &message)
+		err = json.Unmarshal([]byte(raw.RawBody), &message)
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 		messageTime := time.Unix(message.Time, 0)
 
 		pm = &ProcessedMessage{
-			MessageId: MessageId(raw.Data.Context.RequestId),
+			MessageId: MessageId(raw.RequestId),
 			SchemaId:  NewSchemaId(HttpProviderName, message.Device, message.Stream),
 			Time:      &messageTime,
 			Location:  message.Location,
@@ -64,5 +64,5 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 		return
 	}
 
-	return nil, fmt.Errorf("Unknown ContentType: %s", raw.Data.Params.Headers.ContentType)
+	return nil, fmt.Errorf("Unknown ContentType: %s", raw.ContentType)
 }

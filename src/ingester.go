@@ -146,14 +146,13 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 		return err
 	}
 	if mp == nil {
-		log.Printf("(%s)[Error]: No message provider: (UserAgent: %v) (ContentType: %s) Body: %s",
-			raw.Data.Context.RequestId, raw.Data.Params.Headers.UserAgent, raw.Data.Params.Headers.ContentType, raw.Data)
+		log.Printf("(%s)[Error]: No message provider: (ContentType: %s)", raw.RequestId, raw.ContentType)
 		return nil
 	}
 
 	pm, err := mp.ProcessMessage(raw)
 	if err != nil {
-		log.Printf("(%s)[Error]: %v", raw.Data.Context.RequestId, err)
+		log.Printf("(%s)[Error]: %v", raw.RequestId, err)
 	}
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
@@ -185,7 +184,7 @@ type IngestionStatistics struct {
 }
 
 type MessageIngester struct {
-	Handler
+	RawMessageHandler
 	Schemas    SchemaRepository
 	Streams    StreamsRepository
 	Statistics IngestionStatistics

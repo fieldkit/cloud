@@ -13,7 +13,7 @@ type MessageDatabaseOptions struct {
 	Database string
 }
 
-func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
+func ProcessRawMessages(o *MessageDatabaseOptions, h RawMessageHandler) error {
 	connectionString := "postgres://" + o.User + ":" + o.Password + "@" + o.Hostname + "/" + o.Database + "?sslmode=disable"
 
 	db, err := sql.Open("postgres", connectionString)
@@ -32,16 +32,16 @@ func ProcessRawMessages(o *MessageDatabaseOptions, h Handler) error {
 
 	for rows.Next() {
 		row := &RawMessageRow{}
-		rows.Scan(&row.SqsId, &row.Data, &row.Time)
+		rows.Scan(&row.Id, &row.Data, &row.Time)
 
 		raw, err := CreateRawMessageFromRow(row)
 		if err != nil {
-			return fmt.Errorf("(%s)[Error] %v", row.SqsId, err)
+			return fmt.Errorf("(%s)[Error] %v", row.Id, err)
 		}
 
 		err = h.HandleMessage(raw)
 		if err != nil {
-			return fmt.Errorf("(%s)[Error] %v", row.SqsId, err)
+			return fmt.Errorf("(%s)[Error] %v", row.Id, err)
 		}
 	}
 
