@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/conservify/ingestion/ingestion"
 	"github.com/nu7hatch/gouuid"
 	"log"
 	"os"
@@ -14,27 +15,6 @@ import (
 const (
 	UserAgent = "FieldKitBot/1.1"
 )
-
-// From http_provider.go
-type HttpJsonMessage struct {
-	Location []float32         `json:"location"`
-	Time     int64             `json:"time"`
-	Device   string            `json:"device"`
-	Stream   string            `json:"stream"`
-	Values   map[string]string `json:"values"`
-}
-
-type IncomingSqsMessageParams struct {
-	Path        map[string]string `json:"path"`
-	QueryString map[string]string `json:"querystring"`
-	Header      map[string]string `json:"header"`
-}
-
-type IncomingSqsMessage struct {
-	BodyRaw string                   `json:"body-raw"`
-	Params  IncomingSqsMessageParams `json:"params"`
-	Context map[string]string        `json:"context"`
-}
 
 type options struct {
 	MessageId string
@@ -74,7 +54,7 @@ func main() {
 		o.Token = id.String()
 	}
 
-	m := HttpJsonMessage{
+	m := ingestion.HttpJsonMessage{
 		Location: []float32{34.0647314, -118.2956819},
 		Time:     time.Now().Unix(),
 		Device:   o.Device,
@@ -85,32 +65,29 @@ func main() {
 		},
 	}
 
-	bodyRaw, err := json.Marshal(m)
+	rawBody, err := json.Marshal(m)
 	if err != nil {
 		log.Fatalf("Error marshaling JSON: %s", err)
 	}
 
-	sqs := IncomingSqsMessage{
-		BodyRaw: string(bodyRaw),
-		Params: IncomingSqsMessageParams{
-			Path:        map[string]string{},
+	sqs := ingestion.SqsMessage{
+		RawBody: string(rawBody),
+		Params: ingestion.SqsMessageParams{
 			QueryString: map[string]string{"token": o.Token},
-			Header: map[string]string{
-				"User-Agent":          UserAgent,
-				"FieldKit-Message-Id": o.MessageId,
-				"Content-Type":        "application/vnd.fk.message+json",
+			Headers: ingestion.SqsMessageHeaders{
+				UserAgent:   UserAgent,
+				ContentType: "application/vnd.fk.message+json",
 			},
 		},
-		Context: map[string]string{
-			"Request-Id": o.MessageId,
-			"User-Agent": UserAgent,
+		Context: ingestion.SqsMessageContext{
+			RequestId: o.MessageId,
 		},
 	}
 
 	WriteSql(&o, &sqs)
 }
 
-func WriteSql(o *options, sqs *IncomingSqsMessage) {
+func WriteSql(o *options, sqs *ingestion.SqsMessage) {
 	d, err := json.Marshal(sqs)
 	if err != nil {
 		log.Fatalf("Error marshaling JSON: %s", err)

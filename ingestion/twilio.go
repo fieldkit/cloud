@@ -1,4 +1,4 @@
-package main
+package ingestion
 
 const (
 	TwilioProviderName = "TWILIO"

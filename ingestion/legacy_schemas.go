@@ -1,4 +1,4 @@
-package main
+package ingestion
 
 func AddLegacySchemas(sr SchemaRepository) {
 	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "AT"), &JsonMessageSchema{

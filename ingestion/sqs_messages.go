@@ -1,6 +1,4 @@
-package main
-
-import ()
+package ingestion
 
 type SqsMessageHeaders struct {
 	UserAgent   string `json:"User-Agent"`

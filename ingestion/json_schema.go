@@ -1,4 +1,4 @@
-package main
+package ingestion
 
 type JsonSchemaField struct {
 	Name     string
