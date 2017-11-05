@@ -1,2 +1,2 @@
-$(BUILD)/worker: *.go
+$(BUILD)/sqs-worker: *.go
 	go build -o $@ $^
