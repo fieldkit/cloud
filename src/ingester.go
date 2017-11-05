@@ -26,7 +26,7 @@ func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]int
 		t = pm.Time
 	} else {
 		if !ms.HasTime {
-			return nil, fmt.Errorf("%s: no time information.", pm.SchemaId)
+			return nil, fmt.Errorf("%s: No time information.", pm.SchemaId)
 		}
 
 		raw := m[FieldNameTime].(string)
@@ -42,11 +42,11 @@ func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]int
 }
 
 func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (l *Location, err error) {
-	coordinates := make([]float32, 0)
 	if ms.UseProviderLocation {
-		coordinates = pm.Location
+		return &Location{Coordinates: pm.Location}, nil
 	}
 	if ms.HasLocation {
+		coordinates := make([]float32, 0)
 		for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
 			f, err := strconv.ParseFloat(m[key].(string), 32)
 			if err != nil {
@@ -54,15 +54,16 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 			}
 			coordinates = append(coordinates, float32(f))
 		}
+		if len(coordinates) < 2 {
+			return nil, fmt.Errorf("Not enough coordinates.")
+		}
+		return &Location{Coordinates: coordinates}, nil
 	}
-	if len(coordinates) < 2 {
-		return nil, nil
-	}
-	return &Location{Coordinates: coordinates}, nil
+	return nil, nil
 }
 
 func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchema) (im *IngestedMessage, err error) {
-	// This works MapValues, too as they'll be zero for now.
+	// This works with MapValues, too as they'll be zero for now.
 	if pm.ArrayValues != nil && len(pm.ArrayValues) != len(ms.Fields) {
 		return nil, fmt.Errorf("%s: fields S=%v != M=%v", pm.SchemaId, len(ms.Fields), len(pm.ArrayValues))
 	}
@@ -168,8 +169,7 @@ func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 			}
 		} else {
 			if true {
-				// log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-				log.Printf("(%s)(%s)[Success] %+v", pm.MessageId, pm.SchemaId, fm)
+				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
 			i.Statistics.Successes += 1
 		}
