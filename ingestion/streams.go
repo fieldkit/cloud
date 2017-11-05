@@ -45,25 +45,3 @@ func (ms *Stream) GetLocation() (l *Location) {
 type StreamsRepository interface {
 	LookupStream(id DeviceId) (ms *Stream, err error)
 }
-
-type InMemoryStreams struct {
-	Streams map[DeviceId]*Stream
-}
-
-func NewInMemoryStreams() StreamsRepository {
-	return &InMemoryStreams{
-		Streams: make(map[DeviceId]*Stream),
-	}
-}
-
-func (msr *InMemoryStreams) LookupStream(id DeviceId) (ms *Stream, err error) {
-	if msr.Streams[id] == nil {
-		msr.Streams[id] = &Stream{
-			Id:             id,
-			LocationByTime: make(map[int64]*Location),
-		}
-		log.Printf("Created new Stream: %s", id)
-	}
-	ms = msr.Streams[id]
-	return
-}
