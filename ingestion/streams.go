@@ -1,7 +1,7 @@
 package ingestion
 
 import (
-	"log"
+	_ "log"
 	"sort"
 	"time"
 )
