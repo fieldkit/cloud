@@ -145,6 +145,9 @@ const expeditionReducer = (state = initialState, action) => {
 
     case actions.UPDATE_DATE: {
       const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
+      if (!expedition) {
+            return state;
+      }
       const startDate = expedition.get('startDate')
       const endDate = expedition.get('endDate')
       const nextDate = constrain(action.date, startDate, endDate)

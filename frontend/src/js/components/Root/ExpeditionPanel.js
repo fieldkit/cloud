@@ -81,7 +81,6 @@ class ExpeditionPanel extends React.Component {
 
             <a href="http://fieldkit.org:8080">
               <div className="expedition-panel_content_body_logos">
-                <img src={ '/' + logoNatGeo } />
                 <img src={ '/' + logoFieldkit } />
               </div>
             </a>

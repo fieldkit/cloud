@@ -1,6 +1,6 @@
 #+TITLE:  README for fk-cloud 
 #+EMAIL:  jacob@conservify.org 
- 
+
 * FieldKit 
 * Developer Instructions 
 *** Machine Setup
@@ -11,34 +11,32 @@
        sudo gpasswd -a $USER docker
        newgrp docker 
        docker ps -a # testing
-    3. Add to /etc/hosts 
-       127.0.0.1       fieldkit.org 
-       127.0.0.1       api.fieldkit.org 
-       127.0.0.1       www.fieldkit.org 
-    4. Ensure you have the latest golang (>1.8)
+    3. Ensure you have the latest golang (>1.8)
 
-*** fieldkit.env 
-    FIELDKIT_ADMIN_ROOT=/admin
-    FIELDKIT_FRONTEND_ROOT=/frontend
-    FIELDKIT_LANDING_ROOT=/landing
-    FIELDKIT_DOMAIN=fieldkit.org:8080
+*** Running Locally
+    Run the database and the API docker containers:
 
-*** Build
-    ./build.sh 
-
-*** Running
     ./run-server.sh
 
-*** Rebuilding API
-    go get -u github.com/goadesign/goa/...
+    Now the web facing pieces can be run via "yarn dev" in the appropriate directory, eg:
 
-    # You will need to have the source directory linked into your GOWORK path, like so:
-    cd ~/go/src
-    mkdir -p github.com/O-C-R
-    ln -sf ~/conservify/fk-cloud fieldkit
+    cd frontend
+    yarn dev
 
-    # From underneath that symlinked directory you can run:
-    go generate
+*** Rebuilding Goa API
+**** Setup
+
+     go get -u github.com/goadesign/goa/...
+
+     You will need to have the source directory linked into your GOWORK path.
+
+**** Regenerating
+
+     cd server
+     make generate
+
+*** Build / Deploying
+    ./build.sh 
 
 *** Common Problems
 **** On 'Missing API definition, make sure design is properly initialized' when running go generate
@@ -60,5 +58,13 @@
 
 **** On 'Go source file "/home/jlewallen/conservify/fieldkit/server/api/app/contexts.go" not in Go workspace, adjust GOPATH'
      Run 'go generate' from under your GOPATH
+
+*** Misc
+**** fieldkit.env 
+     FIELDKIT_ADMIN_ROOT=/admin
+     FIELDKIT_FRONTEND_ROOT=/frontend
+     FIELDKIT_LANDING_ROOT=/landing
+     FIELDKIT_DOMAIN=fieldkit.org:8080
+
 
 * EOF
