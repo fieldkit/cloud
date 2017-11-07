@@ -169,7 +169,7 @@ definitions:
   Document:
     description: Document media type (default view)
     example:
-      data: 546a3783-74a1-4498-8715-6dfb4ea9a676
+      data: 6e355f38-de20-4386-900d-ccf4eaa69928
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -182,7 +182,7 @@ definitions:
       user_id: 2.319954e+18
     properties:
       data:
-        example: 546a3783-74a1-4498-8715-6dfb4ea9a676
+        example: 6e355f38-de20-4386-900d-ccf4eaa69928
       id:
         example: Possimus porro quaerat in qui.
         type: string
@@ -216,7 +216,7 @@ definitions:
     description: DocumentCollection is the media type for an array of Document (default
       view)
     example:
-    - data: 546a3783-74a1-4498-8715-6dfb4ea9a676
+    - data: 6e355f38-de20-4386-900d-ccf4eaa69928
       id: Possimus porro quaerat in qui.
       input_id: 7.480706e+18
       location:
@@ -236,7 +236,7 @@ definitions:
     description: Documents media type (default view)
     example:
       documents:
-      - data: 546a3783-74a1-4498-8715-6dfb4ea9a676
+      - data: 6e355f38-de20-4386-900d-ccf4eaa69928
         id: Possimus porro quaerat in qui.
         input_id: 7.480706e+18
         location:

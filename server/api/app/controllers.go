@@ -218,6 +218,19 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -232,6 +245,19 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -369,6 +395,19 @@ func handleDocumentOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -383,6 +422,19 @@ func handleDocumentOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -596,6 +648,19 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -610,6 +675,19 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -812,6 +890,19 @@ func handleFieldkitOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -826,6 +917,19 @@ func handleFieldkitOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -995,6 +1099,19 @@ func handleInputOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -1009,6 +1126,19 @@ func handleInputOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1190,6 +1320,19 @@ func handleInputTokenOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -1204,6 +1347,19 @@ func handleInputTokenOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1437,6 +1593,19 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -1451,6 +1620,19 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1626,6 +1808,19 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -1640,6 +1835,19 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1854,6 +2062,19 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -1868,6 +2089,19 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2012,6 +2246,19 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -2026,6 +2273,19 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2259,6 +2519,19 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -2273,6 +2546,19 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2493,6 +2779,19 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -2507,6 +2806,19 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2821,6 +3133,19 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
@@ -2835,6 +3160,19 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")

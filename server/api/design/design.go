@@ -24,6 +24,8 @@ var _ = API("fieldkit", func() {
 	Origin("https://*.fieldkit.org:8080", cors)
 	Origin("https://fieldkit.team", cors)
 	Origin("https://*.fieldkit.team", cors)
+	Origin("https://fkdev.org", cors)
+	Origin("https://*.fkdev.org", cors)
 	Origin("/(.+[.])?localhost:\\d+/", cors)    // Dev
 	Origin("/(.+[.])?fieldkit.org:\\d+/", cors) // Dev
 	Consumes("application/json")

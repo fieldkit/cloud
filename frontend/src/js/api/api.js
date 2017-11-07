@@ -115,11 +115,14 @@ class FKApiClient {
   }
 }
 
-let API_HOST = 'http://api.fieldkit.org:8080';
+let API_HOST = 'http://api.fieldkit.org';
 if (process.env.NODE_ENV === 'development') {
   API_HOST = 'http://localhost:8080';
 } else if (process.env.NODE_ENV === 'staging' || window.location.hostname.endsWith('fieldkit.team')) {
   API_HOST = 'https://api.fieldkit.team';
+}
+if (window.location.hostname.endsWith("fkdev.org")) {
+    API_HOST = 'https://api.fkdev.org';
 }
 
 export default new FKApiClient(API_HOST)
