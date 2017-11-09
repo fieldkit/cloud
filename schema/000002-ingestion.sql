@@ -2,8 +2,7 @@ CREATE TABLE fieldkit.raw_message (
     id serial PRIMARY KEY,
     time timestamp,
     origin_id varchar NOT NULL, -- SQS Id or some other provider generated identifier.
-    data json NOT NULL,
-    hash varchar NOT NULL
+    data json NOT NULL
 );
 
 CREATE TABLE fieldkit.device (

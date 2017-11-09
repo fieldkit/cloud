@@ -310,6 +310,19 @@ func main() {
 		landingServer = singlepageApplication
 	}
 
+	rawMessageIngester, err := backend.NewRawMessageIngester(database)
+	if err != nil {
+		panic(err)
+	}
+
+	serveApi := func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/messages/ingestion" {
+			rawMessageIngester.ServeHTTP(w, req)
+		} else {
+			service.Mux.ServeHTTP(w, req)
+		}
+	}
+
 	apiDomain := "api." + config.Domain
 	suffix := "." + config.Domain
 	server := &http.Server{
@@ -321,7 +334,7 @@ func main() {
 			}
 
 			if req.Host == apiDomain {
-				service.Mux.ServeHTTP(w, req)
+				serveApi(w, req)
 				return
 			}
 
@@ -340,7 +353,7 @@ func main() {
 				return
 			}
 
-			service.Mux.ServeHTTP(w, req)
+			serveApi(w, req)
 		}),
 	}
 
