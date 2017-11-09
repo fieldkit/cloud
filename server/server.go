@@ -167,16 +167,16 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(config.PostgresURL)
-	backend, err := backend.New(config.PostgresURL)
+	be, err := backend.New(config.PostgresURL)
 	if err != nil {
 		panic(err)
 	}
 
 	// TWITTER
 	if flag.Arg(0) == "twitter" {
-		twitterListCredentialer := backend.TwitterListCredentialer()
+		twitterListCredentialer := be.TwitterListCredentialer()
 		social.Twitter(social.TwitterOptions{
-			Backend: backend,
+			Backend: be,
 			StreamOptions: twitter.StreamOptions{
 				UserLister:       twitterListCredentialer,
 				UserCredentialer: twitterListCredentialer,
@@ -196,7 +196,7 @@ func main() {
 	// Mount "user" controller
 	c2, err := api.NewUserController(service, api.UserControllerOptions{
 		Database:   database,
-		Backend:    backend,
+		Backend:    be,
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
 		Domain:     config.Domain,
@@ -238,13 +238,13 @@ func main() {
 
 	// Mount "input" controller
 	c8 := api.NewInputController(service, api.InputControllerOptions{
-		Backend: backend,
+		Backend: be,
 	})
 	app.MountInputController(service, c8)
 
 	// Mount "twitter" controller
 	c9 := api.NewTwitterController(service, api.TwitterControllerOptions{
-		Backend:        backend,
+		Backend:        be,
 		ConsumerKey:    config.TwitterConsumerKey,
 		ConsumerSecret: config.TwitterConsumerSecret,
 		Domain:         config.Domain,
@@ -257,19 +257,19 @@ func main() {
 
 	// Mount "twitter" controller
 	c11 := api.NewFieldkitController(service, api.FieldkitControllerOptions{
-		Backend: backend,
+		Backend: be,
 	})
 	app.MountFieldkitController(service, c11)
 
 	// Mount "document" controller
 	c13 := api.NewDocumentController(service, api.DocumentControllerOptions{
-		Backend: backend,
+		Backend: be,
 	})
 	app.MountDocumentController(service, c13)
 
 	// Mount "input_token" controller
 	c14 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
-		Backend: backend,
+		Backend: be,
 	})
 	app.MountInputTokenController(service, c14)
 
