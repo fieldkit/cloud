@@ -156,11 +156,11 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
 		if err != nil {
-			return nil, pm, err
+			return nil, pm, fmt.Errorf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
 		}
 		im, err := i.ApplySchemas(pm, schemas)
 		if err != nil {
-			return nil, pm, err
+			return nil, pm, fmt.Errorf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
 		} else {
 			i.Statistics.Successes += 1
 			return im, pm, nil
@@ -173,15 +173,9 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
 	_, pm, err := i.Ingest(raw)
 	if err != nil {
-		if true {
-			log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
-		} else {
-			log.Printf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
-		}
+		log.Printf("%v", err)
 	} else {
-		if true {
-			log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-		}
+		log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 	}
 	return nil
 }
