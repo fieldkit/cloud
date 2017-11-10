@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker exec -it fkcloud_postgres_1 psql -U fieldkit fieldkit
+docker exec -it cloud_postgres_1 psql -U fieldkit fieldkit
