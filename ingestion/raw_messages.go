@@ -35,7 +35,7 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 	rmd := SqsMessage{}
 	err = json.Unmarshal([]byte(row.Data), &rmd)
 	if err != nil {
-		return nil, fmt.Errorf("Malformed RawMessage: %s", row.Data)
+		return nil, fmt.Errorf("Malformed RawMessage: %s (%v)", row.Data, err)
 	}
 
 	if rmd.Context.RequestId == "" {
