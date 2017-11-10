@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"strings"
 	"unicode"
 )
 
@@ -21,4 +22,8 @@ func ToSnake(in string) string {
 	}
 
 	return string(out)
+}
+
+func StripNewLines(text string) string {
+	return strings.Replace(strings.Replace(text, "\r", "", -1), "\n", "", -1)
 }

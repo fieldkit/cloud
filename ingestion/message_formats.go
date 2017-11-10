@@ -28,7 +28,7 @@ func normalizeCommaSeparated(provider string, schemaPrefix string, raw *RawMessa
 	trimmed := strings.TrimSpace(text)
 	fields := strings.Split(trimmed, ",")
 	if len(fields) < 2 {
-		return nil, fmt.Errorf("%s(Not enough fields: '%s')", provider, text)
+		return nil, fmt.Errorf("%s(Not enough fields: '%s')", provider, StripNewLines(text))
 	}
 
 	maybeTime := fields[0]
