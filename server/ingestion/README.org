@@ -1,0 +1,19 @@
+* Message Ingest
+  Two very similar methods:
+
+** Webhook
+** API
+
+* Message Schemas
+
+  For every message we need to find its Schema.
+
+  1. Determine the provider format, is this a RockBlock, FK Raw, Twilio, Particle message, Twitter, etc...
+     NOTE: Some message providers have a fixed Schema (Twitter)
+  2. Decode message from a known format so we can locate Schema correlators:
+       - Parsing known binary message formats.
+       - Splitting CSVs into arrays.
+       - Parsing JSON into a known object/map
+  3. Use schema correlators from that information to build a SchemaId
+  4. Lookup Schema using that SchemaId
+  5. Set orphaned messages aside until they're able to be identified (that is until a new Schema is defined)

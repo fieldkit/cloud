@@ -1,0 +1,10 @@
+version: '2'
+services:
+  postgres:
+    image: mdillon/postgis:9.6-alpine
+    environment:
+      - POSTGRES_USER=fieldkit
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fieldkit
+    volumes:
+      - ./schema:/docker-entrypoint-initdb.d/:ro
