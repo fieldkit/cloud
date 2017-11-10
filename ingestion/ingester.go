@@ -138,43 +138,51 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 	return nil, fmt.Errorf("Schemas failed: %v", errors)
 }
 
-func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
+func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *ProcessedMessage, err error) {
 	i.Statistics.Processed += 1
 
 	mp, err := IdentifyMessageProvider(raw)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if mp == nil {
-		log.Printf("(%s)[Error]: No message provider: (ContentType: %s)", raw.RequestId, raw.ContentType)
-		return nil
+		return nil, nil, fmt.Errorf("(%s)[Error]: No message provider: (ContentType: %s)", raw.RequestId, raw.ContentType)
 	}
 
-	pm, err := mp.ProcessMessage(raw)
+	pm, err = mp.ProcessMessage(raw)
 	if err != nil {
-		log.Printf("(%s)[Error]: %v", raw.RequestId, err)
+		return nil, nil, fmt.Errorf("(%s)[Error]: %v", raw.RequestId, err)
 	}
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
 		if err != nil {
-			return err
+			return nil, pm, err
 		}
-		fm, err := i.ApplySchemas(pm, schemas)
+		im, err := i.ApplySchemas(pm, schemas)
 		if err != nil {
-			if true {
-				log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
-			} else {
-				log.Printf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
-			}
+			return nil, pm, err
 		} else {
-			if true {
-				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-			}
 			i.Statistics.Successes += 1
+			return im, pm, nil
 		}
-		_ = fm
 	}
 
+	return
+}
+
+func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
+	_, pm, err := i.Ingest(raw)
+	if err != nil {
+		if true {
+			log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
+		} else {
+			log.Printf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
+		}
+	} else {
+		if true {
+			log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+		}
+	}
 	return nil
 }
 
