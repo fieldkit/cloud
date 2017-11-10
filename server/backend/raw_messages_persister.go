@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/conservify/ingestion/ingestion"
+	"github.com/O-C-R/fieldkit/server/ingestion"
 	"github.com/conservify/sqlxcache"
 	"io/ioutil"
 	"log"
