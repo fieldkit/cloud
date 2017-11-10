@@ -170,11 +170,18 @@
 			"revisionTime": "2017-02-01T15:12:07Z"
 		},
 		{
+			"checksumSHA1": "SkPt6W6tpeUmlmmyk0Nt5ObqhtI=",
+			"path": "github.com/conservify/ingestion/ingestion",
+			"revision": "cdca0f38100afe5e1519a08dcb6c6a9d2f3a4028",
+			"revisionTime": "2017-11-07T23:37:03Z"
+		},
+		{
 			"checksumSHA1": "kioiN4V6B8K81d0tSDvaIR2+pEU=",
 			"path": "github.com/conservify/sqlxcache",
 			"revision": "722db915a35a77d87aefa596812906258b3dd18e",
 			"revisionTime": "2017-11-09T22:46:40Z"
 		},
+		{
 			"checksumSHA1": "mO6yxa23lXY/HZ5nLTr1XgPAuXU=",
 			"path": "github.com/dghubble/go-twitter/twitter",
 			"revision": "fc93bb35701bb85903d17daa80a21a824b9c592f",
@@ -369,6 +376,12 @@
 			"path": "github.com/golang/freetype/truetype",
 			"revision": "d9be45aaf7452cc30c0ceb1b1bf7efe1d17b7c87",
 			"revisionTime": "2016-12-08T06:47:10Z"
+		},
+		{
+			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "1909bc2f63dc92bb931deace8b8312c4db72d12f",
+			"revisionTime": "2017-08-08T02:16:21Z"
 		},
 		{
 			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",

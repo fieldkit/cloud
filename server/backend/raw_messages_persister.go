@@ -6,10 +6,12 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/O-C-R/sqlxcache"
+	"github.com/conservify/ingestion/ingestion"
+	"github.com/conservify/sqlxcache"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 type IncomingMessageContext struct {
@@ -18,8 +20,8 @@ type IncomingMessageContext struct {
 }
 
 type IncomingMessageParams struct {
-	Headers     map[string][]string `json:"header"`
-	QueryString map[string][]string `json:"querystring"`
+	Headers     map[string]string `json:"header"`
+	QueryString map[string]string `json:"querystring"`
 }
 
 type IncomingMessage struct {
@@ -29,13 +31,51 @@ type IncomingMessage struct {
 }
 
 type RawMessageIngester struct {
-	db *sqlxcache.DB
+	incoming chan *ingestion.RawMessageRow
+	ingester *ingestion.MessageIngester
+	db       *sqlxcache.DB
 }
 
-func NewRawMessageIngester(db *sqlxcache.DB) (*RawMessageIngester, error) {
-	return &RawMessageIngester{
-		db: db,
-	}, nil
+func NewRawMessageIngester(db *sqlxcache.DB) (rmi *RawMessageIngester, err error) {
+	incoming := make(chan *ingestion.RawMessageRow, 100)
+
+	sr := ingestion.NewInMemorySchemas()
+	ingestion.AddLegacySchemas(sr)
+	streams := ingestion.NewInMemoryStreams()
+	ingester := ingestion.NewMessageIngester(sr, streams)
+
+	rmi = &RawMessageIngester{
+		incoming: incoming,
+		ingester: ingester,
+		db:       db,
+	}
+
+	go backgroundIngestion(rmi)
+
+	return
+}
+
+func backgroundIngestion(rmi *RawMessageIngester) {
+	for row := range rmi.incoming {
+		raw, err := ingestion.CreateRawMessageFromRow(row)
+		if err != nil {
+			log.Printf("(%s)[Error] %v", row.Id, err)
+		} else {
+			err = rmi.ingester.HandleMessage(raw)
+			if err != nil {
+				log.Printf("(%s)[Error] %v", row.Id, err)
+			}
+		}
+	}
+}
+
+// TODO: Eventually I'd like to see this go away. It's a relic from some Request Template stuff we had in Lambda.
+func flatten(m map[string][]string) map[string]string {
+	f := make(map[string]string)
+	for k, v := range m {
+		f[k] = v[0]
+	}
+	return f
 }
 
 func generateOriginId() (string, error) {
@@ -61,15 +101,15 @@ func (rmi *RawMessageIngester) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	m := IncomingMessage{
+	m := &IncomingMessage{
 		RawBody: string(bodyBytes),
 		Context: IncomingMessageContext{
 			UserAgent: req.UserAgent(),
-			RequestId: "",
+			RequestId: originId,
 		},
 		Params: IncomingMessageParams{
-			QueryString: queryString,
-			Headers:     headers,
+			QueryString: flatten(queryString),
+			Headers:     flatten(headers),
 		},
 	}
 
@@ -79,5 +119,13 @@ func (rmi *RawMessageIngester) ServeHTTP(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	rmi.db.ExecContext(context.TODO(), `INSERT INTO fieldkit.raw_message (time, origin_id, data) VALUES (now(), $1, $2)`, originId, string(data))
+	time := time.Now()
+
+	rmi.db.ExecContext(context.TODO(), `INSERT INTO fieldkit.raw_message (time, origin_id, data) VALUES ($1, $2, $3)`, time, originId, string(data))
+
+	rmi.incoming <- &ingestion.RawMessageRow{
+		Time: uint64(time.Unix()),
+		Id:   originId,
+		Data: string(data),
+	}
 }
