@@ -3,9 +3,9 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/O-C-R/fieldkit/server/api/app"
-	"github.com/O-C-R/fieldkit/server/backend"
-	"github.com/O-C-R/fieldkit/server/data"
+	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 func InputTokenType(inputToken *data.InputToken) *app.InputToken {

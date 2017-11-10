@@ -4,8 +4,8 @@ import (
 	"github.com/conservify/sqlxcache"
 	"github.com/goadesign/goa"
 
-	"github.com/O-C-R/fieldkit/server/api/app"
-	"github.com/O-C-R/fieldkit/server/data"
+	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type AdministratorControllerOptions struct {

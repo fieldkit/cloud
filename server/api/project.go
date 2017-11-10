@@ -8,8 +8,8 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/O-C-R/fieldkit/server/api/app"
-	"github.com/O-C-R/fieldkit/server/data"
+	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type ProjectControllerOptions struct {

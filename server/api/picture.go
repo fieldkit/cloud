@@ -12,7 +12,7 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 	"github.com/lucasb-eyer/go-colorful"
 
-	"github.com/O-C-R/fieldkit/server/api/app"
+	"github.com/fieldkit/cloud/server/api/app"
 )
 
 const (

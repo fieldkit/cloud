@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
 
-	"github.com/O-C-R/fieldkit/server/data"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type AWSSESEmailer struct {

@@ -7,9 +7,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/O-C-R/fieldkit/server/backend"
-	"github.com/O-C-R/fieldkit/server/data"
-	"github.com/O-C-R/fieldkit/server/social/twitter"
+	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/social/twitter"
 )
 
 const (

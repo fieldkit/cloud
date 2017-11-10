@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/O-C-R/fieldkit/server/api/design"
+	_ "github.com/fieldkit/cloud/server/api/design"
 
 	"github.com/goadesign/goa/design"
 	"github.com/goadesign/goa/goagen/codegen"

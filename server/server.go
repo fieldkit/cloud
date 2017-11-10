@@ -23,12 +23,12 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 
-	"github.com/O-C-R/fieldkit/server/api"
-	"github.com/O-C-R/fieldkit/server/api/app"
-	"github.com/O-C-R/fieldkit/server/backend"
-	"github.com/O-C-R/fieldkit/server/email"
-	"github.com/O-C-R/fieldkit/server/social"
-	"github.com/O-C-R/fieldkit/server/social/twitter"
+	"github.com/fieldkit/cloud/server/api"
+	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/social"
+	"github.com/fieldkit/cloud/server/social/twitter"
 )
 
 type Config struct {

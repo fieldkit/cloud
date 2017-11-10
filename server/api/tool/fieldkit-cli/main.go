@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/O-C-R/fieldkit/server/api/client"
-	"github.com/O-C-R/fieldkit/server/api/tool/cli"
+	"github.com/fieldkit/cloud/server/api/client"
+	"github.com/fieldkit/cloud/server/api/tool/cli"
 	goaclient "github.com/goadesign/goa/client"
 	"github.com/spf13/cobra"
 	"net/http"
