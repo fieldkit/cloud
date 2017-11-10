@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/O-C-R/sqlxcache"
+	"github.com/conservify/sqlxcache"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"

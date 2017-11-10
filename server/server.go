@@ -13,10 +13,10 @@ import (
 	"strings"
 
 	"github.com/O-C-R/singlepage"
-	"github.com/O-C-R/sqlxcache"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
+	"github.com/conservify/sqlxcache"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"

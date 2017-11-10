@@ -170,6 +170,11 @@
 			"revisionTime": "2017-02-01T15:12:07Z"
 		},
 		{
+			"checksumSHA1": "kioiN4V6B8K81d0tSDvaIR2+pEU=",
+			"path": "github.com/conservify/sqlxcache",
+			"revision": "722db915a35a77d87aefa596812906258b3dd18e",
+			"revisionTime": "2017-11-09T22:46:40Z"
+		},
 			"checksumSHA1": "mO6yxa23lXY/HZ5nLTr1XgPAuXU=",
 			"path": "github.com/dghubble/go-twitter/twitter",
 			"revision": "fc93bb35701bb85903d17daa80a21a824b9c592f",

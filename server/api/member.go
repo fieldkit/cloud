@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/O-C-R/sqlxcache"
+	"github.com/conservify/sqlxcache"
 	"github.com/goadesign/goa"
 
 	"github.com/O-C-R/fieldkit/server/api/app"
