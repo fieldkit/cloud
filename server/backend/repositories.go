@@ -100,8 +100,13 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
 
 	for _, s := range schemas {
 		if s.Key == id.Stream {
-			// Need s.DeviceID and s.ID
-			js := &ingestion.JsonMessageSchema{}
+			ids := DatabaseIds{
+				SchemaID: s.ID,
+				DeviceID: s.DeviceID,
+			}
+			js := &ingestion.JsonMessageSchema{
+				Ids: ids,
+			}
 			err = json.Unmarshal([]byte(s.JSONSchema), js)
 			if err != nil {
 				return nil, fmt.Errorf("Malformed schema: %v", err)
@@ -133,4 +138,9 @@ type DeviceLocation struct {
 	DeviceID  int64          `db:"device_id"`
 	Timestamp *time.Time     `db:"timestamp"`
 	Location  *data.Location `db:"location"`
+}
+
+type DatabaseIds struct {
+	SchemaID int64
+	DeviceID int64
 }

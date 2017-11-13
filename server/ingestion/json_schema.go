@@ -8,6 +8,7 @@ type JsonSchemaField struct {
 
 type JsonMessageSchema struct {
 	MessageSchema
+	Ids                 interface{}
 	UseProviderTime     bool
 	UseProviderLocation bool
 	HasTime             bool

@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/conservify/sqlxcache"
-	_ "github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/ingestion"
 	"io/ioutil"
 	"log"
@@ -73,6 +73,19 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 			} else {
 				if true {
 					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+
+					// TODO: Not terrible happy with this hack.
+					ids := im.Schema.Ids.(DatabaseIds)
+					d := data.Document{
+						SchemaID:  int32(ids.SchemaID),
+						InputID:   int32(ids.DeviceID),
+						TeamID:    nil,
+						UserID:    nil,
+						Timestamp: *im.Time,
+						Location:  data.NewLocation(float64(im.Location.Coordinates[0]), float64(im.Location.Coordinates[1])),
+					}
+					d.SetData(im.Fields)
+					rmi.backend.AddDocument(context.TODO(), &d)
 				}
 			}
 			_ = im

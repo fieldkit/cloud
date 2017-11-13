@@ -1,7 +1,5 @@
 package ingestion
 
-import ()
-
 type MessageSchema struct {
 }
 
