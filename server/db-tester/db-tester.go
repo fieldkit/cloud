@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/conservify/ingestion/ingestion"
+	"github.com/fieldkit/cloud/server/ingestion"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
