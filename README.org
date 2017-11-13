@@ -1,4 +1,4 @@
-#+TITLE:  README for fk-cloud 
+#+TITLE:  README for cloud
 #+EMAIL:  jacob@conservify.org 
 
 * FieldKit 
