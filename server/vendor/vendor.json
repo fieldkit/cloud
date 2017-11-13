@@ -170,12 +170,6 @@
 			"revisionTime": "2017-02-01T15:12:07Z"
 		},
 		{
-			"checksumSHA1": "SkPt6W6tpeUmlmmyk0Nt5ObqhtI=",
-			"path": "github.com/conservify/ingestion/ingestion",
-			"revision": "cdca0f38100afe5e1519a08dcb6c6a9d2f3a4028",
-			"revisionTime": "2017-11-07T23:37:03Z"
-		},
-		{
 			"checksumSHA1": "kioiN4V6B8K81d0tSDvaIR2+pEU=",
 			"path": "github.com/conservify/sqlxcache",
 			"revision": "722db915a35a77d87aefa596812906258b3dd18e",
