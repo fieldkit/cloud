@@ -46,13 +46,13 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 		return &Location{Coordinates: pm.Location}, nil
 	}
 	if ms.HasLocation {
-		coordinates := make([]float32, 0)
+		coordinates := make([]float64, 0)
 		for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
-			f, err := strconv.ParseFloat(m[key].(string), 32)
+			f, err := strconv.ParseFloat(m[key].(string), 64)
 			if err != nil {
 				return nil, err
 			}
-			coordinates = append(coordinates, float32(f))
+			coordinates = append(coordinates, f)
 		}
 		if len(coordinates) < 2 {
 			return nil, fmt.Errorf("Not enough coordinates.")

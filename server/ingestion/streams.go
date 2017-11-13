@@ -8,7 +8,7 @@ import (
 
 type Location struct {
 	UpdatedAt   time.Time
-	Coordinates []float32
+	Coordinates []float64
 }
 
 type LocationTimes []int64

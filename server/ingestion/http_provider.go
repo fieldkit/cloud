@@ -18,7 +18,7 @@ const (
 )
 
 type HttpJsonMessage struct {
-	Location []float32         `json:"location"`
+	Location []float64         `json:"location"`
 	Time     int64             `json:"time"`
 	Device   string            `json:"device"`
 	Stream   string            `json:"stream"`

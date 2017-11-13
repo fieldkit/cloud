@@ -64,7 +64,7 @@ type ProcessedMessage struct {
 	MessageId   MessageId
 	SchemaId    SchemaId
 	Time        *time.Time
-	Location    []float32
+	Location    []float64
 	ArrayValues []string
 	MapValues   map[string]string
 }
