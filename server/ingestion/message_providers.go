@@ -18,6 +18,10 @@ type DeviceId struct {
 	Id       string
 }
 
+func (s DeviceId) ToString() string {
+	return fmt.Sprintf("%s-%s", s.Provider, s.Id)
+}
+
 type SchemaId struct {
 	Device DeviceId
 	Stream string
@@ -25,9 +29,9 @@ type SchemaId struct {
 
 func (s SchemaId) ToString() string {
 	if s.Stream == "" {
-		return fmt.Sprintf("%s-%s", s.Device.Provider, s.Device.Id)
+		return s.Device.ToString()
 	}
-	return fmt.Sprintf("%s-%s-%s", s.Device.Provider, s.Device.Id, s.Stream)
+	return fmt.Sprintf("%s-%s", s.Device.ToString(), s.Stream)
 }
 
 func NewSchemaId(provider string, device string, stream string) SchemaId {
