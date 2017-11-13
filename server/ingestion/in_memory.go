@@ -2,27 +2,43 @@ package ingestion
 
 import (
 	"log"
+	"sort"
 )
 
+type Locations []*Location
+
+func (a Locations) Len() int           { return len(a) }
+func (a Locations) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Locations) Less(i, j int) bool { return a[i].UpdatedAt.Unix() < a[j].UpdatedAt.Unix() }
+
+type inMemoryStream struct {
+	Locations Locations
+}
+
 type InMemoryStreams struct {
-	Streams map[DeviceId]*Stream
+	Streams map[DeviceId]*inMemoryStream
 }
 
 func NewInMemoryStreams() StreamsRepository {
 	return &InMemoryStreams{
-		Streams: make(map[DeviceId]*Stream),
+		Streams: make(map[DeviceId]*inMemoryStream),
 	}
 }
 
 func (msr *InMemoryStreams) LookupStream(id DeviceId) (ms *Stream, err error) {
 	if msr.Streams[id] == nil {
-		msr.Streams[id] = &Stream{
-			Id:             id,
-			LocationByTime: make(map[int64]*Location),
+		msr.Streams[id] = &inMemoryStream{
+			Locations: Locations{},
 		}
 		log.Printf("Created new Stream: %s", id)
 	}
-	ms = msr.Streams[id]
+	return
+}
+
+func (msr *InMemoryStreams) UpdateLocation(id DeviceId, l *Location) (err error) {
+	ms := msr.Streams[id]
+	ms.Locations = append(ms.Locations, l)
+	sort.Sort(msr.Streams[id].Locations)
 	return
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -41,7 +42,7 @@ func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]int
 	return
 }
 
-func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (l *Location, err error) {
+func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}, t *time.Time) (l *Location, err error) {
 	if ms.UseProviderLocation {
 		return &Location{Coordinates: pm.Location}, nil
 	}
@@ -57,7 +58,10 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 		if len(coordinates) < 2 {
 			return nil, fmt.Errorf("Not enough coordinates.")
 		}
-		return &Location{Coordinates: coordinates}, nil
+		return &Location{
+			UpdatedAt:   t,
+			Coordinates: coordinates,
+		}, nil
 	}
 	return nil, nil
 }
@@ -87,28 +91,31 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		return nil, err
 	}
 
+	if stream == nil {
+		return nil, fmt.Errorf("%s: Unable to find stream", pm.SchemaId.Device)
+	}
+
 	time, err := determineTime(pm, ms, mapped)
 	if err != nil {
 		return nil, fmt.Errorf("%s: Unable to get time (%s)", pm.SchemaId, err)
 	}
 
-	location, err := determineLocation(pm, ms, mapped)
+	location, err := determineLocation(pm, ms, mapped, time)
 	if err != nil {
 		return nil, fmt.Errorf("%s: Unable to get location (%s)", pm.SchemaId, err)
 	}
 	if location != nil {
-		stream.SetLocation(time, location)
+		i.Streams.UpdateLocation(pm.SchemaId.Device, location)
+		stream.Location = location
 	}
-
-	if !stream.HasLocation() {
+	if stream.Location == nil {
 		return nil, fmt.Errorf("%s: Stream has no location, yet.", pm.SchemaId.Device)
 	}
 
-	lastLocation := stream.GetLocation()
 	im = &IngestedMessage{
 		Schema:   ms,
 		Time:     time,
-		Location: lastLocation,
+		Location: stream.Location,
 		Fields:   mapped,
 	}
 
@@ -135,7 +142,16 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 			log.Printf("Unexpected MessageSchema type: %v", schema)
 		}
 	}
-	return nil, fmt.Errorf("Schemas failed: %v", errors)
+	return nil, fmt.Errorf("Schemas failed: %v", makePretty(errors))
+}
+
+func makePretty(errors []error) (m string) {
+	strs := []string{}
+	for _, err := range errors {
+		strs = append(strs, fmt.Sprintf("(%v)", err))
+	}
+
+	return strings.Join(strs, ", ")
 }
 
 func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *ProcessedMessage, err error) {
