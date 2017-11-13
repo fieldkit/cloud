@@ -310,7 +310,7 @@ func main() {
 		landingServer = singlepageApplication
 	}
 
-	rawMessageIngester, err := backend.NewRawMessageIngester(database)
+	rawMessageIngester, err := backend.NewRawMessageIngester(be)
 	if err != nil {
 		panic(err)
 	}

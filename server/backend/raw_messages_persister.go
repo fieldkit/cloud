@@ -6,8 +6,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/fieldkit/cloud/server/ingestion"
 	"github.com/conservify/sqlxcache"
+	_ "github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/ingestion"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,21 +34,22 @@ type IncomingMessage struct {
 type RawMessageIngester struct {
 	incoming chan *ingestion.RawMessageRow
 	ingester *ingestion.MessageIngester
+	backend  *Backend
 	db       *sqlxcache.DB
 }
 
-func NewRawMessageIngester(db *sqlxcache.DB) (rmi *RawMessageIngester, err error) {
+func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	incoming := make(chan *ingestion.RawMessageRow, 100)
 
-	sr := ingestion.NewInMemorySchemas()
-	ingestion.AddLegacySchemas(sr)
-	streams := ingestion.NewInMemoryStreams()
+	sr := NewDatabaseSchemas(b.db)
+	streams := NewDatabaseStreams(b.db)
 	ingester := ingestion.NewMessageIngester(sr, streams)
 
 	rmi = &RawMessageIngester{
 		incoming: incoming,
 		ingester: ingester,
-		db:       db,
+		backend:  b,
+		db:       b.db,
 	}
 
 	go backgroundIngestion(rmi)
@@ -61,10 +63,19 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 		if err != nil {
 			log.Printf("(%s)[Error] %v", row.Id, err)
 		} else {
-			err = rmi.ingester.HandleMessage(raw)
+			im, pm, err := rmi.ingester.Ingest(raw)
 			if err != nil {
-				log.Printf("(%s)[Error] %v", row.Id, err)
+				if pm != nil {
+					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
+				} else {
+					log.Printf("(%s)[Error] %v", row.Id, err)
+				}
+			} else {
+				if true {
+					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				}
 			}
+			_ = im
 		}
 	}
 }
