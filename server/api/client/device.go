@@ -59,8 +59,8 @@ func (c *Client) NewAddDeviceRequest(ctx context.Context, path string, payload *
 }
 
 // GetIDDevicePath computes a request path to the get id action of device.
-func GetIDDevicePath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
+func GetIDDevicePath(id int) string {
+	param0 := strconv.Itoa(id)
 
 	return fmt.Sprintf("/inputs/devices/%s", param0)
 }
@@ -130,8 +130,8 @@ func (c *Client) NewListDeviceRequest(ctx context.Context, path string) (*http.R
 }
 
 // UpdateDevicePath computes a request path to the update action of device.
-func UpdateDevicePath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
+func UpdateDevicePath(id int) string {
+	param0 := strconv.Itoa(id)
 
 	return fmt.Sprintf("/inputs/devices/%s", param0)
 }
@@ -147,6 +147,48 @@ func (c *Client) UpdateDevice(ctx context.Context, path string, payload *UpdateD
 
 // NewUpdateDeviceRequest create the request corresponding to the update action endpoint of the device resource.
 func (c *Client) NewUpdateDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// UpdateSchemaDevicePath computes a request path to the update schema action of device.
+func UpdateSchemaDevicePath(id int) string {
+	param0 := strconv.Itoa(id)
+
+	return fmt.Sprintf("/inputs/devices/%s/schemas", param0)
+}
+
+// Update an Device input schema
+func (c *Client) UpdateSchemaDevice(ctx context.Context, path string, payload *UpdateDeviceInputSchemaPayload) (*http.Response, error) {
+	req, err := c.NewUpdateSchemaDeviceRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateSchemaDeviceRequest create the request corresponding to the update schema action endpoint of the device resource.
+func (c *Client) NewUpdateSchemaDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputSchemaPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {

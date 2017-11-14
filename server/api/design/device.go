@@ -10,11 +10,22 @@ var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
 	Reference(Input)
 	Attributes(func() {
 		Attribute("id")
-		Attribute("token")
-		Attribute("key")
+		Attribute("expedition_id")
+		Attribute("team_id")
+		Attribute("user_id")
+		Attribute("active", Boolean)
+		Attribute("name", String)
+		Attribute("token", String)
+		Attribute("key", String)
+		Required("id", "expedition_id", "active", "name", "token", "key")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("expedition_id")
+		Attribute("team_id")
+		Attribute("user_id")
+		Attribute("active")
+		Attribute("name")
 		Attribute("token")
 		Attribute("key")
 	})
@@ -41,8 +52,20 @@ var AddDeviceInputPayload = Type("AddDeviceInputPayload", func() {
 
 var UpdateDeviceInputPayload = Type("UpdateDeviceInputPayload", func() {
 	Reference(Input)
-	Attribute("schema")
-	Required("schema")
+	Attribute("name")
+	Required("name")
+	Attribute("key")
+	Required("key")
+})
+
+var UpdateDeviceInputSchemaPayload = Type("UpdateDeviceInputSchemaPayload", func() {
+	Reference(Input)
+	Attribute("key")
+	Required("key")
+	Attribute("active")
+	Required("active")
+	Attribute("json_schema")
+	Required("json_schema")
 })
 
 var _ = Resource("device", func() {
@@ -60,16 +83,16 @@ var _ = Resource("device", func() {
 		Payload(AddDeviceInputPayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Location)
+			Media(DeviceInput)
 		})
 	})
 
 	Action("update", func() {
-		Routing(PATCH("inputs/devices/:input_id"))
+		Routing(PATCH("inputs/devices/:id"))
 		Description("Update an Device input")
 		Params(func() {
-			Param("input_id", Integer)
-			Required("input_id")
+			Param("id", Integer)
+			Required("id")
 		})
 		Payload(UpdateDeviceInputPayload)
 		Response(BadRequest)
@@ -78,12 +101,26 @@ var _ = Resource("device", func() {
 		})
 	})
 
+	Action("update schema", func() {
+		Routing(PATCH("inputs/devices/:id/schemas"))
+		Description("Update an Device input schema")
+		Params(func() {
+			Param("id", Integer)
+			Required("id")
+		})
+		Payload(UpdateDeviceInputSchemaPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(DeviceInput)
+		})
+	})
+
 	Action("get id", func() {
-		Routing(GET("inputs/devices/:input_id"))
+		Routing(GET("inputs/devices/:id"))
 		Description("Get a Device input")
 		Params(func() {
-			Param("input_id", Integer)
-			Required("input_id")
+			Param("id", Integer)
+			Required("id")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

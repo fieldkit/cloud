@@ -10,3 +10,10 @@ type DeviceInput struct {
 	Input
 	Device
 }
+
+type DeviceSchema struct {
+	ID       int64  `db:"id"`
+	DeviceID int64  `db:"device_id"`
+	SchemaID int64  `db:"schema_id"`
+	Key      string `db:"key"`
+}

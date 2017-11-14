@@ -2,11 +2,10 @@ package backend
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/conservify/sqlxcache"
-	_ "github.com/lib/pq"
-
 	"github.com/fieldkit/cloud/server/data"
+	_ "github.com/lib/pq"
 )
 
 type Backend struct {
@@ -151,6 +150,17 @@ func (b *Backend) AddTwitterAccountInput(ctx context.Context, twitterAccount *da
 	return nil
 }
 
+func (b *Backend) Expedition(ctx context.Context, expeditionID int32) (*data.Expedition, error) {
+	expedition := &data.Expedition{}
+	if err := b.db.GetContext(ctx, expedition, `
+		SELECT * FROM fieldkit.expedition WHERE id = $1
+		`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return expedition, nil
+}
+
 func (b *Backend) Input(ctx context.Context, inputID int32) (*data.Input, error) {
 	input := &data.Input{}
 	if err := b.db.GetContext(ctx, input, `
@@ -236,9 +246,27 @@ func (b *Backend) ListDeviceInputsByID(ctx context.Context, expeditionID int32) 
 	return devices, nil
 }
 
+func (b *Backend) GetDeviceInputByID(ctx context.Context, id int32) (*data.DeviceInput, error) {
+	devices := []*data.DeviceInput{}
+	if err := b.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.input_id, d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+					WHERE i.id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	if len(devices) != 1 {
+		return nil, fmt.Errorf("No such Device Input")
+	}
+
+	return devices[0], nil
+}
+
 func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
-	TwitterAccountInputs := []*data.TwitterAccountInput{}
-	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
+	twitterAccountInputs := []*data.TwitterAccountInput{}
+	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
@@ -248,7 +276,7 @@ func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID
 		return nil, err
 	}
 
-	return TwitterAccountInputs, nil
+	return twitterAccountInputs, nil
 }
 
 func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccount, error) {
@@ -263,8 +291,8 @@ func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccou
 }
 
 func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountInput, error) {
-	TwitterAccountInputs := []*data.TwitterAccountInput{}
-	if err := b.db.SelectContext(ctx, &TwitterAccountInputs, `
+	twitterAccountInputs := []*data.TwitterAccountInput{}
+	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
 			FROM fieldkit.twitter_account AS ta 
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
@@ -274,19 +302,31 @@ func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accou
 		return nil, err
 	}
 
-	return TwitterAccountInputs, nil
+	return twitterAccountInputs, nil
 }
 
-func (b *Backend) AddSchema(ctx context.Context, fieldkitInput *data.Schema) error {
-	return b.db.NamedGetContext(ctx, fieldkitInput, `
+func (b *Backend) AddDevice(ctx context.Context, device *data.Device) error {
+	return b.db.NamedGetContext(ctx, device, `
+		INSERT INTO fieldkit.device (input_id, key, token) VALUES (:input_id, :key, :token) RETURNING *
+		`, device)
+}
+
+func (b *Backend) AddRawSchema(ctx context.Context, schema *data.RawSchema) error {
+	return b.db.NamedGetContext(ctx, schema, `
 		INSERT INTO fieldkit.schema (project_id, json_schema) VALUES (:project_id, :json_schema) RETURNING *
-		`, fieldkitInput)
+		`, schema)
 }
 
-func (b *Backend) UpdateSchema(ctx context.Context, fieldkitInput *data.Schema) error {
-	return b.db.NamedGetContext(ctx, fieldkitInput, `
+func (b *Backend) AddSchema(ctx context.Context, schema *data.Schema) error {
+	return b.db.NamedGetContext(ctx, schema, `
+		INSERT INTO fieldkit.schema (project_id, json_schema) VALUES (:project_id, :json_schema) RETURNING *
+		`, schema)
+}
+
+func (b *Backend) UpdateSchema(ctx context.Context, schema *data.Schema) error {
+	return b.db.NamedGetContext(ctx, schema, `
 		UPDATE fieldkit.schema SET project_id = :project_id, json_schema = :json_schema RETURNING *
-		`, fieldkitInput)
+		`, schema)
 }
 
 func (b *Backend) ListSchemas(ctx context.Context, project string) ([]*data.Schema, error) {

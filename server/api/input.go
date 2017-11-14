@@ -13,6 +13,7 @@ func InputType(input *data.Input) *app.Input {
 		ID:           int(input.ID),
 		ExpeditionID: int(input.ExpeditionID),
 		Name:         input.Name,
+		Active:       &input.Active,
 	}
 
 	if input.TeamID != nil {

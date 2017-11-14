@@ -317,8 +317,8 @@ func NewAddDeviceContext(ctx context.Context, r *http.Request, service *goa.Serv
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *AddDeviceContext) OK(r *Location) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location+json")
+func (ctx *AddDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -333,7 +333,7 @@ type GetIDDeviceContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	ID int
 }
 
 // NewGetIDDeviceContext parses the incoming request URL and body, performs validations and creates the
@@ -345,13 +345,13 @@ func NewGetIDDeviceContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		if id, err2 := strconv.Atoi(rawID); err2 == nil {
+			rctx.ID = id
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("id", rawID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -429,7 +429,7 @@ type UpdateDeviceContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	ID      int
 	Payload *UpdateDeviceInputPayload
 }
 
@@ -442,13 +442,13 @@ func NewUpdateDeviceContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		if id, err2 := strconv.Atoi(rawID); err2 == nil {
+			rctx.ID = id
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("id", rawID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -462,6 +462,48 @@ func (ctx *UpdateDeviceContext) OK(r *DeviceInput) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *UpdateDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateSchemaDeviceContext provides the device update schema action context.
+type UpdateSchemaDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ID      int
+	Payload *UpdateDeviceInputSchemaPayload
+}
+
+// NewUpdateSchemaDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller update schema action.
+func NewUpdateSchemaDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateSchemaDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateSchemaDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		if id, err2 := strconv.Atoi(rawID); err2 == nil {
+			rctx.ID = id
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("id", rawID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateSchemaDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateSchemaDeviceContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

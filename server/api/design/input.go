@@ -13,6 +13,7 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 		Attribute("name", String)
 		Attribute("team_id", Integer)
 		Attribute("user_id", Integer)
+		Attribute("active", Boolean)
 		Required("id", "expedition_id", "name")
 	})
 	View("default", func() {
@@ -21,6 +22,7 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 		Attribute("name")
 		Attribute("team_id")
 		Attribute("user_id")
+		Attribute("active")
 	})
 })
 
@@ -29,6 +31,7 @@ var UpdateInputPayload = Type("UpdateInputPayload", func() {
 	Attribute("name")
 	Attribute("team_id")
 	Attribute("user_id")
+	Attribute("active")
 	Required("name")
 })
 

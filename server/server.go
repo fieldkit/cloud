@@ -253,7 +253,8 @@ func main() {
 
 	// Mount "device" controller
 	c15 := api.NewDeviceController(service, api.DeviceControllerOptions{
-		Backend: be,
+		Database: database,
+		Backend:  be,
 	})
 	app.MountDeviceController(service, c15)
 

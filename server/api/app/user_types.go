@@ -613,13 +613,17 @@ func (ut *LoginPayload) Validate() (err error) {
 
 // updateDeviceInputPayload user type.
 type updateDeviceInputPayload struct {
-	Schema *string `form:"schema,omitempty" json:"schema,omitempty" xml:"schema,omitempty"`
+	Key  *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
 // Validate validates the updateDeviceInputPayload type instance.
 func (ut *updateDeviceInputPayload) Validate() (err error) {
-	if ut.Schema == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "schema"))
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
 	}
 	return
 }
@@ -627,27 +631,90 @@ func (ut *updateDeviceInputPayload) Validate() (err error) {
 // Publicize creates UpdateDeviceInputPayload from updateDeviceInputPayload
 func (ut *updateDeviceInputPayload) Publicize() *UpdateDeviceInputPayload {
 	var pub UpdateDeviceInputPayload
-	if ut.Schema != nil {
-		pub.Schema = *ut.Schema
+	if ut.Key != nil {
+		pub.Key = *ut.Key
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
 	}
 	return &pub
 }
 
 // UpdateDeviceInputPayload user type.
 type UpdateDeviceInputPayload struct {
-	Schema string `form:"schema" json:"schema" xml:"schema"`
+	Key  string `form:"key" json:"key" xml:"key"`
+	Name string `form:"name" json:"name" xml:"name"`
 }
 
 // Validate validates the UpdateDeviceInputPayload type instance.
 func (ut *UpdateDeviceInputPayload) Validate() (err error) {
-	if ut.Schema == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "schema"))
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
+	}
+	return
+}
+
+// updateDeviceInputSchemaPayload user type.
+type updateDeviceInputSchemaPayload struct {
+	Active     *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
+	JSONSchema *string `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+	Key        *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+}
+
+// Validate validates the updateDeviceInputSchemaPayload type instance.
+func (ut *updateDeviceInputSchemaPayload) Validate() (err error) {
+	if ut.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
+	}
+	if ut.Active == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "active"))
+	}
+	if ut.JSONSchema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "json_schema"))
+	}
+	return
+}
+
+// Publicize creates UpdateDeviceInputSchemaPayload from updateDeviceInputSchemaPayload
+func (ut *updateDeviceInputSchemaPayload) Publicize() *UpdateDeviceInputSchemaPayload {
+	var pub UpdateDeviceInputSchemaPayload
+	if ut.Active != nil {
+		pub.Active = *ut.Active
+	}
+	if ut.JSONSchema != nil {
+		pub.JSONSchema = *ut.JSONSchema
+	}
+	if ut.Key != nil {
+		pub.Key = *ut.Key
+	}
+	return &pub
+}
+
+// UpdateDeviceInputSchemaPayload user type.
+type UpdateDeviceInputSchemaPayload struct {
+	Active     bool   `form:"active" json:"active" xml:"active"`
+	JSONSchema string `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	Key        string `form:"key" json:"key" xml:"key"`
+}
+
+// Validate validates the UpdateDeviceInputSchemaPayload type instance.
+func (ut *UpdateDeviceInputSchemaPayload) Validate() (err error) {
+	if ut.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
+	}
+
+	if ut.JSONSchema == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "json_schema"))
 	}
 	return
 }
 
 // updateInputPayload user type.
 type updateInputPayload struct {
+	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
 	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
@@ -664,6 +731,9 @@ func (ut *updateInputPayload) Validate() (err error) {
 // Publicize creates UpdateInputPayload from updateInputPayload
 func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
 	var pub UpdateInputPayload
+	if ut.Active != nil {
+		pub.Active = ut.Active
+	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
@@ -678,6 +748,7 @@ func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
 
 // UpdateInputPayload user type.
 type UpdateInputPayload struct {
+	Active *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	Name   string `form:"name" json:"name" xml:"name"`
 	TeamID *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
 	UserID *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`

@@ -62,15 +62,47 @@ func (mt *ProjectAdministrators) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device_input+json; view=default
 type DeviceInput struct {
-	ID    *int    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Key   *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
-	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	Active       bool   `form:"active" json:"active" xml:"active"`
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Key          string `form:"key" json:"key" xml:"key"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	Token        string `form:"token" json:"token" xml:"token"`
+	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the DeviceInput media type instance.
+func (mt *DeviceInput) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	return
 }
 
 // DeviceInputCollection is the media type for an array of DeviceInput (default view)
 //
 // Identifier: application/vnd.app.device_input+json; type=collection; view=default
 type DeviceInputCollection []*DeviceInput
+
+// Validate validates the DeviceInputCollection media type instance.
+func (mt DeviceInputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
 
 // DeviceInputs media type (default view)
 //
@@ -83,6 +115,9 @@ type DeviceInputs struct {
 func (mt *DeviceInputs) Validate() (err error) {
 	if mt.DeviceInputs == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_inputs"))
+	}
+	if err2 := mt.DeviceInputs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	return
 }
@@ -223,6 +258,7 @@ func (mt *Expeditions) Validate() (err error) {
 //
 // Identifier: application/vnd.app.input+json; view=default
 type Input struct {
+	Active       *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
 	ID           int    `form:"id" json:"id" xml:"id"`
 	Name         string `form:"name" json:"name" xml:"name"`
@@ -303,6 +339,9 @@ type Inputs struct {
 
 // Validate validates the Inputs media type instance.
 func (mt *Inputs) Validate() (err error) {
+	if err2 := mt.DeviceInputs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
 	if err2 := mt.TwitterAccountInputs.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}

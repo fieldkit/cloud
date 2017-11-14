@@ -18,6 +18,13 @@ type JSONSchema struct {
 	schema *gojsonschema.Schema
 }
 
+func NewJSONSchema(json string) (js *JSONSchema, err error) {
+	js = &JSONSchema{
+		json: json,
+	}
+	return
+}
+
 func (s *JSONSchema) MarshalJSON() ([]byte, error) {
 	data := new(bytes.Buffer)
 	if err := json.NewEncoder(data).Encode(s.json); err != nil {
@@ -75,6 +82,12 @@ func (s *JSONSchema) Validate(data interface{}) (bool, map[string]string, error)
 	}
 
 	return false, errors, nil
+}
+
+type RawSchema struct {
+	ID         int32   `db:"id,omitempty"`
+	ProjectID  *int32  `db:"project_id"`
+	JSONSchema *string `db:"json_schema"`
 }
 
 type Schema struct {
