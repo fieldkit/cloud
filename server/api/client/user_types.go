@@ -112,41 +112,6 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	return
 }
 
-// addFieldkitInputPayload user type.
-type addFieldkitInputPayload struct {
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-}
-
-// Validate validates the addFieldkitInputPayload type instance.
-func (ut *addFieldkitInputPayload) Validate() (err error) {
-	if ut.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
-	}
-	return
-}
-
-// Publicize creates AddFieldkitInputPayload from addFieldkitInputPayload
-func (ut *addFieldkitInputPayload) Publicize() *AddFieldkitInputPayload {
-	var pub AddFieldkitInputPayload
-	if ut.Name != nil {
-		pub.Name = *ut.Name
-	}
-	return &pub
-}
-
-// AddFieldkitInputPayload user type.
-type AddFieldkitInputPayload struct {
-	Name string `form:"name" json:"name" xml:"name"`
-}
-
-// Validate validates the AddFieldkitInputPayload type instance.
-func (ut *AddFieldkitInputPayload) Validate() (err error) {
-	if ut.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
-	}
-	return
-}
-
 // addMemberPayload user type.
 type addMemberPayload struct {
 	Role   *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
@@ -598,35 +563,6 @@ func (ut *LoginPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
 	}
 	return
-}
-
-// updateFieldkitInputPayload user type.
-type updateFieldkitInputPayload struct {
-	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
-}
-
-// Publicize creates UpdateFieldkitInputPayload from updateFieldkitInputPayload
-func (ut *updateFieldkitInputPayload) Publicize() *UpdateFieldkitInputPayload {
-	var pub UpdateFieldkitInputPayload
-	if ut.Name != nil {
-		pub.Name = ut.Name
-	}
-	if ut.TeamID != nil {
-		pub.TeamID = ut.TeamID
-	}
-	if ut.UserID != nil {
-		pub.UserID = ut.UserID
-	}
-	return &pub
-}
-
-// UpdateFieldkitInputPayload user type.
-type UpdateFieldkitInputPayload struct {
-	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // updateInputPayload user type.

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/conservify/sqlxcache"
-	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -245,82 +245,6 @@ func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accou
 	}
 
 	return TwitterAccountInputs, nil
-}
-
-func (b *Backend) AddFieldkitInput(ctx context.Context, fieldkitInput *data.FieldkitInput) error {
-	return b.db.NamedGetContext(ctx, fieldkitInput, `
-		INSERT INTO fieldkit.input_fieldkit (input_id) VALUES (:id) RETURNING input_id AS id
-		`, fieldkitInput)
-}
-
-func (b *Backend) SetFieldkitInputBinary(ctx context.Context, fieldkitBinary *data.FieldkitBinary) error {
-	_, err := b.db.ExecContext(ctx, `
-		INSERT INTO fieldkit.fieldkit_binary (id, input_id, schema_id, fields, mapper) VALUES ($1, $2, $3, $4, $5)
-			ON CONFLICT (id, input_id)
-				DO UPDATE SET schema_id = $3, fields = $4, mapper = $5
-		`, fieldkitBinary.ID, fieldkitBinary.InputID, fieldkitBinary.SchemaID, pq.Array(fieldkitBinary.Fields), fieldkitBinary.Mapper)
-	return err
-}
-
-func (b *Backend) FieldkitInputBinary(ctx context.Context, inputID int32, id uint16) (*data.FieldkitBinary, error) {
-	row, err := b.db.QueryxContext(ctx, `
-		SELECT id, input_id, schema_id, fields, mapper, longitude, latitude FROM fieldkit.fieldkit_binary WHERE input_id = $1 AND id = $2
-		`, inputID, id)
-	if err != nil {
-		return nil, err
-	}
-
-	row.Next()
-	fieldkitBinary := &data.FieldkitBinary{}
-	if err := row.Scan(&fieldkitBinary.ID, &fieldkitBinary.InputID, &fieldkitBinary.SchemaID, pq.Array(&fieldkitBinary.Fields), &fieldkitBinary.Mapper, &fieldkitBinary.Longitude, &fieldkitBinary.Latitude); err != nil {
-		return nil, err
-	}
-
-	return fieldkitBinary, nil
-}
-
-func (b *Backend) FieldkitInput(ctx context.Context, inputID int32) (*data.FieldkitInput, error) {
-	fieldkitInput := &data.FieldkitInput{}
-	if err := b.db.GetContext(ctx, fieldkitInput, `
-		SELECT i.*
-			FROM fieldkit.input_fieldkit AS if
-				JOIN fieldkit.input AS i ON i.id = if.input_id
-					WHERE i.id = $1
-		`, inputID); err != nil {
-		return nil, err
-	}
-
-	return fieldkitInput, nil
-}
-
-func (b *Backend) ListFieldkitInputs(ctx context.Context, project, expedition string) ([]*data.FieldkitInput, error) {
-	fieldkitInput := []*data.FieldkitInput{}
-	if err := b.db.SelectContext(ctx, &fieldkitInput, `
-		SELECT i.*
-			FROM fieldkit.input_fieldkit AS if
-				JOIN fieldkit.input AS i ON i.id = if.input_id
-				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
-				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE p.slug = $1 AND e.slug = $2
-		`, project, expedition); err != nil {
-		return nil, err
-	}
-
-	return fieldkitInput, nil
-}
-
-func (b *Backend) ListFieldkitInputsByID(ctx context.Context, expeditionID int32) ([]*data.FieldkitInput, error) {
-	fieldkitInputs := []*data.FieldkitInput{}
-	if err := b.db.SelectContext(ctx, &fieldkitInputs, `
-		SELECT i.*
-			FROM fieldkit.input_fieldkit AS if
-				JOIN fieldkit.input AS i ON i.id = if.input_id
-					WHERE i.expedition_id = $1
-			`, expeditionID); err != nil {
-		return nil, err
-	}
-
-	return fieldkitInputs, nil
 }
 
 func (b *Backend) AddSchema(ctx context.Context, fieldkitInput *data.Schema) error {

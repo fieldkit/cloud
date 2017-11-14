@@ -91,13 +91,7 @@ func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
 		return err
 	}
 
-	fieldkitInputs, err := c.options.Backend.ListFieldkitInputsByID(ctx, int32(ctx.ExpeditionID))
-	if err != nil {
-		return err
-	}
-
 	return ctx.OK(&app.Inputs{
 		TwitterAccountInputs: TwitterAccountInputsType(twitterAccountInputs).TwitterAccountInputs,
-		FieldkitInputs:       FieldkitInputsType(fieldkitInputs).FieldkitInputs,
 	})
 }

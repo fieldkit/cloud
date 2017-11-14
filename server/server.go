@@ -255,12 +255,6 @@ func main() {
 	c10 := api.NewPictureController(service)
 	app.MountPictureController(service, c10)
 
-	// Mount "twitter" controller
-	c11 := api.NewFieldkitController(service, api.FieldkitControllerOptions{
-		Backend: be,
-	})
-	app.MountFieldkitController(service, c11)
-
 	// Mount "document" controller
 	c13 := api.NewDocumentController(service, api.DocumentControllerOptions{
 		Backend: be,

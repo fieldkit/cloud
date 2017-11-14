@@ -190,61 +190,6 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
-// FieldkitInput media type (default view)
-//
-// Identifier: application/vnd.app.fieldkit_input+json; view=default
-type FieldkitInput struct {
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
-}
-
-// Validate validates the FieldkitInput media type instance.
-func (mt *FieldkitInput) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	return
-}
-
-// FieldkitInputCollection is the media type for an array of FieldkitInput (default view)
-//
-// Identifier: application/vnd.app.fieldkit_input+json; type=collection; view=default
-type FieldkitInputCollection []*FieldkitInput
-
-// Validate validates the FieldkitInputCollection media type instance.
-func (mt FieldkitInputCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// FieldkitInputs media type (default view)
-//
-// Identifier: application/vnd.app.fieldkit_inputs+json; view=default
-type FieldkitInputs struct {
-	FieldkitInputs FieldkitInputCollection `form:"fieldkit_inputs" json:"fieldkit_inputs" xml:"fieldkit_inputs"`
-}
-
-// Validate validates the FieldkitInputs media type instance.
-func (mt *FieldkitInputs) Validate() (err error) {
-	if mt.FieldkitInputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fieldkit_inputs"))
-	}
-	if err2 := mt.FieldkitInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
 // Input media type (default view)
 //
 // Identifier: application/vnd.app.input+json; view=default
@@ -323,15 +268,11 @@ func (mt *InputTokens) Validate() (err error) {
 //
 // Identifier: application/vnd.app.inputs+json; view=default
 type Inputs struct {
-	FieldkitInputs       FieldkitInputCollection       `form:"fieldkit_inputs,omitempty" json:"fieldkit_inputs,omitempty" xml:"fieldkit_inputs,omitempty"`
 	TwitterAccountInputs TwitterAccountInputCollection `form:"twitter_account_inputs,omitempty" json:"twitter_account_inputs,omitempty" xml:"twitter_account_inputs,omitempty"`
 }
 
 // Validate validates the Inputs media type instance.
 func (mt *Inputs) Validate() (err error) {
-	if err2 := mt.FieldkitInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
 	if err2 := mt.TwitterAccountInputs.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}

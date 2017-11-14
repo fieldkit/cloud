@@ -36,11 +36,9 @@ var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 	TypeName("Inputs")
 	Attributes(func() {
 		Attribute("twitter_account_inputs", CollectionOf(TwitterAccountInput))
-		Attribute("fieldkit_inputs", CollectionOf(FieldkitInput))
 	})
 	View("default", func() {
 		Attribute("twitter_account_inputs")
-		Attribute("fieldkit_inputs")
 	})
 })
 
