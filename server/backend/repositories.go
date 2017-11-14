@@ -7,8 +7,12 @@ import (
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/ingestion"
-	"time"
 )
+
+type DatabaseIds struct {
+	SchemaID int64
+	DeviceID int64
+}
 
 type DatabaseStreams struct {
 	db *sqlxcache.DB
@@ -30,7 +34,7 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 		return nil, fmt.Errorf("No such device: %s", id)
 	}
 
-	locations := []*DeviceLocation{}
+	locations := []*data.DeviceLocation{}
 	if err := ds.db.SelectContext(context.TODO(), &locations, `
                   SELECT l.timestamp, ST_AsBinary(l.location) AS location
                   FROM fieldkit.device_location AS l
@@ -61,7 +65,7 @@ func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Lo
 		return fmt.Errorf("No such device: %s", id)
 	}
 
-	dl := DeviceLocation{
+	dl := data.DeviceLocation{
 		DeviceID:  devices[0].InputID,
 		Timestamp: l.UpdatedAt,
 		Location:  data.NewLocation(l.Coordinates[0], l.Coordinates[1]),
@@ -87,9 +91,9 @@ func (ds *DatabaseSchemas) DefineSchema(id ingestion.SchemaId, ms interface{}) (
 }
 
 func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}, err error) {
-	schemas := []*KeyedSchema{}
+	schemas := []*data.DeviceJSONSchema{}
 	if err := ds.db.SelectContext(context.TODO(), &schemas, `
-                  SELECT ds.key, ds.device_id, s.id, s.project_id, s.json_schema FROM fieldkit.device AS d
+                  SELECT ds.*, s.* FROM fieldkit.device AS d
                   JOIN fieldkit.device_schema AS ds ON (d.input_id = ds.device_id)
                   JOIN fieldkit.schema AS s ON (ds.schema_id = s.id)
                   WHERE d.key = $1`, id.Device.ToString()); err != nil {
@@ -101,13 +105,13 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
 	for _, s := range schemas {
 		if s.Key == id.Stream {
 			ids := DatabaseIds{
-				SchemaID: s.ID,
+				SchemaID: s.SchemaID,
 				DeviceID: s.DeviceID,
 			}
 			js := &ingestion.JsonMessageSchema{
 				Ids: ids,
 			}
-			err = json.Unmarshal([]byte(s.JSONSchema), js)
+			err = json.Unmarshal([]byte(*s.JSONSchema), js)
 			if err != nil {
 				return nil, fmt.Errorf("Malformed schema: %v", err)
 			}
@@ -116,25 +120,4 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
 	}
 
 	return
-}
-
-type KeyedSchema struct {
-	// data.Schema TODO: Try and squeeze our schema into a JSON Schema
-	ID         int64  `db:"id"`
-	DeviceID   int64  `db:"device_id"`
-	ProjectID  *int64 `db:"project_id"`
-	JSONSchema string `db:"json_schema"`
-	Key        string `db:"key"`
-}
-
-type DeviceLocation struct {
-	ID        int64          `db:"id"`
-	DeviceID  int64          `db:"device_id"`
-	Timestamp *time.Time     `db:"timestamp"`
-	Location  *data.Location `db:"location"`
-}
-
-type DatabaseIds struct {
-	SchemaID int64
-	DeviceID int64
 }

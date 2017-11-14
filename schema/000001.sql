@@ -132,6 +132,8 @@ CREATE TABLE fieldkit.raw_message (
     data json NOT NULL
 );
 
+CREATE UNIQUE INDEX ON fieldkit.raw_message (origin_id);
+
 -- device
 
 CREATE TABLE fieldkit.device (
@@ -140,9 +142,9 @@ CREATE TABLE fieldkit.device (
     token bytea NOT NULL
 );
 
-CREATE INDEX ON fieldkit.device (key);
+CREATE UNIQUE INDEX ON fieldkit.device (key);
 
-CREATE INDEX ON fieldkit.device (token);
+CREATE UNIQUE INDEX ON fieldkit.device (token);
 
 CREATE TABLE fieldkit.device_schema (
     id serial PRIMARY KEY,
