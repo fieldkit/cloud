@@ -17,3 +17,8 @@ type DeviceSchema struct {
 	SchemaID int64  `db:"schema_id"`
 	Key      string `db:"key"`
 }
+
+type DeviceJSONSchema struct {
+	DeviceSchema
+	RawSchema
+}

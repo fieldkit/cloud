@@ -497,8 +497,8 @@ func NewUpdateSchemaDeviceContext(ctx context.Context, r *http.Request, service 
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UpdateSchemaDeviceContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *UpdateSchemaDeviceContext) OK(r *DeviceSchemas) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_schemas+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 

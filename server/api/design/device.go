@@ -31,6 +31,38 @@ var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
 	})
 })
 
+var DeviceSchema = MediaType("application/vnd.app.device_schema+json", func() {
+	TypeName("DeviceSchema")
+	Attributes(func() {
+		Attribute("device_id", Integer)
+		Attribute("schema_id", Integer)
+		Attribute("project_id", Integer)
+		Attribute("active", Boolean)
+		Attribute("json_schema", String)
+		Attribute("key", String)
+		Required("device_id", "schema_id", "project_id", "active", "json_schema", "key")
+	})
+	View("default", func() {
+		Attribute("device_id")
+		Attribute("schema_id")
+		Attribute("project_id")
+		Attribute("active")
+		Attribute("json_schema")
+		Attribute("key")
+	})
+})
+
+var DeviceSchemas = MediaType("application/vnd.app.device_schemas+json", func() {
+	TypeName("DeviceSchemas")
+	Attributes(func() {
+		Attribute("schemas", CollectionOf(DeviceSchema))
+		Required("schemas")
+	})
+	View("default", func() {
+		Attribute("schemas")
+	})
+})
+
 var DeviceInputs = MediaType("application/vnd.app.device_inputs+json", func() {
 	TypeName("DeviceInputs")
 	Attributes(func() {
@@ -111,7 +143,7 @@ var _ = Resource("device", func() {
 		Payload(UpdateDeviceInputSchemaPayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSchemas)
 		})
 	})
 

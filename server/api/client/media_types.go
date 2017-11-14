@@ -165,6 +165,86 @@ func (c *Client) DecodeDeviceInputs(resp *http.Response) (*DeviceInputs, error) 
 	return &decoded, err
 }
 
+// DeviceSchema media type (default view)
+//
+// Identifier: application/vnd.app.device_schema+json; view=default
+type DeviceSchema struct {
+	Active     bool   `form:"active" json:"active" xml:"active"`
+	DeviceID   int    `form:"device_id" json:"device_id" xml:"device_id"`
+	JSONSchema string `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	Key        string `form:"key" json:"key" xml:"key"`
+	ProjectID  int    `form:"project_id" json:"project_id" xml:"project_id"`
+	SchemaID   int    `form:"schema_id" json:"schema_id" xml:"schema_id"`
+}
+
+// Validate validates the DeviceSchema media type instance.
+func (mt *DeviceSchema) Validate() (err error) {
+
+	if mt.JSONSchema == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	return
+}
+
+// DecodeDeviceSchema decodes the DeviceSchema instance encoded in resp body.
+func (c *Client) DecodeDeviceSchema(resp *http.Response) (*DeviceSchema, error) {
+	var decoded DeviceSchema
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceSchemaCollection is the media type for an array of DeviceSchema (default view)
+//
+// Identifier: application/vnd.app.device_schema+json; type=collection; view=default
+type DeviceSchemaCollection []*DeviceSchema
+
+// Validate validates the DeviceSchemaCollection media type instance.
+func (mt DeviceSchemaCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDeviceSchemaCollection decodes the DeviceSchemaCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceSchemaCollection(resp *http.Response) (DeviceSchemaCollection, error) {
+	var decoded DeviceSchemaCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DeviceSchemas media type (default view)
+//
+// Identifier: application/vnd.app.device_schemas+json; view=default
+type DeviceSchemas struct {
+	Schemas DeviceSchemaCollection `form:"schemas" json:"schemas" xml:"schemas"`
+}
+
+// Validate validates the DeviceSchemas media type instance.
+func (mt *DeviceSchemas) Validate() (err error) {
+	if mt.Schemas == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schemas"))
+	}
+	if err2 := mt.Schemas.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeDeviceSchemas decodes the DeviceSchemas instance encoded in resp body.
+func (c *Client) DecodeDeviceSchemas(resp *http.Response) (*DeviceSchemas, error) {
+	var decoded DeviceSchemas
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Document media type (default view)
 //
 // Identifier: application/vnd.app.document+json; view=default

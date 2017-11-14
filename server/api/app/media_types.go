@@ -122,6 +122,65 @@ func (mt *DeviceInputs) Validate() (err error) {
 	return
 }
 
+// DeviceSchema media type (default view)
+//
+// Identifier: application/vnd.app.device_schema+json; view=default
+type DeviceSchema struct {
+	Active     bool   `form:"active" json:"active" xml:"active"`
+	DeviceID   int    `form:"device_id" json:"device_id" xml:"device_id"`
+	JSONSchema string `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	Key        string `form:"key" json:"key" xml:"key"`
+	ProjectID  int    `form:"project_id" json:"project_id" xml:"project_id"`
+	SchemaID   int    `form:"schema_id" json:"schema_id" xml:"schema_id"`
+}
+
+// Validate validates the DeviceSchema media type instance.
+func (mt *DeviceSchema) Validate() (err error) {
+
+	if mt.JSONSchema == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+	}
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	return
+}
+
+// DeviceSchemaCollection is the media type for an array of DeviceSchema (default view)
+//
+// Identifier: application/vnd.app.device_schema+json; type=collection; view=default
+type DeviceSchemaCollection []*DeviceSchema
+
+// Validate validates the DeviceSchemaCollection media type instance.
+func (mt DeviceSchemaCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DeviceSchemas media type (default view)
+//
+// Identifier: application/vnd.app.device_schemas+json; view=default
+type DeviceSchemas struct {
+	Schemas DeviceSchemaCollection `form:"schemas" json:"schemas" xml:"schemas"`
+}
+
+// Validate validates the DeviceSchemas media type instance.
+func (mt *DeviceSchemas) Validate() (err error) {
+	if mt.Schemas == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schemas"))
+	}
+	if err2 := mt.Schemas.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // Document media type (default view)
 //
 // Identifier: application/vnd.app.document+json; view=default

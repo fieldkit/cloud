@@ -33,6 +33,30 @@ func DeviceInputsType(deviceInputs []*data.DeviceInput) *app.DeviceInputs {
 	}
 }
 
+func DeviceSchemaType(deviceInput *data.DeviceInput, deviceSchema *data.DeviceJSONSchema) *app.DeviceSchema {
+	deviceSchemaType := &app.DeviceSchema{
+		SchemaID:   int(deviceSchema.RawSchema.ID),
+		DeviceID:   int(deviceInput.Input.ID),
+		ProjectID:  int(*deviceSchema.RawSchema.ProjectID),
+		Key:        deviceSchema.Key,
+		JSONSchema: *deviceSchema.JSONSchema,
+		Active:     true,
+	}
+
+	return deviceSchemaType
+}
+
+func DeviceSchemasType(deviceInput *data.DeviceInput, deviceSchemas []*data.DeviceJSONSchema) *app.DeviceSchemas {
+	deviceSchemasCollection := make([]*app.DeviceSchema, len(deviceSchemas))
+	for i, deviceSchema := range deviceSchemas {
+		deviceSchemasCollection[i] = DeviceSchemaType(deviceInput, deviceSchema)
+	}
+
+	return &app.DeviceSchemas{
+		Schemas: deviceSchemasCollection,
+	}
+}
+
 type DeviceControllerOptions struct {
 	Backend  *backend.Backend
 	Database *sqlxcache.DB
@@ -162,5 +186,9 @@ func (c *DeviceController) UpdateSchema(ctx *app.UpdateSchemaDeviceContext) erro
 		}
 	}
 
-	return ctx.OK(DeviceInputType(deviceInput))
+	allSchemas := []*data.DeviceJSONSchema{}
+	if err = c.options.Database.SelectContext(ctx, &allSchemas, `SELECT * FROM fieldkit.device_schema AS ds JOIN fieldkit.schema AS s ON s.id = ds.schema_id WHERE ds.device_id = $1`, ctx.ID); err != nil {
+		return err
+	}
+	return ctx.OK(DeviceSchemasType(deviceInput, allSchemas))
 }
