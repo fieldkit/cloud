@@ -189,6 +189,22 @@ func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data
 	return twitterAccount, nil
 }
 
+func (b *Backend) ListDeviceInputs(ctx context.Context, project, expedition string) ([]*data.DeviceInput, error) {
+	devices := []*data.DeviceInput{}
+	if err := b.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.input_id,  d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE p.slug = $1 AND e.slug = $2
+		`, project, expedition); err != nil {
+		return nil, err
+	}
+
+	return devices, nil
+}
+
 func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedition string) ([]*data.TwitterAccountInput, error) {
 	twitterAccounts := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
@@ -204,6 +220,20 @@ func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedit
 	}
 
 	return twitterAccounts, nil
+}
+
+func (b *Backend) ListDeviceInputsByID(ctx context.Context, expeditionID int32) ([]*data.DeviceInput, error) {
+	devices := []*data.DeviceInput{}
+	if err := b.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.input_id, d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+					WHERE i.expedition_id = $1
+		`, expeditionID); err != nil {
+		return nil, err
+	}
+
+	return devices, nil
 }
 
 func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {

@@ -80,6 +80,56 @@ func (c *Client) DecodeProjectAdministrators(resp *http.Response) (*ProjectAdmin
 	return &decoded, err
 }
 
+// DeviceInput media type (default view)
+//
+// Identifier: application/vnd.app.device_input+json; view=default
+type DeviceInput struct {
+	ID    *int    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Key   *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
+// DecodeDeviceInput decodes the DeviceInput instance encoded in resp body.
+func (c *Client) DecodeDeviceInput(resp *http.Response) (*DeviceInput, error) {
+	var decoded DeviceInput
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceInputCollection is the media type for an array of DeviceInput (default view)
+//
+// Identifier: application/vnd.app.device_input+json; type=collection; view=default
+type DeviceInputCollection []*DeviceInput
+
+// DecodeDeviceInputCollection decodes the DeviceInputCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceInputCollection(resp *http.Response) (DeviceInputCollection, error) {
+	var decoded DeviceInputCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DeviceInputs media type (default view)
+//
+// Identifier: application/vnd.app.device_inputs+json; view=default
+type DeviceInputs struct {
+	DeviceInputs DeviceInputCollection `form:"device_inputs" json:"device_inputs" xml:"device_inputs"`
+}
+
+// Validate validates the DeviceInputs media type instance.
+func (mt *DeviceInputs) Validate() (err error) {
+	if mt.DeviceInputs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_inputs"))
+	}
+	return
+}
+
+// DecodeDeviceInputs decodes the DeviceInputs instance encoded in resp body.
+func (c *Client) DecodeDeviceInputs(resp *http.Response) (*DeviceInputs, error) {
+	var decoded DeviceInputs
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Document media type (default view)
 //
 // Identifier: application/vnd.app.document+json; view=default
@@ -360,6 +410,7 @@ func (c *Client) DecodeInputTokens(resp *http.Response) (*InputTokens, error) {
 //
 // Identifier: application/vnd.app.inputs+json; view=default
 type Inputs struct {
+	DeviceInputs         DeviceInputCollection         `form:"device_inputs,omitempty" json:"device_inputs,omitempty" xml:"device_inputs,omitempty"`
 	TwitterAccountInputs TwitterAccountInputCollection `form:"twitter_account_inputs,omitempty" json:"twitter_account_inputs,omitempty" xml:"twitter_account_inputs,omitempty"`
 }
 

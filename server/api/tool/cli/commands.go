@@ -470,7 +470,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 Payload example:
 
 {
-   "user_id": 8387468056669034645
+   "user_id": 124473867210452590
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp40.Run(c, args) },
 	}
@@ -486,9 +486,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Voluptates ad consectetur occaecati.",
-   "name": "Omnis sint.",
-   "slug": "y52dmi76ci"
+   "description": "Rem sint velit ad laboriosam voluptatem explicabo.",
+   "name": "Sunt debitis rerum rerum et quia ut.",
+   "slug": "uckup4mrpl"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp41.Run(c, args) },
 	}
@@ -513,8 +513,8 @@ Payload example:
 Payload example:
 
 {
-   "role": "Incidunt consequatur magni et.",
-   "user_id": 3943128718421767794
+   "role": "Facere et quo vel aut.",
+   "user_id": 2072833317639837852
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp43.Run(c, args) },
 	}
@@ -530,9 +530,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Corrupti ipsum fugit.",
-   "name": "Odio vel tempore.",
-   "slug": "1y638ourow"
+   "description": "Quisquam pariatur molestiae.",
+   "name": "Officiis dignissimos consectetur.",
+   "slug": "0oh0spvjjv"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp44.Run(c, args) },
 	}
@@ -548,9 +548,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Doloremque aut dolore sed quisquam pariatur molestiae.",
-   "name": "u72r0oh0sp",
-   "slug": "jjvebfq1e5"
+   "description": "Eum consequatur numquam repellat accusamus ipsa rerum.",
+   "name": "b6z6j4q26y",
+   "slug": "8iweonufpo"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp45.Run(c, args) },
 	}
@@ -566,7 +566,7 @@ Payload example:
 Payload example:
 
 {
-   "name": "Et sed dolorem consequatur quidem sed."
+   "name": "Qui eos maxime consequatur ut odio aperiam."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp46.Run(c, args) },
 	}
@@ -582,12 +582,12 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Vel expedita impedit et incidunt illo voluptatem.",
-   "email": "christop.hyatt@cummings.org",
-   "invite_token": "Necessitatibus non veritatis velit.",
-   "name": "rjw265h606",
-   "password": "rrbwtu6d71",
-   "username": "lgh80jxqft"
+   "bio": "Veritatis dolore eius iusto veritatis.",
+   "email": "kamryn@konopelski.net",
+   "invite_token": "Consectetur nostrum.",
+   "name": "2lgh80jxqf",
+   "password": "x2igp59zql",
+   "username": "v0uepd168s"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp47.Run(c, args) },
 	}
@@ -1004,8 +1004,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "2igp59zqli",
-   "username": "0uepd168s1"
+   "password": "lx8rzq05j6",
+   "username": "1dd458dgtu"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp87.Run(c, args) },
 	}
@@ -1054,7 +1054,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Eaque necessitatibus voluptatum odit eum qui magnam."
+   "refresh_token": "Aliquam rerum esse."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp90.Run(c, args) },
 	}
@@ -1075,9 +1075,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Voluptates ad consectetur occaecati.",
-   "name": "Omnis sint.",
-   "slug": "y52dmi76ci"
+   "description": "Rem sint velit ad laboriosam voluptatem explicabo.",
+   "name": "Sunt debitis rerum rerum et quia ut.",
+   "slug": "uckup4mrpl"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp91.Run(c, args) },
 	}
@@ -1093,9 +1093,9 @@ Payload example:
 Payload example:
 
 {
-   "name": "Debitis rerum rerum.",
-   "team_id": 6389891566807760820,
-   "user_id": 7880554031425777044
+   "name": "Vitae et corrupti ipsum fugit nisi odio.",
+   "team_id": 5509519436236999988,
+   "user_id": 3016808703759909371
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp92.Run(c, args) },
 	}
@@ -1111,7 +1111,7 @@ Payload example:
 Payload example:
 
 {
-   "role": "Consequatur non nisi dolor autem sint vitae."
+   "role": "Voluptatem doloribus perferendis minus doloremque aut dolore."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp93.Run(c, args) },
 	}
@@ -1127,9 +1127,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Corrupti ipsum fugit.",
-   "name": "Odio vel tempore.",
-   "slug": "1y638ourow"
+   "description": "Quisquam pariatur molestiae.",
+   "name": "Officiis dignissimos consectetur.",
+   "slug": "0oh0spvjjv"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp94.Run(c, args) },
 	}
@@ -1145,9 +1145,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Doloremque aut dolore sed quisquam pariatur molestiae.",
-   "name": "u72r0oh0sp",
-   "slug": "jjvebfq1e5"
+   "description": "Eum consequatur numquam repellat accusamus ipsa rerum.",
+   "name": "b6z6j4q26y",
+   "slug": "8iweonufpo"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp95.Run(c, args) },
 	}
@@ -1163,10 +1163,10 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Cupiditate ullam.",
-   "email": "kiara.huels@padbergswaniawski.name",
-   "name": "3lezlnik2m",
-   "username": "0074l47q76"
+   "bio": "Mollitia quaerat occaecati est.",
+   "email": "cecelia.kiehn@torphybraun.net",
+   "name": "76xcws9vmo",
+   "username": "afdiw072s4"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp96.Run(c, args) },
 	}

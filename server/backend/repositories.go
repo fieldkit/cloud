@@ -21,7 +21,7 @@ func NewDatabaseStreams(db *sqlxcache.DB) ingestion.StreamsRepository {
 }
 
 func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.Stream, err error) {
-	devices := []*Device{}
+	devices := []*data.Device{}
 	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.ToString()); err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 }
 
 func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Location) (err error) {
-	devices := []*Device{}
+	devices := []*data.Device{}
 	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.ToString()); err != nil {
 		return err
 	}
@@ -116,12 +116,6 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
 	}
 
 	return
-}
-
-type Device struct {
-	InputID int64  `db:"input_id"`
-	Key     string `db:"key"`
-	Token   string `db:"token"`
 }
 
 type KeyedSchema struct {
