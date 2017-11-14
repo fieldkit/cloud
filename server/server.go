@@ -251,6 +251,12 @@ func main() {
 	})
 	app.MountTwitterController(service, c9)
 
+	// Mount "device" controller
+	c15 := api.NewDeviceController(service, api.DeviceControllerOptions{
+		Backend: be,
+	})
+	app.MountDeviceController(service, c15)
+
 	// Mount "picture" controller
 	c10 := api.NewPictureController(service)
 	app.MountPictureController(service, c10)

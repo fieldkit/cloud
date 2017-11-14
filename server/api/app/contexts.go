@@ -286,6 +286,186 @@ func (ctx *ListIDAdministratorContext) BadRequest() error {
 	return nil
 }
 
+// AddDeviceContext provides the device add action context.
+type AddDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+	Payload      *AddDeviceInputPayload
+}
+
+// NewAddDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller add action.
+func NewAddDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddDeviceContext) OK(r *Location) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetIDDeviceContext provides the device get id action context.
+type GetIDDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewGetIDDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller get id action.
+func NewGetIDDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetIDDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetIDDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetIDDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListDeviceContext provides the device list action context.
+type ListDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller list action.
+func NewListDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListDeviceContext) OK(r *DeviceInputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_inputs+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateDeviceContext provides the device update action context.
+type UpdateDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+	Payload *UpdateDeviceInputPayload
+}
+
+// NewUpdateDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller update action.
+func NewUpdateDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListDocumentContext provides the document list action context.
 type ListDocumentContext struct {
 	context.Context

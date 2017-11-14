@@ -39,6 +39,52 @@ type AddAdministratorPayload struct {
 	UserID int `form:"user_id" json:"user_id" xml:"user_id"`
 }
 
+// addDeviceInputPayload user type.
+type addDeviceInputPayload struct {
+	Key  *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// Validate validates the addDeviceInputPayload type instance.
+func (ut *addDeviceInputPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
+	}
+	return
+}
+
+// Publicize creates AddDeviceInputPayload from addDeviceInputPayload
+func (ut *addDeviceInputPayload) Publicize() *AddDeviceInputPayload {
+	var pub AddDeviceInputPayload
+	if ut.Key != nil {
+		pub.Key = *ut.Key
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	return &pub
+}
+
+// AddDeviceInputPayload user type.
+type AddDeviceInputPayload struct {
+	Key  string `form:"key" json:"key" xml:"key"`
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// Validate validates the AddDeviceInputPayload type instance.
+func (ut *AddDeviceInputPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
+	}
+	return
+}
+
 // addExpeditionPayload user type.
 type addExpeditionPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
@@ -561,6 +607,41 @@ func (ut *LoginPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Username) > 40 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
+	}
+	return
+}
+
+// updateDeviceInputPayload user type.
+type updateDeviceInputPayload struct {
+	Schema *string `form:"schema,omitempty" json:"schema,omitempty" xml:"schema,omitempty"`
+}
+
+// Validate validates the updateDeviceInputPayload type instance.
+func (ut *updateDeviceInputPayload) Validate() (err error) {
+	if ut.Schema == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "schema"))
+	}
+	return
+}
+
+// Publicize creates UpdateDeviceInputPayload from updateDeviceInputPayload
+func (ut *updateDeviceInputPayload) Publicize() *UpdateDeviceInputPayload {
+	var pub UpdateDeviceInputPayload
+	if ut.Schema != nil {
+		pub.Schema = *ut.Schema
+	}
+	return &pub
+}
+
+// UpdateDeviceInputPayload user type.
+type UpdateDeviceInputPayload struct {
+	Schema string `form:"schema" json:"schema" xml:"schema"`
+}
+
+// Validate validates the UpdateDeviceInputPayload type instance.
+func (ut *UpdateDeviceInputPayload) Validate() (err error) {
+	if ut.Schema == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "schema"))
 	}
 	return
 }

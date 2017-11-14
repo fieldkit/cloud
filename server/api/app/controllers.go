@@ -285,6 +285,254 @@ func unmarshalAddAdministratorPayload(ctx context.Context, service *goa.Service,
 	return nil
 }
 
+// DeviceController is the controller interface for the Device actions.
+type DeviceController interface {
+	goa.Muxer
+	Add(*AddDeviceContext) error
+	GetID(*GetIDDeviceContext) error
+	List(*ListDeviceContext) error
+	Update(*UpdateDeviceContext) error
+}
+
+// MountDeviceController "mounts" a Device resource controller on the given service.
+func MountDeviceController(service *goa.Service, ctrl DeviceController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/devices", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/devices/:input_id", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/devices", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddDeviceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddDeviceInputPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDeviceOrigin(h)
+	service.Mux.Handle("POST", "/expeditions/:expedition_id/inputs/devices", ctrl.MuxHandler("add", h, unmarshalAddDevicePayload))
+	service.LogInfo("mount", "ctrl", "Device", "action", "Add", "route", "POST /expeditions/:expedition_id/inputs/devices", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetIDDeviceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDeviceOrigin(h)
+	service.Mux.Handle("GET", "/inputs/devices/:input_id", ctrl.MuxHandler("get id", h, nil))
+	service.LogInfo("mount", "ctrl", "Device", "action", "GetID", "route", "GET /inputs/devices/:input_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListDeviceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDeviceOrigin(h)
+	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/inputs/devices", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "Device", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/inputs/devices", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateDeviceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UpdateDeviceInputPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDeviceOrigin(h)
+	service.Mux.Handle("PATCH", "/inputs/devices/:input_id", ctrl.MuxHandler("update", h, unmarshalUpdateDevicePayload))
+	service.LogInfo("mount", "ctrl", "Device", "action", "Update", "route", "PATCH /inputs/devices/:input_id", "security", "jwt")
+}
+
+// handleDeviceOrigin applies the CORS response headers corresponding to the origin.
+func handleDeviceOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec0) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec1) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org:8080") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddDevicePayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddDevicePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addDeviceInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateDevicePayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateDevicePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateDeviceInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
 // DocumentController is the controller interface for the Document actions.
 type DocumentController interface {
 	goa.Muxer

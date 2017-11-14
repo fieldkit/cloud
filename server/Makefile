@@ -1,9 +1,5 @@
-default: none
-
-none:
-	@echo "Try:"
-	@echo "make image"
-	@echo "make generate"
+default:
+	go build server.go
 
 image:
 	docker build -t conservify/fk-cloud-server .
