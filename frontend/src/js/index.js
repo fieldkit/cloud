@@ -10,6 +10,9 @@ import thunkMiddleware from 'redux-thunk'
 import multiMiddleware from 'redux-multi'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 
+import { rootSaga } from './actions/sagas'
+import createSagaMiddleware from 'redux-saga'
+
 import * as actions from './actions'
 import expeditionReducer from './reducers/expeditions'
 
@@ -22,14 +25,21 @@ import FKApiClient from './api/api.js'
 
 document.getElementById('root').remove()
 
+const sagaMiddleware = createSagaMiddleware();
+
 const createStoreWithMiddleware = applyMiddleware(
-  thunkMiddleware,
-  multiMiddleware,
+    thunkMiddleware,
+    multiMiddleware,
+    sagaMiddleware,
 )(createStore)
+
 const reducer = combineReducers({
   expeditions: expeditionReducer
 })
+
 const store = createStoreWithMiddleware(reducer)
+
+sagaMiddleware.run(rootSaga);
 
 const routes = (
   <Route 

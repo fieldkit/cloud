@@ -96,6 +96,7 @@
     "redux-batched-subscribe": "^0.1.6",
     "redux-logger": "^2.6.1",
     "redux-multi": "^0.1.12",
+    "redux-saga": "^0.16.0",
     "redux-thunk": "^2.1.0",
     "reselect": "^3.0.0",
     "slug": "^0.9.1",
