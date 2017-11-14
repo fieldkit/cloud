@@ -86,10 +86,6 @@ func NewDatabaseSchemas(db *sqlxcache.DB) ingestion.SchemaRepository {
 	}
 }
 
-func (ds *DatabaseSchemas) DefineSchema(id ingestion.SchemaId, ms interface{}) (err error) {
-	return
-}
-
 func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}, err error) {
 	schemas := []*data.DeviceJSONSchema{}
 	if err := ds.db.SelectContext(context.TODO(), &schemas, `

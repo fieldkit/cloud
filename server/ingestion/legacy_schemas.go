@@ -1,6 +1,6 @@
 package ingestion
 
-func AddLegacySchemas(sr SchemaRepository) {
+func AddLegacySchemas(sr *InMemorySchemas) {
 	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "AT"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{

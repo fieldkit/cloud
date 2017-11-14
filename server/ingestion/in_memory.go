@@ -46,7 +46,7 @@ type InMemorySchemas struct {
 	Map map[SchemaId][]interface{}
 }
 
-func NewInMemorySchemas() SchemaRepository {
+func NewInMemorySchemas() *InMemorySchemas {
 	return &InMemorySchemas{
 		Map: make(map[SchemaId][]interface{}),
 	}
