@@ -15,76 +15,33 @@ import iconFastForwardHover from '../../../../img/icon-fastForward-hover.png'
 
 class PlaybackSelector extends React.Component {
 
-  shouldComponentUpdate (props) {
-    return this.props.playbackMode !== props.playbackMode
-  }
+    shouldComponentUpdate(props) {
+        return this.props.playbackMode !== props.playbackMode
+    }
 
-  render () {
-    const {
-      playbackMode,
-      selectPlaybackMode
-    } = this.props
+    render() {
+        const {playbackMode, selectPlaybackMode} = this.props
 
-    return (
-      <ul className="control-panel_playback-selector">
-        <li
-          className="control-panel_playback-selector_button"
-          onClick={ () => selectPlaybackMode('fastBackward') }
-          style={{
-            backgroundColor: playbackMode === 'fastBackward' ? '#D0462C' : 'white'
-          }}
-        >
-          <img
-            src={ '/' + (playbackMode === 'fastBackward' ? iconFastBackwardHover : iconFastBackward) }
-          />
-        </li>
-        <li
-          className="control-panel_playback-selector_button"
-          onClick={ () => selectPlaybackMode('backward') }
-          style={{
-            backgroundColor: playbackMode === 'backward' ? '#D0462C' : 'white'
-          }}
-        >
-          <img
-            src={ '/' + (playbackMode === 'backward' ? iconBackwardHover : iconBackward) }
-          />
-        </li>
-        <li
-          className="control-panel_playback-selector_button"
-          onClick={ () => selectPlaybackMode('pause') }
-          style={{
-            backgroundColor: playbackMode === 'pause' ? '#D0462C' : 'white'
-          }}
-        >
-          <img
-            src={ '/' + (playbackMode === 'pause' ? iconPauseHover : iconPause) }
-          />
-        </li>
-        <li
-          className="control-panel_playback-selector_button"
-          onClick={ () => selectPlaybackMode('forward') }
-          style={{
-            backgroundColor: playbackMode === 'forward' ? '#D0462C' : 'white'
-          }}
-        >
-          <img
-            src={ '/' + (playbackMode === 'forward' ? iconForwardHover : iconForward) }
-          />
-        </li>
-        <li
-          className="control-panel_playback-selector_button"
-          onClick={ () => selectPlaybackMode('fastForward') }
-          style={{
-            backgroundColor: playbackMode === 'fastForward' ? '#D0462C' : 'white'
-          }}
-        >
-          <img
-            src={ '/' + (playbackMode === 'fastForward' ? iconFastForwardHover : iconFastForward) }
-          />
-        </li>
-      </ul>
-    )
-  }
+        return (
+            <ul className="control-panel_playback-selector">
+                <li className="control-panel_playback-selector_button" onClick={ () => selectPlaybackMode('fastBackward') } style={ { backgroundColor: playbackMode === 'fastBackward' ? '#D0462C' : 'white' } }>
+                    <img src={ '/' + (playbackMode === 'fastBackward' ? iconFastBackwardHover : iconFastBackward) } />
+                </li>
+                <li className="control-panel_playback-selector_button" onClick={ () => selectPlaybackMode('backward') } style={ { backgroundColor: playbackMode === 'backward' ? '#D0462C' : 'white' } }>
+                    <img src={ '/' + (playbackMode === 'backward' ? iconBackwardHover : iconBackward) } />
+                </li>
+                <li className="control-panel_playback-selector_button" onClick={ () => selectPlaybackMode('pause') } style={ { backgroundColor: playbackMode === 'pause' ? '#D0462C' : 'white' } }>
+                    <img src={ '/' + (playbackMode === 'pause' ? iconPauseHover : iconPause) } />
+                </li>
+                <li className="control-panel_playback-selector_button" onClick={ () => selectPlaybackMode('forward') } style={ { backgroundColor: playbackMode === 'forward' ? '#D0462C' : 'white' } }>
+                    <img src={ '/' + (playbackMode === 'forward' ? iconForwardHover : iconForward) } />
+                </li>
+                <li className="control-panel_playback-selector_button" onClick={ () => selectPlaybackMode('fastForward') } style={ { backgroundColor: playbackMode === 'fastForward' ? '#D0462C' : 'white' } }>
+                    <img src={ '/' + (playbackMode === 'fastForward' ? iconFastForwardHover : iconFastForward) } />
+                </li>
+            </ul>
+        )
+    }
 }
 
 export default PlaybackSelector

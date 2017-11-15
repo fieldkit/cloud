@@ -5,22 +5,18 @@ import NotificationPanelContainer from '../../containers/MapPage/NotificationPan
 import DisclaimerPanelContainer from '../../containers/MapPage/DisclaimerPanel'
 
 class MapPage extends React.Component {
-  render () {
-    const {
-      documents
-    } = this.props
+    render() {
+        const {documents} = this.props
 
-    return (
-      <div className="map-page page">
-        {
-          !!documents && documents.size > 0 &&
-          <ControlPanelContainer/>
-        }
-        <NotificationPanelContainer/>
-        <DisclaimerPanelContainer/>
-      </div>
-    )
-  }
+        return (
+            <div className="map-page page">
+                { !!documents && documents.size > 0 &&
+                  <ControlPanelContainer/> }
+                <NotificationPanelContainer/>
+                <DisclaimerPanelContainer/>
+            </div>
+        )
+    }
 
 }
 

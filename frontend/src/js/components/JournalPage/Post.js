@@ -9,46 +9,39 @@ import iconSensor from '../../../img/icon-sensor-red.svg'
 
 class Post extends React.Component {
 
-  shouldComponentUpdate (props) {
-    return !is(this.props.data, props.data)
-  }
+    shouldComponentUpdate(props) {
+        return !is(this.props.data, props.data)
+    }
 
-  render () {
-    const {
-      data,
-      currentExpeditionID,
-      updateDate
-    } = this.props
+    render() {
+        const {data, currentExpeditionID, updateDate} = this.props
 
-    return (
-      <div className="post" ref="container">
-        <div className="post_type">
-          <img src={ '/' + iconSensor } />
-        </div>
-        <div className="post_main">
-          <div className="post_main_content">
-            { 'This is a post: ' + data.get('id') } 
-          </div>
-          <div className="post_main_meta">
-            <div className="post_main_meta_data">
-              { dateToString(new Date(data.get('date'))) }
+        return (
+            <div className="post" ref="container">
+                <div className="post_type">
+                    <img src={ '/' + iconSensor } />
+                </div>
+                <div className="post_main">
+                    <div className="post_main_content">
+                        { 'This is a post: ' + data.get('id') }
+                    </div>
+                    <div className="post_main_meta">
+                        <div className="post_main_meta_data">
+                            { dateToString(new Date(data.get('date'))) }
+                        </div>
+                        <div className="post_main_meta_geo">
+                            <Link to={ '/' + currentExpeditionID + '/map' } onClick={ () => updateDate(data.get('date'), 'pause') }>
+                                <img src={ '/' + iconLocation } width="100%" />
+                            </Link>
+                        </div>
+                        <div className="post_main_meta_separator" />
+                    </div>
+                </div>
+                <div className="post_actions">
+                </div>
             </div>
-            <div className="post_main_meta_geo">
-              <Link
-                to={ '/' + currentExpeditionID + '/map' }
-                onClick={ () => updateDate(data.get('date'), 'pause') }
-              >
-                <img src={ '/' + iconLocation } width="100%"/>
-              </Link>
-            </div>
-            <div className="post_main_meta_separator"/>
-          </div>
-        </div>
-        <div className="post_actions">
-        </div>
-      </div>
-    )
-  }
+        )
+    }
 }
 
 export default Post

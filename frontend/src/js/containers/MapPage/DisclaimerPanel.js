@@ -5,16 +5,16 @@ import { createSelector } from 'reselect'
 import DisclaimerPanel from '../../components/MapPage/DisclaimerPanel'
 
 const mapStateToProps = (state, ownProps) => {
-  return {}
+    return {}
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {}
+    return {}
 }
 
 const DisclaimerPanelContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(DisclaimerPanel)
 
 export default DisclaimerPanelContainer

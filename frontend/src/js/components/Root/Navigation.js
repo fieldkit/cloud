@@ -3,46 +3,32 @@ import React, { PropTypes } from 'react'
 import { Link } from 'react-router'
 
 class Navigation extends React.Component {
-  render () {
+    render() {
 
-    const {
-      currentExpeditionID,
-      currentProjectID,
-      currentPage
-    } = this.props
-    
-    let apiDomain = "http://api.fieldkit.org:8080";
+        const {currentExpeditionID, currentProjectID, currentPage} = this.props
 
-    return (
-      <ul className="navigation">
-        <li 
-          className={ 'navigation_link ' + (currentPage === 'map' ? 'active' : '') }
-        >
-          <Link
-            to={ '/' + currentExpeditionID + '/map' }
-          >
-            Map
-          </Link>
-        </li>
-        <li 
-          className={ 'navigation_link ' + (currentPage === 'journal' ? 'active' : '') }
-        >
-          <Link
-            to={ '/' + currentExpeditionID + '/journal' }
-          >
-            Journal
-          </Link>
-        </li>
-        <li 
-          className={ 'navigation_link ' + (currentPage === 'data' ? 'active' : '') }
-        >
-          <a href={ `${apiDomain}/projects/@/${currentProjectID}/expeditions/@/${currentExpeditionID}/documents` }>
-            Data
-          </a>
-        </li>
-      </ul>
-    )
-  }
+        let apiDomain = "http://api.fieldkit.org:8080";
+
+        return (
+            <ul className="navigation">
+                <li className={ 'navigation_link ' + (currentPage === 'map' ? 'active' : '') }>
+                    <Link to={ '/' + currentExpeditionID + '/map' }>
+                        Map
+                    </Link>
+                </li>
+                <li className={ 'navigation_link ' + (currentPage === 'journal' ? 'active' : '') }>
+                    <Link to={ '/' + currentExpeditionID + '/journal' }>
+                        Journal
+                    </Link>
+                </li>
+                <li className={ 'navigation_link ' + (currentPage === 'data' ? 'active' : '') }>
+                    <a href={ `${apiDomain}/projects/@/${currentProjectID}/expeditions/@/${currentExpeditionID}/documents` }>
+                        Data
+                      </a>
+                </li>
+            </ul>
+        )
+    }
 
 }
 
