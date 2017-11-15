@@ -6,7 +6,7 @@ import * as Creators from './creators'
 
 function* api(raw) {
     yield put({
-        type: raw.types[0],
+        type: raw.types.START,
         message: raw.message
     })
 
@@ -14,7 +14,7 @@ function* api(raw) {
         const data = yield FKApiClient.getJSON(raw.path)
         const unwrapped = raw.unwrap != null ? raw.unwrap(data) : data
         yield put({
-            type: raw.types[1],
+            type: raw.types.SUCCESS,
             response: unwrapped,
         })
 
@@ -22,7 +22,7 @@ function* api(raw) {
     }
     catch (err) {
         yield put({
-            type: raw.types[2],
+            type: raw.types.FAILURE,
             error: err,
         })
         throw err
