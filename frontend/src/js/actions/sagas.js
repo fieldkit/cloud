@@ -1,9 +1,9 @@
 import { delay } from 'redux-saga'
 import { put, take, takeLatest, takeEvery, select, all, race, call } from 'redux-saga/effects'
-import * as ActionTypes from './types'
-
 import I from 'immutable'
-import FKApiClient from '../api/api.js'
+
+import * as ActionTypes from './types'
+import FkApi from '../api/calls'
 
 export function* refreshSaga() {
     while (true) {
@@ -18,9 +18,7 @@ function mapBySlug(collection) {
 }
 
 function* loadExpeditionDocs(projectSlug, expeditionSlug) {
-    const docs = yield FKApiClient.getDocuments(projectSlug, expeditionSlug)
-    console.log(docs)
-
+    const docs = yield FkApi.getDocs(projectSlug, expeditionSlug)
     const map = {}
     docs.forEach((d, i) => {
         d.data.type = 'Feature';
@@ -41,8 +39,8 @@ function* loadExpeditionDocs(projectSlug, expeditionSlug) {
 
 function* load() {
     const projectSlug = 'www'
-    const expeditions = yield FKApiClient.getExpeditions(projectSlug)
-    const project = yield FKApiClient.getProject(projectSlug)
+    const expeditions = yield FkApi.getProjectExpeditions(projectSlug)
+    const project = yield FkApi.getProject(projectSlug)
     if (!project) {
         return
     }

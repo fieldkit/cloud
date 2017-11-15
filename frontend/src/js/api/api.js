@@ -98,25 +98,27 @@ class FKApiClient {
         return res.text()
     }
 
-    async getProject(projectID) {
-        const res = await this.getJSON('/projects/@/' + projectID)
+    /*
+    async getProject(projectId) {
+        const res = await this.getJSON('/projects/@/' + projectId)
         return res
     }
 
-    async getExpeditions(projectID) {
-        const res = await this.getJSON('/projects/@/' + projectID + '/expeditions')
+    async getExpeditions(projectId) {
+        const res = await this.getJSON('/projects/@/' + projectId + '/expeditions')
         return res.expeditions
     }
 
-    async getExpedition(projectID, expeditionID) {
-        const res = await this.getJSON('/projects/@/' + projectID + '/expeditions/@/' + expeditionID)
+    async getExpedition(projectId, expeditionId) {
+        const res = await this.getJSON('/projects/@/' + projectId + '/expeditions/@/' + expeditionId)
         return res
     }
 
-    async getDocuments(projectID, expeditionID) {
-        const res = await this.getJSON('/projects/@/' + projectID + '/expeditions/@/' + expeditionID + '/documents')
+    async getDocuments(projectId, expeditionId) {
+        const res = await this.getJSON('/projects/@/' + projectId + '/expeditions/@/' + expeditionId + '/documents')
         return res.documents
     }
+    */
 }
 
 let API_HOST = 'https://api.fieldkit.org';
