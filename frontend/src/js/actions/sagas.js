@@ -45,11 +45,6 @@ function* load() {
         return
     }
 
-    yield put({
-        type: ActionTypes.SET_PROJECT_NAME,
-        name: project.name
-    })
-
     const expeditionsMap = mapBySlug(expeditions);
 
     for (const expedition of expeditions) {

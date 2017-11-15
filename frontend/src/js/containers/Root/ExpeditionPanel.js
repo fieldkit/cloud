@@ -12,12 +12,12 @@ const mapStateToProps = (state, ownProps) => {
             state => state.expeditions.get('currentExpedition'),
             state => state.expeditions.get('expeditionPanelOpen'),
             state => state.expeditions.get('expeditions'),
-            state => state.expeditions.get('project'),
+            state => state.project,
             (currentExpedition, expeditionPanelOpen, expeditions, project) => ({
                 currentExpedition,
                 expeditionPanelOpen,
                 expeditions,
-                project
+                project: I.fromJS(project)
             })
         )(state)
     }

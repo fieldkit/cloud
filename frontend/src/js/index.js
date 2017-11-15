@@ -42,9 +42,7 @@ sagaMiddleware.run(rootSaga);
 const routes = (
 <Route path="/" component={ RootContainer }>
     <IndexRoute />
-    <Route path=":expeditionID" onEnter={ (state) => {
-                                              store.dispatch(actions.requestExpedition(state.params.expeditionID))
-                                          } }>
+    <Route path=":expeditionID">
         <IndexRoute component={ MapPageContainer } onEnter={ (state, replace) => {
                                                                  store.dispatch(actions.setCurrentPage('map'))
                                                              } } />
