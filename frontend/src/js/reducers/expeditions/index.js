@@ -40,10 +40,6 @@ export const initialState = I.fromJS({
 })
 
 const expeditionReducer = (state = initialState, action) => {
-    if (action.type !== ActionTypes.UPDATE_DATE && action.type !== ActionTypes.SET_MOUSE_POSITION) {
-        console.log('reducer:', action.type, action)
-    }
-
     switch (action.type) {
         case ActionTypes.SET_PROJECT_NAME: {
             return state

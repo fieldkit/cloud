@@ -7,6 +7,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
 import multiMiddleware from 'redux-multi'
+import { createLogger } from 'redux-logger'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 import { rootSaga } from './actions/sagas'
 import createSagaMiddleware from 'redux-saga'
@@ -18,14 +19,18 @@ import MapPageContainer from './containers/MapPage/MapPage'
 import JournalPageContainer from './containers/JournalPage/JournalPage'
 import DataPageContainer from './containers/DataPage/DataPage'
 
-// document.getElementById('root').remove()
-
 const sagaMiddleware = createSagaMiddleware();
+
+const loggerMiddleware = createLogger({
+    // predicate: (getState, action) => __DEV__,
+    collapsed: (getState, action) => true
+});
 
 const createStoreWithMiddleware = applyMiddleware(
     thunkMiddleware,
     multiMiddleware,
     sagaMiddleware,
+    loggerMiddleware,
 )(createStore)
 
 const store = createStoreWithMiddleware(reducer)
