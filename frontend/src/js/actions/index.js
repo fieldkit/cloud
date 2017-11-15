@@ -9,76 +9,6 @@ import I from 'immutable'
 
 import * as Types from './types'
 
-function processQueryString(getState) {
-    const queryString = {};
-    const query = window.location.search.substring(1);
-    const vars = query.split("&");
-    for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split("=");
-        if (typeof queryString[pair[0]] === "undefined") {
-            queryString[pair[0]] = decodeURIComponent(pair[1]);
-        } else if (typeof queryString[pair[0]] === "string") {
-            const arr = [queryString[pair[0]], decodeURIComponent(pair[1])];
-            queryString[pair[0]] = arr;
-        } else {
-            queryString[pair[0]].push(decodeURIComponent(pair[1]));
-        }
-    }
-    const params = I.fromJS(queryString)
-    const currentPage = getState().expeditions.get('currentPage')
-
-    switch (currentPage) {
-        case 'map': {
-            if (params.has('date')) {
-                return [{
-                    type: Types.UPDATE_DATE,
-                    date: params.get('date')
-                }]
-            } else if (params.has('type')) {
-                return [{
-                    type: Types.SELECT_FOCUS_TYPE,
-                    focusType: 'documents',
-                    focusID: params.get('type')
-                }]
-            } else if (params.has('view')) {
-                const coords = params.get('view').split(',')
-                const viewport = {
-                    bearing: 0,
-                    isDragging: false,
-                    longitude: parseFloat(coords[0]),
-                    latitude: parseFloat(coords[1]),
-                    pitch: 0,
-                    startBearing: null,
-                    startDragLngLat: null,
-                    startPitch: null,
-                    zoom: parseFloat(coords[2])
-                }
-                return [{
-                    type: Types.SELECT_FOCUS_TYPE,
-                    focusType: 'manual'
-                }, {
-                    type: Types.SET_VIEWPORT,
-                    viewport
-                }]
-            } else {
-                return [{
-                    type: Types.BLANK
-                }]
-            }
-        }
-        case 'journal': {
-            return [{
-                type: Types.UPDATE_DATE,
-                date: parseFloat(params.get('date')),
-                forceUpdate: true
-            }]
-        }
-        default: {
-            return [{}]
-        }
-    }
-}
-
 export function requestExpedition(expeditionID) {
     return (dispatch, getState) => {
         dispatch({
@@ -172,8 +102,7 @@ export function requestExpedition(expeditionID) {
                                         {
                                             type: Types.INITIALIZE_DOCUMENTS,
                                             data: documents
-                                        },
-                                        ...processQueryString(getState)
+                                        }
                                     ])
                                     window.setInterval(() => {
                                         updateDeepLinking(browserHistory, getState)
