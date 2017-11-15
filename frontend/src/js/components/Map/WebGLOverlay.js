@@ -135,22 +135,25 @@ export default class WebGLOverlay extends Component {
         const points = bufferGeometries.points
         const pixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1
 
+        console.log(meshLine.geometry)
+        console.log(meshLineMaterial)
+
+            // <mesh geometry={meshLine.geometry} material={meshLineMaterial} />
         return (
             <div>
                 <div id="three-renderer">
-                    <React3 mainCamera="camera" width={ width } height={ height } alpha={ true } antialias={ true } pixelRatio={ pixelRatio }>
+                    <React3 mainCamera="camera" width={width} height={height} alpha={true} antialias={true} pixelRatio={pixelRatio}>
                         <scene>
                             <orthographicCamera name="camera" { ...cameraProps } />
-                            <mesh geometry={ meshLine.geometry } material={ meshLineMaterial } />
-                            { Object.keys(bufferGeometries.particles).map(type => {
+                            {Object.keys(bufferGeometries.particles).map(type => {
                                   const particles = bufferGeometries.particles[type]
                                   return (
-                                      <points key={ 'particles-' + type }>
-                                          <bufferGeometry position={ points.position } color={ points.color } index={ points.index } />
-                                          <pointsMaterial size={ 30 } vertexColors={ VertexColors } map={ bufferGeometries.particles[type].texture } transparent={ true } />
+                                      <points key={'particles-' + type}>
+                                          <bufferGeometry position={points.position} color={points.color} index={points.index} />
+                                          <pointsMaterial size={30} vertexColors={VertexColors} map={bufferGeometries.particles[type].texture} transparent={true} />
                                       </points>
                                   )
-                              }) }
+                              })}
                         </scene>
                     </React3>
                 </div>
