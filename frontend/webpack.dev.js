@@ -2,6 +2,16 @@ var webpack = require('webpack')
 var path = require('path')
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+var imageLoaderQuery = {
+    bypassOnDebug: true,
+    optipng: {
+        optimizationLevel: 7
+    },
+    gifsicle: {
+        interlaced: false
+    }
+};
+
 module.exports = {
   cache: true,
   context: path.join(__dirname, ''),
@@ -33,7 +43,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loaders: [
           'file?hash=sha512&digest=hex&name=[hash].[ext]',
-          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+          `image-webpack?${JSON.stringify(imageLoaderQuery)}`
         ]
       },
       {

@@ -11,6 +11,16 @@ function isExternal(module) {
   return userRequest.indexOf('node_modules') >= 0
 }
 
+var imageLoaderQuery = {
+    bypassOnDebug: true,
+    optipng: {
+        optimizationLevel: 7
+    },
+    gifsicle: {
+        interlaced: false
+    }
+};
+
 module.exports = {
   context: path.join(__dirname),
   devtool: null,
@@ -41,7 +51,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loaders: [
           'file?hash=sha512&digest=hex&name=[hash].[ext]',
-          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+          `image-webpack?${JSON.stringify(imageLoaderQuery)}`
         ]
       },
       {
