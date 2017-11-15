@@ -105,6 +105,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		return nil, fmt.Errorf("%s: Unable to get location (%s)", pm.SchemaId, err)
 	}
 	if location != nil {
+		log.Printf("(%s)(%s)[Updating Location] %v", pm.MessageId, pm.SchemaId, location)
 		i.Streams.UpdateLocation(pm.SchemaId.Device, location)
 		stream.Location = location
 	}

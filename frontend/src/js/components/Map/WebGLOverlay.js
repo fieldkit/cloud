@@ -135,10 +135,6 @@ export default class WebGLOverlay extends Component {
         const points = bufferGeometries.points
         const pixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1
 
-        console.log(meshLine.geometry)
-        console.log(meshLineMaterial)
-
-            // <mesh geometry={meshLine.geometry} material={meshLineMaterial} />
         return (
             <div>
                 <div id="three-renderer">

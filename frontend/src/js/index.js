@@ -19,10 +19,12 @@ import MapPageContainer from './containers/MapPage/MapPage'
 import JournalPageContainer from './containers/JournalPage/JournalPage'
 import DataPageContainer from './containers/DataPage/DataPage'
 
-const sagaMiddleware = createSagaMiddleware();
+const sagaMiddleware = createSagaMiddleware()
+
+import * as ActionTypes from './actions/types'
 
 const loggerMiddleware = createLogger({
-    // predicate: (getState, action) => __DEV__,
+    predicate: (getState, action) => action.type != ActionTypes.SET_MOUSE_POSITION, // __DEV__,
     collapsed: (getState, action) => true
 });
 

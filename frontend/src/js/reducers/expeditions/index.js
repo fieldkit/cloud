@@ -102,8 +102,8 @@ const expeditionReducer = (state = initialState, action) => {
             const position = action.data.toList().get(0).getIn(['geometry', 'coordinates'])
             const currentDocuments = action.data.map(d => d.get('id')).toList()
             const newState = state
-                .setIn(['viewport', 'longitude'], position.get(0))
-                .setIn(['viewport', 'latitude'], position.get(1))
+                .setIn(['viewport', 'latitude'], position.get(0))
+                .setIn(['viewport', 'longitude'], position.get(1))
                 .setIn(['expeditions', state.get('currentExpedition'), 'documentsFetching'], false)
                 .set('documents', action.data)
                 .set('currentDocuments', currentDocuments)
@@ -209,8 +209,8 @@ const updateViewport = (state, nextDate, nextFocusType) => {
 
             if (!previousDocument || !nextDocument) return state.get('viewport')
 
-            const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
             const latitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 0]), nextDocument.getIn(['geometry', 'coordinates', 0]))
+            const longitude = map(date, previousDocument.get('date'), nextDocument.get('date'), previousDocument.getIn(['geometry', 'coordinates', 1]), nextDocument.getIn(['geometry', 'coordinates', 1]))
 
             return state
                 .update('viewport', viewport => viewport

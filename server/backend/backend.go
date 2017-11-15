@@ -218,8 +218,8 @@ func (b *Backend) ListDeviceInputs(ctx context.Context, project, expedition stri
 func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedition string) ([]*data.TwitterAccountInput, error) {
 	twitterAccounts := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
-		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
-			FROM fieldkit.twitter_account AS ta 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
+			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
@@ -267,8 +267,8 @@ func (b *Backend) GetDeviceInputByID(ctx context.Context, id int32) (*data.Devic
 func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
 	twitterAccountInputs := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
-		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
-			FROM fieldkit.twitter_account AS ta 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
+			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
 					WHERE i.expedition_id = $1
@@ -293,8 +293,8 @@ func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccou
 func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountInput, error) {
 	twitterAccountInputs := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
-		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret 
-			FROM fieldkit.twitter_account AS ta 
+		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
+			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
 				JOIN fieldkit.input AS i ON i.id = ita.input_id
 					WHERE ta.id = $1
