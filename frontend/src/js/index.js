@@ -24,7 +24,7 @@ const sagaMiddleware = createSagaMiddleware()
 import * as ActionTypes from './actions/types'
 
 const loggerMiddleware = createLogger({
-    predicate: (getState, action) => action.type != ActionTypes.SET_MOUSE_POSITION, // __DEV__,
+    predicate: (getState, action) => action.type != ActionTypes.SET_MOUSE_POSITION && action.type != ActionTypes.UPDATE_DATE, // __DEV__,
     collapsed: (getState, action) => true
 });
 
