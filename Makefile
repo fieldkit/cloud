@@ -1,23 +1,34 @@
+
 BUILD=build
 
-all: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli
+default: binaries
+
+binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli
+
+all: binaries bundles
+
+bundles: frontend/src/vendors/dll/dll.vendor.js
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
+FRONTEND_BUNDLE_SOURCES = $(shell find frontend/src/js -type f -name '*.js')
 
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go
 
 $(BUILD)/db-tester: server/db-tester/*.go $(SERVER_SOURCES)
-	go build -o $@ $^
+	go build -o $@ server/db-tester/*.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
-	go build -o $@ $^
+	go build -o $@ server/sqs-worker/*.go
 
 $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
-	go build -o $@ $^
+	go build -o $@ server/sqs-sender/*.go
 
 $(BUILD)/fkcli: server/api/tool/fieldkit-cli/*.go $(SERVER_SOURCES)
-	go build -o $@ $^
+	go build -o $@ server/api/tool/fieldkit-cli/*.go
+
+frontend/src/vendors/dll/dll.vendor.js: $(FRONTEND_BUNDLE_SOURCES)
+	cd frontend && yarn install && yarn dll
 
 image:
 	cd server && docker build -t conservify/fk-cloud-server .
@@ -29,3 +40,4 @@ generate:
 
 clean:
 	rm -rf build
+	rm -rf frontend/src/vendors/dll/dll.vendor.js
