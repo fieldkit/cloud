@@ -44,7 +44,7 @@ func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]int
 
 func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}, t *time.Time) (l *Location, err error) {
 	if ms.UseProviderLocation {
-		return &Location{Coordinates: pm.Location}, nil
+		return &Location{UpdatedAt: t, Coordinates: pm.Location}, nil
 	}
 	if ms.HasLocation {
 		coordinates := make([]float64, 0)
