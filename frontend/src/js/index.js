@@ -9,8 +9,8 @@ import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 import { Router, Route, IndexRoute, Redirect, browserHistory } from 'react-router'
 import { rootSaga } from './actions/sagas'
+import * as ActionTypes from './actions/types'
 import createSagaMiddleware from 'redux-saga'
-import * as actions from './actions'
 import reducer from './reducers'
 
 import RootContainer from './containers/Root/Root'
@@ -18,11 +18,16 @@ import MapPageContainer from './containers/MapPage/MapPage'
 
 const sagaMiddleware = createSagaMiddleware()
 
-import * as ActionTypes from './actions/types'
-
 const loggerMiddleware = createLogger({
     predicate: (getState, action) => action.type != ActionTypes.SET_MOUSE_POSITION && action.type != ActionTypes.UPDATE_DATE, // __DEV__,
-    collapsed: (getState, action) => true
+    collapsed: (getState, action) => true,
+    stateTransformer: state => {
+        return Object.assign({}, state, {
+            expeditions: state.expeditions.toJS(),
+            project: state.project.toJS ? state.project.toJS() : state.project,
+            visibleExpedition: state.visibleExpedition.toJS ? state.visibleExpedition.toJS() : state.visibleExpedition
+        })
+    },
 });
 
 const createStoreWithMiddleware = applyMiddleware(
@@ -40,7 +45,6 @@ const routes = (
         <IndexRoute />
         <Route path=":expeditionSlug">
             <IndexRoute component={MapPageContainer} />
-            <Route path="map" component={MapPageContainer} />
         </Route>
     </Route>
 )

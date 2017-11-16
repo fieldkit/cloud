@@ -8,21 +8,19 @@ import ZoomSelector from './ZoomSelector'
 class ControlPanel extends React.Component {
 
     render() {
-
-        const {currentExpeditionID, currentDate, playbackMode, focus, zoom, selectPlaybackMode, selectFocusType, selectZoom} = this.props
-
-        const currentPage = location.pathname.split('/').filter(p => !!p && p !== currentExpeditionID)[0] || 'map'
+        const { activeExpedition, replay } = this.props
+        const { selectPlaybackMode, selectFocusType, selectZoom} = this.props
 
         return (
             <div className="control-panel">
                 <div className="control-panel_date-counter">
-                    { dateToString(new Date(currentDate)) }
+                    { dateToString(new Date(replay.now)) }
                 </div>
-                { currentPage === 'map' &&
+                { replay.controlsVisible &&
                   <div>
-                      <PlaybackSelector playbackMode={ playbackMode } selectPlaybackMode={ selectPlaybackMode } />
-                      <FocusSelector focus={ focus } selectFocusType={ selectFocusType } />
-                      <ZoomSelector zoom={ zoom } selectZoom={ selectZoom } />
+                      <PlaybackSelector playbackMode={ replay.playbackMode } selectPlaybackMode={ selectPlaybackMode } />
+                      <FocusSelector focus={ replay.focus } selectFocusType={ selectFocusType } />
+                      <ZoomSelector zoom={ replay.zoom } selectZoom={ selectZoom } />
                   </div> }
             </div>
         )
@@ -30,6 +28,18 @@ class ControlPanel extends React.Component {
 }
 
 ControlPanel.propTypes = {
+    activeExpedition: PropTypes.object.isRequired,
+    replay: PropTypes.shape({
+        controlsVisible: PropTypes.bool.isRequired,
+        zoom: PropTypes.number.isRequired,
+        now: PropTypes.number.isRequired,
+        playbackMode: PropTypes.string.isRequired,
+        focus: PropTypes.object.isRequired,
+    }).isRequired,
+
+    selectZoom: PropTypes.func.isRequired,
+    selectPlaybackMode: PropTypes.func.isRequired,
+    selectFocusType: PropTypes.func.isRequired,
 }
 
 export default ControlPanel

@@ -57,14 +57,6 @@ export function selectZoom(zoom) {
     }
 }
 
-export function toggleSensorData() {
-    return (dispatch, getState) => {
-        dispatch({
-            type: Types.TOGGLE_SENSOR_DATA
-        })
-    }
-}
-
 export function setMousePosition(x, y) {
     return (dispatch, getState) => {
         dispatch({

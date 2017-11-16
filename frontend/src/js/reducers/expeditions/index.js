@@ -4,6 +4,18 @@ import ViewportMercator from 'viewport-mercator-project'
 import { map, constrain } from '../../utils.js'
 import * as ActionTypes from '../../actions/types'
 
+class DocumentCollection {
+    constructor(docs) {
+        this.docs = docs
+    }
+
+    after(id) {
+    }
+
+    before(id) {
+    }
+}
+
 export const initialState = I.fromJS({
     project: {
         id: location.hostname.split('.')[0],
@@ -16,13 +28,11 @@ export const initialState = I.fromJS({
     currentPage: 'map',
     currentExpedition: '',
     playbackMode: 'pause',
-    showSensors: true,
     focus: {
         type: 'expedition',
         id: null
     },
     currentDate: new Date(),
-    forceDateUpdate: false,
     mousePosition: [-1, -1],
     expeditions: {},
     viewport: {
@@ -31,9 +41,7 @@ export const initialState = I.fromJS({
         zoom: 15,
         width: window.innerWidth,
         height: window.innerHeight,
-        startDragLngLat: [0, 0],
         isDragging: false,
-        geoBounds: [0, 0, 0, 0]
     },
     currentDocuments: [],
     documents: {}
@@ -136,7 +144,6 @@ const expeditionReducer = (state = initialState, action) => {
             const nextDate = constrain(action.date, startDate, endDate)
             return state
                 .set('currentDate', nextDate)
-                .set('forceDateUpdate', !!action.forceUpdate)
                 .update('viewport', viewport => updateViewport(state, nextDate, null))
                 .update('playbackMode', playbackMode => action.playbackMode || playbackMode)
 
@@ -157,11 +164,6 @@ const expeditionReducer = (state = initialState, action) => {
                 .setIn(['viewport', 'zoom'], action.zoom)
                 .setIn(['focus', 'type'], 'manual')
                 .set('playbackMode', 'pause')
-        }
-        case ActionTypes.TOGGLE_SENSOR_DATA: {
-            let sensors_on = state.get('showSensors')
-            return state
-                .set('showSensors', !sensors_on)
         }
         case ActionTypes.SET_MOUSE_POSITION: {
             return state
