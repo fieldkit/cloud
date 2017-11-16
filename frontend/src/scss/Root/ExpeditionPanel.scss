@@ -25,6 +25,10 @@
       background-color: $color-accent;
       position: relative;
 
+      h1 {
+          line-height: 25px;
+      }
+
       &_close {
         position: absolute;
         right: $line-width * 2;

@@ -7,15 +7,15 @@
   overflow: visible;
   pointer-events: none;
 
-  &_title{
+  &_title {
         font-weight:bold;
   }
 
-  &_twitter-media{
+  &_twitter-media {
     margin-top:10px;
     width:100%;
   }
-    
+
   &_post {
     height: auto;
     opacity: 1;
@@ -67,8 +67,5 @@
         }
       }
     }
-
-
   }
-
 }

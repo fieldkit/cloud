@@ -48,12 +48,6 @@ export function updateDeepLinking(history, getState) {
                 }
             }
         }
-        case 'journal': {
-            return history.push({
-                pathname: location.pathname,
-                search: `?date=${currentDate}`
-            })
-        }
     }
 }
 
