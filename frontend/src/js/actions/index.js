@@ -75,15 +75,6 @@ export function setMousePosition(x, y) {
     }
 }
 
-export function setCurrentPage(currentPage) {
-    return (dispatch, getState) => {
-        dispatch({
-            type: Types.SET_CURRENT_PAGE,
-            currentPage
-        })
-    }
-}
-
 export function openExpeditionPanel() {
     return (dispatch, getState) => {
         dispatch({

@@ -71,10 +71,6 @@ const expeditionReducer = (state = initialState, action) => {
             return state
                 .set('lightboxDocumentID', null)
         }
-        case ActionTypes.SET_CURRENT_PAGE: {
-            return state
-                .set('currentPage', action.currentPage)
-        }
         case ActionTypes.OPEN_EXPEDITION_PANEL: {
             return state
                 .set('expeditionPanelOpen', true)

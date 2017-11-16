@@ -33,16 +33,18 @@ class Timeline extends React.Component {
     }
 
     onClick(e) {
+        const {updateDate, startDate, endDate} = this.props
+
         const lineHeight = getLineHeight()
         const h = (window.innerHeight - lineHeight * 2) - lineHeight * 2
-        const {updateDate, startDate, endDate} = this.props
         const mouseY = e.nativeEvent.clientY - lineHeight * 2
         const nextDate = constrain(map(mouseY, 0, h, startDate, endDate), startDate, endDate)
         updateDate(nextDate, null, true)
     }
 
     render() {
-        const {currentDate, startDate, endDate, documents, } = this.props
+        const {currentDate, startDate, endDate, documents } = this.props
+
         const {mouseOver} = this.state
 
         if (!documents || documents.size === 0) return null
