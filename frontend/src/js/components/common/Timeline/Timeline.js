@@ -55,7 +55,7 @@ class Timeline extends React.Component {
         const rad = lineWidth / 2
         const x = lineWidth - w / 2
         const y = lineHeight
-        const progress = map(currentDate, startDate, endDate, 0, 1)
+        const progress = map(isNaN(currentDate) ? startDate : currentDate, startDate, endDate, 0, 1)
 
         return (
             <div id="timeline">
