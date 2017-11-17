@@ -13,7 +13,7 @@ export function* refreshSaga() {
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
     const [ expedition, docs ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
-        FkApi.getExpeditionDocs(projectSlug, expeditionSlug)
+        FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug)
     ]);
 }
 

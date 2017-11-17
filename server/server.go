@@ -274,6 +274,12 @@ func main() {
 	})
 	app.MountInputTokenController(service, c14)
 
+	// Mount "geojson" controller
+	c16 := api.NewGeoJSONController(service, api.GeoJSONControllerOptions{
+		Backend: be,
+	})
+	app.MountGeoJSONController(service, c16)
+
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {

@@ -6,7 +6,7 @@ function expandApiTypes(base) {
     };
 }
 
-export const API_EXPEDITION_DOCS_GET = expandApiTypes("API_EXPEDITION_DOCS_GET");
+export const API_EXPEDITION_GEOJSON_GET = expandApiTypes("API_EXPEDITION_GEOJSON_GET");
 export const API_PROJECT_EXPEDITIONS_GET = expandApiTypes("API_PROJECT_EXPEDITIONS_GET");
 export const API_EXPEDITION_GET = expandApiTypes("API_EXPEDITION_GET");
 export const API_PROJECT_GET = expandApiTypes("API_PROJECT_GET");

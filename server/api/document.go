@@ -10,18 +10,6 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-// Attributes(func() {
-// 	Attribute("id", String)
-// 	Attribute("document_id", String)
-// 	Attribute("input_id", Integer)
-// 	Attribute("team_id", Integer)
-// 	Attribute("user_id", Integer)
-// 	Attribute("timestamp", Integer)
-// 	Attribute("location", Point)
-// 	Attribute("data", Any)
-// 	Required("id", "document_id", "input_id", "timestamp", "location", "data")
-// })
-
 func DocumentType(document *data.Document) *app.Document {
 	locationType := &app.Point{
 		Type:        "Point",

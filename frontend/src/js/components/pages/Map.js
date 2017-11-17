@@ -80,63 +80,34 @@ function generatePointDecorator(colorType: string, sizeType: string) {
 }
 
 type Props = {
-    activeExpedition: PropTypes.object.isRequired
+    activeExpedition: PropTypes.object.isRequired,
+    visibleGeoJson: GeoJSON,
 };
 
 class Map extends Component {
     props: Props;
     state: {
-        pointDecorator: PointDecorator,
-        data: GeoJSON,
+        pointDecorator: PointDecorator
     };
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            pointDecorator: {},
-            data: {}
-        } ;
-    }
-
-    componentWillMount() {
-        const data = {
-            type: "FeatureCollection",
-            features: [{
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [-77.02827,38.91427]
-                },
-                properties: {
-                    temp: 32
-                }
-            },
-            {
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [-77.02013, 38.91538]
-                },
-                properties: {
-                    temp: 45
-                }
-            }]
-        }
-
-        const pointDecorator = generatePointDecorator('linear', 'linear');
-
-        this.setState({
-            data,
-            pointDecorator
-        });
+            pointDecorator: generatePointDecorator('constant', 'constant')
+        };
     }
 
     render() {
-        const { pointDecorator, data } = this.state;
+        const { visibleGeoJson } = this.props;
+        const { pointDecorator } = this.state;
+
+        if (!visibleGeoJson.type) {
+            return (<div></div>);
+        }
 
         return (
             <div className="map page">
-                <MapContainer pointDecorator={ pointDecorator } data={ data } />
+                <MapContainer pointDecorator={ pointDecorator } data={ visibleGeoJson } />
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
@@ -151,7 +122,8 @@ class Map extends Component {
 }
 
 const mapStateToProps = state => ({
-    activeExpedition: state.activeExpedition
+    activeExpedition: state.activeExpedition,
+    visibleGeoJson: state.visibleGeoJson,
 });
 
 export default connect(mapStateToProps, {

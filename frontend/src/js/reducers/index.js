@@ -14,6 +14,17 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
     }
 }
 
+function visibleGeoJson(state = { }, action) {
+    let nextState = state;
+    switch (action.type) {
+    case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS:
+        return Object.assign({ }, state, action.response);
+    default:
+        return nextState;
+    }
+}
+
 export default combineReducers({
-    activeExpedition
+    activeExpedition,
+    visibleGeoJson,
 });

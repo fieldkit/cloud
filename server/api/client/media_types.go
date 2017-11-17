@@ -419,6 +419,120 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// GeoJSON media type (default view)
+//
+// Identifier: application/vnd.app.geojson+json; view=default
+type GeoJSON struct {
+	Features GeoJSONFeatureCollection `form:"features" json:"features" xml:"features"`
+	Type     string                   `form:"type" json:"type" xml:"type"`
+}
+
+// Validate validates the GeoJSON media type instance.
+func (mt *GeoJSON) Validate() (err error) {
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
+	if mt.Features == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "features"))
+	}
+	if err2 := mt.Features.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeGeoJSON decodes the GeoJSON instance encoded in resp body.
+func (c *Client) DecodeGeoJSON(resp *http.Response) (*GeoJSON, error) {
+	var decoded GeoJSON
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// GeoJSONFeature media type (default view)
+//
+// Identifier: application/vnd.app.geojson-feature+json; view=default
+type GeoJSONFeature struct {
+	Geometry   *GeoJSONGeometry  `form:"geometry" json:"geometry" xml:"geometry"`
+	Properties map[string]string `form:"properties" json:"properties" xml:"properties"`
+	Type       string            `form:"type" json:"type" xml:"type"`
+}
+
+// Validate validates the GeoJSONFeature media type instance.
+func (mt *GeoJSONFeature) Validate() (err error) {
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
+	if mt.Geometry == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometry"))
+	}
+	if mt.Properties == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "properties"))
+	}
+	if mt.Geometry != nil {
+		if err2 := mt.Geometry.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeGeoJSONFeature decodes the GeoJSONFeature instance encoded in resp body.
+func (c *Client) DecodeGeoJSONFeature(resp *http.Response) (*GeoJSONFeature, error) {
+	var decoded GeoJSONFeature
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature (default view)
+//
+// Identifier: application/vnd.app.geojson-feature+json; type=collection; view=default
+type GeoJSONFeatureCollection []*GeoJSONFeature
+
+// Validate validates the GeoJSONFeatureCollection media type instance.
+func (mt GeoJSONFeatureCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeGeoJSONFeatureCollection decodes the GeoJSONFeatureCollection instance encoded in resp body.
+func (c *Client) DecodeGeoJSONFeatureCollection(resp *http.Response) (GeoJSONFeatureCollection, error) {
+	var decoded GeoJSONFeatureCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// GeoJSONGeometry media type (default view)
+//
+// Identifier: application/vnd.app.geojson-geometry+json; view=default
+type GeoJSONGeometry struct {
+	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Type        string    `form:"type" json:"type" xml:"type"`
+}
+
+// Validate validates the GeoJSONGeometry media type instance.
+func (mt *GeoJSONGeometry) Validate() (err error) {
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
+	if mt.Coordinates == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
+	}
+	return
+}
+
+// DecodeGeoJSONGeometry decodes the GeoJSONGeometry instance encoded in resp body.
+func (c *Client) DecodeGeoJSONGeometry(resp *http.Response) (*GeoJSONGeometry, error) {
+	var decoded GeoJSONGeometry
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Input media type (default view)
 //
 // Identifier: application/vnd.app.input+json; view=default

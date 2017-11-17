@@ -27,11 +27,11 @@ export function getExpedition(projectSlug, expeditionSlug) {
     }
 }
 
-export function getExpeditionDocs(projectSlug, expeditionSlug) {
+export function getExpeditionGeoJson(projectSlug, expeditionSlug) {
     return {
-        types: ActionTypes.API_EXPEDITION_DOCS_GET,
-        path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/documents',
+        types: ActionTypes.API_EXPEDITION_GEOJSON_GET,
+        path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/geojson',
         method: 'GET',
-        unwrap: (r) => r.documents
+        unwrap: (r) => r
     }
 }
