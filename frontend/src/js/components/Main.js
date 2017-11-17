@@ -5,7 +5,6 @@ import { Route, Switch, NavLink } from 'react-router-dom';
 import type { Match as RouterMatch, Location as RouterLocation, RouterHistory, } from 'react-router-dom';
 
 import log from 'loglevel';
-import { getProjectSlug } from '../common/util';
 import Map from './pages/Map';
 import Sensors from './pages/Sensors';
 import About from './pages/About';
@@ -20,7 +19,7 @@ type Props = {
 export default class Main extends Component {
     props: Props;
     state: {
-    activeProject: ?APIProject,
+        activeProject: ?APIProject,
     };
 
     constructor(props: Props) {
@@ -33,12 +32,7 @@ export default class Main extends Component {
         log.setLevel('trace');
     }
 
-    async loadActiveProject() {
-        
-    }
-
     componentDidMount() {
-        this.loadActiveProject();
     }
 
     render() {

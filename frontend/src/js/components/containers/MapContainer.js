@@ -1,12 +1,11 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import log from 'loglevel';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
 import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 import BubbleMap from '../visualizations/BubbleMap';
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../constants/mapbox'
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
 
 type Props = {
     pointDecorator: PointDecorator,

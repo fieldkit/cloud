@@ -1,7 +1,6 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import log from 'loglevel';
 import * as d3 from 'd3';
 import { Source, Layer, Feature } from 'react-mapbox-gl';
 import type { GeoJSON } from '../../types/MapTypes';
@@ -52,14 +51,14 @@ export default class BubbleMap extends Component {
         if (color.type === 'constant') {
             circleColor = color.colors[0].color;
         } else {
-            const { data_key, bounds } = color;
+            const { dateKey, bounds } = color;
             let min;
             let max;
             if (bounds) {
                 min = bounds[0];
                 max = bounds[1];
             } else {
-                const values = data.features.map(f => f.properties[data_key]);
+                const values = data.features.map(f => f.properties[dateKey]);
                 min = d3.min(values);
                 max = d3.max(values);
             }
@@ -69,7 +68,7 @@ export default class BubbleMap extends Component {
                 c.color,
             ]);
             circleColor = {
-                property: data_key,
+                property: dateKey,
                 type: 'exponential',
                 stops,
             };
@@ -84,10 +83,10 @@ export default class BubbleMap extends Component {
         if (size.type === 'constant') {
             circleRadius = size.bounds[0];
         } else {
-            const { data_key } = size;
-            const values = data.features.map(f => f.properties[data_key]);
+            const { dateKey } = size;
+            const values = data.features.map(f => f.properties[dateKey]);
             circleRadius = {
-                property: data_key,
+                property: dateKey,
                 type: 'exponential',
                 stops: [
                     [d3.min(values), size.bounds[0]],
@@ -108,7 +107,10 @@ export default class BubbleMap extends Component {
                 <Layer type="circle" id="circle" sourceId={ 'source' } paint={ { 'circle-color': circleColor, 'circle-radius': circleRadius, } } />
                 <Layer type="circle" id="circle-markers" paint={ { 'circle-color': 'rgba(0, 0, 0, 0)', 'circle-radius': 10, } }>
                 { data.features.map((f, i) => (
-                        <Feature key={i} onClick={ click.bind(this, f) } onMouseEnter={ onToggleHover.bind(this, 'pointer') } onMouseLeave={ onToggleHover.bind(this, '') } coordinates={ f.geometry.coordinates } />
+                        <Feature key={i} onClick={ click.bind(this, f) }
+                            onMouseEnter={ onToggleHover.bind(this, 'pointer') }
+                            onMouseLeave={ onToggleHover.bind(this, '') }
+                            coordinates={ f.geometry.coordinates } />
                       )) }
                 </Layer>
             </div>

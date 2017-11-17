@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 
-export class FieldkitLogo extends Component {
+export class FieldKitLogo extends Component {
     render() {
         return (
             <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 440 110">

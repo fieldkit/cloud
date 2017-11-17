@@ -1,11 +1,12 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import log from 'loglevel';
+import { connect } from 'react-redux'
+
 import MapContainer from '../containers/MapContainer';
 import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 import type { GeoJSON } from '../../types/MapTypes';
-import { FieldkitLogo } from '../icons/Icons';
+import { FieldKitLogo } from '../icons/Icons';
 import '../../../css/map.css';
 
 function generateConstantColor() {
@@ -15,7 +16,7 @@ function generateConstantColor() {
             location: 0,
             color: '#facada'
         }],
-        data_key: null,
+        dateKey: null,
         bounds: null,
     };
 }
@@ -45,7 +46,7 @@ function generateLinearColor() {
                 color: 'rgb(189, 0, 38)'
             } ,
         ],
-        data_key: 'temp',
+        dateKey: 'temp',
         bounds: null,
     };
 }
@@ -53,7 +54,7 @@ function generateLinearColor() {
 function generateConstantSize() {
     return {
         type: 'constant',
-        data_key: null,
+        dateKey: null,
         bounds: [10, 10],
     };
 }
@@ -61,7 +62,7 @@ function generateConstantSize() {
 function generateLinearSize() {
     return {
         type: 'linear',
-        data_key: 'temp',
+        dateKey: 'temp',
         bounds: [15, 40],
     };
 }
@@ -78,45 +79,26 @@ function generatePointDecorator(colorType: string, sizeType: string) {
     };
 }
 
-type Props = {};
+type Props = {
+    activeExpedition: PropTypes.object.isRequired
+};
 
-export default class Map extends Component {
+class Map extends Component {
     props: Props;
     state: {
-    pointDecorator: PointDecorator,
-    data: GeoJSON,
+        pointDecorator: PointDecorator,
+        data: GeoJSON,
     };
 
     constructor(props: Props) {
         super(props);
         this.state = {
             pointDecorator: {},
-            data: {},
-            feature: null,
+            data: {}
         } ;
     }
 
     componentWillMount() {
-        /*
-        const testSelection = generateSelectionsFromMap({
-          id: 'number',
-          place: 'string',
-          login: 'string',
-          location: 'location',
-          temp: 'number',
-        });
-
-        const testGrouping = {
-          operation: 'equal',
-          parameter: null,
-          source_attribute: 'id',
-        };
-
-        const rawData = getMapSampleData();
-        const transformedData = transform(rawData, testGrouping, testSelection);
-        const data = streamToGeoJSON(transformedData, 'location');
-        */
-
         const data = {
             type: "FeatureCollection",
             features: [{
@@ -126,7 +108,7 @@ export default class Map extends Component {
                     coordinates: [-77.02827,38.91427]
                 },
                 properties: {
-                    temp: 23
+                    temp: 32
                 }
             },
             {
@@ -136,7 +118,7 @@ export default class Map extends Component {
                     coordinates: [-77.02013, 38.91538]
                 },
                 properties: {
-                    temp: 23
+                    temp: 45
                 }
             }]
         }
@@ -160,10 +142,17 @@ export default class Map extends Component {
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
                     </div>
                     <div className="fieldkit-logo">
-                        <FieldkitLogo />
+                        <FieldKitLogo />
                     </div>
                 </div>
             </div>
-            );
+        );
     }
 }
+
+const mapStateToProps = state => ({
+    activeExpedition: state.activeExpedition
+});
+
+export default connect(mapStateToProps, {
+})(Map);

@@ -1,18 +1,13 @@
 // @flow weak
 
-import log from 'loglevel';
-import * as d3 from 'd3';
-import type { Margin } from '../../types/D3Types';
+import log from 'loglevel'
+import * as d3 from 'd3'
+import type { Margin } from '../../types/D3Types'
 
 type Props = {
     margin: Margin,
     data: {}[],
     node: HTMLElement,
-};
-
-function parseDates(data) {
-    const parseTime = d3.timeParse('%L');
-    log.info(data);
 }
 
 export default class D3TimeSeries {
@@ -22,7 +17,7 @@ export default class D3TimeSeries {
             x: () => {},
             y: () => {},
         },
-    };
+    }
 
     constructor(props) {
         log.info('D3Chart');
@@ -40,7 +35,6 @@ export default class D3TimeSeries {
 
     updateData(data) {
         log.info('updateData');
-        // parseDates(data);
         this.props.data = data;
         const domain = this.getDomain();
         const scales = this.getScales(domain);
@@ -120,7 +114,6 @@ export default class D3TimeSeries {
 
     updateElements() {
         log.info('updateElements');
-        const self = this;
         const { node, data } = this.props;
         const { scales } = this.state;
         log.info(scales);

@@ -1,6 +1,5 @@
 // @flow weak
 
-import log from 'loglevel';
 import * as d3 from 'd3';
 
 type Props = {

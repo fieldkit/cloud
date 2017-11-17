@@ -1,8 +1,8 @@
 // @flow weak
+
 import React, { Component } from 'react';
-import log from 'loglevel';
-import { chartStringToClass } from '../../common/util';
 import D3Scatterplot from '../visualizations/D3Scatterplot';
+import D3TimeSeries from '../visualizations/D3TimeSeries';
 import type { Margin } from '../../types/D3Types';
 
 type Props = {
@@ -11,8 +11,18 @@ type Props = {
     data: {}[],
 };
 
-export default class ChartContainer extends Component {
+function chartStringToClass(type, props) {
+    switch (type) {
+    case 'scatterplot':
+        return (new D3Scatterplot(props));
+    case 'time-series':
+        return (new D3TimeSeries(props));
+    default:
+        return null;
+    }
+}
 
+export default class ChartContainer extends Component {
     props: Props;
     node: HTMLElement;
     chart: D3Scatterplot;
