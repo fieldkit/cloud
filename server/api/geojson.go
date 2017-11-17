@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/goadesign/goa"
 
@@ -31,6 +33,19 @@ func createProperties(d *data.Document) map[string]string {
 
 	p["id"] = fmt.Sprintf("%v", d.ID)
 	p["timestamp"] = fmt.Sprintf("%v", d.Timestamp)
+
+	m := map[string]string{}
+	err := json.Unmarshal(d.Data, &m)
+	if err == nil {
+		for k, v := range m {
+			// Just in case, I'm thinking of giving special values
+			// an obscure prefix instead, like _ or $
+			if p[k] != "" {
+				k = "data" + strings.Title(k)
+			}
+			p[k] = v
+		}
+	}
 
 	return p
 }
