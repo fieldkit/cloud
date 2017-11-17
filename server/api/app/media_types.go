@@ -339,9 +339,9 @@ func (mt *GeoJSON) Validate() (err error) {
 //
 // Identifier: application/vnd.app.geojson-feature+json; view=default
 type GeoJSONFeature struct {
-	Geometry   *GeoJSONGeometry  `form:"geometry" json:"geometry" xml:"geometry"`
-	Properties map[string]string `form:"properties" json:"properties" xml:"properties"`
-	Type       string            `form:"type" json:"type" xml:"type"`
+	Geometry   *GeoJSONGeometry       `form:"geometry" json:"geometry" xml:"geometry"`
+	Properties map[string]interface{} `form:"properties" json:"properties" xml:"properties"`
+	Type       string                 `form:"type" json:"type" xml:"type"`
 }
 
 // Validate validates the GeoJSONFeature media type instance.

@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
+	"time"
 
 	"github.com/goadesign/goa"
 
@@ -28,11 +28,11 @@ func NewGeoJSONController(service *goa.Service, options GeoJSONControllerOptions
 	}
 }
 
-func createProperties(d *data.Document) map[string]string {
-	p := make(map[string]string)
+func createProperties(d *data.Document) map[string]interface{} {
+	p := make(map[string]interface{})
 
-	p["id"] = fmt.Sprintf("%v", d.ID)
-	p["timestamp"] = fmt.Sprintf("%v", d.Timestamp)
+	p["id"] = d.ID
+	p["timestamp"] = d.Timestamp.UnixNano() / int64(time.Millisecond)
 
 	m := map[string]string{}
 	err := json.Unmarshal(d.Data, &m)
@@ -40,7 +40,7 @@ func createProperties(d *data.Document) map[string]string {
 		for k, v := range m {
 			// Just in case, I'm thinking of giving special values
 			// an obscure prefix instead, like _ or $
-			if p[k] != "" {
+			if p[k] != nil {
 				k = "data" + strings.Title(k)
 			}
 			p[k] = v

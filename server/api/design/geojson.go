@@ -24,7 +24,7 @@ var GeoJSONFeature = MediaType("application/vnd.app.geojson-feature+json", func(
 	Attributes(func() {
 		Attribute("type", String)
 		Attribute("geometry", GeoJSONGeometry)
-		Attribute("properties", HashOf(String, String))
+		Attribute("properties", HashOf(String, Any))
 		Required("type")
 		Required("geometry")
 		Required("properties")
