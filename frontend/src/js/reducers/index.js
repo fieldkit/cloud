@@ -76,24 +76,19 @@ export function visibleExpedition(state = {}, action) {
     }
 }
 
-const initialTimelineState = {
-    dates: {
-        start: null,
-        end: null,
-        now: null
-    }
-}
-
-export function timeline(state = initialTimelineState, action) {
+export function expeditionPanel(state = { open: false }, action) {
     let nextState = state
 
     switch (action.type) {
-    case ActionTypes.UPDATE_DATE: 
-    case ActionTypes.TIMELINE_SCRUB: {
-        // const expedition = state.getIn(['expeditions', state.get('currentExpedition')])
-        // const startDate = expedition.get('startDate')
-        // const endDate = expedition.get('endDate')
-        return nextState
+    case ActionTypes.OPEN_EXPEDITION_PANEL: {
+        return {
+            open: true
+        }
+    }
+    case ActionTypes.CLOSE_EXPEDITION_PANEL: {
+        return {
+            open: false
+        }
     }
     default:
         return nextState
@@ -103,8 +98,8 @@ export function timeline(state = initialTimelineState, action) {
 export default combineReducers({
     project,
     navigation,
-    timeline,
     visibleExpedition,
+    expeditionPanel,
     expeditions: expeditionReducer,
 });
 

@@ -15,7 +15,7 @@ class Map extends React.Component {
     }
 
     tick(firstFrame) {
-        const {currentDate, playbackMode, updateDate, focusType} = this.props
+        const { currentDate, playbackMode, updateDate, focusType } = this.props
         const framesPerSecond = 60
         const dateDelta = (playbackMode === 'forward' ? 500000 :
                 playbackMode === 'fastForward' ? 5000000 :
@@ -23,7 +23,9 @@ class Map extends React.Component {
                         playbackMode === 'fastBackward' ? -5000000 :
                             0) / framesPerSecond
         const nextDate = Math.round(currentDate + dateDelta)
-        if (firstFrame || dateDelta !== 0) updateDate(nextDate)
+        if (firstFrame || dateDelta !== 0) {
+            updateDate(nextDate)
+        }
         requestAnimationFrame(() => this.tick(false))
     }
 
@@ -39,8 +41,8 @@ class Map extends React.Component {
 
     shouldComponentUpdate(props) {
         return !is(this.props.viewport, props.viewport) ||
-            this.props.currentDate !== props.currentDate ||
-            !is(this.props.focusedDocument, props.focusedDocument)
+               !is(this.props.focusedDocument, props.focusedDocument) ||
+               !this.props.currentDate === props.currentDate
     }
 
     render() {
@@ -51,7 +53,7 @@ class Map extends React.Component {
         return (
             <div id="map">
                 <MapboxGL { ...viewport } mapStyle={ MAPBOX_STYLE } mapboxApiAccessToken={ MAPBOX_ACCESS_TOKEN } onChangeViewport={ this.onChangeViewport }>
-                    <WebGLOverlay { ...viewport } redraw={ this.redrawGLOverlay } particles={ particles } readingPath={ readingPath } pointsPath={ pointsPath } />
+                    <WebGLOverlay { ...viewport } particles={ particles } readingPath={ readingPath } pointsPath={ pointsPath } />
                     <DOMOverlay focusedDocument={ focusedDocument } openLightbox={ openLightbox } />
                 </MapboxGL>
             </div>

@@ -1,6 +1,5 @@
 
 import React, { PropTypes } from 'react'
-import Navigation from './Navigation'
 
 import iconHamburger from '../../../img/icon-hamburger.svg'
 
@@ -13,7 +12,6 @@ class Header extends React.Component {
                     <img src={'/' + iconHamburger} onClick={openExpeditionPanel} />
                     {expeditionName}
                 </h1>
-                <Navigation currentExpeditionID={currentExpeditionID} currentPage={currentPage} />
             </div>
         )
     }

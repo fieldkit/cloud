@@ -16,6 +16,9 @@ import reducer from './reducers'
 import RootContainer from './containers/Root/Root'
 import MapPageContainer from './containers/MapPage/MapPage'
 
+import RootPage from './pages/RootPage'
+import MapPage from './pages/MapPage'
+
 const sagaMiddleware = createSagaMiddleware()
 
 const loggerMiddleware = createLogger({
@@ -41,19 +44,20 @@ const store = createStoreWithMiddleware(reducer)
 sagaMiddleware.run(rootSaga);
 
 const routes = (
-    <Route path="/" component={RootContainer}>
-        <IndexRoute />
-        <Route path=":expeditionSlug">
+    <Route path="/">
+        <IndexRoute component={RootPage} />
+        <Route path="/old" component={RootContainer}>
             <IndexRoute component={MapPageContainer} />
         </Route>
+        <Route path="/:expeditionSlug" component={MapPage} />
     </Route>
 )
 
 const render = function() {
     ReactDOM.render(
         (
-            <Provider store={ store }>
-                <Router history={ browserHistory } routes={ routes } />
+            <Provider store={store}>
+                <Router history={browserHistory} routes={routes} />
             </Provider>
         ),
         document.getElementById('fieldkit')

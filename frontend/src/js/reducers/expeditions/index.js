@@ -6,7 +6,13 @@ import * as ActionTypes from '../../actions/types'
 
 class DocumentCollection {
     constructor(docs) {
-        this.docs = docs
+        this.docs = I.fromJS(docs)
+    }
+
+    byId() {
+    }
+
+    boundingArea() {
     }
 
     after(id) {
@@ -17,10 +23,6 @@ class DocumentCollection {
 }
 
 export const initialState = I.fromJS({
-    project: {
-        id: location.hostname.split('.')[0],
-        name: location.hostname.split('.')[0]
-    },
     lightboxDocumentID: null,
     previousDocumentID: null,
     nextDocumentID: null,
@@ -47,12 +49,16 @@ export const initialState = I.fromJS({
     documents: {}
 })
 
+const initialMapState = {
+    viewport: {
+    }
+}
+
+export function mapInterface(state = initialMapState, action) {
+}
+
 const expeditionReducer = (state = initialState, action) => {
     switch (action.type) {
-        case ActionTypes.SET_PROJECT_NAME: {
-            return state
-                .setIn(['project', 'name'], action.name)
-        }
         case ActionTypes.OPEN_LIGHTBOX: {
             const previousDocument = state.get('documents')
                 .filter(d => state.get('currentDocuments').includes(d.get('id')))
@@ -68,6 +74,9 @@ const expeditionReducer = (state = initialState, action) => {
 
             const nextDate = state.getIn(['documents', action.id, 'date'])
 
+            console.log(state);
+            console.log(state.get('documents').toJS())
+
             return state
                 .set('lightboxDocumentID', action.id)
                 .set('previousDocumentID', !!previousDocument ? previousDocument.get('id') : null)
@@ -78,14 +87,6 @@ const expeditionReducer = (state = initialState, action) => {
         case ActionTypes.CLOSE_LIGHTBOX: {
             return state
                 .set('lightboxDocumentID', null)
-        }
-        case ActionTypes.OPEN_EXPEDITION_PANEL: {
-            return state
-                .set('expeditionPanelOpen', true)
-        }
-        case ActionTypes.CLOSE_EXPEDITION_PANEL: {
-            return state
-                .set('expeditionPanelOpen', false)
         }
         case ActionTypes.REQUEST_EXPEDITION: {
             return state

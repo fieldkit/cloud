@@ -10,14 +10,14 @@ export default class WebGLOverlay extends Component {
     constructor(props) {
         super(props)
 
-        // here you can add other feature types and assign them a particle texture
+        const maximumParticles = 1000;
         const bufferGeometries = {
             particles: {
                 'Feature': {
-                    count: 1000,
-                    position: new BufferAttribute(new Float32Array(1000 * 3), 3),
-                    color: new BufferAttribute(new Float32Array(1000 * 4), 4),
-                    index: new BufferAttribute(new Uint16Array(1000 * 1), 1),
+                    maxNumber: maximumParticles,
+                    position: new BufferAttribute(new Float32Array(maximumParticles * 3), 3),
+                    color: new BufferAttribute(new Float32Array(maximumParticles * 4), 4),
+                    index: new BufferAttribute(new Uint16Array(maximumParticles * 1), 1),
                     texture: new TextureLoader().load(('/' + iconSensorReading))
                 }
             },
@@ -34,29 +34,19 @@ export default class WebGLOverlay extends Component {
         }
         for (let k in bufferGeometries) {
             for (let l in bufferGeometries[k]) {
-                for (let i = 0; i < bufferGeometries[k][l].count; i++) {
+                for (let i = 0; i < bufferGeometries[k][l].maxNumber; i++) {
                     bufferGeometries[k][l].index.array[i] = i
                 }
             }
         }
 
-        let {width, height} = this.props
-
         this.state = {
             bufferGeometries,
-            meshLine: new MeshLine(),
-            meshLineMaterial: new MeshLineMaterial({
-                lineWidth: 0.025,
-                resolution: new Vector2(width, height),
-                sizeAttenuation: 0,
-                near: 1,
-                far: 5000
-            })
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        const {bufferGeometries, meshLine, meshLineMaterial} = this.state
+        const {bufferGeometries } = this.state
         const {particles, pointsPath, readingPath} = nextProps
         const old_documents_length = this.props.pointsPath.length
         const new_documents_length = nextProps.pointsPath.length
@@ -106,16 +96,14 @@ export default class WebGLOverlay extends Component {
 
 
         this.setState({
-            bufferGeometries,
-            meshLine: line
+            bufferGeometries
         })
     }
 
     render() {
-        const {project} = ViewportMercator(this.props)
-        const {width, height, longitude, latitude} = this.props
-
-        const {bufferGeometries, meshLine, meshLineMaterial} = this.state
+        const { project } = ViewportMercator(this.props)
+        const { width, height, longitude, latitude } = this.props
+        const { bufferGeometries } = this.state
 
         const point = project([longitude, latitude])
         const startPoint = project([this.state.longitude, this.state.latitude])
@@ -131,8 +119,7 @@ export default class WebGLOverlay extends Component {
             position: new Vector3(left, top, 600),
             lookAt: new Vector3(left, top, 0)
         }
-        const readingPath = bufferGeometries.line
-        const points = bufferGeometries.points
+        const bubbles = bufferGeometries.points
         const pixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1
 
         return (
@@ -145,7 +132,7 @@ export default class WebGLOverlay extends Component {
                                   const particles = bufferGeometries.particles[type]
                                   return (
                                       <points key={'particles-' + type}>
-                                          <bufferGeometry position={points.position} color={points.color} index={points.index} />
+                                          <bufferGeometry position={bubbles.position} color={bubbles.color} index={bubbles.index} />
                                           <pointsMaterial size={30} vertexColors={VertexColors} map={bufferGeometries.particles[type].texture} transparent={true} />
                                       </points>
                                   )
