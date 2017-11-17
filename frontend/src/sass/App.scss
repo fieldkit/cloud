@@ -1,0 +1,158 @@
+//-------------------- RESPONSIVE --------------------//
+
+@mixin for-phone-down {
+  @media (max-width: 600px) { @content; }
+}
+
+@mixin for-tablet-portrait-down {
+  @media (max-width: 900px) { @content; }
+}
+
+@mixin for-tablet-landscape-down {
+  @media (max-width: 1200px) { @content; }
+}
+
+@mixin for-desktop-down {
+  @media (max-width: 1799px) { @content; }
+}
+
+@mixin for-big-desktop-only {
+  @media (min-width: 1800px) { @content; }
+}
+
+//---------------------- LAYOUT ----------------------//
+$col-gutter: 30px;
+$baseline-height: 12px;
+$elements-margin: $baseline-height;
+$elements-padding: $baseline-height;
+
+@mixin content-width {
+  width: 960px;
+  margin: auto;
+  @include for-tablet-portrait-down {
+    width: calc(100% - #{$col-gutter}*2);
+  }
+}
+
+//---------------------- COLOR -----------------------//
+$color-black: #333;
+
+//-------------------- TYPOGRAPHY --------------------//
+
+$font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@mixin type-h1 {
+  font-size: 36px;
+  line-height: $baseline-height*4;
+  font-family: $font-sans;
+  font-weight: 300;
+  letter-spacing: 1px;
+  margin-bottom: $baseline-height*2;
+}
+
+@mixin type-h2 {
+  font-size: 30px;
+  line-height: $baseline-height*3;
+  font-family: $font-sans;
+  font-weight: 400;
+}
+
+@mixin type-h3 {
+  font-size: 20px;
+  line-height: $baseline-height*4;
+  font-family: $font-sans;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@mixin type-h4 {
+  font-size: 20px;
+  line-height: $baseline-height*3;
+  font-family: $font-sans;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+@mixin type-h5 {
+  font-size: 10px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+@mixin type-intro {
+  font-size: 16px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
+}
+
+@mixin type-body-1 {
+  font-size: 13px;
+  line-height: $baseline-height*2;
+  font-family: $font-sans;
+}
+
+@mixin type-body-2 {
+  @include type-body-1;
+  font-weight: 600;
+}
+
+@mixin type-small {
+  font-size: 11px;
+  line-height: $baseline-height;
+  font-family: $font-sans;
+}
+
+@mixin type-button {
+  font-size: 10px;
+  line-height: $baseline-height*2.5;
+  font-family: $font-sans;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+//-------------------- INTERACTION --------------------//
+
+
+//-------------------- STYLES --------------------//
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+*:focus {
+  outline: none;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  color: white;
+  @include type-body-1;
+  text-align: left;
+}
+
+html {
+  height: 100%;
+}
+
+a:link, a:visited, a:hover, a:active {
+  color: white;
+}
+
+h1  { @include type-h1; }
+h2  { @include type-h2; }
+h3  { @include type-h3; }
+h4  { @include type-h4; }
+h5  { @include type-h5; }
+.type-small { @include type-small; }

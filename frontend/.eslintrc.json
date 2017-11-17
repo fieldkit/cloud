@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "parser": "babel-eslint",
+  "extends": [
+    "airbnb",
+    "plugin:flowtype/recommended"
+  ],
+  "plugins": [
+    "flowtype"
+  ],
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    // This whole app is react, .js is fine.
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+
+    // Until we have ES7 decorators, using bind still can make sense.
+    "react/jsx-no-bind": 0,
+
+    // Some loops are still clearer this way
+    "no-plusplus": 0,
+
+    // Make flow first
+    "react/sort-comp": [1, {
+      "order": [
+        "type-annotations",
+        "static-methods",
+        "lifecycle",
+        "everything-else",
+        "render"
+      ]
+    }],
+
+    // By OCR vote, we're going to align brackets on the same line
+    "react/jsx-closing-bracket-location": [1, {
+      "selfClosing": "after-props",
+      "nonEmpty": "after-props"
+    }]
+  }
+}

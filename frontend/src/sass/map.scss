@@ -1,0 +1,52 @@
+@import 'App.scss';
+
+$popup-width: 200px;
+
+.map.page {
+
+  .mapboxgl-map {
+
+    .mapboxgl-popup {
+      color: black;
+      width: $popup-width;
+      padding: $elements-padding;
+    }
+
+    .zoom-control {
+      top: $col-gutter*4 !important;
+      left: $col-gutter !important;
+    }
+  }
+
+  .disclaimer-panel {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: calc(100% - (150px + #{$elements-padding}*2));
+    padding: 0 $elements-padding;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .disclaimer-body {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      flex-grow: 1;
+      text-align: right;
+      opacity: 0.8;
+    }
+
+    .fieldkit-logo {
+      width: 80px;
+      height: 40px;
+      flex-shrink: 0;
+      margin-left: $elements-margin;
+
+      svg {
+        position: relative;
+        top: 50%;
+        transform: translate(0, -50%);
+      }
+    }
+  }
+}
