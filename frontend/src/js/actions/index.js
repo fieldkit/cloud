@@ -14,3 +14,9 @@ export function focusExpeditionTime(time, center) {
         center: center
     };
 }
+
+export function notifyOfUserMapActivity() {
+    return {
+        type: ActionTypes.USER_MAP_ACTIVITY
+    };
+}

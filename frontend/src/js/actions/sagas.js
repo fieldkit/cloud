@@ -1,8 +1,8 @@
 
 import { delay } from 'redux-saga';
 import {
-    all, put,
-    // take, takeLatest, takeEvery, select, all, race, call
+    all, put, take, race
+    // takeLatest, takeEvery, select, all, call
 } from 'redux-saga/effects';
 
 import _ from 'lodash';
@@ -108,7 +108,15 @@ export function* walkExpedition(geojson) {
         const coordinates = expedition.getCoordinatesAtTime(time);
 
         yield put(focusExpeditionTime(time, coordinates));
-        yield delay(100);
+
+        const [ activity, _ ] = yield race([
+            take(ActionTypes.USER_MAP_ACTIVITY),
+            delay(100)
+        ]);
+
+        if (activity) {
+            break;
+        }
 
         time.setTime(time.getTime() + (expeditionMinutesPerTick * 60 * 1000));
     }

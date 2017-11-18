@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
+import { is, fromJS } from 'immutable';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
 
@@ -26,6 +27,7 @@ function getCenter(fitBounds: Bounds) {
 type Props = {
     playbackMode: mixed,
     onChangePlaybackMode: () => mixed,
+    notifyOfUserMapActivity: () => mixed,
     pointDecorator: PointDecorator,
     visibleFeatures: {
         geojson: GeoJSON,
@@ -92,6 +94,12 @@ export default class MapContainer extends Component {
         });
     }
 
+    onChangeViewport(viewport) {
+        const { notifyOfUserMapActivity } = this.props;
+
+        notifyOfUserMapActivity();
+    }
+
     onPopupChange() {
         let { feature } = this.state;
         if (feature) { // If we have a popup and we're changing to another one.
@@ -102,6 +110,7 @@ export default class MapContainer extends Component {
         }
     }
 
+    /*
     tick(ms, firstFrame) {
         requestAnimationFrame(ms => this.tick(ms, false));
     }
@@ -109,6 +118,7 @@ export default class MapContainer extends Component {
     componentDidMount() {
         requestAnimationFrame(ms => this.tick(ms, true));
     }
+    */
 
     renderProperties(feature) {
         return (
@@ -147,6 +157,7 @@ export default class MapContainer extends Component {
                 <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
                     style={MAPBOX_STYLE}
                     movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
+                    onDrag={ this.onChangeViewport.bind(this) } onZoom={ this.onChangeViewport.bind(this) }
                     zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
