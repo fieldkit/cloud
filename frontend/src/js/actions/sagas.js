@@ -20,7 +20,7 @@ export function* loadActiveExpedition(projectSlug, expeditionSlug) {
         yield delay(2000)
 
         yield put({
-            type: ActionTypes.FEATURES_FOCUS,
+            type: ActionTypes.FOCUS_FEATURE,
             feature: geojson.features[0]
         })
     }

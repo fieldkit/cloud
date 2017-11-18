@@ -3,8 +3,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
-import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 import type { GeoJSON } from '../../types/MapTypes';
+import type { ActiveExpedition  } from '../../types';
 
 import MapContainer from '../containers/MapContainer';
 import { changePlaybackMode } from '../../actions/index';
@@ -82,12 +82,17 @@ function generatePointDecorator(colorType: string, sizeType: string) {
 }
 
 type Props = {
-    activeExpedition: PropTypes.object.isRequired,
-    visibleGeoJson: GeoJSON,
+    activeExpedition: ActiveExpedition,
+    visibleFeatures: {
+        geojson: GeoJSON,
+        focus: mixed
+    },
+    playbackMode: {},
+    changePlaybackMode: () => mixed,
 };
 
 class Map extends Component {
-    props: Props;
+    props: Props
     state: {
         pointDecorator: PointDecorator
     };
@@ -100,17 +105,17 @@ class Map extends Component {
     }
 
     render() {
-        const { visibleGeoJson, playbackMode, changePlaybackMode } = this.props;
+        const { visibleFeatures, playbackMode, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;
 
-        if (!visibleGeoJson.type) {
+        if (!visibleFeatures.geojson) {
             return (<div></div>);
         }
 
         return (
             <div className="map page">
                 <MapContainer pointDecorator={ pointDecorator }
-                    data={ visibleGeoJson }
+                    visibleFeatures={ visibleFeatures }
                     playbackMode={ playbackMode }
                     onChangePlaybackMode={ changePlaybackMode.bind(this) } />
             </div>
@@ -120,7 +125,7 @@ class Map extends Component {
 
 const mapStateToProps = state => ({
     activeExpedition: state.activeExpedition,
-    visibleGeoJson: state.visibleGeoJson,
+    visibleFeatures: state.visibleFeatures,
     playbackMode: state.playbackMode,
 });
 

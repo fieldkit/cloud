@@ -12,13 +12,13 @@ export type InterpolationType = "constant" | "linear"
 export type Color = {
   type: InterpolationType;
   colors: Stop[];
-  data_key: ?string;
+  dataKey: ?string;
   bounds: ?[number,number];
 }
 
 export type Size = {
   type: InterpolationType;
-  data_key: ?string;
+  dataKey: ?string;
   bounds: [number,number];
 }
 

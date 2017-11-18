@@ -9,20 +9,12 @@ import BubbleMap from '../visualizations/BubbleMap';
 import PlaybackControl from '../PlaybackControl';
 
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
-import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 
 import { FieldKitLogo } from '../icons/Icons';
 
-type Props = {
-    pointDecorator: PointDecorator,
-    playback: null,
-    onChangePlaybackMode: PropTypes.func.isRequired,
-    data: GeoJSON,
-};
-
-function getFitBounds(data) {
-    const lon = data.features.map(f => f.geometry.coordinates[0]);
-    const lat = data.features.map(f => f.geometry.coordinates[1]);
+function getFitBounds(geojson: GeoJSON) {
+    const lon = geojson.features.map(f => f.geometry.coordinates[0]);
+    const lat = geojson.features.map(f => f.geometry.coordinates[1]);
     return [[Math.min(...lon), Math.min(...lat)], [Math.max(...lon), Math.max(...lat)]];
 }
 
@@ -30,8 +22,18 @@ function getCenter(fitBounds: Bounds) {
     return [(fitBounds[0][0] + fitBounds[1][0]) / 2, (fitBounds[0][1] + fitBounds[1][1]) / 2];
 }
 
+type Props = {
+    playbackMode: mixed,
+    onChangePlaybackMode: () => mixed,
+    pointDecorator: PointDecorator,
+    visibleFeatures: {
+        geojson: GeoJSON,
+        focus: mixed,
+    }
+};
+
 export default class MapContainer extends Component {
-    props: Props;
+    props: Props
     state: {
         fitBounds: Bounds,
         center: Coordinates,
@@ -50,8 +52,9 @@ export default class MapContainer extends Component {
     }
 
     componentWillMount() {
-        const { data } = this.props;
-        const fitBounds = getFitBounds(data);
+        const { visibleFeatures } = this.props;
+
+        const fitBounds = getFitBounds(visibleFeatures.geojson);
         const center = getCenter(fitBounds);
         this.setState({
             fitBounds,
@@ -60,8 +63,8 @@ export default class MapContainer extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { data: oldData } = this.props;
-        const { data: newData } = nextProps;
+        const { visibleFeatures: oldData } = this.props;
+        const { visibleFeatures: newData } = nextProps;
 
         if (oldData !== newData) {
             const { focus: oldFocus } = oldData;
@@ -91,12 +94,12 @@ export default class MapContainer extends Component {
         }
     }
 
-    tick(firstFrame) {
-        requestAnimationFrame(() => this.tick(false));
+    tick(ms, firstFrame) {
+        requestAnimationFrame(ms => this.tick(ms, false));
     }
 
     componentDidMount() {
-        requestAnimationFrame(() => this.tick(true));
+        requestAnimationFrame(ms => this.tick(ms, true));
     }
 
     renderProperties(feature) {
@@ -121,13 +124,13 @@ export default class MapContainer extends Component {
     }
 
     render() {
-        const { pointDecorator, data, onChangePlaybackMode, playbackMode } = this.props;
+        const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
 
-        if (!data.features) {
+        if (!visibleFeatures.geojson) {
             return (<div><h1>Loading</h1></div>);
         }
-        else if (data.features.length === 0) {
+        else if (visibleFeatures.geojson.features.length === 0) {
             return (<div><h1>Empty</h1></div>);
         }
 
@@ -137,7 +140,7 @@ export default class MapContainer extends Component {
                     style={MAPBOX_STYLE}
                     movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
                     zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
-                    <BubbleMap pointDecorator={ pointDecorator } data={ data } click={ this.onMarkerClick.bind(this) } />
+                    <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
                     <ZoomControl className="zoom-control" position={ 'topLeft' } />
 

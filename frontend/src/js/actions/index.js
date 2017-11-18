@@ -6,3 +6,10 @@ export function changePlaybackMode(mode) {
         mode: mode
     };
 }
+
+export function focusExpeditionTime(time) {
+    return {
+        type: ActionTypes.FOCUS_EXPEDITION_TIME,
+        time: time
+    };
+}

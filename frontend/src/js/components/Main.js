@@ -3,32 +3,25 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Route, Switch, NavLink } from 'react-router-dom';
-import type { Match as RouterMatch, Location as RouterLocation, RouterHistory, } from 'react-router-dom';
 
 import log from 'loglevel';
 import Map from './pages/Map';
 import Sensors from './pages/Sensors';
 import About from './pages/About';
+
+import type { ActiveExpedition  } from '../types';
+
 import '../../css/main.css';
 
 type Props = {
-    match: RouterMatch,
-    location: RouterLocation,
-    history: RouterHistory,
+    activeExpedition: ActiveExpedition
 };
 
 export class Main extends Component {
-    props: Props;
-    state: {
-        activeExpedition: ?APIProject,
-    };
+    props: Props
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            activeProject: null,
-        };
 
         log.setLevel('trace');
     }
@@ -40,7 +33,7 @@ export class Main extends Component {
             <div className="main">
                 <div className="header">
                     <div className="project-name">
-                        { activeExpedition && activeExpedition.name }
+                        { activeExpedition && activeExpedition.project && activeExpedition.project.name }
                     </div>
                     <div className="nav-bar">
                         <div className="navigation-tabs">

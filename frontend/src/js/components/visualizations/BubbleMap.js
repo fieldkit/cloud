@@ -3,13 +3,13 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Source, Layer, Feature } from 'react-mapbox-gl';
+
 import type { GeoJSON } from '../../types/MapTypes';
-import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 
 type Props = {
     pointDecorator: PointDecorator,
     data: GeoJSON,
-    click: () => {},
+    click: () => mixed,
 };
 
 function onToggleHover(cursor) {

@@ -8,17 +8,17 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
     case ActionTypes.API_PROJECT_GET.SUCCESS:
         return Object.assign({ }, state, { project: action.response });
     case ActionTypes.API_EXPEDITION_GET.SUCCESS:
-        return Object.assign({ }, state, { expedition: action.expedition });
+        return Object.assign({ }, state, { expedition: action.response });
     default:
         return nextState;
     }
 }
 
-function visibleGeoJson(state = { }, action) {
+function visibleFeatures(state = { }, action) {
     let nextState = state;
     switch (action.type) {
     case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS:
-        return Object.assign({ }, state, action.response);
+        return Object.assign({ }, state, { geojson: action.response });
     case ActionTypes.FEATURES_FOCUS:
         return Object.assign({ }, state, { focus: action.feature });
     default:
@@ -38,6 +38,6 @@ function playbackMode(state = { }, action) {
 
 export default combineReducers({
     activeExpedition,
-    visibleGeoJson,
+    visibleFeatures,
     playbackMode,
 });

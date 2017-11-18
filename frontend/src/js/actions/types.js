@@ -16,4 +16,6 @@ export function isVerboseActionType(type) {
 }
 
 export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
-export const FEATURES_FOCUS = 'FEATURES_FOCUS';
+
+export const FOCUS_FEATURE = 'FOCUS_FEATURE';
+export const FOCUS_TIME = 'FOCUS_TIME';
