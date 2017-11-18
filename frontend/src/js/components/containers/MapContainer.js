@@ -67,6 +67,27 @@ export default class MapContainer extends Component {
         }
     }
 
+    renderProperties(feature) {
+        return (
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                { Object.entries(feature.properties).map(([ k , v ]) => (
+                    <tr key={k}>
+                        <td> {k} </td>
+                        <td> {v} </td>
+                    </tr>
+                )) }
+                </tbody>
+            </table>
+        )
+    }
+
     render() {
         const { pointDecorator, data } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
@@ -86,7 +107,7 @@ export default class MapContainer extends Component {
                               ×
                           </button>
                           <div>
-                              <span> { feature.properties && feature.properties.place } </span>
+                              <span> {this.renderProperties(feature)} </span>
                           </div>
                       </Popup> }
                 </ReactMapboxGl>
