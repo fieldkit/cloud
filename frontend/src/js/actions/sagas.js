@@ -10,7 +10,9 @@ import _ from 'lodash';
 import * as ActionTypes from './types';
 import FkApi from '../api/calls';
 
-import { focusExpeditionTime } from './index';
+import { changePlaybackMode, focusExpeditionTime } from './index';
+
+import { PlaybackModes } from '../components/PlaybackControl';
 
 export function* refreshSaga() {
     while (true) {
@@ -100,28 +102,71 @@ class FkGeoJSON {
 export function* walkExpedition(geojson) {
     const expedition = new FkGeoJSON(geojson);
 
-    let time = expedition.getFirst().time();
+    const start = expedition.getFirst().time();
     const end = expedition.getLast().time();
-    const expeditionMinutesPerTick = 5;
 
-    while (time < end) {
-        const coordinates = expedition.getCoordinatesAtTime(time);
+    let expeditionMinutesPerTick = 5;
+    let time = start;
 
-        yield put(focusExpeditionTime(time, coordinates));
+    while (true) {
+        while (time < end) {
+            const coordinates = expedition.getCoordinatesAtTime(time);
 
-        const [ activity, _ ] = yield race([
-            take(ActionTypes.USER_MAP_ACTIVITY),
-            delay(100)
-        ]);
+            yield put(focusExpeditionTime(time, coordinates));
 
-        if (activity) {
-            break;
+            const [ activityAction, playbackAction, _ ] = yield race([
+                take(ActionTypes.USER_MAP_ACTIVITY),
+                take(ActionTypes.CHANGE_PLAYBACK_MODE),
+                delay(100)
+            ]);
+
+            if (activityAction) {
+                break;
+            }
+
+            if (playbackAction) {
+                let nextAction = playbackAction;
+                if (playbackAction.mode === PlaybackModes.Pause) {
+                    nextAction = yield take(ActionTypes.CHANGE_PLAYBACK_MODE);
+                }
+                switch (nextAction.mode) {
+                case PlaybackModes.Beginning: {
+                    time = expedition.getFirst().time();
+                    break;
+                }
+                case PlaybackModes.Rewind: {
+                    expeditionMinutesPerTick = -5;
+                    break;
+                }
+                case PlaybackModes.Play: {
+                    expeditionMinutesPerTick = 5;
+                    break;
+                }
+                case PlaybackModes.Forward: {
+                    expeditionMinutesPerTick = 20;
+                    break;
+                }
+                case PlaybackModes.End: {
+                    time = expedition.getLast().time();
+                    break;
+                }
+                default: {
+                    break;
+                }
+                }
+            }
+
+            time.setTime(time.getTime() + (expeditionMinutesPerTick * 60 * 1000));
         }
 
-        time.setTime(time.getTime() + (expeditionMinutesPerTick * 60 * 1000));
-    }
+        console.log("DONE", start, end, time);
 
-    console.log("DONE");
+        time = expedition.getFirst().time();
+
+        yield put(changePlaybackMode(PlaybackModes.Pause));
+
+        yield take(ActionTypes.CHANGE_PLAYBACK_MODE);
+    }
 }
 
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {

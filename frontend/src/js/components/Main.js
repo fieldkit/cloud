@@ -38,9 +38,7 @@ export class Main extends Component {
                     <div className="nav-bar">
                         <div className="navigation-tabs">
                             <NavLink exact to={ '/' }><span>Map</span></NavLink>
-                            <NavLink exact to={ '/sensors' }><span>Sensors</span></NavLink>
-                            <NavLink exact to={ '/journal' }><span>Journal</span></NavLink>
-                            <NavLink exact to={ '/about' }><span>About</span></NavLink>
+                            <NavLink exact to={ '/' }><span>About</span></NavLink>
                         </div>
                     </div>
                 </div>

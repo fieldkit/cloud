@@ -2398,6 +2398,12 @@ h5 {
   overflow: visible;
   clip: auto; }
 
+.playback-control button.selected {
+  background-color: '#f0f0f0'; }
+
+.playback-control .fa:hover {
+  color: red; }
+
 .map.page .mapboxgl-map .mapboxgl-popup {
   color: black;
   width: 200px;

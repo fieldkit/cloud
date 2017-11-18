@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
-import { is, fromJS } from 'immutable';
 import _ from 'lodash';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'

@@ -3,6 +3,12 @@
 
 $popup-width: 200px;
 
+.playback-control {
+    .fa:hover {
+        color: red;
+    }
+}
+
 .map.page {
 
   .mapboxgl-map {
