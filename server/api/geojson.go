@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/goadesign/goa"
 
 	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/api/client"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -51,13 +53,14 @@ func createProperties(d *data.Document) map[string]interface{} {
 }
 
 func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
-	docs, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition)
+	token := ctx.RequestData.Params.Get("token")
+	docs, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition, token)
 	if err != nil {
 		return err
 	}
 
 	features := make([]*app.GeoJSONFeature, 0)
-	for _, d := range docs {
+	for _, d := range docs.Documents {
 		c := d.Location.Coordinates()
 		f := &app.GeoJSONFeature{
 			Type: "Feature",
@@ -72,8 +75,13 @@ func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
 		features = append(features, f)
 	}
 
-	return ctx.OK(&app.GeoJSON{
+	geoJson := &app.GeoJSON{
 		Type:     "FeatureCollection",
 		Features: features,
+	}
+
+	return ctx.OK(&app.PagedGeoJSON{
+		NextURL: client.ListGeoJSONPath(ctx.Project, ctx.Expedition) + fmt.Sprintf("?token=%s", docs.NextToken),
+		Geo:     geoJson,
 	})
 }

@@ -14,12 +14,6 @@ import { changePlaybackMode, focusExpeditionTime } from './index';
 
 import { PlaybackModes } from '../components/PlaybackControl';
 
-export function* refreshSaga() {
-    while (true) {
-        yield delay(1000);
-    }
-}
-
 class FkGeoJSONFeature {
     constructor(feature) {
         this.feature = feature;
@@ -169,18 +163,26 @@ export function* walkExpedition(geojson) {
     }
 }
 
+export function* refreshSaga(pagedGeojson) {
+    while (true) {
+        yield delay(10000);
+
+        pagedGeojson = yield FkApi.getNextExpeditionGeoJson(pagedGeojson);
+    }
+}
+
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, geojson ] = yield all([
+    const [ expedition, pagedGeojson ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
         FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug)
     ]);
 
-    console.log(expedition, geojson);
+    console.log(expedition, pagedGeojson);
 
-    if (geojson.features.length > 0) {
+    if (pagedGeojson.geo.features.length > 0) {
         yield delay(1000)
 
-        yield walkExpedition(geojson);
+        yield all([ walkExpedition(pagedGeojson.geo), refreshSaga(pagedGeojson) ]);
     }
 }
 
@@ -201,7 +203,6 @@ export function* loadActiveProject() {
 
 export function* rootSaga() {
     yield all([
-        loadActiveProject(),
-        refreshSaga()
+        loadActiveProject()
     ]);
 }

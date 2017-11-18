@@ -172,6 +172,7 @@ CREATE TABLE fieldkit.document (
 	schema_id int REFERENCES fieldkit.schema (id) NOT NULL,
 	team_id int REFERENCES fieldkit.team (id),
 	user_id int REFERENCES fieldkit.user (id),
+	insertion timestamp NOT NULL DEFAULT now(),
 	timestamp timestamp NOT NULL,
 	location geometry(POINT, 4326) NOT NULL,
 	data jsonb NOT NULL

@@ -59,8 +59,8 @@ func NewListGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListGeoJSONContext) OK(r *GeoJSON) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.geojson+json")
+func (ctx *ListGeoJSONContext) OK(r *PagedGeoJSON) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 

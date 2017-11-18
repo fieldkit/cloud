@@ -66,12 +66,12 @@ func NewDocumentController(service *goa.Service, options DocumentControllerOptio
 }
 
 func (c *DocumentController) List(ctx *app.ListDocumentContext) error {
-	documents, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition)
+	documents, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition, "")
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(DocumentsType(documents))
+	return ctx.OK(DocumentsType(documents.Documents))
 }
 
 func (c *DocumentController) ListID(ctx *app.ListIDDocumentContext) error {

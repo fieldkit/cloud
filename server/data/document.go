@@ -48,9 +48,15 @@ type Document struct {
 	InputID   int32          `db:"input_id"`
 	TeamID    *int32         `db:"team_id"`
 	UserID    *int32         `db:"user_id"`
+	Insertion time.Time      `db:"insertion"`
 	Timestamp time.Time      `db:"timestamp"`
 	Location  *Location      `db:"location"`
 	Data      types.JSONText `db:"data"`
+}
+
+type DocumentsPage struct {
+	Documents []*Document
+	NextToken string
 }
 
 func (d *Document) SetData(data interface{}) error {

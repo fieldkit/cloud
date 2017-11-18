@@ -248,6 +248,8 @@ func main() {
 
 	for _, e := range generateFakeEventsAlong(path, 5, start, end) {
 		o.postRawMessage(o.createMessage(&e))
+
+		time.Sleep(10 * time.Second)
 	}
 }
 

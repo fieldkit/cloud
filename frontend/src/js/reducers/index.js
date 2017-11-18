@@ -17,8 +17,13 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
 function visibleFeatures(state = { }, action) {
     let nextState = state;
     switch (action.type) {
-    case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS:
-        return Object.assign({ }, state, { geojson: action.response });
+    case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS: {
+        let newGeojson = Object.assign({}, action.response.geo);
+        if (state.geojson) {
+            newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ]
+        }
+        return Object.assign({ }, state, { geojson: newGeojson });
+    }
     case ActionTypes.FOCUS_FEATURE:
         return Object.assign({ }, state, { focus: { feature: action.feature } });
     case ActionTypes.FOCUS_TIME:

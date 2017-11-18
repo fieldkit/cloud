@@ -35,3 +35,12 @@ export function getExpeditionGeoJson(projectSlug, expeditionSlug) {
         unwrap: (r) => r
     }
 }
+
+export function getNextExpeditionGeoJson(last) {
+    return {
+        types: ActionTypes.API_EXPEDITION_GEOJSON_GET,
+        path: last.nextUrl,
+        method: 'GET',
+        unwrap: (r) => r
+    }
+}

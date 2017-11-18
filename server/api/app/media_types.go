@@ -564,6 +564,31 @@ func (mt *TeamMembers) Validate() (err error) {
 	return
 }
 
+// PagedGeoJSON media type (default view)
+//
+// Identifier: application/vnd.app.paged-geojson+json; view=default
+type PagedGeoJSON struct {
+	Geo         *GeoJSON `form:"geo" json:"geo" xml:"geo"`
+	NextURL     string   `form:"nextUrl" json:"nextUrl" xml:"nextUrl"`
+	PreviousURL *string  `form:"previousUrl,omitempty" json:"previousUrl,omitempty" xml:"previousUrl,omitempty"`
+}
+
+// Validate validates the PagedGeoJSON media type instance.
+func (mt *PagedGeoJSON) Validate() (err error) {
+	if mt.NextURL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "nextUrl"))
+	}
+	if mt.Geo == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geo"))
+	}
+	if mt.Geo != nil {
+		if err2 := mt.Geo.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
 // Point media type (default view)
 //
 // Identifier: application/vnd.app.point+json; view=default

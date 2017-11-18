@@ -6,6 +6,8 @@ import (
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	_ "github.com/lib/pq"
+	"strconv"
+	"time"
 )
 
 type Backend struct {
@@ -380,7 +382,15 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 	return schemaID, nil
 }
 
-func (b *Backend) ListDocuments(ctx context.Context, project, expedition string) ([]*data.Document, error) {
+func (b *Backend) ListDocuments(ctx context.Context, project, expedition, token string) (*data.DocumentsPage, error) {
+	after := time.Now().AddDate(-10, 0, 0)
+	if token != "" {
+		nanos, err := strconv.ParseInt(token, 10, 64)
+		if err == nil {
+			after = time.Unix(0, nanos)
+		}
+	}
+	before := time.Now()
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
 		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
@@ -388,13 +398,16 @@ func (b *Backend) ListDocuments(ctx context.Context, project, expedition string)
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE p.slug = $1 AND e.slug = $2
+					WHERE p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4)
                         ORDER BY timestamp
-		`, project, expedition); err != nil {
+		`, project, expedition, before, after); err != nil {
 		return nil, err
 	}
 
-	return documents, nil
+	return &data.DocumentsPage{
+		Documents: documents,
+		NextToken: fmt.Sprintf("%d", before.UnixNano()),
+	}, nil
 }
 
 func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
