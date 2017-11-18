@@ -1,6 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { Route, Switch, NavLink } from 'react-router-dom';
 import type { Match as RouterMatch, Location as RouterLocation, RouterHistory, } from 'react-router-dom';
 
@@ -16,10 +17,10 @@ type Props = {
     history: RouterHistory,
 };
 
-export default class Main extends Component {
+export class Main extends Component {
     props: Props;
     state: {
-        activeProject: ?APIProject,
+        activeExpedition: ?APIProject,
     };
 
     constructor(props: Props) {
@@ -32,17 +33,14 @@ export default class Main extends Component {
         log.setLevel('trace');
     }
 
-    componentDidMount() {
-    }
-
     render() {
-        const { activeProject } = this.state;
+        const { activeExpedition } = this.props;
 
         return (
             <div className="main">
                 <div className="header">
                     <div className="project-name">
-                        { activeProject && activeProject.name }
+                        { activeExpedition && activeExpedition.name }
                     </div>
                     <div className="nav-bar">
                         <div className="navigation-tabs">
@@ -62,3 +60,10 @@ export default class Main extends Component {
         );
     }
 }
+
+const mapStateToProps = state => ({
+    activeExpedition: state.activeExpedition
+});
+
+export default connect(mapStateToProps, {
+})(Main);

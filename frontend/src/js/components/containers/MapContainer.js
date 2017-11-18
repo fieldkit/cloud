@@ -11,6 +11,8 @@ import PlaybackControl from '../PlaybackControl';
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
 import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 
+import { FieldKitLogo } from '../icons/Icons';
+
 type Props = {
     pointDecorator: PointDecorator,
     playback: null,
@@ -122,8 +124,15 @@ export default class MapContainer extends Component {
         const { pointDecorator, data, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
 
+        if (!data.features) {
+            return (<div><h1>Loading</h1></div>);
+        }
+        else if (data.features.length === 0) {
+            return (<div><h1>Empty</h1></div>);
+        }
+
         return (
-            <div className="bubble-map">
+            <div>
                 <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
                     style={MAPBOX_STYLE}
                     movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
@@ -144,6 +153,14 @@ export default class MapContainer extends Component {
                           </div>
                       </Popup> }
                 </ReactMapboxGl>
+                <div className="disclaimer-panel">
+                    <div className="disclaimer-body">
+                        <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
+                    </div>
+                    <div className="fieldkit-logo">
+                        <FieldKitLogo />
+                    </div>
+                </div>
             </div>
         );
     }

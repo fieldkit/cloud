@@ -16,12 +16,14 @@ export function* loadActiveExpedition(projectSlug, expeditionSlug) {
         FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug)
     ]);
 
-    yield delay(2000)
+    if (geojson.features.length > 0) {
+        yield delay(2000)
 
-    yield put({
-        type: ActionTypes.FEATURES_FOCUS,
-        feature: geojson.features[0]
-    })
+        yield put({
+            type: ActionTypes.FEATURES_FOCUS,
+            feature: geojson.features[0]
+        })
+    }
 }
 
 export function* loadActiveProject() {

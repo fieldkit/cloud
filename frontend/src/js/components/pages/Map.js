@@ -9,7 +9,6 @@ import type { GeoJSON } from '../../types/MapTypes';
 import MapContainer from '../containers/MapContainer';
 import { changePlaybackMode } from '../../actions/index';
 
-import { FieldKitLogo } from '../icons/Icons';
 import '../../../css/map.css';
 
 function generateConstantColor() {
@@ -110,15 +109,10 @@ class Map extends Component {
 
         return (
             <div className="map page">
-                <MapContainer pointDecorator={ pointDecorator } data={ visibleGeoJson } playbackMode={ playbackMode } onChangePlaybackMode={ changePlaybackMode.bind(this) } />
-                <div className="disclaimer-panel">
-                    <div className="disclaimer-body">
-                        <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
-                    </div>
-                    <div className="fieldkit-logo">
-                        <FieldKitLogo />
-                    </div>
-                </div>
+                <MapContainer pointDecorator={ pointDecorator }
+                    data={ visibleGeoJson }
+                    playbackMode={ playbackMode }
+                    onChangePlaybackMode={ changePlaybackMode.bind(this) } />
             </div>
         );
     }
