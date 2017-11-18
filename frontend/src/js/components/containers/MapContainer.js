@@ -14,6 +14,9 @@ import type { Focus } from '../../types';
 
 import { FieldKitLogo } from '../icons/Icons';
 
+import FeaturePanel from './FeaturePanel';
+import NotificationsPanel from './NotificationsPanel';
+
 function getFitBounds(geojson: GeoJSON) {
     const lon = geojson.features.map(f => f.geometry.coordinates[0]);
     const lat = geojson.features.map(f => f.geometry.coordinates[1]);
@@ -121,27 +124,6 @@ export default class MapContainer extends Component {
     }
     */
 
-    renderProperties(feature) {
-        return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                { Object.entries(feature.properties).map(([ k , v ]) => (
-                    <tr key={k}>
-                        <td> {k} </td>
-                        <td> {v} </td>
-                    </tr>
-                )) }
-                </tbody>
-            </table>
-        )
-    }
-
     render() {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
@@ -166,14 +148,11 @@ export default class MapContainer extends Component {
 
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
+                    <NotificationsPanel features={visibleFeatures.focus.features} />
+
                     { feature &&
-                      <Popup anchor="bottom" offset={ [0, -10] } coordinates={ feature.geometry.coordinates }>
-                          <button className="mapboxgl-popup-close-button" type="button" onClick={ this.onPopupChange.bind(this, false) }>
-                              ×
-                          </button>
-                          <div>
-                              <span> {this.renderProperties(feature)} </span>
-                          </div>
+                      <Popup anchor="bottom" offset={ [0, -10] } coordinates={ feature.geometry.coordinates } style={{ padding: '0px' }}>
+                        <FeaturePanel feature={feature} />
                       </Popup> }
                 </ReactMapboxGl>
                 <div className="disclaimer-panel">

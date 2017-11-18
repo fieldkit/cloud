@@ -96,7 +96,7 @@ export default class PlaybackControl extends Component {
         const { className, playback, onPlaybackChange } = this.props;
         const { advanced } = this.state;
 
-        const position = { top: 100, right: 30, bottom: 'auto', left: 'auto' };
+        const position = { top: 120, left: 70, bottom: 'auto', right: 'auto' };
         const smallStyle = {
             ...buttonStyle,
             ...{ width: '30px' }

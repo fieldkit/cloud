@@ -1,7 +1,7 @@
 @import 'App.scss';
 @import '../images/fa/scss/font-awesome.scss';
 
-$popup-width: 200px;
+$popup-width: 300px;
 
 .playback-control {
     .fa:hover {
@@ -9,14 +9,19 @@ $popup-width: 200px;
     }
 }
 
+.notification-panel {
+}
+
 .map.page {
 
   .mapboxgl-map {
+    .mapboxgl-popup-content {
+      padding: 0px;
+    }
 
     .mapboxgl-popup {
       color: black;
       width: $popup-width;
-      padding: $elements-padding;
     }
 
     .zoom-control {

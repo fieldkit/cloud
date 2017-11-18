@@ -2,6 +2,8 @@ import { combineReducers } from 'redux';
 
 import * as ActionTypes from '../actions/types';
 
+import { FkGeoJSON } from '../common/geojson';
+
 function activeExpedition(state = { project: null, expedition: null }, action) {
     let nextState = state;
     switch (action.type) {
@@ -14,7 +16,7 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
     }
 }
 
-function visibleFeatures(state = { }, action) {
+function visibleFeatures(state = { focus: { features: [] } }, action) {
     let nextState = state;
     switch (action.type) {
     case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS: {
@@ -22,12 +24,28 @@ function visibleFeatures(state = { }, action) {
         if (state.geojson) {
             newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ]
         }
-        return Object.assign({ }, state, { geojson: newGeojson });
+        return Object.assign({ }, state, {
+            geojson: newGeojson
+        });
     }
     case ActionTypes.FOCUS_FEATURE:
-        return Object.assign({ }, state, { focus: { feature: action.feature } });
+        return Object.assign({ }, state, {
+            focus: {
+                feature: action.feature,
+                features: []
+            }
+        });
     case ActionTypes.FOCUS_TIME:
-        return Object.assign({ }, state, { focus: { time: action.time, center: action.center } });
+        const expedition = new FkGeoJSON(state.geojson);
+        const features = expedition.getFeaturesWithinTime(action.time, 500000 * 10);
+
+        return Object.assign({ }, state, {
+            focus: {
+                time: action.time,
+                center: action.center,
+                features: features
+            }
+        });
     default:
         return nextState;
     }
