@@ -2,13 +2,19 @@
 
 import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
+
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
+
+import BubbleMap from '../visualizations/BubbleMap';
+import PlaybackControl from '../PlaybackControl';
+
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
 import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
-import BubbleMap from '../visualizations/BubbleMap';
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
 
 type Props = {
     pointDecorator: PointDecorator,
+    playback: null,
+    onChangePlaybackMode: PropTypes.func.isRequired,
     data: GeoJSON,
 };
 
@@ -37,7 +43,7 @@ export default class MapContainer extends Component {
             fitBounds: [[0, 0], [0, 0]],
             center: [0, 0],
             zoom: [12],
-            feature: null,
+            feature: null
         };
     }
 
@@ -51,20 +57,44 @@ export default class MapContainer extends Component {
         });
     }
 
-    markerClick(feature) {
+    componentWillReceiveProps(nextProps) {
+        const { data: oldData } = this.props;
+        const { data: newData } = nextProps;
+
+        if (oldData !== newData) {
+            const { focus: oldFocus } = oldData;
+            const { focus: newFocus } = newData;
+
+            if (oldFocus !== newFocus) {
+                this.setState({
+                    center: newFocus.geometry.coordinates
+                })
+            }
+        }
+    }
+
+    onMarkerClick(feature) {
         this.setState({
             feature
         });
     }
 
-    popupChange() {
+    onPopupChange() {
         let { feature } = this.state;
-        if (feature) {
+        if (feature) { // If we have a popup and we're changing to another one.
             feature = null;
             this.setState({
                 feature
             });
         }
+    }
+
+    tick(firstFrame) {
+        requestAnimationFrame(() => this.tick(false));
+    }
+
+    componentDidMount() {
+        requestAnimationFrame(() => this.tick(true));
     }
 
     renderProperties(feature) {
@@ -89,7 +119,7 @@ export default class MapContainer extends Component {
     }
 
     render() {
-        const { pointDecorator, data } = this.props;
+        const { pointDecorator, data, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
 
         return (
@@ -97,13 +127,16 @@ export default class MapContainer extends Component {
                 <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
                     style={MAPBOX_STYLE}
                     movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
-                    zoom={ zoom } onClick={ this.popupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
-                    <BubbleMap pointDecorator={ pointDecorator } data={ data } click={ this.markerClick.bind(this) } />
+                    zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
+                    <BubbleMap pointDecorator={ pointDecorator } data={ data } click={ this.onMarkerClick.bind(this) } />
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
                     <ZoomControl className="zoom-control" position={ 'topLeft' } />
+
+                    <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
+
                     { feature &&
                       <Popup anchor="bottom" offset={ [0, -10] } coordinates={ feature.geometry.coordinates }>
-                          <button className="mapboxgl-popup-close-button" type="button" onClick={ this.popupChange.bind(this, false) }>
+                          <button className="mapboxgl-popup-close-button" type="button" onClick={ this.onPopupChange.bind(this, false) }>
                               ×
                           </button>
                           <div>

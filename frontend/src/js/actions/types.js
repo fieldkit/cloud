@@ -14,3 +14,6 @@ export const API_PROJECT_GET = expandApiTypes("API_PROJECT_GET");
 export function isVerboseActionType(type) {
     return false;
 }
+
+export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
+export const FEATURES_FOCUS = 'FEATURES_FOCUS';

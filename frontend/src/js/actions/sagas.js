@@ -11,10 +11,17 @@ export function* refreshSaga() {
 }
 
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, docs ] = yield all([
+    const [ expedition, geojson ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
         FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug)
     ]);
+
+    yield delay(2000)
+
+    yield put({
+        type: ActionTypes.FEATURES_FOCUS,
+        feature: geojson.features[0]
+    })
 }
 
 export function* loadActiveProject() {

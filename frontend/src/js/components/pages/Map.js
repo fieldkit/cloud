@@ -3,9 +3,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
-import MapContainer from '../containers/MapContainer';
 import type { PointDecorator } from '../../../../../admin/src/js/types/VizTypes';
 import type { GeoJSON } from '../../types/MapTypes';
+
+import MapContainer from '../containers/MapContainer';
+import { changePlaybackMode } from '../../actions/index';
+
 import { FieldKitLogo } from '../icons/Icons';
 import '../../../css/map.css';
 
@@ -98,7 +101,7 @@ class Map extends Component {
     }
 
     render() {
-        const { visibleGeoJson } = this.props;
+        const { visibleGeoJson, playbackMode, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;
 
         if (!visibleGeoJson.type) {
@@ -107,7 +110,7 @@ class Map extends Component {
 
         return (
             <div className="map page">
-                <MapContainer pointDecorator={ pointDecorator } data={ visibleGeoJson } />
+                <MapContainer pointDecorator={ pointDecorator } data={ visibleGeoJson } playbackMode={ playbackMode } onChangePlaybackMode={ changePlaybackMode.bind(this) } />
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
@@ -124,7 +127,9 @@ class Map extends Component {
 const mapStateToProps = state => ({
     activeExpedition: state.activeExpedition,
     visibleGeoJson: state.visibleGeoJson,
+    playbackMode: state.playbackMode,
 });
 
 export default connect(mapStateToProps, {
+    changePlaybackMode 
 })(Map);

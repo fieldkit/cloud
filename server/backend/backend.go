@@ -389,6 +389,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project, expedition string)
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE p.slug = $1 AND e.slug = $2
+                        ORDER BY timestamp
 		`, project, expedition); err != nil {
 		return nil, err
 	}
