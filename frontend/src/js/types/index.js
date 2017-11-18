@@ -11,3 +11,7 @@ export type ActiveExpedition = {
     }
 }
 
+export type Focus = {
+    feature: ?GeoJSONFeature,
+    time: number
+}

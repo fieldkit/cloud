@@ -19,8 +19,10 @@ function visibleFeatures(state = { }, action) {
     switch (action.type) {
     case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS:
         return Object.assign({ }, state, { geojson: action.response });
-    case ActionTypes.FEATURES_FOCUS:
-        return Object.assign({ }, state, { focus: action.feature });
+    case ActionTypes.FOCUS_FEATURE:
+        return Object.assign({ }, state, { focus: { feature: action.feature } });
+    case ActionTypes.FOCUS_TIME:
+        return Object.assign({ }, state, { focus: { time: action.time, center: action.center } });
     default:
         return nextState;
     }

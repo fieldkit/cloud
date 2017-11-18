@@ -9,6 +9,7 @@ import BubbleMap from '../visualizations/BubbleMap';
 import PlaybackControl from '../PlaybackControl';
 
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
+import type { Focus } from '../../types';
 
 import { FieldKitLogo } from '../icons/Icons';
 
@@ -28,7 +29,7 @@ type Props = {
     pointDecorator: PointDecorator,
     visibleFeatures: {
         geojson: GeoJSON,
-        focus: mixed,
+        focus: Focus,
     }
 };
 
@@ -71,9 +72,16 @@ export default class MapContainer extends Component {
             const { focus: newFocus } = newData;
 
             if (oldFocus !== newFocus) {
-                this.setState({
-                    center: newFocus.geometry.coordinates
-                })
+                if (newFocus.feature) {
+                    this.setState({
+                        center: newFocus.feature.geometry.coordinates
+                    })
+                }
+                else if (newFocus.center) {
+                    this.setState({
+                        center: newFocus.center
+                    })
+                }
             }
         }
     }
