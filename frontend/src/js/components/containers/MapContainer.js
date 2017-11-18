@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
 import { is, fromJS } from 'immutable';
+import _ from 'lodash';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
 
@@ -52,6 +53,7 @@ export default class MapContainer extends Component {
             zoom: [12],
             feature: null
         };
+        this.onUserActivityThrottled = _.throttle(this.onUserActivity.bind(this), 500, { leading: true });
     }
 
     componentWillMount() {
@@ -94,7 +96,7 @@ export default class MapContainer extends Component {
         });
     }
 
-    onChangeViewport(viewport) {
+    onUserActivity(how) {
         const { notifyOfUserMapActivity } = this.props;
 
         notifyOfUserMapActivity();
@@ -157,7 +159,7 @@ export default class MapContainer extends Component {
                 <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
                     style={MAPBOX_STYLE}
                     movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
-                    onDrag={ this.onChangeViewport.bind(this) } onZoom={ this.onChangeViewport.bind(this) }
+                    onDrag={ this.onUserActivityThrottled } 
                     zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
