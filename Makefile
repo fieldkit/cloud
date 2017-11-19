@@ -7,7 +7,7 @@ binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-se
 
 all: binaries bundles
 
-bundles: frontend/src/vendors/dll/dll.vendor.js
+bundles: 
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 FRONTEND_BUNDLE_SOURCES = $(shell find frontend/src/js -type f -name '*.js')
@@ -27,9 +27,6 @@ $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
 $(BUILD)/fkcli: server/api/tool/fieldkit-cli/*.go $(SERVER_SOURCES)
 	go build -o $@ server/api/tool/fieldkit-cli/*.go
 
-frontend/src/vendors/dll/dll.vendor.js: $(FRONTEND_BUNDLE_SOURCES)
-	cd frontend && yarn install && yarn dll
-
 image:
 	cd server && docker build -t conservify/fk-cloud-server .
 
@@ -40,4 +37,3 @@ generate:
 
 clean:
 	rm -rf build
-	rm -rf frontend/src/vendors/dll/dll.vendor.js
