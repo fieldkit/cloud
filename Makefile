@@ -7,7 +7,10 @@ binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-se
 
 all: binaries bundles
 
-bundles: 
+bundles: frontend/build
+
+frontend/build:
+	cd frontend && yarn build
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 FRONTEND_BUNDLE_SOURCES = $(shell find frontend/src/js -type f -name '*.js')
@@ -36,4 +39,4 @@ generate:
 	mv server/vendor-temp server/vendor
 
 clean:
-	rm -rf build
+	rm -rf build frontend/build
