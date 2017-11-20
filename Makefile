@@ -41,5 +41,8 @@ generate:
 	(cd $(GOPATH)/src/github.com/fieldkit/cloud/server && go generate) || true
 	mv server/vendor-temp server/vendor
 
+deps:
+	go get -u github.com/goadesign/goa/...
+
 clean:
 	rm -rf build frontend/build
