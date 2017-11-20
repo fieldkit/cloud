@@ -33,6 +33,12 @@ INSERT INTO fieldkit.project_user (user_id, project_id)
 		(SELECT id FROM fieldkit.project WHERE slug = 'demo-project')
 	);
 
+INSERT INTO fieldkit.project_user (user_id, project_id)
+	VALUES (
+		(SELECT id FROM fieldkit.user WHERE username = 'jacob'),
+		(SELECT id FROM fieldkit.project WHERE slug = 'demo-project')
+	);
+
 INSERT INTO fieldkit.expedition (project_id, name, slug, description)
 	VALUES (
 		(SELECT id FROM fieldkit.project WHERE slug = 'demo-project'),
@@ -51,6 +57,12 @@ INSERT INTO fieldkit.project (name, slug, description)
 INSERT INTO fieldkit.project_user (user_id, project_id)
     VALUES (
         (SELECT id FROM fieldkit.user WHERE username = 'demo-user'),
+        (SELECT id FROM fieldkit.project WHERE slug = 'www')
+    );
+
+INSERT INTO fieldkit.project_user (user_id, project_id)
+    VALUES (
+        (SELECT id FROM fieldkit.user WHERE username = 'jacob'),
         (SELECT id FROM fieldkit.project WHERE slug = 'www')
     );
 
