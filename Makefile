@@ -3,7 +3,7 @@ BUILD=build
 
 default: binaries
 
-binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli
+binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/testingcli
 
 all: binaries bundles
 
@@ -29,6 +29,9 @@ $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
 
 $(BUILD)/fkcli: server/api/tool/fieldkit-cli/*.go $(SERVER_SOURCES)
 	go build -o $@ server/api/tool/fieldkit-cli/*.go
+
+$(BUILD)/testingcli: testing/cli.go $(SERVER_SOURCES)
+	go build -o $@ testing/cli.go
 
 image:
 	cd server && docker build -t conservify/fk-cloud-server .
