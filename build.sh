@@ -1,6 +1,6 @@
 #!/bin/sh
 
-UID=`id -u $USER`
+USER_ID=`id -u $USER`
 
 set -ex
 cd `dirname $0`
@@ -17,24 +17,26 @@ mkdir build
 mkdir build/api
 docker rm -f fieldkit-server-build > /dev/null 2>&1 || true
 docker run --rm --name fieldkit-server-build -v `pwd`/build:/build fieldkit-server-build \
-       sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $UID /build/api /build/server"
+       sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
 
 mkdir build/admin
 docker rm -f fieldkit-admin-build > /dev/null 2>&1 || true
 docker run --rm --name fieldkit-admin-build -v `pwd`/build/admin:/build fieldkit-admin-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $UID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/frontend
 docker rm -f fieldkit-frontend-build > /dev/null 2>&1 || true
 docker run --rm --name fieldkit-frontend-build -v `pwd`/build/frontend:/build fieldkit-frontend-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $UID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/landing
 docker rm -f fieldkit-landing-build > /dev/null 2>&1 || true
 docker run --rm --name fieldkit-landing-build -v `pwd`/build/landing:/build fieldkit-landing-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $UID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
-find build -regextype posix-extended -regex '.*\.(css|csv|html|js|json|map|svg|txt)' -exec gzip -k9 {} \;
+for e in css csv html js json map svg txt; do
+    find build -iname '*.$e' -exec gzip -k9 {} \;
+done
 
 echo '.DS_Store
 Dockerfile' > build/.dockerignore
