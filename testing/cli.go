@@ -212,8 +212,8 @@ func main() {
 
 	httpClient := newHTTPClient()
 	c := fk.New(goaclient.HTTPClientDoer(httpClient))
-	c.Scheme = "http"
-	c.Host = "127.0.0.1:8080"
+	c.Scheme = o.Scheme
+	c.Host = o.Host
 
 	loginPayload := fk.LoginPayload{}
 	loginPayload.Username = "demo-user"
