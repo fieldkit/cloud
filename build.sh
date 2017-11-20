@@ -1,6 +1,31 @@
-#!/bin/sh
+#!/bin/bash
 
 USER_ID=`id -u $USER`
+
+function show_help {
+    echo "build.sh [-h] [-p]"
+    echo " -h this text"
+    echo " -p push image"
+}
+
+# A POSIX variable
+OPTIND=1
+push=0
+
+while getopts "h?p" opt; do
+    case "$opt" in
+        h|\?)
+            show_help
+            exit 0
+            ;;
+        p)  push=1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
 
 set -ex
 cd `dirname $0`
@@ -60,4 +85,6 @@ fi
 
 docker build -t conservify/fk-cloud:$DOCKER_TAG build
 
-docker push conservify/fk-cloud:$DOCKER_TAG
+if [ "$push" == "1" ]; then
+    docker push conservify/fk-cloud:$DOCKER_TAG
+fi
