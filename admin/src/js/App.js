@@ -6,6 +6,7 @@ import { FKApiClient } from './api/api';
 import { Signin } from './components/unauth/Signin';
 import { Signup } from './components/unauth/Signup';
 import { Main } from './components/Main';
+import { API_HOST } from './secrets';
 
 import '../css/App.css';
 
@@ -25,14 +26,6 @@ const PrivateRoute = ({ component, ...rest }) => (
 export class App extends Component {
   constructor(props) {
     super(props);
-
-    let API_HOST = 'http://api.fieldkit.org:8080';
-    if (process.env.NODE_ENV === 'development') {
-      API_HOST = 'http://localhost:8080';
-    } else if (process.env.NODE_ENV === 'staging' || window.location.hostname.endsWith('fieldkit.team')) {
-      API_HOST = 'https://api.fieldkit.team';
-    }
-
     FKApiClient.setup(API_HOST, this.onUnauthorizedAccess.bind(this));
   }
 
