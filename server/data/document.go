@@ -56,7 +56,6 @@ type Document struct {
 
 type DocumentsPage struct {
 	Documents []*Document
-	NextToken string
 }
 
 func (d *Document) SetData(data interface{}) error {

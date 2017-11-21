@@ -71,17 +71,4 @@ var _ = Resource("document", func() {
 			Media(Documents)
 		})
 	})
-
-	Action("list id", func() {
-		Routing(GET("expeditions/:expedition_id/documents"))
-		Description("List a expedition's documents")
-		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Documents)
-		})
-	})
 })

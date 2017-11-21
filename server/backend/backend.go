@@ -6,7 +6,6 @@ import (
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	_ "github.com/lib/pq"
-	"strconv"
 	"time"
 )
 
@@ -382,14 +381,19 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 	return schemaID, nil
 }
 
-func (b *Backend) ListDocuments(ctx context.Context, project, expedition, token string) (*data.DocumentsPage, error) {
-	after := time.Now().AddDate(-10, 0, 0)
-	if token != "" {
-		nanos, err := strconv.ParseInt(token, 10, 64)
-		if err == nil {
-			after = time.Unix(0, nanos)
+const DefaultPageSize = 100
+
+func (b *Backend) ListDocuments(ctx context.Context, project string, expedition string, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
+	if token == nil {
+		after := time.Now().AddDate(-10, 0, 0)
+		token = &PagingToken{
+			time: after.UnixNano(),
+			page: 0,
 		}
 	}
+
+	after := time.Unix(0, token.time)
+	pageSize := int32(DefaultPageSize)
 	before := time.Now()
 	documents := []*data.Document{}
 	if err := b.db.SelectContext(ctx, &documents, `
@@ -400,14 +404,22 @@ func (b *Backend) ListDocuments(ctx context.Context, project, expedition, token 
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4)
                         ORDER BY timestamp
-		`, project, expedition, before, after); err != nil {
-		return nil, err
+                        LIMIT $5 OFFSET $6
+		`, project, expedition, before, after, pageSize, token.page*pageSize); err != nil {
+		return nil, nil, err
+	}
+
+	nextToken := &PagingToken{}
+	if int32(len(documents)) < pageSize {
+		nextToken.time = before.UnixNano()
+	} else {
+		nextToken.time = token.time
+		nextToken.page += 1
 	}
 
 	return &data.DocumentsPage{
 		Documents: documents,
-		NextToken: fmt.Sprintf("%d", before.UnixNano()),
-	}, nil
+	}, nextToken, nil
 }
 
 func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {

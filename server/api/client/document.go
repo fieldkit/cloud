@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 // ListDocumentPath computes a request path to the list action of document.
@@ -34,36 +33,6 @@ func (c *Client) ListDocument(ctx context.Context, path string) (*http.Response,
 
 // NewListDocumentRequest create the request corresponding to the list action endpoint of the document resource.
 func (c *Client) NewListDocumentRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
-// ListIDDocumentPath computes a request path to the list id action of document.
-func ListIDDocumentPath(expeditionID int) string {
-	param0 := strconv.Itoa(expeditionID)
-
-	return fmt.Sprintf("/expeditions/%s/documents", param0)
-}
-
-// List a expedition's documents
-func (c *Client) ListIDDocument(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListIDDocumentRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewListIDDocumentRequest create the request corresponding to the list id action endpoint of the document resource.
-func (c *Client) NewListIDDocumentRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

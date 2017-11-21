@@ -53,8 +53,8 @@ func createProperties(d *data.Document) map[string]interface{} {
 }
 
 func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
-	token := ctx.RequestData.Params.Get("token")
-	docs, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition, token)
+	token := backend.NewPagingTokenFromString(ctx.RequestData.Params.Get("token"))
+	docs, nextToken, err := c.options.Backend.ListDocuments(ctx, ctx.Project, ctx.Expedition, token)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,8 @@ func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
 	}
 
 	return ctx.OK(&app.PagedGeoJSON{
-		NextURL: client.ListGeoJSONPath(ctx.Project, ctx.Expedition) + fmt.Sprintf("?token=%s", docs.NextToken),
+		NextURL: client.ListGeoJSONPath(ctx.Project, ctx.Expedition) + fmt.Sprintf("?token=%s", nextToken.String()),
 		Geo:     geoJson,
+		HasMore: len(features) >= backend.DefaultPageSize,
 	})
 }

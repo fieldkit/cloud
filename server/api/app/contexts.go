@@ -618,47 +618,6 @@ func (ctx *ListDocumentContext) BadRequest() error {
 	return nil
 }
 
-// ListIDDocumentContext provides the document list id action context.
-type ListIDDocumentContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ExpeditionID int
-}
-
-// NewListIDDocumentContext parses the incoming request URL and body, performs validations and creates the
-// context used by the document controller list id action.
-func NewListIDDocumentContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDDocumentContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListIDDocumentContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListIDDocumentContext) OK(r *Documents) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.documents+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListIDDocumentContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // AddExpeditionContext provides the expedition add action context.
 type AddExpeditionContext struct {
 	context.Context

@@ -766,6 +766,7 @@ func (c *Client) DecodeTeamMembers(resp *http.Response) (*TeamMembers, error) {
 // Identifier: application/vnd.app.paged-geojson+json; view=default
 type PagedGeoJSON struct {
 	Geo         *GeoJSON `form:"geo" json:"geo" xml:"geo"`
+	HasMore     bool     `form:"hasMore" json:"hasMore" xml:"hasMore"`
 	NextURL     string   `form:"nextUrl" json:"nextUrl" xml:"nextUrl"`
 	PreviousURL *string  `form:"previousUrl,omitempty" json:"previousUrl,omitempty" xml:"previousUrl,omitempty"`
 }
@@ -778,6 +779,7 @@ func (mt *PagedGeoJSON) Validate() (err error) {
 	if mt.Geo == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geo"))
 	}
+
 	if mt.Geo != nil {
 		if err2 := mt.Geo.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)

@@ -726,7 +726,6 @@ func unmarshalUpdateSchemaDevicePayload(ctx context.Context, service *goa.Servic
 type DocumentController interface {
 	goa.Muxer
 	List(*ListDocumentContext) error
-	ListID(*ListIDDocumentContext) error
 }
 
 // MountDocumentController "mounts" a Document resource controller on the given service.
@@ -734,7 +733,6 @@ func MountDocumentController(service *goa.Service, ctrl DocumentController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/documents", ctrl.MuxHandler("preflight", handleDocumentOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/documents", ctrl.MuxHandler("preflight", handleDocumentOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -751,22 +749,6 @@ func MountDocumentController(service *goa.Service, ctrl DocumentController) {
 	h = handleDocumentOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/documents", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Document", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/documents")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewListIDDocumentContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.ListID(rctx)
-	}
-	h = handleDocumentOrigin(h)
-	service.Mux.Handle("GET", "/expeditions/:expedition_id/documents", ctrl.MuxHandler("list id", h, nil))
-	service.LogInfo("mount", "ctrl", "Document", "action", "ListID", "route", "GET /expeditions/:expedition_id/documents")
 }
 
 // handleDocumentOrigin applies the CORS response headers corresponding to the origin.
