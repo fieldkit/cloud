@@ -7,6 +7,8 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
+
+	"github.com/segmentio/ksuid"
 )
 
 func DeviceInputType(deviceInput *data.DeviceInput) *app.DeviceInput {
@@ -82,19 +84,15 @@ func (c *DeviceController) Add(ctx *app.AddDeviceContext) error {
 		return err
 	}
 
-	token, err := data.NewToken(40)
-	if err != nil {
-		return err
-	}
-
+	token := ksuid.New().String()
 	if ctx.Payload.Key == "" {
-		ctx.Payload.Key = token.String()
+		ctx.Payload.Key = token
 	}
 
 	device := &data.Device{
 		InputID: int64(input.ID),
 		Key:     ctx.Payload.Key,
-		Token:   token.String(),
+		Token:   token,
 	}
 
 	if err := c.options.Backend.AddDevice(ctx, device); err != nil {

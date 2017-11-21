@@ -36,7 +36,7 @@ generate:
 	mv server/vendor-temp server/vendor
 
 deps:
-	go get -u github.com/goadesign/goa/...
+	cd server && go get ./...
 
 clean:
 	rm -rf build 
