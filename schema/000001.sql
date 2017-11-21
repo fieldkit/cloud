@@ -9,7 +9,7 @@ CREATE TABLE fieldkit.user (
 	username varchar(40) NOT NULL UNIQUE,
 	email varchar(254) NOT NULL UNIQUE,
 	password bytea NOT NULL,
-	valid bool NOT NULL DEFAULT false,
+	valid boolean NOT NULL DEFAULT false,
 	bio varchar NOT NULL
 );
 
@@ -175,6 +175,7 @@ CREATE TABLE fieldkit.document (
 	insertion timestamp NOT NULL DEFAULT now(),
 	timestamp timestamp NOT NULL,
 	location geometry(POINT, 4326) NOT NULL,
+    visible boolean NOT NULL DEFAULT true,
 	data jsonb NOT NULL
 );
 

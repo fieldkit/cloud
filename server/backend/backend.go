@@ -402,7 +402,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4)
+					WHERE d.visible AND p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4)
                         ORDER BY timestamp
                         LIMIT $5 OFFSET $6
 		`, project, expedition, before, after, pageSize, token.page*pageSize); err != nil {
@@ -420,20 +420,6 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 	return &data.DocumentsPage{
 		Documents: documents,
 	}, nextToken, nil
-}
-
-func (b *Backend) ListDocumentsByID(ctx context.Context, expeditionID int32) ([]*data.Document, error) {
-	documents := []*data.Document{}
-	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
-			FROM fieldkit.document AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
-					WHERE i.expedition_id = $1
-		`, expeditionID); err != nil {
-		return nil, err
-	}
-
-	return documents, nil
 }
 
 func (b *Backend) TwitterListCredentialer() *TwitterListCredentialer {
