@@ -3,17 +3,11 @@ BUILD=build
 
 default: binaries
 
-binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/testingcli
+binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/testing-random $(BUILD)/weather-proxy
 
-all: binaries bundles
-
-bundles: frontend/build
-
-frontend/build:
-	cd frontend && yarn build
+all: binaries
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
-FRONTEND_BUNDLE_SOURCES = $(shell find frontend/src/js -type f -name '*.js')
 
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go
@@ -30,11 +24,11 @@ $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
 $(BUILD)/fkcli: server/api/tool/fieldkit-cli/*.go $(SERVER_SOURCES)
 	go build -o $@ server/api/tool/fieldkit-cli/*.go
 
-$(BUILD)/testingcli: testing/cli.go $(SERVER_SOURCES)
-	go build -o $@ testing/cli.go
+$(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES)
+	go build -o $@ testing/random/*.go
 
-image:
-	cd server && docker build -t conservify/fk-cloud-server .
+$(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES)
+	go build -o $@ testing/weather-proxy/*.go
 
 generate:
 	mv server/vendor server/vendor-temp # See https://github.com/goadesign/goa/issues/923
@@ -45,4 +39,4 @@ deps:
 	go get -u github.com/goadesign/goa/...
 
 clean:
-	rm -rf build frontend/build
+	rm -rf build 

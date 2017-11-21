@@ -7,9 +7,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	fk "github.com/fieldkit/cloud/server/api/client"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
-	goaclient "github.com/goadesign/goa/client"
+	fktesting "github.com/fieldkit/cloud/testing"
 	"log"
 	"net/http"
 	"net/url"
@@ -27,6 +26,8 @@ type options struct {
 	RockBlock       bool
 	CurlOut         bool
 	Interval        int
+	Username        string
+	Password        string
 }
 
 func (o *options) getUrl() string {
@@ -49,88 +50,6 @@ func (o *options) postRawMessage(m *FakeMessage) error {
 	}
 
 	return nil
-}
-
-func createWebDevice(ctx context.Context, c *fk.Client, o *options) (d *fk.DeviceInput, err error) {
-	res, err := c.ListProject(ctx, fk.ListProjectPath())
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	projects, err := c.DecodeProjects(res)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	for _, project := range projects.Projects {
-		log.Printf("Project: %+v\n", *project)
-
-		if project.Slug == o.Project {
-			res, err = c.ListExpedition(ctx, fk.ListExpeditionPath(project.Slug))
-			if err != nil {
-				log.Fatalf("%v", err)
-			}
-			expeditions, err := c.DecodeExpeditions(res)
-			if err != nil {
-				log.Fatalf("%v", err)
-			}
-
-			for _, exp := range expeditions.Expeditions {
-				log.Printf("Expedition: %+v\n", *exp)
-
-				res, err = c.ListDevice(ctx, fk.ListDevicePath(project.Slug, exp.Slug))
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-				devices, err := c.DecodeDeviceInputs(res)
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-
-				var theDevice *fk.DeviceInput
-				for _, device := range devices.DeviceInputs {
-					log.Printf("Device: %+v\n", *device)
-
-					if device.Name == o.DeviceName {
-						theDevice = device
-					}
-				}
-
-				if theDevice == nil {
-					log.Printf("Creating new Device %v", o.DeviceName)
-
-					addPayload := fk.AddDeviceInputPayload{
-						Key:  "HTTP-" + o.DeviceName,
-						Name: o.DeviceName,
-					}
-					res, err = c.AddDevice(ctx, fk.AddDevicePath(exp.ID), &addPayload)
-					if err != nil {
-						log.Fatalf("%v", err)
-					}
-
-					added, err := c.DecodeDeviceInput(res)
-					if err != nil {
-						log.Fatalf("%v", err)
-					}
-
-					theDevice = added
-				}
-
-				schema := fk.UpdateDeviceInputSchemaPayload{
-					Active:     true,
-					Key:        "1",
-					JSONSchema: `{ "UseProviderTime": true, "UseProviderLocation": true }`,
-				}
-				_, err = c.UpdateSchemaDevice(ctx, fk.UpdateSchemaDevicePath(theDevice.ID), &schema)
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-
-				return theDevice, nil
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("Unable to create Web device")
 }
 
 type FakeMessage struct {
@@ -199,6 +118,8 @@ func main() {
 	flag.StringVar(&o.DeviceName, "device-name", "test-generator", "device name")
 	flag.StringVar(&o.Scheme, "scheme", "http", "scheme to use")
 	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "hostname to use")
+	flag.StringVar(&o.Username, "username", "demo-user", "username to use")
+	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password to use")
 	flag.BoolVar(&o.WebDevice, "web", false, "fake web device messages")
 	flag.StringVar(&o.RockBlockSerial, "rb-serial", "11380", "fake rockblock device serial")
 	flag.BoolVar(&o.RockBlock, "rockblock", false, "fake rockblock device messages")
@@ -212,24 +133,12 @@ func main() {
 		return
 	}
 
-	httpClient := newHTTPClient()
-	c := fk.New(goaclient.HTTPClientDoer(httpClient))
-	c.Scheme = o.Scheme
-	c.Host = o.Host
-
-	loginPayload := fk.LoginPayload{}
-	loginPayload.Username = "demo-user"
-	loginPayload.Password = "asdfasdfasdf"
-	res, err := c.LoginUser(ctx, fk.LoginUserPath(), &loginPayload)
+	c, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	key := res.Header.Get("Authorization")
-	jwtSigner := newJWTSigner(key, "%s")
-	c.SetJWTSigner(jwtSigner)
-
-	device, err := createWebDevice(ctx, c, &o)
+	device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -259,17 +168,6 @@ type FakeEvent struct {
 	Coordinates []float64
 }
 
-func mapInt64(v, minV, maxV int, minRange, maxRange int64) int64 {
-	return int64(mapFloat64(v, minV, maxV, float64(minRange), float64(maxRange)))
-}
-
-func mapFloat64(v, minV, maxV int, minRange, maxRange float64) float64 {
-	if minV == maxV {
-		return minRange
-	}
-	return float64(v-minV)/float64(maxV-minV)*(maxRange-minRange) + minRange
-}
-
 func generateFakeEventsAlong(path [][]float64, numberPerLeg int, startTime, endTime int64) (fakes []FakeEvent) {
 	fakes = make([]FakeEvent, 0)
 
@@ -278,8 +176,8 @@ func generateFakeEventsAlong(path [][]float64, numberPerLeg int, startTime, endT
 	previous := path[0]
 	for _, next := range path[1:] {
 		for i := 0; i < numberPerLeg; i++ {
-			lat := mapFloat64(i, 0, numberPerLeg, previous[0], next[0])
-			lng := mapFloat64(i, 0, numberPerLeg, previous[1], next[1])
+			lat := fktesting.MapFloat64(i, 0, numberPerLeg, previous[0], next[0])
+			lng := fktesting.MapFloat64(i, 0, numberPerLeg, previous[1], next[1])
 			fakes = append(fakes, FakeEvent{
 				Timestamp:   now,
 				Coordinates: []float64{lat, lng},
@@ -291,18 +189,4 @@ func generateFakeEventsAlong(path [][]float64, numberPerLeg int, startTime, endT
 	}
 
 	return
-}
-
-func newHTTPClient() *http.Client {
-	return http.DefaultClient
-}
-
-func newJWTSigner(key, format string) goaclient.Signer {
-	return &goaclient.APIKeySigner{
-		SignQuery: false,
-		KeyName:   "Authorization",
-		KeyValue:  key,
-		Format:    format,
-	}
-
 }
