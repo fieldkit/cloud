@@ -87,6 +87,10 @@ func (c *DeviceController) Add(ctx *app.AddDeviceContext) error {
 		return err
 	}
 
+	if ctx.Payload.Key == "" {
+		ctx.Payload.Key = token.String()
+	}
+
 	device := &data.Device{
 		InputID: int64(input.ID),
 		Key:     ctx.Payload.Key,

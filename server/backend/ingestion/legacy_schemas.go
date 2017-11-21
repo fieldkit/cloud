@@ -1,7 +1,7 @@
 package ingestion
 
-func AddLegacySchemas(sr *InMemorySchemas) {
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "AT"), &JsonMessageSchema{
+func AddLegacyRockBlockSchemas(sr *InMemorySchemas, rb DeviceId) {
+	sr.DefineSchema(NewSchemaId(rb, "AT"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -25,7 +25,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "WE"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "WE"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -46,7 +46,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "SO"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "SO"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -64,7 +64,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "LO"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "LO"), &JsonMessageSchema{
 		HasTime:     true,
 		HasLocation: true,
 		Fields: []JsonSchemaField{
@@ -81,7 +81,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "ST"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "ST"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -121,7 +121,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "ST"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "ST"), &JsonMessageSchema{
 		HasTime: true,
 		Fields: []JsonSchemaField{
 			JsonSchemaField{Name: "Time", Type: "uint32"},
@@ -162,7 +162,7 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 		},
 	})
 
-	sr.DefineSchema(NewSchemaId(RockBlockProviderName, "(\\d+)", "1"), &JsonMessageSchema{
+	sr.DefineSchema(NewSchemaId(rb, "1"), &JsonMessageSchema{
 		UseProviderTime: true,
 		HasLocation:     true,
 		Fields: []JsonSchemaField{
@@ -175,26 +175,5 @@ func AddLegacySchemas(sr *InMemorySchemas) {
 			JsonSchemaField{Name: "Battery Voltage", Type: "float32"},
 			JsonSchemaField{Name: "Uptime", Type: "uint32"},
 		},
-	})
-
-	sr.DefineSchema(NewSchemaId(ParticleProviderName, "(\\d+)", ""), &JsonMessageSchema{
-		UseProviderTime: true,
-		HasLocation:     true,
-		Fields: []JsonSchemaField{
-			JsonSchemaField{Name: "Battery Voltage", Type: "float32"},
-			JsonSchemaField{Name: "Battery Percentage", Type: "float32"},
-			JsonSchemaField{Name: "Latitude", Type: "float32"},
-			JsonSchemaField{Name: "Longitude", Type: "float32"},
-			JsonSchemaField{Name: "Altitude", Type: "float32"},
-			JsonSchemaField{Name: "Satellites", Type: "float32"},
-			JsonSchemaField{Name: "HDOP", Type: "float32"},
-			JsonSchemaField{Name: "Has Fix", Type: "boolean"},
-		},
-	})
-
-	sr.DefineSchema(NewSchemaId(HttpProviderName, "(\\S+)", ""), &JsonMessageSchema{
-		UseProviderTime:     true,
-		UseProviderLocation: true,
-		Fields:              []JsonSchemaField{},
 	})
 }

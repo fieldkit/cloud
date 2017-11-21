@@ -57,7 +57,6 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName 
 					log.Printf("Creating new Device %v", deviceName)
 
 					addPayload := fk.AddDeviceInputPayload{
-						Key:  "HTTP-" + deviceName,
 						Name: deviceName,
 					}
 					res, err = c.AddDevice(ctx, fk.AddDevicePath(exp.ID), &addPayload)

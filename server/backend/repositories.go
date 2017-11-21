@@ -26,7 +26,7 @@ func NewDatabaseStreams(db *sqlxcache.DB) ingestion.StreamsRepository {
 
 func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.Stream, err error) {
 	devices := []*data.Device{}
-	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.ToString()); err != nil {
+	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
 		return nil, err
 	}
 
@@ -57,7 +57,7 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 
 func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Location) (err error) {
 	devices := []*data.Device{}
-	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.ToString()); err != nil {
+	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
 		return err
 	}
 
@@ -92,14 +92,14 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
                   SELECT ds.*, s.* FROM fieldkit.device AS d
                   JOIN fieldkit.device_schema AS ds ON (d.input_id = ds.device_id)
                   JOIN fieldkit.schema AS s ON (ds.schema_id = s.id)
-                  WHERE d.key = $1`, id.Device.ToString()); err != nil {
+                  WHERE d.key = $1`, id.Device.String()); err != nil {
 		return nil, err
 	}
 
 	ms = make([]interface{}, 0)
 
 	for _, s := range schemas {
-		if s.Key == id.Stream {
+		if id.Stream == "" || s.Key == id.Stream {
 			ids := DatabaseIds{
 				SchemaID: s.SchemaID,
 				DeviceID: s.DeviceID,

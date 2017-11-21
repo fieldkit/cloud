@@ -11,7 +11,8 @@ import (
 
 func main() {
 	sr := ingestion.NewInMemorySchemas()
-	ingestion.AddLegacySchemas(sr)
+	rb := ingestion.NewProviderDeviceId(ingestion.RockBlockProviderName, "11380")
+	ingestion.AddLegacyRockBlockSchemas(sr, rb)
 	streams := ingestion.NewInMemoryStreams()
 	ingester := ingestion.NewMessageIngester(sr, streams)
 

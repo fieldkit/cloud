@@ -2,7 +2,6 @@ package ingestion
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 )
 
@@ -13,13 +12,18 @@ const (
 
 type MessageId string
 
-type DeviceId struct {
-	Provider string
-	Id       string
+type DeviceId string
+
+func NewDeviceId(id string) DeviceId {
+	return DeviceId(id)
 }
 
-func (s DeviceId) ToString() string {
-	return fmt.Sprintf("%s-%s", s.Provider, s.Id)
+func NewProviderDeviceId(provider, id string) DeviceId {
+	return DeviceId(fmt.Sprintf("%s-%s", provider, id))
+}
+
+func (s DeviceId) String() string {
+	return fmt.Sprintf("%s", string(s))
 }
 
 type SchemaId struct {
@@ -27,37 +31,18 @@ type SchemaId struct {
 	Stream string
 }
 
-func (s SchemaId) ToString() string {
+func (s SchemaId) String() string {
 	if s.Stream == "" {
-		return s.Device.ToString()
+		return s.Device.String()
 	}
-	return fmt.Sprintf("%s-%s", s.Device.ToString(), s.Stream)
+	return fmt.Sprintf("%s-%s", s.Device.String(), s.Stream)
 }
 
-func NewSchemaId(provider string, device string, stream string) SchemaId {
+func NewSchemaId(deviceId DeviceId, stream string) SchemaId {
 	return SchemaId{
-		Device: DeviceId{
-			Provider: provider,
-			Id:       device,
-		},
+		Device: deviceId,
 		Stream: stream,
 	}
-}
-
-func (s SchemaId) Matches(o SchemaId) bool {
-	if s.Device.Provider != o.Device.Provider {
-		return false
-	}
-	re := regexp.MustCompile(s.Device.Id)
-	if !re.MatchString(o.Device.Id) {
-		return false
-	}
-
-	if s.Stream != "" && s.Stream != o.Stream {
-		return false
-	}
-
-	return true
 }
 
 type ProcessedMessage struct {

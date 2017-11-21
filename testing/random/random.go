@@ -57,7 +57,7 @@ type FakeMessage struct {
 	Body        string
 }
 
-func (o *options) createMessage(e *FakeEvent) *FakeMessage {
+func (o *options) createMessage(key string, e *FakeEvent) *FakeMessage {
 	if o.RockBlock {
 		contentType := "application/x-www-form-urlencoded; charset=UTF-8"
 		imei := "300234065114240"
@@ -85,7 +85,7 @@ func (o *options) createMessage(e *FakeEvent) *FakeMessage {
 		m := ingestion.HttpJsonMessage{
 			Location: e.Coordinates,
 			Time:     e.Timestamp,
-			Device:   o.DeviceName,
+			Device:   key,
 			Stream:   "1",
 			Values: map[string]string{
 				"cpu":      "100",
@@ -158,7 +158,7 @@ func main() {
 	end := time.Now().Unix()
 
 	for _, e := range generateFakeEventsAlong(path, 5, start, end) {
-		o.postRawMessage(o.createMessage(&e))
+		o.postRawMessage(o.createMessage(device.Key, &e))
 		time.Sleep(time.Duration(o.Interval) * time.Second)
 	}
 }

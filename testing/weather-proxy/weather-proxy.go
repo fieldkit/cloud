@@ -64,7 +64,7 @@ func main() {
 
 	fmt.Printf("%v\n", device)
 
-	m := createFieldKitMessageFromWeather(w, o.DeviceName)
+	m := createFieldKitMessageFromWeather(w, device.Key)
 	b, err := json.Marshal(m)
 	if err != nil {
 		log.Fatalf("Error %v", err)

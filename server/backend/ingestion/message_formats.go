@@ -20,7 +20,7 @@ const (
 var LegacyMessageTypeRe = regexp.MustCompile(LegacyMessageTypePattern)
 var LegacyStationNameRe = regexp.MustCompile(LegacyStationNamePattern)
 
-func normalizeCommaSeparated(provider string, schemaPrefix string, raw *RawMessage, text string) (pm *ProcessedMessage, err error) {
+func normalizeCommaSeparated(provider, providerId string, raw *RawMessage, text string) (pm *ProcessedMessage, err error) {
 	if len(text) == 0 {
 		return nil, fmt.Errorf("%s(Empty message)", provider)
 	}
@@ -47,14 +47,14 @@ func normalizeCommaSeparated(provider string, schemaPrefix string, raw *RawMessa
 
 	pm = &ProcessedMessage{
 		MessageId:   MessageId(raw.RequestId),
-		SchemaId:    NewSchemaId(provider, schemaPrefix, maybeMessageType),
+		SchemaId:    NewSchemaId(NewProviderDeviceId(provider, providerId), maybeMessageType),
 		ArrayValues: fields,
 	}
 
 	return
 }
 
-func normalizeBinary(provider string, schemaPrefix string, raw *RawMessage, bytes []byte) (pm *ProcessedMessage, err error) {
+func normalizeBinary(provider, providerId string, raw *RawMessage, bytes []byte) (pm *ProcessedMessage, err error) {
 	// This is a protobuf message or some other kind of similar low level binary.
 	buffer := proto.NewBuffer(bytes)
 
@@ -90,7 +90,7 @@ func normalizeBinary(provider string, schemaPrefix string, raw *RawMessage, byte
 
 	pm = &ProcessedMessage{
 		MessageId:   MessageId(raw.RequestId),
-		SchemaId:    NewSchemaId(provider, schemaPrefix, strconv.Itoa(int(id))),
+		SchemaId:    NewSchemaId(NewProviderDeviceId(provider, providerId), strconv.Itoa(int(id))),
 		Time:        &time,
 		ArrayValues: values,
 	}

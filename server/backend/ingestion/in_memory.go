@@ -43,30 +43,29 @@ func (msr *InMemoryStreams) UpdateLocation(id DeviceId, l *Location) (err error)
 }
 
 type InMemorySchemas struct {
-	Map map[SchemaId][]interface{}
+	Map map[DeviceId][]interface{}
 }
 
 func NewInMemorySchemas() *InMemorySchemas {
 	return &InMemorySchemas{
-		Map: make(map[SchemaId][]interface{}),
+		Map: make(map[DeviceId][]interface{}),
 	}
 }
 
 func (sr *InMemorySchemas) DefineSchema(id SchemaId, ms interface{}) (err error) {
-	if sr.Map[id] == nil {
-		sr.Map[id] = make([]interface{}, 0)
+	if sr.Map[id.Device] == nil {
+		sr.Map[id.Device] = make([]interface{}, 0)
 	}
-	sr.Map[id] = append(sr.Map[id], ms)
+	sr.Map[id.Device] = append(sr.Map[id.Device], ms)
 	return
 }
 
 func (sr *InMemorySchemas) LookupSchema(id SchemaId) (ms []interface{}, err error) {
 	ms = make([]interface{}, 0)
 
-	for key, value := range sr.Map {
-		if key.Matches(id) {
-			ms = append(ms, value...)
-		}
+	if sr.Map[id.Device] != nil {
+		ms = append(ms, sr.Map[id.Device])
 	}
+
 	return
 }

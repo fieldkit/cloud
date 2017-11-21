@@ -55,7 +55,7 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 
 		pm = &ProcessedMessage{
 			MessageId: MessageId(raw.RequestId),
-			SchemaId:  NewSchemaId(HttpProviderName, message.Device, message.Stream),
+			SchemaId:  NewSchemaId(NewDeviceId(message.Device), message.Stream),
 			Time:      &messageTime,
 			Location:  message.Location,
 			MapValues: message.Values,
