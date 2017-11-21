@@ -252,33 +252,27 @@ func main() {
 	app.MountTwitterController(service, c9)
 
 	// Mount "device" controller
-	c15 := api.NewDeviceController(service, api.DeviceControllerOptions{
+	c10 := api.NewDeviceController(service, api.DeviceControllerOptions{
 		Database: database,
 		Backend:  be,
 	})
-	app.MountDeviceController(service, c15)
+	app.MountDeviceController(service, c10)
 
 	// Mount "picture" controller
-	c10 := api.NewPictureController(service)
-	app.MountPictureController(service, c10)
-
-	// Mount "document" controller
-	c13 := api.NewDocumentController(service, api.DocumentControllerOptions{
-		Backend: be,
-	})
-	app.MountDocumentController(service, c13)
+	c11 := api.NewPictureController(service)
+	app.MountPictureController(service, c11)
 
 	// Mount "input_token" controller
-	c14 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
+	c12 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
 		Backend: be,
 	})
-	app.MountInputTokenController(service, c14)
+	app.MountInputTokenController(service, c12)
 
 	// Mount "geojson" controller
-	c16 := api.NewGeoJSONController(service, api.GeoJSONControllerOptions{
+	c13 := api.NewGeoJSONController(service, api.GeoJSONControllerOptions{
 		Backend: be,
 	})
-	app.MountGeoJSONController(service, c16)
+	app.MountGeoJSONController(service, c13)
 
 	notFoundHandler := http.NotFoundHandler()
 	adminServer := notFoundHandler

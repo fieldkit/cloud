@@ -563,61 +563,6 @@ func (ctx *UpdateSchemaDeviceContext) BadRequest() error {
 	return nil
 }
 
-// ListDocumentContext provides the document list action context.
-type ListDocumentContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Expedition string
-	Project    string
-}
-
-// NewListDocumentContext parses the incoming request URL and body, performs validations and creates the
-// context used by the document controller list action.
-func NewListDocumentContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDocumentContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListDocumentContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpedition := req.Params["expedition"]
-	if len(paramExpedition) > 0 {
-		rawExpedition := paramExpedition[0]
-		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Expedition) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
-		}
-	}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Project) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListDocumentContext) OK(r *Documents) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.documents+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListDocumentContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // AddExpeditionContext provides the expedition add action context.
 type AddExpeditionContext struct {
 	context.Context
