@@ -5,385 +5,360 @@ import log from 'loglevel';
 import { JWTAPIClient, APIError, AuthenticationError } from './base-api';
 import type { SupportedMethods } from './base-api';
 
-import type {
-  APIErrors,
-  APIUser,
-  APIUsers,
-  APIBaseUser,
-  APINewUser,
-  APIProject,
-  APINewProject,
-  APIProjects,
-  APIExpedition,
-  APINewExpedition,
-  APIExpeditions,
-  APIMutableInput,
-  APIBaseInput,
-  APINewTwitterInput,
-  APITwitterInput,
-  APITwitterInputCreateResponse,
-  APIFieldkitInput,
-  APIFieldkitInputs,
-  APINewFieldkitInput,
-  APINewInputToken,
-  APIInputToken,
-  APIInputTokens,
-  APIInputs,
-  APITeam,
-  APINewTeam,
-  APITeams,
-  APIBaseMember,
-  APIMember,
-  APINewMember,
-  APIMembers,
-  APIAdministrator,
-  APINewAdministrator,
-  APIAdministrators,
-  APINewCollection,
-  APICollection,
-  APICollections
-} from './types';
+import type { APIErrors, APIUser, APIUsers, APIBaseUser, APINewUser, APIProject, APINewProject, APIProjects, APIExpedition, APINewExpedition, APIExpeditions, APIMutableInput, APIBaseInput, APINewTwitterInput, APITwitterInput, APITwitterInputCreateResponse, APIFieldkitInput, APIFieldkitInputs, APINewFieldkitInput, APINewInputToken, APIInputToken, APIInputTokens, APIInputs, APITeam, APINewTeam, APITeams, APIBaseMember, APIMember, APINewMember, APIMembers, APIAdministrator, APINewAdministrator, APIAdministrators, APINewCollection, APICollection, APICollections } from './types';
 
 export type FKAPIOKResponse<T> = {
-  type: 'ok';
-  payload: T;
+type: 'ok';
+payload: T;
 };
 export type FKAPIErrResponse = {
-  type: 'err';
-  errors: APIErrors;
+type: 'err';
+errors: APIErrors;
 }
 export type FKAPIResponse<T> = FKAPIOKResponse<T> | FKAPIErrResponse;
 
 let apiClientInstance;
 export class FKApiClient extends JWTAPIClient {
-  signinCb: ?() => void;
-  signoutCb: ?() => void;
-  unauthorizedHandler: ?() => void;
+    signinCb: ?() => void;
+    signoutCb: ?() => void;
+    unauthorizedHandler: ?() => void;
 
-  static get(): FKApiClient {
-    if (!apiClientInstance) {
-      throw new APIError('API has not been set up!');
-    }
-
-    return apiClientInstance;
-  }
-
-  static setup(
-    baseUrl: string,
-    unauthorizedHandler: () => void,
-    { onSignin, onSignout }: { onSignin?: () => void, onSignout?: () => void } = {}
-  ): FKApiClient
-  {
-    if (!apiClientInstance) {
-      apiClientInstance = new FKApiClient(baseUrl);
-      apiClientInstance.signinCb = onSignin;
-      apiClientInstance.signoutCb = onSignout;
-      apiClientInstance.unauthorizedHandler = unauthorizedHandler;
-    }
-
-    return apiClientInstance;
-  }
-
-  onSignin() {
-    if (this.signinCb) {
-      this.signinCb();
-    }
-  }
-
-  onSignout() {
-    this.clearJWT();
-
-    if (this.signoutCb) {
-      this.signoutCb();
-    }
-  }
-
-  signedIn(): boolean {
-    return this.loadJWT() != null;
-  }
-
-  onAuthError(e: AuthenticationError) {
-    if (this.signedIn()) {
-      if (this.unauthorizedHandler) {
-        this.unauthorizedHandler();
-      }
-      this.onSignout();
-    }
-  }
-
-  async exec(
-    method: SupportedMethods,
-    path: string,
-    { params, body, headers = {} }: {
-      params?: Object,
-      body?: ?(Blob | FormData | URLSearchParams | string),
-      headers: Object
-    } = {}
-  ): Promise<Response> {
-    try {
-      return await super.exec(method, path, { params, body, headers });
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onAuthError(e);
-      }
-
-      throw e;
-    }
-  }
-
-  async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
-    try {
-      const res = await p;
-      return { type: 'ok', payload: res };
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        this.onSignout();
-      }
-
-      if (e instanceof APIError) {
-        const jsonError = JSON.parse(e.body);
-        return { type: 'err', errors: jsonError };
-      } else {
-        log.error('Unknown error:', e);
-
-        const APIFakeOtherError: APIErrors = {
-          code: 'UnknownError',
-          detail: e.msg,
-          id: '',
-          meta: {},
-          status: 500
+    static get(): FKApiClient {
+        if (!apiClientInstance) {
+            throw new APIError('API has not been set up!');
         }
-        return { type: 'err', errors: APIFakeOtherError };
-      }
+
+        return apiClientInstance;
     }
-  }
 
-  postWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
-    return this.execWithErrors(this.postJSON(endpoint, values));
-  }
+    static setup(
+        baseUrl: string,
+        unauthorizedHandler: () => void, {onSignin, onSignout }: { onSignin?: () => void, onSignout?: () => void} = {}
+    ): FKApiClient {
+        if (!apiClientInstance) {
+            apiClientInstance = new FKApiClient(baseUrl);
+            apiClientInstance.signinCb = onSignin;
+            apiClientInstance.signoutCb = onSignout;
+            apiClientInstance.unauthorizedHandler = unauthorizedHandler;
+        }
 
-  getWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
-    return this.execWithErrors(this.getJSON(endpoint, values));
-  }
-
-  delWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
-    return this.execWithErrors(this.delJSON(endpoint, values));
-  }
-
-  patchWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
-    return this.execWithErrors(this.patchJSON(endpoint, values));
-  }
-
-  putWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
-    return this.execWithErrors(this.putJSON(endpoint, values));
-  }
-
-  signUp(u: APINewUser): Promise<FKAPIResponse<APIUser>> {
-    return this.postWithErrors('/users', u);
-  }
-
-  async signIn(username, password): Promise<FKAPIResponse<void>> {
-    const response = await this.postWithErrors('/login', { username, password });
-    if (response.type === 'ok') {
-      this.onSignin();
+        return apiClientInstance;
     }
-    return response;
-  }
 
-  async signOut(): Promise<void> {
-    await this.postForm('/logout')
-    this.onSignout();
-  }
+    onSignin() {
+        if (this.signinCb) {
+            this.signinCb();
+        }
+    }
 
-  userPictureUrl(userId: number): string {
-    return `${this.baseUrl}/users/${userId}/picture`;
-  }
+    onSignout() {
+        this.clearJWT();
 
-  getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
-    return this.getWithErrors('/user');
-  }
+        if (this.signoutCb) {
+            this.signoutCb();
+        }
+    }
 
-  getUserById(userId: number): Promise<FKAPIResponse<?APIUser>> {
-    return this.getWithErrors(`/users/${userId}`);
-  }
+    signedIn(): boolean {
+        return this.loadJWT() != null;
+    }
 
-  updateUserById(userId: number, u: APIBaseUser): Promise<FKAPIResponse<?APIUser>> {
-    return this.patchWithErrors(`/users/${userId}`, u);
-  }
+    onAuthError(e: AuthenticationError) {
+        if (this.signedIn()) {
+            if (this.unauthorizedHandler) {
+                this.unauthorizedHandler();
+            }
+            this.onSignout();
+        }
+    }
 
-  getUserByUsername(username: string): Promise<FKAPIResponse<?APIUser>> {
-    return this.getWithErrors(`/users/@/${username}`);
-  }
+    async exec(
+        method: SupportedMethods,
+        path: string, {params, body, headers = {} }: {
+            params?: Object,
+            body?: ?(Blob | FormData | URLSearchParams | string),
+            headers: Object} = {}
+    ): Promise<Response> {
+        try {
+            return await super.exec(method, path, {
+                    params,
+                    body,
+                    headers
+                });
+        } catch (e) {
+            if (e instanceof AuthenticationError) {
+                this.onAuthError(e);
+            }
 
-  getUsers(): Promise<FKAPIResponse<APIUsers>> {
-    return this.getWithErrors('/users');
-  }
+            throw e;
+        }
+    }
 
-  projectPictureUrl(projectId: number): string {
-    return `${this.baseUrl}/projects/${projectId}/picture`;
-  }
+    async execWithErrors<T>(p: Promise<any>, parseJSON = false): Promise<FKAPIResponse<T>> {
+        try {
+            const res = await p;
+            return {
+                type: 'ok',
+                payload: res
+            };
+        } catch (e) {
+            if (e instanceof AuthenticationError) {
+                this.onSignout();
+            }
 
-  getProjects(): Promise<FKAPIResponse<APIProjects>> {
-    return this.getWithErrors('/projects')
-  }
+            if (e instanceof APIError) {
+                const jsonError = JSON.parse(e.body);
+                return {
+                    type: 'err',
+                    errors: jsonError
+                };
+            } else {
+                log.error('Unknown error:', e);
 
-  getCurrentUserProjects(): Promise<FKAPIResponse<APIProjects>> {
-    return this.getWithErrors('/user/projects')
-  }
+                const APIFakeOtherError: APIErrors = {
+                    code: 'UnknownError',
+                    detail: e.msg,
+                    id: '',
+                    meta: {},
+                    status: 500
+                }
+                return {
+                    type: 'err',
+                    errors: APIFakeOtherError
+                };
+            }
+        }
+    }
 
-  getProjectBySlug(slug: string): Promise<FKAPIResponse<APIProject>> {
-    return this.getWithErrors(`/projects/@/${slug}`)
-  }
+    postWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+        return this.execWithErrors(this.postJSON(endpoint, values));
+    }
 
-  createProject(values: APINewProject): Promise<FKAPIResponse<APIProject>> {
-    return this.postWithErrors('/projects', values)
-  }
+    getWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+        return this.execWithErrors(this.getJSON(endpoint, values));
+    }
 
-  updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
-    return this.patchWithErrors(`/projects/${projectId}`, values)
-  }
+    delWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+        return this.execWithErrors(this.delJSON(endpoint, values));
+    }
 
-  expeditionPictureUrl(expeditionId: number): string {
-    return `${this.baseUrl}/expeditions/${expeditionId}/picture`;
-  }
+    patchWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+        return this.execWithErrors(this.patchJSON(endpoint, values));
+    }
 
-  getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions`)
-  }
+    putWithErrors<T>(endpoint: string, values?: Object): Promise<FKAPIResponse<T>> {
+        return this.execWithErrors(this.putJSON(endpoint, values));
+    }
 
-  getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIExpedition>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
-  }
+    signUp(u: APINewUser): Promise<FKAPIResponse<APIUser>> {
+        return this.postWithErrors('/users', u);
+    }
 
-  createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
-    return this.postWithErrors(`/projects/${projectId}/expeditions`, values)
-  }
+    async signIn(username, password): Promise<FKAPIResponse<void>> {
+        const response = await this.postWithErrors('/login', {
+            username,
+            password
+        });
+        if (response.type === 'ok') {
+            this.onSignin();
+        }
+        return response;
+    }
 
-  updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
-    return this.patchWithErrors(`/expeditions/${expeditionId}`, values)
-  }
+    async signOut(): Promise<void> {
+        await this.postForm('/logout')
+        this.onSignout();
+    }
 
-  updateInput(inputId: number, inputData: APIMutableInput): Promise<FKAPIResponse<APIBaseInput>> {
-    return this.patchWithErrors(`/inputs/${inputId}`, inputData);
-  }
+    userPictureUrl(userId: number): string {
+        return `${this.baseUrl}/users/${userId}/picture`;
+    }
 
-  getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
-    return this.getWithErrors(`/expeditions/${expeditionId}/inputs`)
-  }
+    getCurrentUser(): Promise<FKAPIResponse<APIUser>> {
+        return this.getWithErrors('/user');
+    }
 
-  getInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputs>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs`)
-  }
+    getUserById(userId: number): Promise<FKAPIResponse<?APIUser>> {
+        return this.getWithErrors(`/users/${userId}`);
+    }
 
-  getTwitterInput(inputId: number): Promise<FKAPIResponse<APITwitterInput>> {
-    return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
-  }
+    updateUserById(userId: number, u: APIBaseUser): Promise<FKAPIResponse<?APIUser>> {
+        return this.patchWithErrors(`/users/${userId}`, u);
+    }
 
-  createTwitterInput(expeditionId: number, twitterInput: APINewTwitterInput): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`, twitterInput)
-  }
+    getUserByUsername(username: string): Promise<FKAPIResponse<?APIUser>> {
+        return this.getWithErrors(`/users/@/${username}`);
+    }
 
-  createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`, fieldkitInput);
-  }
+    getUsers(): Promise<FKAPIResponse<APIUsers>> {
+        return this.getWithErrors('/users');
+    }
 
-  getFieldkitInput(inputId: number): Promise<FKAPIResponse<APIFieldkitInput>> {
-    return this.getWithErrors(`/inputs/fieldkits/${inputId}`);
-  }
+    projectPictureUrl(projectId: number): string {
+        return `${this.baseUrl}/projects/${projectId}/picture`;
+    }
 
-  getFieldkitsByExpeditionId(expeditionId: number): Promise<FKAPIResponse<APIFieldkitInputs>> {
-    return this.getWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`);
-  }
+    getProjects(): Promise<FKAPIResponse<APIProjects>> {
+        return this.getWithErrors('/projects')
+    }
 
-  getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
-    return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
-  }
+    getCurrentUserProjects(): Promise<FKAPIResponse<APIProjects>> {
+        return this.getWithErrors('/user/projects')
+    }
 
-  getExpeditionInputTokens(expeditionId: number): Promise<FKAPIResponse<APIInputTokens>> {
-    return this.getWithErrors(`/expeditions/${expeditionId}/input-tokens`)
-  }
+    getProjectBySlug(slug: string): Promise<FKAPIResponse<APIProject>> {
+        return this.getWithErrors(`/projects/@/${slug}`)
+    }
 
-  getInputTokensBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputTokens>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/input-tokens`)
-  }
+    createProject(values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+        return this.postWithErrors('/projects', values)
+    }
 
-  createInputToken(expeditionId: number, inputToken: APINewInputToken): Promise<FKAPIResponse<APIInputToken>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/input-tokens`, inputToken)
-  }
+    updateProject(projectId: number, values: APINewProject): Promise<FKAPIResponse<APIProject>> {
+        return this.patchWithErrors(`/projects/${projectId}`, values)
+    }
 
-  deleteInputToken(inputTokenId: number): Promise<FKAPIResponse<void>> {
-    return this.delWithErrors(`/input-tokens/${inputTokenId}`)
-  }
+    expeditionPictureUrl(expeditionId: number): string {
+        return `${this.baseUrl}/expeditions/${expeditionId}/picture`;
+    }
 
-  getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/teams`)
-  }
+    getExpeditionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APIExpeditions>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expeditions`)
+    }
 
-  getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APITeam>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}`)
-  }
+    getExpeditionBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIExpedition>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}`)
+    }
 
-  createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
-    return this.postWithErrors(`/expeditions/${expeditionId}/teams`, values)
-  }
+    createExpedition(projectId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+        return this.postWithErrors(`/projects/${projectId}/expeditions`, values)
+    }
 
-  deleteTeam(teamId: number): Promise<FKAPIResponse<APITeam>> {
-    return this.delWithErrors(`/teams/${teamId}`)
-  }
+    updateExpedition(expeditionId: number, values: APINewExpedition): Promise<FKAPIResponse<APIExpedition>> {
+        return this.patchWithErrors(`/expeditions/${expeditionId}`, values)
+    }
 
-  updateTeam(teamId: number, values: APINewTeam): Promise<FKAPIResponse<APINewTeam>> {
-    return this.patchWithErrors(`/teams/${teamId}`, values)
-  }
+    updateInput(inputId: number, inputData: APIMutableInput): Promise<FKAPIResponse<APIBaseInput>> {
+        return this.patchWithErrors(`/inputs/${inputId}`, inputData);
+    }
 
-  getCollectionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APICollections>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/collections`)
-  }
+    getExpeditionInputs(expeditionId: number): Promise<FKAPIResponse<APIInputs>> {
+        return this.getWithErrors(`/expeditions/${expeditionId}/inputs`)
+    }
 
-  createCollection(projectId: number, values: APINewCollection): Promise<FKAPIResponse<APICollection>> {
-    return this.postWithErrors(`/projects/${projectId}/collection`, values)
-  }
+    getInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputs>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs`)
+    }
 
-  deleteCollection(collectionId: number): Promise<FKAPIResponse<APICollection>> {
-    return this.delWithErrors(`/collections/${collectionId}`)
-  }
+    getTwitterInput(inputId: number): Promise<FKAPIResponse<APITwitterInput>> {
+        return this.getWithErrors(`/inputs/twitter-accounts/${inputId}`)
+    }
 
-  updateCollection(collectionId: number, values: APINewCollection): Promise<FKAPIResponse<APINewCollection>> {
-    return this.patchWithErrors(`/collections/${collectionId}`, values)
-  }
+    createTwitterInput(expeditionId: number, twitterInput: APINewTwitterInput): Promise<FKAPIResponse<APITwitterInputCreateResponse>> {
+        return this.postWithErrors(`/expeditions/${expeditionId}/inputs/twitter-accounts`, twitterInput)
+    }
 
-  addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
-    return this.postWithErrors(`/projects/${projectId}/administrators`, values)
-  }
+    createFieldkitInput(expeditionId: number, fieldkitInput: APINewFieldkitInput): Promise<FKAPIResponse<APIFieldkitInput>> {
+        return this.postWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`, fieldkitInput);
+    }
 
-  getAdministrators(projectId: number): Promise<FKAPIResponse<APIAdministrators>> {
-    return this.getWithErrors(`/projects/${projectId}/administrators`)
-  }
+    getFieldkitInput(inputId: number): Promise<FKAPIResponse<APIFieldkitInput>> {
+        return this.getWithErrors(`/inputs/fieldkits/${inputId}`);
+    }
 
-  getAdministratorsBySlug(projectSlug: string): Promise<FKAPIResponse<APIAdministrators>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/administrators`)
-  }
+    getFieldkitsByExpeditionId(expeditionId: number): Promise<FKAPIResponse<APIFieldkitInputs>> {
+        return this.getWithErrors(`/expeditions/${expeditionId}/inputs/fieldkits`);
+    }
 
-  deleteAdministrator(projectId: number, userId: number): Promise<FKAPIResponse<APIAdministrator>> {
-    return this.delWithErrors(`/projects/${projectId}/administrators/${userId}`)
-  }
+    getFieldkitInputsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIFieldkitInputs>> {
+        return this.putWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/inputs/fieldkits`);
+    }
 
-  addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
-    return this.postWithErrors(`/teams/${teamId}/members`, values)
-  }
+    getExpeditionInputTokens(expeditionId: number): Promise<FKAPIResponse<APIInputTokens>> {
+        return this.getWithErrors(`/expeditions/${expeditionId}/input-tokens`)
+    }
 
-  updateMember(teamId: number, userId: number, values: APIBaseMember): Promise<FKAPIResponse<APIMember>> {
-    return this.patchWithErrors(`/teams/${teamId}/members/${userId}`, values)
-  }
+    getInputTokensBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APIInputTokens>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/input-tokens`)
+    }
 
-  getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {
-    return this.getWithErrors(`/teams/${teamId}/members`)
-  }
+    createInputToken(expeditionId: number, inputToken: APINewInputToken): Promise<FKAPIResponse<APIInputToken>> {
+        return this.postWithErrors(`/expeditions/${expeditionId}/input-tokens`, inputToken)
+    }
 
-  getMembersBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APIMembers>> {
-    return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}/members`)
-  }
+    deleteInputToken(inputTokenId: number): Promise<FKAPIResponse<void>> {
+        return this.delWithErrors(`/input-tokens/${inputTokenId}`)
+    }
 
-  deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
-    return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
-  }
+    getTeamsBySlugs(projectSlug: string, expeditionSlug: string): Promise<FKAPIResponse<APITeams>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expeditions/@/${expeditionSlug}/teams`)
+    }
+
+    getTeamBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APITeam>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}`)
+    }
+
+    createTeam(expeditionId: number, values: APINewTeam): Promise<FKAPIResponse<APITeam>> {
+        return this.postWithErrors(`/expeditions/${expeditionId}/teams`, values)
+    }
+
+    deleteTeam(teamId: number): Promise<FKAPIResponse<APITeam>> {
+        return this.delWithErrors(`/teams/${teamId}`)
+    }
+
+    updateTeam(teamId: number, values: APINewTeam): Promise<FKAPIResponse<APINewTeam>> {
+        return this.patchWithErrors(`/teams/${teamId}`, values)
+    }
+
+    getCollectionsByProjectSlug(projectSlug: string): Promise<FKAPIResponse<APICollections>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/collections`)
+    }
+
+    createCollection(projectId: number, values: APINewCollection): Promise<FKAPIResponse<APICollection>> {
+        return this.postWithErrors(`/projects/${projectId}/collection`, values)
+    }
+
+    deleteCollection(collectionId: number): Promise<FKAPIResponse<APICollection>> {
+        return this.delWithErrors(`/collections/${collectionId}`)
+    }
+
+    updateCollection(collectionId: number, values: APINewCollection): Promise<FKAPIResponse<APINewCollection>> {
+        return this.patchWithErrors(`/collections/${collectionId}`, values)
+    }
+
+    addAdministrator(projectId: number, values: APINewAdministrator): Promise<FKAPIResponse<APIAdministrator>> {
+        return this.postWithErrors(`/projects/${projectId}/administrators`, values)
+    }
+
+    getAdministrators(projectId: number): Promise<FKAPIResponse<APIAdministrators>> {
+        return this.getWithErrors(`/projects/${projectId}/administrators`)
+    }
+
+    getAdministratorsBySlug(projectSlug: string): Promise<FKAPIResponse<APIAdministrators>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/administrators`)
+    }
+
+    deleteAdministrator(projectId: number, userId: number): Promise<FKAPIResponse<APIAdministrator>> {
+        return this.delWithErrors(`/projects/${projectId}/administrators/${userId}`)
+    }
+
+    addMember(teamId: number, values: APINewMember): Promise<FKAPIResponse<APIMember>> {
+        return this.postWithErrors(`/teams/${teamId}/members`, values)
+    }
+
+    updateMember(teamId: number, userId: number, values: APIBaseMember): Promise<FKAPIResponse<APIMember>> {
+        return this.patchWithErrors(`/teams/${teamId}/members/${userId}`, values)
+    }
+
+    getMembers(teamId: number): Promise<FKAPIResponse<APIMembers>> {
+        return this.getWithErrors(`/teams/${teamId}/members`)
+    }
+
+    getMembersBySlugs(projectSlug: string, expeditionSlug: string, teamSlug: string): Promise<FKAPIResponse<APIMembers>> {
+        return this.getWithErrors(`/projects/@/${projectSlug}/expedition/@/${expeditionSlug}/teams/@/${teamSlug}/members`)
+    }
+
+    deleteMember(teamId: number, userId: number): Promise<FKAPIResponse<APIMember>> {
+        return this.delWithErrors(`/teams/${teamId}/members/${userId}`)
+    }
 }

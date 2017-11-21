@@ -11,88 +11,81 @@ import { FKApiClient } from '../../api/api';
 import type { APIProject, APIExpedition, APINewProject, APINewExpedition, } from '../../api/types';
 
 type Props = {
-  project: APIProject;
-  expeditions: APIExpedition[];
-  onUpdate: (newSlug: ?string) => void;
+project: APIProject;
+expeditions: APIExpedition[];
+onUpdate: (newSlug: ?string) => void;
 
-  match: Object;
-  location: Object;
-  history: Object;
+match: Object;
+location: Object;
+history: Object;
 }
 
 export class ProjectExpeditions extends Component {
-  props: Props;
-  state: {
+    props: Props;
+    state: {
     expeditions: APIExpedition[]
-  }
-
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      expeditions: []
-    };
-  }
-
-  onComponentWillReceiveProps(nextProps: Props) {
-    this.setState({expeditions: nextProps.expeditions});
-  }
-
-  async onExpeditionCreate(e: APINewExpedition) {
-    const { match, project } = this.props;
-
-    const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
-    if (expeditionRes.type === 'ok') {
-      this.props.history.push(`${match.url}/expeditions/${e.slug}/datasources`);
-    } else {
-      return expeditionRes.errors;
-    }
-  }
-
-  async onProjectSave(project: APINewProject) {
-    // TODO: this isn't implemented on the backend yet!
-
-    const projectRes = await FKApiClient.get().updateProject(this.props.project.id, project);
-    if (projectRes.type !== 'ok') {
-      return projectRes.errors;
     }
 
-    if (projectRes.slug != this.props.project.slug && projectRes.payload) {
-      this.props.onUpdate(projectRes.payload.slug);
-    } else {
-      this.props.onUpdate();
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            expeditions: []
+        } ;
     }
-  }
 
-  render () {
-    const { match, project } = this.props;
-    const projectSlug = project.slug;
+    onComponentWillReceiveProps(nextProps: Props) {
+        this.setState({
+            expeditions: nextProps.expeditions
+        });
+    }
 
-    return (
-      <div className="project">
-        <Route path={`${match.url}/new-expedition`} render={() =>
-          <ReactModal isOpen={true} contentLabel="New expedition form" className="modal" overlayClassName="modal-overlay">
-            <h2>Create New Expedition</h2>
-            <ProjectExpeditionForm
-              projectSlug={projectSlug}
-              onCancel={() => this.props.history.push(match.url)}
-              onSave={this.onExpeditionCreate.bind(this)} />
-          </ReactModal> } />
-        
-        <h1>Expeditions</h1>
-        <div id="expeditions" className="gallery-list">
-          { this.props.expeditions.map((e, i) =>
-            <Link to={`/projects/${projectSlug}/expeditions/${e.slug}/datasources`} key={`expedition-${i}`} className="gallery-list-item expeditions"
-              style={{
-                backgroundImage: 'url(' + FKApiClient.get().expeditionPictureUrl(e.id) + ')'
-              }}>
-              <h4>{e.name}</h4>
-            </Link> )}
-          { this.props.expeditions.length === 0 &&
-            <span className="empty">This project doesn't have any expeditions yet.</span> }
-        </div>
-        <Link to={`${match.url}/new-expedition`} className="button">Create new expedition</Link>
-      </div>
-    )
-  }
+    async onExpeditionCreate(e: APINewExpedition) {
+        const {match, project} = this.props;
+
+        const expeditionRes = await FKApiClient.get().createExpedition(project.id, e);
+        if (expeditionRes.type === 'ok') {
+            this.props.history.push(`${match.url}/expeditions/${e.slug}/datasources`);
+        } else {
+            return expeditionRes.errors;
+        }
+    }
+
+    async onProjectSave(project: APINewProject) {
+        // TODO: this isn't implemented on the backend yet!
+
+        const projectRes = await FKApiClient.get().updateProject(this.props.project.id, project);
+        if (projectRes.type !== 'ok') {
+            return projectRes.errors;
+        }
+
+        if (projectRes.slug != this.props.project.slug && projectRes.payload) {
+            this.props.onUpdate(projectRes.payload.slug);
+        } else {
+            this.props.onUpdate();
+        }
+    }
+
+    render() {
+        const {match, project} = this.props;
+        const projectSlug = project.slug;
+
+        return (
+            <div className="project">
+                <Route path={ `${match.url}/new-expedition` } render={ () => <ReactModal isOpen={ true } contentLabel="New expedition form" className="modal" overlayClassName="modal-overlay">
+                                                                                 <h2>Create New Expedition</h2>
+                                                                                 <ProjectExpeditionForm projectSlug={ projectSlug } onCancel={ () => this.props.history.push(match.url) } onSave={ this.onExpeditionCreate.bind(this) } />
+                                                                             </ReactModal> } />
+                <h1>Expeditions</h1>
+                <div id="expeditions" className="gallery-list">
+                    { this.props.expeditions.map((e, i) => <Link to={ `/projects/${projectSlug}/expeditions/${e.slug}/datasources` } key={ `expedition-${i}` } className="gallery-list-item expeditions" style={ { backgroundImage: 'url(' + FKApiClient.get().expeditionPictureUrl(e.id) + ')' } }>
+                                                               <h4>{ e.name }</h4>
+                                                           </Link>) }
+                    { this.props.expeditions.length === 0 &&
+                      <span className="empty">This project doesn't have any expeditions yet.</span> }
+                </div>
+                <Link to={ `${match.url}/new-expedition` } className="button">Create new expedition</Link>
+            </div>
+        )
+    }
 }
