@@ -26,6 +26,7 @@ type options struct {
 	RockBlockSerial string
 	RockBlock       bool
 	CurlOut         bool
+	Interval        int
 }
 
 func (o *options) getUrl() string {
@@ -202,6 +203,7 @@ func main() {
 	flag.StringVar(&o.RockBlockSerial, "rb-serial", "11380", "fake rockblock device serial")
 	flag.BoolVar(&o.RockBlock, "rockblock", false, "fake rockblock device messages")
 	flag.BoolVar(&o.CurlOut, "curl", false, "write curl commands")
+	flag.IntVar(&o.Interval, "interval", 0, "time between messages")
 
 	flag.Parse()
 
@@ -248,8 +250,7 @@ func main() {
 
 	for _, e := range generateFakeEventsAlong(path, 5, start, end) {
 		o.postRawMessage(o.createMessage(&e))
-
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(o.Interval) * time.Second)
 	}
 }
 
