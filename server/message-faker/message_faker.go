@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/conservify/ingestion/ingestion"
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/nu7hatch/gouuid"
 	"log"
 	"os"
@@ -55,7 +55,7 @@ func main() {
 	}
 
 	m := ingestion.HttpJsonMessage{
-		Location: []float32{34.0647314, -118.2956819},
+		Location: []float64{34.0647314, -118.2956819},
 		Time:     time.Now().Unix(),
 		Device:   o.Device,
 		Stream:   o.Stream,
