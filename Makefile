@@ -40,3 +40,5 @@ deps:
 
 clean:
 	rm -rf build 
+
+veryclean:
