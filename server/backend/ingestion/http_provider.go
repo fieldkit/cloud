@@ -40,7 +40,7 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 		message := HttpJsonMessage{}
 		err = json.Unmarshal([]byte(raw.RawBody), &message)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("JSON Error: '%v': '%s'", err, raw.RawBody)
 		}
 
 		if message.Device == "" {
