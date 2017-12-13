@@ -48,7 +48,7 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 	}
 	if ms.HasLocation {
 		coordinates := make([]float64, 0)
-		for _, key := range []string{FieldNameLatitude, FieldNameLongitude, FieldNameAltitude} {
+		for _, key := range []string{FieldNameLongitude, FieldNameLatitude, FieldNameAltitude} {
 			f, err := strconv.ParseFloat(m[key].(string), 64)
 			if err != nil {
 				return nil, err

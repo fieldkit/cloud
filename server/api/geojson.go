@@ -67,7 +67,7 @@ func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
 			Geometry: &app.GeoJSONGeometry{
 				Type: "Point",
 				Coordinates: []float64{
-					c[1], c[0],
+					c[0], c[1],
 				},
 			},
 			Properties: createProperties(d),
