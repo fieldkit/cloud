@@ -84,7 +84,7 @@ func kToF(k float64) float64 {
 
 func createFieldKitMessageFromWeather(w *OwmWeatherInfo, device string) *ingestion.HttpJsonMessage {
 	return &ingestion.HttpJsonMessage{
-		Location: []float64{w.Coords.Latitude, w.Coords.Longitude},
+		Location: []float64{w.Coords.Longitude, w.Coords.Latitude},
 		Time:     w.Time,
 		Device:   device,
 		Stream:   "1",
