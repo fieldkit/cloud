@@ -402,7 +402,8 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE d.visible AND p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4)
+					WHERE d.visible AND p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4) AND
+                                              ST_X(d.location) != 0 AND ST_Y(d.location) != 0
                         ORDER BY timestamp
                         LIMIT $5 OFFSET $6
 		`, project, expedition, before, after, pageSize, token.page*pageSize); err != nil {
