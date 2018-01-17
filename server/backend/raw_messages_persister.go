@@ -62,6 +62,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 		raw, err := ingestion.CreateRawMessageFromRow(row)
 		if err != nil {
 			log.Printf("(%s)[Error] %v", row.Id, err)
+			log.Printf("%s", row.Data)
 		} else {
 			im, pm, err := rmi.ingester.Ingest(raw)
 			if err != nil {
@@ -69,6 +70,10 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
 				} else {
 					log.Printf("(%s)[Error] %v", row.Id, err)
+				}
+				if true {
+					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
+					log.Printf("%s", raw.RawBody)
 				}
 			} else {
 				if true {

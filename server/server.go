@@ -166,7 +166,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(config.PostgresURL)
 	be, err := backend.New(config.PostgresURL)
 	if err != nil {
 		panic(err)

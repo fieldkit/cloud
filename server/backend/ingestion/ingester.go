@@ -143,7 +143,7 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 			log.Printf("Unexpected MessageSchema type: %v", schema)
 		}
 	}
-	return nil, fmt.Errorf("Schemas failed: %v", makePretty(errors))
+	return nil, fmt.Errorf("%v", makePretty(errors))
 }
 
 func makePretty(errors []error) (m string) {
@@ -163,21 +163,21 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 		return nil, nil, err
 	}
 	if mp == nil {
-		return nil, nil, fmt.Errorf("(%s)[Error]: No message provider: (ContentType: %s)", raw.RequestId, raw.ContentType)
+		return nil, nil, fmt.Errorf("No message provider: (ContentType: %s)", raw.ContentType)
 	}
 
 	pm, err = mp.ProcessMessage(raw)
 	if err != nil {
-		return nil, nil, fmt.Errorf("(%s)[Error]: %v", raw.RequestId, err)
+		return nil, nil, fmt.Errorf("(ProcessMessage) %v", err)
 	}
 	if pm != nil {
 		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
 		if err != nil {
-			return nil, pm, fmt.Errorf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
+			return nil, pm, fmt.Errorf("(LookupSchema) %v", err)
 		}
 		im, err := i.ApplySchemas(pm, schemas)
 		if err != nil {
-			return nil, pm, fmt.Errorf("(%s)(%s)[Error]: %v", pm.MessageId, pm.SchemaId, err)
+			return nil, pm, fmt.Errorf("(ApplySchemas) %v", err)
 		} else {
 			i.Statistics.Successes += 1
 			return im, pm, nil
