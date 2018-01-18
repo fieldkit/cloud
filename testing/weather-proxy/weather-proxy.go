@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	fktesting "github.com/fieldkit/cloud/server/api/tool"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
-	fktesting "github.com/fieldkit/cloud/testing"
 	"log"
 	"net/http"
 	"os"
@@ -57,7 +57,7 @@ func main() {
 		log.Fatalf("%v", err)
 	}
 
-	device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName)
+	device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName, "", "1")
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

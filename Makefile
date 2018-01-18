@@ -3,11 +3,12 @@ BUILD=build
 
 default: binaries
 
-binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/testing-random $(BUILD)/weather-proxy
+binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy
 
 all: binaries
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
+TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
 
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go
@@ -21,13 +22,16 @@ $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
 $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
 	go build -o $@ server/sqs-sender/*.go
 
-$(BUILD)/fkcli: server/api/tool/fieldkit-cli/*.go $(SERVER_SOURCES)
-	go build -o $@ server/api/tool/fieldkit-cli/*.go
+$(BUILD)/fkcli: server/api/tool/fkcli/*.go $(SERVER_SOURCES)
+	go build -o $@ server/api/tool/fkcli/*.go
 
-$(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES)
+$(BUILD)/fktool: server/api/tool/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/api/tool/fktool/*.go
+
+$(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/random/*.go
 
-$(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES)
+$(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/weather-proxy/*.go
 
 generate:

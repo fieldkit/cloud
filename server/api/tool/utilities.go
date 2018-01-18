@@ -1,4 +1,4 @@
-package testing
+package utilities
 
 import (
 	"context"
@@ -9,14 +9,14 @@ import (
 	"net/http"
 )
 
-func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName string) (d *fk.DeviceInput, err error) {
+func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceInput, err error) {
 	res, err := c.ListProject(ctx, fk.ListProjectPath())
 	if err != nil {
-		log.Fatalf("%v", err)
+		log.Fatalf("Error listing projects: %v", err)
 	}
 	projects, err := c.DecodeProjects(res)
 	if err != nil {
-		log.Fatalf("%v", err)
+		log.Fatalf("Error listing projects: %v", err)
 	}
 
 	for _, project := range projects.Projects {
@@ -58,23 +58,45 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName 
 
 					addPayload := fk.AddDeviceInputPayload{
 						Name: deviceName,
+						Key:  deviceId,
 					}
 					res, err = c.AddDevice(ctx, fk.AddDevicePath(exp.ID), &addPayload)
 					if err != nil {
-						log.Fatalf("%v", err)
+						log.Fatalf("Error adding device: %v", err)
 					}
 
 					added, err := c.DecodeDeviceInput(res)
 					if err != nil {
-						log.Fatalf("%v", err)
+						log.Fatalf("Error adding device: %v", err)
 					}
 
 					theDevice = added
+				} else {
+					if deviceId != "" && theDevice.Key != deviceId {
+						log.Printf("Device id/key is different (%s != %s) fixing...", deviceId, theDevice.Key)
+
+						updatePayload := fk.UpdateDeviceInputPayload{
+							Name: deviceName,
+							Key:  deviceId,
+						}
+						res, err = c.UpdateDevice(ctx, fk.UpdateDevicePath(exp.ID), &updatePayload)
+						if err != nil {
+							log.Fatalf("Error updating device: %v", err)
+						}
+
+						updated, err := c.DecodeDeviceInput(res)
+						if err != nil {
+							log.Fatalf("Error adding device: %v", err)
+						}
+
+						log.Printf("Updated: %+v", updated)
+					}
+
 				}
 
 				schema := fk.UpdateDeviceInputSchemaPayload{
 					Active:     true,
-					Key:        "1",
+					Key:        streamName,
 					JSONSchema: `{ "UseProviderTime": true, "UseProviderLocation": true }`,
 				}
 				_, err = c.UpdateSchemaDevice(ctx, fk.UpdateSchemaDevicePath(theDevice.ID), &schema)
