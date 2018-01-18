@@ -10,6 +10,15 @@ type Location struct {
 	Coordinates []float64
 }
 
+func (l *Location) Valid() bool {
+	for _, c := range l.Coordinates {
+		if c != 0 {
+			return true
+		}
+	}
+	return false
+}
+
 type Stream struct {
 	Id       DeviceId
 	Location *Location
