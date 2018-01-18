@@ -19,6 +19,10 @@ type options struct {
 	DeviceName string
 	DeviceId   string
 	StreamName string
+
+	Latitude         float64
+	Longitude        float64
+	LocationPrimeZip string
 }
 
 func main() {
@@ -37,6 +41,10 @@ func main() {
 	flag.StringVar(&o.DeviceId, "device-id", "", "device id")
 	flag.StringVar(&o.StreamName, "stream-name", "", "stream name")
 
+	flag.Float64Var(&o.Longitude, "longitude", 0, "longitude")
+	flag.Float64Var(&o.Latitude, "latitude", 0, "latitude")
+	flag.StringVar(&o.LocationPrimeZip, "location-prime-zip", "", "zipcode to prime the location with")
+
 	flag.Parse()
 
 	c, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
@@ -53,5 +61,13 @@ func main() {
 		}
 
 		log.Printf("Associated %v", device)
+
+		if o.Latitude != 0 && o.Longitude != 0 {
+			log.Printf("Setting location %v,%v", o.Longitude, o.Latitude)
+			err := fktesting.UpdateLocation(ctx, c, device, o.Longitude, o.Latitude)
+			if err != nil {
+				log.Fatalf("Error updating location: %v", err)
+			}
+		}
 	}
 }

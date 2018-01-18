@@ -9,6 +9,26 @@ import (
 	"net/http"
 )
 
+func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceInput, longitude, latitude float64) error {
+	updateLocationPayload := fk.UpdateDeviceInputLocationPayload{
+		Longitude: longitude,
+		Latitude:  latitude,
+	}
+	res, err := c.UpdateLocationDevice(ctx, fk.UpdateLocationDevicePath(device.ID), &updateLocationPayload)
+	if err != nil {
+		log.Fatalf("Error updating device location: %v", err)
+	}
+
+	updated, err := c.DecodeDeviceInput(res)
+	if err != nil {
+		log.Fatalf("Error adding device location: %v", err)
+	}
+
+	log.Printf("Updated: %+v", updated)
+
+	return nil
+}
+
 func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceInput, err error) {
 	res, err := c.ListProject(ctx, fk.ListProjectPath())
 	if err != nil {
@@ -79,7 +99,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 							Name: deviceName,
 							Key:  deviceId,
 						}
-						res, err = c.UpdateDevice(ctx, fk.UpdateDevicePath(exp.ID), &updatePayload)
+						res, err = c.UpdateDevice(ctx, fk.UpdateDevicePath(theDevice.ID), &updatePayload)
 						if err != nil {
 							log.Fatalf("Error updating device: %v", err)
 						}
