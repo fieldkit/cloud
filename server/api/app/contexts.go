@@ -521,6 +521,48 @@ func (ctx *UpdateDeviceContext) BadRequest() error {
 	return nil
 }
 
+// UpdateLocationDeviceContext provides the device update location action context.
+type UpdateLocationDeviceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ID      int
+	Payload *UpdateDeviceInputLocationPayload
+}
+
+// NewUpdateLocationDeviceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the device controller update location action.
+func NewUpdateLocationDeviceContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateLocationDeviceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateLocationDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		if id, err2 := strconv.Atoi(rawID); err2 == nil {
+			rctx.ID = id
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("id", rawID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateLocationDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateLocationDeviceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // UpdateSchemaDeviceContext provides the device update schema action context.
 type UpdateSchemaDeviceContext struct {
 	context.Context

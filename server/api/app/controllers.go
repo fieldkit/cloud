@@ -441,6 +441,7 @@ type DeviceController interface {
 	GetID(*GetIDDeviceContext) error
 	List(*ListDeviceContext) error
 	Update(*UpdateDeviceContext) error
+	UpdateLocation(*UpdateLocationDeviceContext) error
 	UpdateSchema(*UpdateSchemaDeviceContext) error
 }
 
@@ -451,6 +452,7 @@ func MountDeviceController(service *goa.Service, ctrl DeviceController) {
 	service.Mux.Handle("OPTIONS", "/expeditions/:expedition_id/inputs/devices", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/devices/:id", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs/devices", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/devices/:id/location", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/devices/:id/schemas", ctrl.MuxHandler("preflight", handleDeviceOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -532,6 +534,29 @@ func MountDeviceController(service *goa.Service, ctrl DeviceController) {
 	h = handleDeviceOrigin(h)
 	service.Mux.Handle("PATCH", "/inputs/devices/:id", ctrl.MuxHandler("update", h, unmarshalUpdateDevicePayload))
 	service.LogInfo("mount", "ctrl", "Device", "action", "Update", "route", "PATCH /inputs/devices/:id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateLocationDeviceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UpdateDeviceInputLocationPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.UpdateLocation(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDeviceOrigin(h)
+	service.Mux.Handle("PATCH", "/inputs/devices/:id/location", ctrl.MuxHandler("update location", h, unmarshalUpdateLocationDevicePayload))
+	service.LogInfo("mount", "ctrl", "Device", "action", "UpdateLocation", "route", "PATCH /inputs/devices/:id/location", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -695,6 +720,21 @@ func unmarshalAddDevicePayload(ctx context.Context, service *goa.Service, req *h
 // unmarshalUpdateDevicePayload unmarshals the request body into the context request data Payload field.
 func unmarshalUpdateDevicePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &updateDeviceInputPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateLocationDevicePayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateLocationDevicePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateDeviceInputLocationPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

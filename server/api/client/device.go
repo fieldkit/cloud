@@ -171,6 +171,48 @@ func (c *Client) NewUpdateDeviceRequest(ctx context.Context, path string, payloa
 	return req, nil
 }
 
+// UpdateLocationDevicePath computes a request path to the update location action of device.
+func UpdateLocationDevicePath(id int) string {
+	param0 := strconv.Itoa(id)
+
+	return fmt.Sprintf("/inputs/devices/%s/location", param0)
+}
+
+// Update an Device input location
+func (c *Client) UpdateLocationDevice(ctx context.Context, path string, payload *UpdateDeviceInputLocationPayload) (*http.Response, error) {
+	req, err := c.NewUpdateLocationDeviceRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateLocationDeviceRequest create the request corresponding to the update location action endpoint of the device resource.
+func (c *Client) NewUpdateLocationDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputLocationPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // UpdateSchemaDevicePath computes a request path to the update schema action of device.
 func UpdateSchemaDevicePath(id int) string {
 	param0 := strconv.Itoa(id)

@@ -100,6 +100,16 @@ var UpdateDeviceInputSchemaPayload = Type("UpdateDeviceInputSchemaPayload", func
 	Required("json_schema")
 })
 
+var UpdateDeviceInputLocationPayload = Type("UpdateDeviceInputLocationPayload", func() {
+	Reference(Input)
+	Attribute("key")
+	Required("key")
+	Attribute("longitude", Number)
+	Required("longitude")
+	Attribute("latitude", Number)
+	Required("latitude")
+})
+
 var _ = Resource("device", func() {
 	Security(JWT, func() {
 		Scope("api:access")
@@ -127,6 +137,20 @@ var _ = Resource("device", func() {
 			Required("id")
 		})
 		Payload(UpdateDeviceInputPayload)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(DeviceInput)
+		})
+	})
+
+	Action("update location", func() {
+		Routing(PATCH("inputs/devices/:id/location"))
+		Description("Update an Device input location")
+		Params(func() {
+			Param("id", Integer)
+			Required("id")
+		})
+		Payload(UpdateDeviceInputLocationPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(DeviceInput)

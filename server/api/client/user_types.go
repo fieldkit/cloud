@@ -611,6 +611,58 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// updateDeviceInputLocationPayload user type.
+type updateDeviceInputLocationPayload struct {
+	Key       *string  `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Latitude  *float64 `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
+	Longitude *float64 `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
+}
+
+// Validate validates the updateDeviceInputLocationPayload type instance.
+func (ut *updateDeviceInputLocationPayload) Validate() (err error) {
+	if ut.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
+	}
+	if ut.Longitude == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "longitude"))
+	}
+	if ut.Latitude == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "latitude"))
+	}
+	return
+}
+
+// Publicize creates UpdateDeviceInputLocationPayload from updateDeviceInputLocationPayload
+func (ut *updateDeviceInputLocationPayload) Publicize() *UpdateDeviceInputLocationPayload {
+	var pub UpdateDeviceInputLocationPayload
+	if ut.Key != nil {
+		pub.Key = *ut.Key
+	}
+	if ut.Latitude != nil {
+		pub.Latitude = *ut.Latitude
+	}
+	if ut.Longitude != nil {
+		pub.Longitude = *ut.Longitude
+	}
+	return &pub
+}
+
+// UpdateDeviceInputLocationPayload user type.
+type UpdateDeviceInputLocationPayload struct {
+	Key       string  `form:"key" json:"key" xml:"key"`
+	Latitude  float64 `form:"latitude" json:"latitude" xml:"latitude"`
+	Longitude float64 `form:"longitude" json:"longitude" xml:"longitude"`
+}
+
+// Validate validates the UpdateDeviceInputLocationPayload type instance.
+func (ut *UpdateDeviceInputLocationPayload) Validate() (err error) {
+	if ut.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
+	}
+
+	return
+}
+
 // updateDeviceInputPayload user type.
 type updateDeviceInputPayload struct {
 	Key  *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`

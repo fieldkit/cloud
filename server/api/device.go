@@ -9,6 +9,8 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 
 	"github.com/segmentio/ksuid"
+
+	"time"
 )
 
 func DeviceInputType(deviceInput *data.DeviceInput) *app.DeviceInput {
@@ -139,6 +141,27 @@ func (c *DeviceController) Update(ctx *app.UpdateDeviceContext) error {
 	if err != nil {
 		return err
 	}
+	return ctx.OK(DeviceInputType(deviceInput))
+}
+
+func (c *DeviceController) UpdateLocation(ctx *app.UpdateLocationDeviceContext) error {
+	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.ID))
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+
+	dl := data.DeviceLocation{
+		DeviceID:  int64(deviceInput.ID),
+		Timestamp: &now,
+		Location:  data.NewLocation(ctx.Payload.Longitude, ctx.Payload.Latitude),
+	}
+
+	c.options.Database.NamedGetContext(ctx, dl, `
+               INSERT INTO fieldkit.device_location (device_id, timestamp, location)
+	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326)) RETURNING *`, dl)
+
 	return ctx.OK(DeviceInputType(deviceInput))
 }
 
