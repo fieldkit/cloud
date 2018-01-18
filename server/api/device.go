@@ -126,12 +126,12 @@ func (c *DeviceController) List(ctx *app.ListDeviceContext) error {
 
 func (c *DeviceController) Update(ctx *app.UpdateDeviceContext) error {
 	if _, err := c.options.Database.ExecContext(ctx,
-		`UPDATE fieldkit.device SET key = $1 WHERE input_id = $2`, ctx.ID, ctx.Payload.Key); err != nil {
+		`UPDATE fieldkit.device SET key = $1 WHERE input_id = $2`, ctx.Payload.Key, ctx.ID); err != nil {
 		return err
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx,
-		`UPDATE fieldkit.input SET name = $1 WHERE id = $2`, ctx.ID, ctx.Payload.Name); err != nil {
+		`UPDATE fieldkit.input SET name = $1 WHERE id = $2`, ctx.Payload.Name, ctx.ID); err != nil {
 		return err
 	}
 

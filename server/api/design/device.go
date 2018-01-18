@@ -78,6 +78,8 @@ var AddDeviceInputPayload = Type("AddDeviceInputPayload", func() {
 	Reference(Input)
 	Attribute("name")
 	Required("name")
+	Attribute("key")
+	Required("key")
 })
 
 var UpdateDeviceInputPayload = Type("UpdateDeviceInputPayload", func() {
