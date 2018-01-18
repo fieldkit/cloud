@@ -35,7 +35,7 @@ export default class FeaturePanel extends Component {
                 { properties.value().map(([ k , v ]) => (
                     <tr key={k}>
                         <td style={{ width: '50%' }}> {k} </td>
-                        <td> {v} </td>
+                        <td> {Number(v).toFixed(2)} </td>
                     </tr>
                 )) }
                 </tbody>
