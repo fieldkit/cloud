@@ -1454,11 +1454,11 @@ paths:
   /expeditions/{expedition_id}/inputs:
     get:
       description: |-
-        List a project's inputs
+        List an expedition's inputs
 
         Required security scopes:
           * `api:access`
-      operationId: input#list id
+      operationId: input#list expedition id
       parameters:
       - in: path
         name: expedition_id
@@ -1478,7 +1478,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list id input
+      summary: list expedition id input
       tags:
       - input
   /expeditions/{expedition_id}/inputs/devices:
@@ -1692,6 +1692,28 @@ paths:
       tags:
       - input_token
   /inputs/{input_id}:
+    get:
+      description: List an input
+      operationId: input#list id
+      parameters:
+      - in: path
+        name: input_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.inputs+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Inputs'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: list id input
+      tags:
+      - input
     patch:
       description: |-
         Update an input
@@ -1726,6 +1748,29 @@ paths:
       summary: update input
       tags:
       - input
+  /inputs/{input_id}/geojson:
+    get:
+      description: List an input's features in a GeoJSON.
+      operationId: GeoJSON#list by input
+      parameters:
+      - in: path
+        name: input_id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.paged-geojson+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PagedGeoJSON'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: list by input GeoJSON
+      tags:
+      - GeoJSON
   /inputs/devices/{id}:
     get:
       description: |-

@@ -81,8 +81,23 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list id", func() {
+		NoSecurity() // TOOD: Fix this.
+
+		Routing(GET("inputs/:input_id"))
+		Description("List an input")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Inputs)
+		})
+	})
+
+	Action("list expedition id", func() {
 		Routing(GET("expeditions/:expedition_id/inputs"))
-		Description("List a project's inputs")
+		Description("List an expedition's inputs")
 		Params(func() {
 			Param("expedition_id", Integer)
 			Required("expedition_id")

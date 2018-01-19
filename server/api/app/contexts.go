@@ -70,6 +70,47 @@ func (ctx *ListGeoJSONContext) BadRequest() error {
 	return nil
 }
 
+// ListByInputGeoJSONContext provides the GeoJSON list by input action context.
+type ListByInputGeoJSONContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewListByInputGeoJSONContext parses the incoming request URL and body, performs validations and creates the
+// context used by the GeoJSON controller list by input action.
+func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByInputGeoJSONContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListByInputGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListByInputGeoJSONContext) OK(r *PagedGeoJSON) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListByInputGeoJSONContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddAdministratorContext provides the administrator add action context.
 type AddAdministratorContext struct {
 	context.Context
@@ -924,12 +965,53 @@ func (ctx *ListInputContext) BadRequest() error {
 	return nil
 }
 
+// ListExpeditionIDInputContext provides the input list expedition id action context.
+type ListExpeditionIDInputContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListExpeditionIDInputContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input controller list expedition id action.
+func NewListExpeditionIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListExpeditionIDInputContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListExpeditionIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expedition_id"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListExpeditionIDInputContext) OK(r *Inputs) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.inputs+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListExpeditionIDInputContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListIDInputContext provides the input list id action context.
 type ListIDInputContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	ExpeditionID int
+	InputID int
 }
 
 // NewListIDInputContext parses the incoming request URL and body, performs validations and creates the
@@ -941,13 +1023,13 @@ func NewListIDInputContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
+	paramInputID := req.Params["input_id"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
 		}
 	}
 	return &rctx, err

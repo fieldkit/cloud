@@ -30,6 +30,7 @@ func initService(service *goa.Service) {
 type GeoJSONController interface {
 	goa.Muxer
 	List(*ListGeoJSONContext) error
+	ListByInput(*ListByInputGeoJSONContext) error
 }
 
 // MountGeoJSONController "mounts" a GeoJSON resource controller on the given service.
@@ -37,6 +38,7 @@ func MountGeoJSONController(service *goa.Service, ctrl GeoJSONController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/geojson", ctrl.MuxHandler("preflight", handleGeoJSONOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/:input_id/geojson", ctrl.MuxHandler("preflight", handleGeoJSONOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -53,6 +55,22 @@ func MountGeoJSONController(service *goa.Service, ctrl GeoJSONController) {
 	h = handleGeoJSONOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/geojson", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "GeoJSON", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/geojson")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListByInputGeoJSONContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListByInput(rctx)
+	}
+	h = handleGeoJSONOrigin(h)
+	service.Mux.Handle("GET", "/inputs/:input_id/geojson", ctrl.MuxHandler("list by input", h, nil))
+	service.LogInfo("mount", "ctrl", "GeoJSON", "action", "ListByInput", "route", "GET /inputs/:input_id/geojson")
 }
 
 // handleGeoJSONOrigin applies the CORS response headers corresponding to the origin.
@@ -1049,6 +1067,7 @@ func unmarshalUpdateExpeditionPayload(ctx context.Context, service *goa.Service,
 type InputController interface {
 	goa.Muxer
 	List(*ListInputContext) error
+	ListExpeditionID(*ListExpeditionIDInputContext) error
 	ListID(*ListIDInputContext) error
 	Update(*UpdateInputContext) error
 }
@@ -1084,16 +1103,32 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 			return err
 		}
 		// Build the context
+		rctx, err := NewListExpeditionIDInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListExpeditionID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs", ctrl.MuxHandler("list expedition id", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "ListExpeditionID", "route", "GET /expeditions/:expedition_id/inputs", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
 		rctx, err := NewListIDInputContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		return ctrl.ListID(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleInputOrigin(h)
-	service.Mux.Handle("GET", "/expeditions/:expedition_id/inputs", ctrl.MuxHandler("list id", h, nil))
-	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /expeditions/:expedition_id/inputs", "security", "jwt")
+	service.Mux.Handle("GET", "/inputs/:input_id", ctrl.MuxHandler("list id", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /inputs/:input_id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

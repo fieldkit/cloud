@@ -233,7 +233,7 @@ func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedit
 	return twitterAccounts, nil
 }
 
-func (b *Backend) ListDeviceInputsByID(ctx context.Context, expeditionID int32) ([]*data.DeviceInput, error) {
+func (b *Backend) ListDeviceInputsByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.DeviceInput, error) {
 	devices := []*data.DeviceInput{}
 	if err := b.db.SelectContext(ctx, &devices, `
 		SELECT i.*, d.input_id, d.key, d.token
@@ -265,7 +265,7 @@ func (b *Backend) GetDeviceInputByID(ctx context.Context, id int32) (*data.Devic
 	return devices[0], nil
 }
 
-func (b *Backend) ListTwitterAccountInputsByID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
+func (b *Backend) ListTwitterAccountInputsByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
 	twitterAccountInputs := []*data.TwitterAccountInput{}
 	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
@@ -407,6 +407,46 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
                         ORDER BY timestamp
                         LIMIT $5 OFFSET $6
 		`, project, expedition, before, after, pageSize, token.page*pageSize); err != nil {
+		return nil, nil, err
+	}
+
+	nextToken := &PagingToken{}
+	if int32(len(documents)) < pageSize {
+		nextToken.time = before.UnixNano()
+	} else {
+		nextToken.time = token.time
+		nextToken.page += 1
+	}
+
+	return &data.DocumentsPage{
+		Documents: documents,
+	}, nextToken, nil
+}
+
+func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
+	if token == nil {
+		after := time.Now().AddDate(-10, 0, 0)
+		token = &PagingToken{
+			time: after.UnixNano(),
+			page: 0,
+		}
+	}
+
+	after := time.Unix(0, token.time)
+	pageSize := int32(DefaultPageSize)
+	before := time.Now()
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE d.visible AND i.id = $1 AND d.insertion < $2 AND (insertion >= $3) AND
+                                              ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+                        ORDER BY timestamp
+                        LIMIT $4 OFFSET $5
+		`, inputID, before, after, pageSize, token.page*pageSize); err != nil {
 		return nil, nil, err
 	}
 

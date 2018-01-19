@@ -52,14 +52,49 @@ func (c *Client) NewListInputRequest(ctx context.Context, path string) (*http.Re
 	return req, nil
 }
 
-// ListIDInputPath computes a request path to the list id action of input.
-func ListIDInputPath(expeditionID int) string {
+// ListExpeditionIDInputPath computes a request path to the list expedition id action of input.
+func ListExpeditionIDInputPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
 	return fmt.Sprintf("/expeditions/%s/inputs", param0)
 }
 
-// List a project's inputs
+// List an expedition's inputs
+func (c *Client) ListExpeditionIDInput(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListExpeditionIDInputRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListExpeditionIDInputRequest create the request corresponding to the list expedition id action endpoint of the input resource.
+func (c *Client) NewListExpeditionIDInputRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// ListIDInputPath computes a request path to the list id action of input.
+func ListIDInputPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/%s", param0)
+}
+
+// List an input
 func (c *Client) ListIDInput(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListIDInputRequest(ctx, path)
 	if err != nil {
@@ -78,11 +113,6 @@ func (c *Client) NewListIDInputRequest(ctx context.Context, path string) (*http.
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }

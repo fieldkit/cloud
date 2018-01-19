@@ -19,9 +19,7 @@ export default class FeaturePanel extends Component {
     }
 
     renderProperties(feature) {
-        const properties = _(Object.entries(feature.properties))
-              .filter((p) => p[0] !== 'timestamp')
-              .filter((p) => p[0] !== 'id');
+        const properties = _(Object.entries(feature.properties.data));
 
         return (
             <table style={{ padding: '5px', width: '100%' }}>

@@ -93,12 +93,25 @@ func (c *InputController) List(ctx *app.ListInputContext) error {
 }
 
 func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
-	twitterAccountInputs, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
+	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.InputID))
 	if err != nil {
 		return err
 	}
 
-	deviceInputs, err := c.options.Backend.ListDeviceInputsByID(ctx, int32(ctx.ExpeditionID))
+	deviceInputs := []*data.DeviceInput{deviceInput}
+
+	return ctx.OK(&app.Inputs{
+		DeviceInputs: DeviceInputsType(deviceInputs).DeviceInputs,
+	})
+}
+
+func (c *InputController) ListExpeditionID(ctx *app.ListExpeditionIDInputContext) error {
+	twitterAccountInputs, err := c.options.Backend.ListTwitterAccountInputsByExpeditionID(ctx, int32(ctx.ExpeditionID))
+	if err != nil {
+		return err
+	}
+
+	deviceInputs, err := c.options.Backend.ListDeviceInputsByExpeditionID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}

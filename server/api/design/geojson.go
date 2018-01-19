@@ -81,4 +81,17 @@ var _ = Resource("GeoJSON", func() {
 			Media(PagedGeoJSON)
 		})
 	})
+
+	Action("list by input", func() {
+		Routing(GET("inputs/:input_id/geojson"))
+		Description("List an input's features in a GeoJSON.")
+		Params(func() {
+			Param("input_id", Integer)
+			Required("input_id")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(PagedGeoJSON)
+		})
+	})
 })

@@ -113,7 +113,7 @@ func (c *TwitterController) GetID(ctx *app.GetIDTwitterContext) error {
 }
 
 func (c *TwitterController) ListID(ctx *app.ListIDTwitterContext) error {
-	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputsByID(ctx, int32(ctx.ExpeditionID))
+	twitterAccounts, err := c.options.Backend.ListTwitterAccountInputsByExpeditionID(ctx, int32(ctx.ExpeditionID))
 	if err != nil {
 		return err
 	}
