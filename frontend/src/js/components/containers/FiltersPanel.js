@@ -1,8 +1,11 @@
 // @flow weak
 
-import React, { Component } from 'react';
 import _ from 'lodash';
 import moment from 'moment';
+
+import { API_HOST } from '../../secrets';
+
+import React, { Component } from 'react';
 
 const panelStyle: React.CSSProperties = {
     backgroundColor: '#f9f9f9',
@@ -22,6 +25,27 @@ const containerStyle: React.CSSProperties = {
     zIndex: 10,
     display: 'flex',
     flexDirection: 'column',
+};
+
+const sourcesTitleStyle: React.CSSProperties = {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    paddingBottom: '5px',
+};
+
+const sourceContainerStyle: React.CSSProperties = {
+    paddingBottom: '10px',
+};
+
+const sourceNameStyle: React.CSSProperties = {
+    fontWeight: 'bold',
+};
+
+const sourceFirstLineStyle: React.CSSProperties = {
+    fontSize: '14px',
+};
+
+const sourceSecondLineStyle: React.CSSProperties = {
 };
 
 export default class FiltersPanel extends Component {
@@ -45,7 +69,7 @@ export default class FiltersPanel extends Component {
 
         return (
             <div>
-            <b>Sources</b>
+            <div style={sourcesTitleStyle}>Sources</div>
             {_.values(sources).map(source => {
                 const lastFeature = source.lastFeature;
                 if (lastFeature == null) {
@@ -53,19 +77,17 @@ export default class FiltersPanel extends Component {
                 }
                 const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp)).format('MMM Do YYYY, h:mm:ss a');
                 const numberOfFeatures = source.numberOfFeatures;
+                const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson";
 
                 return (
-                    <div key={source.id} style={{ paddingBottom: '5px' }}>
-                        <div style={{ display: 'inline-block' }}>
-                            <input type="checkbox" />
+                    <div key={source.id} style={sourceContainerStyle}>
+                        <div style={sourceFirstLineStyle}>
+                            <a style={{ ...sourceNameStyle, ...{ color: 'black' } }} href="#" onClick={() => console.log(source)}>{source.name}</a>
+                            &nbsp;
+                            <a style={{ color: 'black' }} target="_blank" href={featuresUrl}>{numberOfFeatures} features</a>
                         </div>
-
-                        <div style={{ display: 'inline-block', paddingLeft: '10px' }}>
-                            <a style={{color: 'black'}} href="#" onClick={() => console.log(source)}>{source.name}</a>
-                            <span style={{ float: 'right' }}>&nbsp;{numberOfFeatures} features</span>
-                        </div>
-                        <div style={{ display: 'inline-block', paddingLeft: '30px' }}>
-                            <a style={{color: 'black'}} href="#" onClick={() => onShowFeature(lastFeature) }>{lastFeatureDate}</a>
+                        <div style={sourceSecondLineStyle}>
+                            <a style={{ color: 'black' }} href="#" onClick={() => onShowFeature(lastFeature) }>{lastFeatureDate}</a>
                         </div>
                     </div>
                 )
