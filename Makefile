@@ -43,6 +43,21 @@ deps:
 	cd server && go get ./...
 
 clean:
-	rm -rf build 
+	rm -rf build
+
+schema-production:
+	mkdir schema-production
+	@if [ -d ~/conservify/dev-ops ]; then                                           \
+		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
+		cp ~/conservify/dev-ops/schema.sql schema-production/000001.sql;        \
+		cp ~/conservify/dev-ops/schema.sql schema-production/000002.sql;        \
+	else                                                                            \
+		echo "No dev-ops directory found";                                      \
+	fi
+
+clone-production: schema-production
+	rm -f active-schema
+	ln -sf schema-production active-schema
+
 
 veryclean:

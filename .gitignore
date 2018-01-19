@@ -1,3 +1,5 @@
 .DS_Store
 fieldkit.env
 build
+schema-production
+active-schema

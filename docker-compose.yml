@@ -20,4 +20,4 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=fieldkit
     volumes:
-      - ./schema:/docker-entrypoint-initdb.d/:ro
+      - ./active-schema:/docker-entrypoint-initdb.d/:ro
