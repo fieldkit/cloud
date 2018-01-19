@@ -10,7 +10,8 @@ export const API_EXPEDITION_GEOJSON_GET = expandApiTypes("API_EXPEDITION_GEOJSON
 export const API_PROJECT_EXPEDITIONS_GET = expandApiTypes("API_PROJECT_EXPEDITIONS_GET");
 export const API_EXPEDITION_GET = expandApiTypes("API_EXPEDITION_GET");
 export const API_PROJECT_GET = expandApiTypes("API_PROJECT_GET");
-export const API_INPUT_GET = expandApiTypes("API_INPUT_GET");
+export const API_SOURCE_GET = expandApiTypes("API_SOURCE_GET");
+export const API_FEATURE_GEOJSON_GET = expandApiTypes("API_FEATURE_GEOJSON_GET");
 
 export function isVerboseActionType(type) {
     return false;

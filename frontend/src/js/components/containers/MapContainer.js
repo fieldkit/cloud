@@ -16,6 +16,7 @@ import { FieldKitLogo } from '../icons/Icons';
 
 import FeaturePanel from './FeaturePanel';
 import NotificationsPanel from './NotificationsPanel';
+import FiltersPanel from './FiltersPanel';
 
 function getFitBounds(geojson: GeoJSON) {
     const lon = geojson.features.map(f => f.geometry.coordinates[0]);
@@ -98,6 +99,14 @@ export default class MapContainer extends Component {
         });
     }
 
+    onFocusFeature(feature) {
+        const { focusFeature } = this.props;
+        focusFeature(feature);
+        this.setState({
+            feature
+        });
+    }
+
     onUserActivity(how) {
         const { notifyOfUserMapActivity } = this.props;
 
@@ -147,6 +156,8 @@ export default class MapContainer extends Component {
                     <ZoomControl className="zoom-control" position={ 'topLeft' } />
 
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
+
+                    <FiltersPanel features visibleFeatures={visibleFeatures} onShowFeature={ this.onFocusFeature.bind(this) } />
 
                     <NotificationsPanel features={visibleFeatures.focus.features} />
 

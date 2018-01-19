@@ -36,6 +36,15 @@ export function getExpeditionGeoJson(projectSlug, expeditionSlug) {
     }
 }
 
+export function getFeatureGeoJson(id) {
+    return {
+        types: ActionTypes.API_FEATURE_GEOJSON_GET,
+        path: '/features/' + id + '/geojson',
+        method: 'GET',
+        unwrap: (r) => r
+    }
+}
+
 export function getNextExpeditionGeoJson(last) {
     return {
         types: ActionTypes.API_EXPEDITION_GEOJSON_GET,
@@ -45,9 +54,9 @@ export function getNextExpeditionGeoJson(last) {
     }
 }
 
-export function getInput(id) {
+export function getSource(id) {
     return {
-        types: ActionTypes.API_INPUT_GET,
+        types: ActionTypes.API_SOURCE_GET,
         path: '/inputs/' + id,
         method: 'GET',
         unwrap: (r) => r

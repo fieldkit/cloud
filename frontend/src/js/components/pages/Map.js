@@ -7,7 +7,7 @@ import type { GeoJSON } from '../../types/MapTypes';
 import type { ActiveExpedition  } from '../../types';
 
 import MapContainer from '../containers/MapContainer';
-import { notifyOfUserMapActivity, changePlaybackMode } from '../../actions/index';
+import { notifyOfUserMapActivity, changePlaybackMode, focusFeature } from '../../actions';
 
 import '../../../css/map.css';
 
@@ -106,7 +106,7 @@ class Map extends Component {
     }
 
     render() {
-        const { visibleFeatures, playbackMode, notifyOfUserMapActivity, changePlaybackMode } = this.props;
+        const { visibleFeatures, playbackMode, notifyOfUserMapActivity, focusFeature, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;
 
         if (!visibleFeatures.geojson) {
@@ -118,6 +118,7 @@ class Map extends Component {
                 <MapContainer pointDecorator={ pointDecorator }
                     visibleFeatures={ visibleFeatures }
                     playbackMode={ playbackMode }
+                    focusFeature={ focusFeature }
                     notifyOfUserMapActivity={ notifyOfUserMapActivity }
                     onChangePlaybackMode={ changePlaybackMode } />
             </div>
@@ -133,5 +134,6 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
     notifyOfUserMapActivity,
-    changePlaybackMode
+    changePlaybackMode,
+    focusFeature
 })(Map);

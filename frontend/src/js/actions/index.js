@@ -20,3 +20,10 @@ export function notifyOfUserMapActivity() {
         type: ActionTypes.USER_MAP_ACTIVITY
     };
 }
+
+export function focusFeature(feature) {
+    return {
+        type: ActionTypes.FOCUS_FEATURE,
+        feature: feature
+    }
+}

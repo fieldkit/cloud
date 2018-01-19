@@ -78,8 +78,19 @@ export class FkGeoJSON {
         });
     }
 
-    getUniqueInputIds() {
+    getUniqueSourceIds() {
         return _(this.features).map(f => f.unwrap()).map('properties').map('source').map('inputId').uniq().value();
+    }
+
+    getSourcesSummary() {
+        return _(this.features).map(f => f.unwrap()).groupBy(f => f.properties.source.inputId).mapValues((value) => {
+            const sorted = _(value).sortBy(f => f.properties.timestamp).value();
+            const lastFeature = sorted[sorted.length - 1];
+            return {
+                numberOfFeatures: value.length,
+                lastFeature: lastFeature
+            };
+        }).value();
     }
 
     getCoordinatesAtTime(time) {

@@ -1,7 +1,8 @@
 // @flow weak
 
-import React, { Component } from 'react';
 import _ from 'lodash';
+
+import React, { Component } from 'react';
 import moment from 'moment';
 
 const panelStyle: React.CSSProperties = {

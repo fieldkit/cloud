@@ -31,13 +31,14 @@ export function* walkExpedition(geojson) {
 
             yield put(focusExpeditionTime(time, coordinates));
 
-            const [ activityAction, playbackAction, _ ] = yield race([
+            const [ activityAction, focusFeatureAction, playbackAction, _ ] = yield race([
                 take(ActionTypes.USER_MAP_ACTIVITY),
+                take(ActionTypes.FOCUS_FEATURE),
                 take(ActionTypes.CHANGE_PLAYBACK_MODE),
                 delay(100)
             ]);
 
-            if (activityAction) {
+            if (activityAction || focusFeatureAction) {
                 break;
             }
 
@@ -95,17 +96,17 @@ export function* refreshSaga(pagedGeojson) {
 }
 
 export function* loadExpeditionDetails() {
-    let cache = {};
+    const cache = {};
 
     yield takeLatest([ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS], function* (geojsonSuccess) {
         const geojson = geojsonSuccess.response.geo;
         const expedition = new FkGeoJSON(geojson);
-        const ids = expedition.getUniqueInputIds().map(id => id.toString());
+        const ids = expedition.getUniqueSourceIds().map(id => id.toString());
         const newIds = _.difference(ids, _.keys(cache));
-        const queried = yield all(newIds.map(id => FkApi.getInput(id)));
-        const indexed = _(queried).keyBy('id').value();
-        cache = { ...cache, ...indexed }
-        console.log(cache);
+        const sources = yield all(newIds.map(id => FkApi.getSource(id)));
+        const indexed = _(sources).keyBy('id').value();
+        const features = yield all(sources.map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
+        Object.assign(cache, indexed);
     });
 }
 
