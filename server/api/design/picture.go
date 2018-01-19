@@ -7,11 +7,11 @@ import (
 
 var _ = Resource("picture", func() {
 	Action("user get id", func() {
-		Routing(GET("users/:user_id/picture"))
+		Routing(GET("users/:userId/picture"))
 		Description("Get a user's picture")
 		Params(func() {
-			Param("user_id", Integer)
-			Required("user_id")
+			Param("userId", Integer)
+			Required("userId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -20,11 +20,11 @@ var _ = Resource("picture", func() {
 	})
 
 	Action("project get id", func() {
-		Routing(GET("projects/:project_id/picture"))
+		Routing(GET("projects/:projectId/picture"))
 		Description("Get a project's picture")
 		Params(func() {
-			Param("project_id", Integer)
-			Required("project_id")
+			Param("projectId", Integer)
+			Required("projectId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -33,11 +33,11 @@ var _ = Resource("picture", func() {
 	})
 
 	Action("expedition get id", func() {
-		Routing(GET("expeditions/:expedition_id/picture"))
+		Routing(GET("expeditions/:expeditionId/picture"))
 		Description("Get a expedition's picture")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

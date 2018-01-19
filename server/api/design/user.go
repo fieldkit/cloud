@@ -140,11 +140,11 @@ var _ = Resource("user", func() {
 	})
 
 	Action("update", func() {
-		Routing(PATCH("users/:user_id"))
+		Routing(PATCH("users/:userId"))
 		Description("Update a user")
 		Params(func() {
-			Param("user_id", Integer)
-			Required("user_id")
+			Param("userId", Integer)
+			Required("userId")
 		})
 		Payload(UpdateUserPayload)
 		Response(OK, func() {
@@ -169,11 +169,11 @@ var _ = Resource("user", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("users/:user_id"))
+		Routing(GET("users/:userId"))
 		Description("Get a user")
 		Params(func() {
-			Param("user_id", Integer)
-			Required("user_id")
+			Param("userId", Integer)
+			Required("userId")
 		})
 		Response(OK, func() {
 			Media(User)

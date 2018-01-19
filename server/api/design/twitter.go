@@ -14,8 +14,8 @@ var AddTwitterAccountInputPayload = Type("AddTwitterAccountInputPayload", func()
 var UpdateTwitterAccountInputPayload = Type("UpdateTwitterAccountInputPayload", func() {
 	Reference(Input)
 	Attribute("name")
-	Attribute("team_id")
-	Attribute("user_id")
+	Attribute("teamId")
+	Attribute("userId")
 })
 
 var TwitterAccountInput = MediaType("application/vnd.app.twitter_account_input+json", func() {
@@ -23,33 +23,33 @@ var TwitterAccountInput = MediaType("application/vnd.app.twitter_account_input+j
 	Reference(Input)
 	Attributes(func() {
 		Attribute("id")
-		Attribute("expedition_id")
+		Attribute("expeditionId")
 		Attribute("name")
-		Attribute("team_id")
-		Attribute("user_id")
-		Attribute("twitter_account_id", Integer)
-		Attribute("screen_name", String)
-		Required("id", "expedition_id", "name", "twitter_account_id", "screen_name")
+		Attribute("teamId")
+		Attribute("userId")
+		Attribute("twitterAccountId", Integer)
+		Attribute("screenName", String)
+		Required("id", "expeditionId", "name", "twitterAccountId", "screenName")
 	})
 	View("default", func() {
 		Attribute("id")
-		Attribute("expedition_id")
+		Attribute("expeditionId")
 		Attribute("name")
-		Attribute("team_id")
-		Attribute("user_id")
-		Attribute("twitter_account_id")
-		Attribute("screen_name")
+		Attribute("teamId")
+		Attribute("userId")
+		Attribute("twitterAccountId")
+		Attribute("screenName")
 	})
 })
 
 var TwitterAccountInputs = MediaType("application/vnd.app.twitter_account_intputs+json", func() {
 	TypeName("TwitterAccountInputs")
 	Attributes(func() {
-		Attribute("twitter_account_inputs", CollectionOf(TwitterAccountInput))
-		Required("twitter_account_inputs")
+		Attribute("twitterAccountInputs", CollectionOf(TwitterAccountInput))
+		Required("twitterAccountInputs")
 	})
 	View("default", func() {
-		Attribute("twitter_account_inputs")
+		Attribute("twitterAccountInputs")
 	})
 })
 
@@ -59,11 +59,11 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expedition_id/inputs/twitter-accounts"))
+		Routing(POST("expeditions/:expeditionId/inputs/twitter-accounts"))
 		Description("Add a Twitter account input")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Payload(AddTwitterAccountInputPayload)
 		Response(BadRequest)
@@ -73,11 +73,11 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("inputs/twitter-accounts/:input_id"))
+		Routing(GET("inputs/twitter-accounts/:inputId"))
 		Description("Get a Twitter account input")
 		Params(func() {
-			Param("input_id", Integer)
-			Required("input_id")
+			Param("inputId", Integer)
+			Required("inputId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -99,11 +99,11 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("expeditions/:expedition_id/inputs/twitter-accounts"))
+		Routing(GET("expeditions/:expeditionId/inputs/twitter-accounts"))
 		Description("List an expedition's Twitter account inputs")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -116,9 +116,9 @@ var _ = Resource("twitter", func() {
 		Description("OAuth callback endpoint for Twitter")
 		NoSecurity()
 		Params(func() {
-			Param("oauth_token", String)
-			Param("oauth_verifier", String)
-			Required("oauth_token", "oauth_verifier")
+			Param("oauthToken", String)
+			Param("oauthVerifier", String)
+			Required("oauthToken", "oauth_verifier")
 		})
 		Response(BadRequest)
 		Response(Found, func() {

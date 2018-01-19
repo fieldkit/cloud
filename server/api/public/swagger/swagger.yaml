@@ -3,14 +3,14 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      user_id: 6.3747106e+18
+      userId: 6.3747106e+18
     properties:
-      user_id:
+      userId:
         example: 6.3747106e+18
         format: int64
         type: integer
     required:
-    - user_id
+    - userId
     title: AddAdministratorPayload
     type: object
   AddDeviceInputPayload:
@@ -55,17 +55,17 @@ definitions:
   AddMemberPayload:
     example:
       role: Est tempora cumque sed.
-      user_id: 5.676036e+18
+      userId: 5.676036e+18
     properties:
       role:
         example: Est tempora cumque sed.
         type: string
-      user_id:
+      userId:
         example: 5.676036e+18
         format: int64
         type: integer
     required:
-    - user_id
+    - userId
     - role
     title: AddMemberPayload
     type: object
@@ -175,18 +175,18 @@ definitions:
     description: DeviceInput media type (default view)
     example:
       active: false
-      expedition_id: 5.794513e+18
+      expeditionId: 5.794513e+18
       id: 8.930515e+18
       key: Quaerat in qui.
-      name: Facilis quis blanditiis recusandae est.
-      team_id: 4.0004988e+18
-      token: Vel est.
-      user_id: 7.8603976e+18
+      name: Quis blanditiis recusandae est quidem rem.
+      teamId: 9.165355e+18
+      token: Ratione sequi et inventore voluptas rerum.
+      userId: 8.568918e+18
     properties:
       active:
         example: false
         type: boolean
-      expedition_id:
+      expeditionId:
         example: 5.794513e+18
         format: int64
         type: integer
@@ -198,22 +198,22 @@ definitions:
         example: Quaerat in qui.
         type: string
       name:
-        example: Facilis quis blanditiis recusandae est.
+        example: Quis blanditiis recusandae est quidem rem.
         type: string
-      team_id:
-        example: 4.0004988e+18
+      teamId:
+        example: 9.165355e+18
         format: int64
         type: integer
       token:
-        example: Vel est.
+        example: Ratione sequi et inventore voluptas rerum.
         type: string
-      user_id:
-        example: 7.8603976e+18
+      userId:
+        example: 8.568918e+18
         format: int64
         type: integer
     required:
     - id
-    - expedition_id
+    - expeditionId
     - active
     - name
     - token
@@ -225,29 +225,29 @@ definitions:
       (default view)
     example:
     - active: false
-      expedition_id: 5.794513e+18
+      expeditionId: 5.794513e+18
       id: 8.930515e+18
       key: Quaerat in qui.
-      name: Facilis quis blanditiis recusandae est.
-      team_id: 4.0004988e+18
-      token: Vel est.
-      user_id: 7.8603976e+18
+      name: Quis blanditiis recusandae est quidem rem.
+      teamId: 9.165355e+18
+      token: Ratione sequi et inventore voluptas rerum.
+      userId: 8.568918e+18
     - active: false
-      expedition_id: 5.794513e+18
+      expeditionId: 5.794513e+18
       id: 8.930515e+18
       key: Quaerat in qui.
-      name: Facilis quis blanditiis recusandae est.
-      team_id: 4.0004988e+18
-      token: Vel est.
-      user_id: 7.8603976e+18
+      name: Quis blanditiis recusandae est quidem rem.
+      teamId: 9.165355e+18
+      token: Ratione sequi et inventore voluptas rerum.
+      userId: 8.568918e+18
     - active: false
-      expedition_id: 5.794513e+18
+      expeditionId: 5.794513e+18
       id: 8.930515e+18
       key: Quaerat in qui.
-      name: Facilis quis blanditiis recusandae est.
-      team_id: 4.0004988e+18
-      token: Vel est.
-      user_id: 7.8603976e+18
+      name: Quis blanditiis recusandae est quidem rem.
+      teamId: 9.165355e+18
+      token: Ratione sequi et inventore voluptas rerum.
+      userId: 8.568918e+18
     items:
       $ref: '#/definitions/DeviceInput'
     title: 'Mediatype identifier: application/vnd.app.device_input+json; type=collection;
@@ -256,59 +256,59 @@ definitions:
   DeviceInputs:
     description: DeviceInputs media type (default view)
     example:
-      device_inputs:
+      deviceInputs:
       - active: false
-        expedition_id: 5.794513e+18
+        expeditionId: 5.794513e+18
         id: 8.930515e+18
         key: Quaerat in qui.
-        name: Facilis quis blanditiis recusandae est.
-        team_id: 4.0004988e+18
-        token: Vel est.
-        user_id: 7.8603976e+18
+        name: Quis blanditiis recusandae est quidem rem.
+        teamId: 9.165355e+18
+        token: Ratione sequi et inventore voluptas rerum.
+        userId: 8.568918e+18
     properties:
-      device_inputs:
+      deviceInputs:
         $ref: '#/definitions/DeviceInputCollection'
     required:
-    - device_inputs
+    - deviceInputs
     title: 'Mediatype identifier: application/vnd.app.device_inputs+json; view=default'
     type: object
   DeviceSchema:
     description: DeviceSchema media type (default view)
     example:
       active: true
-      device_id: 6.682842e+18
-      json_schema: Rerum cumque.
-      key: Sit labore dolorem vel laboriosam aut.
-      project_id: 2.4394763e+18
-      schema_id: 2.2726114e+18
+      deviceId: 3.6825135e+17
+      jsonSchema: Laboriosam aut voluptatum.
+      key: Error dignissimos.
+      projectId: 8.369166e+18
+      schemaId: 5.950821e+18
     properties:
       active:
         example: true
         type: boolean
-      device_id:
-        example: 6.682842e+18
+      deviceId:
+        example: 3.6825135e+17
         format: int64
         type: integer
-      json_schema:
-        example: Rerum cumque.
+      jsonSchema:
+        example: Laboriosam aut voluptatum.
         type: string
       key:
-        example: Sit labore dolorem vel laboriosam aut.
+        example: Error dignissimos.
         type: string
-      project_id:
-        example: 2.4394763e+18
+      projectId:
+        example: 8.369166e+18
         format: int64
         type: integer
-      schema_id:
-        example: 2.2726114e+18
+      schemaId:
+        example: 5.950821e+18
         format: int64
         type: integer
     required:
-    - device_id
-    - schema_id
-    - project_id
+    - deviceId
+    - schemaId
+    - projectId
     - active
-    - json_schema
+    - jsonSchema
     - key
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; view=default'
     type: object
@@ -317,17 +317,17 @@ definitions:
       (default view)
     example:
     - active: true
-      device_id: 6.682842e+18
-      json_schema: Rerum cumque.
-      key: Sit labore dolorem vel laboriosam aut.
-      project_id: 2.4394763e+18
-      schema_id: 2.2726114e+18
+      deviceId: 3.6825135e+17
+      jsonSchema: Laboriosam aut voluptatum.
+      key: Error dignissimos.
+      projectId: 8.369166e+18
+      schemaId: 5.950821e+18
     - active: true
-      device_id: 6.682842e+18
-      json_schema: Rerum cumque.
-      key: Sit labore dolorem vel laboriosam aut.
-      project_id: 2.4394763e+18
-      schema_id: 2.2726114e+18
+      deviceId: 3.6825135e+17
+      jsonSchema: Laboriosam aut voluptatum.
+      key: Error dignissimos.
+      projectId: 8.369166e+18
+      schemaId: 5.950821e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -338,11 +338,11 @@ definitions:
     example:
       schemas:
       - active: true
-        device_id: 6.682842e+18
-        json_schema: Rerum cumque.
-        key: Sit labore dolorem vel laboriosam aut.
-        project_id: 2.4394763e+18
-        schema_id: 2.2726114e+18
+        deviceId: 3.6825135e+17
+        jsonSchema: Laboriosam aut voluptatum.
+        key: Error dignissimos.
+        projectId: 8.369166e+18
+        schemaId: 5.950821e+18
     properties:
       schemas:
         $ref: '#/definitions/DeviceSchemaCollection'
@@ -353,23 +353,23 @@ definitions:
   Expedition:
     description: Expedition media type (default view)
     example:
-      description: Incidunt consequuntur fugit non ut.
-      id: 7.202539e+18
-      name: Perspiciatis quasi error voluptatem et.
-      slug: mrhxwu5kh0
+      description: Ut voluptatum ducimus perspiciatis quasi error.
+      id: 1.3719604e+18
+      name: Debitis ducimus.
+      slug: hxwu5kh0we
     properties:
       description:
-        example: Incidunt consequuntur fugit non ut.
+        example: Ut voluptatum ducimus perspiciatis quasi error.
         type: string
       id:
-        example: 7.202539e+18
+        example: 1.3719604e+18
         format: int64
         type: integer
       name:
-        example: Perspiciatis quasi error voluptatem et.
+        example: Debitis ducimus.
         type: string
       slug:
-        example: mrhxwu5kh0
+        example: hxwu5kh0we
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -384,18 +384,18 @@ definitions:
     description: ExpeditionCollection is the media type for an array of Expedition
       (default view)
     example:
-    - description: Incidunt consequuntur fugit non ut.
-      id: 7.202539e+18
-      name: Perspiciatis quasi error voluptatem et.
-      slug: mrhxwu5kh0
-    - description: Incidunt consequuntur fugit non ut.
-      id: 7.202539e+18
-      name: Perspiciatis quasi error voluptatem et.
-      slug: mrhxwu5kh0
-    - description: Incidunt consequuntur fugit non ut.
-      id: 7.202539e+18
-      name: Perspiciatis quasi error voluptatem et.
-      slug: mrhxwu5kh0
+    - description: Ut voluptatum ducimus perspiciatis quasi error.
+      id: 1.3719604e+18
+      name: Debitis ducimus.
+      slug: hxwu5kh0we
+    - description: Ut voluptatum ducimus perspiciatis quasi error.
+      id: 1.3719604e+18
+      name: Debitis ducimus.
+      slug: hxwu5kh0we
+    - description: Ut voluptatum ducimus perspiciatis quasi error.
+      id: 1.3719604e+18
+      name: Debitis ducimus.
+      slug: hxwu5kh0we
     items:
       $ref: '#/definitions/Expedition'
     title: 'Mediatype identifier: application/vnd.app.expedition+json; type=collection;
@@ -405,14 +405,14 @@ definitions:
     description: Expeditions media type (default view)
     example:
       expeditions:
-      - description: Incidunt consequuntur fugit non ut.
-        id: 7.202539e+18
-        name: Perspiciatis quasi error voluptatem et.
-        slug: mrhxwu5kh0
-      - description: Incidunt consequuntur fugit non ut.
-        id: 7.202539e+18
-        name: Perspiciatis quasi error voluptatem et.
-        slug: mrhxwu5kh0
+      - description: Ut voluptatum ducimus perspiciatis quasi error.
+        id: 1.3719604e+18
+        name: Debitis ducimus.
+        slug: hxwu5kh0we
+      - description: Ut voluptatum ducimus perspiciatis quasi error.
+        id: 1.3719604e+18
+        name: Debitis ducimus.
+        slug: hxwu5kh0we
     properties:
       expeditions:
         $ref: '#/definitions/ExpeditionCollection'
@@ -426,25 +426,28 @@ definitions:
       features:
       - geometry:
           coordinates:
-          - 0.860823
-          - 0.860823
-          type: Sit velit quo eveniet in.
+          - 0.2960596
+          - 0.2960596
+          - 0.2960596
+          type: Quo eveniet in.
         properties:
           Sit ratione aut et.: 3.0362945e+18
         type: Odit sapiente.
       - geometry:
           coordinates:
-          - 0.860823
-          - 0.860823
-          type: Sit velit quo eveniet in.
+          - 0.2960596
+          - 0.2960596
+          - 0.2960596
+          type: Quo eveniet in.
         properties:
           Sit ratione aut et.: 3.0362945e+18
         type: Odit sapiente.
       - geometry:
           coordinates:
-          - 0.860823
-          - 0.860823
-          type: Sit velit quo eveniet in.
+          - 0.2960596
+          - 0.2960596
+          - 0.2960596
+          type: Quo eveniet in.
         properties:
           Sit ratione aut et.: 3.0362945e+18
         type: Odit sapiente.
@@ -465,9 +468,10 @@ definitions:
     example:
       geometry:
         coordinates:
-        - 0.860823
-        - 0.860823
-        type: Sit velit quo eveniet in.
+        - 0.2960596
+        - 0.2960596
+        - 0.2960596
+        type: Quo eveniet in.
       properties:
         Sit ratione aut et.: 3.0362945e+18
       type: Odit sapiente.
@@ -494,25 +498,28 @@ definitions:
     example:
     - geometry:
         coordinates:
-        - 0.860823
-        - 0.860823
-        type: Sit velit quo eveniet in.
+        - 0.2960596
+        - 0.2960596
+        - 0.2960596
+        type: Quo eveniet in.
       properties:
         Sit ratione aut et.: 3.0362945e+18
       type: Odit sapiente.
     - geometry:
         coordinates:
-        - 0.860823
-        - 0.860823
-        type: Sit velit quo eveniet in.
+        - 0.2960596
+        - 0.2960596
+        - 0.2960596
+        type: Quo eveniet in.
       properties:
         Sit ratione aut et.: 3.0362945e+18
       type: Odit sapiente.
     - geometry:
         coordinates:
-        - 0.860823
-        - 0.860823
-        type: Sit velit quo eveniet in.
+        - 0.2960596
+        - 0.2960596
+        - 0.2960596
+        type: Quo eveniet in.
       properties:
         Sit ratione aut et.: 3.0362945e+18
       type: Odit sapiente.
@@ -525,21 +532,23 @@ definitions:
     description: GeoJSONGeometry media type (default view)
     example:
       coordinates:
-      - 0.860823
-      - 0.860823
-      type: Sit velit quo eveniet in.
+      - 0.2960596
+      - 0.2960596
+      - 0.2960596
+      type: Quo eveniet in.
     properties:
       coordinates:
         example:
-        - 0.860823
-        - 0.860823
+        - 0.2960596
+        - 0.2960596
+        - 0.2960596
         items:
-          example: 0.860823
+          example: 0.2960596
           format: double
           type: number
         type: array
       type:
-        example: Sit velit quo eveniet in.
+        example: Quo eveniet in.
         type: string
     required:
     - type
@@ -550,16 +559,16 @@ definitions:
     description: Input media type (default view)
     example:
       active: false
-      expedition_id: 5.1553956e+18
+      expeditionId: 5.1553956e+18
       id: 3.8114873e+18
       name: Dolore laboriosam soluta quia molestias.
-      team_id: 3.7761713e+18
-      user_id: 4.7540266e+18
+      teamId: 3.7761713e+18
+      userId: 4.7540266e+18
     properties:
       active:
         example: false
         type: boolean
-      expedition_id:
+      expeditionId:
         example: 5.1553956e+18
         format: int64
         type: integer
@@ -570,28 +579,28 @@ definitions:
       name:
         example: Dolore laboriosam soluta quia molestias.
         type: string
-      team_id:
+      teamId:
         example: 3.7761713e+18
         format: int64
         type: integer
-      user_id:
+      userId:
         example: 4.7540266e+18
         format: int64
         type: integer
     required:
     - id
-    - expedition_id
+    - expeditionId
     - name
     title: 'Mediatype identifier: application/vnd.app.input+json; view=default'
     type: object
   InputToken:
     description: InputToken media type (default view)
     example:
-      expedition_id: 4.977542e+18
+      expeditionId: 4.977542e+18
       id: 7.839764e+18
       token: Reprehenderit totam dolorem impedit hic.
     properties:
-      expedition_id:
+      expeditionId:
         example: 4.977542e+18
         format: int64
         type: integer
@@ -605,14 +614,14 @@ definitions:
     required:
     - id
     - token
-    - expedition_id
+    - expeditionId
     title: 'Mediatype identifier: application/vnd.app.input_token+json; view=default'
     type: object
   InputTokenCollection:
     description: InputTokenCollection is the media type for an array of InputToken
       (default view)
     example:
-    - expedition_id: 4.977542e+18
+    - expeditionId: 4.977542e+18
       id: 7.839764e+18
       token: Reprehenderit totam dolorem impedit hic.
     items:
@@ -623,62 +632,62 @@ definitions:
   InputTokens:
     description: InputTokens media type (default view)
     example:
-      input_tokens:
-      - expedition_id: 4.977542e+18
+      inputTokens:
+      - expeditionId: 4.977542e+18
         id: 7.839764e+18
         token: Reprehenderit totam dolorem impedit hic.
-      - expedition_id: 4.977542e+18
+      - expeditionId: 4.977542e+18
         id: 7.839764e+18
         token: Reprehenderit totam dolorem impedit hic.
-      - expedition_id: 4.977542e+18
+      - expeditionId: 4.977542e+18
         id: 7.839764e+18
         token: Reprehenderit totam dolorem impedit hic.
     properties:
-      input_tokens:
+      inputTokens:
         $ref: '#/definitions/InputTokenCollection'
     required:
-    - input_tokens
+    - inputTokens
     title: 'Mediatype identifier: application/vnd.app.input_tokens+json; view=default'
     type: object
   Inputs:
     description: Inputs media type (default view)
     example:
-      device_inputs:
+      deviceInputs:
       - active: false
-        expedition_id: 5.794513e+18
+        expeditionId: 5.794513e+18
         id: 8.930515e+18
         key: Quaerat in qui.
-        name: Facilis quis blanditiis recusandae est.
-        team_id: 4.0004988e+18
-        token: Vel est.
-        user_id: 7.8603976e+18
+        name: Quis blanditiis recusandae est quidem rem.
+        teamId: 9.165355e+18
+        token: Ratione sequi et inventore voluptas rerum.
+        userId: 8.568918e+18
       - active: false
-        expedition_id: 5.794513e+18
+        expeditionId: 5.794513e+18
         id: 8.930515e+18
         key: Quaerat in qui.
-        name: Facilis quis blanditiis recusandae est.
-        team_id: 4.0004988e+18
-        token: Vel est.
-        user_id: 7.8603976e+18
-      twitter_account_inputs:
-      - expedition_id: 2.4099368e+18
+        name: Quis blanditiis recusandae est quidem rem.
+        teamId: 9.165355e+18
+        token: Ratione sequi et inventore voluptas rerum.
+        userId: 8.568918e+18
+      twitterAccountInputs:
+      - expeditionId: 2.4099368e+18
         id: 2.8585887e+18
         name: Dignissimos ea nobis in harum doloribus.
-        screen_name: Placeat amet illo reprehenderit quod provident dolorum.
-        team_id: 6.943343e+18
-        twitter_account_id: 1.3138473e+18
-        user_id: 6.7501333e+18
-      - expedition_id: 2.4099368e+18
+        screenName: Placeat amet illo reprehenderit quod provident dolorum.
+        teamId: 6.943343e+18
+        twitterAccountId: 1.3138473e+18
+        userId: 6.7501333e+18
+      - expeditionId: 2.4099368e+18
         id: 2.8585887e+18
         name: Dignissimos ea nobis in harum doloribus.
-        screen_name: Placeat amet illo reprehenderit quod provident dolorum.
-        team_id: 6.943343e+18
-        twitter_account_id: 1.3138473e+18
-        user_id: 6.7501333e+18
+        screenName: Placeat amet illo reprehenderit quod provident dolorum.
+        teamId: 6.943343e+18
+        twitterAccountId: 1.3138473e+18
+        userId: 6.7501333e+18
     properties:
-      device_inputs:
+      deviceInputs:
         $ref: '#/definitions/DeviceInputCollection'
-      twitter_account_inputs:
+      twitterAccountInputs:
         $ref: '#/definitions/TwitterAccountInputCollection'
     title: 'Mediatype identifier: application/vnd.app.inputs+json; view=default'
     type: object
@@ -722,25 +731,28 @@ definitions:
         features:
         - geometry:
             coordinates:
-            - 0.860823
-            - 0.860823
-            type: Sit velit quo eveniet in.
+            - 0.2960596
+            - 0.2960596
+            - 0.2960596
+            type: Quo eveniet in.
           properties:
             Sit ratione aut et.: 3.0362945e+18
           type: Odit sapiente.
         - geometry:
             coordinates:
-            - 0.860823
-            - 0.860823
-            type: Sit velit quo eveniet in.
+            - 0.2960596
+            - 0.2960596
+            - 0.2960596
+            type: Quo eveniet in.
           properties:
             Sit ratione aut et.: 3.0362945e+18
           type: Odit sapiente.
         - geometry:
             coordinates:
-            - 0.860823
-            - 0.860823
-            type: Sit velit quo eveniet in.
+            - 0.2960596
+            - 0.2960596
+            - 0.2960596
+            type: Quo eveniet in.
           properties:
             Sit ratione aut et.: 3.0362945e+18
           type: Odit sapiente.
@@ -799,28 +811,28 @@ definitions:
   ProjectAdministrator:
     description: ProjectAdministrator media type (default view)
     example:
-      project_id: 1.2833427e+18
-      user_id: 6.2970576e+18
+      projectId: 1.2833427e+18
+      userId: 6.2970576e+18
     properties:
-      project_id:
+      projectId:
         example: 1.2833427e+18
         format: int64
         type: integer
-      user_id:
+      userId:
         example: 6.2970576e+18
         format: int64
         type: integer
     required:
-    - project_id
-    - user_id
+    - projectId
+    - userId
     title: 'Mediatype identifier: application/vnd.app.administrator+json; view=default'
     type: object
   ProjectAdministratorCollection:
     description: ProjectAdministratorCollection is the media type for an array of
       ProjectAdministrator (default view)
     example:
-    - project_id: 1.2833427e+18
-      user_id: 6.2970576e+18
+    - projectId: 1.2833427e+18
+      userId: 6.2970576e+18
     items:
       $ref: '#/definitions/ProjectAdministrator'
     title: 'Mediatype identifier: application/vnd.app.administrator+json; type=collection;
@@ -830,10 +842,10 @@ definitions:
     description: ProjectAdministrators media type (default view)
     example:
       administrators:
-      - project_id: 1.2833427e+18
-        user_id: 6.2970576e+18
-      - project_id: 1.2833427e+18
-        user_id: 6.2970576e+18
+      - projectId: 1.2833427e+18
+        userId: 6.2970576e+18
+      - projectId: 1.2833427e+18
+        userId: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -936,23 +948,23 @@ definitions:
     description: TeamMember media type (default view)
     example:
       role: Voluptas sed dolorum itaque qui sequi.
-      team_id: 3.9228076e+18
-      user_id: 4.8803786e+18
+      teamId: 3.9228076e+18
+      userId: 4.8803786e+18
     properties:
       role:
         example: Voluptas sed dolorum itaque qui sequi.
         type: string
-      team_id:
+      teamId:
         example: 3.9228076e+18
         format: int64
         type: integer
-      user_id:
+      userId:
         example: 4.8803786e+18
         format: int64
         type: integer
     required:
-    - team_id
-    - user_id
+    - teamId
+    - userId
     - role
     title: 'Mediatype identifier: application/vnd.app.member+json; view=default'
     type: object
@@ -961,8 +973,8 @@ definitions:
       (default view)
     example:
     - role: Voluptas sed dolorum itaque qui sequi.
-      team_id: 3.9228076e+18
-      user_id: 4.8803786e+18
+      teamId: 3.9228076e+18
+      userId: 4.8803786e+18
     items:
       $ref: '#/definitions/TeamMember'
     title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
@@ -973,11 +985,11 @@ definitions:
     example:
       members:
       - role: Voluptas sed dolorum itaque qui sequi.
-        team_id: 3.9228076e+18
-        user_id: 4.8803786e+18
+        teamId: 3.9228076e+18
+        userId: 4.8803786e+18
       - role: Voluptas sed dolorum itaque qui sequi.
-        team_id: 3.9228076e+18
-        user_id: 4.8803786e+18
+        teamId: 3.9228076e+18
+        userId: 4.8803786e+18
     properties:
       members:
         $ref: '#/definitions/TeamMemberCollection'
@@ -1011,15 +1023,15 @@ definitions:
   TwitterAccountInput:
     description: TwitterAccountInput media type (default view)
     example:
-      expedition_id: 2.4099368e+18
+      expeditionId: 2.4099368e+18
       id: 2.8585887e+18
       name: Dignissimos ea nobis in harum doloribus.
-      screen_name: Placeat amet illo reprehenderit quod provident dolorum.
-      team_id: 6.943343e+18
-      twitter_account_id: 1.3138473e+18
-      user_id: 6.7501333e+18
+      screenName: Placeat amet illo reprehenderit quod provident dolorum.
+      teamId: 6.943343e+18
+      twitterAccountId: 1.3138473e+18
+      userId: 6.7501333e+18
     properties:
-      expedition_id:
+      expeditionId:
         example: 2.4099368e+18
         format: int64
         type: integer
@@ -1030,27 +1042,27 @@ definitions:
       name:
         example: Dignissimos ea nobis in harum doloribus.
         type: string
-      screen_name:
+      screenName:
         example: Placeat amet illo reprehenderit quod provident dolorum.
         type: string
-      team_id:
+      teamId:
         example: 6.943343e+18
         format: int64
         type: integer
-      twitter_account_id:
+      twitterAccountId:
         example: 1.3138473e+18
         format: int64
         type: integer
-      user_id:
+      userId:
         example: 6.7501333e+18
         format: int64
         type: integer
     required:
     - id
-    - expedition_id
+    - expeditionId
     - name
-    - twitter_account_id
-    - screen_name
+    - twitterAccountId
+    - screenName
     title: 'Mediatype identifier: application/vnd.app.twitter_account_input+json;
       view=default'
     type: object
@@ -1058,13 +1070,13 @@ definitions:
     description: TwitterAccountInputCollection is the media type for an array of TwitterAccountInput
       (default view)
     example:
-    - expedition_id: 2.4099368e+18
+    - expeditionId: 2.4099368e+18
       id: 2.8585887e+18
       name: Dignissimos ea nobis in harum doloribus.
-      screen_name: Placeat amet illo reprehenderit quod provident dolorum.
-      team_id: 6.943343e+18
-      twitter_account_id: 1.3138473e+18
-      user_id: 6.7501333e+18
+      screenName: Placeat amet illo reprehenderit quod provident dolorum.
+      teamId: 6.943343e+18
+      twitterAccountId: 1.3138473e+18
+      userId: 6.7501333e+18
     items:
       $ref: '#/definitions/TwitterAccountInput'
     title: 'Mediatype identifier: application/vnd.app.twitter_account_input+json;
@@ -1073,19 +1085,19 @@ definitions:
   TwitterAccountInputs:
     description: TwitterAccountInputs media type (default view)
     example:
-      twitter_account_inputs:
-      - expedition_id: 2.4099368e+18
+      twitterAccountInputs:
+      - expeditionId: 2.4099368e+18
         id: 2.8585887e+18
         name: Dignissimos ea nobis in harum doloribus.
-        screen_name: Placeat amet illo reprehenderit quod provident dolorum.
-        team_id: 6.943343e+18
-        twitter_account_id: 1.3138473e+18
-        user_id: 6.7501333e+18
+        screenName: Placeat amet illo reprehenderit quod provident dolorum.
+        teamId: 6.943343e+18
+        twitterAccountId: 1.3138473e+18
+        userId: 6.7501333e+18
     properties:
-      twitter_account_inputs:
+      twitterAccountInputs:
         $ref: '#/definitions/TwitterAccountInputCollection'
     required:
-    - twitter_account_inputs
+    - twitterAccountInputs
     title: 'Mediatype identifier: application/vnd.app.twitter_account_intputs+json;
       view=default'
     type: object
@@ -1131,13 +1143,13 @@ definitions:
   UpdateDeviceInputSchemaPayload:
     example:
       active: false
-      json_schema: Maxime consequatur ut.
+      jsonSchema: Maxime consequatur ut.
       key: Aperiam perferendis veritatis dolore eius iusto.
     properties:
       active:
         example: false
         type: boolean
-      json_schema:
+      jsonSchema:
         example: Maxime consequatur ut.
         type: string
       key:
@@ -1146,15 +1158,15 @@ definitions:
     required:
     - key
     - active
-    - json_schema
+    - jsonSchema
     title: UpdateDeviceInputSchemaPayload
     type: object
   UpdateInputPayload:
     example:
       active: true
       name: Velit unde.
-      team_id: 7.6975253e+18
-      user_id: 6.3603015e+18
+      teamId: 7.6975253e+18
+      userId: 6.3603015e+18
     properties:
       active:
         example: true
@@ -1162,11 +1174,11 @@ definitions:
       name:
         example: Velit unde.
         type: string
-      team_id:
+      teamId:
         example: 7.6975253e+18
         format: int64
         type: integer
-      user_id:
+      userId:
         example: 6.3603015e+18
         format: int64
         type: integer
@@ -1328,7 +1340,7 @@ info:
   title: Fieldkit API
   version: ""
 paths:
-  /expeditions/{expedition_id}:
+  /expeditions/{expeditionId}:
     get:
       description: |-
         Add an expedition
@@ -1338,7 +1350,7 @@ paths:
       operationId: expedition#get id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1367,7 +1379,7 @@ paths:
       operationId: expedition#update
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       - in: body
@@ -1392,7 +1404,7 @@ paths:
       summary: update expedition
       tags:
       - expedition
-  /expeditions/{expedition_id}/input-tokens:
+  /expeditions/{expeditionId}/input-tokens:
     get:
       description: |-
         Update an expedition's input tokens
@@ -1402,7 +1414,7 @@ paths:
       operationId: input_token#list id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1431,7 +1443,7 @@ paths:
       operationId: input_token#add
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1451,7 +1463,7 @@ paths:
       summary: add input_token
       tags:
       - input_token
-  /expeditions/{expedition_id}/inputs:
+  /expeditions/{expeditionId}/inputs:
     get:
       description: |-
         List an expedition's inputs
@@ -1461,7 +1473,7 @@ paths:
       operationId: input#list expedition id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1481,7 +1493,7 @@ paths:
       summary: list expedition id input
       tags:
       - input
-  /expeditions/{expedition_id}/inputs/devices:
+  /expeditions/{expeditionId}/inputs/devices:
     post:
       description: |-
         Add a Device input
@@ -1491,7 +1503,7 @@ paths:
       operationId: device#add
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       - in: body
@@ -1516,7 +1528,7 @@ paths:
       summary: add device
       tags:
       - device
-  /expeditions/{expedition_id}/inputs/twitter-accounts:
+  /expeditions/{expeditionId}/inputs/twitter-accounts:
     get:
       description: |-
         List an expedition's Twitter account inputs
@@ -1526,7 +1538,7 @@ paths:
       operationId: twitter#list id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1555,7 +1567,7 @@ paths:
       operationId: twitter#add
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       - in: body
@@ -1580,13 +1592,13 @@ paths:
       summary: add twitter
       tags:
       - twitter
-  /expeditions/{expedition_id}/picture:
+  /expeditions/{expeditionId}/picture:
     get:
       description: Get a expedition's picture
       operationId: picture#expedition get id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1601,7 +1613,7 @@ paths:
       summary: expedition get id picture
       tags:
       - picture
-  /expeditions/{expedition_id}/teams:
+  /expeditions/{expeditionId}/teams:
     get:
       description: |-
         List an expedition's teams
@@ -1611,7 +1623,7 @@ paths:
       operationId: team#list id
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       produces:
@@ -1640,7 +1652,7 @@ paths:
       operationId: team#add
       parameters:
       - in: path
-        name: expedition_id
+        name: expeditionId
         required: true
         type: integer
       - in: body
@@ -1665,7 +1677,30 @@ paths:
       summary: add team
       tags:
       - team
-  /input-tokens/{input_token_id}:
+  /features/{featureId}/geojson:
+    get:
+      description: List a feature's GeoJSON by id.
+      operationId: GeoJSON#list by id
+      parameters:
+      - in: path
+        name: featureId
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.paged-geojson+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PagedGeoJSON'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: list by id GeoJSON
+      tags:
+      - GeoJSON
+  /input-tokens/{inputTokenId}:
     delete:
       description: |-
         Delete an input token
@@ -1675,7 +1710,7 @@ paths:
       operationId: input_token#delete
       parameters:
       - in: path
-        name: input_token_id
+        name: inputTokenId
         required: true
         type: integer
       responses:
@@ -1691,13 +1726,13 @@ paths:
       summary: delete input_token
       tags:
       - input_token
-  /inputs/{input_id}:
+  /inputs/{inputId}:
     get:
       description: List an input
       operationId: input#list id
       parameters:
       - in: path
-        name: input_id
+        name: inputId
         required: true
         type: integer
       produces:
@@ -1723,7 +1758,7 @@ paths:
       operationId: input#update
       parameters:
       - in: path
-        name: input_id
+        name: inputId
         required: true
         type: integer
       - in: body
@@ -1748,13 +1783,13 @@ paths:
       summary: update input
       tags:
       - input
-  /inputs/{input_id}/geojson:
+  /inputs/{inputId}/geojson:
     get:
       description: List an input's features in a GeoJSON.
       operationId: GeoJSON#list by input
       parameters:
       - in: path
-        name: input_id
+        name: inputId
         required: true
         type: integer
       produces:
@@ -1905,7 +1940,7 @@ paths:
       summary: update schema device
       tags:
       - device
-  /inputs/twitter-accounts/{input_id}:
+  /inputs/twitter-accounts/{inputId}:
     get:
       description: |-
         Get a Twitter account input
@@ -1915,7 +1950,7 @@ paths:
       operationId: twitter#get id
       parameters:
       - in: path
-        name: input_id
+        name: inputId
         required: true
         type: integer
       produces:
@@ -2576,7 +2611,7 @@ paths:
       summary: get member
       tags:
       - member
-  /projects/{project_id}:
+  /projects/{projectId}:
     get:
       description: |-
         Get a project
@@ -2586,7 +2621,7 @@ paths:
       operationId: project#get id
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       produces:
@@ -2615,7 +2650,7 @@ paths:
       operationId: project#update
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       - in: body
@@ -2640,7 +2675,7 @@ paths:
       summary: update project
       tags:
       - project
-  /projects/{project_id}/administrators:
+  /projects/{projectId}/administrators:
     get:
       description: |-
         List an projects's administrators
@@ -2650,7 +2685,7 @@ paths:
       operationId: administrator#list id
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       produces:
@@ -2679,7 +2714,7 @@ paths:
       operationId: administrator#add
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       - in: body
@@ -2704,7 +2739,7 @@ paths:
       summary: add administrator
       tags:
       - administrator
-  /projects/{project_id}/administrators/{user_id}:
+  /projects/{projectId}/administrators/{userId}:
     delete:
       description: |-
         Remove an administrator from a project
@@ -2714,11 +2749,11 @@ paths:
       operationId: administrator#delete
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:
@@ -2747,11 +2782,11 @@ paths:
       operationId: administrator#get id
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:
@@ -2769,7 +2804,7 @@ paths:
       summary: get id administrator
       tags:
       - administrator
-  /projects/{project_id}/expeditions:
+  /projects/{projectId}/expeditions:
     get:
       description: |-
         List a project's expeditions
@@ -2779,7 +2814,7 @@ paths:
       operationId: expedition#list id
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       produces:
@@ -2808,7 +2843,7 @@ paths:
       operationId: expedition#add
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       - in: body
@@ -2833,13 +2868,13 @@ paths:
       summary: add expedition
       tags:
       - expedition
-  /projects/{project_id}/picture:
+  /projects/{projectId}/picture:
     get:
       description: Get a project's picture
       operationId: picture#project get id
       parameters:
       - in: path
-        name: project_id
+        name: projectId
         required: true
         type: integer
       produces:
@@ -2900,7 +2935,7 @@ paths:
       schemes:
       - https
       summary: Download api/public/swagger/swagger.yaml
-  /teams/{team_id}:
+  /teams/{teamId}:
     delete:
       description: |-
         Update a team
@@ -2910,7 +2945,7 @@ paths:
       operationId: team#delete
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       produces:
@@ -2939,7 +2974,7 @@ paths:
       operationId: team#get id
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       produces:
@@ -2968,7 +3003,7 @@ paths:
       operationId: team#update
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       - in: body
@@ -2993,7 +3028,7 @@ paths:
       summary: update team
       tags:
       - team
-  /teams/{team_id}/members:
+  /teams/{teamId}/members:
     get:
       description: |-
         List an teams's members
@@ -3003,7 +3038,7 @@ paths:
       operationId: member#list id
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       produces:
@@ -3032,7 +3067,7 @@ paths:
       operationId: member#add
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       - in: body
@@ -3057,7 +3092,7 @@ paths:
       summary: add member
       tags:
       - member
-  /teams/{team_id}/members/{user_id}:
+  /teams/{teamId}/members/{userId}:
     delete:
       description: |-
         Remove a member from a team
@@ -3067,11 +3102,11 @@ paths:
       operationId: member#delete
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:
@@ -3100,11 +3135,11 @@ paths:
       operationId: member#get id
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:
@@ -3131,11 +3166,11 @@ paths:
       operationId: member#update
       parameters:
       - in: path
-        name: team_id
+        name: teamId
         required: true
         type: integer
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       - in: body
@@ -3164,12 +3199,12 @@ paths:
       operationId: twitter#callback
       parameters:
       - in: query
-        name: oauth_token
+        name: oauthToken
         required: true
         type: string
       - in: query
-        name: oauth_verifier
-        required: true
+        name: oauthVerifier
+        required: false
         type: string
       responses:
         "302":
@@ -3308,7 +3343,7 @@ paths:
       summary: get user
       tags:
       - user
-  /users/{user_id}:
+  /users/{userId}:
     get:
       description: |-
         Get a user
@@ -3318,7 +3353,7 @@ paths:
       operationId: user#get id
       parameters:
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:
@@ -3345,7 +3380,7 @@ paths:
       operationId: user#update
       parameters:
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       - in: body
@@ -3368,13 +3403,13 @@ paths:
       summary: update user
       tags:
       - user
-  /users/{user_id}/picture:
+  /users/{userId}/picture:
     get:
       description: Get a user's picture
       operationId: picture#user get id
       parameters:
       - in: path
-        name: user_id
+        name: userId
         required: true
         type: integer
       produces:

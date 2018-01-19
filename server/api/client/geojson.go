@@ -46,6 +46,36 @@ func (c *Client) NewListGeoJSONRequest(ctx context.Context, path string) (*http.
 	return req, nil
 }
 
+// ListByIDGeoJSONPath computes a request path to the list by id action of GeoJSON.
+func ListByIDGeoJSONPath(featureID int) string {
+	param0 := strconv.Itoa(featureID)
+
+	return fmt.Sprintf("/features/%s/geojson", param0)
+}
+
+// List a feature's GeoJSON by id.
+func (c *Client) ListByIDGeoJSON(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListByIDGeoJSONRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListByIDGeoJSONRequest create the request corresponding to the list by id action endpoint of the GeoJSON resource.
+func (c *Client) NewListByIDGeoJSONRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListByInputGeoJSONPath computes a request path to the list by input action of GeoJSON.
 func ListByInputGeoJSONPath(inputID int) string {
 	param0 := strconv.Itoa(inputID)

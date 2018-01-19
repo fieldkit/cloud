@@ -97,8 +97,11 @@ func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
 	if err != nil {
 		return err
 	}
-
-	return ctx.OKPublic(DeviceInputPublicType(deviceInput))
+	summary, err := c.options.Backend.FeatureSummaryBySourceID(ctx, ctx.InputID)
+	if err != nil {
+		return err
+	}
+	return ctx.OKPublic(DeviceInputPublicType(deviceInput, summary))
 }
 
 func (c *InputController) ListExpeditionID(ctx *app.ListExpeditionIDInputContext) error {

@@ -463,6 +463,41 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *
 	}, nextToken, nil
 }
 
+type FeatureSummary struct {
+	NumberOfFeatures int
+	LastFeatureID    int
+}
+
+func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*FeatureSummary, error) {
+	summaries := []*FeatureSummary{}
+	if err := b.db.SelectContext(ctx, &summaries, `
+                SELECT
+		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1),
+		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 ORDER BY d.timestamp DESC LIMIT 1)
+	      `, sourceId); err != nil {
+		return nil, err
+	}
+	return summaries[0], nil
+}
+
+func (b *Backend) ListDocumentsByID(ctx context.Context, id int) (*data.DocumentsPage, error) {
+	documents := []*data.Document{}
+	if err := b.db.SelectContext(ctx, &documents, `
+		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
+			FROM fieldkit.document AS d
+				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+					WHERE d.visible AND d.id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	return &data.DocumentsPage{
+		Documents: documents,
+	}, nil
+}
+
 func (b *Backend) TwitterListCredentialer() *TwitterListCredentialer {
 	return &TwitterListCredentialer{b}
 }

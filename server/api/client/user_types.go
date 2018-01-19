@@ -14,13 +14,13 @@ import (
 
 // addAdministratorPayload user type.
 type addAdministratorPayload struct {
-	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	UserID *int `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the addAdministratorPayload type instance.
 func (ut *addAdministratorPayload) Validate() (err error) {
 	if ut.UserID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "userId"))
 	}
 	return
 }
@@ -36,7 +36,7 @@ func (ut *addAdministratorPayload) Publicize() *AddAdministratorPayload {
 
 // AddAdministratorPayload user type.
 type AddAdministratorPayload struct {
-	UserID int `form:"user_id" json:"user_id" xml:"user_id"`
+	UserID int `form:"userId" json:"userId" xml:"userId"`
 }
 
 // addDeviceInputPayload user type.
@@ -161,13 +161,13 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 // addMemberPayload user type.
 type addMemberPayload struct {
 	Role   *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the addMemberPayload type instance.
 func (ut *addMemberPayload) Validate() (err error) {
 	if ut.UserID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "userId"))
 	}
 	if ut.Role == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "role"))
@@ -190,7 +190,7 @@ func (ut *addMemberPayload) Publicize() *AddMemberPayload {
 // AddMemberPayload user type.
 type AddMemberPayload struct {
 	Role   string `form:"role" json:"role" xml:"role"`
-	UserID int    `form:"user_id" json:"user_id" xml:"user_id"`
+	UserID int    `form:"userId" json:"userId" xml:"userId"`
 }
 
 // Validate validates the AddMemberPayload type instance.
@@ -712,7 +712,7 @@ func (ut *UpdateDeviceInputPayload) Validate() (err error) {
 // updateDeviceInputSchemaPayload user type.
 type updateDeviceInputSchemaPayload struct {
 	Active     *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	JSONSchema *string `form:"json_schema,omitempty" json:"json_schema,omitempty" xml:"json_schema,omitempty"`
+	JSONSchema *string `form:"jsonSchema,omitempty" json:"jsonSchema,omitempty" xml:"jsonSchema,omitempty"`
 	Key        *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 }
 
@@ -725,7 +725,7 @@ func (ut *updateDeviceInputSchemaPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "active"))
 	}
 	if ut.JSONSchema == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "json_schema"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "jsonSchema"))
 	}
 	return
 }
@@ -748,7 +748,7 @@ func (ut *updateDeviceInputSchemaPayload) Publicize() *UpdateDeviceInputSchemaPa
 // UpdateDeviceInputSchemaPayload user type.
 type UpdateDeviceInputSchemaPayload struct {
 	Active     bool   `form:"active" json:"active" xml:"active"`
-	JSONSchema string `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	JSONSchema string `form:"jsonSchema" json:"jsonSchema" xml:"jsonSchema"`
 	Key        string `form:"key" json:"key" xml:"key"`
 }
 
@@ -759,7 +759,7 @@ func (ut *UpdateDeviceInputSchemaPayload) Validate() (err error) {
 	}
 
 	if ut.JSONSchema == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "json_schema"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "jsonSchema"))
 	}
 	return
 }
@@ -768,8 +768,8 @@ func (ut *UpdateDeviceInputSchemaPayload) Validate() (err error) {
 type updateInputPayload struct {
 	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the updateInputPayload type instance.
@@ -802,8 +802,8 @@ func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
 type UpdateInputPayload struct {
 	Active *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	Name   string `form:"name" json:"name" xml:"name"`
-	TeamID *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	TeamID *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the UpdateInputPayload type instance.
@@ -852,8 +852,8 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 // updateTwitterAccountInputPayload user type.
 type updateTwitterAccountInputPayload struct {
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Publicize creates UpdateTwitterAccountInputPayload from updateTwitterAccountInputPayload
@@ -874,8 +874,8 @@ func (ut *updateTwitterAccountInputPayload) Publicize() *UpdateTwitterAccountInp
 // UpdateTwitterAccountInputPayload user type.
 type UpdateTwitterAccountInputPayload struct {
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // updateUserPayload user type.

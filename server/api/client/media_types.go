@@ -17,8 +17,8 @@ import (
 //
 // Identifier: application/vnd.app.administrator+json; view=default
 type ProjectAdministrator struct {
-	ProjectID int `form:"project_id" json:"project_id" xml:"project_id"`
-	UserID    int `form:"user_id" json:"user_id" xml:"user_id"`
+	ProjectID int `form:"projectId" json:"projectId" xml:"projectId"`
+	UserID    int `form:"userId" json:"userId" xml:"userId"`
 }
 
 // Validate validates the ProjectAdministrator media type instance.
@@ -85,13 +85,13 @@ func (c *Client) DecodeProjectAdministrators(resp *http.Response) (*ProjectAdmin
 // Identifier: application/vnd.app.device_input+json; view=default
 type DeviceInput struct {
 	Active       bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID           int    `form:"id" json:"id" xml:"id"`
 	Key          string `form:"key" json:"key" xml:"key"`
 	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
 	Token        string `form:"token" json:"token" xml:"token"`
-	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the DeviceInput media type instance.
@@ -113,12 +113,14 @@ func (mt *DeviceInput) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device_input+json; view=public
 type DeviceInputPublic struct {
-	Active       bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	Active           bool   `form:"active" json:"active" xml:"active"`
+	ExpeditionID     int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID               int    `form:"id" json:"id" xml:"id"`
+	LastFeatureID    *int   `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
+	Name             string `form:"name" json:"name" xml:"name"`
+	NumberOfFeatures *int   `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	TeamID           *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID           *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the DeviceInputPublic media type instance.
@@ -196,13 +198,13 @@ func (c *Client) DecodeDeviceInputPublicCollection(resp *http.Response) (DeviceI
 //
 // Identifier: application/vnd.app.device_inputs+json; view=default
 type DeviceInputs struct {
-	DeviceInputs DeviceInputCollection `form:"device_inputs" json:"device_inputs" xml:"device_inputs"`
+	DeviceInputs DeviceInputCollection `form:"deviceInputs" json:"deviceInputs" xml:"deviceInputs"`
 }
 
 // Validate validates the DeviceInputs media type instance.
 func (mt *DeviceInputs) Validate() (err error) {
 	if mt.DeviceInputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_inputs"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "deviceInputs"))
 	}
 	if err2 := mt.DeviceInputs.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
@@ -222,18 +224,18 @@ func (c *Client) DecodeDeviceInputs(resp *http.Response) (*DeviceInputs, error) 
 // Identifier: application/vnd.app.device_schema+json; view=default
 type DeviceSchema struct {
 	Active     bool   `form:"active" json:"active" xml:"active"`
-	DeviceID   int    `form:"device_id" json:"device_id" xml:"device_id"`
-	JSONSchema string `form:"json_schema" json:"json_schema" xml:"json_schema"`
+	DeviceID   int    `form:"deviceId" json:"deviceId" xml:"deviceId"`
+	JSONSchema string `form:"jsonSchema" json:"jsonSchema" xml:"jsonSchema"`
 	Key        string `form:"key" json:"key" xml:"key"`
-	ProjectID  int    `form:"project_id" json:"project_id" xml:"project_id"`
-	SchemaID   int    `form:"schema_id" json:"schema_id" xml:"schema_id"`
+	ProjectID  int    `form:"projectId" json:"projectId" xml:"projectId"`
+	SchemaID   int    `form:"schemaId" json:"schemaId" xml:"schemaId"`
 }
 
 // Validate validates the DeviceSchema media type instance.
 func (mt *DeviceSchema) Validate() (err error) {
 
 	if mt.JSONSchema == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "json_schema"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "jsonSchema"))
 	}
 	if mt.Key == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
@@ -503,11 +505,11 @@ func (c *Client) DecodeGeoJSONGeometry(resp *http.Response) (*GeoJSONGeometry, e
 // Identifier: application/vnd.app.input+json; view=default
 type Input struct {
 	Active       *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID           int    `form:"id" json:"id" xml:"id"`
 	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the Input media type instance.
@@ -530,7 +532,7 @@ func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
 //
 // Identifier: application/vnd.app.input_token+json; view=default
 type InputToken struct {
-	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID           int    `form:"id" json:"id" xml:"id"`
 	Token        string `form:"token" json:"token" xml:"token"`
 }
@@ -580,13 +582,13 @@ func (c *Client) DecodeInputTokenCollection(resp *http.Response) (InputTokenColl
 //
 // Identifier: application/vnd.app.input_tokens+json; view=default
 type InputTokens struct {
-	InputTokens InputTokenCollection `form:"input_tokens" json:"input_tokens" xml:"input_tokens"`
+	InputTokens InputTokenCollection `form:"inputTokens" json:"inputTokens" xml:"inputTokens"`
 }
 
 // Validate validates the InputTokens media type instance.
 func (mt *InputTokens) Validate() (err error) {
 	if mt.InputTokens == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "input_tokens"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputTokens"))
 	}
 	if err2 := mt.InputTokens.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
@@ -605,8 +607,8 @@ func (c *Client) DecodeInputTokens(resp *http.Response) (*InputTokens, error) {
 //
 // Identifier: application/vnd.app.inputs+json; view=default
 type Inputs struct {
-	DeviceInputs         DeviceInputCollection         `form:"device_inputs,omitempty" json:"device_inputs,omitempty" xml:"device_inputs,omitempty"`
-	TwitterAccountInputs TwitterAccountInputCollection `form:"twitter_account_inputs,omitempty" json:"twitter_account_inputs,omitempty" xml:"twitter_account_inputs,omitempty"`
+	DeviceInputs         DeviceInputCollection         `form:"deviceInputs,omitempty" json:"deviceInputs,omitempty" xml:"deviceInputs,omitempty"`
+	TwitterAccountInputs TwitterAccountInputCollection `form:"twitterAccountInputs,omitempty" json:"twitterAccountInputs,omitempty" xml:"twitterAccountInputs,omitempty"`
 }
 
 // Validate validates the Inputs media type instance.
@@ -657,8 +659,8 @@ func (c *Client) DecodeLocation(resp *http.Response) (*Location, error) {
 // Identifier: application/vnd.app.member+json; view=default
 type TeamMember struct {
 	Role   string `form:"role" json:"role" xml:"role"`
-	TeamID int    `form:"team_id" json:"team_id" xml:"team_id"`
-	UserID int    `form:"user_id" json:"user_id" xml:"user_id"`
+	TeamID int    `form:"teamId" json:"teamId" xml:"teamId"`
+	UserID int    `form:"userId" json:"userId" xml:"userId"`
 }
 
 // Validate validates the TeamMember media type instance.
@@ -944,13 +946,13 @@ func (c *Client) DecodeTeams(resp *http.Response) (*Teams, error) {
 //
 // Identifier: application/vnd.app.twitter_account_input+json; view=default
 type TwitterAccountInput struct {
-	ExpeditionID     int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ExpeditionID     int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID               int    `form:"id" json:"id" xml:"id"`
 	Name             string `form:"name" json:"name" xml:"name"`
-	ScreenName       string `form:"screen_name" json:"screen_name" xml:"screen_name"`
-	TeamID           *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
-	TwitterAccountID int    `form:"twitter_account_id" json:"twitter_account_id" xml:"twitter_account_id"`
-	UserID           *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	ScreenName       string `form:"screenName" json:"screenName" xml:"screenName"`
+	TeamID           *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	TwitterAccountID int    `form:"twitterAccountId" json:"twitterAccountId" xml:"twitterAccountId"`
+	UserID           *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the TwitterAccountInput media type instance.
@@ -961,7 +963,7 @@ func (mt *TwitterAccountInput) Validate() (err error) {
 	}
 
 	if mt.ScreenName == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "screen_name"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "screenName"))
 	}
 	return
 }
@@ -1001,13 +1003,13 @@ func (c *Client) DecodeTwitterAccountInputCollection(resp *http.Response) (Twitt
 //
 // Identifier: application/vnd.app.twitter_account_intputs+json; view=default
 type TwitterAccountInputs struct {
-	TwitterAccountInputs TwitterAccountInputCollection `form:"twitter_account_inputs" json:"twitter_account_inputs" xml:"twitter_account_inputs"`
+	TwitterAccountInputs TwitterAccountInputCollection `form:"twitterAccountInputs" json:"twitterAccountInputs" xml:"twitterAccountInputs"`
 }
 
 // Validate validates the TwitterAccountInputs media type instance.
 func (mt *TwitterAccountInputs) Validate() (err error) {
 	if mt.TwitterAccountInputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitter_account_inputs"))
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitterAccountInputs"))
 	}
 	if err2 := mt.TwitterAccountInputs.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)

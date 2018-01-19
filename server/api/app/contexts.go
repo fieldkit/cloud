@@ -70,6 +70,47 @@ func (ctx *ListGeoJSONContext) BadRequest() error {
 	return nil
 }
 
+// ListByIDGeoJSONContext provides the GeoJSON list by id action context.
+type ListByIDGeoJSONContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	FeatureID int
+}
+
+// NewListByIDGeoJSONContext parses the incoming request URL and body, performs validations and creates the
+// context used by the GeoJSON controller list by id action.
+func NewListByIDGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByIDGeoJSONContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListByIDGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramFeatureID := req.Params["featureId"]
+	if len(paramFeatureID) > 0 {
+		rawFeatureID := paramFeatureID[0]
+		if featureID, err2 := strconv.Atoi(rawFeatureID); err2 == nil {
+			rctx.FeatureID = featureID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("featureId", rawFeatureID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListByIDGeoJSONContext) OK(r *PagedGeoJSON) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListByIDGeoJSONContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListByInputGeoJSONContext provides the GeoJSON list by input action context.
 type ListByInputGeoJSONContext struct {
 	context.Context
@@ -87,13 +128,13 @@ func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service 
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListByInputGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
+	paramInputID := req.Params["inputId"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
 		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
 			rctx.InputID = inputID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -129,13 +170,13 @@ func NewAddAdministratorContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -171,22 +212,22 @@ func NewDeleteAdministratorContext(ctx context.Context, r *http.Request, service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := DeleteAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -271,22 +312,22 @@ func NewGetIDAdministratorContext(ctx context.Context, r *http.Request, service 
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -358,13 +399,13 @@ func NewListIDAdministratorContext(ctx context.Context, r *http.Request, service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -400,13 +441,13 @@ func NewAddDeviceContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddDeviceContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -688,13 +729,13 @@ func NewAddExpeditionContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -784,13 +825,13 @@ func NewGetIDExpeditionContext(ctx context.Context, r *http.Request, service *go
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -868,13 +909,13 @@ func NewListIDExpeditionContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -910,13 +951,13 @@ func NewUpdateExpeditionContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateExpeditionContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1006,13 +1047,13 @@ func NewListExpeditionIDInputContext(ctx context.Context, r *http.Request, servi
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListExpeditionIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1047,13 +1088,13 @@ func NewListIDInputContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
+	paramInputID := req.Params["inputId"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
 		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
 			rctx.InputID = inputID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1095,13 +1136,13 @@ func NewUpdateInputContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
+	paramInputID := req.Params["inputId"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
 		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
 			rctx.InputID = inputID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1136,13 +1177,13 @@ func NewAddInputTokenContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1177,13 +1218,13 @@ func NewDeleteInputTokenContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := DeleteInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputTokenID := req.Params["input_token_id"]
+	paramInputTokenID := req.Params["inputTokenId"]
 	if len(paramInputTokenID) > 0 {
 		rawInputTokenID := paramInputTokenID[0]
 		if inputTokenID, err2 := strconv.Atoi(rawInputTokenID); err2 == nil {
 			rctx.InputTokenID = inputTokenID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_token_id", rawInputTokenID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputTokenId", rawInputTokenID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1273,13 +1314,13 @@ func NewListIDInputTokenContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1315,13 +1356,13 @@ func NewAddMemberContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1357,22 +1398,22 @@ func NewDeleteMemberContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := DeleteMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1481,22 +1522,22 @@ func NewGetIDMemberContext(ctx context.Context, r *http.Request, service *goa.Se
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1592,13 +1633,13 @@ func NewListIDMemberContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1635,22 +1676,22 @@ func NewUpdateMemberContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1679,13 +1720,13 @@ func NewExpeditionGetIDPictureContext(ctx context.Context, r *http.Request, serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ExpeditionGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1722,13 +1763,13 @@ func NewProjectGetIDPictureContext(ctx context.Context, r *http.Request, service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ProjectGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1765,13 +1806,13 @@ func NewUserGetIDPictureContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UserGetIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1883,13 +1924,13 @@ func NewGetIDProjectContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1987,13 +2028,13 @@ func NewUpdateProjectContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["project_id"]
+	paramProjectID := req.Params["projectId"]
 	if len(paramProjectID) > 0 {
 		rawProjectID := paramProjectID[0]
 		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
 			rctx.ProjectID = projectID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("project_id", rawProjectID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2029,13 +2070,13 @@ func NewAddTeamContext(ctx context.Context, r *http.Request, service *goa.Servic
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2070,13 +2111,13 @@ func NewDeleteTeamContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := DeleteTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2178,13 +2219,13 @@ func NewGetIDTeamContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2274,13 +2315,13 @@ func NewListIDTeamContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2316,13 +2357,13 @@ func NewUpdateTeamContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateTeamContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramTeamID := req.Params["team_id"]
+	paramTeamID := req.Params["teamId"]
 	if len(paramTeamID) > 0 {
 		rawTeamID := paramTeamID[0]
 		if teamID, err2 := strconv.Atoi(rawTeamID); err2 == nil {
 			rctx.TeamID = teamID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("team_id", rawTeamID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("teamId", rawTeamID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2358,13 +2399,13 @@ func NewAddTwitterContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := AddTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2388,7 +2429,7 @@ type CallbackTwitterContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	OauthToken    string
-	OauthVerifier string
+	OauthVerifier *string
 }
 
 // NewCallbackTwitterContext parses the incoming request URL and body, performs validations and creates the
@@ -2400,19 +2441,17 @@ func NewCallbackTwitterContext(ctx context.Context, r *http.Request, service *go
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := CallbackTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramOauthToken := req.Params["oauth_token"]
+	paramOauthToken := req.Params["oauthToken"]
 	if len(paramOauthToken) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("oauth_token"))
+		err = goa.MergeErrors(err, goa.MissingParamError("oauthToken"))
 	} else {
 		rawOauthToken := paramOauthToken[0]
 		rctx.OauthToken = rawOauthToken
 	}
-	paramOauthVerifier := req.Params["oauth_verifier"]
-	if len(paramOauthVerifier) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("oauth_verifier"))
-	} else {
+	paramOauthVerifier := req.Params["oauthVerifier"]
+	if len(paramOauthVerifier) > 0 {
 		rawOauthVerifier := paramOauthVerifier[0]
-		rctx.OauthVerifier = rawOauthVerifier
+		rctx.OauthVerifier = &rawOauthVerifier
 	}
 	return &rctx, err
 }
@@ -2446,13 +2485,13 @@ func NewGetIDTwitterContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["input_id"]
+	paramInputID := req.Params["inputId"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]
 		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
 			rctx.InputID = inputID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("input_id", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2542,13 +2581,13 @@ func NewListIDTwitterContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListIDTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expedition_id"]
+	paramExpeditionID := req.Params["expeditionId"]
 	if len(paramExpeditionID) > 0 {
 		rawExpeditionID := paramExpeditionID[0]
 		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
 			rctx.ExpeditionID = expeditionID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expedition_id", rawExpeditionID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2677,13 +2716,13 @@ func NewGetIDUserContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -2874,13 +2913,13 @@ func NewUpdateUserContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["user_id"]
+	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
 		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
 			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("user_id", rawUserID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err

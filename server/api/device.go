@@ -13,12 +13,14 @@ import (
 	"time"
 )
 
-func DeviceInputPublicType(deviceInput *data.DeviceInput) *app.DeviceInputPublic {
+func DeviceInputPublicType(deviceInput *data.DeviceInput, summary *backend.FeatureSummary) *app.DeviceInputPublic {
 	deviceInputType := &app.DeviceInputPublic{
-		ID:           int(deviceInput.Input.ID),
-		ExpeditionID: int(deviceInput.Input.ExpeditionID),
-		Name:         deviceInput.Input.Name,
-		Active:       true,
+		ID:               int(deviceInput.Input.ID),
+		ExpeditionID:     int(deviceInput.Input.ExpeditionID),
+		Name:             deviceInput.Input.Name,
+		Active:           true,
+		NumberOfFeatures: &summary.NumberOfFeatures,
+		LastFeatureID:    &summary.LastFeatureID,
 	}
 
 	return deviceInputType

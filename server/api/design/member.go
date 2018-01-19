@@ -6,9 +6,9 @@ import (
 )
 
 var AddMemberPayload = Type("AddMemberPayload", func() {
-	Attribute("user_id", Integer)
+	Attribute("userId", Integer)
 	Attribute("role", String)
-	Required("user_id", "role")
+	Required("userId", "role")
 })
 
 var UpdateMemberPayload = Type("UpdateMemberPayload", func() {
@@ -20,14 +20,14 @@ var TeamMember = MediaType("application/vnd.app.member+json", func() {
 	TypeName("TeamMember")
 	Reference(AddMemberPayload)
 	Attributes(func() {
-		Attribute("team_id", Integer)
-		Attribute("user_id")
+		Attribute("teamId", Integer)
+		Attribute("userId")
 		Attribute("role")
-		Required("team_id", "user_id", "role")
+		Required("teamId", "userId", "role")
 	})
 	View("default", func() {
-		Attribute("team_id")
-		Attribute("user_id")
+		Attribute("teamId")
+		Attribute("userId")
 		Attribute("role")
 	})
 })
@@ -49,10 +49,10 @@ var _ = Resource("member", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("teams/:team_id/members"))
+		Routing(POST("teams/:teamId/members"))
 		Description("Add a member to a team")
 		Params(func() {
-			Param("team_id", Integer)
+			Param("teamId", Integer)
 		})
 		Payload(AddMemberPayload)
 		Response(BadRequest)
@@ -62,12 +62,12 @@ var _ = Resource("member", func() {
 	})
 
 	Action("update", func() {
-		Routing(PATCH("teams/:team_id/members/:user_id"))
+		Routing(PATCH("teams/:teamId/members/:userId"))
 		Description("Update a member")
 		Params(func() {
-			Param("team_id", Integer)
-			Param("user_id", Integer)
-			Required("team_id", "user_id")
+			Param("teamId", Integer)
+			Param("userId", Integer)
+			Required("teamId", "userId")
 		})
 		Payload(UpdateMemberPayload)
 		Response(OK, func() {
@@ -76,11 +76,11 @@ var _ = Resource("member", func() {
 	})
 
 	Action("delete", func() {
-		Routing(DELETE("teams/:team_id/members/:user_id"))
+		Routing(DELETE("teams/:teamId/members/:userId"))
 		Description("Remove a member from a team")
 		Params(func() {
-			Param("team_id", Integer)
-			Param("user_id", Integer)
+			Param("teamId", Integer)
+			Param("userId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -103,12 +103,12 @@ var _ = Resource("member", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("teams/:team_id/members/:user_id"))
+		Routing(GET("teams/:teamId/members/:userId"))
 		Description("Get a member")
 		Params(func() {
-			Param("team_id", Integer)
-			Param("user_id", Integer)
-			Required("team_id", "user_id")
+			Param("teamId", Integer)
+			Param("userId", Integer)
+			Required("teamId", "userId")
 		})
 		Response(OK, func() {
 			Media(TeamMember)
@@ -130,10 +130,10 @@ var _ = Resource("member", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("teams/:team_id/members"))
+		Routing(GET("teams/:teamId/members"))
 		Description("List an teams's members")
 		Params(func() {
-			Param("team_id", Integer)
+			Param("teamId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

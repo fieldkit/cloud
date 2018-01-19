@@ -6,21 +6,21 @@ import (
 )
 
 var AddProjectAdministratorPayload = Type("AddAdministratorPayload", func() {
-	Attribute("user_id", Integer, func() {})
-	Required("user_id")
+	Attribute("userId", Integer, func() {})
+	Required("userId")
 })
 
 var ProjectAdministrator = MediaType("application/vnd.app.administrator+json", func() {
 	TypeName("ProjectAdministrator")
 	Reference(AddProjectAdministratorPayload)
 	Attributes(func() {
-		Attribute("project_id", Integer)
-		Attribute("user_id")
-		Required("project_id", "user_id")
+		Attribute("projectId", Integer)
+		Attribute("userId")
+		Required("projectId", "userId")
 	})
 	View("default", func() {
-		Attribute("project_id")
-		Attribute("user_id")
+		Attribute("projectId")
+		Attribute("userId")
 	})
 })
 
@@ -41,10 +41,10 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("projects/:project_id/administrators"))
+		Routing(POST("projects/:projectId/administrators"))
 		Description("Add an administrator to a project")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("projectId", Integer)
 		})
 		Payload(AddProjectAdministratorPayload)
 		Response(BadRequest)
@@ -54,11 +54,11 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("delete", func() {
-		Routing(DELETE("projects/:project_id/administrators/:user_id"))
+		Routing(DELETE("projects/:projectId/administrators/:userId"))
 		Description("Remove an administrator from a project")
 		Params(func() {
-			Param("project_id", Integer)
-			Param("user_id", Integer)
+			Param("projectId", Integer)
+			Param("userId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -79,12 +79,12 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("projects/:project_id/administrators/:user_id"))
+		Routing(GET("projects/:projectId/administrators/:userId"))
 		Description("Get an administrator")
 		Params(func() {
-			Param("project_id", Integer)
-			Param("user_id", Integer)
-			Required("project_id", "user_id")
+			Param("projectId", Integer)
+			Param("userId", Integer)
+			Required("projectId", "userId")
 		})
 		Response(OK, func() {
 			Media(ProjectAdministrator)
@@ -104,10 +104,10 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("projects/:project_id/administrators"))
+		Routing(GET("projects/:projectId/administrators"))
 		Description("List an projects's administrators")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("projectId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

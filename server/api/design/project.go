@@ -60,11 +60,11 @@ var _ = Resource("project", func() {
 	})
 
 	Action("update", func() {
-		Routing(PATCH("projects/:project_id"))
+		Routing(PATCH("projects/:projectId"))
 		Description("Update a project")
 		Params(func() {
-			Param("project_id", Integer)
-			Required("project_id")
+			Param("projectId", Integer)
+			Required("projectId")
 		})
 		Payload(AddProjectPayload)
 		Response(BadRequest)
@@ -87,11 +87,11 @@ var _ = Resource("project", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("projects/:project_id"))
+		Routing(GET("projects/:projectId"))
 		Description("Get a project")
 		Params(func() {
-			Param("project_id", Integer)
-			Required("project_id")
+			Param("projectId", Integer)
+			Required("projectId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

@@ -65,7 +65,7 @@ func CallbackTwitterPath() string {
 }
 
 // OAuth callback endpoint for Twitter
-func (c *Client) CallbackTwitter(ctx context.Context, path string, oauthToken string, oauthVerifier string) (*http.Response, error) {
+func (c *Client) CallbackTwitter(ctx context.Context, path string, oauthToken string, oauthVerifier *string) (*http.Response, error) {
 	req, err := c.NewCallbackTwitterRequest(ctx, path, oauthToken, oauthVerifier)
 	if err != nil {
 		return nil, err
@@ -74,15 +74,17 @@ func (c *Client) CallbackTwitter(ctx context.Context, path string, oauthToken st
 }
 
 // NewCallbackTwitterRequest create the request corresponding to the callback action endpoint of the twitter resource.
-func (c *Client) NewCallbackTwitterRequest(ctx context.Context, path string, oauthToken string, oauthVerifier string) (*http.Request, error) {
+func (c *Client) NewCallbackTwitterRequest(ctx context.Context, path string, oauthToken string, oauthVerifier *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	values.Set("oauth_token", oauthToken)
-	values.Set("oauth_verifier", oauthVerifier)
+	values.Set("oauthToken", oauthToken)
+	if oauthVerifier != nil {
+		values.Set("oauthVerifier", *oauthVerifier)
+	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {

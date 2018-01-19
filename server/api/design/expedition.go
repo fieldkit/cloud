@@ -50,10 +50,10 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("projects/:project_id/expeditions"))
+		Routing(POST("projects/:projectId/expeditions"))
 		Description("Add an expedition")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("projectId", Integer)
 		})
 		Payload(AddExpeditionPayload)
 		Response(BadRequest)
@@ -63,11 +63,11 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("update", func() {
-		Routing(PATCH("expeditions/:expedition_id"))
+		Routing(PATCH("expeditions/:expeditionId"))
 		Description("Update an expedition")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Payload(AddExpeditionPayload)
 		Response(BadRequest)
@@ -91,11 +91,11 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("expeditions/:expedition_id"))
+		Routing(GET("expeditions/:expeditionId"))
 		Description("Add an expedition")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -117,10 +117,10 @@ var _ = Resource("expedition", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("projects/:project_id/expeditions"))
+		Routing(GET("projects/:projectId/expeditions"))
 		Description("List a project's expeditions")
 		Params(func() {
-			Param("project_id", Integer)
+			Param("projectId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

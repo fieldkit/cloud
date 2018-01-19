@@ -10,24 +10,24 @@ var InputToken = MediaType("application/vnd.app.input_token+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("token", String)
-		Attribute("expedition_id", Integer)
-		Required("id", "token", "expedition_id")
+		Attribute("expeditionId", Integer)
+		Required("id", "token", "expeditionId")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("token")
-		Attribute("expedition_id")
+		Attribute("expeditionId")
 	})
 })
 
 var InputTokens = MediaType("application/vnd.app.input_tokens+json", func() {
 	TypeName("InputTokens")
 	Attributes(func() {
-		Attribute("input_tokens", CollectionOf(InputToken))
-		Required("input_tokens")
+		Attribute("inputTokens", CollectionOf(InputToken))
+		Required("inputTokens")
 	})
 	View("default", func() {
-		Attribute("input_tokens")
+		Attribute("inputTokens")
 	})
 })
 
@@ -37,11 +37,11 @@ var _ = Resource("input_token", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expedition_id/input-tokens"))
+		Routing(POST("expeditions/:expeditionId/input-tokens"))
 		Description("Add an input token")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
@@ -50,11 +50,11 @@ var _ = Resource("input_token", func() {
 	})
 
 	Action("delete", func() {
-		Routing(DELETE("input-tokens/:input_token_id"))
+		Routing(DELETE("input-tokens/:inputTokenId"))
 		Description("Delete an input token")
 		Params(func() {
-			Param("input_token_id", Integer)
-			Required("input_token_id")
+			Param("inputTokenId", Integer)
+			Required("inputTokenId")
 		})
 		Response(BadRequest)
 		Response(NoContent)
@@ -75,11 +75,11 @@ var _ = Resource("input_token", func() {
 	})
 
 	Action("list id", func() {
-		Routing(GET("expeditions/:expedition_id/input-tokens"))
+		Routing(GET("expeditions/:expeditionId/input-tokens"))
 		Description("Update an expedition's input tokens")
 		Params(func() {
-			Param("expedition_id", Integer)
-			Required("expedition_id")
+			Param("expeditionId", Integer)
+			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
