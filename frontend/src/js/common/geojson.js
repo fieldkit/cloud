@@ -78,6 +78,10 @@ export class FkGeoJSON {
         });
     }
 
+    getUniqueInputIds() {
+        return _(this.features).map(f => f.unwrap()).map('properties').map('source').map('inputId').uniq().value();
+    }
+
     getCoordinatesAtTime(time) {
         const pair = _(this.getFeaturesSurroundingTime(time)).value();
 

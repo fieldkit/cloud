@@ -3,7 +3,7 @@ import * as ActionTypes from '../actions/types'
 export function getProject(projectSlug) {
     return {
         types: ActionTypes.API_PROJECT_GET,
-        path: '/projects/@/' + projectSlug ,
+        path: '/projects/@/' + projectSlug,
         method: 'GET',
         unwrap: (r) => r
     }
@@ -40,6 +40,15 @@ export function getNextExpeditionGeoJson(last) {
     return {
         types: ActionTypes.API_EXPEDITION_GEOJSON_GET,
         path: last.nextUrl,
+        method: 'GET',
+        unwrap: (r) => r
+    }
+}
+
+export function getInput(id) {
+    return {
+        types: ActionTypes.API_INPUT_GET,
+        path: '/inputs/' + id,
         method: 'GET',
         unwrap: (r) => r
     }

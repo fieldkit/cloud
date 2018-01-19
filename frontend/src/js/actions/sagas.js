@@ -1,7 +1,7 @@
 
 import { delay } from 'redux-saga';
 import {
-    all, put, take, race
+    all, put, take, race, takeLatest
     // takeLatest, takeEvery, select, all, call
 } from 'redux-saga/effects';
 
@@ -94,6 +94,21 @@ export function* refreshSaga(pagedGeojson) {
     }
 }
 
+export function* loadExpeditionDetails() {
+    let cache = {};
+
+    yield takeLatest([ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS], function* (geojsonSuccess) {
+        const geojson = geojsonSuccess.response.geo;
+        const expedition = new FkGeoJSON(geojson);
+        const ids = expedition.getUniqueInputIds().map(id => id.toString());
+        const newIds = _.difference(ids, _.keys(cache));
+        const queried = yield all(newIds.map(id => FkApi.getInput(id)));
+        const indexed = _(queried).keyBy('id').value();
+        cache = { ...cache, ...indexed }
+        console.log(cache);
+    });
+}
+
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
     const [ expedition, pagedGeojson ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
@@ -120,7 +135,11 @@ export function* loadActiveProject() {
     console.log(project);
 
     if (expeditions.length > 0) {
-        yield loadActiveExpedition(projectSlug, expeditions[0].slug);
+        yield all([
+            loadExpeditionDetails(),
+            loadActiveExpedition(projectSlug, expeditions[0].slug)
+        ])
+        console.log("Done")
     }
 }
 
