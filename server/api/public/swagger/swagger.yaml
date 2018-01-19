@@ -1701,12 +1701,12 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.app.inputs+json
+      - application/vnd.app.device_input+json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Inputs'
+            $ref: '#/definitions/DeviceInput'
         "400":
           description: Bad Request
       schemes:

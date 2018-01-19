@@ -87,6 +87,27 @@ func (mt *DeviceInput) Validate() (err error) {
 	return
 }
 
+// DeviceInput media type (public view)
+//
+// Identifier: application/vnd.app.device_input+json; view=public
+type DeviceInputPublic struct {
+	Active       bool   `form:"active" json:"active" xml:"active"`
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the DeviceInputPublic media type instance.
+func (mt *DeviceInputPublic) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
 // DeviceInputCollection is the media type for an array of DeviceInput (default view)
 //
 // Identifier: application/vnd.app.device_input+json; type=collection; view=default
@@ -94,6 +115,23 @@ type DeviceInputCollection []*DeviceInput
 
 // Validate validates the DeviceInputCollection media type instance.
 func (mt DeviceInputCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DeviceInputCollection is the media type for an array of DeviceInput (public view)
+//
+// Identifier: application/vnd.app.device_input+json; type=collection; view=public
+type DeviceInputPublicCollection []*DeviceInputPublic
+
+// Validate validates the DeviceInputPublicCollection media type instance.
+func (mt DeviceInputPublicCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {

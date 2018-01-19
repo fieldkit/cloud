@@ -13,6 +13,17 @@ import (
 	"time"
 )
 
+func DeviceInputPublicType(deviceInput *data.DeviceInput) *app.DeviceInputPublic {
+	deviceInputType := &app.DeviceInputPublic{
+		ID:           int(deviceInput.Input.ID),
+		ExpeditionID: int(deviceInput.Input.ExpeditionID),
+		Name:         deviceInput.Input.Name,
+		Active:       true,
+	}
+
+	return deviceInputType
+}
+
 func DeviceInputType(deviceInput *data.DeviceInput) *app.DeviceInput {
 	deviceInputType := &app.DeviceInput{
 		ID:           int(deviceInput.Input.ID),

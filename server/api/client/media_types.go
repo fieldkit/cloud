@@ -109,9 +109,37 @@ func (mt *DeviceInput) Validate() (err error) {
 	return
 }
 
+// DeviceInput media type (public view)
+//
+// Identifier: application/vnd.app.device_input+json; view=public
+type DeviceInputPublic struct {
+	Active       bool   `form:"active" json:"active" xml:"active"`
+	ExpeditionID int    `form:"expedition_id" json:"expedition_id" xml:"expedition_id"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	TeamID       *int   `form:"team_id,omitempty" json:"team_id,omitempty" xml:"team_id,omitempty"`
+	UserID       *int   `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the DeviceInputPublic media type instance.
+func (mt *DeviceInputPublic) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
 // DecodeDeviceInput decodes the DeviceInput instance encoded in resp body.
 func (c *Client) DecodeDeviceInput(resp *http.Response) (*DeviceInput, error) {
 	var decoded DeviceInput
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DecodeDeviceInputPublic decodes the DeviceInputPublic instance encoded in resp body.
+func (c *Client) DecodeDeviceInputPublic(resp *http.Response) (*DeviceInputPublic, error) {
+	var decoded DeviceInputPublic
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
@@ -133,9 +161,33 @@ func (mt DeviceInputCollection) Validate() (err error) {
 	return
 }
 
+// DeviceInputCollection is the media type for an array of DeviceInput (public view)
+//
+// Identifier: application/vnd.app.device_input+json; type=collection; view=public
+type DeviceInputPublicCollection []*DeviceInputPublic
+
+// Validate validates the DeviceInputPublicCollection media type instance.
+func (mt DeviceInputPublicCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // DecodeDeviceInputCollection decodes the DeviceInputCollection instance encoded in resp body.
 func (c *Client) DecodeDeviceInputCollection(resp *http.Response) (DeviceInputCollection, error) {
 	var decoded DeviceInputCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DecodeDeviceInputPublicCollection decodes the DeviceInputPublicCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceInputPublicCollection(resp *http.Response) (DeviceInputPublicCollection, error) {
+	var decoded DeviceInputPublicCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }

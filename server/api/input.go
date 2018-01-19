@@ -98,11 +98,7 @@ func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
 		return err
 	}
 
-	deviceInputs := []*data.DeviceInput{deviceInput}
-
-	return ctx.OK(&app.Inputs{
-		DeviceInputs: DeviceInputsType(deviceInputs).DeviceInputs,
-	})
+	return ctx.OKPublic(DeviceInputPublicType(deviceInput))
 }
 
 func (c *InputController) ListExpeditionID(ctx *app.ListExpeditionIDInputContext) error {

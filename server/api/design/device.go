@@ -29,6 +29,14 @@ var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
 		Attribute("token")
 		Attribute("key")
 	})
+	View("public", func() {
+		Attribute("id")
+		Attribute("expedition_id")
+		Attribute("team_id")
+		Attribute("user_id")
+		Attribute("active")
+		Attribute("name")
+	})
 })
 
 var DeviceSchema = MediaType("application/vnd.app.device_schema+json", func() {

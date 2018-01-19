@@ -418,6 +418,12 @@ func (ctx *AddDeviceContext) OK(r *DeviceInput) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *AddDeviceContext) OKPublic(r *DeviceInputPublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *AddDeviceContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
@@ -455,6 +461,12 @@ func NewGetIDDeviceContext(ctx context.Context, r *http.Request, service *goa.Se
 
 // OK sends a HTTP response with status code 200.
 func (ctx *GetIDDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *GetIDDeviceContext) OKPublic(r *DeviceInputPublic) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -556,6 +568,12 @@ func (ctx *UpdateDeviceContext) OK(r *DeviceInput) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *UpdateDeviceContext) OKPublic(r *DeviceInputPublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *UpdateDeviceContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
@@ -594,6 +612,12 @@ func NewUpdateLocationDeviceContext(ctx context.Context, r *http.Request, servic
 
 // OK sends a HTTP response with status code 200.
 func (ctx *UpdateLocationDeviceContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *UpdateLocationDeviceContext) OKPublic(r *DeviceInputPublic) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -1036,8 +1060,14 @@ func NewListIDInputContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListIDInputContext) OK(r *Inputs) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.inputs+json")
+func (ctx *ListIDInputContext) OK(r *DeviceInput) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *ListIDInputContext) OKPublic(r *DeviceInputPublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 

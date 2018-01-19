@@ -81,7 +81,7 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list id", func() {
-		NoSecurity() // TOOD: Fix this.
+		NoSecurity()
 
 		Routing(GET("inputs/:input_id"))
 		Description("List an input")
@@ -91,7 +91,7 @@ var _ = Resource("input", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Inputs)
+			Media(DeviceInput)
 		})
 	})
 
