@@ -82,8 +82,28 @@ function playbackMode(state = { }, action) {
     }
 }
 
+function chartData(state = { geo: [], loading: true }, action) {
+    switch (action.type) {
+    case ActionTypes.CHART_DATA_LOAD:
+        return {
+            geo: [],
+            loading: true
+        };
+    case ActionTypes.API_SOURCE_GEOJSON_GET.SUCCESS:
+        return {
+            geo: [ ...state.geo, ...action.response.geo.features ],
+            loading: true
+        };
+    case ActionTypes.CHART_DATA_LOADED:
+        return { ...state, ...{ loading: false } };
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     activeExpedition,
     visibleFeatures,
     playbackMode,
+    chartData
 });

@@ -2,7 +2,7 @@
 import { delay } from 'redux-saga';
 import {
     all, put, take, race, takeLatest
-    // takeLatest, takeEvery, select, all, call
+    // takeEvery, select, all, call
 } from 'redux-saga/effects';
 
 import _ from 'lodash';
@@ -10,7 +10,7 @@ import _ from 'lodash';
 import * as ActionTypes from './types';
 import FkApi from '../api/calls';
 
-import { changePlaybackMode, focusExpeditionTime } from './index';
+import { changePlaybackMode, focusExpeditionTime, chartDataLoaded } from './index';
 
 import { PlaybackModes } from '../components/PlaybackControl';
 
@@ -95,6 +95,16 @@ export function* refreshSaga(pagedGeojson) {
     }
 }
 
+export function* loadCharts() {
+    yield takeLatest([ActionTypes.CHART_DATA_LOAD], function* (chartAction) {
+        let page = yield FkApi.getSourceGeoJson(chartAction.chart.source.inputId);
+        while (page.hasMore) {
+            page = yield FkApi.getNextSourceGeoJson(page);
+        }
+        yield put(chartDataLoaded(chartAction.chart))
+    });
+}
+
 export function* loadExpeditionDetails() {
     const cache = {};
 
@@ -138,6 +148,7 @@ export function* loadActiveProject() {
     if (expeditions.length > 0) {
         yield all([
             loadExpeditionDetails(),
+            loadCharts(),
             loadActiveExpedition(projectSlug, expeditions[0].slug)
         ])
         console.log("Done")

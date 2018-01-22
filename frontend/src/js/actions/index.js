@@ -27,3 +27,17 @@ export function focusFeature(feature) {
         feature: feature
     }
 }
+
+export function loadChartData(chart) {
+    return {
+        type: ActionTypes.CHART_DATA_LOAD,
+        chart: chart
+    }
+}
+
+export function chartDataLoaded(chart) {
+    return {
+        type: ActionTypes.CHART_DATA_LOADED,
+        chart: chart
+    }
+}

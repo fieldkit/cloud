@@ -54,6 +54,24 @@ export function getNextExpeditionGeoJson(last) {
     }
 }
 
+export function getSourceGeoJson(id) {
+    return {
+        types: ActionTypes.API_SOURCE_GEOJSON_GET,
+        path: '/inputs/' + id + '/geojson?descending=false',
+        method: 'GET',
+        unwrap: (r) => r
+    }
+}
+
+export function getNextSourceGeoJson(last) {
+    return {
+        types: ActionTypes.API_SOURCE_GEOJSON_GET,
+        path: last.nextUrl,
+        method: 'GET',
+        unwrap: (r) => r
+    }
+}
+
 export function getSource(id) {
     return {
         types: ActionTypes.API_SOURCE_GET,
