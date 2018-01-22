@@ -84,8 +84,8 @@ func ListByInputGeoJSONPath(inputID int) string {
 }
 
 // List an input's features in a GeoJSON.
-func (c *Client) ListByInputGeoJSON(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListByInputGeoJSONRequest(ctx, path)
+func (c *Client) ListByInputGeoJSON(ctx context.Context, path string, descending *bool) (*http.Response, error) {
+	req, err := c.NewListByInputGeoJSONRequest(ctx, path, descending)
 	if err != nil {
 		return nil, err
 	}
@@ -93,12 +93,18 @@ func (c *Client) ListByInputGeoJSON(ctx context.Context, path string) (*http.Res
 }
 
 // NewListByInputGeoJSONRequest create the request corresponding to the list by input action endpoint of the GeoJSON resource.
-func (c *Client) NewListByInputGeoJSONRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewListByInputGeoJSONRequest(ctx context.Context, path string, descending *bool) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if descending != nil {
+		tmp116 := strconv.FormatBool(*descending)
+		values.Set("descending", tmp116)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

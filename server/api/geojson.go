@@ -99,7 +99,11 @@ func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
 
 func (c *GeoJSONController) ListByInput(ctx *app.ListByInputGeoJSONContext) error {
 	token := backend.NewPagingTokenFromString(ctx.RequestData.Params.Get("token"))
-	docs, nextToken, err := c.options.Backend.ListDocumentsByInput(ctx, ctx.InputID, token)
+	descending := false
+	if ctx.Descending != nil {
+		descending = *ctx.Descending
+	}
+	docs, nextToken, err := c.options.Backend.ListDocumentsByInput(ctx, ctx.InputID, descending, token)
 	if err != nil {
 		return err
 	}
@@ -107,7 +111,7 @@ func (c *GeoJSONController) ListByInput(ctx *app.ListByInputGeoJSONContext) erro
 	geoJson := MakeGeoJSON(docs)
 
 	return ctx.OK(&app.PagedGeoJSON{
-		NextURL: client.ListByInputGeoJSONPath(ctx.InputID) + fmt.Sprintf("?token=%s", nextToken.String()),
+		NextURL: client.ListByInputGeoJSONPath(ctx.InputID) + fmt.Sprintf("?token=%s&descending=%v", nextToken.String(), descending),
 		Geo:     geoJson,
 		HasMore: len(geoJson.Features) >= backend.DefaultPageSize,
 	})

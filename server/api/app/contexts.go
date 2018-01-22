@@ -116,7 +116,8 @@ type ListByInputGeoJSONContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	Descending *bool
+	InputID    int
 }
 
 // NewListByInputGeoJSONContext parses the incoming request URL and body, performs validations and creates the
@@ -128,6 +129,16 @@ func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service 
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListByInputGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDescending := req.Params["descending"]
+	if len(paramDescending) > 0 {
+		rawDescending := paramDescending[0]
+		if descending, err2 := strconv.ParseBool(rawDescending); err2 == nil {
+			tmp2 := &descending
+			rctx.Descending = tmp2
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("descending", rawDescending, "boolean"))
+		}
+	}
 	paramInputID := req.Params["inputId"]
 	if len(paramInputID) > 0 {
 		rawInputID := paramInputID[0]

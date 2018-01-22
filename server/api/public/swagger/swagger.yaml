@@ -1788,6 +1788,10 @@ paths:
       description: List an input's features in a GeoJSON.
       operationId: GeoJSON#list by input
       parameters:
+      - in: query
+        name: descending
+        required: false
+        type: boolean
       - in: path
         name: inputId
         required: true

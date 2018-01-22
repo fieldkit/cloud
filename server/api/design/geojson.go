@@ -88,6 +88,7 @@ var _ = Resource("GeoJSON", func() {
 		Params(func() {
 			Param("inputId", Integer)
 			Required("inputId")
+			Param("descending", Boolean)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

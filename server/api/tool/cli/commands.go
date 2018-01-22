@@ -43,6 +43,7 @@ type (
 	// ListByInputGeojsonCommand is the command line data structure for the list by input action of GeoJSON
 	ListByInputGeojsonCommand struct {
 		InputID     int
+		Descending  string
 		PrettyPrint bool
 	}
 
@@ -520,7 +521,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 		Use:   "add",
 		Short: `add action`,
 	}
-	tmp47 := new(AddAdministratorCommand)
+	tmp48 := new(AddAdministratorCommand)
 	sub = &cobra.Command{
 		Use:   `administrator ["/projects/PROJECTID/administrators"]`,
 		Short: ``,
@@ -531,12 +532,12 @@ Payload example:
 {
    "userId": 6374710697087778877
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp47.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp48.Run(c, args) },
 	}
-	tmp47.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp47.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp48.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp48.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp48 := new(AddDeviceCommand)
+	tmp49 := new(AddDeviceCommand)
 	sub = &cobra.Command{
 		Use:   `device ["/expeditions/EXPEDITIONID/inputs/devices"]`,
 		Short: ``,
@@ -548,12 +549,12 @@ Payload example:
    "key": "Ipsa rerum.",
    "name": "Sed dolorem."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp48.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp49.Run(c, args) },
 	}
-	tmp48.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp48.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp49.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp49.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp49 := new(AddExpeditionCommand)
+	tmp50 := new(AddExpeditionCommand)
 	sub = &cobra.Command{
 		Use:   `expedition ["/projects/PROJECTID/expeditions"]`,
 		Short: ``,
@@ -566,21 +567,21 @@ Payload example:
    "name": "Et est soluta et aut.",
    "slug": "7ambiiuahx"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp49.Run(c, args) },
-	}
-	tmp49.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp49.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	tmp50 := new(AddInputTokenCommand)
-	sub = &cobra.Command{
-		Use:   `input-token ["/expeditions/EXPEDITIONID/input-tokens"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp50.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp50.Run(c, args) },
 	}
 	tmp50.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp50.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp51 := new(AddMemberCommand)
+	tmp51 := new(AddInputTokenCommand)
+	sub = &cobra.Command{
+		Use:   `input-token ["/expeditions/EXPEDITIONID/input-tokens"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp51.Run(c, args) },
+	}
+	tmp51.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp51.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	tmp52 := new(AddMemberCommand)
 	sub = &cobra.Command{
 		Use:   `member ["/teams/TEAMID/members"]`,
 		Short: ``,
@@ -592,12 +593,12 @@ Payload example:
    "role": "Est tempora cumque sed.",
    "userId": 5676036061821429066
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp51.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp52.Run(c, args) },
 	}
-	tmp51.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp51.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp52.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp52.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp52 := new(AddProjectCommand)
+	tmp53 := new(AddProjectCommand)
 	sub = &cobra.Command{
 		Use:   `project ["/projects"]`,
 		Short: ``,
@@ -610,12 +611,12 @@ Payload example:
    "name": "Voluptates dicta consectetur.",
    "slug": "12lgh80jxq"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp52.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp53.Run(c, args) },
 	}
-	tmp52.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp52.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp53.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp53.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp53 := new(AddTeamCommand)
+	tmp54 := new(AddTeamCommand)
 	sub = &cobra.Command{
 		Use:   `team ["/expeditions/EXPEDITIONID/teams"]`,
 		Short: ``,
@@ -628,12 +629,12 @@ Payload example:
    "name": "igp59zqliv",
    "slug": "uepd168s1l"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp53.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp54.Run(c, args) },
 	}
-	tmp53.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp53.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp54.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp54.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp54 := new(AddTwitterCommand)
+	tmp55 := new(AddTwitterCommand)
 	sub = &cobra.Command{
 		Use:   `twitter ["/expeditions/EXPEDITIONID/inputs/twitter-accounts"]`,
 		Short: ``,
@@ -644,12 +645,12 @@ Payload example:
 {
    "name": "Necessitatibus voluptatum odit eum qui."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp54.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp55.Run(c, args) },
 	}
-	tmp54.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp54.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp55.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp55.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp55 := new(AddUserCommand)
+	tmp56 := new(AddUserCommand)
 	sub = &cobra.Command{
 		Use:   `user ["/users"]`,
 		Short: ``,
@@ -665,74 +666,60 @@ Payload example:
    "password": "xcws9vmoha",
    "username": "diw072s4wt"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp55.Run(c, args) },
-	}
-	tmp55.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp55.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "callback",
-		Short: `OAuth callback endpoint for Twitter`,
-	}
-	tmp56 := new(CallbackTwitterCommand)
-	sub = &cobra.Command{
-		Use:   `twitter ["/twitter/callback"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp56.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp56.Run(c, args) },
 	}
 	tmp56.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp56.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "delete",
-		Short: `delete action`,
+		Use:   "callback",
+		Short: `OAuth callback endpoint for Twitter`,
 	}
-	tmp57 := new(DeleteAdministratorCommand)
+	tmp57 := new(CallbackTwitterCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/PROJECTID/administrators/USERID"]`,
+		Use:   `twitter ["/twitter/callback"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp57.Run(c, args) },
 	}
 	tmp57.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp57.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp58 := new(DeleteInputTokenCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "delete",
+		Short: `delete action`,
+	}
+	tmp58 := new(DeleteAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `input-token ["/input-tokens/INPUTTOKENID"]`,
+		Use:   `administrator ["/projects/PROJECTID/administrators/USERID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp58.Run(c, args) },
 	}
 	tmp58.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp58.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp59 := new(DeleteMemberCommand)
+	tmp59 := new(DeleteInputTokenCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/teams/TEAMID/members/USERID"]`,
+		Use:   `input-token ["/input-tokens/INPUTTOKENID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp59.Run(c, args) },
 	}
 	tmp59.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp59.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp60 := new(DeleteTeamCommand)
+	tmp60 := new(DeleteMemberCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/teams/TEAMID"]`,
+		Use:   `member ["/teams/TEAMID/members/USERID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp60.Run(c, args) },
 	}
 	tmp60.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp60.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "expedition-getid",
-		Short: `Get a expedition's picture`,
-	}
-	tmp61 := new(ExpeditionGetIDPictureCommand)
+	tmp61 := new(DeleteTeamCommand)
 	sub = &cobra.Command{
-		Use:   `picture ["/expeditions/EXPEDITIONID/picture"]`,
+		Use:   `team ["/teams/TEAMID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp61.Run(c, args) },
 	}
@@ -741,71 +728,71 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "get",
-		Short: `get action`,
+		Use:   "expedition-getid",
+		Short: `Get a expedition's picture`,
 	}
-	tmp62 := new(GetAdministratorCommand)
+	tmp62 := new(ExpeditionGetIDPictureCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/@/PROJECT/administrators/@/USERNAME"]`,
+		Use:   `picture ["/expeditions/EXPEDITIONID/picture"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp62.Run(c, args) },
 	}
 	tmp62.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp62.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp63 := new(GetExpeditionCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "get",
+		Short: `get action`,
+	}
+	tmp63 := new(GetAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `expedition ["/projects/@/PROJECT/expeditions/@/EXPEDITION"]`,
+		Use:   `administrator ["/projects/@/PROJECT/administrators/@/USERNAME"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp63.Run(c, args) },
 	}
 	tmp63.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp63.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp64 := new(GetMemberCommand)
+	tmp64 := new(GetExpeditionCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM/members/@/USERNAME"]`,
+		Use:   `expedition ["/projects/@/PROJECT/expeditions/@/EXPEDITION"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp64.Run(c, args) },
 	}
 	tmp64.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp64.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp65 := new(GetProjectCommand)
+	tmp65 := new(GetMemberCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/projects/@/PROJECT"]`,
+		Use:   `member ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM/members/@/USERNAME"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp65.Run(c, args) },
 	}
 	tmp65.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp65.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp66 := new(GetTeamCommand)
+	tmp66 := new(GetProjectCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM"]`,
+		Use:   `project ["/projects/@/PROJECT"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp66.Run(c, args) },
 	}
 	tmp66.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp66.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp67 := new(GetUserCommand)
+	tmp67 := new(GetTeamCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/users/@/USERNAME"]`,
+		Use:   `team ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp67.Run(c, args) },
 	}
 	tmp67.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp67.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "get-current",
-		Short: `Get the authenticated user`,
-	}
-	tmp68 := new(GetCurrentUserCommand)
+	tmp68 := new(GetUserCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/user"]`,
+		Use:   `user ["/users/@/USERNAME"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp68.Run(c, args) },
 	}
@@ -814,193 +801,193 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "getid",
-		Short: `getID action`,
+		Use:   "get-current",
+		Short: `Get the authenticated user`,
 	}
-	tmp69 := new(GetIDAdministratorCommand)
+	tmp69 := new(GetCurrentUserCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/PROJECTID/administrators/USERID"]`,
+		Use:   `user ["/user"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp69.Run(c, args) },
 	}
 	tmp69.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp69.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp70 := new(GetIDDeviceCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "getid",
+		Short: `getID action`,
+	}
+	tmp70 := new(GetIDAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `device ["/inputs/devices/ID"]`,
+		Use:   `administrator ["/projects/PROJECTID/administrators/USERID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp70.Run(c, args) },
 	}
 	tmp70.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp70.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp71 := new(GetIDExpeditionCommand)
+	tmp71 := new(GetIDDeviceCommand)
 	sub = &cobra.Command{
-		Use:   `expedition ["/expeditions/EXPEDITIONID"]`,
+		Use:   `device ["/inputs/devices/ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp71.Run(c, args) },
 	}
 	tmp71.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp71.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp72 := new(GetIDMemberCommand)
+	tmp72 := new(GetIDExpeditionCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/teams/TEAMID/members/USERID"]`,
+		Use:   `expedition ["/expeditions/EXPEDITIONID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp72.Run(c, args) },
 	}
 	tmp72.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp72.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp73 := new(GetIDProjectCommand)
+	tmp73 := new(GetIDMemberCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/projects/PROJECTID"]`,
+		Use:   `member ["/teams/TEAMID/members/USERID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp73.Run(c, args) },
 	}
 	tmp73.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp73.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp74 := new(GetIDTeamCommand)
+	tmp74 := new(GetIDProjectCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/teams/TEAMID"]`,
+		Use:   `project ["/projects/PROJECTID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp74.Run(c, args) },
 	}
 	tmp74.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp74.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp75 := new(GetIDTwitterCommand)
+	tmp75 := new(GetIDTeamCommand)
 	sub = &cobra.Command{
-		Use:   `twitter ["/inputs/twitter-accounts/INPUTID"]`,
+		Use:   `team ["/teams/TEAMID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp75.Run(c, args) },
 	}
 	tmp75.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp75.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp76 := new(GetIDUserCommand)
+	tmp76 := new(GetIDTwitterCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/users/USERID"]`,
+		Use:   `twitter ["/inputs/twitter-accounts/INPUTID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp76.Run(c, args) },
 	}
 	tmp76.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp76.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list",
-		Short: `list action`,
-	}
-	tmp77 := new(ListGeojsonCommand)
+	tmp77 := new(GetIDUserCommand)
 	sub = &cobra.Command{
-		Use:   `geojson ["/projects/@/PROJECT/expeditions/@/EXPEDITION/geojson"]`,
+		Use:   `user ["/users/USERID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp77.Run(c, args) },
 	}
 	tmp77.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp77.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp78 := new(ListAdministratorCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "list",
+		Short: `list action`,
+	}
+	tmp78 := new(ListGeojsonCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/@/PROJECT/administrators"]`,
+		Use:   `geojson ["/projects/@/PROJECT/expeditions/@/EXPEDITION/geojson"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp78.Run(c, args) },
 	}
 	tmp78.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp78.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp79 := new(ListDeviceCommand)
+	tmp79 := new(ListAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `device ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs/devices"]`,
+		Use:   `administrator ["/projects/@/PROJECT/administrators"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp79.Run(c, args) },
 	}
 	tmp79.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp79.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp80 := new(ListExpeditionCommand)
+	tmp80 := new(ListDeviceCommand)
 	sub = &cobra.Command{
-		Use:   `expedition ["/projects/@/PROJECT/expeditions"]`,
+		Use:   `device ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs/devices"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp80.Run(c, args) },
 	}
 	tmp80.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp80.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp81 := new(ListInputCommand)
+	tmp81 := new(ListExpeditionCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs"]`,
+		Use:   `expedition ["/projects/@/PROJECT/expeditions"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp81.Run(c, args) },
 	}
 	tmp81.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp81.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp82 := new(ListInputTokenCommand)
+	tmp82 := new(ListInputCommand)
 	sub = &cobra.Command{
-		Use:   `input-token ["/projects/@/PROJECT/expeditions/@/EXPEDITION/input-tokens"]`,
+		Use:   `input ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp82.Run(c, args) },
 	}
 	tmp82.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp82.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp83 := new(ListMemberCommand)
+	tmp83 := new(ListInputTokenCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM/members"]`,
+		Use:   `input-token ["/projects/@/PROJECT/expeditions/@/EXPEDITION/input-tokens"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp83.Run(c, args) },
 	}
 	tmp83.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp83.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp84 := new(ListProjectCommand)
+	tmp84 := new(ListMemberCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/projects"]`,
+		Use:   `member ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams/@/TEAM/members"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp84.Run(c, args) },
 	}
 	tmp84.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp84.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp85 := new(ListTeamCommand)
+	tmp85 := new(ListProjectCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams"]`,
+		Use:   `project ["/projects"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp85.Run(c, args) },
 	}
 	tmp85.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp85.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp86 := new(ListTwitterCommand)
+	tmp86 := new(ListTeamCommand)
 	sub = &cobra.Command{
-		Use:   `twitter ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs/twitter-accounts"]`,
+		Use:   `team ["/projects/@/PROJECT/expeditions/@/EXPEDITION/teams"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp86.Run(c, args) },
 	}
 	tmp86.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp86.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp87 := new(ListUserCommand)
+	tmp87 := new(ListTwitterCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/users"]`,
+		Use:   `twitter ["/projects/@/PROJECT/expeditions/@/EXPEDITION/inputs/twitter-accounts"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp87.Run(c, args) },
 	}
 	tmp87.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp87.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list-byid",
-		Short: `List a feature's GeoJSON by id.`,
-	}
-	tmp88 := new(ListByIDGeojsonCommand)
+	tmp88 := new(ListUserCommand)
 	sub = &cobra.Command{
-		Use:   `geojson ["/features/FEATUREID/geojson"]`,
+		Use:   `user ["/users"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp88.Run(c, args) },
 	}
@@ -1009,12 +996,12 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-by-input",
-		Short: `List an input's features in a GeoJSON.`,
+		Use:   "list-byid",
+		Short: `List a feature's GeoJSON by id.`,
 	}
-	tmp89 := new(ListByInputGeojsonCommand)
+	tmp89 := new(ListByIDGeojsonCommand)
 	sub = &cobra.Command{
-		Use:   `geojson ["/inputs/INPUTID/geojson"]`,
+		Use:   `geojson ["/features/FEATUREID/geojson"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp89.Run(c, args) },
 	}
@@ -1023,12 +1010,12 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-current",
-		Short: `List the authenticated user's projects`,
+		Use:   "list-by-input",
+		Short: `List an input's features in a GeoJSON.`,
 	}
-	tmp90 := new(ListCurrentProjectCommand)
+	tmp90 := new(ListByInputGeojsonCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/user/projects"]`,
+		Use:   `geojson ["/inputs/INPUTID/geojson"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp90.Run(c, args) },
 	}
@@ -1037,12 +1024,12 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-expeditionid",
-		Short: `List an expedition's inputs`,
+		Use:   "list-current",
+		Short: `List the authenticated user's projects`,
 	}
-	tmp91 := new(ListExpeditionIDInputCommand)
+	tmp91 := new(ListCurrentProjectCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/expeditions/EXPEDITIONID/inputs"]`,
+		Use:   `project ["/user/projects"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp91.Run(c, args) },
 	}
@@ -1051,78 +1038,92 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "listid",
-		Short: `listID action`,
+		Use:   "list-expeditionid",
+		Short: `List an expedition's inputs`,
 	}
-	tmp92 := new(ListIDAdministratorCommand)
+	tmp92 := new(ListExpeditionIDInputCommand)
 	sub = &cobra.Command{
-		Use:   `administrator ["/projects/PROJECTID/administrators"]`,
+		Use:   `input ["/expeditions/EXPEDITIONID/inputs"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp92.Run(c, args) },
 	}
 	tmp92.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp92.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp93 := new(ListIDExpeditionCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "listid",
+		Short: `listID action`,
+	}
+	tmp93 := new(ListIDAdministratorCommand)
 	sub = &cobra.Command{
-		Use:   `expedition ["/projects/PROJECTID/expeditions"]`,
+		Use:   `administrator ["/projects/PROJECTID/administrators"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp93.Run(c, args) },
 	}
 	tmp93.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp93.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp94 := new(ListIDInputCommand)
+	tmp94 := new(ListIDExpeditionCommand)
 	sub = &cobra.Command{
-		Use:   `input ["/inputs/INPUTID"]`,
+		Use:   `expedition ["/projects/PROJECTID/expeditions"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp94.Run(c, args) },
 	}
 	tmp94.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp94.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp95 := new(ListIDInputTokenCommand)
+	tmp95 := new(ListIDInputCommand)
 	sub = &cobra.Command{
-		Use:   `input-token ["/expeditions/EXPEDITIONID/input-tokens"]`,
+		Use:   `input ["/inputs/INPUTID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp95.Run(c, args) },
 	}
 	tmp95.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp95.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp96 := new(ListIDMemberCommand)
+	tmp96 := new(ListIDInputTokenCommand)
 	sub = &cobra.Command{
-		Use:   `member ["/teams/TEAMID/members"]`,
+		Use:   `input-token ["/expeditions/EXPEDITIONID/input-tokens"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp96.Run(c, args) },
 	}
 	tmp96.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp96.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp97 := new(ListIDTeamCommand)
+	tmp97 := new(ListIDMemberCommand)
 	sub = &cobra.Command{
-		Use:   `team ["/expeditions/EXPEDITIONID/teams"]`,
+		Use:   `member ["/teams/TEAMID/members"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp97.Run(c, args) },
 	}
 	tmp97.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp97.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp98 := new(ListIDTwitterCommand)
+	tmp98 := new(ListIDTeamCommand)
 	sub = &cobra.Command{
-		Use:   `twitter ["/expeditions/EXPEDITIONID/inputs/twitter-accounts"]`,
+		Use:   `team ["/expeditions/EXPEDITIONID/teams"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp98.Run(c, args) },
 	}
 	tmp98.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp98.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
+	tmp99 := new(ListIDTwitterCommand)
+	sub = &cobra.Command{
+		Use:   `twitter ["/expeditions/EXPEDITIONID/inputs/twitter-accounts"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp99.Run(c, args) },
+	}
+	tmp99.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp99.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "login",
 		Short: `Creates a valid JWT given login credentials.`,
 	}
-	tmp99 := new(LoginUserCommand)
+	tmp100 := new(LoginUserCommand)
 	sub = &cobra.Command{
 		Use:   `user ["/login"]`,
 		Short: ``,
@@ -1134,33 +1135,19 @@ Payload example:
    "password": "o8fcm9dpz8",
    "username": "ljd524hqby"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp99.Run(c, args) },
-	}
-	tmp99.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp99.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "logout",
-		Short: `Creates a valid JWT given login credentials.`,
-	}
-	tmp100 := new(LogoutUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/logout"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp100.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp100.Run(c, args) },
 	}
 	tmp100.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp100.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "project-getid",
-		Short: `Get a project's picture`,
+		Use:   "logout",
+		Short: `Creates a valid JWT given login credentials.`,
 	}
-	tmp101 := new(ProjectGetIDPictureCommand)
+	tmp101 := new(LogoutUserCommand)
 	sub = &cobra.Command{
-		Use:   `picture ["/projects/PROJECTID/picture"]`,
+		Use:   `user ["/logout"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp101.Run(c, args) },
 	}
@@ -1169,10 +1156,24 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
+		Use:   "project-getid",
+		Short: `Get a project's picture`,
+	}
+	tmp102 := new(ProjectGetIDPictureCommand)
+	sub = &cobra.Command{
+		Use:   `picture ["/projects/PROJECTID/picture"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp102.Run(c, args) },
+	}
+	tmp102.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp102.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
 		Use:   "refresh",
 		Short: `Creates a valid JWT given a refresh token.`,
 	}
-	tmp102 := new(RefreshUserCommand)
+	tmp103 := new(RefreshUserCommand)
 	sub = &cobra.Command{
 		Use:   `user ["/refresh"]`,
 		Short: ``,
@@ -1183,17 +1184,17 @@ Payload example:
 {
    "refresh_token": "Iste illo nobis eos asperiores non nam."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp102.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp103.Run(c, args) },
 	}
-	tmp102.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp102.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp103.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp103.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "update",
 		Short: `update action`,
 	}
-	tmp103 := new(UpdateDeviceCommand)
+	tmp104 := new(UpdateDeviceCommand)
 	sub = &cobra.Command{
 		Use:   `device ["/inputs/devices/ID"]`,
 		Short: ``,
@@ -1205,12 +1206,12 @@ Payload example:
    "key": "Quidem sed tempora vel expedita impedit.",
    "name": "Incidunt illo voluptatem."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp103.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp104.Run(c, args) },
 	}
-	tmp103.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp103.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp104.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp104.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp104 := new(UpdateExpeditionCommand)
+	tmp105 := new(UpdateExpeditionCommand)
 	sub = &cobra.Command{
 		Use:   `expedition ["/expeditions/EXPEDITIONID"]`,
 		Short: ``,
@@ -1223,12 +1224,12 @@ Payload example:
    "name": "Et est soluta et aut.",
    "slug": "7ambiiuahx"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp104.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp105.Run(c, args) },
 	}
-	tmp104.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp104.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp105.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp105.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp105 := new(UpdateInputCommand)
+	tmp106 := new(UpdateInputCommand)
 	sub = &cobra.Command{
 		Use:   `input ["/inputs/INPUTID"]`,
 		Short: ``,
@@ -1242,12 +1243,12 @@ Payload example:
    "teamId": 7697525532234681123,
    "userId": 6360301326752246395
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp105.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp106.Run(c, args) },
 	}
-	tmp105.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp105.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp106.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp106.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp106 := new(UpdateMemberCommand)
+	tmp107 := new(UpdateMemberCommand)
 	sub = &cobra.Command{
 		Use:   `member ["/teams/TEAMID/members/USERID"]`,
 		Short: ``,
@@ -1258,12 +1259,12 @@ Payload example:
 {
    "role": "Et praesentium."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp106.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp107.Run(c, args) },
 	}
-	tmp106.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp106.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp107.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp107.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp107 := new(UpdateProjectCommand)
+	tmp108 := new(UpdateProjectCommand)
 	sub = &cobra.Command{
 		Use:   `project ["/projects/PROJECTID"]`,
 		Short: ``,
@@ -1276,12 +1277,12 @@ Payload example:
    "name": "Voluptates dicta consectetur.",
    "slug": "12lgh80jxq"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp107.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp108.Run(c, args) },
 	}
-	tmp107.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp107.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp108.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp108.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp108 := new(UpdateTeamCommand)
+	tmp109 := new(UpdateTeamCommand)
 	sub = &cobra.Command{
 		Use:   `team ["/teams/TEAMID"]`,
 		Short: ``,
@@ -1294,12 +1295,12 @@ Payload example:
    "name": "igp59zqliv",
    "slug": "uepd168s1l"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp108.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp109.Run(c, args) },
 	}
-	tmp108.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp108.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp109.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp109.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp109 := new(UpdateUserCommand)
+	tmp110 := new(UpdateUserCommand)
 	sub = &cobra.Command{
 		Use:   `user ["/users/USERID"]`,
 		Short: ``,
@@ -1313,17 +1314,17 @@ Payload example:
    "name": "vcbmmrted8",
    "username": "ycrrcazxi7"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp109.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp110.Run(c, args) },
 	}
-	tmp109.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp109.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp110.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp110.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "update-location",
 		Short: `Update an Device input location`,
 	}
-	tmp110 := new(UpdateLocationDeviceCommand)
+	tmp111 := new(UpdateLocationDeviceCommand)
 	sub = &cobra.Command{
 		Use:   `device ["/inputs/devices/ID/location"]`,
 		Short: ``,
@@ -1336,17 +1337,17 @@ Payload example:
    "latitude": 0.3263130465701045,
    "longitude": 0.7928765136144637
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp110.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp111.Run(c, args) },
 	}
-	tmp110.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp110.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp111.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp111.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "update-schema",
 		Short: `Update an Device input schema`,
 	}
-	tmp111 := new(UpdateSchemaDeviceCommand)
+	tmp112 := new(UpdateSchemaDeviceCommand)
 	sub = &cobra.Command{
 		Use:   `device ["/inputs/devices/ID/schemas"]`,
 		Short: ``,
@@ -1359,38 +1360,38 @@ Payload example:
    "jsonSchema": "Maxime consequatur ut.",
    "key": "Aperiam perferendis veritatis dolore eius iusto."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp111.Run(c, args) },
-	}
-	tmp111.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp111.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "user-getid",
-		Short: `Get a user's picture`,
-	}
-	tmp112 := new(UserGetIDPictureCommand)
-	sub = &cobra.Command{
-		Use:   `picture ["/users/USERID/picture"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp112.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp112.Run(c, args) },
 	}
 	tmp112.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp112.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "validate",
-		Short: `Validate a user's email address.`,
+		Use:   "user-getid",
+		Short: `Get a user's picture`,
 	}
-	tmp113 := new(ValidateUserCommand)
+	tmp113 := new(UserGetIDPictureCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/validate"]`,
+		Use:   `picture ["/users/USERID/picture"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp113.Run(c, args) },
 	}
 	tmp113.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp113.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "validate",
+		Short: `Validate a user's email address.`,
+	}
+	tmp114 := new(ValidateUserCommand)
+	sub = &cobra.Command{
+		Use:   `user ["/validate"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp114.Run(c, args) },
+	}
+	tmp114.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp114.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -1669,7 +1670,16 @@ func (cmd *ListByInputGeojsonCommand) Run(c *client.Client, args []string) error
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListByInputGeoJSON(ctx, path)
+	var tmp115 *bool
+	if cmd.Descending != "" {
+		var err error
+		tmp115, err = boolVal(cmd.Descending)
+		if err != nil {
+			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--descending", "err", err)
+			return err
+		}
+	}
+	resp, err := c.ListByInputGeoJSON(ctx, path, tmp115)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1683,6 +1693,8 @@ func (cmd *ListByInputGeojsonCommand) Run(c *client.Client, args []string) error
 func (cmd *ListByInputGeojsonCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var inputID int
 	cc.Flags().IntVar(&cmd.InputID, "inputId", inputID, ``)
+	var descending string
+	cc.Flags().StringVar(&cmd.Descending, "descending", descending, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddAdministratorCommand command.

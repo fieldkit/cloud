@@ -415,7 +415,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 		nextToken.time = before.UnixNano()
 	} else {
 		nextToken.time = token.time
-		nextToken.page += 1
+		nextToken.page = token.page + 1
 	}
 
 	return &data.DocumentsPage{
@@ -423,7 +423,7 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 	}, nextToken, nil
 }
 
-func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
+func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, descending bool, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
 	if token == nil {
 		after := time.Now().AddDate(-10, 0, 0)
 		token = &PagingToken{
@@ -436,7 +436,11 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *
 	pageSize := int32(DefaultPageSize)
 	before := time.Now()
 	documents := []*data.Document{}
-	if err := b.db.SelectContext(ctx, &documents, `
+	order := "ASC"
+	if descending {
+		order = "DESC"
+	}
+	if err := b.db.SelectContext(ctx, &documents, fmt.Sprintf(`
 		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
 			FROM fieldkit.document AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
@@ -444,9 +448,9 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE d.visible AND i.id = $1 AND d.insertion < $2 AND (insertion >= $3) AND
                                               ST_X(d.location) != 0 AND ST_Y(d.location) != 0
-                        ORDER BY timestamp
+                        ORDER BY timestamp %s
                         LIMIT $4 OFFSET $5
-		`, inputID, before, after, pageSize, token.page*pageSize); err != nil {
+		`, order), inputID, before, after, pageSize, token.page*pageSize); err != nil {
 		return nil, nil, err
 	}
 
@@ -455,7 +459,7 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, token *
 		nextToken.time = before.UnixNano()
 	} else {
 		nextToken.time = token.time
-		nextToken.page += 1
+		nextToken.page = token.page + 1
 	}
 
 	return &data.DocumentsPage{
@@ -472,8 +476,8 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 	summaries := []*FeatureSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
                 SELECT
-		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1),
-		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 ORDER BY d.timestamp DESC LIMIT 1)
+		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1)
 	      `, sourceId); err != nil {
 		return nil, err
 	}
