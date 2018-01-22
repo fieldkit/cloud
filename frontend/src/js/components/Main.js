@@ -6,7 +6,6 @@ import { Route, Switch, NavLink } from 'react-router-dom';
 
 import log from 'loglevel';
 import Map from './pages/Map';
-import Sensors from './pages/Sensors';
 import About from './pages/About';
 
 import type { ActiveExpedition  } from '../types';
@@ -43,7 +42,6 @@ export class Main extends Component {
                     </div>
                 </div>
                 <Switch>
-                    <Route path={ '/sensors' } component={ Sensors } />
                     <Route path={ '/about' } component={ About } />
                     <Route path={ '/' } component={ Map } />
                 </Switch>

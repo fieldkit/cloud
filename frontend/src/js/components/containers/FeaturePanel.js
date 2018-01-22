@@ -33,7 +33,7 @@ export default class FeaturePanel extends Component {
                 <tbody>
                 { properties.value().map(([ k , v ]) => (
                     <tr key={k}>
-                        <td style={{ width: '50%' }}> {k} </td>
+                        <td style={{ width: '50%' }}> <a href="#" onClick={() => console.log(k)}>{k}</a> </td>
                         <td> {Number(v).toFixed(2)} </td>
                     </tr>
                 )) }
