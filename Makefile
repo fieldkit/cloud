@@ -50,7 +50,8 @@ schema-production:
 	@if [ -d ~/conservify/dev-ops ]; then                                           \
 		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
 		cp ~/conservify/dev-ops/schema.sql schema-production/000001.sql;        \
-		cp ~/conservify/dev-ops/schema.sql schema-production/000002.sql;        \
+		cp ~/conservify/dev-ops/data.sql schema-production/000002.sql;          \
+		cp schema/000001.sql schema-production/000001.sql;                      \
 	else                                                                            \
 		echo "No dev-ops directory found";                                      \
 	fi
