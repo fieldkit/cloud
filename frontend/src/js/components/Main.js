@@ -34,12 +34,12 @@ export class Main extends Component {
                     <div className="project-name">
                         { activeExpedition && activeExpedition.project && activeExpedition.project.name }
                     </div>
-                    <div className="nav-bar">
+                    { false && <div className="nav-bar">
                         <div className="navigation-tabs">
                             <NavLink exact to={ '/' }><span>Map</span></NavLink>
                             <NavLink exact to={ '/' }><span>About</span></NavLink>
                         </div>
-                    </div>
+                    </div>}
                 </div>
                 <Switch>
                     <Route path={ '/about' } component={ About } />

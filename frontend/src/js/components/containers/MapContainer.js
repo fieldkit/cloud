@@ -39,6 +39,66 @@ type Props = {
     }
 };
 
+const panelContainerStyle = {
+    backgroundColor: '#f9f9f9',
+    color: "#000",
+    position: 'absolute',
+    zIndex: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
+};
+
+const panelHeaderStyle = {
+    padding: '5px',
+    backgroundColor: '#a9a9a9',
+    borderBottom: '1px solid black',
+
+};
+
+const panelBodyStyle = {
+};
+
+export class MapBottom extends Component {
+    positionStyle() {
+        const { sidePanelVisible } = this.props;
+        if (!sidePanelVisible) {
+            return { top: 'auto', right: 0, bottom: 0, left: 0, height: '200px', width: '100%' };
+        }
+        return { top: 'auto', right: 300, bottom: 0, left: 0, height: '200px' };
+    }
+
+    render() {
+        const { onHide } = this.props;
+        const position = this.positionStyle();
+
+        return (
+            <div style={{...panelContainerStyle, ...position}}>
+                <div style={{ ...panelHeaderStyle }}><span style={{}} onClick={() => onHide()}>Close</span></div>
+                <div style={{ ...panelBodyStyle }}>
+                    Hello
+                </div>
+            </div>
+        );
+    }
+}
+
+export class MapRight extends Component {
+    render() {
+        const { onHide } = this.props;
+        const position = { top: 0, right: 0, bottom: 'auto', left: 'auto', width: '300px', height: '100%' };
+
+        return (
+            <div style={{...panelContainerStyle, ...position}}>
+                <div style={{ ...panelHeaderStyle }}><span style={{}} onClick={() => onHide()}>Close</span></div>
+                <div style={{ ...panelBodyStyle }}>
+                    Hello
+                </div>
+            </div>
+        );
+    }
+}
+
 export default class MapContainer extends Component {
     props: Props
     state: {
@@ -54,7 +114,11 @@ export default class MapContainer extends Component {
             fitBounds: [[0, 0], [0, 0]],
             center: [0, 0],
             zoom: [12],
-            feature: null
+            feature: null,
+            panels: {
+                sidePanelVisible: false,
+                bottomPanelVisible: false,
+            }
         };
         this.onUserActivityThrottled = _.throttle(this.onUserActivity.bind(this), 500, { leading: true });
     }
@@ -133,6 +197,16 @@ export default class MapContainer extends Component {
     }
     */
 
+    renderPanels() {
+        const { panels } = this.state;
+        return (
+            <div>
+                { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false }})} /> }
+                { panels.bottomPanelVisible && <MapBottom onHide={() => this.setState({ panels: { ...panels, bottomPanelVisible: false }})} sidePanelVisible={panels.sidePanelVisible} /> }
+            </div>
+        );
+    }
+
     render() {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom, feature } = this.state;
@@ -166,6 +240,7 @@ export default class MapContainer extends Component {
                         <FeaturePanel feature={feature} />
                       </Popup> }
                 </ReactMapboxGl>
+                {this.renderPanels()}
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
