@@ -3,6 +3,8 @@
 set -xe
 make
 
-build/fktool --host api.fkdev.org --scheme https --device-id cbb0e36b54324e5120204a37381f06ff --device-name weather-1 --longitude -118.2688137 --latitude 34.0309388
-build/fktool --host api.fkdev.org --scheme https --device-id 3856141154324e5120202037242c13ff --device-name weather-2 --longitude -118.2688137 --latitude 34.0309388
+build/fktool --host api.fkdev.org --scheme https --device-id cbb0e36b54324e5120204a37381f06ff --device-name nat-1 --longitude -118.2688137 --latitude 34.0309388
+build/fktool --host api.fkdev.org --scheme https --device-id 3856141154324e5120202037242c13ff --device-name nat-2 --longitude -118.2688137 --latitude 34.0309388
 build/fktool --host api.fkdev.org --scheme https --device-id 0004a30b001d1c5e --device-name atlas-1 --longitude -118.2688137 --latitude 34.0309388
+build/fktool --host api.fkdev.org --scheme https --device-id 0004a30b001ca901 --device-name weather-1 --longitude -118.2688137 --latitude 34.0309388
+
