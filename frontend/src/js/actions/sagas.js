@@ -108,10 +108,8 @@ export function* loadCharts() {
 export function* loadExpeditionDetails() {
     const cache = {};
 
-    yield takeLatest([ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS], function* (geojsonSuccess) {
-        const geojson = geojsonSuccess.response.geo;
-        const expedition = new FkGeoJSON(geojson);
-        const ids = expedition.getUniqueSourceIds().map(id => id.toString());
+    yield takeLatest([ActionTypes.API_EXPEDITION_SOURCES_GET.SUCCESS], function* (sourcesAction) {
+        const ids = _(sourcesAction.response.deviceInputs).map('id').uniq().value();
         const newIds = _.difference(ids, _.keys(cache));
         const sources = yield all(newIds.map(id => FkApi.getSource(id)));
         const indexed = _(sources).keyBy('id').value();
@@ -121,9 +119,10 @@ export function* loadExpeditionDetails() {
 }
 
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, pagedGeojson ] = yield all([
+    const [ expedition, pagedGeojson, sources ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
-        FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug)
+        FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug),
+        FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
     console.log(expedition, pagedGeojson);
