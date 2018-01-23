@@ -67,6 +67,8 @@ var _ = Resource("input", func() {
 	})
 
 	Action("list", func() {
+		NoSecurity()
+
 		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs"))
 		Description("List a project's inputs")
 		Params(func() {

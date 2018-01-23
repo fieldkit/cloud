@@ -1110,10 +1110,9 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleInputOrigin(h)
 	service.Mux.Handle("GET", "/projects/@/:project/expeditions/@/:expedition/inputs", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Input", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/inputs", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Input", "action", "List", "route", "GET /projects/@/:project/expeditions/@/:expedition/inputs")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -2311,11 +2311,7 @@ paths:
       - input_token
   /projects/@/{project}/expeditions/@/{expedition}/inputs:
     get:
-      description: |-
-        List a project's inputs
-
-        Required security scopes:
-          * `api:access`
+      description: List a project's inputs
       operationId: input#list
       parameters:
       - description: Expedition slug
@@ -2343,9 +2339,6 @@ paths:
           description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: list input
       tags:
       - input
