@@ -105,6 +105,15 @@ class Map extends Component {
         };
     }
 
+    // Not sure how I feel about this. I'm open to suggestions.
+    componentWillMount() {
+        document.body.style.overflow = "hidden";
+    }
+
+    componentWillUnmount() {
+        document.body.style.overflow = null;
+    }
+
     render() {
         const { visibleFeatures, playbackMode, notifyOfUserMapActivity, focusFeature, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;

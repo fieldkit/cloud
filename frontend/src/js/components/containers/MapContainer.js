@@ -198,9 +198,12 @@ export default class MapContainer extends Component {
     */
 
     renderPanels() {
+        const { visibleFeatures } = this.props;
         const { panels } = this.state;
+
         return (
             <div>
+                <NotificationsPanel features={visibleFeatures.focus.features} sidePanelVisible={panels.sidePanelVisible} />
                 { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false }})} /> }
                 { panels.bottomPanelVisible && <MapBottom onHide={() => this.setState({ panels: { ...panels, bottomPanelVisible: false }})} sidePanelVisible={panels.sidePanelVisible} /> }
             </div>
@@ -232,8 +235,6 @@ export default class MapContainer extends Component {
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
                     <FiltersPanel features visibleFeatures={visibleFeatures} onShowFeature={ this.onFocusFeature.bind(this) } />
-
-                    <NotificationsPanel features={visibleFeatures.focus.features} />
 
                     { feature &&
                       <Popup anchor="bottom" offset={ [0, -10] } coordinates={ feature.geometry.coordinates } style={{ padding: '0px' }}>

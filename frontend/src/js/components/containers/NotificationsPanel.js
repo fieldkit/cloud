@@ -30,15 +30,26 @@ type Props = {
 export default class NotificationsPanel extends Component {
     props: Props
 
+    positionStyle() {
+        const { sidePanelVisible } = this.props;
+        if (!sidePanelVisible) {
+            return { top: 150, right: 30, bottom: 'auto', left: 'auto' };
+        }
+        return { top: 150, right: 30 + 300, bottom: 'auto', left: 'auto' };
+    }
+
+
     render() {
         const { features } = this.props;
-        const position = { top: 150, right: 30, bottom: 'auto', left: 'auto' };
+        const position = this.positionStyle();
 
         if (features.length === 0) {
             return (<div></div>);
         }
 
-        const panels = features.map((f, i) => <FeaturePanel key={i} feature={f} style={{ ...panelStyle, ...(i > 0 ? separatorStyle : {}) }} />);
+        const visible = features.slice(0, 5);
+
+        const panels = visible.map((f, i) => <FeaturePanel key={i} feature={f} style={{ ...panelStyle, ...(i > 0 ? separatorStyle : {}) }} />);
 
         return (
             <div className="notification-panel" style={{ ...containerStyle, ...position }}>
