@@ -5,8 +5,6 @@ import moment from 'moment';
 
 import React, { Component } from 'react';
 
-import ChartComponent from '../ChartComponent';
-
 const panelStyle: React.CSSProperties = {
     backgroundColor: '#f9f9f9',
     color: "#000",
@@ -31,25 +29,13 @@ export default class FeaturePanel extends Component {
     componentWillReceiveProps(nextProps) {
         const { feature: oldFeature } = this.props;
         const { feature: newFeature } = nextProps;
-
-        if (oldFeature.properties.id != newFeature.properties.id) {
-            this.onHideChart();
-        }
     }
 
     onShowChart(key) {
-        const { feature } = this.props;
-        this.setState({
-            chart: {
-                source: feature.properties.source,
-                key: key
-            }
-        });
-    }
-
-    onHideChart() {
-        this.setState({
-            chart: null
+        const { onShowChart, feature } = this.props;
+        onShowChart({
+            source: feature.properties.source,
+            key: key
         });
     }
 
@@ -67,7 +53,7 @@ export default class FeaturePanel extends Component {
                 <tbody>
                 { properties.value().map(([ k , v ]) => (
                     <tr key={k}>
-                        <td style={{ width: '50%' }}> <a href="#" onClick={() => this.onShowChart(k)}>{k}</a> </td>
+                        <td style={{ width: '50%' }}> <div onClick={() => this.onShowChart(k)} style={{ cursor: 'pointer' }}>{k}</div> </td>
                         <td> {Number(v).toFixed(2)} </td>
                     </tr>
                 )) }
@@ -77,19 +63,10 @@ export default class FeaturePanel extends Component {
     }
 
     render() {
-        const { style, feature } = this.props;
-        const { chart } = this.state;
-
-        if (chart) {
-            return (
-                <div style={{ ...panelStyle, ...style }}>
-                    <div style={{ backgroundColor: '#d0d0d0', padding: '5px', fontWeight: 'bold' }} onClick={() => this.onHideChart()}><a href="#">{chart.key} - Back</a></div>
-                    <ChartComponent chart={chart} />
-                </div>
-            );
-        }
+        const { style, feature, onShowChart } = this.props;
 
         const date = moment(new Date(feature.properties['timestamp'])).format('MMM Do YYYY, h:mm:ss a');
+
         return (
             <div style={{ ...panelStyle, ...style }}>
                 <div style={{ backgroundColor: '#d0d0d0', padding: '5px', fontWeight: 'bold' }}>{date}</div>

@@ -8,7 +8,7 @@ import React, { Component } from 'react';
 import { Loading } from '../Loading';
 
 import { TimeSeries, TimeRange } from "pondjs";
-import { Charts, ChartContainer, ChartRow, YAxis, LineChart, styler } from "react-timeseries-charts";
+import { Charts, ChartContainer, ChartRow, YAxis, LineChart, styler, Resizable } from "react-timeseries-charts";
 
 type Props = {
     chart: {},
@@ -17,6 +17,10 @@ type Props = {
 
 export default class SimpleChartContainer extends Component {
     props: Props;
+
+    handleChartResize(width) {
+        this.setState({ width });
+    }
 
     render() {
         const { chart, geojson } = this.props;
@@ -38,24 +42,27 @@ export default class SimpleChartContainer extends Component {
             points: samples
         };
         const timeseries = new TimeSeries(data);
-        const myStyler = styler([
-            {key: "value1", color: "#2ca02c", width: 1},
-            {key: "value", color: "#9467bd", width: 2}
+        const lineStyle = styler([
+            { key: "value", color: "#9467bd", width: 1 }
         ]);
+        /*
         const begin = moment();
         const end =  moment().subtract(3, 'days');
-        // const tr = timeseries.timerange();
         const tr = new TimeRange(begin, end);
+        */
+        const tr = timeseries.timerange();
         return (
             <div style={{ padding: '10px' }}>
-                <ChartContainer timeRange={tr} width={480} showGrid={false}>
-                    <ChartRow height="200">
-                        <YAxis id="y" label={chart.key} min={timeseries.min()} max={timeseries.max()} width="70" type="linear" format=",.2f"/>
-                        <Charts>
-                            <LineChart axis="y" series={timeseries} style={myStyler} />
-                        </Charts>
-                    </ChartRow>
-                </ChartContainer>
+                <Resizable>
+                    <ChartContainer timeRange={tr} showGrid={false} onChartResize={width => this.handleChartResize(width)} showGrid={true}>
+                        <ChartRow height="180">
+                            <YAxis id="y" label={chart.key} min={timeseries.min()} max={timeseries.max()} width="100" type="linear" format=",.2f" labelOffset={-40} />
+                            <Charts>
+                                <LineChart axis="y" series={timeseries} style={lineStyle} />
+                            </Charts>
+                        </ChartRow>
+                    </ChartContainer>
+                </Resizable>
             </div>
         );
     }

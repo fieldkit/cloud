@@ -16,6 +16,7 @@ import { FieldKitLogo } from '../icons/Icons';
 
 import FeaturePanel from './FeaturePanel';
 import NotificationsPanel from './NotificationsPanel';
+import ChartComponent from '../ChartComponent';
 import FiltersPanel from './FiltersPanel';
 
 function getFitBounds(geojson: GeoJSON) {
@@ -51,9 +52,9 @@ const panelContainerStyle = {
 
 const panelHeaderStyle = {
     padding: '5px',
-    backgroundColor: '#a9a9a9',
-    borderBottom: '1px solid black',
-
+    backgroundColor: 'rgb(196, 196, 196)',
+    borderBottom: '1px solid rgb(128, 128, 128)',
+    fontWeight: 'bold',
 };
 
 const panelBodyStyle = {
@@ -63,20 +64,20 @@ export class MapBottom extends Component {
     positionStyle() {
         const { sidePanelVisible } = this.props;
         if (!sidePanelVisible) {
-            return { top: 'auto', right: 0, bottom: 0, left: 0, height: '200px', width: '100%' };
+            return { top: 'auto', right: 0, bottom: 0, left: 0, height: '250px', width: '100%' };
         }
-        return { top: 'auto', right: 300, bottom: 0, left: 0, height: '200px' };
+        return { top: 'auto', right: 300, bottom: 0, left: 0, height: '250px' };
     }
 
     render() {
-        const { onHide } = this.props;
+        const { onHide, children } = this.props;
         const position = this.positionStyle();
 
         return (
             <div style={{...panelContainerStyle, ...position}}>
-                <div style={{ ...panelHeaderStyle }}><span style={{}} onClick={() => onHide()}>Close</span></div>
+                <div style={{ ...panelHeaderStyle }}><span style={{ cursor: 'pointer' }} onClick={() => onHide()}>Close</span></div>
                 <div style={{ ...panelBodyStyle }}>
-                    Hello
+                    {children}
                 </div>
             </div>
         );
@@ -85,14 +86,14 @@ export class MapBottom extends Component {
 
 export class MapRight extends Component {
     render() {
-        const { onHide } = this.props;
+        const { onHide, children } = this.props;
         const position = { top: 0, right: 0, bottom: 'auto', left: 'auto', width: '300px', height: '100%' };
 
         return (
             <div style={{...panelContainerStyle, ...position}}>
-                <div style={{ ...panelHeaderStyle }}><span style={{}} onClick={() => onHide()}>Close</span></div>
+                <div style={{ ...panelHeaderStyle }}><span style={{ cursor: 'pointer' }} onClick={() => onHide()}>Close</span></div>
                 <div style={{ ...panelBodyStyle }}>
-                    Hello
+                    {children}
                 </div>
             </div>
         );
@@ -167,7 +168,20 @@ export default class MapContainer extends Component {
         const { focusFeature } = this.props;
         focusFeature(feature);
         this.setState({
-            feature
+            feature,
+            panels: {
+                sidePanelVisible: true,
+            },
+        });
+    }
+
+    onShowChart(chart) {
+        this.setState({
+            chart,
+            panels: {
+                sidePanelVisible: true,
+                bottomPanelVisible: true,
+            },
         });
     }
 
@@ -199,13 +213,17 @@ export default class MapContainer extends Component {
 
     renderPanels() {
         const { visibleFeatures } = this.props;
-        const { panels } = this.state;
+        const { panels, chart, feature } = this.state;
 
         return (
             <div>
                 <NotificationsPanel features={visibleFeatures.focus.features} sidePanelVisible={panels.sidePanelVisible} />
-                { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false }})} /> }
-                { panels.bottomPanelVisible && <MapBottom onHide={() => this.setState({ panels: { ...panels, bottomPanelVisible: false }})} sidePanelVisible={panels.sidePanelVisible} /> }
+                { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false, bottomPanelVisible: false }})}>
+                  <FeaturePanel feature={feature} onShowChart={chart => this.onShowChart(chart)}/>
+                </MapRight> }
+                { panels.bottomPanelVisible && <MapBottom onHide={() => this.setState({ panels: { ...panels, bottomPanelVisible: false }})} sidePanelVisible={panels.sidePanelVisible}>
+                  <ChartComponent chart={chart} />
+                </MapBottom> }
             </div>
         );
     }
@@ -235,11 +253,6 @@ export default class MapContainer extends Component {
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
                     <FiltersPanel features visibleFeatures={visibleFeatures} onShowFeature={ this.onFocusFeature.bind(this) } />
-
-                    { feature &&
-                      <Popup anchor="bottom" offset={ [0, -10] } coordinates={ feature.geometry.coordinates } style={{ padding: '0px' }}>
-                        <FeaturePanel feature={feature} />
-                      </Popup> }
                 </ReactMapboxGl>
                 {this.renderPanels()}
                 <div className="disclaimer-panel">
