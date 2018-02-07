@@ -217,12 +217,15 @@ export default class MapContainer extends Component {
     */
 
     renderPanels() {
-        const { visibleFeatures } = this.props;
+        const { visibleFeatures, playbackMode } = this.props;
         const { panels, chart, feature } = this.state;
+
+        const { mode } = playbackMode;
+        const paused = mode == "Pause";
 
         return (
             <div>
-                <NotificationsPanel features={visibleFeatures.focus.features} sidePanelVisible={panels.sidePanelVisible} />
+                { !paused && <NotificationsPanel features={visibleFeatures.focus.features} sidePanelVisible={panels.sidePanelVisible} />}
                 { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false, bottomPanelVisible: false }})}>
                   <FeaturePanel feature={feature} onShowChart={chart => this.onShowChart(chart)}/>
                 </MapRight> }

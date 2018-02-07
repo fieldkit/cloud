@@ -45,6 +45,7 @@ export function* walkExpedition(geojson) {
             ]);
 
             if (activityAction || focusFeatureAction) {
+                yield put(changePlaybackMode(PlaybackModes.Pause));
                 break;
             }
 
