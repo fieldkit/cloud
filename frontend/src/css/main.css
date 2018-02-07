@@ -80,7 +80,8 @@ h5 {
     z-index: 1;
     display: flex;
     flex-direction: row;
-    align-items: baseline; }
+    align-items: baseline;
+    background-color: rgba(0, 0, 0, 0.6); }
     .main .header .project-name {
       font-size: 36px;
       line-height: 48px;
@@ -89,8 +90,9 @@ h5 {
       letter-spacing: 1px;
       margin-bottom: 24px;
       flex-grow: 1;
-      line-height: 58px;
-      margin-bottom: 0; }
+      line-height: 30px;
+      margin-bottom: 0;
+      font-weight: bold; }
     .main .header .nav-bar {
       font-size: 13px;
       line-height: 24px;
