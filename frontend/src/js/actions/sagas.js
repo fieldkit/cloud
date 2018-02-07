@@ -22,7 +22,15 @@ export function* walkExpedition(geojson) {
     const start = expedition.getFirst().time();
     const end = expedition.getLast().time();
 
-    let expeditionMinutesPerTick = 5;
+    const tickDuration = 100;
+    const walkDurationInSeconds = 30;
+    const walkLength = end - start;
+    const walkLengthInSeconds = (walkLength / 1000);
+
+    let expeditionSecondsPerTick = (walkLengthInSeconds / walkDurationInSeconds) / (1000 / tickDuration);
+
+    console.log(walkLength, walkLength / 1000, walkLengthInSeconds, expeditionSecondsPerTick);
+
     let time = start;
 
     while (true) {
@@ -35,7 +43,7 @@ export function* walkExpedition(geojson) {
                 take(ActionTypes.USER_MAP_ACTIVITY),
                 take(ActionTypes.FOCUS_FEATURE),
                 take(ActionTypes.CHANGE_PLAYBACK_MODE),
-                delay(100)
+                delay(tickDuration)
             ]);
 
             if (activityAction || focusFeatureAction) {
@@ -53,15 +61,15 @@ export function* walkExpedition(geojson) {
                     break;
                 }
                 case PlaybackModes.Rewind: {
-                    expeditionMinutesPerTick = -5;
+                    expeditionSecondsPerTick = -5;
                     break;
                 }
                 case PlaybackModes.Play: {
-                    expeditionMinutesPerTick = 5;
+                    expeditionSecondsPerTick = 5;
                     break;
                 }
                 case PlaybackModes.Forward: {
-                    expeditionMinutesPerTick = 20;
+                    expeditionSecondsPerTick = 20;
                     break;
                 }
                 case PlaybackModes.End: {
@@ -74,7 +82,7 @@ export function* walkExpedition(geojson) {
                 }
             }
 
-            time.setTime(time.getTime() + (expeditionMinutesPerTick * 60 * 1000));
+            time.setTime(time.getTime() + (expeditionSecondsPerTick * 1000));
         }
 
         console.log("DONE", start, end, time);
