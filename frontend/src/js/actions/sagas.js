@@ -142,6 +142,23 @@ export function* loadActiveExpedition(projectSlug, expeditionSlug) {
     }
 }
 
+export function* loadSingleDevice(deviceId) {
+    const [ pagedGeojson ] = yield all([
+        FkApi.getSourceGeoJson(deviceId),
+    ]);
+
+    yield put({
+        type: ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS,
+        response: pagedGeojson,
+    })
+
+    if (pagedGeojson.geo.features.length > 0) {
+        yield delay(1000)
+
+        yield all([ walkExpedition(pagedGeojson.geo), refreshSaga(pagedGeojson) ]);
+    }
+}
+
 export function* loadActiveProject() {
     const projectSlug = 'www';
 
