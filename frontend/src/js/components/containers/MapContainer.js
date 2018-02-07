@@ -160,7 +160,10 @@ export default class MapContainer extends Component {
 
     onMarkerClick(feature) {
         this.setState({
-            feature
+            feature,
+            panels: {
+                sidePanelVisible: true,
+            },
         });
     }
 
@@ -192,6 +195,7 @@ export default class MapContainer extends Component {
     }
 
     onPopupChange() {
+        /*
         let { feature } = this.state;
         if (feature) { // If we have a popup and we're changing to another one.
             feature = null;
@@ -199,6 +203,7 @@ export default class MapContainer extends Component {
                 feature
             });
         }
+        */
     }
 
     /*

@@ -29,8 +29,6 @@ export function* walkExpedition(geojson) {
 
     let expeditionSecondsPerTick = (walkLengthInSeconds / walkDurationInSeconds) / (1000 / tickDuration);
 
-    console.log(walkLength, walkLength / 1000, walkLengthInSeconds, expeditionSecondsPerTick);
-
     let time = start;
 
     while (true) {
@@ -122,6 +120,7 @@ export function* loadExpeditionDetails() {
         const sources = yield all(newIds.map(id => FkApi.getSource(id)));
         const indexed = _(sources).keyBy('id').value();
         const features = yield all(sources.map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
+        console.log("LatestFeatures", features);
         Object.assign(cache, indexed);
     });
 }
@@ -133,7 +132,7 @@ export function* loadActiveExpedition(projectSlug, expeditionSlug) {
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
-    console.log(expedition, pagedGeojson);
+    console.log(expedition, pagedGeojson, sources);
 
     if (pagedGeojson.geo.features.length > 0) {
         yield delay(1000)
@@ -173,7 +172,8 @@ export function* loadActiveProject() {
         yield all([
             loadExpeditionDetails(),
             loadCharts(),
-            loadActiveExpedition(projectSlug, expeditions[0].slug)
+            loadSingleDevice(125),
+            // loadActiveExpedition(projectSlug, expeditions[0].slug)
         ])
         console.log("Done")
     }
