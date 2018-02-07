@@ -32,7 +32,7 @@ export class Main extends Component {
             <div className="main">
                 <div className="header">
                     <div className="project-name">
-                        { activeExpedition && activeExpedition.project && activeExpedition.project.name }
+                        FieldKit Project
                     </div>
                     { false && <div className="nav-bar">
                         <div className="navigation-tabs">
