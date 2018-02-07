@@ -35,7 +35,7 @@ export function* walkExpedition(geojson) {
         while (time < end) {
             const coordinates = expedition.getCoordinatesAtTime(time);
 
-            yield put(focusExpeditionTime(time, coordinates));
+            yield put(focusExpeditionTime(time, coordinates, expeditionSecondsPerTick));
 
             const [ activityAction, focusFeatureAction, playbackAction, _ ] = yield race([
                 take(ActionTypes.USER_MAP_ACTIVITY),

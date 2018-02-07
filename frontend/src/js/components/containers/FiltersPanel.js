@@ -57,6 +57,10 @@ export default class FiltersPanel extends Component {
         const { style, visibleFeatures } = this.props;
         const position = { top: 120, left: 70, bottom: 'auto', right: 'auto' };
 
+        if (_.values(visibleFeatures.sources).length == 0) {
+            return (<div></div>);
+        }
+
         return (
             <div style={{ ...panelStyle, ...containerStyle, ...style, ...position }}>
                 {this.renderSources(visibleFeatures.sources)}

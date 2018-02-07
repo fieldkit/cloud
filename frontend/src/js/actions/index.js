@@ -7,11 +7,12 @@ export function changePlaybackMode(mode) {
     };
 }
 
-export function focusExpeditionTime(time, center) {
+export function focusExpeditionTime(time, center, expeditionSecondsPerTick) {
     return {
         type: ActionTypes.FOCUS_TIME,
         time: time,
-        center: center
+        center: center,
+        expeditionSecondsPerTick: expeditionSecondsPerTick
     };
 }
 

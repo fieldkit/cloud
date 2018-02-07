@@ -16,7 +16,7 @@ function generateConstantColor() {
         type: 'constant',
         colors: [{
             location: 0,
-            color: '#facada'
+            color: '#ff0000'
         }],
         dateKey: null,
         bounds: null,

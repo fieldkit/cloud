@@ -58,11 +58,13 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
         return nextState;
     }
     case ActionTypes.FOCUS_TIME:
+        const expeditionSecondsPerTick = action.expeditionSecondsPerTick;
         const expedition = new FkGeoJSON(state.geojson);
-        const features = expedition.getFeaturesWithinTime(action.time, 500000 * 10);
+        const features = expedition.getFeaturesWithinTime(action.time, 1 * 60 * 1000);
 
         return Object.assign({ }, state, {
             focus: {
+                expeditionSecondsPerTick: expeditionSecondsPerTick,
                 time: action.time,
                 center: action.center,
                 features: features
