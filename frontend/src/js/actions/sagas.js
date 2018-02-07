@@ -29,6 +29,11 @@ export function* walkExpedition(geojson) {
 
     let expeditionSecondsPerTick = (walkLengthInSeconds / walkDurationInSeconds) / (1000 / tickDuration);
 
+    console.log("Start", start);
+    console.log("End", end);
+    console.log(tickDuration, walkDurationInSeconds);
+    console.log(expeditionSecondsPerTick);
+
     let time = start;
 
     while (true) {
