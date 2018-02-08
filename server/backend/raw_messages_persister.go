@@ -26,7 +26,7 @@ type IncomingMessageParams struct {
 }
 
 type IncomingMessage struct {
-	RawBody string                 `json:"body-raw"`
+	RawBody []byte                 `json:"body-raw"`
 	Params  IncomingMessageParams  `json:"params"`
 	Context IncomingMessageContext `json:"context"`
 }
@@ -73,7 +73,6 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 				}
 				if true {
 					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
-					log.Printf("%s", raw.RawBody)
 				}
 			} else {
 				if true {
@@ -131,7 +130,7 @@ func (rmi *RawMessageIngester) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	}
 
 	m := &IncomingMessage{
-		RawBody: string(bodyBytes),
+		RawBody: bodyBytes,
 		Context: IncomingMessageContext{
 			UserAgent: req.UserAgent(),
 			RequestId: originId,

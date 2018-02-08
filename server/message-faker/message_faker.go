@@ -71,7 +71,7 @@ func main() {
 	}
 
 	sqs := ingestion.SqsMessage{
-		RawBody: string(rawBody),
+		RawBody: rawBody,
 		Params: ingestion.SqsMessageParams{
 			QueryString: map[string]string{"token": o.Token},
 			Headers: ingestion.SqsMessageHeaders{

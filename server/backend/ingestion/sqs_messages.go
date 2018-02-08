@@ -16,7 +16,7 @@ type SqsMessageContext struct {
 }
 
 type SqsMessage struct {
-	RawBody string            `json:"body-raw"`
+	RawBody []byte            `json:"body-raw"`
 	Params  SqsMessageParams  `json:"params"`
 	Context SqsMessageContext `json:"context"`
 }

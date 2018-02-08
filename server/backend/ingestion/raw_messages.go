@@ -25,7 +25,7 @@ type RawMessageHandler interface {
 
 type RawMessage struct {
 	RequestId   string
-	RawBody     string
+	RawBody     []byte
 	ContentType string
 	QueryString *url.Values
 	Form        *url.Values
@@ -49,7 +49,7 @@ func CreateRawMessageFromRow(row *RawMessageRow) (raw *RawMessage, err error) {
 	}
 
 	if strings.Contains(rmd.Params.Headers.ContentType, FormUrlEncodedMimeType) {
-		parsedForm, err := url.ParseQuery(rmd.RawBody)
+		parsedForm, err := url.ParseQuery(string(rmd.RawBody))
 		if err != nil {
 			return nil, fmt.Errorf("Malformed RawMessage: RawBody invalid for %s.", rmd.Params.Headers.ContentType)
 		}
