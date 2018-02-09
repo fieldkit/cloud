@@ -173,20 +173,27 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 		return nil, nil, fmt.Errorf("(ProcessMessage) %v", err)
 	}
 	if pm != nil {
-		schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
+		im, err := i.IngestProcessedMessage(pm)
 		if err != nil {
-			return nil, pm, fmt.Errorf("(LookupSchema) %v", err)
+			return nil, pm, err
 		}
-		im, err := i.ApplySchemas(pm, schemas)
-		if err != nil {
-			return nil, pm, fmt.Errorf("(ApplySchemas) %v", err)
-		} else {
-			i.Statistics.Successes += 1
-			return im, pm, nil
-		}
+		return im, pm, nil
 	}
 
 	return
+}
+
+func (i *MessageIngester) IngestProcessedMessage(pm *ProcessedMessage) (im *IngestedMessage, err error) {
+	schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
+	if err != nil {
+		return nil, fmt.Errorf("(LookupSchema) %v", err)
+	}
+	im, err = i.ApplySchemas(pm, schemas)
+	if err != nil {
+		return nil, fmt.Errorf("(ApplySchemas) %v", err)
+	}
+	i.Statistics.Successes += 1
+	return im, nil
 }
 
 func (i *MessageIngester) HandleMessage(raw *RawMessage) error {

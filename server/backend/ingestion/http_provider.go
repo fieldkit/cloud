@@ -37,32 +37,36 @@ func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
 
 func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
 	if raw.ContentType == HttpProviderJsonContentType {
-		message := HttpJsonMessage{}
-		err = json.Unmarshal([]byte(raw.RawBody), &message)
+		message := &HttpJsonMessage{}
+		err = json.Unmarshal([]byte(raw.RawBody), message)
 		if err != nil {
 			return nil, fmt.Errorf("JSON Error: '%v': '%s'", err, raw.RawBody)
 		}
 
-		if message.Device == "" {
-			return nil, fmt.Errorf("Malformed HttpJsonMessage. Device is required.")
-		}
-
-		if len(message.Location) < 2 {
-			return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
-		}
-
-		messageTime := time.Unix(message.Time, 0)
-
-		pm = &ProcessedMessage{
-			MessageId: MessageId(raw.RequestId),
-			SchemaId:  NewSchemaId(NewDeviceId(message.Device), message.Stream),
-			Time:      &messageTime,
-			Location:  message.Location,
-			MapValues: message.Values,
-		}
-
-		return
+		return message.ToProcessedMessage(MessageId(raw.RequestId))
 	}
 
 	return nil, fmt.Errorf("Unknown ContentType: %s", raw.ContentType)
+}
+
+func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *ProcessedMessage, err error) {
+	if message.Device == "" {
+		return nil, fmt.Errorf("Malformed HttpJsonMessage. Device is required.")
+	}
+
+	if len(message.Location) < 2 {
+		return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
+	}
+
+	messageTime := time.Unix(message.Time, 0)
+
+	pm = &ProcessedMessage{
+		MessageId: messageId,
+		SchemaId:  NewSchemaId(NewDeviceId(message.Device), message.Stream),
+		Time:      &messageTime,
+		Location:  message.Location,
+		MapValues: message.Values,
+	}
+
+	return
 }

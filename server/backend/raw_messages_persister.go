@@ -32,10 +32,11 @@ type IncomingMessage struct {
 }
 
 type RawMessageIngester struct {
-	incoming chan *ingestion.RawMessageRow
-	ingester *ingestion.MessageIngester
-	backend  *Backend
-	db       *sqlxcache.DB
+	incoming      chan *ingestion.RawMessageRow
+	ingester      *ingestion.MessageIngester
+	backend       *Backend
+	db            *sqlxcache.DB
+	documentAdder *DocumentAdder
 }
 
 func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
@@ -46,15 +47,41 @@ func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	ingester := ingestion.NewMessageIngester(sr, streams)
 
 	rmi = &RawMessageIngester{
-		incoming: incoming,
-		ingester: ingester,
-		backend:  b,
-		db:       b.db,
+		incoming:      incoming,
+		ingester:      ingester,
+		backend:       b,
+		db:            b.db,
+		documentAdder: NewDocumentAdder(b),
 	}
 
 	go backgroundIngestion(rmi)
 
 	return
+}
+
+type DocumentAdder struct {
+	backend *Backend
+}
+
+func NewDocumentAdder(backend *Backend) *DocumentAdder {
+	return &DocumentAdder{
+		backend: backend,
+	}
+}
+
+func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
+	// TODO: Not terrible happy with this hack.
+	ids := im.Schema.Ids.(DatabaseIds)
+	d := data.Document{
+		SchemaID:  int32(ids.SchemaID),
+		InputID:   int32(ids.DeviceID),
+		TeamID:    nil,
+		UserID:    nil,
+		Timestamp: *im.Time,
+		Location:  data.NewLocation(float64(im.Location.Coordinates[0]), float64(im.Location.Coordinates[1])),
+	}
+	d.SetData(im.Fields)
+	return da.backend.AddDocument(context.TODO(), &d)
 }
 
 func backgroundIngestion(rmi *RawMessageIngester) {
@@ -75,24 +102,9 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
 				}
 			} else {
-				if true {
-					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-
-					// TODO: Not terrible happy with this hack.
-					ids := im.Schema.Ids.(DatabaseIds)
-					d := data.Document{
-						SchemaID:  int32(ids.SchemaID),
-						InputID:   int32(ids.DeviceID),
-						TeamID:    nil,
-						UserID:    nil,
-						Timestamp: *im.Time,
-						Location:  data.NewLocation(float64(im.Location.Coordinates[0]), float64(im.Location.Coordinates[1])),
-					}
-					d.SetData(im.Fields)
-					rmi.backend.AddDocument(context.TODO(), &d)
-				}
+				rmi.documentAdder.AddDocument(im)
+				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
-			_ = im
 		}
 	}
 }

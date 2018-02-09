@@ -19,8 +19,8 @@ type StreamIngester struct {
 	db      *sqlxcache.DB
 }
 
-func NewStreamIngester(b *Backend) (rmi *StreamIngester, err error) {
-	rmi = &StreamIngester{
+func NewStreamIngester(b *Backend) (si *StreamIngester, err error) {
+	si = &StreamIngester{
 		backend: b,
 		db:      b.db,
 	}
@@ -28,12 +28,14 @@ func NewStreamIngester(b *Backend) (rmi *StreamIngester, err error) {
 	return
 }
 
-func (rmi *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	if contentType != FkDataBinaryContentType {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	binaryReader := NewFkBinaryReader(si.backend)
 
 	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var record pb.DataRecord
@@ -43,7 +45,12 @@ func (rmi *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return nil, err
 		}
 
-		log.Printf("%v", record)
+		err = binaryReader.Push(&record)
+		if err != nil {
+			log.Printf("%v (Error) %v", record, err)
+		} else {
+			log.Printf("%v", record)
+		}
 
 		return &record, nil
 	})
