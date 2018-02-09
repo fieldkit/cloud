@@ -19,6 +19,8 @@ var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
 		Attribute("key", String)
 		Attribute("numberOfFeatures", Integer)
 		Attribute("lastFeatureId", Integer)
+		Attribute("startTime", DateTime)
+		Attribute("endTime", DateTime)
 		Required("id", "expeditionId", "active", "name", "token", "key")
 	})
 	View("default", func() {
@@ -40,7 +42,9 @@ var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
 		Attribute("name")
 		Attribute("numberOfFeatures")
 		Attribute("lastFeatureId")
-		Required("id", "expeditionId", "active", "name", "numberOfFeatures", "lastFeatureId")
+		Attribute("startTime")
+		Attribute("endTime")
+		Required("id", "expeditionId", "active", "name", "numberOfFeatures", "lastFeatureId", "startTime", "endTime")
 	})
 })
 

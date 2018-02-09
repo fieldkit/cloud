@@ -70,16 +70,21 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 		}
 		reading := record.LoggedReading.Reading
 		if reading != nil {
-			if record.LoggedReading.Location == nil || record.LoggedReading.Location.Fix != 1 {
-				log.Printf("Skip unfixed reading")
+			if br.NumberOfSensors == 0 {
+				log.Printf("Ignored: No sensor information yet.")
 				return nil
 			}
+
+			if record.LoggedReading.Location == nil || record.LoggedReading.Location.Fix != 1 {
+				log.Printf("Ignored: Unfixed reading")
+				return nil
+			}
+
 			br.Readings[reading.Sensor] = reading.Value
 			br.ReadingsSeen += 1
 
 			if br.ReadingsSeen == br.NumberOfSensors {
 				br.Time = int64(record.LoggedReading.Reading.Time)
-
 				br.ReadingsSeen = 0
 
 				if br.Location != nil {
@@ -99,6 +104,8 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 
 					br.DocumentAdder.AddDocument(im)
 					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				} else {
+					log.Printf("Ignored: No location.")
 				}
 			}
 		}

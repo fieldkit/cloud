@@ -9,6 +9,7 @@ package app
 
 import (
 	"github.com/goadesign/goa"
+	"time"
 	"unicode/utf8"
 )
 
@@ -91,14 +92,16 @@ func (mt *DeviceInput) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device_input+json; view=public
 type DeviceInputPublic struct {
-	Active           bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID     int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID               int    `form:"id" json:"id" xml:"id"`
-	LastFeatureID    *int   `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
-	Name             string `form:"name" json:"name" xml:"name"`
-	NumberOfFeatures *int   `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
-	TeamID           *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID           *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+	Active           bool       `form:"active" json:"active" xml:"active"`
+	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	ExpeditionID     int        `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID               int        `form:"id" json:"id" xml:"id"`
+	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
+	Name             string     `form:"name" json:"name" xml:"name"`
+	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	TeamID           *int       `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID           *int       `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the DeviceInputPublic media type instance.
@@ -252,6 +255,41 @@ func (mt *Expedition) Validate() (err error) {
 	return
 }
 
+// Expedition media type (detailed view)
+//
+// Identifier: application/vnd.app.expedition+json; view=detailed
+type ExpeditionDetailed struct {
+	Description      string     `form:"description" json:"description" xml:"description"`
+	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	ID               int        `form:"id" json:"id" xml:"id"`
+	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
+	Name             string     `form:"name" json:"name" xml:"name"`
+	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	Slug             string     `form:"slug" json:"slug" xml:"slug"`
+	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+}
+
+// Validate validates the ExpeditionDetailed media type instance.
+func (mt *ExpeditionDetailed) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Slug == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
+	}
+	if mt.Description == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
+	}
+	if utf8.RuneCountInString(mt.Slug) > 40 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
+	}
+	return
+}
+
 // ExpeditionCollection is the media type for an array of Expedition (default view)
 //
 // Identifier: application/vnd.app.expedition+json; type=collection; view=default
@@ -259,6 +297,23 @@ type ExpeditionCollection []*Expedition
 
 // Validate validates the ExpeditionCollection media type instance.
 func (mt ExpeditionCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ExpeditionCollection is the media type for an array of Expedition (detailed view)
+//
+// Identifier: application/vnd.app.expedition+json; type=collection; view=detailed
+type ExpeditionDetailedCollection []*ExpeditionDetailed
+
+// Validate validates the ExpeditionDetailedCollection media type instance.
+func (mt ExpeditionDetailedCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {

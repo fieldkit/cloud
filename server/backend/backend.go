@@ -470,6 +470,22 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, descend
 type FeatureSummary struct {
 	NumberOfFeatures int
 	LastFeatureID    int
+	StartTime        time.Time
+	EndTime          time.Time
+}
+
+func (b *Backend) FeatureSummaryByExpeditionID(ctx context.Context, expeditionId int) (*FeatureSummary, error) {
+	summaries := []*FeatureSummary{}
+	if err := b.db.SelectContext(ctx, &summaries, `
+                SELECT
+		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT MIN(d.timestamp) AS StartTime FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT MAX(d.timestamp) AS EndTime FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1)
+	      `, expeditionId); err != nil {
+		return nil, err
+	}
+	return summaries[0], nil
 }
 
 func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*FeatureSummary, error) {
@@ -477,6 +493,8 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 	if err := b.db.SelectContext(ctx, &summaries, `
                 SELECT
 		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT MIN(d.timestamp) AS StartTime FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT MAX(d.timestamp) AS EndTime FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
 		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1)
 	      `, sourceId); err != nil {
 		return nil, err

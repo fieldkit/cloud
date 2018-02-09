@@ -214,6 +214,7 @@ func main() {
 	// Mount "expedition" controller
 	c4 := api.NewExpeditionController(service, api.ExpeditionControllerOptions{
 		Database: database,
+		Backend:  be,
 	})
 	app.MountExpeditionController(service, c4)
 

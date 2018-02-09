@@ -5,11 +5,13 @@ import (
 	"github.com/goadesign/goa"
 
 	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
 
 type ExpeditionControllerOptions struct {
 	Database *sqlxcache.DB
+	Backend  *backend.Backend
 }
 
 func ExpeditionType(expedition *data.Expedition) *app.Expedition {
@@ -18,6 +20,19 @@ func ExpeditionType(expedition *data.Expedition) *app.Expedition {
 		Name:        expedition.Name,
 		Slug:        expedition.Slug,
 		Description: expedition.Description,
+	}
+}
+
+func ExpeditionDetailedType(expedition *data.Expedition, summary *backend.FeatureSummary) *app.ExpeditionDetailed {
+	return &app.ExpeditionDetailed{
+		ID:               int(expedition.ID),
+		Name:             expedition.Name,
+		Slug:             expedition.Slug,
+		Description:      expedition.Description,
+		NumberOfFeatures: &summary.NumberOfFeatures,
+		LastFeatureID:    &summary.LastFeatureID,
+		StartTime:        &summary.StartTime,
+		EndTime:          &summary.EndTime,
 	}
 }
 
@@ -81,7 +96,12 @@ func (c *ExpeditionController) Get(ctx *app.GetExpeditionContext) error {
 		return err
 	}
 
-	return ctx.OK(ExpeditionType(expedition))
+	summary, err := c.options.Backend.FeatureSummaryByExpeditionID(ctx, int(expedition.ID))
+	if err != nil {
+		return err
+	}
+
+	return ctx.OKDetailed(ExpeditionDetailedType(expedition, summary))
 }
 
 func (c *ExpeditionController) GetID(ctx *app.GetIDExpeditionContext) error {
@@ -90,7 +110,12 @@ func (c *ExpeditionController) GetID(ctx *app.GetIDExpeditionContext) error {
 		return err
 	}
 
-	return ctx.OK(ExpeditionType(expedition))
+	summary, err := c.options.Backend.FeatureSummaryByExpeditionID(ctx, int(expedition.ID))
+	if err != nil {
+		return err
+	}
+
+	return ctx.OKDetailed(ExpeditionDetailedType(expedition, summary))
 }
 
 func (c *ExpeditionController) List(ctx *app.ListExpeditionContext) error {

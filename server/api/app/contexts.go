@@ -758,6 +758,12 @@ func (ctx *AddExpeditionContext) OK(r *Expedition) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKDetailed sends a HTTP response with status code 200.
+func (ctx *AddExpeditionContext) OKDetailed(r *ExpeditionDetailed) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *AddExpeditionContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
@@ -813,6 +819,12 @@ func (ctx *GetExpeditionContext) OK(r *Expedition) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKDetailed sends a HTTP response with status code 200.
+func (ctx *GetExpeditionContext) OKDetailed(r *ExpeditionDetailed) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *GetExpeditionContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
@@ -850,6 +862,12 @@ func NewGetIDExpeditionContext(ctx context.Context, r *http.Request, service *go
 
 // OK sends a HTTP response with status code 200.
 func (ctx *GetIDExpeditionContext) OK(r *Expedition) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKDetailed sends a HTTP response with status code 200.
+func (ctx *GetIDExpeditionContext) OKDetailed(r *ExpeditionDetailed) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -976,6 +994,12 @@ func NewUpdateExpeditionContext(ctx context.Context, r *http.Request, service *g
 
 // OK sends a HTTP response with status code 200.
 func (ctx *UpdateExpeditionContext) OK(r *Expedition) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKDetailed sends a HTTP response with status code 200.
+func (ctx *UpdateExpeditionContext) OKDetailed(r *ExpeditionDetailed) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.expedition+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

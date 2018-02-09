@@ -21,6 +21,8 @@ func DeviceInputPublicType(deviceInput *data.DeviceInput, summary *backend.Featu
 		Active:           true,
 		NumberOfFeatures: &summary.NumberOfFeatures,
 		LastFeatureID:    &summary.LastFeatureID,
+		StartTime:        &summary.StartTime,
+		EndTime:          &summary.EndTime,
 	}
 
 	return deviceInputType
