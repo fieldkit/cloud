@@ -218,6 +218,12 @@
 			"revisionTime": "2017-02-26T06:22:14Z"
 		},
 		{
+			"checksumSHA1": "pwyEDeUxwfYhzKBdNEIPBPdwc7s=",
+			"path": "github.com/fieldkit/data-protocol",
+			"revision": "ed536f6d20cb3f4b2731c521c7a802b614e9a102",
+			"revisionTime": "2018-01-18T16:49:26Z"
+		},
+		{
 			"checksumSHA1": "94gx2lhRkCHR2wxEGcrKlpqIOgk=",
 			"path": "github.com/go-ini/ini",
 			"revision": "1730955e3146956d6a087861380f9b4667ed5071",
@@ -474,10 +480,34 @@
 			"revisionTime": "2017-03-27T17:05:36Z"
 		},
 		{
+			"checksumSHA1": "Dj76GEaDMQWNAtiwm6TGDJd5ccU=",
+			"path": "github.com/robinpowered/go-proto/collection",
+			"revision": "85ea3e1f1d3d20d71b7b9363104cdab4b77f7935",
+			"revisionTime": "2016-06-14T14:23:41Z"
+		},
+		{
+			"checksumSHA1": "sF9j3S6e0npDxKDrOCgjs4Hj7DU=",
+			"path": "github.com/robinpowered/go-proto/message",
+			"revision": "85ea3e1f1d3d20d71b7b9363104cdab4b77f7935",
+			"revisionTime": "2016-06-14T14:23:41Z"
+		},
+		{
+			"checksumSHA1": "OHBawMrKtcgojTDn7OucqQyVKPA=",
+			"path": "github.com/robinpowered/go-proto/stream",
+			"revision": "85ea3e1f1d3d20d71b7b9363104cdab4b77f7935",
+			"revisionTime": "2016-06-14T14:23:41Z"
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
 			"revisionTime": "2016-09-27T10:08:44Z"
+		},
+		{
+			"checksumSHA1": "C96PWBz3Y56gLe9/qWN0jtXFJQI=",
+			"path": "github.com/segmentio/ksuid",
+			"revision": "112f929a3020abfcd06b77c963ec919130796a35",
+			"revisionTime": "2017-11-24T20:10:50Z"
 		},
 		{
 			"checksumSHA1": "lU+gVOtSFnBKx11uhPL8b9v0uTE=",
