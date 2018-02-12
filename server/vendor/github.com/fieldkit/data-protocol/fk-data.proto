@@ -10,9 +10,10 @@ message DeviceLocation {
 }
 
 message SensorReading {
-  uint64 time = 1;
-  uint32 sensor = 2;
-  float value = 3;
+  uint32 reading = 1;
+  uint64 time = 2;
+  uint32 sensor = 3;
+  float value = 4;
 }
 
 message LoggedReading {
