@@ -1,13 +1,12 @@
 // @flow weak
 
 import _ from 'lodash';
-import moment from 'moment';
 
 import React, { Component } from 'react';
 
 import { Loading } from '../Loading';
 
-import { TimeSeries, TimeRange } from "pondjs";
+import { TimeSeries } from "pondjs";
 import { Charts, ChartContainer, ChartRow, YAxis, LineChart, styler, Resizable } from "react-timeseries-charts";
 
 type Props = {
@@ -54,7 +53,7 @@ export default class SimpleChartContainer extends Component {
         return (
             <div style={{ padding: '10px' }}>
                 <Resizable>
-                    <ChartContainer timeRange={tr} showGrid={false} onChartResize={width => this.handleChartResize(width)} showGrid={true}>
+                    <ChartContainer timeRange={tr} onChartResize={width => this.handleChartResize(width)} showGrid={true}>
                         <ChartRow height="180">
                             <YAxis id="y" label={chart.key} min={timeseries.min()} max={timeseries.max()} width="100" type="linear" format=",.2f" labelOffset={-40} />
                             <Charts>

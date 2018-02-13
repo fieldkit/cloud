@@ -1,7 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
+import ReactMapboxGl, { ScaleControl, ZoomControl/*, Popup*/ } from 'react-mapbox-gl';
 import _ from 'lodash';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
@@ -221,7 +221,7 @@ export default class MapContainer extends Component {
         const { panels, chart, feature } = this.state;
 
         const { mode } = playbackMode;
-        const paused = mode == "Pause";
+        const paused = mode === "Pause";
 
         return (
             <div>
@@ -238,7 +238,7 @@ export default class MapContainer extends Component {
 
     render() {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
-        const { fitBounds, center, zoom, feature } = this.state;
+        const { fitBounds, center, zoom } = this.state;
 
         if (!visibleFeatures.geojson) {
             return (<div><h1>Loading</h1></div>);

@@ -57,7 +57,7 @@ export default class FiltersPanel extends Component {
         const { style, visibleFeatures } = this.props;
         const position = { top: 120, left: 70, bottom: 'auto', right: 'auto' };
 
-        if (_.values(visibleFeatures.sources).length == 0) {
+        if (_.values(visibleFeatures.sources).length === 0) {
             return (<div></div>);
         }
 
@@ -77,7 +77,7 @@ export default class FiltersPanel extends Component {
             {_.values(sources).map(source => {
                 const lastFeature = source.lastFeature;
                 if (lastFeature == null) {
-                    return (<div>Loading...</div>);
+                    return (<div key={source.id}>Loading...</div>);
                 }
                 const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp)).format('MMM Do YYYY, h:mm:ss a');
                 const numberOfFeatures = source.numberOfFeatures;

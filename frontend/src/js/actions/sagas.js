@@ -16,23 +16,23 @@ import { PlaybackModes } from '../components/PlaybackControl';
 
 import { FkGeoJSON } from '../common/geojson';
 
-export function* walkExpedition(geojson) {
+export function* walkGeoJson(summary, geojson) {
     const expedition = new FkGeoJSON(geojson);
 
-    const start = expedition.getFirst().time();
-    const end = expedition.getLast().time();
+    const start = new Date(summary.startTime);
+    const end = new Date(summary.endTime);
 
     const tickDuration = 100;
     const walkDurationInSeconds = 30;
     const walkLength = end - start;
     const walkLengthInSeconds = (walkLength / 1000);
 
-    let expeditionSecondsPerTick = (walkLengthInSeconds / walkDurationInSeconds) / (1000 / tickDuration);
+    let walkSecondsPerTick = (walkLengthInSeconds / walkDurationInSeconds) / (1000 / tickDuration);
 
     console.log("Start", start);
     console.log("End", end);
-    console.log(tickDuration, walkDurationInSeconds);
-    console.log(expeditionSecondsPerTick);
+    console.log("TickDuration", tickDuration, "WalkDuration", walkDurationInSeconds);
+    console.log("SecondsPerTick", walkSecondsPerTick);
 
     let time = start;
 
@@ -40,7 +40,7 @@ export function* walkExpedition(geojson) {
         while (time < end) {
             const coordinates = expedition.getCoordinatesAtTime(time);
 
-            yield put(focusExpeditionTime(time, coordinates, expeditionSecondsPerTick));
+            yield put(focusExpeditionTime(time, coordinates, walkSecondsPerTick));
 
             const [ activityAction, focusFeatureAction, playbackAction, _ ] = yield race([
                 take(ActionTypes.USER_MAP_ACTIVITY),
@@ -65,15 +65,15 @@ export function* walkExpedition(geojson) {
                     break;
                 }
                 case PlaybackModes.Rewind: {
-                    expeditionSecondsPerTick = -5;
+                    walkSecondsPerTick = -5;
                     break;
                 }
                 case PlaybackModes.Play: {
-                    expeditionSecondsPerTick = 5;
+                    walkSecondsPerTick = 5;
                     break;
                 }
                 case PlaybackModes.Forward: {
-                    expeditionSecondsPerTick = 20;
+                    walkSecondsPerTick = 20;
                     break;
                 }
                 case PlaybackModes.End: {
@@ -86,7 +86,7 @@ export function* walkExpedition(geojson) {
                 }
             }
 
-            time.setTime(time.getTime() + (expeditionSecondsPerTick * 1000));
+            time.setTime(time.getTime() + (walkSecondsPerTick * 1000));
         }
 
         console.log("DONE", start, end, time);
@@ -101,9 +101,10 @@ export function* walkExpedition(geojson) {
 
 export function* refreshSaga(pagedGeojson) {
     while (true) {
-        yield delay(10000);
-
         pagedGeojson = yield FkApi.getNextExpeditionGeoJson(pagedGeojson);
+        if (pagedGeojson.geo.features.length === 0) {
+            yield delay(10000);
+        }
     }
 }
 
@@ -132,35 +133,32 @@ export function* loadExpeditionDetails() {
 }
 
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, pagedGeojson, sources ] = yield all([
+    const [ expedition, pagedGeoJson, sources ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
         FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug),
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
-    console.log(expedition, pagedGeojson, sources);
+    console.log(expedition, pagedGeoJson, sources);
 
-    if (pagedGeojson.geo.features.length > 0) {
+    if (pagedGeoJson.geo.features.length > 0) {
         yield delay(1000)
-
-        yield all([ walkExpedition(pagedGeojson.geo), refreshSaga(pagedGeojson) ]);
+        yield all([ walkGeoJson(expedition, pagedGeoJson.geo), refreshSaga(pagedGeoJson) ]);
     }
 }
 
 export function* loadSingleDevice(deviceId) {
-    const [ pagedGeojson ] = yield all([
+    const [ pagedGeoJson, source ] = yield all([
         FkApi.getSourceGeoJson(deviceId),
+        FkApi.getSource(deviceId),
     ]);
 
-    yield put({
-        type: ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS,
-        response: pagedGeojson,
-    })
+    if (pagedGeoJson.geo.features.length > 0) {
+        const features = yield all([FkApi.getFeatureGeoJson(source.lastFeatureId)]);
+        console.log("LatestFeatures", features);
 
-    if (pagedGeojson.geo.features.length > 0) {
         yield delay(1000)
-
-        yield all([ walkExpedition(pagedGeojson.geo), refreshSaga(pagedGeojson) ]);
+        yield all([ walkGeoJson(source, pagedGeoJson.geo), refreshSaga(pagedGeoJson) ]);
     }
 }
 

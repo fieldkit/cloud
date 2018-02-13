@@ -26,7 +26,7 @@ export class Main extends Component {
     }
 
     render() {
-        const { activeExpedition } = this.props;
+        // const { activeExpedition } = this.props;
 
         return (
             <div className="main">

@@ -27,8 +27,8 @@ export default class FeaturePanel extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { feature: oldFeature } = this.props;
-        const { feature: newFeature } = nextProps;
+        // const { feature: oldFeature } = this.props;
+        // const { feature: newFeature } = nextProps;
     }
 
     onShowChart(key) {
@@ -63,7 +63,7 @@ export default class FeaturePanel extends Component {
     }
 
     render() {
-        const { style, feature, onShowChart } = this.props;
+        const { style, feature/*, onShowChart*/ } = this.props;
 
         const date = moment(new Date(feature.properties['timestamp'])).format('MMM Do YYYY, h:mm:ss a');
 

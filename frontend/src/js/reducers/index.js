@@ -22,16 +22,23 @@ const visibleFeaturesInitialState = {
     sources: { }
 };
 
+function mergeFeatures(state, action) {
+    let newGeojson = Object.assign({}, action.response.geo);
+    if (state.geojson) {
+        newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ]
+    }
+    return Object.assign({ }, state, {
+        geojson: newGeojson
+    });
+}
+
 function visibleFeatures(state = visibleFeaturesInitialState, action) {
     switch (action.type) {
     case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS: {
-        let newGeojson = Object.assign({}, action.response.geo);
-        if (state.geojson) {
-            newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ]
-        }
-        return Object.assign({ }, state, {
-            geojson: newGeojson
-        });
+        return mergeFeatures(state, action);
+    }
+    case ActionTypes.API_SOURCE_GEOJSON_GET.SUCCESS: {
+        return mergeFeatures(state, action);
     }
     case ActionTypes.FOCUS_FEATURE:
         return Object.assign({ }, state, {
