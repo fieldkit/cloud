@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 
 const containerStyle: React.CSSProperties = {
     position: 'absolute',
+    width: '300px',
     zIndex: 10,
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
-    border: '1px solid rgba(0, 0, 0, 0.1)'
+    border: '1px solid rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#f9f9f9',
 };
 
 const buttonContainerStyle: React.CSSProperties = {
@@ -96,7 +98,7 @@ export default class PlaybackControl extends Component {
         const { className, playback, onPlaybackChange } = this.props;
         const { advanced } = this.state;
 
-        const position = { top: 120, left: 380, bottom: 'auto', right: 'auto' };
+        const position = { top: 120, left: 20, bottom: 'auto', right: 'auto' };
         const smallStyle = {
             ...buttonStyle,
             ...{ width: '30px' }

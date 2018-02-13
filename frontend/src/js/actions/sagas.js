@@ -1,8 +1,7 @@
 
 import { delay } from 'redux-saga';
 import {
-    all, put, take, race, takeLatest
-    // takeEvery, select, all, call
+    all, put, take, race, takeLatest, select
 } from 'redux-saga/effects';
 
 import _ from 'lodash';
@@ -16,9 +15,11 @@ import { PlaybackModes } from '../components/PlaybackControl';
 
 import { FkGeoJSON } from '../common/geojson';
 
-export function* walkGeoJson(summary, geojson) {
-    const expedition = new FkGeoJSON(geojson);
+export function* getExpedition() {
+    return yield select(state => new FkGeoJSON(state.visibleFeatures.geojson));
+}
 
+export function* walkGeoJson(summary) {
     const start = new Date(summary.startTime);
     const end = new Date(summary.endTime);
 
@@ -34,10 +35,11 @@ export function* walkGeoJson(summary, geojson) {
     console.log("TickDuration", tickDuration, "WalkDuration", walkDurationInSeconds);
     console.log("SecondsPerTick", walkSecondsPerTick);
 
-    let time = start;
-
     while (true) {
+        let time = new Date(start);
+
         while (time < end) {
+            const expedition = yield getExpedition();
             const coordinates = expedition.getCoordinatesAtTime(time);
 
             yield put(focusExpeditionTime(time, coordinates, walkSecondsPerTick));
@@ -91,8 +93,6 @@ export function* walkGeoJson(summary, geojson) {
 
         console.log("DONE", start, end, time);
 
-        time = expedition.getFirst().time();
-
         yield put(changePlaybackMode(PlaybackModes.Pause));
 
         yield take(ActionTypes.CHANGE_PLAYBACK_MODE);
@@ -133,18 +133,12 @@ export function* loadExpeditionDetails() {
 }
 
 export function* loadActiveExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, pagedGeoJson, sources ] = yield all([
+    const [ expedition, sources ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
-        FkApi.getExpeditionGeoJson(projectSlug, expeditionSlug),
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
-    console.log(expedition, pagedGeoJson, sources);
-
-    if (pagedGeoJson.geo.features.length > 0) {
-        yield delay(1000)
-        yield all([ walkGeoJson(expedition, pagedGeoJson.geo), refreshSaga(pagedGeoJson) ]);
-    }
+    console.log(expedition, sources);
 }
 
 export function* loadSingleDevice(deviceId) {
@@ -177,7 +171,7 @@ export function* loadActiveProject() {
             loadExpeditionDetails(),
             loadCharts(),
             loadSingleDevice(125),
-            // loadActiveExpedition(projectSlug, expeditions[0].slug)
+            loadActiveExpedition(projectSlug, expeditions[0].slug)
         ])
         console.log("Done")
     }

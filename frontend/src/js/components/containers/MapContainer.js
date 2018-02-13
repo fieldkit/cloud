@@ -256,7 +256,7 @@ export default class MapContainer extends Component {
                     zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
-                    <ZoomControl className="zoom-control" position={ 'topLeft' } />
+                    { false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
 
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
