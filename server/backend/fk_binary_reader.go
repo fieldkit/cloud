@@ -2,10 +2,11 @@ package backend
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	pb "github.com/fieldkit/data-protocol"
-	"github.com/segmentio/ksuid"
+	"github.com/google/uuid"
 	"log"
 )
 
@@ -49,6 +50,26 @@ func (br *FkBinaryReader) CreateHttpJsonMessage() *ingestion.HttpJsonMessage {
 	}
 }
 
+var (
+	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
+)
+
+func ToHashingData(im *ingestion.HttpJsonMessage) (data []byte, err error) {
+	data, err = json.Marshal(im)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func ToUniqueHash(im *ingestion.HttpJsonMessage) (uuid.UUID, error) {
+	data, err := ToHashingData(im)
+	if err != nil {
+		return uuid.New(), err
+	}
+	return uuid.NewSHA1(FkBinaryMessagesSpace, data), err
+}
+
 func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 	if record.Metadata != nil {
 		if br.DeviceId == "" {
@@ -88,11 +109,15 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 				br.ReadingsSeen = 0
 
 				if br.Location != nil {
-					token := ksuid.New().String()
 					message := br.CreateHttpJsonMessage()
 					log.Printf("HttpJsonMessage: %v", message)
 
-					pm, err := message.ToProcessedMessage(ingestion.MessageId(token))
+					token, err := ToUniqueHash(message)
+					if err != nil {
+						return err
+					}
+
+					pm, err := message.ToProcessedMessage(ingestion.MessageId(token.String()))
 					if err != nil {
 						return err
 					}
