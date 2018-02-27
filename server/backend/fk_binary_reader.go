@@ -92,12 +92,12 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 		reading := record.LoggedReading.Reading
 		if reading != nil {
 			if br.NumberOfSensors == 0 {
-				log.Printf("Ignored: No sensor information yet.")
+				log.Printf("Ignored: Unknown sensor. (%+v)", record)
 				return nil
 			}
 
 			if record.LoggedReading.Location == nil || record.LoggedReading.Location.Fix != 1 {
-				log.Printf("Ignored: Unfixed reading")
+				log.Printf("Ignored: Unfixed. (%+v)", record)
 				return nil
 			}
 
@@ -110,27 +110,32 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 
 				if br.Location != nil {
 					message := br.CreateHttpJsonMessage()
-					log.Printf("HttpJsonMessage: %v", message)
-
 					token, err := ToUniqueHash(message)
 					if err != nil {
 						return err
 					}
 
-					pm, err := message.ToProcessedMessage(ingestion.MessageId(token.String()))
+					messageId := ingestion.MessageId(token.String())
+
+					log.Printf("(%s)[Ingesting] %+v", messageId, message)
+
+					pm, err := message.ToProcessedMessage(messageId)
 					if err != nil {
+						log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
 						return err
 					}
 
 					im, err := br.Ingester.IngestProcessedMessage(pm)
 					if err != nil {
+						log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
 						return err
 					}
 
 					br.DocumentAdder.AddDocument(im)
+
 					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 				} else {
-					log.Printf("Ignored: No location.")
+					log.Printf("Ignored: No location. (%+v)", record)
 				}
 			}
 		}

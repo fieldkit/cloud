@@ -45,12 +45,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return nil, err
 		}
 
-		err = binaryReader.Push(&record)
-		if err != nil {
-			log.Printf("%v (Error) %v", record, err)
-		} else {
-			log.Printf("%v", record)
-		}
+		_ = binaryReader.Push(&record)
 
 		return &record, nil
 	})
