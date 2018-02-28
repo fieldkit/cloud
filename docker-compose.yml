@@ -15,6 +15,8 @@ services:
       - FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
   postgres:
     image: mdillon/postgis:9.6-alpine
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=fieldkit
       - POSTGRES_PASSWORD=password
