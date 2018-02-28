@@ -29,11 +29,38 @@ func InputType(input *data.Input) *app.Input {
 	return inputType
 }
 
+func GeometryClusterSummaryType(s *backend.GeometryClusterSummary) *app.GeometryClusterSummary {
+	return &app.GeometryClusterSummary{
+		ID:               s.ID,
+		NumberOfFeatures: s.NumberOfFeatures,
+		StartTime:        s.StartTime,
+		EndTime:          s.EndTime,
+		Centroid:         s.Centroid.Coordinates(),
+		Radius:           s.Radius,
+	}
+}
+
+func GeometryClusterSummariesType(s []*backend.GeometryClusterSummary) []*app.GeometryClusterSummary {
+	summaries := make([]*app.GeometryClusterSummary, len(s))
+	for i, summary := range s {
+		summaries[i] = GeometryClusterSummaryType(summary)
+	}
+	return summaries
+}
+
+func InputSummaryType(input *data.DeviceInput, spatial, temporal []*backend.GeometryClusterSummary) *app.InputSummary {
+	return &app.InputSummary{
+		ID:       int(input.ID),
+		Name:     input.Name,
+		Temporal: GeometryClusterSummariesType(temporal),
+		Spatial:  GeometryClusterSummariesType(spatial),
+	}
+}
+
 type InputControllerOptions struct {
 	Backend *backend.Backend
 }
 
-// InputController implements the input resource.
 type InputController struct {
 	*goa.Controller
 	options InputControllerOptions
@@ -102,6 +129,25 @@ func (c *InputController) ListID(ctx *app.ListIDInputContext) error {
 		return err
 	}
 	return ctx.OKPublic(DeviceInputPublicType(deviceInput, summary))
+}
+
+func (c *InputController) SummaryByID(ctx *app.SummaryByIDInputContext) error {
+	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.InputID))
+	if err != nil {
+		return err
+	}
+
+	spatial, err := c.options.Backend.SpatialClustersBySourceID(ctx, ctx.InputID)
+	if err != nil {
+		return err
+	}
+
+	temporal, err := c.options.Backend.TemporalClustersBySourceID(ctx, ctx.InputID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OK(InputSummaryType(deviceInput, spatial, temporal))
 }
 
 func (c *InputController) ListExpeditionID(ctx *app.ListExpeditionIDInputContext) error {

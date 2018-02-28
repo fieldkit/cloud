@@ -47,6 +47,44 @@ var Inputs = MediaType("application/vnd.app.inputs+json", func() {
 	})
 })
 
+var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_summary+json", func() {
+	TypeName("GeometryClusterSummary")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("startTime", DateTime)
+		Attribute("endTime", DateTime)
+		Attribute("numberOfFeatures", Integer)
+		Attribute("centroid", ArrayOf(Number))
+		Attribute("radius", Number)
+		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("startTime")
+		Attribute("endTime")
+		Attribute("numberOfFeatures")
+		Attribute("centroid")
+		Attribute("radius")
+	})
+})
+
+var InputSummary = MediaType("application/vnd.app.input_summary+json", func() {
+	TypeName("InputSummary")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("name", String)
+		Attribute("temporal", CollectionOf(GeometryClusterSummary))
+		Attribute("spatial", CollectionOf(GeometryClusterSummary))
+		Required("id", "name", "temporal", "spatial")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+		Attribute("temporal")
+		Attribute("spatial")
+	})
+})
+
 var _ = Resource("input", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
@@ -94,6 +132,21 @@ var _ = Resource("input", func() {
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(DeviceInput)
+		})
+	})
+
+	Action("summary by id", func() {
+		NoSecurity()
+
+		Routing(GET("inputs/:inputId/summary"))
+		Description("List an input")
+		Params(func() {
+			Param("inputId", Integer)
+			Required("inputId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(InputSummary)
 		})
 	})
 

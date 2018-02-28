@@ -1153,6 +1153,47 @@ func (ctx *ListIDInputContext) BadRequest() error {
 	return nil
 }
 
+// SummaryByIDInputContext provides the input summary by id action context.
+type SummaryByIDInputContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewSummaryByIDInputContext parses the incoming request URL and body, performs validations and creates the
+// context used by the input controller summary by id action.
+func NewSummaryByIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*SummaryByIDInputContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SummaryByIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["inputId"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SummaryByIDInputContext) OK(r *InputSummary) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_summary+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SummaryByIDInputContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // UpdateInputContext provides the input update action context.
 type UpdateInputContext struct {
 	context.Context

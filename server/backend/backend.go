@@ -6,6 +6,7 @@ import (
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	_ "github.com/lib/pq"
+	_ "github.com/paulmach/go.geo"
 	"time"
 )
 
@@ -361,7 +362,7 @@ func (b *Backend) ListSchemasByID(ctx context.Context, projectID int32) ([]*data
 func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {
 	_, err := b.db.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data)
-			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location),4326), :data)
+			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
 		`, document)
 	return err
 }
@@ -500,6 +501,57 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 		return nil, err
 	}
 	return summaries[0], nil
+}
+
+type GeometryClusterSummary struct {
+	ID               int
+	NumberOfFeatures int
+	StartTime        time.Time
+	EndTime          time.Time
+	Centroid         data.Location
+	Radius           float64
+}
+
+func (b *Backend) SpatialClustersBySourceID(ctx context.Context, sourceId int) (summaries []*GeometryClusterSummary, err error) {
+	summaries = []*GeometryClusterSummary{}
+	if err := b.db.SelectContext(ctx, &summaries, `
+		  SELECT
+			  spatial_cluster_id AS id,
+			  MIN(timestamp) AS startTime,
+			  MAX(timestamp) AS endTime,
+			  COUNT(id) AS numberOfFeatures,
+			  ST_AsBinary(ST_Centroid(ST_Collect(location))) AS centroid,
+			  SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
+		  FROM 
+			  fk_clustered_docs($1)
+		  WHERE spatial_cluster_id IS NOT NULL
+		  GROUP BY spatial_cluster_id, input_id
+		  ORDER BY spatial_cluster_id
+	      `, sourceId); err != nil {
+		return nil, err
+	}
+	return summaries, nil
+}
+
+func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) (summaries []*GeometryClusterSummary, err error) {
+	summaries = []*GeometryClusterSummary{}
+	if err := b.db.SelectContext(ctx, &summaries, `
+		  SELECT
+			  temporal_cluster_id AS id,
+			  MIN(timestamp) AS startTime,
+			  MAX(timestamp) AS endTime,
+			  COUNT(id) AS numberOfFeatures,
+			  ST_AsBinary(ST_Centroid(ST_Collect(location))) AS centroid,
+			  SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
+		  FROM 
+			  fk_clustered_docs($1)
+		  WHERE spatial_cluster_id IS NULL
+		  GROUP BY temporal_cluster_id, input_id
+		  ORDER BY temporal_cluster_id
+	      `, sourceId); err != nil {
+		return nil, err
+	}
+	return summaries, nil
 }
 
 func (b *Backend) ListDocumentsByID(ctx context.Context, id int) (*data.DocumentsPage, error) {

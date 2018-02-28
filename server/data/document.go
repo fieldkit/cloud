@@ -25,7 +25,7 @@ func NewLocation(latitude, longitude float64) *Location {
 }
 
 func (l *Location) Coordinates() []float64 {
-	return []float64{l.point.Lat(), l.point.Lng()}
+	return []float64{l.point.Lng(), l.point.Lat()}
 }
 
 func (l *Location) Scan(data interface{}) error {

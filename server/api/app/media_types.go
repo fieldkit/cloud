@@ -428,6 +428,45 @@ func (mt *GeoJSONGeometry) Validate() (err error) {
 	return
 }
 
+// GeometryClusterSummary media type (default view)
+//
+// Identifier: application/vnd.app.geometry_cluster_summary+json; view=default
+type GeometryClusterSummary struct {
+	Centroid         []float64 `form:"centroid" json:"centroid" xml:"centroid"`
+	EndTime          time.Time `form:"endTime" json:"endTime" xml:"endTime"`
+	ID               int       `form:"id" json:"id" xml:"id"`
+	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
+	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
+	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
+}
+
+// Validate validates the GeometryClusterSummary media type instance.
+func (mt *GeometryClusterSummary) Validate() (err error) {
+
+	if mt.Centroid == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "centroid"))
+	}
+
+	return
+}
+
+// GeometryClusterSummaryCollection is the media type for an array of GeometryClusterSummary (default view)
+//
+// Identifier: application/vnd.app.geometry_cluster_summary+json; type=collection; view=default
+type GeometryClusterSummaryCollection []*GeometryClusterSummary
+
+// Validate validates the GeometryClusterSummaryCollection media type instance.
+func (mt GeometryClusterSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // Input media type (default view)
 //
 // Identifier: application/vnd.app.input+json; view=default
@@ -445,6 +484,37 @@ func (mt *Input) Validate() (err error) {
 
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// InputSummary media type (default view)
+//
+// Identifier: application/vnd.app.input_summary+json; view=default
+type InputSummary struct {
+	ID       int                              `form:"id" json:"id" xml:"id"`
+	Name     string                           `form:"name" json:"name" xml:"name"`
+	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
+	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
+}
+
+// Validate validates the InputSummary media type instance.
+func (mt *InputSummary) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Temporal == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "temporal"))
+	}
+	if mt.Spatial == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
+	}
+	if err2 := mt.Spatial.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Temporal.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	return
 }

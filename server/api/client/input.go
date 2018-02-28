@@ -112,6 +112,36 @@ func (c *Client) NewListIDInputRequest(ctx context.Context, path string) (*http.
 	return req, nil
 }
 
+// SummaryByIDInputPath computes a request path to the summary by id action of input.
+func SummaryByIDInputPath(inputID int) string {
+	param0 := strconv.Itoa(inputID)
+
+	return fmt.Sprintf("/inputs/%s/summary", param0)
+}
+
+// List an input
+func (c *Client) SummaryByIDInput(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSummaryByIDInputRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSummaryByIDInputRequest create the request corresponding to the summary by id action endpoint of the input resource.
+func (c *Client) NewSummaryByIDInputRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // UpdateInputPath computes a request path to the update action of input.
 func UpdateInputPath(inputID int) string {
 	param0 := strconv.Itoa(inputID)

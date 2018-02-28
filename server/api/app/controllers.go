@@ -1087,6 +1087,7 @@ type InputController interface {
 	List(*ListInputContext) error
 	ListExpeditionID(*ListExpeditionIDInputContext) error
 	ListID(*ListIDInputContext) error
+	SummaryByID(*SummaryByIDInputContext) error
 	Update(*UpdateInputContext) error
 }
 
@@ -1097,6 +1098,7 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 	service.Mux.Handle("OPTIONS", "/projects/@/:project/expeditions/@/:expedition/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/expeditions/:expeditionId/inputs", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/inputs/:inputId", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/inputs/:inputId/summary", ctrl.MuxHandler("preflight", handleInputOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1146,6 +1148,22 @@ func MountInputController(service *goa.Service, ctrl InputController) {
 	h = handleInputOrigin(h)
 	service.Mux.Handle("GET", "/inputs/:inputId", ctrl.MuxHandler("list id", h, nil))
 	service.LogInfo("mount", "ctrl", "Input", "action", "ListID", "route", "GET /inputs/:inputId")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSummaryByIDInputContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SummaryByID(rctx)
+	}
+	h = handleInputOrigin(h)
+	service.Mux.Handle("GET", "/inputs/:inputId/summary", ctrl.MuxHandler("summary by id", h, nil))
+	service.LogInfo("mount", "ctrl", "Input", "action", "SummaryByID", "route", "GET /inputs/:inputId/summary")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

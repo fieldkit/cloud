@@ -569,6 +569,59 @@ func (c *Client) DecodeGeoJSONGeometry(resp *http.Response) (*GeoJSONGeometry, e
 	return &decoded, err
 }
 
+// GeometryClusterSummary media type (default view)
+//
+// Identifier: application/vnd.app.geometry_cluster_summary+json; view=default
+type GeometryClusterSummary struct {
+	Centroid         []float64 `form:"centroid" json:"centroid" xml:"centroid"`
+	EndTime          time.Time `form:"endTime" json:"endTime" xml:"endTime"`
+	ID               int       `form:"id" json:"id" xml:"id"`
+	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
+	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
+	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
+}
+
+// Validate validates the GeometryClusterSummary media type instance.
+func (mt *GeometryClusterSummary) Validate() (err error) {
+
+	if mt.Centroid == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "centroid"))
+	}
+
+	return
+}
+
+// DecodeGeometryClusterSummary decodes the GeometryClusterSummary instance encoded in resp body.
+func (c *Client) DecodeGeometryClusterSummary(resp *http.Response) (*GeometryClusterSummary, error) {
+	var decoded GeometryClusterSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// GeometryClusterSummaryCollection is the media type for an array of GeometryClusterSummary (default view)
+//
+// Identifier: application/vnd.app.geometry_cluster_summary+json; type=collection; view=default
+type GeometryClusterSummaryCollection []*GeometryClusterSummary
+
+// Validate validates the GeometryClusterSummaryCollection media type instance.
+func (mt GeometryClusterSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeGeometryClusterSummaryCollection decodes the GeometryClusterSummaryCollection instance encoded in resp body.
+func (c *Client) DecodeGeometryClusterSummaryCollection(resp *http.Response) (GeometryClusterSummaryCollection, error) {
+	var decoded GeometryClusterSummaryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // Input media type (default view)
 //
 // Identifier: application/vnd.app.input+json; view=default
@@ -593,6 +646,44 @@ func (mt *Input) Validate() (err error) {
 // DecodeInput decodes the Input instance encoded in resp body.
 func (c *Client) DecodeInput(resp *http.Response) (*Input, error) {
 	var decoded Input
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// InputSummary media type (default view)
+//
+// Identifier: application/vnd.app.input_summary+json; view=default
+type InputSummary struct {
+	ID       int                              `form:"id" json:"id" xml:"id"`
+	Name     string                           `form:"name" json:"name" xml:"name"`
+	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
+	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
+}
+
+// Validate validates the InputSummary media type instance.
+func (mt *InputSummary) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Temporal == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "temporal"))
+	}
+	if mt.Spatial == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
+	}
+	if err2 := mt.Spatial.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Temporal.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeInputSummary decodes the InputSummary instance encoded in resp body.
+func (c *Client) DecodeInputSummary(resp *http.Response) (*InputSummary, error) {
+	var decoded InputSummary
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
