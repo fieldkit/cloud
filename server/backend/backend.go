@@ -10,8 +10,13 @@ import (
 	"time"
 )
 
+type SourceChange struct {
+	SourceID int64
+}
+
 type Backend struct {
-	db *sqlxcache.DB
+	SourceChanges chan SourceChange
+	db            *sqlxcache.DB
 }
 
 func New(url string) (*Backend, error) {
@@ -21,7 +26,8 @@ func New(url string) (*Backend, error) {
 	}
 
 	return &Backend{
-		db: db,
+		SourceChanges: make(chan SourceChange, 100),
+		db:            db,
 	}, nil
 }
 
@@ -364,6 +370,11 @@ func (b *Backend) AddDocument(ctx context.Context, document *data.Document) erro
 		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data)
 			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
 		`, document)
+
+	b.SourceChanges <- SourceChange{
+		SourceID: int64(document.InputID),
+	}
+
 	return err
 }
 

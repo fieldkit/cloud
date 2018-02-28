@@ -17,7 +17,7 @@ source AS (
 		d.id,
 		d.input_id,
 		d.timestamp,
-		ST_FlipCoordinates(d.location) AS location
+		d.location
 	FROM fieldkit.document d WHERE d.input_id IN (source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
 ),
 with_timestamp_differences AS (
@@ -63,3 +63,27 @@ SELECT
 FROM spatial_clustering s;
 END
 ' LANGUAGE plpgsql;
+
+CREATE TABLE fieldkit.sources_temporal_clusters (
+    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    cluster_id integer NOT NULL,
+    updated_at timestamp NOT NULL,
+    number_of_features integer NOT NULL,
+    start_time timestamp NOT NULL,
+    end_time timestamp NOT NULL,
+    centroid geometry(POINT, 4326) NOT NULL,
+    radius decimal NOT NULL,
+    PRIMARY KEY (source_id, cluster_id)
+);
+
+CREATE TABLE fieldkit.sources_spatial_clusters (
+    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    cluster_id integer NOT NULL,
+    updated_at timestamp NOT NULL,
+    number_of_features integer NOT NULL,
+	start_time timestamp NOT NULL,
+	end_time timestamp NOT NULL,
+    centroid geometry(POINT, 4326) NOT NULL,
+    radius decimal NOT NULL,
+    PRIMARY KEY (source_id, cluster_id)
+);
