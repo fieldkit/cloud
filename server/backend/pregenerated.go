@@ -23,7 +23,7 @@ func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId in
 	      SELECT
 		      input_id,
 		      temporal_cluster_id,
-                      now() AS updated_at,
+                      NOW() AS updated_at,
 		      COUNT(id) AS number_of_features,
 		      MIN(timestamp) AS start_time,
 		      MAX(timestamp) AS end_time,
@@ -35,10 +35,10 @@ func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId in
 	      GROUP BY temporal_cluster_id, input_id
 	      ORDER BY temporal_cluster_id
 	      ON CONFLICT (source_id, cluster_id) DO UPDATE SET
-		      start_time = excluded.start_time,
-		      end_time = excluded.end_time,
                       updated_at = excluded.updated_at,
 		      number_of_features = excluded.number_of_features,
+		      start_time = excluded.start_time,
+		      end_time = excluded.end_time,
 		      centroid = excluded.centroid,
 		      radius = excluded.radius
 	`, sourceId)
@@ -51,7 +51,7 @@ func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int
 	      SELECT
 		      input_id,
 		      spatial_cluster_id,
-                      now() AS updated_at,
+                      NOW() AS updated_at,
 		      COUNT(id) AS number_of_features,
 		      MIN(timestamp) AS start_time,
 		      MAX(timestamp) AS end_time,
@@ -63,10 +63,10 @@ func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int
 	      GROUP BY spatial_cluster_id, input_id
 	      ORDER BY spatial_cluster_id
 	      ON CONFLICT (source_id, cluster_id) DO UPDATE SET
-		      start_time = excluded.start_time,
-		      end_time = excluded.end_time,
                       updated_at = excluded.updated_at,
 		      number_of_features = excluded.number_of_features,
+		      start_time = excluded.start_time,
+		      end_time = excluded.end_time,
 		      centroid = excluded.centroid,
 		      radius = excluded.radius
 	`, sourceId)

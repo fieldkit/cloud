@@ -18,7 +18,9 @@ func NewNaiveBackgroundJobs(be *Backend) *NaiveBackgroundJobs {
 }
 
 func (j *NaiveBackgroundJobs) Start() error {
-	delayed := make(chan SourceChange)
+	delayed := make(chan SourceChange, 100)
+
+	ctx := context.TODO()
 
 	go func() {
 		log.Printf("Started background jobs...")
@@ -42,8 +44,6 @@ func (j *NaiveBackgroundJobs) Start() error {
 	}()
 
 	go func() {
-		ctx := context.TODO()
-
 		for {
 			select {
 			case c := <-delayed:
@@ -55,6 +55,15 @@ func (j *NaiveBackgroundJobs) Start() error {
 			}
 		}
 	}()
+
+	devices, err := j.be.ListAllDeviceInputs(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, device := range devices {
+		delayed <- SourceChange{SourceID: int64(device.ID)}
+	}
 
 	return nil
 }
