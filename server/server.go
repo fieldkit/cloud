@@ -45,13 +45,6 @@ type Config struct {
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 }
 
-// https://github.com/goadesign/goa/blob/master/error.go#L312
-func newErrorID() string {
-	b := make([]byte, 6)
-	io.ReadFull(rand.Reader, b)
-	return base64.StdEncoding.EncodeToString(b)
-}
-
 var help bool
 
 func init() {
@@ -62,6 +55,7 @@ func main() {
 	flag.Parse()
 
 	var config Config
+
 	if help {
 		envconfig.Usage("fieldkit", &config)
 		os.Exit(0)
@@ -71,50 +65,9 @@ func main() {
 		panic(err)
 	}
 
-	goa.ErrorMediaIdentifier += "+json"
-
-	errInvalidRequest := goa.ErrInvalidRequest
-	goa.ErrInvalidRequest = func(message interface{}, keyvals ...interface{}) error {
-		if len(keyvals) < 2 {
-			return errInvalidRequest(message, keyvals...)
-		}
-
-		messageString, ok := message.(string)
-		if !ok {
-			return errInvalidRequest(message, keyvals...)
-		}
-
-		fmt.Println(keyvals)
-
-		if keyval, ok := keyvals[0].(string); !ok || keyval != "attribute" {
-			return errInvalidRequest(message, keyvals...)
-		}
-
-		attribute, ok := keyvals[1].(string)
-		if !ok {
-			return errInvalidRequest(message, keyvals...)
-		}
-
-		if i := strings.LastIndex(attribute, "."); i != -1 {
-			attribute = attribute[i+1:]
-		}
-
-		return &goa.ErrorResponse{
-			Code:   "bad_request",
-			Detail: messageString,
-			ID:     newErrorID(),
-			Meta:   map[string]interface{}{attribute: message},
-			Status: 400,
-		}
-	}
-
-	errBadRequest := goa.ErrBadRequest
-	goa.ErrBadRequest = func(message interface{}, keyvals ...interface{}) error {
-		if err, ok := message.(*goa.ErrorResponse); ok {
-			return err
-		}
-
-		return errBadRequest(message, keyvals...)
+	database, err := sqlxcache.Open("postgres", config.PostgresURL)
+	if err != nil {
+		panic(err)
 	}
 
 	awsSessionOptions := session.Options{
@@ -130,20 +83,150 @@ func main() {
 		panic(err)
 	}
 
-	var emailer email.Emailer
+	be, err := backend.New(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	rawMessageIngester, err := backend.NewRawMessageIngester(be)
+	if err != nil {
+		panic(err)
+	}
+
+	streamIngester, err := backend.NewStreamIngester(be)
+	if err != nil {
+		panic(err)
+	}
+
+	background := backend.NewNaiveBackgroundJobs(be)
+
+	background.Start()
+
+	if flag.Arg(0) == "twitter" {
+		twitterListCredentialer := be.TwitterListCredentialer()
+		social.Twitter(social.TwitterOptions{
+			Backend: be,
+			StreamOptions: twitter.StreamOptions{
+				UserLister:       twitterListCredentialer,
+				UserCredentialer: twitterListCredentialer,
+				ConsumerKey:      config.TwitterConsumerKey,
+				ConsumerSecret:   config.TwitterConsumerSecret,
+				Domain:           config.Domain,
+			},
+		})
+
+		os.Exit(0)
+	}
+
+	service, err := createApiService(database, be, awsSession, config)
+
+	notFoundHandler := http.NotFoundHandler()
+
+	adminServer := notFoundHandler
+	if config.AdminRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.AdminRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		adminServer = http.StripPrefix("/admin", singlepageApplication)
+	}
+
+	frontendServer := notFoundHandler
+	if config.FrontendRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.FrontendRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		frontendServer = singlepageApplication
+	}
+
+	landingServer := notFoundHandler
+	if config.LandingRoot != "" {
+		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.LandingRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		landingServer = singlepageApplication
+	}
+
+	serveApi := func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/messages/ingestion" {
+			rawMessageIngester.ServeHTTP(w, req)
+		} else if req.URL.Path == "/messages/ingestion/stream" {
+			streamIngester.ServeHTTP(w, req)
+		} else {
+			service.Mux.ServeHTTP(w, req)
+		}
+	}
+
+	apiDomain := "api." + config.Domain
+	suffix := "." + config.Domain
+	server := &http.Server{
+		Addr: config.Addr,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/status" {
+				fmt.Fprint(w, "ok")
+				return
+			}
+
+			if req.Host == apiDomain {
+				serveApi(w, req)
+				return
+			}
+
+			if req.Host == config.Domain {
+				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
+					adminServer.ServeHTTP(w, req)
+					return
+				}
+
+				landingServer.ServeHTTP(w, req)
+				return
+			}
+
+			if strings.HasSuffix(req.Host, suffix) {
+				frontendServer.ServeHTTP(w, req)
+				return
+			}
+
+			serveApi(w, req)
+		}),
+	}
+
+	if err := server.ListenAndServe(); err != nil {
+		service.LogError("startup", "err", err)
+	}
+}
+
+func createEmailer(awsSession *session.Session, config Config) (emailer email.Emailer, err error) {
 	switch config.Emailer {
 	case "default":
 		emailer = email.NewEmailer("admin", config.Domain)
 	case "aws":
 		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
 	default:
-		panic("invalid emailer")
+		panic("Invalid emailer")
+	}
+	return
+}
+
+func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config Config) (service *goa.Service, err error) {
+	emailer, err := createEmailer(awsSession, config)
+	if err != nil {
+		panic(err)
 	}
 
-	// Create service
-	service := goa.New("fieldkit")
+	service = goa.New("fieldkit")
 
-	// Mount middleware
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
 		panic(err)
@@ -160,33 +243,6 @@ func main() {
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
-	// service.Use(gzip.Middleware(6))
-
-	database, err := sqlxcache.Open("postgres", config.PostgresURL)
-	if err != nil {
-		panic(err)
-	}
-	be, err := backend.New(config.PostgresURL)
-	if err != nil {
-		panic(err)
-	}
-
-	// TWITTER
-	if flag.Arg(0) == "twitter" {
-		twitterListCredentialer := be.TwitterListCredentialer()
-		social.Twitter(social.TwitterOptions{
-			Backend: be,
-			StreamOptions: twitter.StreamOptions{
-				UserLister:       twitterListCredentialer,
-				UserCredentialer: twitterListCredentialer,
-				ConsumerKey:      config.TwitterConsumerKey,
-				ConsumerSecret:   config.TwitterConsumerSecret,
-				Domain:           config.Domain,
-			},
-		})
-
-		os.Exit(0)
-	}
 
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
@@ -274,99 +330,62 @@ func main() {
 	})
 	app.MountGeoJSONController(service, c13)
 
-	notFoundHandler := http.NotFoundHandler()
-	adminServer := notFoundHandler
-	if config.AdminRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.AdminRoot,
-		})
-		if err != nil {
-			panic(err)
+	setupErrorHandling()
+
+	return
+}
+
+// https://github.com/goadesign/goa/blob/master/error.go#L312
+func newErrorID() string {
+	b := make([]byte, 6)
+	io.ReadFull(rand.Reader, b)
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func setupErrorHandling() {
+	goa.ErrorMediaIdentifier += "+json"
+
+	errInvalidRequest := goa.ErrInvalidRequest
+	goa.ErrInvalidRequest = func(message interface{}, keyvals ...interface{}) error {
+		if len(keyvals) < 2 {
+			return errInvalidRequest(message, keyvals...)
 		}
 
-		adminServer = http.StripPrefix("/admin", singlepageApplication)
-	}
-
-	frontendServer := notFoundHandler
-	if config.FrontendRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.FrontendRoot,
-		})
-		if err != nil {
-			panic(err)
+		messageString, ok := message.(string)
+		if !ok {
+			return errInvalidRequest(message, keyvals...)
 		}
 
-		frontendServer = singlepageApplication
-	}
+		fmt.Println(keyvals)
 
-	landingServer := notFoundHandler
-	if config.LandingRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.LandingRoot,
-		})
-		if err != nil {
-			panic(err)
+		if keyval, ok := keyvals[0].(string); !ok || keyval != "attribute" {
+			return errInvalidRequest(message, keyvals...)
 		}
 
-		landingServer = singlepageApplication
-	}
+		attribute, ok := keyvals[1].(string)
+		if !ok {
+			return errInvalidRequest(message, keyvals...)
+		}
 
-	rawMessageIngester, err := backend.NewRawMessageIngester(be)
-	if err != nil {
-		panic(err)
-	}
+		if i := strings.LastIndex(attribute, "."); i != -1 {
+			attribute = attribute[i+1:]
+		}
 
-	streamIngester, err := backend.NewStreamIngester(be)
-	if err != nil {
-		panic(err)
-	}
-
-	serveApi := func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/messages/ingestion" {
-			rawMessageIngester.ServeHTTP(w, req)
-		} else if req.URL.Path == "/messages/ingestion/stream" {
-			streamIngester.ServeHTTP(w, req)
-		} else {
-			service.Mux.ServeHTTP(w, req)
+		return &goa.ErrorResponse{
+			Code:   "bad_request",
+			Detail: messageString,
+			ID:     newErrorID(),
+			Meta:   map[string]interface{}{attribute: message},
+			Status: 400,
 		}
 	}
 
-	apiDomain := "api." + config.Domain
-	suffix := "." + config.Domain
-	server := &http.Server{
-		Addr: config.Addr,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/status" {
-				fmt.Fprint(w, "ok")
-				return
-			}
+	errBadRequest := goa.ErrBadRequest
+	goa.ErrBadRequest = func(message interface{}, keyvals ...interface{}) error {
+		if err, ok := message.(*goa.ErrorResponse); ok {
+			return err
+		}
 
-			if req.Host == apiDomain {
-				serveApi(w, req)
-				return
-			}
-
-			if req.Host == config.Domain {
-				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
-					adminServer.ServeHTTP(w, req)
-					return
-				}
-
-				landingServer.ServeHTTP(w, req)
-				return
-			}
-
-			if strings.HasSuffix(req.Host, suffix) {
-				frontendServer.ServeHTTP(w, req)
-				return
-			}
-
-			serveApi(w, req)
-		}),
-	}
-
-	// Start service
-	if err := server.ListenAndServe(); err != nil {
-		service.LogError("startup", "err", err)
+		return errBadRequest(message, keyvals...)
 	}
 }
