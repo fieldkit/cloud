@@ -50,7 +50,10 @@ func (j *NaiveBackgroundJobs) Start() error {
 				started := time.Now()
 				log.Printf("Processing %v...", c)
 				generator := NewPregenerator(j.be)
-				generator.Pregenerate(ctx, c.SourceID)
+				err := generator.Pregenerate(ctx, c.SourceID)
+				if err != nil {
+					log.Printf("Error: %v", err)
+				}
 				log.Printf("Done %v in %v", c, time.Now().Sub(started))
 			}
 		}

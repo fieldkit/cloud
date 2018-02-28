@@ -19,7 +19,7 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 
 func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId int64) error {
 	_, err := p.db.ExecContext(ctx, `
-	      INSERT INTO sources_temporal_clusters
+	      INSERT INTO fieldkit.sources_temporal_clusters
 	      SELECT
 		      input_id,
 		      temporal_cluster_id,
@@ -30,7 +30,7 @@ func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId in
 		      ST_Centroid(ST_Collect(location)) AS centroid,
 		      SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
 	      FROM
-		      fk_clustered_docs($1)
+		      fieldkit.fk_clustered_docs($1)
 	      WHERE spatial_cluster_id IS NULL
 	      GROUP BY temporal_cluster_id, input_id
 	      ORDER BY temporal_cluster_id
@@ -47,7 +47,7 @@ func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId in
 
 func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int64) error {
 	_, err := p.db.ExecContext(ctx, `
-	      INSERT INTO sources_spatial_clusters
+	      INSERT INTO fieldkit.sources_spatial_clusters
 	      SELECT
 		      input_id,
 		      spatial_cluster_id,
@@ -58,7 +58,7 @@ func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int
 		      ST_Centroid(ST_Collect(location)) AS centroid,
 		      SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
 	      FROM
-		      fk_clustered_docs($1)
+		      fieldkit.fk_clustered_docs($1)
 	      WHERE spatial_cluster_id IS NOT NULL
 	      GROUP BY spatial_cluster_id, input_id
 	      ORDER BY spatial_cluster_id

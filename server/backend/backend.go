@@ -532,6 +532,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 type GeometryClusterSummary struct {
 	ID               int
 	NumberOfFeatures int
+	UpdatedAt        time.Time
 	StartTime        time.Time
 	EndTime          time.Time
 	Centroid         data.Location
@@ -542,17 +543,10 @@ func (b *Backend) SpatialClustersBySourceID(ctx context.Context, sourceId int) (
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-			  spatial_cluster_id AS id,
-			  MIN(timestamp) AS startTime,
-			  MAX(timestamp) AS endTime,
-			  COUNT(id) AS numberOfFeatures,
-			  ST_AsBinary(ST_Centroid(ST_Collect(location))) AS centroid,
-			  SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
-		  FROM 
-			  fk_clustered_docs($1)
-		  WHERE spatial_cluster_id IS NOT NULL
-		  GROUP BY spatial_cluster_id, input_id
-		  ORDER BY spatial_cluster_id
+		    cluster_id AS id, updated_at AS updatedAt, number_of_features AS numberOfFeatures, start_time AS startTime, end_time AS endTime, ST_AsBinary(centroid) AS centroid, radius
+		  FROM
+		    fieldkit.sources_spatial_clusters
+		  WHERE source_id = $1
 	      `, sourceId); err != nil {
 		return nil, err
 	}
@@ -563,17 +557,10 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-			  temporal_cluster_id AS id,
-			  MIN(timestamp) AS startTime,
-			  MAX(timestamp) AS endTime,
-			  COUNT(id) AS numberOfFeatures,
-			  ST_AsBinary(ST_Centroid(ST_Collect(location))) AS centroid,
-			  SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
-		  FROM 
-			  fk_clustered_docs($1)
-		  WHERE spatial_cluster_id IS NULL
-		  GROUP BY temporal_cluster_id, input_id
-		  ORDER BY temporal_cluster_id
+		    cluster_id AS id, updated_at AS updatedAt, number_of_features AS numberOfFeatures, start_time AS startTime, end_time AS endTime, ST_AsBinary(centroid) AS centroid, radius
+		  FROM
+		    fieldkit.sources_temporal_clusters
+		  WHERE source_id = $1
 	      `, sourceId); err != nil {
 		return nil, err
 	}

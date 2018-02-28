@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION fk_clustered_docs(source_id BIGINT)
+CREATE OR REPLACE FUNCTION fieldkit.fk_clustered_docs(source_id BIGINT)
 RETURNS TABLE (
 	"id" BIGINT,
 	"input_id" INTEGER,
