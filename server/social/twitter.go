@@ -75,7 +75,7 @@ func Twitter(options TwitterOptions) {
 			}
 
 			coordinates := twitter.Coordinates(tweet)
-			location := data.NewLocation(coordinates[0], coordinates[1])
+			location := data.NewLocation([]float64{coordinates[0], coordinates[1]})
 
 			ctx := context.Background()
 			twitterAccountInputs, err := options.Backend.ListTwitterAccountInputsByAccountID(ctx, tweet.User.ID)

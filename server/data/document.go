@@ -18,9 +18,9 @@ type Location struct {
 	point *geo.Point
 }
 
-func NewLocation(latitude, longitude float64) *Location {
+func NewLocation(coordinates []float64) *Location {
 	return &Location{
-		point: geo.NewPointFromLatLng(latitude, longitude),
+		point: geo.NewPointFromLatLng(coordinates[1], coordinates[0]),
 	}
 }
 

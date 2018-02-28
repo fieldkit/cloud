@@ -170,7 +170,7 @@ func (c *DeviceController) UpdateLocation(ctx *app.UpdateLocationDeviceContext) 
 	dl := data.DeviceLocation{
 		DeviceID:  int64(deviceInput.ID),
 		Timestamp: &now,
-		Location:  data.NewLocation(ctx.Payload.Longitude, ctx.Payload.Latitude),
+		Location:  data.NewLocation([]float64{ctx.Payload.Longitude, ctx.Payload.Latitude}),
 	}
 
 	c.options.Database.NamedGetContext(ctx, dl, `

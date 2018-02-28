@@ -70,7 +70,7 @@ func NewDocumentAdder(backend *Backend) *DocumentAdder {
 }
 
 func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
-	// TODO: Not terrible happy with this hack.
+	// TODO: Not terribly happy with this hack.
 	ids := im.Schema.Ids.(DatabaseIds)
 	d := data.Document{
 		SchemaID:  int32(ids.SchemaID),
@@ -78,7 +78,7 @@ func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
 		TeamID:    nil,
 		UserID:    nil,
 		Timestamp: *im.Time,
-		Location:  data.NewLocation(float64(im.Location.Coordinates[0]), float64(im.Location.Coordinates[1])),
+		Location:  data.NewLocation(im.Location.Coordinates),
 	}
 	d.SetData(im.Fields)
 	return da.backend.AddDocument(context.TODO(), &d)

@@ -68,7 +68,7 @@ func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Lo
 	dl := data.DeviceLocation{
 		DeviceID:  devices[0].InputID,
 		Timestamp: l.UpdatedAt,
-		Location:  data.NewLocation(l.Coordinates[0], l.Coordinates[1]),
+		Location:  data.NewLocation(l.Coordinates),
 	}
 	return ds.db.NamedGetContext(context.TODO(), dl, `
                INSERT INTO fieldkit.device_location (device_id, timestamp, location)
