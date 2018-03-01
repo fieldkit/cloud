@@ -102,6 +102,10 @@ export class MapRight extends Component {
     }
 }
 
+const Map = ReactMapboxGl({
+    accessToken: MAPBOX_ACCESS_TOKEN
+});
+
 export default class MapContainer extends Component {
     props: Props
     state: {
@@ -239,8 +243,7 @@ export default class MapContainer extends Component {
 
         return (
             <div>
-                <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
-                    style={MAPBOX_STYLE}
+                <Map style={MAPBOX_STYLE} containerStyle={ { height: '100vh', width: '100vw', } }
                     movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
                     onDrag={ this.onUserActivityThrottled }
                     onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
@@ -255,7 +258,7 @@ export default class MapContainer extends Component {
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
                     <FiltersPanel features visibleFeatures={visibleFeatures} onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />
-                </ReactMapboxGl>
+                </Map>
                 {this.renderPanels()}
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
