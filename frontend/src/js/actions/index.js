@@ -7,6 +7,14 @@ export function changePlaybackMode(mode) {
     };
 }
 
+export function focusLocation(center, altitude) {
+    return {
+        type: ActionTypes.FOCUS_LOCATION,
+        center: center,
+        altitude: altitude
+    };
+}
+
 export function focusExpeditionTime(time, center, expeditionSecondsPerTick) {
     return {
         type: ActionTypes.FOCUS_TIME,
@@ -22,23 +30,30 @@ export function notifyOfUserMapActivity() {
     };
 }
 
+export function focusSource(source) {
+    return {
+        type: ActionTypes.FOCUS_SOURCE,
+        source: source
+    };
+}
+
 export function focusFeature(feature) {
     return {
         type: ActionTypes.FOCUS_FEATURE,
         feature: feature
-    }
+    };
 }
 
 export function loadChartData(chart) {
     return {
         type: ActionTypes.CHART_DATA_LOAD,
         chart: chart
-    }
+    };
 }
 
 export function chartDataLoaded(chart) {
     return {
         type: ActionTypes.CHART_DATA_LOADED,
         chart: chart
-    }
+    };
 }

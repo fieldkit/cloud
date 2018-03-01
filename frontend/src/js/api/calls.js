@@ -31,11 +31,11 @@ function* api(raw) {
 const Calls = {};
 
 for (let name of Object.keys(Creators)) {
-    const fn = Creators[name]
+    const fn = Creators[name];
     Calls[name] = function() {
         const args = Array.prototype.slice.call(arguments);
         return call(api, fn.apply(null, args));
-    }
+    };
 }
 
 export default Calls;

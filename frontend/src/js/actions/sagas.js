@@ -9,7 +9,7 @@ import _ from 'lodash';
 import * as ActionTypes from './types';
 import FkApi from '../api/calls';
 
-import { changePlaybackMode, focusExpeditionTime, chartDataLoaded } from './index';
+import { changePlaybackMode, focusLocation, focusExpeditionTime, chartDataLoaded } from './index';
 
 import { PlaybackModes } from '../components/PlaybackControl';
 
@@ -99,61 +99,75 @@ export function* walkGeoJson(summary) {
     }
 }
 
-export function* refreshSaga(pagedGeojson) {
-    while (true) {
-        pagedGeojson = yield FkApi.getNextExpeditionGeoJson(pagedGeojson);
-        if (pagedGeojson.geo.features.length === 0) {
-            yield delay(10000);
-        }
-    }
-}
-
 export function* loadCharts() {
     yield takeLatest([ActionTypes.CHART_DATA_LOAD], function* (chartAction) {
         let page = yield FkApi.getSourceGeoJson(chartAction.chart.source.inputId);
         while (page.hasMore) {
             page = yield FkApi.getNextSourceGeoJson(page);
         }
-        yield put(chartDataLoaded(chartAction.chart))
+        yield put(chartDataLoaded(chartAction.chart));
     });
 }
 
-export function* loadExpeditionDetails() {
+export function* manageMap() {
+    yield takeLatest([ActionTypes.FOCUS_SOURCE], function* (focusSourceAction) {
+        const source = focusSourceAction.source.source;
+        yield loadAndWalkSource(source.id);
+    });
+}
+
+export function* loadSources(ids) {
     const cache = {};
-
-    yield takeLatest([ActionTypes.API_EXPEDITION_SOURCES_GET.SUCCESS], function* (sourcesAction) {
-        const ids = _(sourcesAction.response.deviceInputs).map('id').uniq().value();
-        const newIds = _.difference(ids, _.keys(cache));
-        const sources = yield all(newIds.map(id => FkApi.getSource(id)));
-        const indexed = _(sources).keyBy('id').value();
-        const features = yield all(sources.map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
-        console.log("LatestFeatures", features);
-        Object.assign(cache, indexed);
-    });
+    const newIds = _.difference(ids, _.keys(cache));
+    const sources = yield all(newIds.map(id => FkApi.getSource(id)));
+    const summaries = yield all(newIds.map(id => FkApi.getSourceSummary(id)));
+    const indexed = _(sources).keyBy('id').value();
+    const features = yield all(sources.map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
+    console.log("LatestFeatures", features);
+    console.log('Summaries', summaries);
+    Object.assign(cache, indexed);
 }
 
-export function* loadActiveExpedition(projectSlug, expeditionSlug) {
+export function* loadExpedition(projectSlug, expeditionSlug) {
     const [ expedition, sources ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
-    console.log(expedition, sources);
+    const sourceIds = _(sources.deviceInputs).map('id').uniq().value();
+    const detailedSources = yield loadSources(sourceIds);
+
+    yield put(focusLocation(expedition.centroid));
+
+    return [ expedition, sources, sources, detailedSources ];
 }
 
-export function* loadSingleDevice(deviceId) {
+function* loadGeojson(lastPage, call) {
+    while (true) {
+        lastPage = yield call(lastPage);
+        if (lastPage.geo.features.length === 0) {
+            break;
+        }
+    }
+}
+
+export function* loadAllGeojson(deviceId) {
     const [ pagedGeoJson, source ] = yield all([
         FkApi.getSourceGeoJson(deviceId),
         FkApi.getSource(deviceId),
     ]);
 
-    if (pagedGeoJson.geo.features.length > 0) {
-        const features = yield all([FkApi.getFeatureGeoJson(source.lastFeatureId)]);
-        console.log("LatestFeatures", features);
+    yield loadGeojson(pagedGeoJson, (page) => FkApi.getNextSourceGeoJson(page));
 
-        yield delay(1000)
-        yield all([ walkGeoJson(source, pagedGeoJson.geo), refreshSaga(pagedGeoJson) ]);
-    }
+    return [ source, yield select(state => state.visibleFeatures.geojson) ];
+}
+
+export function* loadAndWalkSource(deviceId) {
+    const [ source, geojson ] = yield loadAllGeojson(deviceId);
+
+    yield delay(1000);
+
+    yield walkGeoJson(source, geojson.geo);
 }
 
 export function* loadActiveProject() {
@@ -164,16 +178,15 @@ export function* loadActiveProject() {
         FkApi.getProjectExpeditions(projectSlug)
     ]);
 
-    console.log(project);
+    console.log('Project', project);
 
     if (expeditions.length > 0) {
         yield all([
-            loadExpeditionDetails(),
+            manageMap(),
+            loadExpedition(projectSlug, expeditions[0].slug),
             loadCharts(),
-            loadSingleDevice(125),
-            loadActiveExpedition(projectSlug, expeditions[0].slug)
-        ])
-        console.log("Done")
+        ]);
+        console.log("Done");
     }
 }
 

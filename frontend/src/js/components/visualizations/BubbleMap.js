@@ -101,11 +101,13 @@ export default class BubbleMap extends Component {
         const { data, click } = this.props;
         const { circleColor, circleRadius } = this.state;
 
+        if (!data || data.features.length === 0) {
+            return <div></div>;
+        }
+
         return (
             <div>
-                <Source id="source" geoJsonSource={ { type: 'geojson', data, } } />
-                <Layer type="circle" id="circle" sourceId={ 'source' } paint={ { 'circle-color': circleColor, 'circle-radius': circleRadius, } } />
-                <Layer type="circle" id="circle-markers" paint={ { 'circle-color': 'rgba(0, 0, 0, 0)', 'circle-radius': 10, } }>
+                <Layer type="circle" id="circle-markers" paint={ { 'circle-color': circleColor, 'circle-radius': circleRadius } }>
                 { data.features.map((f, i) => (
                         <Feature key={i} onClick={ click.bind(this, f) }
                             onMouseEnter={ onToggleHover.bind(this, 'pointer') }

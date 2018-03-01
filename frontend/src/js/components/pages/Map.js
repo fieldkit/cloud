@@ -7,7 +7,7 @@ import type { GeoJSON } from '../../types/MapTypes';
 import type { ActiveExpedition  } from '../../types';
 
 import MapContainer from '../containers/MapContainer';
-import { notifyOfUserMapActivity, changePlaybackMode, focusFeature } from '../../actions';
+import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource } from '../../actions';
 
 import '../../../css/map.css';
 
@@ -16,7 +16,7 @@ function generateConstantColor() {
         type: 'constant',
         colors: [{
             location: 0,
-            color: '#ff0000'
+            color: '#C0392B'
         }],
         dateKey: null,
         bounds: null,
@@ -115,19 +115,15 @@ class Map extends Component {
     }
 
     render() {
-        const { visibleFeatures, playbackMode, notifyOfUserMapActivity, focusFeature, changePlaybackMode } = this.props;
+        const { visibleFeatures, playbackMode, notifyOfUserMapActivity, focusFeature, focusSource, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;
-
-        if (!visibleFeatures.geojson) {
-            return (<div></div>);
-        }
 
         return (
             <div className="map page">
                 <MapContainer pointDecorator={ pointDecorator }
                     visibleFeatures={ visibleFeatures }
                     playbackMode={ playbackMode }
-                    focusFeature={ focusFeature }
+                    focusFeature={ focusFeature } focusSource={ focusSource }
                     notifyOfUserMapActivity={ notifyOfUserMapActivity }
                     onChangePlaybackMode={ changePlaybackMode } />
             </div>
@@ -144,5 +140,6 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
     notifyOfUserMapActivity,
     changePlaybackMode,
-    focusFeature
+    focusFeature,
+    focusSource
 })(Map);

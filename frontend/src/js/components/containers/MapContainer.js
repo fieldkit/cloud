@@ -4,9 +4,10 @@ import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl/*, Popup*/ } from 'react-mapbox-gl';
 import _ from 'lodash';
 
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets'
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
 
 import BubbleMap from '../visualizations/BubbleMap';
+import ClusterMap  from '../visualizations/ClusterMap';
 import PlaybackControl from '../PlaybackControl';
 
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
@@ -31,6 +32,7 @@ function getCenter(fitBounds: Bounds) {
 
 type Props = {
     playbackMode: mixed,
+    focusSource: () => mixed,
     onChangePlaybackMode: () => mixed,
     notifyOfUserMapActivity: () => mixed,
     pointDecorator: PointDecorator,
@@ -112,9 +114,9 @@ export default class MapContainer extends Component {
     constructor(props: Props) {
         super(props);
         this.state = {
-            fitBounds: [[0, 0], [0, 0]],
-            center: [0, 0],
-            zoom: [12],
+            fitBounds: null,
+            center: null,
+            zoom: [14],
             feature: null,
             panels: {
                 sidePanelVisible: false,
@@ -127,12 +129,15 @@ export default class MapContainer extends Component {
     componentWillMount() {
         const { visibleFeatures } = this.props;
 
-        const fitBounds = getFitBounds(visibleFeatures.geojson);
-        const center = getCenter(fitBounds);
-        this.setState({
-            fitBounds,
-            center
-        });
+        if (false)
+        if (visibleFeatures.geojson.features.length > 0) {
+            const fitBounds = getFitBounds(visibleFeatures.geojson);
+            const center = getCenter(fitBounds);
+            this.setState({
+                fitBounds,
+                center
+            });
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -147,12 +152,12 @@ export default class MapContainer extends Component {
                 if (newFocus.feature) {
                     this.setState({
                         center: newFocus.feature.geometry.coordinates
-                    })
+                    });
                 }
                 else if (newFocus.center) {
                     this.setState({
                         center: newFocus.center
-                    })
+                    });
                 }
             }
         }
@@ -170,6 +175,7 @@ export default class MapContainer extends Component {
     onFocusFeature(feature) {
         const { focusFeature } = this.props;
         focusFeature(feature);
+
         this.setState({
             feature,
             panels: {
@@ -188,6 +194,12 @@ export default class MapContainer extends Component {
         });
     }
 
+    onFocusSource(source) {
+        const { focusSource } = this.props;
+
+        focusSource(source);
+    }
+
     onUserActivity(how) {
         const { notifyOfUserMapActivity } = this.props;
 
@@ -195,26 +207,7 @@ export default class MapContainer extends Component {
     }
 
     onPopupChange() {
-        /*
-        let { feature } = this.state;
-        if (feature) { // If we have a popup and we're changing to another one.
-            feature = null;
-            this.setState({
-                feature
-            });
-        }
-        */
     }
-
-    /*
-    tick(ms, firstFrame) {
-        requestAnimationFrame(ms => this.tick(ms, false));
-    }
-
-    componentDidMount() {
-        requestAnimationFrame(ms => this.tick(ms, true));
-    }
-    */
 
     renderPanels() {
         const { visibleFeatures, playbackMode } = this.props;
@@ -240,27 +233,28 @@ export default class MapContainer extends Component {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom } = this.state;
 
-        if (!visibleFeatures.geojson) {
-            return (<div><h1>Loading</h1></div>);
-        }
-        else if (visibleFeatures.geojson.features.length === 0) {
-            return (<div><h1>Empty</h1></div>);
+        if (!center) {
+            return <div></div>;
         }
 
         return (
             <div>
                 <ReactMapboxGl accessToken={MAPBOX_ACCESS_TOKEN}
                     style={MAPBOX_STYLE}
-                    movingMethod="easeTo" fitBounds={ fitBounds } center={ center }
-                    onDrag={ this.onUserActivityThrottled } 
-                    zoom={ zoom } onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
+                    movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
+                    onDrag={ this.onUserActivityThrottled }
+                    onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
+
+                    <ClusterMap visibleFeatures={ visibleFeatures } data={ visibleFeatures.sources } click={ this.onMarkerClick.bind(this) } />
+
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
+
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
                     { false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
 
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
-                    <FiltersPanel features visibleFeatures={visibleFeatures} onShowFeature={ this.onFocusFeature.bind(this) } />
+                    <FiltersPanel features visibleFeatures={visibleFeatures} onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />
                 </ReactMapboxGl>
                 {this.renderPanels()}
                 <div className="disclaimer-panel">

@@ -1,4 +1,4 @@
-import * as ActionTypes from '../actions/types'
+import * as ActionTypes from '../actions/types';
 
 export function getProject(projectSlug) {
     return {
@@ -6,7 +6,7 @@ export function getProject(projectSlug) {
         path: '/projects/@/' + projectSlug,
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getProjectExpeditions(projectSlug) {
@@ -15,7 +15,7 @@ export function getProjectExpeditions(projectSlug) {
         path: '/projects/@/' + projectSlug + '/expeditions',
         method: 'GET',
         unwrap: (r) => r.expeditions
-    }
+    };
 }
 
 export function getExpedition(projectSlug, expeditionSlug) {
@@ -24,7 +24,7 @@ export function getExpedition(projectSlug, expeditionSlug) {
         path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug,
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getExpeditionGeoJson(projectSlug, expeditionSlug) {
@@ -33,7 +33,7 @@ export function getExpeditionGeoJson(projectSlug, expeditionSlug) {
         path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/geojson',
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getExpeditionSummary(projectSlug, expeditionSlug) {
@@ -42,7 +42,7 @@ export function getExpeditionSummary(projectSlug, expeditionSlug) {
         path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/summary',
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getExpeditionSources(projectSlug, expeditionSlug) {
@@ -51,7 +51,7 @@ export function getExpeditionSources(projectSlug, expeditionSlug) {
         path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/inputs',
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getFeatureGeoJson(id) {
@@ -60,7 +60,7 @@ export function getFeatureGeoJson(id) {
         path: '/features/' + id + '/geojson',
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getNextExpeditionGeoJson(last) {
@@ -69,7 +69,7 @@ export function getNextExpeditionGeoJson(last) {
         path: last.nextUrl,
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getSourceGeoJson(id) {
@@ -78,7 +78,7 @@ export function getSourceGeoJson(id) {
         path: '/inputs/' + id + '/geojson?descending=false',
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getNextSourceGeoJson(last) {
@@ -87,7 +87,7 @@ export function getNextSourceGeoJson(last) {
         path: last.nextUrl,
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
 }
 
 export function getSource(id) {
@@ -96,5 +96,14 @@ export function getSource(id) {
         path: '/inputs/' + id,
         method: 'GET',
         unwrap: (r) => r
-    }
+    };
+}
+
+export function getSourceSummary(id) {
+    return {
+        types: ActionTypes.API_SOURCE_SUMMARY_GET,
+        path: '/inputs/' + id + '/summary',
+        method: 'GET',
+        unwrap: (r) => r
+    };
 }

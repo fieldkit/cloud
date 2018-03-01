@@ -69,13 +69,15 @@ export default class FiltersPanel extends Component {
     }
 
     renderSources(sources) {
-        const { onShowFeature } = this.props;
+        const { onShowSource, onShowFeature } = this.props;
 
         return (
             <div>
             <div style={sourcesTitleStyle}>Sources</div>
-            {_.values(sources).map(source => {
-                const lastFeature = source.lastFeature;
+            {_.values(sources).filter(r => r.source && r.summary).map(r => {
+                const source = r.source;
+                const lastFeature = r.lastFeature;
+                // const summary = r.summary;
                 if (lastFeature == null) {
                     return (<div key={source.id}>Loading...</div>);
                 }
@@ -86,7 +88,7 @@ export default class FiltersPanel extends Component {
                 return (
                     <div key={source.id} style={sourceContainerStyle}>
                         <div style={sourceFirstLineStyle}>
-                            <a style={{ ...sourceNameStyle, ...{ color: 'black' } }} href="#" onClick={() => console.log(source)}>{source.name}</a>
+                            <a style={{ ...sourceNameStyle, ...{ color: 'black' } }} href="#" onClick={() => onShowSource(r)}>{source.name}</a>
                             &nbsp;
                             <a style={{ color: 'black' }} target="_blank" href={featuresUrl}>{numberOfFeatures} features</a>
                         </div>
@@ -94,7 +96,7 @@ export default class FiltersPanel extends Component {
                             <a style={{ color: 'black' }} href="#" onClick={() => onShowFeature(lastFeature) }>{lastFeatureDate}</a>
                         </div>
                     </div>
-                )
+                );
             })}
             </div>
         );

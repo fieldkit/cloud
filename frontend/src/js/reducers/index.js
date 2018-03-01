@@ -19,13 +19,14 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
 
 const visibleFeaturesInitialState = {
     focus: { features: [] },
-    sources: { }
+    sources: { },
+    geojson: { features: []}
 };
 
 function mergeFeatures(state, action) {
     let newGeojson = Object.assign({}, action.response.geo);
     if (state.geojson) {
-        newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ]
+        newGeojson.features = [ ...state.geojson.features, ...newGeojson.features ];
     }
     return Object.assign({ }, state, {
         geojson: newGeojson
@@ -43,26 +44,48 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
     case ActionTypes.FOCUS_FEATURE:
         return Object.assign({ }, state, {
             focus: {
+                expeditionSecondsPerTick: 0,
                 feature: action.feature,
+                time: null,
                 center: action.feature.geometry.coordinates,
+                altitude: 0,
                 features: []
             }
         });
     case ActionTypes.API_FEATURE_GEOJSON_GET.SUCCESS: {
         const feature = action.response.geo.features[0];
         const nextState = Object.assign({}, state);
-        _.each(nextState.sources, (source, id) => {
-            if (source.lastFeatureId === feature.properties.id) {
-                source.lastFeature = feature;
+        _.each(nextState.sources, (container, id) => {
+            if (container.source.lastFeatureId === feature.properties.id) {
+                container.lastFeature = feature;
             }
         });
         return nextState;
     }
+    case ActionTypes.API_SOURCE_SUMMARY_GET.SUCCESS: {
+        const summary = action.response;
+        const container = state.sources[summary.id] || { };
+        const nextState = Object.assign({}, state);
+        nextState.sources[summary.id] = {...container, ...{ summary: summary } };
+        return nextState;
+    }
     case ActionTypes.API_SOURCE_GET.SUCCESS: {
         const source = action.response;
+        const container = state.sources[source.id] || { };
         const nextState = Object.assign({}, state);
-        nextState.sources[source.id] = {...source, ...{ } }
+        nextState.sources[source.id] = {...container, ...{ source: source } };
         return nextState;
+    }
+    case ActionTypes.FOCUS_LOCATION: {
+        return Object.assign({ }, state, {
+            focus: {
+                expeditionSecondsPerTick: 0,
+                time: null,
+                center: action.center,
+                altitude: action.altitude,
+                features: []
+            }
+        });
     }
     case ActionTypes.FOCUS_TIME:
         const expeditionSecondsPerTick = action.expeditionSecondsPerTick;
@@ -74,6 +97,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
                 expeditionSecondsPerTick: expeditionSecondsPerTick,
                 time: action.time,
                 center: action.center,
+                altitude: 0,
                 features: features
             }
         });
