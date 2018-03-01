@@ -56,7 +56,8 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 		Attribute("numberOfFeatures", Integer)
 		Attribute("centroid", ArrayOf(Number))
 		Attribute("radius", Number)
-		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius")
+		Attribute("geometry", ArrayOf(ArrayOf(Number)))
+		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius", "geometry")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -65,6 +66,7 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 		Attribute("numberOfFeatures")
 		Attribute("centroid")
 		Attribute("radius")
+		Attribute("geometry")
 	})
 })
 

@@ -115,12 +115,14 @@ func (mt *DeviceInput) Validate() (err error) {
 // Identifier: application/vnd.app.device_input+json; view=public
 type DeviceInputPublic struct {
 	Active           bool       `form:"active" json:"active" xml:"active"`
+	Centroid         []float64  `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
 	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	ExpeditionID     int        `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID               int        `form:"id" json:"id" xml:"id"`
 	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
 	Name             string     `form:"name" json:"name" xml:"name"`
 	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
 	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	TeamID           *int       `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
 	UserID           *int       `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
@@ -337,12 +339,14 @@ func (mt *Expedition) Validate() (err error) {
 //
 // Identifier: application/vnd.app.expedition+json; view=detailed
 type ExpeditionDetailed struct {
+	Centroid         []float64  `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
 	Description      string     `form:"description" json:"description" xml:"description"`
 	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	ID               int        `form:"id" json:"id" xml:"id"`
 	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
 	Name             string     `form:"name" json:"name" xml:"name"`
 	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
 	Slug             string     `form:"slug" json:"slug" xml:"slug"`
 	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 }
@@ -573,12 +577,13 @@ func (c *Client) DecodeGeoJSONGeometry(resp *http.Response) (*GeoJSONGeometry, e
 //
 // Identifier: application/vnd.app.geometry_cluster_summary+json; view=default
 type GeometryClusterSummary struct {
-	Centroid         []float64 `form:"centroid" json:"centroid" xml:"centroid"`
-	EndTime          time.Time `form:"endTime" json:"endTime" xml:"endTime"`
-	ID               int       `form:"id" json:"id" xml:"id"`
-	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
-	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
-	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
+	Centroid         []float64   `form:"centroid" json:"centroid" xml:"centroid"`
+	EndTime          time.Time   `form:"endTime" json:"endTime" xml:"endTime"`
+	Geometry         [][]float64 `form:"geometry" json:"geometry" xml:"geometry"`
+	ID               int         `form:"id" json:"id" xml:"id"`
+	NumberOfFeatures int         `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
+	Radius           float64     `form:"radius" json:"radius" xml:"radius"`
+	StartTime        time.Time   `form:"startTime" json:"startTime" xml:"startTime"`
 }
 
 // Validate validates the GeometryClusterSummary media type instance.
@@ -588,6 +593,9 @@ func (mt *GeometryClusterSummary) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "centroid"))
 	}
 
+	if mt.Geometry == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometry"))
+	}
 	return
 }
 

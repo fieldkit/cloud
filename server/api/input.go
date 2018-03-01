@@ -37,6 +37,7 @@ func GeometryClusterSummaryType(s *backend.GeometryClusterSummary) *app.Geometry
 		EndTime:          s.EndTime,
 		Centroid:         s.Centroid.Coordinates(),
 		Radius:           s.Radius,
+		Geometry:         s.Geometry.Coordinates(),
 	}
 }
 

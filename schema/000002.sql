@@ -23,7 +23,7 @@ source AS (
 with_timestamp_differences AS (
 	SELECT
 		*,
-			                             LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS previous_timestamp,
+			                              LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS previous_timestamp,
 		EXTRACT(epoch FROM (s.timestamp - LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp))) AS time_difference
 	FROM source s
 	ORDER BY s.input_id, s.timestamp
@@ -73,6 +73,14 @@ CREATE TABLE fieldkit.sources_temporal_clusters (
     end_time timestamp NOT NULL,
     centroid geometry(POINT, 4326) NOT NULL,
     radius decimal NOT NULL,
+    PRIMARY KEY (source_id, cluster_id)
+);
+
+CREATE TABLE fieldkit.sources_temporal_geometries (
+    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    cluster_id integer NOT NULL,
+    updated_at timestamp NOT NULL,
+    geometry geometry(LINESTRING, 4326) NOT NULL,
     PRIMARY KEY (source_id, cluster_id)
 );
 

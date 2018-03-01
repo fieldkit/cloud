@@ -23,6 +23,8 @@ func DeviceInputPublicType(deviceInput *data.DeviceInput, summary *backend.Featu
 		LastFeatureID:    &summary.LastFeatureID,
 		StartTime:        &summary.StartTime,
 		EndTime:          &summary.EndTime,
+		Centroid:         summary.Centroid.Coordinates(),
+		Radius:           &summary.Radius,
 	}
 
 	return deviceInputType

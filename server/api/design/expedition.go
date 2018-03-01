@@ -27,6 +27,8 @@ var Expedition = MediaType("application/vnd.app.expedition+json", func() {
 		Attribute("lastFeatureId", Integer)
 		Attribute("startTime", DateTime)
 		Attribute("endTime", DateTime)
+		Attribute("centroid", ArrayOf(Number))
+		Attribute("radius", Number)
 		Required("id", "name", "slug", "description")
 	})
 	View("default", func() {
@@ -45,7 +47,9 @@ var Expedition = MediaType("application/vnd.app.expedition+json", func() {
 		Attribute("lastFeatureId")
 		Attribute("startTime")
 		Attribute("endTime")
-		Required("id", "name", "slug", "description", "numberOfFeatures", "lastFeatureId", "startTime", "endTime")
+		Attribute("centroid")
+		Attribute("radius")
+		Required("id", "name", "slug", "description", "numberOfFeatures", "lastFeatureId", "startTime", "endTime", "centroid", "radius")
 	})
 })
 
