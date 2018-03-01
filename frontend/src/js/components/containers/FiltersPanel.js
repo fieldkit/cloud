@@ -8,15 +8,11 @@ import { API_HOST } from '../../secrets';
 import React, { Component } from 'react';
 
 const panelStyle: React.CSSProperties = {
-    backgroundColor: '#f9f9f9',
     color: "#000",
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
     borderBottomLeftRadius: 2,
     borderBottomRightRadius: 2,
-    padding: '10px',
-    // boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
-    // border: '1px solid rgba(0, 0, 0, 0.4)'
 };
 
 const containerStyle: React.CSSProperties = {
@@ -28,9 +24,17 @@ const containerStyle: React.CSSProperties = {
 };
 
 const sourcesTitleStyle: React.CSSProperties = {
+    padding: '10px',
     fontSize: '18px',
     fontWeight: 'bold',
     paddingBottom: '5px',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    color: 'white',
+};
+
+const listContainerStyle: React.CSSProperties = {
+    backgroundColor: "rgba(255, 255, 255, 1.00)",
+    padding: '10px',
 };
 
 const sourceContainerStyle: React.CSSProperties = {
@@ -46,6 +50,51 @@ const sourceFirstLineStyle: React.CSSProperties = {
 };
 
 const sourceSecondLineStyle: React.CSSProperties = {
+};
+
+class SourcePanel extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            expanded: false
+        };
+    }
+
+    render() {
+        const { info, onShowSource, onShowFeature } = this.props;
+        const { source, summary, lastFeature } = info;
+        const { expanded } = this.state;
+
+        const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp));
+        const lastFeatureAge = lastFeatureDate.fromNow();
+
+        const numberOfFeatures = source.numberOfFeatures;
+
+        return (
+                <div style={sourceContainerStyle}>
+                    <div style={sourceFirstLineStyle} onClick={ () => this.setState({ expanded: !expanded }) }>
+                        <span style={{ fontSize: '11px', float: 'right' }}>{numberOfFeatures} total, {lastFeatureAge}</span>
+                        Device: <b>{source.name}</b>
+                    </div>
+                    {expanded && this.renderExpanded()}
+                </div>
+        );
+    }
+
+    renderExpanded() {
+        const { onShowSource, onShowFeature, info } = this.props;
+        const { source, summary, lastFeature } = info;
+
+        const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson";
+
+        return (
+            <div>
+                <a href={featuresUrl} target="_blank">GeoJSON</a>
+                <div onClick={ () => onShowFeature(lastFeature) }>View Latest</div>
+                <div onClick={ () => onShowSource(source) }>Show Source</div>
+            </div>
+        );
+    }
 };
 
 export default class FiltersPanel extends Component {
@@ -73,31 +122,10 @@ export default class FiltersPanel extends Component {
 
         return (
             <div>
-            <div style={sourcesTitleStyle}>Sources</div>
-            {_.values(sources).filter(r => r.source && r.summary).map(r => {
-                const source = r.source;
-                const lastFeature = r.lastFeature;
-                // const summary = r.summary;
-                if (lastFeature == null) {
-                    return (<div key={source.id}>Loading...</div>);
-                }
-                const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp)).format('MMM Do YYYY, h:mm:ss a');
-                const numberOfFeatures = source.numberOfFeatures;
-                const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson";
-
-                return (
-                    <div key={source.id} style={sourceContainerStyle}>
-                        <div style={sourceFirstLineStyle}>
-                            <a style={{ ...sourceNameStyle, ...{ color: 'black' } }} href="#" onClick={() => onShowSource(r)}>{source.name}</a>
-                            &nbsp;
-                            <a style={{ color: 'black' }} target="_blank" href={featuresUrl}>{numberOfFeatures} features</a>
-                        </div>
-                        <div style={sourceSecondLineStyle}>
-                            <a style={{ color: 'black' }} href="#" onClick={() => onShowFeature(lastFeature) }>{lastFeatureDate}</a>
-                        </div>
-                    </div>
-                );
-            })}
+                <div style={sourcesTitleStyle}>Sources</div>
+                <div style={listContainerStyle}>
+                    {_.values(sources).filter(r => r.source && r.summary && r.lastFeature).map((r, i) => <SourcePanel key={i} info={r} onShowFeature={onShowFeature} onShowSource={onShowSource} />)}
+                </div>
             </div>
         );
     }

@@ -1,8 +1,6 @@
 @import 'App.scss';
 @import '../images/fa/scss/font-awesome.scss';
 
-$popup-width: 500px;
-
 .playback-control {
     .fa:hover {
         color: red;
@@ -13,14 +11,9 @@ $popup-width: 500px;
 }
 
 .map.page {
-  .mapboxgl-map {
-    .mapboxgl-popup-content {
-      padding: 0px;
-    }
-
+.mapboxgl-map {
     .mapboxgl-popup {
       color: black;
-      width: $popup-width;
     }
 
     .zoom-control {

@@ -1,17 +1,15 @@
 // @flow weak
 
-import React, { Component } from 'react';
-import ReactMapboxGl, { ScaleControl, ZoomControl/*, Popup*/ } from 'react-mapbox-gl';
 import _ from 'lodash';
+import React, { Component } from 'react';
+import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
 
 import BubbleMap from '../visualizations/BubbleMap';
 import ClusterMap  from '../visualizations/ClusterMap';
 import PlaybackControl from '../PlaybackControl';
-
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
-import type { Focus } from '../../types';
+import { RadialMenu } from '../RadialMenu';
 
 import { FieldKitLogo } from '../icons/Icons';
 
@@ -19,6 +17,9 @@ import FeaturePanel from './FeaturePanel';
 import NotificationsPanel from './NotificationsPanel';
 import ChartComponent from '../ChartComponent';
 import FiltersPanel from './FiltersPanel';
+
+import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
+import type { Focus } from '../../types';
 
 function getFitBounds(geojson: GeoJSON) {
     const lon = geojson.features.map(f => f.geometry.coordinates[0]);
@@ -210,9 +211,6 @@ export default class MapContainer extends Component {
         notifyOfUserMapActivity();
     }
 
-    onPopupChange() {
-    }
-
     renderPanels() {
         const { visibleFeatures, playbackMode } = this.props;
         const { panels, chart, feature } = this.state;
@@ -233,6 +231,104 @@ export default class MapContainer extends Component {
         );
     }
 
+    onMouseMove(target, ev) {
+    }
+
+    onMouseOut(target, ev) {
+    }
+
+    onClick(target, ev) {
+        const features = target.queryRenderedFeatures(ev.point);
+        const coordinates = ev.lngLat;
+
+        let options = this.clusterOptions();
+        if (features.length > 1) {
+            options = this.selectFeatureOptions(features);
+        }
+
+        this.setState({
+            menu: {
+                mouse: ev.point,
+                coordinates: coordinates,
+                features: features,
+                options: options,
+            }
+        });
+    }
+
+    onMenuClose() {
+        const { menu } = this.state;
+
+
+        if (menu.nextOptions) {
+            this.setState({
+                menu: {
+                    mouse: menu.mouse,
+                    coordinates: menu.coordinates,
+                    features: menu.features,
+                    options: menu.nextOptions,
+                }
+            });
+        }
+        else {
+            this.setState({
+                menu: null
+            });
+        }
+    }
+
+    renderRadialMenu() {
+        const { menu } = this.state;
+
+        if (!menu || menu.features.length === 0) {
+            return <div></div>;
+        }
+
+        const { options } = menu;
+
+        return <RadialMenu key={options.key} delay={80} duration={400} strokeWidth={2} innerRadius={20} outerRadius={120}
+                stroke={"rgba(255, 255, 255, 1)"} fill={"rgba(0, 0, 0, 0.8)"}
+                buttons={options.buttons} buttonFunctions={options.functions}
+                position={menu.mouse} onClosed={ this.onMenuClose.bind(this) } />;
+    }
+
+    selectFeatureOptions(features) {
+        const options = _(features).map(f => f.properties).map(f => {
+            return {
+                title: f.name,
+                function: () => {
+                    const { menu } = this.state;
+                    const nextMenu = { ...menu, ...{ features: [f], nextOptions: this.clusterOptions() } };
+                    this.setState({
+                        menu: nextMenu
+                    });
+                }
+            };
+        });
+
+        return {
+            key: 1,
+            buttons: options.map(o => o.title).value(),
+            functions: options.map(o => o.function).value()
+        };
+    }
+
+    clusterOptions() {
+        return {
+            key: 0,
+            buttons: [
+                "Data",
+                "Graph",
+                "Summary"
+            ],
+            functions: [
+                () => console.log("Data"),
+                () => console.log("Graph"),
+                () => console.log("Summary"),
+            ]
+        };
+    }
+
     render() {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
         const { fitBounds, center, zoom } = this.state;
@@ -243,21 +339,26 @@ export default class MapContainer extends Component {
 
         return (
             <div>
-                <Map style={MAPBOX_STYLE} containerStyle={ { height: '100vh', width: '100vw', } }
+                <Map style={MAPBOX_STYLE} containerStyle={ { height: '100vh', width: '100vw' } }
                     movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
-                    onDrag={ this.onUserActivityThrottled }
-                    onClick={ this.onPopupChange.bind(this) } containerStyle={ { height: '100vh', width: '100vw', } }>
+                    onMouseMove={ this.onMouseMove.bind(this) }
+                    onMouseOut={ this.onMouseOut.bind(this) }
+                    onClick={ this.onClick.bind(this) }>
+                    onDrag={ this.onUserActivityThrottled.bind(this) }
 
                     <ClusterMap visibleFeatures={ visibleFeatures } data={ visibleFeatures.sources } click={ this.onMarkerClick.bind(this) } />
 
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
 
                     <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
+
                     { false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
 
                     <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
 
-                    <FiltersPanel features visibleFeatures={visibleFeatures} onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />
+                    <FiltersPanel visibleFeatures={visibleFeatures} onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />
+
+                    {this.renderRadialMenu()}
                 </Map>
                 {this.renderPanels()}
                 <div className="disclaimer-panel">

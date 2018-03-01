@@ -44,7 +44,7 @@ export function* walkGeoJson(summary) {
 
             yield put(focusExpeditionTime(time, coordinates, walkSecondsPerTick));
 
-            const [ activityAction, focusFeatureAction, playbackAction, _ ] = yield race([
+            const [ activityAction, focusFeatureAction, playbackAction ] = yield race([
                 take(ActionTypes.USER_MAP_ACTIVITY),
                 take(ActionTypes.FOCUS_FEATURE),
                 take(ActionTypes.CHANGE_PLAYBACK_MODE),
