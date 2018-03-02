@@ -17,6 +17,7 @@ type FkBinaryReader struct {
 	Time            int64
 	NumberOfSensors uint32
 	ReadingsSeen    uint32
+	Modules         []string
 	Sensors         map[uint32]*pb.SensorInfo
 	Readings        map[uint32]float32
 	Ingester        *ingestion.MessageIngester
@@ -32,6 +33,7 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		Ingester:      ingester,
 		Sensors:       make(map[uint32]*pb.SensorInfo),
 		Readings:      make(map[uint32]float32),
+		Modules:       make([]string, 0),
 		DocumentAdder: NewDocumentAdder(b),
 	}
 }
@@ -132,7 +134,12 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 				}
 			}
 		}
-
+		if record.Metadata.Modules != nil {
+			br.Modules = make([]string, 0)
+			for _, m := range record.Metadata.Modules {
+				br.Modules = append(br.Modules, m.Name)
+			}
+		}
 	}
 	if record.LoggedReading != nil {
 		reading := record.LoggedReading.Reading
@@ -161,7 +168,7 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 					return err
 				}
 
-				log.Printf("(%s)(%s)[Ingesting] %v, %d values", pm.MessageId, pm.SchemaId, pm.Location, len(pm.MapValues))
+				log.Printf("(%s)(%s)[Ingesting] %v, %v, %d values", pm.MessageId, pm.SchemaId, br.Modules, pm.Location, len(pm.MapValues))
 
 				im, err := br.Ingester.IngestProcessedMessage(pm)
 				if err != nil {

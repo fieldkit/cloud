@@ -22,6 +22,12 @@ message LoggedReading {
   SensorReading reading = 3;
 }
 
+message ModuleInfo {
+  uint32 id = 1;
+  uint32 address = 2;
+  string name = 3;
+}
+
 message SensorInfo {
   uint32 sensor = 1;
   string name = 2;
@@ -34,6 +40,7 @@ message Metadata {
   string git = 3;
   uint32 resetCause = 4;
   repeated SensorInfo sensors = 5;
+  repeated ModuleInfo modules = 6;
 }
 
 message DataRecord {

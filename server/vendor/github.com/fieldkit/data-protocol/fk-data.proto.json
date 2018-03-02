@@ -62,6 +62,22 @@
             }
           }
         },
+        "ModuleInfo": {
+          "fields": {
+            "id": {
+              "type": "uint32",
+              "id": 1
+            },
+            "address": {
+              "type": "uint32",
+              "id": 2
+            },
+            "name": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
         "SensorInfo": {
           "fields": {
             "sensor": {
@@ -100,6 +116,11 @@
               "rule": "repeated",
               "type": "SensorInfo",
               "id": 5
+            },
+            "modules": {
+              "rule": "repeated",
+              "type": "ModuleInfo",
+              "id": 6
             }
           }
         },

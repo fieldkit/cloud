@@ -13,3 +13,5 @@ fk-data.pb.go: fk-data.proto
 	protoc --go_out=./ fk-data.proto
 
 veryclean:
+
+clean:
