@@ -41,15 +41,8 @@ const sourceContainerStyle: React.CSSProperties = {
     paddingBottom: '10px',
 };
 
-const sourceNameStyle: React.CSSProperties = {
-    fontWeight: 'bold',
-};
-
 const sourceFirstLineStyle: React.CSSProperties = {
     fontSize: '14px',
-};
-
-const sourceSecondLineStyle: React.CSSProperties = {
 };
 
 class SourcePanel extends Component {
@@ -61,8 +54,8 @@ class SourcePanel extends Component {
     }
 
     render() {
-        const { info, onShowSource, onShowFeature } = this.props;
-        const { source, summary, lastFeature } = info;
+        const { info } = this.props;
+        const { source, lastFeature } = info;
         const { expanded } = this.state;
 
         const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp));
@@ -83,7 +76,7 @@ class SourcePanel extends Component {
 
     renderExpanded() {
         const { onShowSource, onShowFeature, info } = this.props;
-        const { source, summary, lastFeature } = info;
+        const { source, lastFeature } = info;
 
         const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson";
 

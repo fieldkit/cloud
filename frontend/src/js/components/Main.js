@@ -1,7 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { Route, Switch, NavLink } from 'react-router-dom';
 
 import log from 'loglevel';
@@ -26,7 +26,6 @@ export class Main extends Component {
     }
 
     render() {
-        // const { activeExpedition } = this.props;
 
         return (
             <div className="main">

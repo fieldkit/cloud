@@ -25,11 +25,11 @@ export class RadialMenu extends ReactRadial {
     }
 
     componentWillReceiveProps(nextProps) {
+        /*
         const { buttons: oldButtons } = this.props;
         const { buttons: newButtons } = nextProps;
         const { enabled } = this.state;
 
-        /*
         if (enabled) {
             if (oldButtons != newButtons) {
                 console.log("BUTTONS CHANGED");
