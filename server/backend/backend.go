@@ -382,8 +382,8 @@ func (b *Backend) ListSchemasByID(ctx context.Context, projectID int32) ([]*data
 
 func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {
 	_, err := b.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data)
-			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
+		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data, fixed, visible)
+			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
 		`, document)
 
 	b.SourceChanges <- SourceChange{

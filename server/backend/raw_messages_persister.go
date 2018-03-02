@@ -79,6 +79,8 @@ func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
 		UserID:    nil,
 		Timestamp: *im.Time,
 		Location:  data.NewLocation(im.Location.Coordinates),
+		Fixed:     im.Fixed,
+		Visible:   true,
 	}
 	d.SetData(im.Fields)
 	return da.backend.AddDocument(context.TODO(), &d)

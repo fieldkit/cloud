@@ -50,6 +50,7 @@ type ProcessedMessage struct {
 	SchemaId    SchemaId
 	Time        *time.Time
 	Location    []float64
+	Fixed       bool
 	ArrayValues []string
 	MapValues   map[string]string
 }

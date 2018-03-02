@@ -19,6 +19,7 @@ const (
 
 type HttpJsonMessage struct {
 	Location []float64         `json:"location"`
+	Fixed    bool              `json:"fixed"`
 	Time     int64             `json:"time"`
 	Device   string            `json:"device"`
 	Stream   string            `json:"stream"`
@@ -55,7 +56,8 @@ func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *Pro
 	}
 
 	if len(message.Location) < 2 {
-		return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
+		// return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
+		// With no location we'll try and infer where the message is from the past location history.
 	}
 
 	messageTime := time.Unix(message.Time, 0)
@@ -65,6 +67,7 @@ func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *Pro
 		SchemaId:  NewSchemaId(NewDeviceId(message.Device), message.Stream),
 		Time:      &messageTime,
 		Location:  message.Location,
+		Fixed:     message.Fixed,
 		MapValues: message.Values,
 	}
 

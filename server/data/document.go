@@ -52,6 +52,8 @@ type Document struct {
 	Timestamp time.Time      `db:"timestamp"`
 	Location  *Location      `db:"location"`
 	Data      types.JSONText `db:"data"`
+	Fixed     bool           `db:"fixed"`
+	Visible   bool           `db:"visible"`
 }
 
 type DocumentsPage struct {

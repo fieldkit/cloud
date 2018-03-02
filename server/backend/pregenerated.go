@@ -74,8 +74,6 @@ func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId 
 
 	geometries := make(map[int64][]geo.Point)
 	for _, row := range locations {
-		log.Printf("%v", row)
-
 		if geometries[row.ClusterId] == nil {
 			geometries[row.ClusterId] = make([]geo.Point, 0)
 		}

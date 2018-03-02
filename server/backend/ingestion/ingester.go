@@ -13,6 +13,7 @@ type IngestedMessage struct {
 	Time     *time.Time
 	Location *Location
 	Fields   map[string]interface{}
+	Fixed    bool
 }
 
 const (
@@ -119,6 +120,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 		Schema:   ms,
 		Time:     time,
 		Location: stream.Location,
+		Fixed:    pm.Fixed,
 		Fields:   mapped,
 	}
 

@@ -41,12 +41,23 @@ func (br *FkBinaryReader) CreateHttpJsonMessage() *ingestion.HttpJsonMessage {
 		values[br.Sensors[key].Name] = fmt.Sprintf("%f", value)
 	}
 
+	if br.Location != nil {
+		return &ingestion.HttpJsonMessage{
+			Location: []float64{float64(br.Location.Longitude), float64(br.Location.Latitude), float64(br.Location.Altitude)},
+			Fixed:    br.Location.Fix == 1,
+			Time:     br.Time,
+			Device:   br.DeviceId,
+			Stream:   "",
+			Values:   values,
+		}
+	}
+
 	return &ingestion.HttpJsonMessage{
-		Location: []float64{float64(br.Location.Longitude), float64(br.Location.Latitude), float64(br.Location.Altitude)},
-		Time:     br.Time,
-		Device:   br.DeviceId,
-		Stream:   "",
-		Values:   values,
+		Fixed:  false,
+		Time:   br.Time,
+		Device: br.DeviceId,
+		Stream: "",
+		Values: values,
 	}
 }
 
@@ -86,18 +97,16 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 
 	}
 	if record.LoggedReading != nil {
-		if record.LoggedReading.Location != nil {
-			br.Location = record.LoggedReading.Location
-		}
 		reading := record.LoggedReading.Reading
+		location := record.LoggedReading.Location
+
+		if location != nil {
+			br.Location = location
+		}
+
 		if reading != nil {
 			if br.NumberOfSensors == 0 {
 				log.Printf("Ignored: Unknown sensor. (%+v)", record)
-				return nil
-			}
-
-			if record.LoggedReading.Location == nil || record.LoggedReading.Location.Fix != 1 {
-				log.Printf("Ignored: Unfixed. (%+v)", record)
 				return nil
 			}
 
@@ -108,35 +117,35 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 				br.Time = int64(record.LoggedReading.Reading.Time)
 				br.ReadingsSeen = 0
 
-				if br.Location != nil {
-					message := br.CreateHttpJsonMessage()
-					token, err := ToUniqueHash(message)
-					if err != nil {
-						return err
-					}
-
-					messageId := ingestion.MessageId(token.String())
-
-					log.Printf("(%s)[Ingesting] %+v", messageId, message)
-
-					pm, err := message.ToProcessedMessage(messageId)
-					if err != nil {
-						log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
-						return err
-					}
-
-					im, err := br.Ingester.IngestProcessedMessage(pm)
-					if err != nil {
-						log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
-						return err
-					}
-
-					br.DocumentAdder.AddDocument(im)
-
-					log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-				} else {
-					log.Printf("Ignored: No location. (%+v)", record)
+				message := br.CreateHttpJsonMessage()
+				token, err := ToUniqueHash(message)
+				if err != nil {
+					return err
 				}
+
+				messageId := ingestion.MessageId(token.String())
+
+				log.Printf("(%s)[Ingesting] %+v", messageId, message)
+
+				pm, err := message.ToProcessedMessage(messageId)
+				if err != nil {
+					log.Printf("(%s)[Error] %v", messageId, err)
+					return err
+				}
+
+				im, err := br.Ingester.IngestProcessedMessage(pm)
+				if err != nil {
+					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
+					return err
+				}
+
+				err = br.DocumentAdder.AddDocument(im)
+				if err != nil {
+					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
+					return err
+				}
+
+				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
 		}
 	}
