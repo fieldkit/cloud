@@ -22,7 +22,12 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 }
 
 func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId int64) error {
-	_, err := p.db.ExecContext(ctx, `
+	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_clusters WHERE (source_id = $1)", sourceId)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.db.ExecContext(ctx, `
 	      INSERT INTO fieldkit.sources_temporal_clusters
 	      SELECT
 		      input_id,
@@ -56,6 +61,11 @@ type ClusteredRow struct {
 
 func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating temporal cluster geometries...")
+
+	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_geometries WHERE (source_id = $1)", sourceId)
+	if err != nil {
+		return err
+	}
 
 	locations := []*ClusteredRow{}
 	if err := p.db.SelectContext(ctx, &locations, "SELECT temporal_cluster_id AS clusterId, ST_AsBinary(location) AS location FROM fieldkit.fk_clustered_docs($1) WHERE spatial_cluster_id IS NULL ORDER BY timestamp", sourceId); err != nil {
@@ -95,7 +105,12 @@ func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId 
 }
 
 func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int64) error {
-	_, err := p.db.ExecContext(ctx, `
+	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_spatial_clusters WHERE (source_id = $1)", sourceId)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.db.ExecContext(ctx, `
 	      INSERT INTO fieldkit.sources_spatial_clusters
 	      SELECT
 		      input_id,
