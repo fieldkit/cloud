@@ -8,6 +8,7 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 	"github.com/google/uuid"
 	"log"
+	"time"
 )
 
 type FkBinaryReader struct {
@@ -35,51 +36,88 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 	}
 }
 
-func (br *FkBinaryReader) CreateHttpJsonMessage() *ingestion.HttpJsonMessage {
+type HashedData struct {
+	DeviceId string
+	Stream   string
+	Time     int64
+	Values   map[string]string
+	Location []float64
+}
+
+func (br *FkBinaryReader) LocationArray() []float64 {
+	if br.Location != nil {
+		return []float64{float64(br.Location.Longitude), float64(br.Location.Latitude), float64(br.Location.Altitude)}
+	} else {
+		return []float64{}
+	}
+}
+
+func (br *FkBinaryReader) ToHashingData(values map[string]string) (data []byte, err error) {
+	hashed := &HashedData{
+		DeviceId: br.DeviceId,
+		Stream:   "",
+		Time:     br.Time,
+		Values:   values,
+		Location: br.LocationArray(),
+	}
+
+	data, err = json.Marshal(hashed)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+func ToUniqueHash(data []byte) (uuid.UUID, error) {
+	return uuid.NewSHA1(FkBinaryMessagesSpace, data), nil
+}
+
+func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessage, err error) {
 	values := make(map[string]string)
 	for key, value := range br.Readings {
 		values[br.Sensors[key].Name] = fmt.Sprintf("%f", value)
 	}
 
+	hd, err := br.ToHashingData(values)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := ToUniqueHash(hd)
+	if err != nil {
+		return nil, err
+	}
+
+	messageId := token.String()
+	messageTime := time.Unix(br.Time, 0)
+
 	if br.Location != nil {
-		return &ingestion.HttpJsonMessage{
-			Location: []float64{float64(br.Location.Longitude), float64(br.Location.Latitude), float64(br.Location.Altitude)},
-			Fixed:    br.Location.Fix == 1,
-			Time:     br.Time,
-			Device:   br.DeviceId,
-			Stream:   "",
-			Values:   values,
+		pm = &ingestion.ProcessedMessage{
+			MessageId: ingestion.MessageId(messageId),
+			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
+			Time:      &messageTime,
+			Location:  br.LocationArray(),
+			Fixed:     true,
+			MapValues: values,
+		}
+	} else {
+		pm = &ingestion.ProcessedMessage{
+			MessageId: ingestion.MessageId(messageId),
+			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
+			Time:      &messageTime,
+			Location:  []float64{},
+			Fixed:     false,
+			MapValues: values,
 		}
 	}
 
-	return &ingestion.HttpJsonMessage{
-		Fixed:  false,
-		Time:   br.Time,
-		Device: br.DeviceId,
-		Stream: "",
-		Values: values,
-	}
+	return
 }
 
 var (
 	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
 )
-
-func ToHashingData(im *ingestion.HttpJsonMessage) (data []byte, err error) {
-	data, err = json.Marshal(im)
-	if err != nil {
-		return nil, err
-	}
-	return
-}
-
-func ToUniqueHash(im *ingestion.HttpJsonMessage) (uuid.UUID, error) {
-	data, err := ToHashingData(im)
-	if err != nil {
-		return uuid.New(), err
-	}
-	return uuid.NewSHA1(FkBinaryMessagesSpace, data), err
-}
 
 func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 	if record.Metadata != nil {
@@ -117,21 +155,13 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 				br.Time = int64(record.LoggedReading.Reading.Time)
 				br.ReadingsSeen = 0
 
-				message := br.CreateHttpJsonMessage()
-				token, err := ToUniqueHash(message)
+				pm, err := br.CreateProcessedMessage()
 				if err != nil {
+					log.Printf("[Error] %v", err)
 					return err
 				}
 
-				messageId := ingestion.MessageId(token.String())
-
-				log.Printf("(%s)[Ingesting] %+v", messageId, message)
-
-				pm, err := message.ToProcessedMessage(messageId)
-				if err != nil {
-					log.Printf("(%s)[Error] %v", messageId, err)
-					return err
-				}
+				log.Printf("(%s)(%s)[Ingesting] %v, %d values", pm.MessageId, pm.SchemaId, pm.Location, len(pm.MapValues))
 
 				im, err := br.Ingester.IngestProcessedMessage(pm)
 				if err != nil {

@@ -56,8 +56,7 @@ func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *Pro
 	}
 
 	if len(message.Location) < 2 {
-		// return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
-		// With no location we'll try and infer where the message is from the past location history.
+		return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
 	}
 
 	messageTime := time.Unix(message.Time, 0)
