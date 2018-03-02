@@ -28,6 +28,26 @@ with_timestamp_differences AS (
 	FROM source s
 	ORDER BY s.input_id, s.timestamp
 ),
+spatial_clustering AS (
+	SELECT
+		s.*,
+		ST_ClusterDBSCAN(ST_Transform(s.location, 2950), eps := 50, minPoints := 10) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS spatial_cluster_id
+	FROM with_timestamp_differences s
+),
+with_spatial_cluster_size_pre AS (
+	SELECT
+		s.*,
+		((LAG(s.spatial_cluster_id) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) IS NULL AND s.spatial_cluster_id IS NOT NULL) OR
+		 (LAG(s.spatial_cluster_id) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) IS NOT NULL AND s.spatial_cluster_id IS NULL) OR
+		 (LAG(s.spatial_cluster_id) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) != s.spatial_cluster_id))
+		AS spatial_cluster_change
+	FROM spatial_clustering s
+),
+with_spatial_cluster_size AS (
+	SELECT
+		s.*
+	FROM with_spatial_cluster_size_pre s
+),
 with_temporal_clustering AS (
 	SELECT
 		*,
@@ -35,32 +55,27 @@ with_temporal_clustering AS (
 			OR s.time_difference IS NULL THEN true
 			ELSE NULL
 		END AS new_temporal_cluster
-	FROM with_timestamp_differences s
+	FROM with_spatial_cluster_size s
 ),
 with_assigned_temporal_clustering AS (
 	SELECT
 		*,
-		COUNT(new_temporal_cluster) OVER (
+		COUNT(new_temporal_cluster OR spatial_cluster_change) OVER (
 			PARTITION BY s.input_id
 			ORDER BY s.input_id, s.timestamp
 			ROWS UNBOUNDED PRECEDING
 		) AS temporal_cluster_id
 	FROM with_temporal_clustering s
-),
-spatial_clustering AS (
-	SELECT
-		s.id,
-		s.input_id,
-		s.timestamp,
-		s.time_difference,
-		s.temporal_cluster_id,
-		s.location,
-		ST_ClusterDBSCAN(ST_Transform(s.location, 2950), eps := 50, minpoints := 10) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS spatial_cluster_id
-	FROM with_assigned_temporal_clustering s
 )
 SELECT
-	s.*
-FROM spatial_clustering s;
+	s.id,
+	s.input_id,
+	s.timestamp,
+	s.time_difference,
+	s.temporal_cluster_id,
+	s.location,
+	s.spatial_cluster_id
+FROM with_assigned_temporal_clustering s;
 END
 ' LANGUAGE plpgsql;
 
