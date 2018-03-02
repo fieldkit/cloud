@@ -343,8 +343,8 @@ export default class MapContainer extends Component {
                     movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
                     onMouseMove={ this.onMouseMove.bind(this) }
                     onMouseOut={ this.onMouseOut.bind(this) }
-                    onClick={ this.onClick.bind(this) }>
-                    onDrag={ this.onUserActivityThrottled.bind(this) }
+                    onClick={ this.onClick.bind(this) }
+                    onDrag={ this.onUserActivityThrottled.bind(this) }>
 
                     <ClusterMap visibleFeatures={ visibleFeatures } data={ visibleFeatures.sources } click={ this.onMarkerClick.bind(this) } />
 
