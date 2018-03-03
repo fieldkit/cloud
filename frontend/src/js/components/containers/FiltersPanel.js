@@ -85,8 +85,6 @@ class SourcePanel extends Component {
         return (
             <div>
                 <a href={featuresUrl} target="_blank">GeoJSON</a>
-                <div onClick={ () => onShowFeature(lastFeature) }>View Latest</div>
-                <div onClick={ () => onShowSource(source) }>Show Source</div>
             </div>
         );
     }
