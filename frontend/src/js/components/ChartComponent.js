@@ -16,15 +16,18 @@ class ChartComponent extends Component {
 
     componentWillMount() {
         const { loadChartData , chart } = this.props;
+
         loadChartData(chart);
     }
 
     render() {
         const { chart, geojson } = this.props;
 
-        return (
-            <SimpleChartContainer chart={chart} geojson={geojson} />
-        );
+        if (!geojson.geo || geojson.geo.length < 2) {
+            return <div className="loading">Loading</div>;
+        }
+
+        return <SimpleChartContainer chart={chart} geojson={geojson} />
     }
 }
 

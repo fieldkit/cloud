@@ -1,0 +1,129 @@
+@import 'App.scss';
+@import '../images/fa/scss/font-awesome.scss';
+
+$grid-columns: 12;
+$grid-max-width: 100%;
+$breakpoint-small: "only screen and (min-width: 20em)";
+$breakpoint-medium: "only screen and (min-width: 30em)";
+
+@mixin border-box {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+%clearfix {
+    *zoom: 1;
+    &:before,
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+.source.page {
+    background-color: #333333;
+
+    .header {
+        padding: $col-gutter;
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+
+        .project-name {
+            @include type-h1;
+            flex-grow: 1;
+            line-height: 30px;
+            margin-bottom: 0;
+            font-weight: bold;
+            color: white;
+        }
+    }
+
+    .dashboard {
+        height: 100vh;
+
+        .row.top {
+            height: 50%;
+        }
+
+        .map {
+            height: 100%;
+            // border: 2px solid #4f4f4f;
+            border: 2px solid #3e3e3e;
+        }
+
+        .source {
+            border: 2px solid #3e3e3e;
+        }
+
+        .chart {
+            border: 2px solid #3e3e3e;
+        }
+
+        .feature-panel {
+            background-color: #333333;
+            color: #999999;
+
+            td, th {
+                color: #999999;
+            }
+        }
+    }
+
+    .source-name {
+        @include type-h1;
+        flex-grow: 1;
+        line-height: 38px;
+        margin-bottom: 0;
+        font-weight: bold;
+        color: white;
+    }
+
+    *, *:after, *:before {
+        margin: 0;
+        padding: 0;
+        @include border-box;
+    }
+
+    img {
+        width: auto;
+        max-width: 100%;
+        height: auto !important;
+    }
+
+    .wrapper {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .wrapper, .row {
+        @extend %clearfix;
+    }
+
+    [class*='column-'] {
+        float: left;
+        padding: 0.0em;
+        width: 100%;
+        min-height: 1px;
+    }
+
+    @media #{$breakpoint-medium} {
+        .wrapper {
+            // width: 95%;
+            max-width: $grid-max-width;
+        }
+        @for $i from 1 through $grid-columns {
+            .column-#{$i} {
+                width: 100% / $grid-columns * $i;
+            }
+        }
+    }
+
+    .disclaimer-panel {
+        display: none;
+    }
+}

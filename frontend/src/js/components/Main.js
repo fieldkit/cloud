@@ -2,10 +2,12 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch, NavLink } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import log from 'loglevel';
+
 import Map from './pages/Map';
+import Source from './pages/Source';
 import About from './pages/About';
 
 import type { ActiveExpedition  } from '../types';
@@ -26,22 +28,11 @@ export class Main extends Component {
     }
 
     render() {
-
         return (
             <div className="main">
-                <div className="header">
-                    <div className="project-name">
-                        FieldKit Project
-                    </div>
-                    { false && <div className="nav-bar">
-                        <div className="navigation-tabs">
-                            <NavLink exact to={ '/' }><span>Map</span></NavLink>
-                            <NavLink exact to={ '/' }><span>About</span></NavLink>
-                        </div>
-                    </div>}
-                </div>
                 <Switch>
-                    <Route path={ '/about' } component={ About } />
+                    <Route exact path={ '/sources/:sourceId' } component={ Source } />
+                    <Route exact path={ '/about' } component={ About } />
                     <Route path={ '/' } component={ Map } />
                 </Switch>
             </div>

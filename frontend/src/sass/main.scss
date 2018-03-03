@@ -1,74 +1,55 @@
 @import 'App.scss';
 
 .main {
-  width: 100vw;
-  height: 100vh;
+    width: 100vw;
+    height: 100vh;
 
-  .header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: $col-gutter;
-    width: 100%;
-    z-index: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    background-color: rgba(0, 0, 0, 0.6);
+    .header {
+        .nav-bar {
+            @include type-body-2;
+            height: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 56px;
 
-    .project-name {
-      @include type-h1;
-      flex-grow: 1;
-      line-height: 30px;
-      margin-bottom: 0;
-      font-weight: bold;
-    }
+            .navigation-tabs {
+                height: 100%;
+                line-height: 56px;
 
-    .nav-bar {
-      @include type-body-2;
-      height: 100%;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 56px;
+                a {
+                    display: inline-block;
+                    text-align: center;
+                    text-decoration: none;
 
-      .navigation-tabs {
-        height: 100%;
-        line-height: 56px;
+                    &:not(:first-child) {
+                        margin-left: 40px;
+                    }
 
-        a {
-          display: inline-block;
-          text-align: center;
-          text-decoration: none;
+                    span {
+                        margin: 0 $elements-padding/2;
+                    }
 
-          &:not(:first-child) {
-            margin-left: 40px;
-          }
+                    &::after {
+                        content: '';
+                        display: block;
+                        background-color: white;
+                        height: 2px;
+                        position: relative;
+                        top: -16px;
+                        left: 50%;
+                        width: 0;
+                        transition-property: width, left;
+                        transition-duration: 0.25s;
+                    }
 
-          span {
-            margin: 0 $elements-padding/2;
-          }
-
-          &::after {
-            content: '';
-            display: block;
-            background-color: white;
-            height: 2px;
-            position: relative;
-            top: -16px;
-            left: 50%;
-            width: 0;
-            transition-property: width, left;
-            transition-duration: 0.25s;
-          }
-
-          &.active {
-            &::after {
-              width: 100%;
-              left: 0;
+                    &.active {
+                        &::after {
+                            width: 100%;
+                            left: 0;
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-  }
 }

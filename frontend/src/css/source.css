@@ -2398,26 +2398,50 @@ h5 {
   overflow: visible;
   clip: auto; }
 
-div.loading {
-  padding: 10px;
-  fontWeight: bold;
-  fontSize: 14px; }
+.source.page .wrapper, .source.page .row {
+  *zoom: 1; }
+  .source.page .wrapper:before, .source.page .row:before, .source.page .wrapper:after, .source.page .row:after {
+    content: " ";
+    display: table; }
+  .source.page .wrapper:after, .source.page .row:after {
+    clear: both; }
 
-.playback-control .fa:hover {
-  color: red; }
-
-.map.page .header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 30px;
-  width: 100%;
-  z-index: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  background-color: rgba(0, 0, 0, 0.6); }
-  .map.page .header .project-name {
+.source.page {
+  background-color: #333333; }
+  .source.page .header {
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline; }
+    .source.page .header .project-name {
+      font-size: 36px;
+      line-height: 48px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      flex-grow: 1;
+      line-height: 30px;
+      margin-bottom: 0;
+      font-weight: bold;
+      color: white; }
+  .source.page .dashboard {
+    height: 100vh; }
+    .source.page .dashboard .row.top {
+      height: 50%; }
+    .source.page .dashboard .map {
+      height: 100%;
+      border: 2px solid #3e3e3e; }
+    .source.page .dashboard .source {
+      border: 2px solid #3e3e3e; }
+    .source.page .dashboard .chart {
+      border: 2px solid #3e3e3e; }
+    .source.page .dashboard .feature-panel {
+      background-color: #333333;
+      color: #999999; }
+      .source.page .dashboard .feature-panel td, .source.page .dashboard .feature-panel th {
+        color: #999999; }
+  .source.page .source-name {
     font-size: 36px;
     line-height: 48px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -2425,40 +2449,56 @@ div.loading {
     letter-spacing: 1px;
     margin-bottom: 24px;
     flex-grow: 1;
-    line-height: 30px;
+    line-height: 38px;
     margin-bottom: 0;
-    font-weight: bold; }
+    font-weight: bold;
+    color: white; }
+  .source.page *, .source.page *:after, .source.page *:before {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+  .source.page img {
+    width: auto;
+    max-width: 100%;
+    height: auto !important; }
+  .source.page .wrapper {
+    width: 100%;
+    margin: 0 auto; }
+  .source.page [class*='column-'] {
+    float: left;
+    padding: 0.0em;
+    width: 100%;
+    min-height: 1px; }
+  @media only screen and (min-width: 30em) {
+    .source.page .wrapper {
+      max-width: 100%; }
+    .source.page .column-1 {
+      width: 8.33333%; }
+    .source.page .column-2 {
+      width: 16.66667%; }
+    .source.page .column-3 {
+      width: 25%; }
+    .source.page .column-4 {
+      width: 33.33333%; }
+    .source.page .column-5 {
+      width: 41.66667%; }
+    .source.page .column-6 {
+      width: 50%; }
+    .source.page .column-7 {
+      width: 58.33333%; }
+    .source.page .column-8 {
+      width: 66.66667%; }
+    .source.page .column-9 {
+      width: 75%; }
+    .source.page .column-10 {
+      width: 83.33333%; }
+    .source.page .column-11 {
+      width: 91.66667%; }
+    .source.page .column-12 {
+      width: 100%; } }
+  .source.page .disclaimer-panel {
+    display: none; }
 
-.map.page .mapboxgl-map .mapboxgl-popup {
-  color: black; }
-
-.map.page .mapboxgl-map .zoom-control {
-  top: 120px !important;
-  left: 30px !important; }
-
-.map.page .disclaimer-panel {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: calc(100% - (150px + 12px*2));
-  padding: 0 12px;
-  display: flex;
-  flex-direction: row;
-  align-items: center; }
-  .map.page .disclaimer-panel .disclaimer-body {
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    flex-grow: 1;
-    text-align: right;
-    opacity: 0.8; }
-  .map.page .disclaimer-panel .fieldkit-logo {
-    width: 80px;
-    height: 40px;
-    flex-shrink: 0;
-    margin-left: 12px; }
-    .map.page .disclaimer-panel .fieldkit-logo svg {
-      position: relative;
-      top: 50%;
-      transform: translate(0, -50%); }
-
-/*# sourceMappingURL=map.css.map */
+/*# sourceMappingURL=source.css.map */

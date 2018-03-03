@@ -2,10 +2,10 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 import { API_HOST } from '../../secrets';
-
-import React, { Component } from 'react';
 
 const panelStyle: React.CSSProperties = {
     color: "#000",
@@ -65,9 +65,11 @@ class SourcePanel extends Component {
 
         return (
                 <div style={sourceContainerStyle}>
-                    <div style={sourceFirstLineStyle} onClick={ () => this.setState({ expanded: !expanded }) }>
+                <div style={sourceFirstLineStyle} onClick={ () => this.setState({ expanded: !expanded }) }>
                         <span style={{ fontSize: '11px', float: 'right' }}>{numberOfFeatures} total, {lastFeatureAge}</span>
+                        <Link to={"/sources/" + source.id}>
                         Device: <b>{source.name}</b>
+                        </Link>
                     </div>
                     {expanded && this.renderExpanded()}
                 </div>
@@ -78,7 +80,7 @@ class SourcePanel extends Component {
         const { onShowSource, onShowFeature, info } = this.props;
         const { source, lastFeature } = info;
 
-        const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson";
+        const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson?descending=true";
 
         return (
             <div>

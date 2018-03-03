@@ -6,8 +6,6 @@ import moment from 'moment';
 import React, { Component } from 'react';
 
 const panelStyle: React.CSSProperties = {
-    backgroundColor: '#f9f9f9',
-    color: "#000",
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
     borderBottomLeftRadius: 2,
@@ -26,13 +24,9 @@ export default class FeaturePanel extends Component {
         };
     }
 
-    componentWillReceiveProps(nextProps) {
-        // const { feature: oldFeature } = this.props;
-        // const { feature: newFeature } = nextProps;
-    }
-
     onShowChart(key) {
         const { onShowChart, feature } = this.props;
+
         onShowChart({
             source: feature.properties.source,
             key: key
@@ -43,7 +37,7 @@ export default class FeaturePanel extends Component {
         const properties = _(Object.entries(feature.properties.data));
 
         return (
-            <table style={{ padding: '5px', width: '100%' }}>
+            <table style={{ padding: '5px', width: '100%' }} className="feature-data">
                 <thead>
                     <tr>
                         <th>Key</th>
@@ -68,8 +62,8 @@ export default class FeaturePanel extends Component {
         const date = moment(new Date(feature.properties['timestamp'])).format('MMM Do YYYY, h:mm:ss a');
 
         return (
-            <div style={{ ...panelStyle, ...style }}>
-                <div style={{ backgroundColor: '#d0d0d0', padding: '5px', fontWeight: 'bold' }}>{date}</div>
+            <div style={{ ...panelStyle, ...style }} className="feature-panel">
+                <div style={{ padding: '5px', fontWeight: 'bold' }} className="feature-date">{date}</div>
                 {this.renderProperties(feature)}
             </div>
         );

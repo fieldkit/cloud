@@ -98,7 +98,7 @@ export default class BubbleMap extends Component {
     }
 
     render() {
-        const { data, click } = this.props;
+        const { data, onClick } = this.props;
         const { circleColor, circleRadius } = this.state;
 
         if (!data || data.features.length === 0) {
@@ -109,7 +109,7 @@ export default class BubbleMap extends Component {
             <div>
                 <Layer type="circle" id="circle-markers" paint={ { 'circle-color': circleColor, 'circle-radius': circleRadius } }>
                 { data.features.map((f, i) => (
-                        <Feature key={i} onClick={ click.bind(this, f) }
+                    <Feature key={i} onClick={ onClick.bind(this, f) }
                             onMouseEnter={ onToggleHover.bind(this, 'pointer') }
                             onMouseLeave={ onToggleHover.bind(this, '') }
                             coordinates={ f.geometry.coordinates } />

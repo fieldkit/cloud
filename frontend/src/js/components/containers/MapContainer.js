@@ -1,35 +1,28 @@
 // @flow weak
 
 import _ from 'lodash';
+
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
 
 import BubbleMap from '../visualizations/BubbleMap';
-import ClusterMap  from '../visualizations/ClusterMap';
+import ClusterMap from '../visualizations/ClusterMap';
 import PlaybackControl from '../PlaybackControl';
-import { RadialMenu } from '../RadialMenu';
-
-import { FieldKitLogo } from '../icons/Icons';
 
 import FeaturePanel from './FeaturePanel';
 import NotificationsPanel from './NotificationsPanel';
 import ChartComponent from '../ChartComponent';
 import FiltersPanel from './FiltersPanel';
 
+import { RadialMenu } from '../RadialMenu';
+
+import { FieldKitLogo } from '../icons/Icons';
+
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
 import type { Focus } from '../../types';
-
-function getFitBounds(geojson: GeoJSON) {
-    const lon = geojson.features.map(f => f.geometry.coordinates[0]);
-    const lat = geojson.features.map(f => f.geometry.coordinates[1]);
-    return [[Math.min(...lon), Math.min(...lat)], [Math.max(...lon), Math.max(...lat)]];
-}
-
-function getCenter(fitBounds: Bounds) {
-    return [(fitBounds[0][0] + fitBounds[1][0]) / 2, (fitBounds[0][1] + fitBounds[1][1]) / 2];
-}
 
 type Props = {
     playbackMode: mixed,
@@ -116,6 +109,15 @@ export default class MapContainer extends Component {
         feature: ?GeoJSONFeature,
     };
 
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+            }).isRequired
+        }).isRequired
+    };
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -131,18 +133,25 @@ export default class MapContainer extends Component {
         this.onUserActivityThrottled = _.throttle(this.onUserActivity.bind(this), 500, { leading: true });
     }
 
-    componentWillMount() {
-        const { visibleFeatures } = this.props;
+    _createState(props) {
+        const { visibleFeatures } = props;
+        const { focus } = visibleFeatures;
 
-        if (false)
-        if (visibleFeatures.geojson.features.length > 0) {
-            const fitBounds = getFitBounds(visibleFeatures.geojson);
-            const center = getCenter(fitBounds);
-            this.setState({
-                fitBounds,
-                center
-            });
+        if (focus.feature) {
+            return {
+                center: focus.feature.geometry.coordinates
+            };
         }
+        else if (focus.center) {
+            return {
+                center: focus.center
+            };
+        }
+        return {};
+    }
+
+    componentWillMount() {
+        this.setState(this._createState(this.props));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -154,16 +163,7 @@ export default class MapContainer extends Component {
             const { focus: newFocus } = newData;
 
             if (oldFocus !== newFocus) {
-                if (newFocus.feature) {
-                    this.setState({
-                        center: newFocus.feature.geometry.coordinates
-                    });
-                }
-                else if (newFocus.center) {
-                    this.setState({
-                        center: newFocus.center
-                    });
-                }
+                this.setState(this._createState(nextProps));
             }
         }
     }
@@ -179,6 +179,7 @@ export default class MapContainer extends Component {
 
     onFocusFeature(feature) {
         const { focusFeature } = this.props;
+
         focusFeature(feature);
 
         this.setState({
@@ -241,7 +242,7 @@ export default class MapContainer extends Component {
         const features = target.queryRenderedFeatures(ev.point);
         const coordinates = ev.lngLat;
 
-        let options = this.clusterOptions();
+        let options = this.clusterOptions(features);
         if (features.length > 1) {
             options = this.selectFeatureOptions(features);
         }
@@ -298,7 +299,7 @@ export default class MapContainer extends Component {
                 title: f.name,
                 function: () => {
                     const { menu } = this.state;
-                    const nextMenu = { ...menu, ...{ features: [f], nextOptions: this.clusterOptions() } };
+                    const nextMenu = { ...menu, ...{ features: [f], nextOptions: this.clusterOptions([f]) } };
                     this.setState({
                         menu: nextMenu
                     });
@@ -313,7 +314,7 @@ export default class MapContainer extends Component {
         };
     }
 
-    clusterOptions() {
+    clusterOptions(features) {
         return {
             key: 0,
             buttons: [
@@ -330,7 +331,7 @@ export default class MapContainer extends Component {
     }
 
     render() {
-        const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode } = this.props;
+        const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode, containerStyle, style, controls } = this.props;
         const { fitBounds, center, zoom } = this.state;
 
         if (!center) {
@@ -338,29 +339,29 @@ export default class MapContainer extends Component {
         }
 
         return (
-            <div>
-                <Map style={MAPBOX_STYLE} containerStyle={ { height: '100vh', width: '100vw' } }
+            <div style={style}>
+                <Map style={MAPBOX_STYLE} containerStyle={containerStyle}
                     movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
                     onMouseMove={ this.onMouseMove.bind(this) }
                     onMouseOut={ this.onMouseOut.bind(this) }
                     onClick={ this.onClick.bind(this) }
                     onDrag={ this.onUserActivityThrottled.bind(this) }>
 
-                    <ClusterMap visibleFeatures={ visibleFeatures } data={ visibleFeatures.sources } click={ this.onMarkerClick.bind(this) } />
+                    <ClusterMap data={ visibleFeatures.sources } onClick={ this.onMarkerClick.bind(this) } />
 
-                    <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } click={ this.onMarkerClick.bind(this) } />
+                    <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } onClick={ this.onMarkerClick.bind(this) } />
 
-                    <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />
+                    { controls && <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />}
 
-                    { false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
+                    { controls && false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
 
-                    <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />
+                    { controls && <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />}
 
-                    <FiltersPanel visibleFeatures={visibleFeatures} onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />
+                    { controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />}
 
                     {this.renderRadialMenu()}
                 </Map>
-                {this.renderPanels()}
+                { controls && this.renderPanels()}
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.

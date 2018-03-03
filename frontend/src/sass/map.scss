@@ -1,6 +1,12 @@
 @import 'App.scss';
 @import '../images/fa/scss/font-awesome.scss';
 
+div.loading {
+    padding: 10px;
+    fontWeight: bold;
+    fontSize: 14px;
+}
+
 .playback-control {
     .fa:hover {
         color: red;
@@ -11,46 +17,67 @@
 }
 
 .map.page {
-.mapboxgl-map {
-    .mapboxgl-popup {
-      color: black;
+    .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: $col-gutter;
+        width: 100%;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        background-color: rgba(0, 0, 0, 0.6);
+
+        .project-name {
+            @include type-h1;
+            flex-grow: 1;
+            line-height: 30px;
+            margin-bottom: 0;
+            font-weight: bold;
+        }
     }
 
-    .zoom-control {
-      top: $col-gutter*4 !important;
-      left: $col-gutter !important;
-    }
-  }
+    .mapboxgl-map {
+        .mapboxgl-popup {
+            color: black;
+        }
 
-  .disclaimer-panel {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: calc(100% - (150px + #{$elements-padding}*2));
-    padding: 0 $elements-padding;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    .disclaimer-body {
-      font-size: 10px;
-      letter-spacing: 0.5px;
-      flex-grow: 1;
-      text-align: right;
-      opacity: 0.8;
+        .zoom-control {
+            top: $col-gutter*4 !important;
+            left: $col-gutter !important;
+        }
     }
 
-    .fieldkit-logo {
-      width: 80px;
-      height: 40px;
-      flex-shrink: 0;
-      margin-left: $elements-margin;
+    .disclaimer-panel {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: calc(100% - (150px + #{$elements-padding}*2));
+        padding: 0 $elements-padding;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-      svg {
-        position: relative;
-        top: 50%;
-        transform: translate(0, -50%);
-      }
+        .disclaimer-body {
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            flex-grow: 1;
+            text-align: right;
+            opacity: 0.8;
+        }
+
+        .fieldkit-logo {
+            width: 80px;
+            height: 40px;
+            flex-shrink: 0;
+            margin-left: $elements-margin;
+
+            svg {
+                position: relative;
+                top: 50%;
+                transform: translate(0, -50%);
+            }
+        }
     }
-  }
 }

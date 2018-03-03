@@ -42,7 +42,9 @@ export default class SimpleChartContainer extends Component {
         };
         const timeseries = new TimeSeries(data);
         const lineStyle = styler([
-            { key: "value", color: "#9467bd", width: 1 }
+            // { key: "value", color: "#9467bd", width: 2 },
+            // { key: "value", color: "#9acd32", width: 2 },
+            { key: "value", color: "#20b2aa", width: 2 }
         ]);
         /*
         const begin = moment();

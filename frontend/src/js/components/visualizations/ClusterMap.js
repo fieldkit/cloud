@@ -51,7 +51,7 @@ export default class ClusterMap extends Component {
     }
 
     render() {
-        const { data, click } = this.props;
+        const { data, onClick } = this.props;
 
         const colors = new DataColors();
 
@@ -117,7 +117,7 @@ export default class ClusterMap extends Component {
             <div>
                 <Layer type="circle" id="spatial-clusters" paint={ { 'circle-color': spatialColor, 'circle-radius': spatialRadius } }>
                     { spatial.map((f, i) => (
-                        <Feature key={i} onClick={ () => click.bind(this, f) }
+                        <Feature key={i} onClick={ () => onClick.bind(this, f) }
                             onMouseEnter={ this.onToggleHover.bind(this, 'pointer') }
                             onMouseLeave={ this.onToggleHover.bind(this, '') }
                             properties={ f.properties }
@@ -127,7 +127,7 @@ export default class ClusterMap extends Component {
 
                 <Layer type="line" id="temporal-clusters" paint={ { 'line-color': temporalColor, 'line-width': temporalWidth } }>
                     { temporal.map((f, i) => (
-                        <Feature key={i} onClick={ () => click.bind(this, f) }
+                        <Feature key={i} onClick={ () => onClick.bind(this, f) }
                             onMouseEnter={ this.onToggleHover.bind(this, 'pointer') }
                             onMouseLeave={ this.onToggleHover.bind(this, '') }
                             properties={ f.properties }

@@ -7,79 +7,11 @@ import type { GeoJSON } from '../../types/MapTypes';
 import type { ActiveExpedition  } from '../../types';
 
 import MapContainer from '../containers/MapContainer';
+
 import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource } from '../../actions';
+import { generatePointDecorator } from '../../common/utilities';
 
 import '../../../css/map.css';
-
-function generateConstantColor() {
-    return {
-        type: 'constant',
-        colors: [{
-            location: 0,
-            color: '#C0392B'
-        }],
-        dateKey: null,
-        bounds: null,
-    };
-}
-
-function generateLinearColor() {
-    return {
-        type: 'linear',
-        colors: [
-            {
-                location: 0.0,
-                color: 'rgb(255, 255, 178)'
-            },
-            {
-                location: 0.25,
-                color: 'rgb(254, 204, 92)'
-            },
-            {
-                location: 0.50,
-                color: 'rgb(253, 141, 60)'
-            },
-            {
-                location: 0.75,
-                color: 'rgb(240, 59, 32)'
-            },
-            {
-                location: 1.0,
-                color: 'rgb(189, 0, 38)'
-            } ,
-        ],
-        dateKey: 'temp',
-        bounds: null,
-    };
-}
-
-function generateConstantSize() {
-    return {
-        type: 'constant',
-        dateKey: null,
-        bounds: [10, 10],
-    };
-}
-
-function generateLinearSize() {
-    return {
-        type: 'linear',
-        dateKey: 'temp',
-        bounds: [15, 40],
-    };
-}
-
-function generatePointDecorator(colorType: string, sizeType: string) {
-    return {
-        points: {
-            color: colorType === 'constant' ? generateConstantColor() : generateLinearColor(),
-            size: sizeType === 'constant' ? generateConstantSize() : generateLinearSize(),
-            sprite: 'circle.png',
-        },
-        title: '',
-        type: 'point',
-    };
-}
 
 type Props = {
     activeExpedition: ActiveExpedition,
@@ -120,12 +52,19 @@ class Map extends Component {
 
         return (
             <div className="map page">
-                <MapContainer pointDecorator={ pointDecorator }
-                    visibleFeatures={ visibleFeatures }
-                    playbackMode={ playbackMode }
-                    focusFeature={ focusFeature } focusSource={ focusSource }
-                    notifyOfUserMapActivity={ notifyOfUserMapActivity }
-                    onChangePlaybackMode={ changePlaybackMode } />
+                <div className="header">
+                    <div className="project-name">FieldKit Project</div>
+                </div>
+                <div>
+                    <MapContainer style={{ }} containerStyle={{ width: "100vw", height: "100vh" }} controls={true}
+                        pointDecorator={ pointDecorator }
+                        visibleFeatures={ visibleFeatures }
+                        playbackMode={ playbackMode }
+                        focusFeature={ focusFeature }
+                        focusSource={ focusSource }
+                        notifyOfUserMapActivity={ notifyOfUserMapActivity }
+                        onChangePlaybackMode={ changePlaybackMode } />
+                </div>
             </div>
         );
     }
