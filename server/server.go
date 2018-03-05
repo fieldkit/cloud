@@ -330,6 +330,12 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	})
 	app.MountGeoJSONController(service, c13)
 
+	// Mount "export" controller
+	c14 := api.NewExportController(service, api.ExportControllerOptions{
+		Backend: be,
+	})
+	app.MountExportController(service, c14)
+
 	setupErrorHandling()
 
 	return

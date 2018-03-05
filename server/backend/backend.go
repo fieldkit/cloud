@@ -210,7 +210,7 @@ func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data
 func (b *Backend) ListAllDeviceInputs(ctx context.Context) ([]*data.DeviceInput, error) {
 	devices := []*data.DeviceInput{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id,  d.key, d.token
+		SELECT i.*, d.input_id, d.key, d.token
 			FROM fieldkit.device AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
@@ -225,7 +225,7 @@ func (b *Backend) ListAllDeviceInputs(ctx context.Context) ([]*data.DeviceInput,
 func (b *Backend) ListDeviceInputs(ctx context.Context, project, expedition string) ([]*data.DeviceInput, error) {
 	devices := []*data.DeviceInput{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id,  d.key, d.token
+		SELECT i.*, d.input_id, d.key, d.token
 			FROM fieldkit.device AS d
 				JOIN fieldkit.input AS i ON i.id = d.input_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id

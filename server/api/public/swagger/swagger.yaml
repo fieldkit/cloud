@@ -1915,6 +1915,27 @@ paths:
       summary: update input
       tags:
       - input
+  /inputs/{inputId}/csv:
+    get:
+      description: Export data for an input.
+      operationId: Export#list by input
+      parameters:
+      - in: path
+        name: inputId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: list by input Export
+      tags:
+      - Export
   /inputs/{inputId}/geojson:
     get:
       description: List an input's features in a GeoJSON.
@@ -3605,6 +3626,8 @@ responses:
     description: Bad Request
   NoContent:
     description: No Content
+  OK:
+    description: OK
   Unauthorized:
     description: Unauthorized
 schemes:

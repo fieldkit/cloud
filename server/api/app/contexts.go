@@ -15,6 +15,49 @@ import (
 	"unicode/utf8"
 )
 
+// ListByInputExportContext provides the Export list by input action context.
+type ListByInputExportContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	InputID int
+}
+
+// NewListByInputExportContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Export controller list by input action.
+func NewListByInputExportContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByInputExportContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListByInputExportContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramInputID := req.Params["inputId"]
+	if len(paramInputID) > 0 {
+		rawInputID := paramInputID[0]
+		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
+			rctx.InputID = inputID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListByInputExportContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListByInputExportContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListGeoJSONContext provides the GeoJSON list action context.
 type ListGeoJSONContext struct {
 	context.Context
@@ -133,8 +176,8 @@ func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service 
 	if len(paramDescending) > 0 {
 		rawDescending := paramDescending[0]
 		if descending, err2 := strconv.ParseBool(rawDescending); err2 == nil {
-			tmp2 := &descending
-			rctx.Descending = tmp2
+			tmp3 := &descending
+			rctx.Descending = tmp3
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("descending", rawDescending, "boolean"))
 		}

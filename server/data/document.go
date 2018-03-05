@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"math"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -42,6 +44,10 @@ func (l *Location) Value() (driver.Value, error) {
 	return l.point.ToWKT(), nil
 }
 
+func (l *Location) String() string {
+	return l.point.String()
+}
+
 type Document struct {
 	ID        int64          `db:"id,omitempty"`
 	SchemaID  int32          `db:"schema_id"`
@@ -68,4 +74,31 @@ func (d *Document) SetData(data interface{}) error {
 
 	d.Data = jsonData
 	return nil
+}
+
+func (d *Document) GetRawFields() (fields map[string]string, err error) {
+	err = json.Unmarshal(d.Data, &fields)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (d *Document) GetParsedFields() (fields map[string]interface{}, err error) {
+	raw, err := d.GetRawFields()
+	if err != nil {
+		return nil, err
+	}
+
+	fields = make(map[string]interface{})
+	for key, value := range raw {
+		value, err := strconv.ParseFloat(value, 32)
+		if err == nil {
+			if !math.IsNaN(value) {
+				fields[key] = value
+			}
+		}
+	}
+
+	return
 }

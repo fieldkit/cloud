@@ -81,10 +81,11 @@ class SourcePanel extends Component {
         const { source, lastFeature } = info;
 
         const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson?descending=true";
+        const csvUrl = API_HOST + "/inputs/" + source.id + "/csv";
 
         return (
             <div>
-                <a href={featuresUrl} target="_blank">GeoJSON</a>
+                <a href={featuresUrl} target="_blank">GeoJSON</a> | <a href={csvUrl} target="_blank">CSV</a>
             </div>
         );
     }
