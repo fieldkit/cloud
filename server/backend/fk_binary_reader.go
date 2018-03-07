@@ -154,6 +154,9 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 				log.Printf("Ignored: Unknown sensor. (%+v)", record)
 				return nil
 			}
+			if reading.Sensor == 0 {
+				br.ReadingsSeen = 0
+			}
 
 			br.Readings[reading.Sensor] = reading.Value
 			br.ReadingsSeen += 1

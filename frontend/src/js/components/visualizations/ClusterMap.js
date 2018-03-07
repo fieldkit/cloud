@@ -62,7 +62,7 @@ export default class ClusterMap extends Component {
 
         const temporalWidth = 8;
 
-        const temporal = _(data).filter(s => s.summary.spatial != null).map(s => {
+        const temporal = _(data).filter(s => s.summary != null && s.summary.spatial != null).map(s => {
             return _(s.summary.temporal).map(c => {
                 return {
                     geometry: {
@@ -95,7 +95,7 @@ export default class ClusterMap extends Component {
             ]
         };
 
-        const spatial = _(data).filter(s => s.summary.spatial != null).map(s => {
+        const spatial = _(data).filter(s => s.summary != null && s.summary.spatial != null).map(s => {
             return _(s.summary.spatial).map(c => {
                 return {
                     geometry: {
