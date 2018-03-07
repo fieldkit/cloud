@@ -144,12 +144,12 @@ func main() {
 	}
 
 	path := [][]float64{
-		{35.4928533, -114.6846317},
-		{35.4967953, -114.6791397},
-		{35.5031313, -114.6826217},
-		{35.5098653, -114.6789537},
-		{35.5155353, -114.6783727},
-		{35.5247973, -114.6686187},
+		{-114.6846317, 35.4928533},
+		{-114.6791397, 35.4967953},
+		{-114.6826217, 35.5031313},
+		{-114.6789537, 35.5098653},
+		{-114.6783727, 35.5155353},
+		{-114.6686187, 35.5247973},
 	}
 
 	start := time.Now().Add(-24 * time.Hour).Unix()
@@ -174,11 +174,11 @@ func generateFakeEventsAlong(path [][]float64, numberPerLeg int, startTime, endT
 	previous := path[0]
 	for _, next := range path[1:] {
 		for i := 0; i < numberPerLeg; i++ {
-			lat := fktesting.MapFloat64(i, 0, numberPerLeg, previous[0], next[0])
-			lng := fktesting.MapFloat64(i, 0, numberPerLeg, previous[1], next[1])
+			lng := fktesting.MapFloat64(i, 0, numberPerLeg, previous[0], next[0])
+			lat := fktesting.MapFloat64(i, 0, numberPerLeg, previous[1], next[1])
 			fakes = append(fakes, FakeEvent{
 				Timestamp:   now,
-				Coordinates: []float64{lat, lng},
+				Coordinates: []float64{lng, lat},
 			})
 			now += interval
 		}
