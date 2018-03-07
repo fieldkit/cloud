@@ -79,6 +79,18 @@ FROM with_assigned_temporal_clustering s;
 END
 ' LANGUAGE plpgsql;
 
+CREATE TABLE fieldkit.sources_summaries (
+    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    updated_at timestamp NOT NULL,
+    number_of_features integer NOT NULL,
+    last_feature_id integer NOT NULL,
+    start_time timestamp NOT NULL,
+    end_time timestamp NOT NULL,
+    centroid geometry(POINT, 4326) NOT NULL,
+    radius decimal NOT NULL,
+    PRIMARY KEY (source_id)
+);
+
 CREATE TABLE fieldkit.sources_temporal_clusters (
     source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
     cluster_id integer NOT NULL,

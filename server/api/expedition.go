@@ -23,21 +23,6 @@ func ExpeditionType(expedition *data.Expedition) *app.Expedition {
 	}
 }
 
-func ExpeditionDetailedType(expedition *data.Expedition, summary *backend.FeatureSummary) *app.ExpeditionDetailed {
-	return &app.ExpeditionDetailed{
-		ID:               int(expedition.ID),
-		Name:             expedition.Name,
-		Slug:             expedition.Slug,
-		Description:      expedition.Description,
-		NumberOfFeatures: &summary.NumberOfFeatures,
-		LastFeatureID:    &summary.LastFeatureID,
-		StartTime:        &summary.StartTime,
-		EndTime:          &summary.EndTime,
-		Centroid:         summary.Centroid.Coordinates(),
-		Radius:           &summary.Radius,
-	}
-}
-
 func ExpeditionsType(expeditions []*data.Expedition) *app.Expeditions {
 	expeditionsCollection := make([]*app.Expedition, len(expeditions))
 	for i, expedition := range expeditions {
@@ -98,12 +83,7 @@ func (c *ExpeditionController) Get(ctx *app.GetExpeditionContext) error {
 		return err
 	}
 
-	summary, err := c.options.Backend.FeatureSummaryByExpeditionID(ctx, int(expedition.ID))
-	if err != nil {
-		return err
-	}
-
-	return ctx.OKDetailed(ExpeditionDetailedType(expedition, summary))
+	return ctx.OK(ExpeditionType(expedition))
 }
 
 func (c *ExpeditionController) GetID(ctx *app.GetIDExpeditionContext) error {
@@ -112,12 +92,7 @@ func (c *ExpeditionController) GetID(ctx *app.GetIDExpeditionContext) error {
 		return err
 	}
 
-	summary, err := c.options.Backend.FeatureSummaryByExpeditionID(ctx, int(expedition.ID))
-	if err != nil {
-		return err
-	}
-
-	return ctx.OKDetailed(ExpeditionDetailedType(expedition, summary))
+	return ctx.OK(ExpeditionType(expedition))
 }
 
 func (c *ExpeditionController) List(ctx *app.ListExpeditionContext) error {

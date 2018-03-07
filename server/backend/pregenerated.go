@@ -22,6 +22,8 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 }
 
 func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId int64) error {
+	log.Printf("Generating temporal clusters (%v)...", sourceId)
+
 	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_clusters WHERE (source_id = $1)", sourceId)
 	if err != nil {
 		return err
@@ -60,7 +62,7 @@ type ClusteredRow struct {
 }
 
 func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId int64) error {
-	log.Printf("Generating temporal cluster geometries...")
+	log.Printf("Generating temporal cluster geometries (%v)...", sourceId)
 
 	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_geometries WHERE (source_id = $1)", sourceId)
 	if err != nil {
@@ -103,6 +105,8 @@ func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId 
 }
 
 func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int64) error {
+	log.Printf("Generating spatial clusters (%v)...", sourceId)
+
 	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_spatial_clusters WHERE (source_id = $1)", sourceId)
 	if err != nil {
 		return err
@@ -135,8 +139,40 @@ func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int
 	return err
 }
 
+func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) error {
+	log.Printf("Generating summaries (%v)...", sourceId)
+
+	_, err := p.db.ExecContext(ctx, `
+	      INSERT INTO fieldkit.sources_summaries
+	      SELECT
+		  $1 AS source_id,
+		  NOW() AS updated_at,
+		  (SELECT COUNT(d.id) AS number_of_features FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT d.Id AS last_feature_id FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
+		  (SELECT MIN(d.timestamp) AS start_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT MAX(d.timestamp) AS end_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT ST_Centroid(ST_Collect(d.location)) AS centroid FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+		  (SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location)))) AS radius FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0)
+	      ON CONFLICT (source_id) DO UPDATE SET
+		      updated_at = excluded.updated_at,
+		      number_of_features = excluded.number_of_features,
+		      last_feature_id = excluded.last_feature_id,
+		      start_time = excluded.start_time,
+		      end_time = excluded.end_time,
+		      centroid = excluded.centroid,
+		      radius = excluded.radius
+	`, sourceId)
+
+	return err
+}
+
 func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) error {
-	err := p.GenerateSpatialClusters(ctx, sourceId)
+	err := p.Summaries(ctx, sourceId)
+	if err != nil {
+		return err
+	}
+
+	err = p.GenerateSpatialClusters(ctx, sourceId)
 	if err != nil {
 		return err
 	}

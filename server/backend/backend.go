@@ -495,6 +495,7 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, descend
 }
 
 type FeatureSummary struct {
+	UpdatedAt        time.Time
 	NumberOfFeatures int
 	LastFeatureID    int
 	StartTime        time.Time
@@ -503,42 +504,33 @@ type FeatureSummary struct {
 	Radius           float64
 }
 
-func (b *Backend) FeatureSummaryByExpeditionID(ctx context.Context, expeditionId int) (*FeatureSummary, error) {
-	summaries := []*FeatureSummary{}
-	if err := b.db.SelectContext(ctx, &summaries, `
-                SELECT
-		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT MIN(d.timestamp) AS StartTime FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT MAX(d.timestamp) AS EndTime FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d JOIN fieldkit.input i ON (d.input_id = i.id) WHERE d.visible AND i.expedition_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
-		  (SELECT ST_AsBinary(ST_Centroid(ST_Collect(d.location))) AS Centroid FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location)))) AS Radius FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0)
-	      `, expeditionId); err != nil {
-		return nil, err
-	}
-	return summaries[0], nil
-}
-
 func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*FeatureSummary, error) {
 	summaries := []*FeatureSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
-                SELECT
-		  (SELECT COUNT(d.id) AS NumberOfFeatures FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT MIN(d.timestamp) AS StartTime FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT MAX(d.timestamp) AS EndTime FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT d.Id AS LastFeatureID FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
-		  (SELECT ST_AsBinary(ST_Centroid(ST_Collect(d.location))) AS Centroid FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location)))) AS Radius FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0)
+		  SELECT
+		    c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.last_feature_id AS lastFeatureId, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		  FROM
+		    fieldkit.sources_summaries c
+		  WHERE c.source_id = $1
 	      `, sourceId); err != nil {
 		return nil, err
 	}
+	if len(summaries) != 1 {
+		return &FeatureSummary{
+			UpdatedAt: time.Now(),
+			StartTime: time.Now(),
+			EndTime:   time.Now(),
+			Centroid:  *data.NewLocation([]float64{0, 0}),
+		}, nil
+	}
+
 	return summaries[0], nil
 }
 
 type GeometryClusterSummary struct {
 	ID               int
-	NumberOfFeatures int
 	UpdatedAt        time.Time
+	NumberOfFeatures int
 	StartTime        time.Time
 	EndTime          time.Time
 	Centroid         data.Location
