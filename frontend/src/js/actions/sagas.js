@@ -122,7 +122,7 @@ export function* loadSources(ids) {
     const sources = yield all(newIds.map(id => FkApi.getSource(id)));
     const summaries = yield all(newIds.map(id => FkApi.getSourceSummary(id)));
     const indexed = _(sources).keyBy('id').value();
-    const features = yield all(sources.map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
+    const features = yield all(sources.filter(source => source.lastFeatureId > 0).map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
     console.log("LatestFeatures", features);
     console.log('Summaries', summaries);
     Object.assign(cache, indexed);
@@ -137,7 +137,7 @@ export function* loadExpedition(projectSlug, expeditionSlug) {
     const sourceIds = _(sources.deviceInputs).map('id').uniq().value();
     const detailedSources = yield loadSources(sourceIds);
 
-    yield put(focusLocation(expedition.centroid));
+    yield put(focusLocation([-118.2688137, 34.0309388]));
 
     return [ expedition, sources, sources, detailedSources ];
 }
