@@ -61,5 +61,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	binaryReader.Done()
+
 	w.WriteHeader(http.StatusOK)
 }

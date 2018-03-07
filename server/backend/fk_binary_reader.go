@@ -121,6 +121,13 @@ var (
 	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
 )
 
+func (br *FkBinaryReader) Done() error {
+	if br.ReadingsSeen > 0 {
+		log.Printf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
+	}
+	return nil
+}
+
 func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 	if record.Metadata != nil {
 		if br.DeviceId == "" {
