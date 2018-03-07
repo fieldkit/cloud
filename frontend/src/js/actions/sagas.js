@@ -134,10 +134,10 @@ export function* loadExpedition(projectSlug, expeditionSlug) {
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
+    yield put(focusLocation([-118.2688137, 34.0309388]));
+
     const sourceIds = _(sources.deviceInputs).map('id').uniq().value();
     const detailedSources = yield loadSources(sourceIds);
-
-    yield put(focusLocation([-118.2688137, 34.0309388]));
 
     return [ expedition, sources, sources, detailedSources ];
 }
