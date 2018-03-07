@@ -30,10 +30,14 @@ func NewStreamIngester(b *Backend) (si *StreamIngester, err error) {
 
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
+
 	if contentType != FkDataBinaryContentType {
+		log.Printf("Stream [%s]: unknown content type: %v", req.RemoteAddr, contentType)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	log.Printf("Stream [%s]: begin %v", req.RemoteAddr, contentType)
 
 	binaryReader := NewFkBinaryReader(si.backend)
 
@@ -53,7 +57,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	_, err := stream.ReadLengthPrefixedCollection(req.Body, unmarshalFunc)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Error: %v", err)
+		log.Printf("Stream [%s]: ingesting error: %v", req.RemoteAddr, err)
 		return
 	}
 
