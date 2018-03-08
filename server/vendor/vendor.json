@@ -516,6 +516,12 @@
 			"revisionTime": "2017-11-24T20:10:50Z"
 		},
 		{
+			"checksumSHA1": "LRk16/xuEJKGfybyXas5iMuzDn4=",
+			"path": "github.com/sohlich/go-dbscan",
+			"revision": "242a0c72bf774cd0b8ee1dfbf1ab00748d3ed3e8",
+			"revisionTime": "2016-11-28T16:48:35Z"
+		},
+		{
 			"checksumSHA1": "lU+gVOtSFnBKx11uhPL8b9v0uTE=",
 			"path": "github.com/spf13/cobra",
 			"revision": "7be4beda01ec05d0b93d80b3facd2b6f44080d94",
