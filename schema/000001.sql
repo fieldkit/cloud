@@ -181,6 +181,7 @@ CREATE TABLE fieldkit.document (
 );
 
 CREATE INDEX ON fieldkit.document (timestamp, input_id);
+CREATE INDEX ON fieldkit.document USING GIST (location);
 
 -- user
 
