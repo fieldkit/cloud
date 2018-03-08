@@ -1,4 +1,4 @@
-modules = server/db-tester server/sqs-worker server/sqs-sender server/api/tool/fkcli server/api/tool/fktool
+modules = server/sqs-worker server/sqs-sender server/api/tool/fkcli server/api/tool/fktool
 
 BUILD=build
 
@@ -7,15 +7,12 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: binaries
 
-binaries: $(BUILD)/server $(BUILD)/db-tester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy
+binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy
 
 all: binaries
 
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go
-
-$(BUILD)/db-tester: server/db-tester/*.go $(SERVER_SOURCES)
-	go build -o $@ server/db-tester/*.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
 	go build -o $@ server/sqs-worker/*.go
