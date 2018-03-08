@@ -175,10 +175,12 @@ CREATE TABLE fieldkit.document (
 	insertion timestamp NOT NULL DEFAULT now(),
 	timestamp timestamp NOT NULL,
 	location geometry(POINT, 4326) NOT NULL,
-    	visible boolean NOT NULL DEFAULT true,
-    	fixed boolean NOT NULL DEFAULT true,
+	visible boolean NOT NULL DEFAULT true,
+	fixed boolean NOT NULL DEFAULT true,
 	data jsonb NOT NULL
 );
+
+CREATE INDEX ON fieldkit.document (timestamp, input_id);
 
 -- user
 

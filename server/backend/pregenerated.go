@@ -21,38 +21,14 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 	}
 }
 
-func (p *Pregenerator) GenerateTemporalClusters(ctx context.Context, sourceId int64) error {
-	log.Printf("Generating temporal clusters (%v)...", sourceId)
+func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) error {
+	log.Printf("Generating temporal tracks (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_clusters WHERE (source_id = $1)", sourceId)
+	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_temporal_clusters($1)", sourceId)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.db.ExecContext(ctx, `
-	      INSERT INTO fieldkit.sources_temporal_clusters
-	      SELECT
-		      input_id,
-		      temporal_cluster_id,
-                      NOW() AS updated_at,
-		      COUNT(id) AS number_of_features,
-		      MIN(timestamp) AS start_time,
-		      MAX(timestamp) AS end_time,
-		      ST_Centroid(ST_Collect(location)) AS centroid,
-		      SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
-	      FROM
-		      fieldkit.fk_clustered_docs($1)
-	      WHERE spatial_cluster_id IS NULL
-	      GROUP BY temporal_cluster_id, input_id
-	      ORDER BY temporal_cluster_id
-	      ON CONFLICT (source_id, cluster_id) DO UPDATE SET
-                      updated_at = excluded.updated_at,
-		      number_of_features = excluded.number_of_features,
-		      start_time = excluded.start_time,
-		      end_time = excluded.end_time,
-		      centroid = excluded.centroid,
-		      radius = excluded.radius
-	`, sourceId)
 	return err
 }
 
@@ -61,107 +37,35 @@ type ClusteredRow struct {
 	Location  data.Location
 }
 
-func (p *Pregenerator) GenerateTemporalGeometries(ctx context.Context, sourceId int64) error {
-	log.Printf("Generating temporal cluster geometries (%v)...", sourceId)
+func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) error {
+	log.Printf("Generating temporal geometries (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_temporal_geometries WHERE (source_id = $1)", sourceId)
+	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_temporal_geometries($1)", sourceId)
 	if err != nil {
 		return err
-	}
-
-	locations := []*ClusteredRow{}
-	if err := p.db.SelectContext(ctx, &locations, "SELECT temporal_cluster_id AS clusterId, ST_AsBinary(location) AS location FROM fieldkit.fk_clustered_docs($1) WHERE spatial_cluster_id IS NULL ORDER BY timestamp", sourceId); err != nil {
-		return err
-	}
-
-	geometries := make(map[int64][]geo.Point)
-	for _, row := range locations {
-		if geometries[row.ClusterId] == nil {
-			geometries[row.ClusterId] = make([]geo.Point, 0)
-		}
-		c := row.Location.Coordinates()
-		p := geo.NewPoint(c[0], c[1])
-		geometries[row.ClusterId] = append(geometries[row.ClusterId], *p)
-	}
-
-	for clusterId, geometry := range geometries {
-		if len(geometry) >= 2 {
-			path := geo.NewPath()
-			path.SetPoints(geometry)
-			temporal := &TemporalPath{
-				path: path,
-			}
-			_, err := p.db.ExecContext(ctx, `
-			    INSERT INTO fieldkit.sources_temporal_geometries (source_id, cluster_id, updated_at, geometry) VALUES ($1, $2, NOW(), ST_SetSRID(ST_GeomFromText($3), 4326))
-			    ON CONFLICT (source_id, cluster_id) DO UPDATE SET updated_at = excluded.updated_at, geometry = excluded.geometry
-			`, sourceId, clusterId, temporal)
-			if err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil
 }
 
-func (p *Pregenerator) GenerateSpatialClusters(ctx context.Context, sourceId int64) error {
+func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating spatial clusters (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "DELETE FROM fieldkit.sources_spatial_clusters WHERE (source_id = $1)", sourceId)
+	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_spatial_clusters($1)", sourceId)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.db.ExecContext(ctx, `
-	      INSERT INTO fieldkit.sources_spatial_clusters
-	      SELECT
-		      input_id,
-		      spatial_cluster_id,
-                      NOW() AS updated_at,
-		      COUNT(id) AS number_of_features,
-		      MIN(timestamp) AS start_time,
-		      MAX(timestamp) AS end_time,
-		      ST_Centroid(ST_Collect(location)) AS centroid,
-		      SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(ST_Transform(location, 2950)))) / pi()) AS radius
-	      FROM
-		      fieldkit.fk_clustered_docs($1)
-	      WHERE spatial_cluster_id IS NOT NULL
-	      GROUP BY spatial_cluster_id, input_id
-	      ORDER BY spatial_cluster_id
-	      ON CONFLICT (source_id, cluster_id) DO UPDATE SET
-                      updated_at = excluded.updated_at,
-		      number_of_features = excluded.number_of_features,
-		      start_time = excluded.start_time,
-		      end_time = excluded.end_time,
-		      centroid = excluded.centroid,
-		      radius = excluded.radius
-	`, sourceId)
 	return err
 }
 
 func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating summaries (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, `
-	      INSERT INTO fieldkit.sources_summaries
-	      SELECT
-		  $1 AS source_id,
-		  NOW() AS updated_at,
-		  (SELECT COUNT(d.id) AS number_of_features FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT d.Id AS last_feature_id FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
-		  (SELECT MIN(d.timestamp) AS start_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT MAX(d.timestamp) AS end_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT ST_Centroid(ST_Collect(d.location)) AS centroid FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-		  (SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location)))) AS radius FROM fieldkit.document AS d WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0)
-	      ON CONFLICT (source_id) DO UPDATE SET
-		      updated_at = excluded.updated_at,
-		      number_of_features = excluded.number_of_features,
-		      last_feature_id = excluded.last_feature_id,
-		      start_time = excluded.start_time,
-		      end_time = excluded.end_time,
-		      centroid = excluded.centroid,
-		      radius = excluded.radius
-	`, sourceId)
+	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_source_summary($1)", sourceId)
+	if err != nil {
+		return err
+	}
 
 	return err
 }
@@ -172,17 +76,17 @@ func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) error {
 		return err
 	}
 
-	err = p.GenerateSpatialClusters(ctx, sourceId)
+	err = p.SpatialClusters(ctx, sourceId)
 	if err != nil {
 		return err
 	}
 
-	err = p.GenerateTemporalClusters(ctx, sourceId)
+	err = p.TemporalClusters(ctx, sourceId)
 	if err != nil {
 		return err
 	}
 
-	err = p.GenerateTemporalGeometries(ctx, sourceId)
+	err = p.TemporalGeometries(ctx, sourceId)
 	if err != nil {
 		return err
 	}

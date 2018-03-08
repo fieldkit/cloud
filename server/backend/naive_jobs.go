@@ -59,15 +59,13 @@ func (j *NaiveBackgroundJobs) Start() error {
 		}
 	}()
 
-	if false {
-		devices, err := j.be.ListAllDeviceInputs(ctx)
-		if err != nil {
-			return err
-		}
+	devices, err := j.be.ListAllDeviceInputs(ctx)
+	if err != nil {
+		return err
+	}
 
-		for _, device := range devices {
-			delayed <- SourceChange{SourceID: int64(device.ID)}
-		}
+	for _, device := range devices {
+		delayed <- SourceChange{SourceID: int64(device.ID)}
 	}
 
 	return nil
