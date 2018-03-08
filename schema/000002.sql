@@ -23,7 +23,7 @@ source AS (
 with_timestamp_differences AS (
 	SELECT
 		*,
-			                              LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS previous_timestamp,
+  			                              LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp) AS previous_timestamp,
 		EXTRACT(epoch FROM (s.timestamp - LAG(s.timestamp) OVER (PARTITION BY s.input_id ORDER BY s.input_id, s.timestamp))) AS time_difference
 	FROM source s
 	ORDER BY s.input_id, s.timestamp

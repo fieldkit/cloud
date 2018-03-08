@@ -386,8 +386,10 @@ func (b *Backend) AddDocument(ctx context.Context, document *data.Document) erro
 			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
 		`, document)
 
-	b.SourceChanges <- SourceChange{
-		SourceID: int64(document.InputID),
+	if false {
+		b.SourceChanges <- SourceChange{
+			SourceID: int64(document.InputID),
+		}
 	}
 
 	return err
