@@ -13,11 +13,11 @@ import (
 	"time"
 )
 
-func DeviceInputPublicType(deviceInput *data.DeviceInput, summary *backend.FeatureSummary) *app.DeviceInputPublic {
-	deviceInputType := &app.DeviceInputPublic{
-		ID:               int(deviceInput.Input.ID),
-		ExpeditionID:     int(deviceInput.Input.ExpeditionID),
-		Name:             deviceInput.Input.Name,
+func DeviceSourcePublicType(deviceSource *data.DeviceSource, summary *backend.FeatureSummary) *app.DeviceSourcePublic {
+	deviceSourceType := &app.DeviceSourcePublic{
+		ID:               int(deviceSource.Source.ID),
+		ExpeditionID:     int(deviceSource.Source.ExpeditionID),
+		Name:             deviceSource.Source.Name,
 		Active:           true,
 		NumberOfFeatures: &summary.NumberOfFeatures,
 		LastFeatureID:    &summary.LastFeatureID,
@@ -27,37 +27,37 @@ func DeviceInputPublicType(deviceInput *data.DeviceInput, summary *backend.Featu
 		Radius:           &summary.Radius,
 	}
 
-	return deviceInputType
+	return deviceSourceType
 }
 
-func DeviceInputType(deviceInput *data.DeviceInput) *app.DeviceInput {
-	deviceInputType := &app.DeviceInput{
-		ID:           int(deviceInput.Input.ID),
-		ExpeditionID: int(deviceInput.Input.ExpeditionID),
-		Token:        deviceInput.Token,
-		Key:          deviceInput.Key,
-		Name:         deviceInput.Input.Name,
+func DeviceSourceType(deviceSource *data.DeviceSource) *app.DeviceSource {
+	deviceSourceType := &app.DeviceSource{
+		ID:           int(deviceSource.Source.ID),
+		ExpeditionID: int(deviceSource.Source.ExpeditionID),
+		Token:        deviceSource.Token,
+		Key:          deviceSource.Key,
+		Name:         deviceSource.Source.Name,
 		Active:       true,
 	}
 
-	return deviceInputType
+	return deviceSourceType
 }
 
-func DeviceInputsType(deviceInputs []*data.DeviceInput) *app.DeviceInputs {
-	deviceInputsCollection := make([]*app.DeviceInput, len(deviceInputs))
-	for i, deviceInput := range deviceInputs {
-		deviceInputsCollection[i] = DeviceInputType(deviceInput)
+func DeviceSourcesType(deviceSources []*data.DeviceSource) *app.DeviceSources {
+	deviceSourcesCollection := make([]*app.DeviceSource, len(deviceSources))
+	for i, deviceSource := range deviceSources {
+		deviceSourcesCollection[i] = DeviceSourceType(deviceSource)
 	}
 
-	return &app.DeviceInputs{
-		DeviceInputs: deviceInputsCollection,
+	return &app.DeviceSources{
+		DeviceSources: deviceSourcesCollection,
 	}
 }
 
-func DeviceSchemaType(deviceInput *data.DeviceInput, deviceSchema *data.DeviceJSONSchema) *app.DeviceSchema {
+func DeviceSchemaType(deviceSource *data.DeviceSource, deviceSchema *data.DeviceJSONSchema) *app.DeviceSchema {
 	deviceSchemaType := &app.DeviceSchema{
 		SchemaID:   int(deviceSchema.RawSchema.ID),
-		DeviceID:   int(deviceInput.Input.ID),
+		DeviceID:   int(deviceSource.Source.ID),
 		ProjectID:  int(*deviceSchema.RawSchema.ProjectID),
 		Key:        deviceSchema.Key,
 		JSONSchema: *deviceSchema.JSONSchema,
@@ -67,10 +67,10 @@ func DeviceSchemaType(deviceInput *data.DeviceInput, deviceSchema *data.DeviceJS
 	return deviceSchemaType
 }
 
-func DeviceSchemasType(deviceInput *data.DeviceInput, deviceSchemas []*data.DeviceJSONSchema) *app.DeviceSchemas {
+func DeviceSchemasType(deviceSource *data.DeviceSource, deviceSchemas []*data.DeviceJSONSchema) *app.DeviceSchemas {
 	deviceSchemasCollection := make([]*app.DeviceSchema, len(deviceSchemas))
 	for i, deviceSchema := range deviceSchemas {
-		deviceSchemasCollection[i] = DeviceSchemaType(deviceInput, deviceSchema)
+		deviceSchemasCollection[i] = DeviceSchemaType(deviceSource, deviceSchema)
 	}
 
 	return &app.DeviceSchemas{
@@ -96,10 +96,10 @@ func NewDeviceController(service *goa.Service, options DeviceControllerOptions) 
 }
 
 func (c *DeviceController) Add(ctx *app.AddDeviceContext) error {
-	input := &data.Input{}
-	input.ExpeditionID = int32(ctx.ExpeditionID)
-	input.Name = ctx.Payload.Name
-	if err := c.options.Backend.AddInput(ctx, input); err != nil {
+	source := &data.Source{}
+	source.ExpeditionID = int32(ctx.ExpeditionID)
+	source.Name = ctx.Payload.Name
+	if err := c.options.Backend.AddSource(ctx, source); err != nil {
 		return err
 	}
 
@@ -109,60 +109,60 @@ func (c *DeviceController) Add(ctx *app.AddDeviceContext) error {
 	}
 
 	device := &data.Device{
-		InputID: int64(input.ID),
-		Key:     ctx.Payload.Key,
-		Token:   token,
+		SourceID: int64(source.ID),
+		Key:      ctx.Payload.Key,
+		Token:    token,
 	}
 
 	if err := c.options.Backend.AddDevice(ctx, device); err != nil {
 		return err
 	}
 
-	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(device.InputID))
+	deviceSource, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(device.SourceID))
 	if err != nil {
 		return err
 	}
-	return ctx.OK(DeviceInputType(deviceInput))
+	return ctx.OK(DeviceSourceType(deviceSource))
 }
 
 func (c *DeviceController) GetID(ctx *app.GetIDDeviceContext) error {
-	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.ID))
+	deviceSource, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.ID))
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(DeviceInputType(deviceInput))
+	return ctx.OK(DeviceSourceType(deviceSource))
 }
 
 func (c *DeviceController) List(ctx *app.ListDeviceContext) error {
-	deviceInputs, err := c.options.Backend.ListDeviceInputs(ctx, ctx.Project, ctx.Expedition)
+	deviceSources, err := c.options.Backend.ListDeviceSources(ctx, ctx.Project, ctx.Expedition)
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(DeviceInputsType(deviceInputs))
+	return ctx.OK(DeviceSourcesType(deviceSources))
 }
 
 func (c *DeviceController) Update(ctx *app.UpdateDeviceContext) error {
 	if _, err := c.options.Database.ExecContext(ctx,
-		`UPDATE fieldkit.device SET key = $1 WHERE input_id = $2`, ctx.Payload.Key, ctx.ID); err != nil {
+		`UPDATE fieldkit.device SET key = $1 WHERE source_id = $2`, ctx.Payload.Key, ctx.ID); err != nil {
 		return err
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx,
-		`UPDATE fieldkit.input SET name = $1 WHERE id = $2`, ctx.Payload.Name, ctx.ID); err != nil {
+		`UPDATE fieldkit.source SET name = $1 WHERE id = $2`, ctx.Payload.Name, ctx.ID); err != nil {
 		return err
 	}
 
-	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.ID))
+	deviceSource, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.ID))
 	if err != nil {
 		return err
 	}
-	return ctx.OK(DeviceInputType(deviceInput))
+	return ctx.OK(DeviceSourceType(deviceSource))
 }
 
 func (c *DeviceController) UpdateLocation(ctx *app.UpdateLocationDeviceContext) error {
-	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.ID))
+	deviceSource, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.ID))
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func (c *DeviceController) UpdateLocation(ctx *app.UpdateLocationDeviceContext) 
 	now := time.Now()
 
 	dl := data.DeviceLocation{
-		DeviceID:  int64(deviceInput.ID),
+		DeviceID:  int64(deviceSource.ID),
 		Timestamp: &now,
 		Location:  data.NewLocation([]float64{ctx.Payload.Longitude, ctx.Payload.Latitude}),
 	}
@@ -179,16 +179,16 @@ func (c *DeviceController) UpdateLocation(ctx *app.UpdateLocationDeviceContext) 
                INSERT INTO fieldkit.device_location (device_id, timestamp, location)
 	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326)) RETURNING *`, dl)
 
-	return ctx.OK(DeviceInputType(deviceInput))
+	return ctx.OK(DeviceSourceType(deviceSource))
 }
 
 func (c *DeviceController) UpdateSchema(ctx *app.UpdateSchemaDeviceContext) error {
-	deviceInput, err := c.options.Backend.GetDeviceInputByID(ctx, int32(ctx.ID))
+	deviceSource, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.ID))
 	if err != nil {
 		return err
 	}
 
-	expedition, err := c.options.Backend.Expedition(ctx, deviceInput.ExpeditionID)
+	expedition, err := c.options.Backend.Expedition(ctx, deviceSource.ExpeditionID)
 	if err != nil {
 		return err
 	}
@@ -211,7 +211,7 @@ func (c *DeviceController) UpdateSchema(ctx *app.UpdateSchemaDeviceContext) erro
 		}
 
 		deviceSchema := data.DeviceSchema{
-			DeviceID: deviceInput.InputID,
+			DeviceID: deviceSource.SourceID,
 			SchemaID: int64(schema.ID),
 			Key:      ctx.Payload.Key,
 		}
@@ -232,5 +232,5 @@ func (c *DeviceController) UpdateSchema(ctx *app.UpdateSchemaDeviceContext) erro
 	if err = c.options.Database.SelectContext(ctx, &allSchemas, `SELECT * FROM fieldkit.device_schema AS ds JOIN fieldkit.schema AS s ON s.id = ds.schema_id WHERE ds.device_id = $1`, ctx.ID); err != nil {
 		return err
 	}
-	return ctx.OK(DeviceSchemasType(deviceInput, allSchemas))
+	return ctx.OK(DeviceSchemasType(deviceSource, allSchemas))
 }

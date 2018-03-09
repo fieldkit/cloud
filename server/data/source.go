@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Input struct {
+type Source struct {
 	ID           int32  `db:"id,omitempty"`
 	ExpeditionID int32  `db:"expedition_id"`
 	Name         string `db:"name"`
@@ -13,7 +13,7 @@ type Input struct {
 	Active       bool   `db:"active"`
 }
 
-type InputToken struct {
+type SourceToken struct {
 	ID           int32     `db:"id,omitempty"`
 	ExpeditionID int32     `db:"expedition_id"`
 	Token        Token     `db:"token"`

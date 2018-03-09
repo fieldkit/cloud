@@ -82,12 +82,12 @@ var _ = Resource("GeoJSON", func() {
 		})
 	})
 
-	Action("list by input", func() {
-		Routing(GET("inputs/:inputId/geojson"))
-		Description("List an input's features in a GeoJSON.")
+	Action("list by source", func() {
+		Routing(GET("sources/:sourceId/geojson"))
+		Description("List an source's features in a GeoJSON.")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 			Param("descending", Boolean)
 		})
 		Response(BadRequest)

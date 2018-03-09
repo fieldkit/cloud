@@ -5,8 +5,8 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var InputToken = MediaType("application/vnd.app.input_token+json", func() {
-	TypeName("InputToken")
+var SourceToken = MediaType("application/vnd.app.source_token+json", func() {
+	TypeName("SourceToken")
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("token", String)
@@ -20,49 +20,49 @@ var InputToken = MediaType("application/vnd.app.input_token+json", func() {
 	})
 })
 
-var InputTokens = MediaType("application/vnd.app.input_tokens+json", func() {
-	TypeName("InputTokens")
+var SourceTokens = MediaType("application/vnd.app.source_tokens+json", func() {
+	TypeName("SourceTokens")
 	Attributes(func() {
-		Attribute("inputTokens", CollectionOf(InputToken))
-		Required("inputTokens")
+		Attribute("sourceTokens", CollectionOf(SourceToken))
+		Required("sourceTokens")
 	})
 	View("default", func() {
-		Attribute("inputTokens")
+		Attribute("sourceTokens")
 	})
 })
 
-var _ = Resource("input_token", func() {
+var _ = Resource("source_token", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expeditionId/input-tokens"))
-		Description("Add an input token")
+		Routing(POST("expeditions/:expeditionId/source-tokens"))
+		Description("Add an source token")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(InputToken)
+			Media(SourceToken)
 		})
 	})
 
 	Action("delete", func() {
-		Routing(DELETE("input-tokens/:inputTokenId"))
-		Description("Delete an input token")
+		Routing(DELETE("source-tokens/:sourceTokenId"))
+		Description("Delete an source token")
 		Params(func() {
-			Param("inputTokenId", Integer)
-			Required("inputTokenId")
+			Param("sourceTokenId", Integer)
+			Required("sourceTokenId")
 		})
 		Response(BadRequest)
 		Response(NoContent)
 	})
 
 	Action("list", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/input-tokens"))
-		Description("List an expedition's input tokens")
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/source-tokens"))
+		Description("List an expedition's source tokens")
 		Params(func() {
 			Param("project", String, ProjectSlug)
 			Param("expedition", String, ExpeditionSlug)
@@ -70,20 +70,20 @@ var _ = Resource("input_token", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(InputTokens)
+			Media(SourceTokens)
 		})
 	})
 
 	Action("list id", func() {
-		Routing(GET("expeditions/:expeditionId/input-tokens"))
-		Description("Update an expedition's input tokens")
+		Routing(GET("expeditions/:expeditionId/source-tokens"))
+		Description("Update an expedition's source tokens")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(InputTokens)
+			Media(SourceTokens)
 		})
 	})
 })

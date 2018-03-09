@@ -15,37 +15,37 @@ import (
 	"unicode/utf8"
 )
 
-// ListByInputExportContext provides the Export list by input action context.
-type ListByInputExportContext struct {
+// ListBySourceExportContext provides the Export list by source action context.
+type ListBySourceExportContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	SourceID int
 }
 
-// NewListByInputExportContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Export controller list by input action.
-func NewListByInputExportContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByInputExportContext, error) {
+// NewListBySourceExportContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Export controller list by source action.
+func NewListBySourceExportContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListBySourceExportContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := ListByInputExportContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
+	rctx := ListBySourceExportContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
 		}
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListByInputExportContext) OK(resp []byte) error {
+func (ctx *ListBySourceExportContext) OK(resp []byte) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
@@ -53,7 +53,7 @@ func (ctx *ListByInputExportContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ListByInputExportContext) BadRequest() error {
+func (ctx *ListBySourceExportContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -154,24 +154,24 @@ func (ctx *ListByIDGeoJSONContext) BadRequest() error {
 	return nil
 }
 
-// ListByInputGeoJSONContext provides the GeoJSON list by input action context.
-type ListByInputGeoJSONContext struct {
+// ListBySourceGeoJSONContext provides the GeoJSON list by source action context.
+type ListBySourceGeoJSONContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	Descending *bool
-	InputID    int
+	SourceID   int
 }
 
-// NewListByInputGeoJSONContext parses the incoming request URL and body, performs validations and creates the
-// context used by the GeoJSON controller list by input action.
-func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByInputGeoJSONContext, error) {
+// NewListBySourceGeoJSONContext parses the incoming request URL and body, performs validations and creates the
+// context used by the GeoJSON controller list by source action.
+func NewListBySourceGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListBySourceGeoJSONContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := ListByInputGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := ListBySourceGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramDescending := req.Params["descending"]
 	if len(paramDescending) > 0 {
 		rawDescending := paramDescending[0]
@@ -182,26 +182,26 @@ func NewListByInputGeoJSONContext(ctx context.Context, r *http.Request, service 
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("descending", rawDescending, "boolean"))
 		}
 	}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
 		}
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListByInputGeoJSONContext) OK(r *PagedGeoJSON) error {
+func (ctx *ListBySourceGeoJSONContext) OK(r *PagedGeoJSON) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ListByInputGeoJSONContext) BadRequest() error {
+func (ctx *ListBySourceGeoJSONContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -483,7 +483,7 @@ type AddDeviceContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ExpeditionID int
-	Payload      *AddDeviceInputPayload
+	Payload      *AddDeviceSourcePayload
 }
 
 // NewAddDeviceContext parses the incoming request URL and body, performs validations and creates the
@@ -508,14 +508,14 @@ func NewAddDeviceContext(ctx context.Context, r *http.Request, service *goa.Serv
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *AddDeviceContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *AddDeviceContext) OK(r *DeviceSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // OKPublic sends a HTTP response with status code 200.
-func (ctx *AddDeviceContext) OKPublic(r *DeviceInputPublic) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *AddDeviceContext) OKPublic(r *DeviceSourcePublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -555,14 +555,14 @@ func NewGetIDDeviceContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *GetIDDeviceContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *GetIDDeviceContext) OK(r *DeviceSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // OKPublic sends a HTTP response with status code 200.
-func (ctx *GetIDDeviceContext) OKPublic(r *DeviceInputPublic) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *GetIDDeviceContext) OKPublic(r *DeviceSourcePublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -616,8 +616,8 @@ func NewListDeviceContext(ctx context.Context, r *http.Request, service *goa.Ser
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListDeviceContext) OK(r *DeviceInputs) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_inputs+json")
+func (ctx *ListDeviceContext) OK(r *DeviceSources) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_sources+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -633,7 +633,7 @@ type UpdateDeviceContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ID      int
-	Payload *UpdateDeviceInputPayload
+	Payload *UpdateDeviceSourcePayload
 }
 
 // NewUpdateDeviceContext parses the incoming request URL and body, performs validations and creates the
@@ -658,14 +658,14 @@ func NewUpdateDeviceContext(ctx context.Context, r *http.Request, service *goa.S
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UpdateDeviceContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *UpdateDeviceContext) OK(r *DeviceSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // OKPublic sends a HTTP response with status code 200.
-func (ctx *UpdateDeviceContext) OKPublic(r *DeviceInputPublic) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *UpdateDeviceContext) OKPublic(r *DeviceSourcePublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -681,7 +681,7 @@ type UpdateLocationDeviceContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ID      int
-	Payload *UpdateDeviceInputLocationPayload
+	Payload *UpdateDeviceSourceLocationPayload
 }
 
 // NewUpdateLocationDeviceContext parses the incoming request URL and body, performs validations and creates the
@@ -706,14 +706,14 @@ func NewUpdateLocationDeviceContext(ctx context.Context, r *http.Request, servic
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UpdateLocationDeviceContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *UpdateLocationDeviceContext) OK(r *DeviceSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // OKPublic sends a HTTP response with status code 200.
-func (ctx *UpdateLocationDeviceContext) OKPublic(r *DeviceInputPublic) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
+func (ctx *UpdateLocationDeviceContext) OKPublic(r *DeviceSourcePublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -729,7 +729,7 @@ type UpdateSchemaDeviceContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ID      int
-	Payload *UpdateDeviceInputSchemaPayload
+	Payload *UpdateDeviceSourceSchemaPayload
 }
 
 // NewUpdateSchemaDeviceContext parses the incoming request URL and body, performs validations and creates the
@@ -1049,410 +1049,6 @@ func (ctx *UpdateExpeditionContext) OKDetailed(r *ExpeditionDetailed) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *UpdateExpeditionContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListInputContext provides the input list action context.
-type ListInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Expedition string
-	Project    string
-}
-
-// NewListInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller list action.
-func NewListInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpedition := req.Params["expedition"]
-	if len(paramExpedition) > 0 {
-		rawExpedition := paramExpedition[0]
-		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Expedition) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
-		}
-	}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Project) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListInputContext) OK(r *Inputs) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.inputs+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListExpeditionIDInputContext provides the input list expedition id action context.
-type ListExpeditionIDInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ExpeditionID int
-}
-
-// NewListExpeditionIDInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller list expedition id action.
-func NewListExpeditionIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListExpeditionIDInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListExpeditionIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expeditionId"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListExpeditionIDInputContext) OK(r *Inputs) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.inputs+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListExpeditionIDInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListIDInputContext provides the input list id action context.
-type ListIDInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-}
-
-// NewListIDInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller list id action.
-func NewListIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListIDInputContext) OK(r *DeviceInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKPublic sends a HTTP response with status code 200.
-func (ctx *ListIDInputContext) OKPublic(r *DeviceInputPublic) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListIDInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// SummaryByIDInputContext provides the input summary by id action context.
-type SummaryByIDInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-}
-
-// NewSummaryByIDInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller summary by id action.
-func NewSummaryByIDInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*SummaryByIDInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SummaryByIDInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *SummaryByIDInputContext) OK(r *InputSummary) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_summary+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SummaryByIDInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// UpdateInputContext provides the input update action context.
-type UpdateInputContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputID int
-	Payload *UpdateInputPayload
-}
-
-// NewUpdateInputContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input controller update action.
-func NewUpdateInputContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateInputContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := UpdateInputContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *UpdateInputContext) OK(r *Input) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateInputContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// AddInputTokenContext provides the input_token add action context.
-type AddInputTokenContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ExpeditionID int
-}
-
-// NewAddInputTokenContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input_token controller add action.
-func NewAddInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddInputTokenContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AddInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expeditionId"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AddInputTokenContext) OK(r *InputToken) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_token+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *AddInputTokenContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// DeleteInputTokenContext provides the input_token delete action context.
-type DeleteInputTokenContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	InputTokenID int
-}
-
-// NewDeleteInputTokenContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input_token controller delete action.
-func NewDeleteInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteInputTokenContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := DeleteInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputTokenID := req.Params["inputTokenId"]
-	if len(paramInputTokenID) > 0 {
-		rawInputTokenID := paramInputTokenID[0]
-		if inputTokenID, err2 := strconv.Atoi(rawInputTokenID); err2 == nil {
-			rctx.InputTokenID = inputTokenID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputTokenId", rawInputTokenID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// NoContent sends a HTTP response with status code 204.
-func (ctx *DeleteInputTokenContext) NoContent() error {
-	ctx.ResponseData.WriteHeader(204)
-	return nil
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *DeleteInputTokenContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListInputTokenContext provides the input_token list action context.
-type ListInputTokenContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Expedition string
-	Project    string
-}
-
-// NewListInputTokenContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input_token controller list action.
-func NewListInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListInputTokenContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpedition := req.Params["expedition"]
-	if len(paramExpedition) > 0 {
-		rawExpedition := paramExpedition[0]
-		rctx.Expedition = rawExpedition
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Expedition) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
-		}
-	}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Project) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListInputTokenContext) OK(r *InputTokens) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_tokens+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListInputTokenContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// ListIDInputTokenContext provides the input_token list id action context.
-type ListIDInputTokenContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ExpeditionID int
-}
-
-// NewListIDInputTokenContext parses the incoming request URL and body, performs validations and creates the
-// context used by the input_token controller list id action.
-func NewListIDInputTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDInputTokenContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListIDInputTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramExpeditionID := req.Params["expeditionId"]
-	if len(paramExpeditionID) > 0 {
-		rawExpeditionID := paramExpeditionID[0]
-		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
-			rctx.ExpeditionID = expeditionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListIDInputTokenContext) OK(r *InputTokens) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.input_tokens+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *ListIDInputTokenContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -2171,6 +1767,410 @@ func (ctx *UpdateProjectContext) BadRequest() error {
 	return nil
 }
 
+// ListSourceContext provides the source list action context.
+type ListSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller list action.
+func NewListSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListSourceContext) OK(r *Sources) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.sources+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListExpeditionIDSourceContext provides the source list expedition id action context.
+type ListExpeditionIDSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListExpeditionIDSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller list expedition id action.
+func NewListExpeditionIDSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListExpeditionIDSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListExpeditionIDSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expeditionId"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListExpeditionIDSourceContext) OK(r *Sources) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.sources+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListExpeditionIDSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDSourceContext provides the source list id action context.
+type ListIDSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	SourceID int
+}
+
+// NewListIDSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller list id action.
+func NewListIDSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDSourceContext) OK(r *DeviceSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKPublic sends a HTTP response with status code 200.
+func (ctx *ListIDSourceContext) OKPublic(r *DeviceSourcePublic) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device_source+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// SummaryByIDSourceContext provides the source summary by id action context.
+type SummaryByIDSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	SourceID int
+}
+
+// NewSummaryByIDSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller summary by id action.
+func NewSummaryByIDSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*SummaryByIDSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SummaryByIDSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SummaryByIDSourceContext) OK(r *SourceSummary) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.source_summary+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SummaryByIDSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateSourceContext provides the source update action context.
+type UpdateSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	SourceID int
+	Payload  *UpdateSourcePayload
+}
+
+// NewUpdateSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller update action.
+func NewUpdateSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateSourceContext) OK(r *Source) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.source+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// AddSourceTokenContext provides the source_token add action context.
+type AddSourceTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewAddSourceTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source_token controller add action.
+func NewAddSourceTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddSourceTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddSourceTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expeditionId"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddSourceTokenContext) OK(r *SourceToken) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.source_token+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddSourceTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteSourceTokenContext provides the source_token delete action context.
+type DeleteSourceTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	SourceTokenID int
+}
+
+// NewDeleteSourceTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source_token controller delete action.
+func NewDeleteSourceTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteSourceTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteSourceTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceTokenID := req.Params["sourceTokenId"]
+	if len(paramSourceTokenID) > 0 {
+		rawSourceTokenID := paramSourceTokenID[0]
+		if sourceTokenID, err2 := strconv.Atoi(rawSourceTokenID); err2 == nil {
+			rctx.SourceTokenID = sourceTokenID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceTokenId", rawSourceTokenID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *DeleteSourceTokenContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteSourceTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListSourceTokenContext provides the source_token list action context.
+type ListSourceTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Expedition string
+	Project    string
+}
+
+// NewListSourceTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source_token controller list action.
+func NewListSourceTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListSourceTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListSourceTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpedition := req.Params["expedition"]
+	if len(paramExpedition) > 0 {
+		rawExpedition := paramExpedition[0]
+		rctx.Expedition = rawExpedition
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Expedition); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`expedition`, rctx.Expedition, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Expedition) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`expedition`, rctx.Expedition, utf8.RuneCountInString(rctx.Expedition), 40, false))
+		}
+	}
+	paramProject := req.Params["project"]
+	if len(paramProject) > 0 {
+		rawProject := paramProject[0]
+		rctx.Project = rawProject
+		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
+		}
+		if utf8.RuneCountInString(rctx.Project) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListSourceTokenContext) OK(r *SourceTokens) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.source_tokens+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListSourceTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// ListIDSourceTokenContext provides the source_token list id action context.
+type ListIDSourceTokenContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ExpeditionID int
+}
+
+// NewListIDSourceTokenContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source_token controller list id action.
+func NewListIDSourceTokenContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListIDSourceTokenContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListIDSourceTokenContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramExpeditionID := req.Params["expeditionId"]
+	if len(paramExpeditionID) > 0 {
+		rawExpeditionID := paramExpeditionID[0]
+		if expeditionID, err2 := strconv.Atoi(rawExpeditionID); err2 == nil {
+			rctx.ExpeditionID = expeditionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("expeditionId", rawExpeditionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListIDSourceTokenContext) OK(r *SourceTokens) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.source_tokens+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListIDSourceTokenContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddTeamContext provides the team add action context.
 type AddTeamContext struct {
 	context.Context
@@ -2506,7 +2506,7 @@ type AddTwitterContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ExpeditionID int
-	Payload      *AddTwitterAccountInputPayload
+	Payload      *AddTwitterAccountSourcePayload
 }
 
 // NewAddTwitterContext parses the incoming request URL and body, performs validations and creates the
@@ -2592,7 +2592,7 @@ type GetIDTwitterContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	InputID int
+	SourceID int
 }
 
 // NewGetIDTwitterContext parses the incoming request URL and body, performs validations and creates the
@@ -2604,21 +2604,21 @@ func NewGetIDTwitterContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetIDTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInputID := req.Params["inputId"]
-	if len(paramInputID) > 0 {
-		rawInputID := paramInputID[0]
-		if inputID, err2 := strconv.Atoi(rawInputID); err2 == nil {
-			rctx.InputID = inputID
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("inputId", rawInputID, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
 		}
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *GetIDTwitterContext) OK(r *TwitterAccountInput) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_input+json")
+func (ctx *GetIDTwitterContext) OK(r *TwitterAccountSource) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_source+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -2672,7 +2672,7 @@ func NewListTwitterContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListTwitterContext) OK(r *TwitterAccountInputs) error {
+func (ctx *ListTwitterContext) OK(r *TwitterAccountSources) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_intputs+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -2713,7 +2713,7 @@ func NewListIDTwitterContext(ctx context.Context, r *http.Request, service *goa.
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListIDTwitterContext) OK(r *TwitterAccountInputs) error {
+func (ctx *ListIDTwitterContext) OK(r *TwitterAccountSources) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.twitter_account_intputs+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

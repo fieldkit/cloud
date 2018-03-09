@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	_ "fmt"
 	"log"
+	"math"
+	"strconv"
 	"time"
 
 	"encoding/json"
@@ -20,7 +21,9 @@ import (
 
 type options struct {
 	PostgresUrl string
-	DryRun      bool
+	Save        bool
+	FixNames    bool
+	FixTypes    bool
 }
 
 type Row struct {
@@ -80,9 +83,49 @@ func reverseMap(m map[string]string) map[string]string {
 
 var reverseTranslations = reverseMap(translations)
 
+func fixDataTypes(row *Row) (bool, error) {
+	original := make(map[string]interface{})
+	modified := make(map[string]interface{})
+
+	err := json.Unmarshal(row.Data, &original)
+	if err != nil {
+		return false, err
+	}
+
+	fixed := false
+	for key, value := range original {
+		switch value.(type) {
+		case string:
+			f, err := strconv.ParseFloat(value.(string), 64)
+			if err == nil {
+				if math.IsNaN(f) {
+					modified[key] = "NaN"
+				} else {
+					modified[key] = f
+				}
+				fixed = true
+			} else {
+				modified[key] = value
+			}
+			break
+		default:
+			modified[key] = value
+		}
+	}
+
+	raw, err := json.Marshal(&modified)
+	if err != nil {
+		return false, err
+	}
+
+	row.Data = raw
+
+	return fixed, nil
+}
+
 func fixKeyNames(row *Row) (bool, error) {
-	original := make(map[string]string)
-	modified := make(map[string]string)
+	original := make(map[string]interface{})
+	modified := make(map[string]interface{})
 
 	err := json.Unmarshal(row.Data, &original)
 	if err != nil {
@@ -97,7 +140,6 @@ func fixKeyNames(row *Row) (bool, error) {
 		} else {
 			modified[key] = value
 		}
-		_, _ = key, value
 	}
 
 	raw, err := json.Marshal(&modified)
@@ -120,32 +162,51 @@ func fixAll(ctx context.Context, o *options, db *sqlxcache.DB) error {
 		batch := []*Row{}
 		if err := db.SelectContext(ctx, &batch, `
 		  SELECT d.id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
-		  FROM fieldkit.document AS d
+		  FROM fieldkit.record AS d
 		  ORDER BY timestamp
 		  LIMIT $1 OFFSET $2
 		`, pageSize, page*pageSize); err != nil {
+			log.Fatalf("Error: %v", err)
 			panic(err)
 		}
 
 		if len(batch) == 0 {
+			log.Printf("Done!")
 			break
 		}
 
 		log.Printf("Processing %d records", len(batch))
+
 		for _, row := range batch {
-			modified, err := fixKeyNames(row)
-			if err != nil {
-				return err
+			namesModified := false
+			typesModified := false
+
+			if o.FixNames {
+				m, err := fixKeyNames(row)
+				if err != nil {
+					return err
+				}
+				namesModified = m
 			}
 
+			if o.FixTypes {
+				m, err := fixDataTypes(row)
+				if err != nil {
+					return err
+				}
+				typesModified = m
+			}
+
+			modified := namesModified || typesModified
+
 			if modified {
-				if o.DryRun {
-					log.Printf("%v %v", row.ID, string(row.Data))
-				} else {
-					_, err = db.ExecContext(ctx, `UPDATE fieldkit.document SET data = $1 WHERE id = $2`, row.Data, row.ID)
+				if o.Save {
+					_, err := db.ExecContext(ctx, `UPDATE fieldkit.record SET data = $1 WHERE id = $2`, row.Data, row.ID)
 					if err != nil {
 						return err
 					}
+				} else {
+					log.Printf("%v %v", row.ID, string(row.Data))
 				}
 
 				updated += 1
@@ -164,7 +225,9 @@ func main() {
 	o := options{}
 
 	flag.StringVar(&o.PostgresUrl, "postgres-url", "postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable", "url to the postgres server")
-	flag.BoolVar(&o.DryRun, "dry-run", true, "dry run (verbose display and no updates)")
+	flag.BoolVar(&o.Save, "save", false, "save changes")
+	flag.BoolVar(&o.FixNames, "fix-names", false, "fix names")
+	flag.BoolVar(&o.FixTypes, "fix-types", false, "fix types")
 
 	flag.Parse()
 
@@ -175,5 +238,8 @@ func main() {
 
 	ctx := context.TODO()
 
-	fixAll(ctx, &o, db)
+	err = fixAll(ctx, &o, db)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -12,7 +12,7 @@ DROP FUNCTION IF EXISTS fieldkit.fk_update_temporal_geometries(desired_source_id
 DROP FUNCTION IF EXISTS fieldkit.fk_update_source_summary(desired_source_id BIGINT);
 
 CREATE TABLE fieldkit.sources_summaries (
-    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
     updated_at timestamp NOT NULL,
     number_of_features integer NOT NULL,
     last_feature_id integer NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE fieldkit.sources_summaries (
 );
 
 CREATE TABLE fieldkit.sources_temporal_clusters (
-    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
     cluster_id integer NOT NULL,
     updated_at timestamp NOT NULL,
     number_of_features integer NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE fieldkit.sources_temporal_clusters (
 );
 
 CREATE TABLE fieldkit.sources_temporal_geometries (
-    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
     cluster_id integer NOT NULL,
     updated_at timestamp NOT NULL,
     geometry geometry(LINESTRING, 4326) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE fieldkit.sources_temporal_geometries (
 );
 
 CREATE TABLE fieldkit.sources_spatial_clusters (
-    source_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE NOT NULL,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
     cluster_id integer NOT NULL,
     updated_at timestamp NOT NULL,
     number_of_features integer NOT NULL,
@@ -73,15 +73,15 @@ RETURN QUERY
 WITH
   with_identical_clustering AS (
     SELECT
-      d.input_id AS source_id,
+      d.source_id AS source_id,
       d.location,
       COUNT(*) AS actual_size,
       MIN(d.timestamp) AS min_timestamp,
       MAX(d.timestamp) AS max_timestamp,
       LEAST(CAST(11 AS BIGINT), COUNT(*)) AS capped_size
-    FROM fieldkit.document d
-    WHERE d.input_id IN (desired_source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
-    GROUP BY d.input_id, d.location
+    FROM fieldkit.record d
+    WHERE d.source_id IN (desired_source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+    GROUP BY d.source_id, d.location
   ),
   with_cluster_ids AS (
     SELECT
@@ -125,8 +125,8 @@ source AS (
 		d.location,
     (SELECT bool_or(ST_DWithin(d.location::geography, spatial.bounding_envelope::geography, 50)) FROM fieldkit.fk_spatial_clusters(desired_source_id) spatial WHERE spatial.source_id = 125) AS in_spatial,
     COUNT(d.location) AS actual_size
-	FROM fieldkit.document d
-  WHERE d.input_id IN (125) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+	FROM fieldkit.record d
+  WHERE d.source_id IN (125) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
   GROUP BY d.location
 ),
 with_timestamp_differences AS (
@@ -236,12 +236,12 @@ RETURN QUERY
 SELECT
   desired_source_id::integer AS source_id,
   NOW()::timestamp AS updated_at,
-	(SELECT COUNT(d.id)::integer AS number_of_features FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT d.Id::integer AS last_feature_id FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
-	(SELECT MIN(d.timestamp) AS start_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT MAX(d.timestamp) AS end_time FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(Point, 4326) AS centroid FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location))::geography))::numeric AS radius FROM fieldkit.document AS d WHERE d.visible AND d.input_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0);
+	(SELECT COUNT(d.id)::integer AS number_of_features FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT d.Id::integer AS last_feature_id FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
+	(SELECT MIN(d.timestamp) AS start_time FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT MAX(d.timestamp) AS end_time FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(Point, 4326) AS centroid FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location))::geography))::numeric AS radius FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0);
 END
 ' LANGUAGE plpgsql;
 

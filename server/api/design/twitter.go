@@ -5,22 +5,22 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var AddTwitterAccountInputPayload = Type("AddTwitterAccountInputPayload", func() {
-	Reference(Input)
+var AddTwitterAccountSourcePayload = Type("AddTwitterAccountSourcePayload", func() {
+	Reference(Source)
 	Attribute("name")
 	Required("name")
 })
 
-var UpdateTwitterAccountInputPayload = Type("UpdateTwitterAccountInputPayload", func() {
-	Reference(Input)
+var UpdateTwitterAccountSourcePayload = Type("UpdateTwitterAccountSourcePayload", func() {
+	Reference(Source)
 	Attribute("name")
 	Attribute("teamId")
 	Attribute("userId")
 })
 
-var TwitterAccountInput = MediaType("application/vnd.app.twitter_account_input+json", func() {
-	TypeName("TwitterAccountInput")
-	Reference(Input)
+var TwitterAccountSource = MediaType("application/vnd.app.twitter_account_source+json", func() {
+	TypeName("TwitterAccountSource")
+	Reference(Source)
 	Attributes(func() {
 		Attribute("id")
 		Attribute("expeditionId")
@@ -42,14 +42,14 @@ var TwitterAccountInput = MediaType("application/vnd.app.twitter_account_input+j
 	})
 })
 
-var TwitterAccountInputs = MediaType("application/vnd.app.twitter_account_intputs+json", func() {
-	TypeName("TwitterAccountInputs")
+var TwitterAccountSources = MediaType("application/vnd.app.twitter_account_intputs+json", func() {
+	TypeName("TwitterAccountSources")
 	Attributes(func() {
-		Attribute("twitterAccountInputs", CollectionOf(TwitterAccountInput))
-		Required("twitterAccountInputs")
+		Attribute("twitterAccountSources", CollectionOf(TwitterAccountSource))
+		Required("twitterAccountSources")
 	})
 	View("default", func() {
-		Attribute("twitterAccountInputs")
+		Attribute("twitterAccountSources")
 	})
 })
 
@@ -59,13 +59,13 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expeditionId/inputs/twitter-accounts"))
-		Description("Add a Twitter account input")
+		Routing(POST("expeditions/:expeditionId/sources/twitter-accounts"))
+		Description("Add a Twitter account source")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
-		Payload(AddTwitterAccountInputPayload)
+		Payload(AddTwitterAccountSourcePayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Location)
@@ -73,41 +73,41 @@ var _ = Resource("twitter", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("inputs/twitter-accounts/:inputId"))
-		Description("Get a Twitter account input")
+		Routing(GET("sources/twitter-accounts/:sourceId"))
+		Description("Get a Twitter account source")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccountInput)
+			Media(TwitterAccountSource)
 		})
 	})
 
 	Action("list", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/twitter-accounts"))
-		Description("List an expedition's Twitter account inputs")
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/sources/twitter-accounts"))
+		Description("List an expedition's Twitter account sources")
 		Params(func() {
 			Param("project", String, ProjectSlug)
 			Param("expedition", String, ExpeditionSlug)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccountInputs)
+			Media(TwitterAccountSources)
 		})
 	})
 
 	Action("list id", func() {
-		Routing(GET("expeditions/:expeditionId/inputs/twitter-accounts"))
-		Description("List an expedition's Twitter account inputs")
+		Routing(GET("expeditions/:expeditionId/sources/twitter-accounts"))
+		Description("List an expedition's Twitter account sources")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(TwitterAccountInputs)
+			Media(TwitterAccountSources)
 		})
 	})
 

@@ -292,11 +292,11 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	})
 	app.MountAdministratorController(service, c7)
 
-	// Mount "input" controller
-	c8 := api.NewInputController(service, api.InputControllerOptions{
+	// Mount "source" controller
+	c8 := api.NewSourceController(service, api.SourceControllerOptions{
 		Backend: be,
 	})
-	app.MountInputController(service, c8)
+	app.MountSourceController(service, c8)
 
 	// Mount "twitter" controller
 	c9 := api.NewTwitterController(service, api.TwitterControllerOptions{
@@ -318,11 +318,11 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	c11 := api.NewPictureController(service)
 	app.MountPictureController(service, c11)
 
-	// Mount "input_token" controller
-	c12 := api.NewInputTokenController(service, api.InputTokenControllerOptions{
+	// Mount "source_token" controller
+	c12 := api.NewSourceTokenController(service, api.SourceTokenControllerOptions{
 		Backend: be,
 	})
-	app.MountInputTokenController(service, c12)
+	app.MountSourceTokenController(service, c12)
 
 	// Mount "geojson" controller
 	c13 := api.NewGeoJSONController(service, api.GeoJSONControllerOptions{

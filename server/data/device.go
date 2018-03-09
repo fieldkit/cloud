@@ -5,9 +5,9 @@ import (
 )
 
 type Device struct {
-	InputID int64  `db:"input_id"`
-	Key     string `db:"key"`
-	Token   string `db:"token"`
+	SourceID int64  `db:"source_id"`
+	Key      string `db:"key"`
+	Token    string `db:"token"`
 }
 
 type DeviceSchema struct {
@@ -17,8 +17,8 @@ type DeviceSchema struct {
 	Key      string `db:"key"`
 }
 
-type DeviceInput struct {
-	Input
+type DeviceSource struct {
+	Source
 	Device
 }
 

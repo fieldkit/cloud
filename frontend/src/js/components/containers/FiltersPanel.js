@@ -80,8 +80,8 @@ class SourcePanel extends Component {
         const { onShowSource, onShowFeature, info } = this.props;
         const { source, lastFeature } = info;
 
-        const featuresUrl = API_HOST + "/inputs/" + source.id + "/geojson?descending=true";
-        const csvUrl = API_HOST + "/inputs/" + source.id + "/csv";
+        const featuresUrl = API_HOST + "/sources/" + source.id + "/geojson?descending=true";
+        const csvUrl = API_HOST + "/sources/" + source.id + "/csv";
 
         return (
             <div>

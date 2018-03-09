@@ -101,7 +101,7 @@ export function* walkGeoJson(summary) {
 
 export function* loadCharts() {
     yield takeLatest([ActionTypes.CHART_DATA_LOAD], function* (chartAction) {
-        let page = yield FkApi.getSourceGeoJson(chartAction.chart.source.inputId);
+        let page = yield FkApi.getSourceGeoJson(chartAction.chart.source.sourceId);
         while (page.hasMore) {
             page = yield FkApi.getNextSourceGeoJson(page);
         }
@@ -136,7 +136,7 @@ export function* loadExpedition(projectSlug, expeditionSlug) {
 
     yield put(focusLocation([-118.2688137, 34.0309388]));
 
-    const sourceIds = _(sources.deviceInputs).map('id').uniq().value();
+    const sourceIds = _(sources.deviceSources).map('id').uniq().value();
     const detailedSources = yield loadSources(sourceIds);
 
     return [ expedition, sources, sources, detailedSources ];

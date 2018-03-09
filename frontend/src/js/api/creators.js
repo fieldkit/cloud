@@ -48,7 +48,7 @@ export function getExpeditionSummary(projectSlug, expeditionSlug) {
 export function getExpeditionSources(projectSlug, expeditionSlug) {
     return {
         types: ActionTypes.API_EXPEDITION_SOURCES_GET,
-        path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/inputs',
+        path: '/projects/@/' + projectSlug + '/expeditions/@/' + expeditionSlug + '/sources',
         method: 'GET',
         unwrap: (r) => r
     };
@@ -75,7 +75,7 @@ export function getNextExpeditionGeoJson(last) {
 export function getSourceGeoJson(id) {
     return {
         types: ActionTypes.API_SOURCE_GEOJSON_GET,
-        path: '/inputs/' + id + '/geojson?descending=false',
+        path: '/sources/' + id + '/geojson?descending=false',
         method: 'GET',
         unwrap: (r) => r
     };
@@ -93,7 +93,7 @@ export function getNextSourceGeoJson(last) {
 export function getSource(id) {
     return {
         types: ActionTypes.API_SOURCE_GET,
-        path: '/inputs/' + id,
+        path: '/sources/' + id,
         method: 'GET',
         unwrap: (r) => r
     };
@@ -102,7 +102,7 @@ export function getSource(id) {
 export function getSourceSummary(id) {
     return {
         types: ActionTypes.API_SOURCE_SUMMARY_GET,
-        path: '/inputs/' + id + '/summary',
+        path: '/sources/' + id + '/summary',
         method: 'GET',
         unwrap: (r) => r
     };

@@ -32,11 +32,11 @@ type IncomingMessage struct {
 }
 
 type RawMessageIngester struct {
-	incoming      chan *ingestion.RawMessageRow
-	ingester      *ingestion.MessageIngester
-	backend       *Backend
-	db            *sqlxcache.DB
-	documentAdder *DocumentAdder
+	incoming    chan *ingestion.RawMessageRow
+	ingester    *ingestion.MessageIngester
+	backend     *Backend
+	db          *sqlxcache.DB
+	recordAdder *RecordAdder
 }
 
 func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
@@ -47,11 +47,11 @@ func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	ingester := ingestion.NewMessageIngester(sr, streams)
 
 	rmi = &RawMessageIngester{
-		incoming:      incoming,
-		ingester:      ingester,
-		backend:       b,
-		db:            b.db,
-		documentAdder: NewDocumentAdder(b),
+		incoming:    incoming,
+		ingester:    ingester,
+		backend:     b,
+		db:          b.db,
+		recordAdder: NewRecordAdder(b),
 	}
 
 	go backgroundIngestion(rmi)
@@ -59,22 +59,22 @@ func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	return
 }
 
-type DocumentAdder struct {
+type RecordAdder struct {
 	backend *Backend
 }
 
-func NewDocumentAdder(backend *Backend) *DocumentAdder {
-	return &DocumentAdder{
+func NewRecordAdder(backend *Backend) *RecordAdder {
+	return &RecordAdder{
 		backend: backend,
 	}
 }
 
-func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
+func (da *RecordAdder) AddRecord(im *ingestion.IngestedMessage) error {
 	// TODO: Not terribly happy with this hack.
 	ids := im.Schema.Ids.(DatabaseIds)
-	d := data.Document{
+	d := data.Record{
 		SchemaID:  int32(ids.SchemaID),
-		InputID:   int32(ids.DeviceID),
+		SourceID:  int32(ids.DeviceID),
 		TeamID:    nil,
 		UserID:    nil,
 		Timestamp: *im.Time,
@@ -83,7 +83,7 @@ func (da *DocumentAdder) AddDocument(im *ingestion.IngestedMessage) error {
 		Visible:   true,
 	}
 	d.SetData(im.Fields)
-	return da.backend.AddDocument(context.TODO(), &d)
+	return da.backend.AddRecord(context.TODO(), &d)
 }
 
 func backgroundIngestion(rmi *RawMessageIngester) {
@@ -104,7 +104,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
 				}
 			} else {
-				rmi.documentAdder.AddDocument(im)
+				rmi.recordAdder.AddRecord(im)
 				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
 		}

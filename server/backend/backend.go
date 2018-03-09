@@ -31,16 +31,16 @@ func New(url string) (*Backend, error) {
 	}, nil
 }
 
-func (b *Backend) AddInput(ctx context.Context, input *data.Input) error {
-	return b.db.NamedGetContext(ctx, input, `
-		INSERT INTO fieldkit.input (expedition_id, name) VALUES (:expedition_id, :name) RETURNING *
-		`, input)
+func (b *Backend) AddSource(ctx context.Context, source *data.Source) error {
+	return b.db.NamedGetContext(ctx, source, `
+		INSERT INTO fieldkit.source (expedition_id, name) VALUES (:expedition_id, :name) RETURNING *
+		`, source)
 }
 
-func (b *Backend) AddInputToken(ctx context.Context, inputToken *data.InputToken) error {
-	return b.db.NamedGetContext(ctx, inputToken, `
-		INSERT INTO fieldkit.input_token (expedition_id, token) VALUES (:expedition_id, :token) RETURNING *
-		`, inputToken)
+func (b *Backend) AddSourceToken(ctx context.Context, sourceToken *data.SourceToken) error {
+	return b.db.NamedGetContext(ctx, sourceToken, `
+		INSERT INTO fieldkit.source_token (expedition_id, token) VALUES (:expedition_id, :token) RETURNING *
+		`, sourceToken)
 }
 
 func (b *Backend) CheckInviteToken(ctx context.Context, inviteToken data.Token) (bool, error) {
@@ -54,18 +54,18 @@ func (b *Backend) CheckInviteToken(ctx context.Context, inviteToken data.Token) 
 	return count > 0, nil
 }
 
-func (b *Backend) DeleteInputToken(ctx context.Context, inputTokenID int32) error {
+func (b *Backend) DeleteSourceToken(ctx context.Context, sourceTokenID int32) error {
 	_, err := b.db.ExecContext(ctx, `
-		DELETE FROM fieldkit.input_token WHERE id = $1
-		`, inputTokenID)
+		DELETE FROM fieldkit.source_token WHERE id = $1
+		`, sourceTokenID)
 	return err
 }
 
-func (b *Backend) ListInputTokens(ctx context.Context, project, expedition string) ([]*data.InputToken, error) {
-	inputTokens := []*data.InputToken{}
-	if err := b.db.SelectContext(ctx, &inputTokens, `
+func (b *Backend) ListSourceTokens(ctx context.Context, project, expedition string) ([]*data.SourceToken, error) {
+	sourceTokens := []*data.SourceToken{}
+	if err := b.db.SelectContext(ctx, &sourceTokens, `
 		SELECT it.*
-			FROM fieldkit.input_token AS it
+			FROM fieldkit.source_token AS it
 				JOIN fieldkit.expedition AS e ON e.id = it.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE p.slug = $1 AND e.slug = $2
@@ -73,39 +73,39 @@ func (b *Backend) ListInputTokens(ctx context.Context, project, expedition strin
 		return nil, err
 	}
 
-	return inputTokens, nil
+	return sourceTokens, nil
 }
 
-func (b *Backend) CheckInputToken(ctx context.Context, inputID int32, token data.Token) (bool, error) {
+func (b *Backend) CheckSourceToken(ctx context.Context, sourceID int32, token data.Token) (bool, error) {
 	count := 0
 	if err := b.db.GetContext(ctx, &count, `
 		SELECT COUNT(*)
-			FROM fieldkit.input_token AS it
-				JOIN fieldkit.input AS i ON i.expedition_id = it.expedition_id
+			FROM fieldkit.source_token AS it
+				JOIN fieldkit.source AS i ON i.expedition_id = it.expedition_id
 					WHERE i.id = $1 AND it.token = $2
-		`, inputID, token); err != nil {
+		`, sourceID, token); err != nil {
 		return false, err
 	}
 
 	return count > 0, nil
 }
 
-func (b *Backend) ListInputTokensID(ctx context.Context, expeditionID int32) ([]*data.InputToken, error) {
-	inputTokens := []*data.InputToken{}
-	if err := b.db.SelectContext(ctx, &inputTokens, `
-		SELECT it.* FROM fieldkit.input_token AS it WHERE it.expedition_id = $1
+func (b *Backend) ListSourceTokensID(ctx context.Context, expeditionID int32) ([]*data.SourceToken, error) {
+	sourceTokens := []*data.SourceToken{}
+	if err := b.db.SelectContext(ctx, &sourceTokens, `
+		SELECT it.* FROM fieldkit.source_token AS it WHERE it.expedition_id = $1
 		`, expeditionID); err != nil {
 		return nil, err
 	}
 
-	return inputTokens, nil
+	return sourceTokens, nil
 }
 
 func (b *Backend) AddTwitterOAuth(ctx context.Context, twitterOAuth *data.TwitterOAuth) error {
 	_, err := b.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.twitter_oauth (input_id, request_token, request_secret)
-			VALUES (:input_id, :request_token, :request_secret)
-			ON CONFLICT (input_id)
+		INSERT INTO fieldkit.twitter_oauth (source_id, request_token, request_secret)
+			VALUES (:source_id, :request_token, :request_secret)
+			ON CONFLICT (source_id)
 				DO UPDATE SET request_token = :request_token, request_secret = :request_secret
 		`, twitterOAuth)
 	return err
@@ -136,7 +136,7 @@ func (b *Backend) DeleteInviteToken(ctx context.Context, inviteToken data.Token)
 	return err
 }
 
-func (b *Backend) AddTwitterAccountInput(ctx context.Context, twitterAccount *data.TwitterAccountInput) error {
+func (b *Backend) AddTwitterAccountSource(ctx context.Context, twitterAccount *data.TwitterAccountSource) error {
 	if _, err := b.db.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.twitter_account (id, screen_name, access_token, access_secret)
 			VALUES (:twitter_account_id, :screen_name, :access_token, :access_secret)
@@ -147,9 +147,9 @@ func (b *Backend) AddTwitterAccountInput(ctx context.Context, twitterAccount *da
 	}
 
 	if _, err := b.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.input_twitter_account (input_id, twitter_account_id)
+		INSERT INTO fieldkit.source_twitter_account (source_id, twitter_account_id)
 			VALUES (:id, :twitter_account_id)
-			ON CONFLICT (input_id)
+			ON CONFLICT (source_id)
 				DO UPDATE SET twitter_account_id = :twitter_account_id
 		`, twitterAccount); err != nil {
 		return err
@@ -169,50 +169,50 @@ func (b *Backend) Expedition(ctx context.Context, expeditionID int32) (*data.Exp
 	return expedition, nil
 }
 
-func (b *Backend) Input(ctx context.Context, inputID int32) (*data.Input, error) {
-	input := &data.Input{}
-	if err := b.db.GetContext(ctx, input, `
-		SELECT * FROM fieldkit.input WHERE id = $1
-		`, inputID); err != nil {
+func (b *Backend) Source(ctx context.Context, sourceID int32) (*data.Source, error) {
+	source := &data.Source{}
+	if err := b.db.GetContext(ctx, source, `
+		SELECT * FROM fieldkit.source WHERE id = $1
+		`, sourceID); err != nil {
 		return nil, err
 	}
 
-	return input, nil
+	return source, nil
 }
 
-func (b *Backend) UpdateInput(ctx context.Context, input *data.Input) error {
+func (b *Backend) UpdateSource(ctx context.Context, source *data.Source) error {
 	if _, err := b.db.NamedExecContext(ctx, `
-		UPDATE fieldkit.input
+		UPDATE fieldkit.source
 			SET name = :name, team_id = :team_id, user_id = :user_id
 				WHERE id = :id
-		`, input); err != nil {
+		`, source); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (b *Backend) TwitterAccountInput(ctx context.Context, inputID int32) (*data.TwitterAccountInput, error) {
-	twitterAccount := &data.TwitterAccountInput{}
+func (b *Backend) TwitterAccountSource(ctx context.Context, sourceID int32) (*data.TwitterAccountSource, error) {
+	twitterAccount := &data.TwitterAccountSource{}
 	if err := b.db.GetContext(ctx, twitterAccount, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name
 			FROM fieldkit.twitter_account AS ta
-				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
-				JOIN fieldkit.input AS i ON i.id = ita.input_id
+				JOIN fieldkit.source_twitter_account AS ita ON ita.twitter_account_id = ta.id
+				JOIN fieldkit.source AS i ON i.id = ita.source_id
 					WHERE i.id = $1
-		`, inputID); err != nil {
+		`, sourceID); err != nil {
 		return nil, err
 	}
 
 	return twitterAccount, nil
 }
 
-func (b *Backend) ListAllDeviceInputs(ctx context.Context) ([]*data.DeviceInput, error) {
-	devices := []*data.DeviceInput{}
+func (b *Backend) ListAllDeviceSources(ctx context.Context) ([]*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id, d.key, d.token
+		SELECT i.*, d.source_id, d.key, d.token
 			FROM fieldkit.device AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 		`); err != nil {
@@ -222,12 +222,12 @@ func (b *Backend) ListAllDeviceInputs(ctx context.Context) ([]*data.DeviceInput,
 	return devices, nil
 }
 
-func (b *Backend) ListDeviceInputs(ctx context.Context, project, expedition string) ([]*data.DeviceInput, error) {
-	devices := []*data.DeviceInput{}
+func (b *Backend) ListDeviceSources(ctx context.Context, project, expedition string) ([]*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id, d.key, d.token
+		SELECT i.*, d.source_id, d.key, d.token
 			FROM fieldkit.device AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE p.slug = $1 AND e.slug = $2
@@ -238,13 +238,13 @@ func (b *Backend) ListDeviceInputs(ctx context.Context, project, expedition stri
 	return devices, nil
 }
 
-func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedition string) ([]*data.TwitterAccountInput, error) {
-	twitterAccounts := []*data.TwitterAccountInput{}
+func (b *Backend) ListTwitterAccountSources(ctx context.Context, project, expedition string) ([]*data.TwitterAccountSource, error) {
+	twitterAccounts := []*data.TwitterAccountSource{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
 			FROM fieldkit.twitter_account AS ta
-				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
-				JOIN fieldkit.input AS i ON i.id = ita.input_id
+				JOIN fieldkit.source_twitter_account AS ita ON ita.twitter_account_id = ta.id
+				JOIN fieldkit.source AS i ON i.id = ita.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE p.slug = $1 AND e.slug = $2
@@ -255,12 +255,12 @@ func (b *Backend) ListTwitterAccountInputs(ctx context.Context, project, expedit
 	return twitterAccounts, nil
 }
 
-func (b *Backend) ListDeviceInputsByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.DeviceInput, error) {
-	devices := []*data.DeviceInput{}
+func (b *Backend) ListDeviceSourcesByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id, d.key, d.token
+		SELECT i.*, d.source_id, d.key, d.token
 			FROM fieldkit.device AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 					WHERE i.expedition_id = $1
 		`, expeditionID); err != nil {
 		return nil, err
@@ -269,37 +269,37 @@ func (b *Backend) ListDeviceInputsByExpeditionID(ctx context.Context, expedition
 	return devices, nil
 }
 
-func (b *Backend) GetDeviceInputByID(ctx context.Context, id int32) (*data.DeviceInput, error) {
-	devices := []*data.DeviceInput{}
+func (b *Backend) GetDeviceSourceByID(ctx context.Context, id int32) (*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.input_id, d.key, d.token
+		SELECT i.*, d.source_id, d.key, d.token
 			FROM fieldkit.device AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 					WHERE i.id = $1
 		`, id); err != nil {
 		return nil, err
 	}
 
 	if len(devices) != 1 {
-		return nil, fmt.Errorf("No such Device Input")
+		return nil, fmt.Errorf("No such Device Source")
 	}
 
 	return devices[0], nil
 }
 
-func (b *Backend) ListTwitterAccountInputsByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountInput, error) {
-	twitterAccountInputs := []*data.TwitterAccountInput{}
-	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
+func (b *Backend) ListTwitterAccountSourcesByExpeditionID(ctx context.Context, expeditionID int32) ([]*data.TwitterAccountSource, error) {
+	twitterAccountSources := []*data.TwitterAccountSource{}
+	if err := b.db.SelectContext(ctx, &twitterAccountSources, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
 			FROM fieldkit.twitter_account AS ta
-				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
-				JOIN fieldkit.input AS i ON i.id = ita.input_id
+				JOIN fieldkit.source_twitter_account AS ita ON ita.twitter_account_id = ta.id
+				JOIN fieldkit.source AS i ON i.id = ita.source_id
 					WHERE i.expedition_id = $1
 			`, expeditionID); err != nil {
 		return nil, err
 	}
 
-	return twitterAccountInputs, nil
+	return twitterAccountSources, nil
 }
 
 func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccount, error) {
@@ -313,24 +313,24 @@ func (b *Backend) ListTwitterAccounts(ctx context.Context) ([]*data.TwitterAccou
 	return twitterAccounts, nil
 }
 
-func (b *Backend) ListTwitterAccountInputsByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountInput, error) {
-	twitterAccountInputs := []*data.TwitterAccountInput{}
-	if err := b.db.SelectContext(ctx, &twitterAccountInputs, `
+func (b *Backend) ListTwitterAccountSourcesByAccountID(ctx context.Context, accountID int64) ([]*data.TwitterAccountSource, error) {
+	twitterAccountSources := []*data.TwitterAccountSource{}
+	if err := b.db.SelectContext(ctx, &twitterAccountSources, `
 		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
 			FROM fieldkit.twitter_account AS ta
-				JOIN fieldkit.input_twitter_account AS ita ON ita.twitter_account_id = ta.id
-				JOIN fieldkit.input AS i ON i.id = ita.input_id
+				JOIN fieldkit.source_twitter_account AS ita ON ita.twitter_account_id = ta.id
+				JOIN fieldkit.source AS i ON i.id = ita.source_id
 					WHERE ta.id = $1
 			`, accountID); err != nil {
 		return nil, err
 	}
 
-	return twitterAccountInputs, nil
+	return twitterAccountSources, nil
 }
 
 func (b *Backend) AddDevice(ctx context.Context, device *data.Device) error {
 	return b.db.NamedGetContext(ctx, device, `
-		INSERT INTO fieldkit.device (input_id, key, token) VALUES (:input_id, :key, :token) RETURNING *
+		INSERT INTO fieldkit.device (source_id, key, token) VALUES (:source_id, :key, :token) RETURNING *
 		`, device)
 }
 
@@ -380,14 +380,14 @@ func (b *Backend) ListSchemasByID(ctx context.Context, projectID int32) ([]*data
 	return schemas, nil
 }
 
-func (b *Backend) AddDocument(ctx context.Context, document *data.Document) error {
+func (b *Backend) AddRecord(ctx context.Context, record *data.Record) error {
 	_, err := b.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.document (schema_id, input_id, team_id, user_id, timestamp, location, data, fixed, visible)
-			VALUES (:schema_id, :input_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
-		`, document)
+		INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)
+			VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
+		`, record)
 
 	b.SourceChanges <- SourceChange{
-		SourceID: int64(document.InputID),
+		SourceID: int64(record.SourceID),
 	}
 
 	return err
@@ -410,7 +410,7 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 
 const DefaultPageSize = 100
 
-func (b *Backend) ListDocuments(ctx context.Context, project string, expedition string, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
+func (b *Backend) ListRecords(ctx context.Context, project string, expedition string, token *PagingToken) (*data.RecordsPage, *PagingToken, error) {
 	if token == nil {
 		after := time.Now().AddDate(-10, 0, 0)
 		token = &PagingToken{
@@ -422,11 +422,11 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 	after := time.Unix(0, token.time)
 	pageSize := int32(DefaultPageSize)
 	before := time.Now()
-	documents := []*data.Document{}
-	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
-			FROM fieldkit.document AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+	records := []*data.Record{}
+	if err := b.db.SelectContext(ctx, &records, `
+		SELECT d.id, d.schema_id, d.source_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
+			FROM fieldkit.record AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE d.visible AND p.slug = $1 AND e.slug = $2 AND d.insertion < $3 AND (insertion >= $4) AND
@@ -438,19 +438,19 @@ func (b *Backend) ListDocuments(ctx context.Context, project string, expedition 
 	}
 
 	nextToken := &PagingToken{}
-	if int32(len(documents)) < pageSize {
+	if int32(len(records)) < pageSize {
 		nextToken.time = before.UnixNano()
 	} else {
 		nextToken.time = token.time
 		nextToken.page = token.page + 1
 	}
 
-	return &data.DocumentsPage{
-		Documents: documents,
+	return &data.RecordsPage{
+		Records: records,
 	}, nextToken, nil
 }
 
-func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, descending bool, token *PagingToken) (*data.DocumentsPage, *PagingToken, error) {
+func (b *Backend) ListRecordsBySource(ctx context.Context, sourceID int, descending bool, token *PagingToken) (*data.RecordsPage, *PagingToken, error) {
 	if token == nil {
 		after := time.Now().AddDate(-10, 0, 0)
 		token = &PagingToken{
@@ -462,35 +462,35 @@ func (b *Backend) ListDocumentsByInput(ctx context.Context, inputID int, descend
 	after := time.Unix(0, token.time)
 	pageSize := int32(DefaultPageSize)
 	before := time.Now()
-	documents := []*data.Document{}
+	records := []*data.Record{}
 	order := "ASC"
 	if descending {
 		order = "DESC"
 	}
-	if err := b.db.SelectContext(ctx, &documents, fmt.Sprintf(`
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
-			FROM fieldkit.document AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+	if err := b.db.SelectContext(ctx, &records, fmt.Sprintf(`
+		SELECT d.id, d.schema_id, d.source_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
+			FROM fieldkit.record AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE d.visible AND i.id = $1 AND d.insertion < $2 AND (insertion >= $3) AND
                                               ST_X(d.location) != 0 AND ST_Y(d.location) != 0
                         ORDER BY timestamp %s
                         LIMIT $4 OFFSET $5
-		`, order), inputID, before, after, pageSize, token.page*pageSize); err != nil {
+		`, order), sourceID, before, after, pageSize, token.page*pageSize); err != nil {
 		return nil, nil, err
 	}
 
 	nextToken := &PagingToken{}
-	if int32(len(documents)) < pageSize {
+	if int32(len(records)) < pageSize {
 		nextToken.time = before.UnixNano()
 	} else {
 		nextToken.time = token.time
 		nextToken.page = token.page + 1
 	}
 
-	return &data.DocumentsPage{
-		Documents: documents,
+	return &data.RecordsPage{
+		Records: records,
 	}, nextToken, nil
 }
 
@@ -567,12 +567,12 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
 	return summaries, nil
 }
 
-func (b *Backend) ListDocumentsByID(ctx context.Context, id int) (*data.DocumentsPage, error) {
-	documents := []*data.Document{}
-	if err := b.db.SelectContext(ctx, &documents, `
-		SELECT d.id, d.schema_id, d.input_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
-			FROM fieldkit.document AS d
-				JOIN fieldkit.input AS i ON i.id = d.input_id
+func (b *Backend) ListRecordsByID(ctx context.Context, id int) (*data.RecordsPage, error) {
+	records := []*data.Record{}
+	if err := b.db.SelectContext(ctx, &records, `
+		SELECT d.id, d.schema_id, d.source_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data
+			FROM fieldkit.record AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
 					WHERE d.visible AND d.id = $1
@@ -580,8 +580,8 @@ func (b *Backend) ListDocumentsByID(ctx context.Context, id int) (*data.Document
 		return nil, err
 	}
 
-	return &data.DocumentsPage{
-		Documents: documents,
+	return &data.RecordsPage{
+		Records: records,
 	}, nil
 }
 

@@ -99,8 +99,8 @@ func main() {
 		batch := []*Sample{}
 		if err := db.SelectContext(ctx, &batch, `
 		  SELECT d.id, d.timestamp, ST_AsBinary(d.location) AS location
-		  FROM fieldkit.document AS d
-		  WHERE d.visible AND d.input_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+		  FROM fieldkit.record AS d
+		  WHERE d.visible AND d.source_id = $1 AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
 		  ORDER BY timestamp
 		  LIMIT $2 OFFSET $3
 		`, 4, pageSize, page*pageSize); err != nil {

@@ -5,8 +5,8 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var Input = MediaType("application/vnd.app.input+json", func() {
-	TypeName("Input")
+var Source = MediaType("application/vnd.app.source+json", func() {
+	TypeName("Source")
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("expeditionId", Integer)
@@ -26,8 +26,8 @@ var Input = MediaType("application/vnd.app.input+json", func() {
 	})
 })
 
-var UpdateInputPayload = Type("UpdateInputPayload", func() {
-	Reference(Input)
+var UpdateSourcePayload = Type("UpdateSourcePayload", func() {
+	Reference(Source)
 	Attribute("name")
 	Attribute("teamId")
 	Attribute("userId")
@@ -35,15 +35,15 @@ var UpdateInputPayload = Type("UpdateInputPayload", func() {
 	Required("name")
 })
 
-var Inputs = MediaType("application/vnd.app.inputs+json", func() {
-	TypeName("Inputs")
+var Sources = MediaType("application/vnd.app.sources+json", func() {
+	TypeName("Sources")
 	Attributes(func() {
-		Attribute("twitterAccountInputs", CollectionOf(TwitterAccountInput))
-		Attribute("deviceInputs", CollectionOf(DeviceInput))
+		Attribute("twitterAccountSources", CollectionOf(TwitterAccountSource))
+		Attribute("deviceSources", CollectionOf(DeviceSource))
 	})
 	View("default", func() {
-		Attribute("twitterAccountInputs")
-		Attribute("deviceInputs")
+		Attribute("twitterAccountSources")
+		Attribute("deviceSources")
 	})
 })
 
@@ -70,8 +70,8 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 	})
 })
 
-var InputSummary = MediaType("application/vnd.app.input_summary+json", func() {
-	TypeName("InputSummary")
+var SourceSummary = MediaType("application/vnd.app.source_summary+json", func() {
+	TypeName("SourceSummary")
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("name", String)
@@ -87,30 +87,30 @@ var InputSummary = MediaType("application/vnd.app.input_summary+json", func() {
 	})
 })
 
-var _ = Resource("input", func() {
+var _ = Resource("source", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
 	})
 
 	Action("update", func() {
-		Routing(PATCH("inputs/:inputId"))
-		Description("Update an input")
+		Routing(PATCH("sources/:sourceId"))
+		Description("Update an source")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 		})
-		Payload(UpdateInputPayload)
+		Payload(UpdateSourcePayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Input)
+			Media(Source)
 		})
 	})
 
 	Action("list", func() {
 		NoSecurity()
 
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs"))
-		Description("List a project's inputs")
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/sources"))
+		Description("List a project's sources")
 		Params(func() {
 			Param("project", String, ProjectSlug)
 			Param("expedition", String, ExpeditionSlug)
@@ -118,50 +118,50 @@ var _ = Resource("input", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Inputs)
+			Media(Sources)
 		})
 	})
 
 	Action("list id", func() {
 		NoSecurity()
 
-		Routing(GET("inputs/:inputId"))
-		Description("List an input")
+		Routing(GET("sources/:sourceId"))
+		Description("List an source")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSource)
 		})
 	})
 
 	Action("summary by id", func() {
 		NoSecurity()
 
-		Routing(GET("inputs/:inputId/summary"))
-		Description("List an input")
+		Routing(GET("sources/:sourceId/summary"))
+		Description("List an source")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(InputSummary)
+			Media(SourceSummary)
 		})
 	})
 
 	Action("list expedition id", func() {
-		Routing(GET("expeditions/:expeditionId/inputs"))
-		Description("List an expedition's inputs")
+		Routing(GET("expeditions/:expeditionId/sources"))
+		Description("List an expedition's sources")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(Inputs)
+			Media(Sources)
 		})
 	})
 })

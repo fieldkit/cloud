@@ -76,24 +76,24 @@ func (c *Client) NewListByIDGeoJSONRequest(ctx context.Context, path string) (*h
 	return req, nil
 }
 
-// ListByInputGeoJSONPath computes a request path to the list by input action of GeoJSON.
-func ListByInputGeoJSONPath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
+// ListBySourceGeoJSONPath computes a request path to the list by source action of GeoJSON.
+func ListBySourceGeoJSONPath(sourceID int) string {
+	param0 := strconv.Itoa(sourceID)
 
-	return fmt.Sprintf("/inputs/%s/geojson", param0)
+	return fmt.Sprintf("/sources/%s/geojson", param0)
 }
 
-// List an input's features in a GeoJSON.
-func (c *Client) ListByInputGeoJSON(ctx context.Context, path string, descending *bool) (*http.Response, error) {
-	req, err := c.NewListByInputGeoJSONRequest(ctx, path, descending)
+// List an source's features in a GeoJSON.
+func (c *Client) ListBySourceGeoJSON(ctx context.Context, path string, descending *bool) (*http.Response, error) {
+	req, err := c.NewListBySourceGeoJSONRequest(ctx, path, descending)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewListByInputGeoJSONRequest create the request corresponding to the list by input action endpoint of the GeoJSON resource.
-func (c *Client) NewListByInputGeoJSONRequest(ctx context.Context, path string, descending *bool) (*http.Request, error) {
+// NewListBySourceGeoJSONRequest create the request corresponding to the list by source action endpoint of the GeoJSON resource.
+func (c *Client) NewListBySourceGeoJSONRequest(ctx context.Context, path string, descending *bool) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

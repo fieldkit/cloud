@@ -29,9 +29,9 @@ func NewExportController(service *goa.Service, options ExportControllerOptions) 
 	}
 }
 
-func (c *ExportController) ListByInput(ctx *app.ListByInputExportContext) error {
+func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/csv")
-	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"source-%d.csv\"", ctx.InputID))
+	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"source-%d.csv\"", ctx.SourceID))
 	ctx.ResponseData.WriteHeader(200)
 
 	writer := bufio.NewWriter(ctx.ResponseData)
@@ -40,17 +40,17 @@ func (c *ExportController) ListByInput(ctx *app.ListByInputExportContext) error 
 	var keys []string
 
 	for {
-		page, newToken, err := c.options.Backend.ListDocumentsByInput(ctx, ctx.InputID, false, token)
+		page, newToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, false, token)
 		if err != nil {
 			log.Printf("Error querying: %v", err)
 			break
 		}
-		if len(page.Documents) == 0 {
+		if len(page.Records) == 0 {
 			break
 		}
 
-		for _, doc := range page.Documents {
-			fields, err := doc.GetParsedFields()
+		for _, record := range page.Records {
+			fields, err := record.GetParsedFields()
 			if err != nil {
 				log.Printf("Error parsing fields: %v", err)
 			} else {
@@ -74,9 +74,9 @@ func (c *ExportController) ListByInput(ctx *app.ListByInputExportContext) error 
 					}
 				}
 				row := []string{
-					fmt.Sprintf("%d", doc.ID),
-					fmt.Sprintf("%v", doc.Timestamp),
-					doc.Location.String(),
+					fmt.Sprintf("%d", record.ID),
+					fmt.Sprintf("%v", record.Timestamp),
+					record.Location.String(),
 				}
 				row = append(row, fieldValues...)
 				writer.WriteString(strings.Join(row, ",") + "\n")

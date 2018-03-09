@@ -59,114 +59,6 @@ func (mt *ProjectAdministrators) Validate() (err error) {
 	return
 }
 
-// DeviceInput media type (default view)
-//
-// Identifier: application/vnd.app.device_input+json; view=default
-type DeviceInput struct {
-	Active       bool   `form:"active" json:"active" xml:"active"`
-	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Key          string `form:"key" json:"key" xml:"key"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	Token        string `form:"token" json:"token" xml:"token"`
-	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
-}
-
-// Validate validates the DeviceInput media type instance.
-func (mt *DeviceInput) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	if mt.Token == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
-	}
-	if mt.Key == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
-	}
-	return
-}
-
-// DeviceInput media type (public view)
-//
-// Identifier: application/vnd.app.device_input+json; view=public
-type DeviceInputPublic struct {
-	Active           bool       `form:"active" json:"active" xml:"active"`
-	Centroid         []float64  `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
-	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	ExpeditionID     int        `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID               int        `form:"id" json:"id" xml:"id"`
-	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
-	Name             string     `form:"name" json:"name" xml:"name"`
-	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
-	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
-	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	TeamID           *int       `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID           *int       `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
-}
-
-// Validate validates the DeviceInputPublic media type instance.
-func (mt *DeviceInputPublic) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	return
-}
-
-// DeviceInputCollection is the media type for an array of DeviceInput (default view)
-//
-// Identifier: application/vnd.app.device_input+json; type=collection; view=default
-type DeviceInputCollection []*DeviceInput
-
-// Validate validates the DeviceInputCollection media type instance.
-func (mt DeviceInputCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DeviceInputCollection is the media type for an array of DeviceInput (public view)
-//
-// Identifier: application/vnd.app.device_input+json; type=collection; view=public
-type DeviceInputPublicCollection []*DeviceInputPublic
-
-// Validate validates the DeviceInputPublicCollection media type instance.
-func (mt DeviceInputPublicCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DeviceInputs media type (default view)
-//
-// Identifier: application/vnd.app.device_inputs+json; view=default
-type DeviceInputs struct {
-	DeviceInputs DeviceInputCollection `form:"deviceInputs" json:"deviceInputs" xml:"deviceInputs"`
-}
-
-// Validate validates the DeviceInputs media type instance.
-func (mt *DeviceInputs) Validate() (err error) {
-	if mt.DeviceInputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "deviceInputs"))
-	}
-	if err2 := mt.DeviceInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
 // DeviceSchema media type (default view)
 //
 // Identifier: application/vnd.app.device_schema+json; view=default
@@ -221,6 +113,114 @@ func (mt *DeviceSchemas) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schemas"))
 	}
 	if err2 := mt.Schemas.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DeviceSource media type (default view)
+//
+// Identifier: application/vnd.app.device_source+json; view=default
+type DeviceSource struct {
+	Active       bool   `form:"active" json:"active" xml:"active"`
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Key          string `form:"key" json:"key" xml:"key"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	Token        string `form:"token" json:"token" xml:"token"`
+	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
+// Validate validates the DeviceSource media type instance.
+func (mt *DeviceSource) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	return
+}
+
+// DeviceSource media type (public view)
+//
+// Identifier: application/vnd.app.device_source+json; view=public
+type DeviceSourcePublic struct {
+	Active           bool       `form:"active" json:"active" xml:"active"`
+	Centroid         []float64  `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
+	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	ExpeditionID     int        `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID               int        `form:"id" json:"id" xml:"id"`
+	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
+	Name             string     `form:"name" json:"name" xml:"name"`
+	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
+	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	TeamID           *int       `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID           *int       `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
+// Validate validates the DeviceSourcePublic media type instance.
+func (mt *DeviceSourcePublic) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// DeviceSourceCollection is the media type for an array of DeviceSource (default view)
+//
+// Identifier: application/vnd.app.device_source+json; type=collection; view=default
+type DeviceSourceCollection []*DeviceSource
+
+// Validate validates the DeviceSourceCollection media type instance.
+func (mt DeviceSourceCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DeviceSourceCollection is the media type for an array of DeviceSource (public view)
+//
+// Identifier: application/vnd.app.device_source+json; type=collection; view=public
+type DeviceSourcePublicCollection []*DeviceSourcePublic
+
+// Validate validates the DeviceSourcePublicCollection media type instance.
+func (mt DeviceSourcePublicCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DeviceSources media type (default view)
+//
+// Identifier: application/vnd.app.device_sources+json; view=default
+type DeviceSources struct {
+	DeviceSources DeviceSourceCollection `form:"deviceSources" json:"deviceSources" xml:"deviceSources"`
+}
+
+// Validate validates the DeviceSources media type instance.
+func (mt *DeviceSources) Validate() (err error) {
+	if mt.DeviceSources == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "deviceSources"))
+	}
+	if err2 := mt.DeviceSources.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return
@@ -475,131 +475,6 @@ func (mt GeometryClusterSummaryCollection) Validate() (err error) {
 	return
 }
 
-// Input media type (default view)
-//
-// Identifier: application/vnd.app.input+json; view=default
-type Input struct {
-	Active       *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Name         string `form:"name" json:"name" xml:"name"`
-	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
-}
-
-// Validate validates the Input media type instance.
-func (mt *Input) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	return
-}
-
-// InputSummary media type (default view)
-//
-// Identifier: application/vnd.app.input_summary+json; view=default
-type InputSummary struct {
-	ID       int                              `form:"id" json:"id" xml:"id"`
-	Name     string                           `form:"name" json:"name" xml:"name"`
-	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
-	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
-}
-
-// Validate validates the InputSummary media type instance.
-func (mt *InputSummary) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	if mt.Temporal == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "temporal"))
-	}
-	if mt.Spatial == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
-	}
-	if err2 := mt.Spatial.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	if err2 := mt.Temporal.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
-// InputToken media type (default view)
-//
-// Identifier: application/vnd.app.input_token+json; view=default
-type InputToken struct {
-	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID           int    `form:"id" json:"id" xml:"id"`
-	Token        string `form:"token" json:"token" xml:"token"`
-}
-
-// Validate validates the InputToken media type instance.
-func (mt *InputToken) Validate() (err error) {
-
-	if mt.Token == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
-	}
-
-	return
-}
-
-// InputTokenCollection is the media type for an array of InputToken (default view)
-//
-// Identifier: application/vnd.app.input_token+json; type=collection; view=default
-type InputTokenCollection []*InputToken
-
-// Validate validates the InputTokenCollection media type instance.
-func (mt InputTokenCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// InputTokens media type (default view)
-//
-// Identifier: application/vnd.app.input_tokens+json; view=default
-type InputTokens struct {
-	InputTokens InputTokenCollection `form:"inputTokens" json:"inputTokens" xml:"inputTokens"`
-}
-
-// Validate validates the InputTokens media type instance.
-func (mt *InputTokens) Validate() (err error) {
-	if mt.InputTokens == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "inputTokens"))
-	}
-	if err2 := mt.InputTokens.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
-// Inputs media type (default view)
-//
-// Identifier: application/vnd.app.inputs+json; view=default
-type Inputs struct {
-	DeviceInputs         DeviceInputCollection         `form:"deviceInputs,omitempty" json:"deviceInputs,omitempty" xml:"deviceInputs,omitempty"`
-	TwitterAccountInputs TwitterAccountInputCollection `form:"twitterAccountInputs,omitempty" json:"twitterAccountInputs,omitempty" xml:"twitterAccountInputs,omitempty"`
-}
-
-// Validate validates the Inputs media type instance.
-func (mt *Inputs) Validate() (err error) {
-	if err2 := mt.DeviceInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	if err2 := mt.TwitterAccountInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
 // Location media type (default view)
 //
 // Identifier: application/vnd.app.location+json; view=default
@@ -764,6 +639,131 @@ func (mt *Projects) Validate() (err error) {
 	return
 }
 
+// Source media type (default view)
+//
+// Identifier: application/vnd.app.source+json; view=default
+type Source struct {
+	Active       *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Name         string `form:"name" json:"name" xml:"name"`
+	TeamID       *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID       *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
+// Validate validates the Source media type instance.
+func (mt *Source) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// SourceSummary media type (default view)
+//
+// Identifier: application/vnd.app.source_summary+json; view=default
+type SourceSummary struct {
+	ID       int                              `form:"id" json:"id" xml:"id"`
+	Name     string                           `form:"name" json:"name" xml:"name"`
+	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
+	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
+}
+
+// Validate validates the SourceSummary media type instance.
+func (mt *SourceSummary) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Temporal == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "temporal"))
+	}
+	if mt.Spatial == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
+	}
+	if err2 := mt.Spatial.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Temporal.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// SourceToken media type (default view)
+//
+// Identifier: application/vnd.app.source_token+json; view=default
+type SourceToken struct {
+	ExpeditionID int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID           int    `form:"id" json:"id" xml:"id"`
+	Token        string `form:"token" json:"token" xml:"token"`
+}
+
+// Validate validates the SourceToken media type instance.
+func (mt *SourceToken) Validate() (err error) {
+
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+
+	return
+}
+
+// SourceTokenCollection is the media type for an array of SourceToken (default view)
+//
+// Identifier: application/vnd.app.source_token+json; type=collection; view=default
+type SourceTokenCollection []*SourceToken
+
+// Validate validates the SourceTokenCollection media type instance.
+func (mt SourceTokenCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// SourceTokens media type (default view)
+//
+// Identifier: application/vnd.app.source_tokens+json; view=default
+type SourceTokens struct {
+	SourceTokens SourceTokenCollection `form:"sourceTokens" json:"sourceTokens" xml:"sourceTokens"`
+}
+
+// Validate validates the SourceTokens media type instance.
+func (mt *SourceTokens) Validate() (err error) {
+	if mt.SourceTokens == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "sourceTokens"))
+	}
+	if err2 := mt.SourceTokens.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// Sources media type (default view)
+//
+// Identifier: application/vnd.app.sources+json; view=default
+type Sources struct {
+	DeviceSources         DeviceSourceCollection         `form:"deviceSources,omitempty" json:"deviceSources,omitempty" xml:"deviceSources,omitempty"`
+	TwitterAccountSources TwitterAccountSourceCollection `form:"twitterAccountSources,omitempty" json:"twitterAccountSources,omitempty" xml:"twitterAccountSources,omitempty"`
+}
+
+// Validate validates the Sources media type instance.
+func (mt *Sources) Validate() (err error) {
+	if err2 := mt.DeviceSources.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.TwitterAccountSources.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default
@@ -836,10 +836,28 @@ func (mt *Teams) Validate() (err error) {
 	return
 }
 
-// TwitterAccountInput media type (default view)
+// TwitterAccountSources media type (default view)
 //
-// Identifier: application/vnd.app.twitter_account_input+json; view=default
-type TwitterAccountInput struct {
+// Identifier: application/vnd.app.twitter_account_intputs+json; view=default
+type TwitterAccountSources struct {
+	TwitterAccountSources TwitterAccountSourceCollection `form:"twitterAccountSources" json:"twitterAccountSources" xml:"twitterAccountSources"`
+}
+
+// Validate validates the TwitterAccountSources media type instance.
+func (mt *TwitterAccountSources) Validate() (err error) {
+	if mt.TwitterAccountSources == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitterAccountSources"))
+	}
+	if err2 := mt.TwitterAccountSources.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// TwitterAccountSource media type (default view)
+//
+// Identifier: application/vnd.app.twitter_account_source+json; view=default
+type TwitterAccountSource struct {
 	ExpeditionID     int    `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
 	ID               int    `form:"id" json:"id" xml:"id"`
 	Name             string `form:"name" json:"name" xml:"name"`
@@ -849,8 +867,8 @@ type TwitterAccountInput struct {
 	UserID           *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
-// Validate validates the TwitterAccountInput media type instance.
-func (mt *TwitterAccountInput) Validate() (err error) {
+// Validate validates the TwitterAccountSource media type instance.
+func (mt *TwitterAccountSource) Validate() (err error) {
 
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
@@ -862,37 +880,19 @@ func (mt *TwitterAccountInput) Validate() (err error) {
 	return
 }
 
-// TwitterAccountInputCollection is the media type for an array of TwitterAccountInput (default view)
+// TwitterAccountSourceCollection is the media type for an array of TwitterAccountSource (default view)
 //
-// Identifier: application/vnd.app.twitter_account_input+json; type=collection; view=default
-type TwitterAccountInputCollection []*TwitterAccountInput
+// Identifier: application/vnd.app.twitter_account_source+json; type=collection; view=default
+type TwitterAccountSourceCollection []*TwitterAccountSource
 
-// Validate validates the TwitterAccountInputCollection media type instance.
-func (mt TwitterAccountInputCollection) Validate() (err error) {
+// Validate validates the TwitterAccountSourceCollection media type instance.
+func (mt TwitterAccountSourceCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
-	}
-	return
-}
-
-// TwitterAccountInputs media type (default view)
-//
-// Identifier: application/vnd.app.twitter_account_intputs+json; view=default
-type TwitterAccountInputs struct {
-	TwitterAccountInputs TwitterAccountInputCollection `form:"twitterAccountInputs" json:"twitterAccountInputs" xml:"twitterAccountInputs"`
-}
-
-// Validate validates the TwitterAccountInputs media type instance.
-func (mt *TwitterAccountInputs) Validate() (err error) {
-	if mt.TwitterAccountInputs == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "twitterAccountInputs"))
-	}
-	if err2 := mt.TwitterAccountInputs.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
 	}
 	return
 }

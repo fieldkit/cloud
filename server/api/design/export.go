@@ -6,12 +6,12 @@ import (
 )
 
 var _ = Resource("Export", func() {
-	Action("list by input", func() {
-		Routing(GET("inputs/:inputId/csv"))
-		Description("Export data for an input.")
+	Action("list by source", func() {
+		Routing(GET("sources/:sourceId/csv"))
+		Description("Export data for an source.")
 		Params(func() {
-			Param("inputId", Integer)
-			Required("inputId")
+			Param("sourceId", Integer)
+			Required("sourceId")
 		})
 		Response(BadRequest)
 		Response(OK)

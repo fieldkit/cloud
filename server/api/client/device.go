@@ -20,11 +20,11 @@ import (
 func AddDevicePath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expeditions/%s/inputs/devices", param0)
+	return fmt.Sprintf("/expeditions/%s/sources/devices", param0)
 }
 
-// Add a Device input
-func (c *Client) AddDevice(ctx context.Context, path string, payload *AddDeviceInputPayload) (*http.Response, error) {
+// Add a Device source
+func (c *Client) AddDevice(ctx context.Context, path string, payload *AddDeviceSourcePayload) (*http.Response, error) {
 	req, err := c.NewAddDeviceRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *Client) AddDevice(ctx context.Context, path string, payload *AddDeviceI
 }
 
 // NewAddDeviceRequest create the request corresponding to the add action endpoint of the device resource.
-func (c *Client) NewAddDeviceRequest(ctx context.Context, path string, payload *AddDeviceInputPayload) (*http.Request, error) {
+func (c *Client) NewAddDeviceRequest(ctx context.Context, path string, payload *AddDeviceSourcePayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {
@@ -62,10 +62,10 @@ func (c *Client) NewAddDeviceRequest(ctx context.Context, path string, payload *
 func GetIDDevicePath(id int) string {
 	param0 := strconv.Itoa(id)
 
-	return fmt.Sprintf("/inputs/devices/%s", param0)
+	return fmt.Sprintf("/sources/devices/%s", param0)
 }
 
-// Get a Device input
+// Get a Device source
 func (c *Client) GetIDDevice(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewGetIDDeviceRequest(ctx, path)
 	if err != nil {
@@ -98,10 +98,10 @@ func ListDevicePath(project string, expedition string) string {
 	param0 := project
 	param1 := expedition
 
-	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/inputs/devices", param0, param1)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/sources/devices", param0, param1)
 }
 
-// List an expedition's Device inputs
+// List an expedition's Device sources
 func (c *Client) ListDevice(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListDeviceRequest(ctx, path)
 	if err != nil {
@@ -133,11 +133,11 @@ func (c *Client) NewListDeviceRequest(ctx context.Context, path string) (*http.R
 func UpdateDevicePath(id int) string {
 	param0 := strconv.Itoa(id)
 
-	return fmt.Sprintf("/inputs/devices/%s", param0)
+	return fmt.Sprintf("/sources/devices/%s", param0)
 }
 
-// Update an Device input
-func (c *Client) UpdateDevice(ctx context.Context, path string, payload *UpdateDeviceInputPayload) (*http.Response, error) {
+// Update an Device source
+func (c *Client) UpdateDevice(ctx context.Context, path string, payload *UpdateDeviceSourcePayload) (*http.Response, error) {
 	req, err := c.NewUpdateDeviceRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (c *Client) UpdateDevice(ctx context.Context, path string, payload *UpdateD
 }
 
 // NewUpdateDeviceRequest create the request corresponding to the update action endpoint of the device resource.
-func (c *Client) NewUpdateDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputPayload) (*http.Request, error) {
+func (c *Client) NewUpdateDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceSourcePayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {
@@ -175,11 +175,11 @@ func (c *Client) NewUpdateDeviceRequest(ctx context.Context, path string, payloa
 func UpdateLocationDevicePath(id int) string {
 	param0 := strconv.Itoa(id)
 
-	return fmt.Sprintf("/inputs/devices/%s/location", param0)
+	return fmt.Sprintf("/sources/devices/%s/location", param0)
 }
 
-// Update an Device input location
-func (c *Client) UpdateLocationDevice(ctx context.Context, path string, payload *UpdateDeviceInputLocationPayload) (*http.Response, error) {
+// Update an Device source location
+func (c *Client) UpdateLocationDevice(ctx context.Context, path string, payload *UpdateDeviceSourceLocationPayload) (*http.Response, error) {
 	req, err := c.NewUpdateLocationDeviceRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ func (c *Client) UpdateLocationDevice(ctx context.Context, path string, payload 
 }
 
 // NewUpdateLocationDeviceRequest create the request corresponding to the update location action endpoint of the device resource.
-func (c *Client) NewUpdateLocationDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputLocationPayload) (*http.Request, error) {
+func (c *Client) NewUpdateLocationDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceSourceLocationPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {
@@ -217,11 +217,11 @@ func (c *Client) NewUpdateLocationDeviceRequest(ctx context.Context, path string
 func UpdateSchemaDevicePath(id int) string {
 	param0 := strconv.Itoa(id)
 
-	return fmt.Sprintf("/inputs/devices/%s/schemas", param0)
+	return fmt.Sprintf("/sources/devices/%s/schemas", param0)
 }
 
-// Update an Device input schema
-func (c *Client) UpdateSchemaDevice(ctx context.Context, path string, payload *UpdateDeviceInputSchemaPayload) (*http.Response, error) {
+// Update an Device source schema
+func (c *Client) UpdateSchemaDevice(ctx context.Context, path string, payload *UpdateDeviceSourceSchemaPayload) (*http.Response, error) {
 	req, err := c.NewUpdateSchemaDeviceRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func (c *Client) UpdateSchemaDevice(ctx context.Context, path string, payload *U
 }
 
 // NewUpdateSchemaDeviceRequest create the request corresponding to the update schema action endpoint of the device resource.
-func (c *Client) NewUpdateSchemaDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceInputSchemaPayload) (*http.Request, error) {
+func (c *Client) NewUpdateSchemaDeviceRequest(ctx context.Context, path string, payload *UpdateDeviceSourceSchemaPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {

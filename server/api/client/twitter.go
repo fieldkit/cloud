@@ -20,11 +20,11 @@ import (
 func AddTwitterPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expeditions/%s/inputs/twitter-accounts", param0)
+	return fmt.Sprintf("/expeditions/%s/sources/twitter-accounts", param0)
 }
 
-// Add a Twitter account input
-func (c *Client) AddTwitter(ctx context.Context, path string, payload *AddTwitterAccountInputPayload) (*http.Response, error) {
+// Add a Twitter account source
+func (c *Client) AddTwitter(ctx context.Context, path string, payload *AddTwitterAccountSourcePayload) (*http.Response, error) {
 	req, err := c.NewAddTwitterRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *Client) AddTwitter(ctx context.Context, path string, payload *AddTwitte
 }
 
 // NewAddTwitterRequest create the request corresponding to the add action endpoint of the twitter resource.
-func (c *Client) NewAddTwitterRequest(ctx context.Context, path string, payload *AddTwitterAccountInputPayload) (*http.Request, error) {
+func (c *Client) NewAddTwitterRequest(ctx context.Context, path string, payload *AddTwitterAccountSourcePayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {
@@ -94,13 +94,13 @@ func (c *Client) NewCallbackTwitterRequest(ctx context.Context, path string, oau
 }
 
 // GetIDTwitterPath computes a request path to the get id action of twitter.
-func GetIDTwitterPath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
+func GetIDTwitterPath(sourceID int) string {
+	param0 := strconv.Itoa(sourceID)
 
-	return fmt.Sprintf("/inputs/twitter-accounts/%s", param0)
+	return fmt.Sprintf("/sources/twitter-accounts/%s", param0)
 }
 
-// Get a Twitter account input
+// Get a Twitter account source
 func (c *Client) GetIDTwitter(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewGetIDTwitterRequest(ctx, path)
 	if err != nil {
@@ -133,10 +133,10 @@ func ListTwitterPath(project string, expedition string) string {
 	param0 := project
 	param1 := expedition
 
-	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/inputs/twitter-accounts", param0, param1)
+	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/sources/twitter-accounts", param0, param1)
 }
 
-// List an expedition's Twitter account inputs
+// List an expedition's Twitter account sources
 func (c *Client) ListTwitter(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListTwitterRequest(ctx, path)
 	if err != nil {
@@ -168,10 +168,10 @@ func (c *Client) NewListTwitterRequest(ctx context.Context, path string) (*http.
 func ListIDTwitterPath(expeditionID int) string {
 	param0 := strconv.Itoa(expeditionID)
 
-	return fmt.Sprintf("/expeditions/%s/inputs/twitter-accounts", param0)
+	return fmt.Sprintf("/expeditions/%s/sources/twitter-accounts", param0)
 }
 
-// List an expedition's Twitter account inputs
+// List an expedition's Twitter account sources
 func (c *Client) ListIDTwitter(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListIDTwitterRequest(ctx, path)
 	if err != nil {

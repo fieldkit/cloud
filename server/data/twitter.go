@@ -1,7 +1,7 @@
 package data
 
 type TwitterOAuth struct {
-	InputID       int32  `db:"input_id"`
+	SourceID      int32  `db:"source_id"`
 	RequestToken  string `db:"request_token"`
 	RequestSecret string `db:"request_secret"`
 }
@@ -13,7 +13,7 @@ type TwitterAccount struct {
 	AccessSecret     string `db:"access_secret"`
 }
 
-type TwitterAccountInput struct {
-	Input
+type TwitterAccountSource struct {
+	Source
 	TwitterAccount
 }

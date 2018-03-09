@@ -78,28 +78,28 @@ func Twitter(options TwitterOptions) {
 			location := data.NewLocation([]float64{coordinates[0], coordinates[1]})
 
 			ctx := context.Background()
-			twitterAccountInputs, err := options.Backend.ListTwitterAccountInputsByAccountID(ctx, tweet.User.ID)
+			twitterAccountSources, err := options.Backend.ListTwitterAccountSourcesByAccountID(ctx, tweet.User.ID)
 			if err != nil {
-				log.Println("!", "twitter account inputs error:", err)
+				log.Println("!", "twitter account sources error:", err)
 				continue
 			}
 
-			for _, twitterAccountInput := range twitterAccountInputs {
-				document := &data.Document{
+			for _, twitterAccountSource := range twitterAccountSources {
+				record := &data.Record{
 					SchemaID:  schemaID,
-					InputID:   twitterAccountInput.ID,
-					TeamID:    twitterAccountInput.TeamID,
-					UserID:    twitterAccountInput.UserID,
+					SourceID:  twitterAccountSource.ID,
+					TeamID:    twitterAccountSource.TeamID,
+					UserID:    twitterAccountSource.UserID,
 					Timestamp: timestamp,
 					Location:  location,
 				}
 
-				if err := document.Data.UnmarshalJSON(tweetData.Bytes()); err != nil {
-					log.Println("!", "document data error:", err)
+				if err := record.Data.UnmarshalJSON(tweetData.Bytes()); err != nil {
+					log.Println("!", "record data error:", err)
 				}
 
-				if err := options.Backend.AddDocument(ctx, document); err != nil {
-					log.Println("!", "document error:", err)
+				if err := options.Backend.AddRecord(ctx, record); err != nil {
+					log.Println("!", "record error:", err)
 				}
 			}
 		}

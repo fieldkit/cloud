@@ -15,24 +15,24 @@ import (
 	"strconv"
 )
 
-// ListByInputExportPath computes a request path to the list by input action of Export.
-func ListByInputExportPath(inputID int) string {
-	param0 := strconv.Itoa(inputID)
+// ListBySourceExportPath computes a request path to the list by source action of Export.
+func ListBySourceExportPath(sourceID int) string {
+	param0 := strconv.Itoa(sourceID)
 
-	return fmt.Sprintf("/inputs/%s/csv", param0)
+	return fmt.Sprintf("/sources/%s/csv", param0)
 }
 
-// Export data for an input.
-func (c *Client) ListByInputExport(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListByInputExportRequest(ctx, path)
+// Export data for an source.
+func (c *Client) ListBySourceExport(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListBySourceExportRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewListByInputExportRequest create the request corresponding to the list by input action endpoint of the Export resource.
-func (c *Client) NewListByInputExportRequest(ctx context.Context, path string) (*http.Request, error) {
+// NewListBySourceExportRequest create the request corresponding to the list by source action endpoint of the Export resource.
+func (c *Client) NewListBySourceExportRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

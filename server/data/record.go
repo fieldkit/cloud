@@ -48,10 +48,10 @@ func (l *Location) String() string {
 	return l.point.String()
 }
 
-type Document struct {
+type Record struct {
 	ID        int64          `db:"id,omitempty"`
 	SchemaID  int32          `db:"schema_id"`
-	InputID   int32          `db:"input_id"`
+	SourceID  int32          `db:"source_id"`
 	TeamID    *int32         `db:"team_id"`
 	UserID    *int32         `db:"user_id"`
 	Insertion time.Time      `db:"insertion"`
@@ -62,11 +62,11 @@ type Document struct {
 	Visible   bool           `db:"visible"`
 }
 
-type DocumentsPage struct {
-	Documents []*Document
+type RecordsPage struct {
+	Records []*Record
 }
 
-func (d *Document) SetData(data interface{}) error {
+func (d *Record) SetData(data interface{}) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (d *Document) SetData(data interface{}) error {
 	return nil
 }
 
-func (d *Document) GetRawFields() (fields map[string]string, err error) {
+func (d *Record) GetRawFields() (fields map[string]string, err error) {
 	err = json.Unmarshal(d.Data, &fields)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (d *Document) GetRawFields() (fields map[string]string, err error) {
 	return
 }
 
-func (d *Document) GetParsedFields() (fields map[string]interface{}, err error) {
+func (d *Record) GetParsedFields() (fields map[string]interface{}, err error) {
 	raw, err := d.GetRawFields()
 	if err != nil {
 		return nil, err

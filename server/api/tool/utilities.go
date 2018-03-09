@@ -9,8 +9,8 @@ import (
 	"net/http"
 )
 
-func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceInput, longitude, latitude float64) error {
-	updateLocationPayload := fk.UpdateDeviceInputLocationPayload{
+func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceSource, longitude, latitude float64) error {
+	updateLocationPayload := fk.UpdateDeviceSourceLocationPayload{
 		Longitude: longitude,
 		Latitude:  latitude,
 	}
@@ -19,7 +19,7 @@ func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceInput, l
 		log.Fatalf("Error updating device location: %v", err)
 	}
 
-	updated, err := c.DecodeDeviceInput(res)
+	updated, err := c.DecodeDeviceSource(res)
 	if err != nil {
 		log.Fatalf("Error adding device location: %v", err)
 	}
@@ -29,7 +29,7 @@ func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceInput, l
 	return nil
 }
 
-func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceInput, err error) {
+func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceSource, err error) {
 	res, err := c.ListProject(ctx, fk.ListProjectPath())
 	if err != nil {
 		log.Fatalf("Error listing projects: %v", err)
@@ -59,13 +59,13 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 				if err != nil {
 					log.Fatalf("%v", err)
 				}
-				devices, err := c.DecodeDeviceInputs(res)
+				devices, err := c.DecodeDeviceSources(res)
 				if err != nil {
 					log.Fatalf("%v", err)
 				}
 
-				var theDevice *fk.DeviceInput
-				for _, device := range devices.DeviceInputs {
+				var theDevice *fk.DeviceSource
+				for _, device := range devices.DeviceSources {
 					log.Printf("Device: %+v\n", *device)
 
 					if device.Name == deviceName {
@@ -76,7 +76,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 				if theDevice == nil {
 					log.Printf("Creating new Device %v", deviceName)
 
-					addPayload := fk.AddDeviceInputPayload{
+					addPayload := fk.AddDeviceSourcePayload{
 						Name: deviceName,
 						Key:  deviceId,
 					}
@@ -85,7 +85,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 						log.Fatalf("Error adding device: %v", err)
 					}
 
-					added, err := c.DecodeDeviceInput(res)
+					added, err := c.DecodeDeviceSource(res)
 					if err != nil {
 						log.Fatalf("Error adding device: %v", err)
 					}
@@ -95,7 +95,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 					if deviceId != "" && theDevice.Key != deviceId {
 						log.Printf("Device id/key is different (%s != %s) fixing...", deviceId, theDevice.Key)
 
-						updatePayload := fk.UpdateDeviceInputPayload{
+						updatePayload := fk.UpdateDeviceSourcePayload{
 							Name: deviceName,
 							Key:  deviceId,
 						}
@@ -104,7 +104,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 							log.Fatalf("Error updating device: %v", err)
 						}
 
-						updated, err := c.DecodeDeviceInput(res)
+						updated, err := c.DecodeDeviceSource(res)
 						if err != nil {
 							log.Fatalf("Error adding device: %v", err)
 						}
@@ -114,7 +114,7 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 
 				}
 
-				schema := fk.UpdateDeviceInputSchemaPayload{
+				schema := fk.UpdateDeviceSourceSchemaPayload{
 					Active:     true,
 					Key:        streamName,
 					JSONSchema: `{ "UseProviderTime": true, "UseProviderLocation": true }`,

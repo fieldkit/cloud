@@ -5,9 +5,9 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var DeviceInput = MediaType("application/vnd.app.device_input+json", func() {
-	TypeName("DeviceInput")
-	Reference(Input)
+var DeviceSource = MediaType("application/vnd.app.device_source+json", func() {
+	TypeName("DeviceSource")
+	Reference(Source)
 	Attributes(func() {
 		Attribute("id")
 		Attribute("expeditionId")
@@ -84,35 +84,35 @@ var DeviceSchemas = MediaType("application/vnd.app.device_schemas+json", func() 
 	})
 })
 
-var DeviceInputs = MediaType("application/vnd.app.device_inputs+json", func() {
-	TypeName("DeviceInputs")
+var DeviceSources = MediaType("application/vnd.app.device_sources+json", func() {
+	TypeName("DeviceSources")
 	Attributes(func() {
-		Attribute("deviceInputs", CollectionOf(DeviceInput))
-		Required("deviceInputs")
+		Attribute("deviceSources", CollectionOf(DeviceSource))
+		Required("deviceSources")
 	})
 	View("default", func() {
-		Attribute("deviceInputs")
+		Attribute("deviceSources")
 	})
 })
 
-var AddDeviceInputPayload = Type("AddDeviceInputPayload", func() {
-	Reference(Input)
+var AddDeviceSourcePayload = Type("AddDeviceSourcePayload", func() {
+	Reference(Source)
 	Attribute("name")
 	Required("name")
 	Attribute("key")
 	Required("key")
 })
 
-var UpdateDeviceInputPayload = Type("UpdateDeviceInputPayload", func() {
-	Reference(Input)
+var UpdateDeviceSourcePayload = Type("UpdateDeviceSourcePayload", func() {
+	Reference(Source)
 	Attribute("name")
 	Required("name")
 	Attribute("key")
 	Required("key")
 })
 
-var UpdateDeviceInputSchemaPayload = Type("UpdateDeviceInputSchemaPayload", func() {
-	Reference(Input)
+var UpdateDeviceSourceSchemaPayload = Type("UpdateDeviceSourceSchemaPayload", func() {
+	Reference(Source)
 	Attribute("key")
 	Required("key")
 	Attribute("active")
@@ -121,8 +121,8 @@ var UpdateDeviceInputSchemaPayload = Type("UpdateDeviceInputSchemaPayload", func
 	Required("jsonSchema")
 })
 
-var UpdateDeviceInputLocationPayload = Type("UpdateDeviceInputLocationPayload", func() {
-	Reference(Input)
+var UpdateDeviceSourceLocationPayload = Type("UpdateDeviceSourceLocationPayload", func() {
+	Reference(Source)
 	Attribute("key")
 	Required("key")
 	Attribute("longitude", Number)
@@ -137,55 +137,55 @@ var _ = Resource("device", func() {
 	})
 
 	Action("add", func() {
-		Routing(POST("expeditions/:expeditionId/inputs/devices"))
-		Description("Add a Device input")
+		Routing(POST("expeditions/:expeditionId/sources/devices"))
+		Description("Add a Device source")
 		Params(func() {
 			Param("expeditionId", Integer)
 			Required("expeditionId")
 		})
-		Payload(AddDeviceInputPayload)
+		Payload(AddDeviceSourcePayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSource)
 		})
 	})
 
 	Action("update", func() {
-		Routing(PATCH("inputs/devices/:id"))
-		Description("Update an Device input")
+		Routing(PATCH("sources/devices/:id"))
+		Description("Update an Device source")
 		Params(func() {
 			Param("id", Integer)
 			Required("id")
 		})
-		Payload(UpdateDeviceInputPayload)
+		Payload(UpdateDeviceSourcePayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSource)
 		})
 	})
 
 	Action("update location", func() {
-		Routing(PATCH("inputs/devices/:id/location"))
-		Description("Update an Device input location")
+		Routing(PATCH("sources/devices/:id/location"))
+		Description("Update an Device source location")
 		Params(func() {
 			Param("id", Integer)
 			Required("id")
 		})
-		Payload(UpdateDeviceInputLocationPayload)
+		Payload(UpdateDeviceSourceLocationPayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSource)
 		})
 	})
 
 	Action("update schema", func() {
-		Routing(PATCH("inputs/devices/:id/schemas"))
-		Description("Update an Device input schema")
+		Routing(PATCH("sources/devices/:id/schemas"))
+		Description("Update an Device source schema")
 		Params(func() {
 			Param("id", Integer)
 			Required("id")
 		})
-		Payload(UpdateDeviceInputSchemaPayload)
+		Payload(UpdateDeviceSourceSchemaPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(DeviceSchemas)
@@ -193,28 +193,28 @@ var _ = Resource("device", func() {
 	})
 
 	Action("get id", func() {
-		Routing(GET("inputs/devices/:id"))
-		Description("Get a Device input")
+		Routing(GET("sources/devices/:id"))
+		Description("Get a Device source")
 		Params(func() {
 			Param("id", Integer)
 			Required("id")
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInput)
+			Media(DeviceSource)
 		})
 	})
 
 	Action("list", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/inputs/devices"))
-		Description("List an expedition's Device inputs")
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/sources/devices"))
+		Description("List an expedition's Device sources")
 		Params(func() {
 			Param("project", String, ProjectSlug)
 			Param("expedition", String, ExpeditionSlug)
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(DeviceInputs)
+			Media(DeviceSources)
 		})
 	})
 })

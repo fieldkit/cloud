@@ -59,7 +59,7 @@ func (j *NaiveBackgroundJobs) Start() error {
 		}
 	}()
 
-	devices, err := j.be.ListAllDeviceInputs(ctx)
+	devices, err := j.be.ListAllDeviceSources(ctx)
 	if err != nil {
 		return err
 	}

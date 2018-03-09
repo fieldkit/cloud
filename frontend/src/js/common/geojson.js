@@ -81,11 +81,11 @@ export class FkGeoJSON {
     }
 
     getUniqueSourceIds() {
-        return _(this.features).map(f => f.unwrap()).map('properties').map('source').map('inputId').uniq().value();
+        return _(this.features).map(f => f.unwrap()).map('properties').map('source').map('sourceId').uniq().value();
     }
 
     getSourcesSummary() {
-        return _(this.features).map(f => f.unwrap()).groupBy(f => f.properties.source.inputId).mapValues((value) => {
+        return _(this.features).map(f => f.unwrap()).groupBy(f => f.properties.source.sourceId).mapValues((value) => {
             const sorted = _(value).sortBy(f => f.properties.timestamp).value();
             const lastFeature = sorted[sorted.length - 1];
             return {

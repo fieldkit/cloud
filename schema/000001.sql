@@ -76,18 +76,18 @@ CREATE TABLE fieldkit.team_user (
 	PRIMARY KEY (team_id, user_id)
 );
 
--- input
+-- source
 
-CREATE TABLE fieldkit.input (
+CREATE TABLE fieldkit.source (
 	id serial PRIMARY KEY,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL,
 	name varchar(256) NOT NULL,
-	team_id int REFERENCES fieldkit.team (id), 
+	team_id int REFERENCES fieldkit.team (id),
 	user_id int REFERENCES fieldkit.user (id),
 	active boolean NOT NULL DEFAULT false
 );
 
-CREATE TABLE fieldkit.input_token (
+CREATE TABLE fieldkit.source_token (
 	id serial PRIMARY KEY,
 	token bytea NOT NULL UNIQUE,
 	expedition_id integer REFERENCES fieldkit.expedition (id) NOT NULL
@@ -96,7 +96,7 @@ CREATE TABLE fieldkit.input_token (
 -- twitter
 
 CREATE TABLE fieldkit.twitter_oauth (
-	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+	source_id int REFERENCES fieldkit.source (id) ON DELETE CASCADE PRIMARY KEY,
 	request_token varchar NOT NULL UNIQUE,
 	request_secret varchar NOT NULL
 );
@@ -108,8 +108,8 @@ CREATE TABLE fieldkit.twitter_account (
 	access_secret varchar NOT NULL
 );
 
-CREATE TABLE fieldkit.input_twitter_account (
-	input_id int REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+CREATE TABLE fieldkit.source_twitter_account (
+	source_id int REFERENCES fieldkit.source (id) ON DELETE CASCADE PRIMARY KEY,
 	twitter_account_id bigint REFERENCES fieldkit.twitter_account (id) ON DELETE CASCADE NOT NULL
 );
 
@@ -137,7 +137,7 @@ CREATE UNIQUE INDEX ON fieldkit.raw_message (origin_id);
 -- device
 
 CREATE TABLE fieldkit.device (
-    input_id integer REFERENCES fieldkit.input (id) ON DELETE CASCADE PRIMARY KEY,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE PRIMARY KEY,
     key varchar NOT NULL,
     token bytea NOT NULL
 );
@@ -148,7 +148,7 @@ CREATE UNIQUE INDEX ON fieldkit.device (token);
 
 CREATE TABLE fieldkit.device_schema (
     id serial PRIMARY KEY,
-    device_id integer REFERENCES fieldkit.device (input_id) ON DELETE CASCADE,
+    device_id integer REFERENCES fieldkit.device (source_id) ON DELETE CASCADE,
     schema_id integer REFERENCES fieldkit.schema (id) ON DELETE CASCADE,
     key varchar
 );
@@ -158,17 +158,17 @@ CREATE UNIQUE INDEX ON fieldkit.device_schema (device_id, schema_id);
 CREATE TABLE fieldkit.device_location (
   id serial PRIMARY KEY,
   timestamp timestamp NOT NULL,
-  device_id integer REFERENCES fieldkit.device (input_id) NOT NULL,
+  device_id integer REFERENCES fieldkit.device (source_id) NOT NULL,
   location geometry(POINT, 4326) NOT NULL
 );
 
 CREATE INDEX ON fieldkit.device_location (device_id, timestamp);
 
--- documents
+-- records
 
-CREATE TABLE fieldkit.document (
+CREATE TABLE fieldkit.record (
 	id bigserial PRIMARY KEY,
-	input_id int REFERENCES fieldkit.input (id) NOT NULL,
+	source_id int REFERENCES fieldkit.source (id) NOT NULL,
 	schema_id int REFERENCES fieldkit.schema (id) NOT NULL,
 	team_id int REFERENCES fieldkit.team (id),
 	user_id int REFERENCES fieldkit.user (id),
@@ -180,8 +180,8 @@ CREATE TABLE fieldkit.document (
 	data jsonb NOT NULL
 );
 
-CREATE INDEX ON fieldkit.document (timestamp, input_id);
-CREATE INDEX ON fieldkit.document USING GIST (location);
+CREATE INDEX ON fieldkit.record (timestamp, source_id);
+CREATE INDEX ON fieldkit.record USING GIST (location);
 
 -- user
 

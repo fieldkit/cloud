@@ -38,7 +38,7 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 	if err := ds.db.SelectContext(context.TODO(), &locations, `
                   SELECT l.timestamp, ST_AsBinary(l.location) AS location
                   FROM fieldkit.device_location AS l
-                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC`, devices[0].InputID); err != nil {
+                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC`, devices[0].SourceID); err != nil {
 		return nil, err
 	}
 
@@ -66,7 +66,7 @@ func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Lo
 	}
 
 	dl := data.DeviceLocation{
-		DeviceID:  devices[0].InputID,
+		DeviceID:  devices[0].SourceID,
 		Timestamp: l.UpdatedAt,
 		Location:  data.NewLocation(l.Coordinates),
 	}
@@ -90,7 +90,7 @@ func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}
 	schemas := []*data.DeviceJSONSchema{}
 	if err := ds.db.SelectContext(context.TODO(), &schemas, `
                   SELECT ds.*, s.* FROM fieldkit.device AS d
-                  JOIN fieldkit.device_schema AS ds ON (d.input_id = ds.device_id)
+                  JOIN fieldkit.device_schema AS ds ON (d.source_id = ds.device_id)
                   JOIN fieldkit.schema AS s ON (ds.schema_id = s.id)
                   WHERE d.key = $1`, id.Device.String()); err != nil {
 		return nil, err

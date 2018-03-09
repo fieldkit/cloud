@@ -39,14 +39,14 @@ type AddAdministratorPayload struct {
 	UserID int `form:"userId" json:"userId" xml:"userId"`
 }
 
-// addDeviceInputPayload user type.
-type addDeviceInputPayload struct {
+// addDeviceSourcePayload user type.
+type addDeviceSourcePayload struct {
 	Key  *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
-// Validate validates the addDeviceInputPayload type instance.
-func (ut *addDeviceInputPayload) Validate() (err error) {
+// Validate validates the addDeviceSourcePayload type instance.
+func (ut *addDeviceSourcePayload) Validate() (err error) {
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
 	}
@@ -56,9 +56,9 @@ func (ut *addDeviceInputPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates AddDeviceInputPayload from addDeviceInputPayload
-func (ut *addDeviceInputPayload) Publicize() *AddDeviceInputPayload {
-	var pub AddDeviceInputPayload
+// Publicize creates AddDeviceSourcePayload from addDeviceSourcePayload
+func (ut *addDeviceSourcePayload) Publicize() *AddDeviceSourcePayload {
+	var pub AddDeviceSourcePayload
 	if ut.Key != nil {
 		pub.Key = *ut.Key
 	}
@@ -68,14 +68,14 @@ func (ut *addDeviceInputPayload) Publicize() *AddDeviceInputPayload {
 	return &pub
 }
 
-// AddDeviceInputPayload user type.
-type AddDeviceInputPayload struct {
+// AddDeviceSourcePayload user type.
+type AddDeviceSourcePayload struct {
 	Key  string `form:"key" json:"key" xml:"key"`
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
-// Validate validates the AddDeviceInputPayload type instance.
-func (ut *AddDeviceInputPayload) Validate() (err error) {
+// Validate validates the AddDeviceSourcePayload type instance.
+func (ut *AddDeviceSourcePayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
@@ -364,35 +364,35 @@ func (ut *AddTeamPayload) Validate() (err error) {
 	return
 }
 
-// addTwitterAccountInputPayload user type.
-type addTwitterAccountInputPayload struct {
+// addTwitterAccountSourcePayload user type.
+type addTwitterAccountSourcePayload struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
-// Validate validates the addTwitterAccountInputPayload type instance.
-func (ut *addTwitterAccountInputPayload) Validate() (err error) {
+// Validate validates the addTwitterAccountSourcePayload type instance.
+func (ut *addTwitterAccountSourcePayload) Validate() (err error) {
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
 	}
 	return
 }
 
-// Publicize creates AddTwitterAccountInputPayload from addTwitterAccountInputPayload
-func (ut *addTwitterAccountInputPayload) Publicize() *AddTwitterAccountInputPayload {
-	var pub AddTwitterAccountInputPayload
+// Publicize creates AddTwitterAccountSourcePayload from addTwitterAccountSourcePayload
+func (ut *addTwitterAccountSourcePayload) Publicize() *AddTwitterAccountSourcePayload {
+	var pub AddTwitterAccountSourcePayload
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
 	return &pub
 }
 
-// AddTwitterAccountInputPayload user type.
-type AddTwitterAccountInputPayload struct {
+// AddTwitterAccountSourcePayload user type.
+type AddTwitterAccountSourcePayload struct {
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
-// Validate validates the AddTwitterAccountInputPayload type instance.
-func (ut *AddTwitterAccountInputPayload) Validate() (err error) {
+// Validate validates the AddTwitterAccountSourcePayload type instance.
+func (ut *AddTwitterAccountSourcePayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
@@ -611,15 +611,15 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
-// updateDeviceInputLocationPayload user type.
-type updateDeviceInputLocationPayload struct {
+// updateDeviceSourceLocationPayload user type.
+type updateDeviceSourceLocationPayload struct {
 	Key       *string  `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Latitude  *float64 `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
 	Longitude *float64 `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
 }
 
-// Validate validates the updateDeviceInputLocationPayload type instance.
-func (ut *updateDeviceInputLocationPayload) Validate() (err error) {
+// Validate validates the updateDeviceSourceLocationPayload type instance.
+func (ut *updateDeviceSourceLocationPayload) Validate() (err error) {
 	if ut.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
 	}
@@ -632,9 +632,9 @@ func (ut *updateDeviceInputLocationPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates UpdateDeviceInputLocationPayload from updateDeviceInputLocationPayload
-func (ut *updateDeviceInputLocationPayload) Publicize() *UpdateDeviceInputLocationPayload {
-	var pub UpdateDeviceInputLocationPayload
+// Publicize creates UpdateDeviceSourceLocationPayload from updateDeviceSourceLocationPayload
+func (ut *updateDeviceSourceLocationPayload) Publicize() *UpdateDeviceSourceLocationPayload {
+	var pub UpdateDeviceSourceLocationPayload
 	if ut.Key != nil {
 		pub.Key = *ut.Key
 	}
@@ -647,15 +647,15 @@ func (ut *updateDeviceInputLocationPayload) Publicize() *UpdateDeviceInputLocati
 	return &pub
 }
 
-// UpdateDeviceInputLocationPayload user type.
-type UpdateDeviceInputLocationPayload struct {
+// UpdateDeviceSourceLocationPayload user type.
+type UpdateDeviceSourceLocationPayload struct {
 	Key       string  `form:"key" json:"key" xml:"key"`
 	Latitude  float64 `form:"latitude" json:"latitude" xml:"latitude"`
 	Longitude float64 `form:"longitude" json:"longitude" xml:"longitude"`
 }
 
-// Validate validates the UpdateDeviceInputLocationPayload type instance.
-func (ut *UpdateDeviceInputLocationPayload) Validate() (err error) {
+// Validate validates the UpdateDeviceSourceLocationPayload type instance.
+func (ut *UpdateDeviceSourceLocationPayload) Validate() (err error) {
 	if ut.Key == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
 	}
@@ -663,14 +663,14 @@ func (ut *UpdateDeviceInputLocationPayload) Validate() (err error) {
 	return
 }
 
-// updateDeviceInputPayload user type.
-type updateDeviceInputPayload struct {
+// updateDeviceSourcePayload user type.
+type updateDeviceSourcePayload struct {
 	Key  *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
-// Validate validates the updateDeviceInputPayload type instance.
-func (ut *updateDeviceInputPayload) Validate() (err error) {
+// Validate validates the updateDeviceSourcePayload type instance.
+func (ut *updateDeviceSourcePayload) Validate() (err error) {
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
 	}
@@ -680,9 +680,9 @@ func (ut *updateDeviceInputPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates UpdateDeviceInputPayload from updateDeviceInputPayload
-func (ut *updateDeviceInputPayload) Publicize() *UpdateDeviceInputPayload {
-	var pub UpdateDeviceInputPayload
+// Publicize creates UpdateDeviceSourcePayload from updateDeviceSourcePayload
+func (ut *updateDeviceSourcePayload) Publicize() *UpdateDeviceSourcePayload {
+	var pub UpdateDeviceSourcePayload
 	if ut.Key != nil {
 		pub.Key = *ut.Key
 	}
@@ -692,14 +692,14 @@ func (ut *updateDeviceInputPayload) Publicize() *UpdateDeviceInputPayload {
 	return &pub
 }
 
-// UpdateDeviceInputPayload user type.
-type UpdateDeviceInputPayload struct {
+// UpdateDeviceSourcePayload user type.
+type UpdateDeviceSourcePayload struct {
 	Key  string `form:"key" json:"key" xml:"key"`
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
-// Validate validates the UpdateDeviceInputPayload type instance.
-func (ut *UpdateDeviceInputPayload) Validate() (err error) {
+// Validate validates the UpdateDeviceSourcePayload type instance.
+func (ut *UpdateDeviceSourcePayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
@@ -709,15 +709,15 @@ func (ut *UpdateDeviceInputPayload) Validate() (err error) {
 	return
 }
 
-// updateDeviceInputSchemaPayload user type.
-type updateDeviceInputSchemaPayload struct {
+// updateDeviceSourceSchemaPayload user type.
+type updateDeviceSourceSchemaPayload struct {
 	Active     *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	JSONSchema *string `form:"jsonSchema,omitempty" json:"jsonSchema,omitempty" xml:"jsonSchema,omitempty"`
 	Key        *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 }
 
-// Validate validates the updateDeviceInputSchemaPayload type instance.
-func (ut *updateDeviceInputSchemaPayload) Validate() (err error) {
+// Validate validates the updateDeviceSourceSchemaPayload type instance.
+func (ut *updateDeviceSourceSchemaPayload) Validate() (err error) {
 	if ut.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
 	}
@@ -730,9 +730,9 @@ func (ut *updateDeviceInputSchemaPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates UpdateDeviceInputSchemaPayload from updateDeviceInputSchemaPayload
-func (ut *updateDeviceInputSchemaPayload) Publicize() *UpdateDeviceInputSchemaPayload {
-	var pub UpdateDeviceInputSchemaPayload
+// Publicize creates UpdateDeviceSourceSchemaPayload from updateDeviceSourceSchemaPayload
+func (ut *updateDeviceSourceSchemaPayload) Publicize() *UpdateDeviceSourceSchemaPayload {
+	var pub UpdateDeviceSourceSchemaPayload
 	if ut.Active != nil {
 		pub.Active = *ut.Active
 	}
@@ -745,71 +745,21 @@ func (ut *updateDeviceInputSchemaPayload) Publicize() *UpdateDeviceInputSchemaPa
 	return &pub
 }
 
-// UpdateDeviceInputSchemaPayload user type.
-type UpdateDeviceInputSchemaPayload struct {
+// UpdateDeviceSourceSchemaPayload user type.
+type UpdateDeviceSourceSchemaPayload struct {
 	Active     bool   `form:"active" json:"active" xml:"active"`
 	JSONSchema string `form:"jsonSchema" json:"jsonSchema" xml:"jsonSchema"`
 	Key        string `form:"key" json:"key" xml:"key"`
 }
 
-// Validate validates the UpdateDeviceInputSchemaPayload type instance.
-func (ut *UpdateDeviceInputSchemaPayload) Validate() (err error) {
+// Validate validates the UpdateDeviceSourceSchemaPayload type instance.
+func (ut *UpdateDeviceSourceSchemaPayload) Validate() (err error) {
 	if ut.Key == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
 	}
 
 	if ut.JSONSchema == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "jsonSchema"))
-	}
-	return
-}
-
-// updateInputPayload user type.
-type updateInputPayload struct {
-	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
-}
-
-// Validate validates the updateInputPayload type instance.
-func (ut *updateInputPayload) Validate() (err error) {
-	if ut.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
-	}
-	return
-}
-
-// Publicize creates UpdateInputPayload from updateInputPayload
-func (ut *updateInputPayload) Publicize() *UpdateInputPayload {
-	var pub UpdateInputPayload
-	if ut.Active != nil {
-		pub.Active = ut.Active
-	}
-	if ut.Name != nil {
-		pub.Name = *ut.Name
-	}
-	if ut.TeamID != nil {
-		pub.TeamID = ut.TeamID
-	}
-	if ut.UserID != nil {
-		pub.UserID = ut.UserID
-	}
-	return &pub
-}
-
-// UpdateInputPayload user type.
-type UpdateInputPayload struct {
-	Active *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
-	Name   string `form:"name" json:"name" xml:"name"`
-	TeamID *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
-}
-
-// Validate validates the UpdateInputPayload type instance.
-func (ut *UpdateInputPayload) Validate() (err error) {
-	if ut.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
 	return
 }
@@ -849,16 +799,66 @@ func (ut *UpdateMemberPayload) Validate() (err error) {
 	return
 }
 
-// updateTwitterAccountInputPayload user type.
-type updateTwitterAccountInputPayload struct {
+// updateSourcePayload user type.
+type updateSourcePayload struct {
+	Active *bool   `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
 	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
-// Publicize creates UpdateTwitterAccountInputPayload from updateTwitterAccountInputPayload
-func (ut *updateTwitterAccountInputPayload) Publicize() *UpdateTwitterAccountInputPayload {
-	var pub UpdateTwitterAccountInputPayload
+// Validate validates the updateSourcePayload type instance.
+func (ut *updateSourcePayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	return
+}
+
+// Publicize creates UpdateSourcePayload from updateSourcePayload
+func (ut *updateSourcePayload) Publicize() *UpdateSourcePayload {
+	var pub UpdateSourcePayload
+	if ut.Active != nil {
+		pub.Active = ut.Active
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.TeamID != nil {
+		pub.TeamID = ut.TeamID
+	}
+	if ut.UserID != nil {
+		pub.UserID = ut.UserID
+	}
+	return &pub
+}
+
+// UpdateSourcePayload user type.
+type UpdateSourcePayload struct {
+	Active *bool  `form:"active,omitempty" json:"active,omitempty" xml:"active,omitempty"`
+	Name   string `form:"name" json:"name" xml:"name"`
+	TeamID *int   `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int   `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
+// Validate validates the UpdateSourcePayload type instance.
+func (ut *UpdateSourcePayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	return
+}
+
+// updateTwitterAccountSourcePayload user type.
+type updateTwitterAccountSourcePayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
+// Publicize creates UpdateTwitterAccountSourcePayload from updateTwitterAccountSourcePayload
+func (ut *updateTwitterAccountSourcePayload) Publicize() *UpdateTwitterAccountSourcePayload {
+	var pub UpdateTwitterAccountSourcePayload
 	if ut.Name != nil {
 		pub.Name = ut.Name
 	}
@@ -871,8 +871,8 @@ func (ut *updateTwitterAccountInputPayload) Publicize() *UpdateTwitterAccountInp
 	return &pub
 }
 
-// UpdateTwitterAccountInputPayload user type.
-type UpdateTwitterAccountInputPayload struct {
+// UpdateTwitterAccountSourcePayload user type.
+type UpdateTwitterAccountSourcePayload struct {
 	Name   *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	TeamID *int    `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
 	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
