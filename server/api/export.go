@@ -59,7 +59,7 @@ func (c *ExportController) ListByInput(ctx *app.ListByInputExportContext) error 
 						keys = append(keys, key)
 					}
 					sort.Strings(keys)
-					row := []string{"Time", "Location"}
+					row := []string{"ID", "Time", "Location"}
 					row = append(row, keys...)
 					writer.WriteString(strings.Join(row, ",") + "\n")
 				}
@@ -74,6 +74,7 @@ func (c *ExportController) ListByInput(ctx *app.ListByInputExportContext) error 
 					}
 				}
 				row := []string{
+					fmt.Sprintf("%d", doc.ID),
 					fmt.Sprintf("%v", doc.Timestamp),
 					doc.Location.String(),
 				}
