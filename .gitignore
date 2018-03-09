@@ -3,3 +3,4 @@ fieldkit.env
 build
 schema-production
 active-schema
+migration
