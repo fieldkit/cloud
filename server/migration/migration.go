@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -99,11 +100,16 @@ func fixDataTypes(row *Row) (bool, error) {
 			f, err := strconv.ParseFloat(value.(string), 64)
 			if err == nil {
 				if math.IsNaN(f) {
-					modified[key] = "NaN"
+					if strings.EqualFold(value.(string), "nan") {
+						if value != "NaN" {
+							modified[key] = "NaN"
+							fixed = true
+						}
+					}
 				} else {
 					modified[key] = f
+					fixed = true
 				}
-				fixed = true
 			} else {
 				modified[key] = value
 			}
