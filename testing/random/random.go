@@ -87,10 +87,10 @@ func (o *options) createMessage(key string, e *FakeEvent) *FakeMessage {
 			Time:     e.Timestamp,
 			Device:   key,
 			Stream:   "1",
-			Values: map[string]string{
-				"cpu":      "100",
-				"temp":     "100",
-				"humidity": "100",
+			Values: map[string]interface{}{
+				"cpu":      100,
+				"temp":     100,
+				"humidity": 100,
 			},
 		}
 

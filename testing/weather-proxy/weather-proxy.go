@@ -88,11 +88,11 @@ func createFieldKitMessageFromWeather(w *OwmWeatherInfo, device string) *ingesti
 		Time:     w.Time,
 		Device:   device,
 		Stream:   "1",
-		Values: map[string]string{
-			"temp":       fmt.Sprintf("%v", kToF(w.Main.Temp)),
-			"pressure":   fmt.Sprintf("%v", w.Main.Pressure), // hPa
-			"humidity":   fmt.Sprintf("%v", w.Main.Humidity), // %
-			"visibility": fmt.Sprintf("%v", w.Visibility),    // meters
+		Values: map[string]interface{}{
+			"temp":       kToF(w.Main.Temp),
+			"pressure":   w.Main.Pressure, // hPa
+			"humidity":   w.Main.Humidity, // %
+			"visibility": w.Visibility,    // meters
 		},
 	}
 }

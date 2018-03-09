@@ -52,7 +52,7 @@ type ProcessedMessage struct {
 	Location    []float64
 	Fixed       bool
 	ArrayValues []string
-	MapValues   map[string]string
+	MapValues   map[string]interface{}
 }
 
 type MessageProvider interface {

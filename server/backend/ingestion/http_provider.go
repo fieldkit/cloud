@@ -18,12 +18,12 @@ const (
 )
 
 type HttpJsonMessage struct {
-	Location []float64         `json:"location"`
-	Fixed    bool              `json:"fixed"`
-	Time     int64             `json:"time"`
-	Device   string            `json:"device"`
-	Stream   string            `json:"stream"`
-	Values   map[string]string `json:"values"`
+	Location []float64              `json:"location"`
+	Fixed    bool                   `json:"fixed"`
+	Time     int64                  `json:"time"`
+	Device   string                 `json:"device"`
+	Stream   string                 `json:"stream"`
+	Values   map[string]interface{} `json:"values"`
 }
 
 func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {

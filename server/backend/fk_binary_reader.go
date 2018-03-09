@@ -3,12 +3,14 @@ package backend
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	"log"
+	"math"
+	"time"
+
+	"github.com/google/uuid"
+
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	pb "github.com/fieldkit/data-protocol"
-	"github.com/google/uuid"
-	"log"
-	"time"
 )
 
 type FkBinaryReader struct {
@@ -42,7 +44,7 @@ type HashedData struct {
 	DeviceId string
 	Stream   string
 	Time     int64
-	Values   map[string]string
+	Values   map[string]interface{}
 	Location []float64
 }
 
@@ -54,7 +56,7 @@ func (br *FkBinaryReader) LocationArray() []float64 {
 	}
 }
 
-func (br *FkBinaryReader) ToHashingData(values map[string]string) (data []byte, err error) {
+func (br *FkBinaryReader) ToHashingData(values map[string]interface{}) (data []byte, err error) {
 	hashed := &HashedData{
 		DeviceId: br.DeviceId,
 		Stream:   "",
@@ -76,9 +78,13 @@ func ToUniqueHash(data []byte) (uuid.UUID, error) {
 }
 
 func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessage, err error) {
-	values := make(map[string]string)
+	values := make(map[string]interface{})
 	for key, value := range br.Readings {
-		values[br.Sensors[key].Name] = fmt.Sprintf("%f", value)
+		if math.IsNaN(float64(value)) {
+			values[br.Sensors[key].Name] = "NaN"
+		} else {
+			values[br.Sensors[key].Name] = value
+		}
 	}
 
 	hd, err := br.ToHashingData(values)
@@ -174,7 +180,7 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 
 				pm, err := br.CreateProcessedMessage()
 				if err != nil {
-					log.Printf("[Error] %v", err)
+					log.Printf("[Error] %v (%+v)", err, record)
 					return err
 				}
 
