@@ -143,7 +143,6 @@ CREATE TABLE fieldkit.device (
 );
 
 CREATE UNIQUE INDEX ON fieldkit.device (key);
-
 CREATE UNIQUE INDEX ON fieldkit.device (token);
 
 CREATE TABLE fieldkit.device_schema (

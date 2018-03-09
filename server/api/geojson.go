@@ -35,7 +35,7 @@ func createProperties(d *data.Record) map[string]interface{} {
 	timestamp := d.Timestamp.UnixNano() / int64(time.Millisecond)
 
 	data := make(map[string]interface{})
-	m := map[string]string{}
+	m := make(map[string]interface{})
 	err := json.Unmarshal(d.Data, &m)
 	if err == nil {
 		for k, v := range m {
