@@ -850,6 +850,81 @@ func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 	return &decoded, err
 }
 
+// QueryData media type (default view)
+//
+// Identifier: application/vnd.app.queried+json; view=default
+type QueryData struct {
+	Series SeriesDataCollection `form:"series" json:"series" xml:"series"`
+}
+
+// Validate validates the QueryData media type instance.
+func (mt *QueryData) Validate() (err error) {
+	if mt.Series == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "series"))
+	}
+	if err2 := mt.Series.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeQueryData decodes the QueryData instance encoded in resp body.
+func (c *Client) DecodeQueryData(resp *http.Response) (*QueryData, error) {
+	var decoded QueryData
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// SeriesData media type (default view)
+//
+// Identifier: application/vnd.app.series+json; view=default
+type SeriesData struct {
+	Name string        `form:"name" json:"name" xml:"name"`
+	Rows []interface{} `form:"rows" json:"rows" xml:"rows"`
+}
+
+// Validate validates the SeriesData media type instance.
+func (mt *SeriesData) Validate() (err error) {
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Rows == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "rows"))
+	}
+	return
+}
+
+// DecodeSeriesData decodes the SeriesData instance encoded in resp body.
+func (c *Client) DecodeSeriesData(resp *http.Response) (*SeriesData, error) {
+	var decoded SeriesData
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// SeriesDataCollection is the media type for an array of SeriesData (default view)
+//
+// Identifier: application/vnd.app.series+json; type=collection; view=default
+type SeriesDataCollection []*SeriesData
+
+// Validate validates the SeriesDataCollection media type instance.
+func (mt SeriesDataCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeSeriesDataCollection decodes the SeriesDataCollection instance encoded in resp body.
+func (c *Client) DecodeSeriesDataCollection(resp *http.Response) (SeriesDataCollection, error) {
+	var decoded SeriesDataCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // Source media type (default view)
 //
 // Identifier: application/vnd.app.source+json; view=default

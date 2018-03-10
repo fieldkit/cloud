@@ -206,6 +206,47 @@ func (ctx *ListBySourceGeoJSONContext) BadRequest() error {
 	return nil
 }
 
+// ListBySourceQueryContext provides the Query list by source action context.
+type ListBySourceQueryContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	SourceID int
+}
+
+// NewListBySourceQueryContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Query controller list by source action.
+func NewListBySourceQueryContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListBySourceQueryContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListBySourceQueryContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListBySourceQueryContext) OK(r *QueryData) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.queried+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListBySourceQueryContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddAdministratorContext provides the administrator add action context.
 type AddAdministratorContext struct {
 	context.Context

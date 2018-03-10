@@ -639,6 +639,60 @@ func (mt *Projects) Validate() (err error) {
 	return
 }
 
+// QueryData media type (default view)
+//
+// Identifier: application/vnd.app.queried+json; view=default
+type QueryData struct {
+	Series SeriesDataCollection `form:"series" json:"series" xml:"series"`
+}
+
+// Validate validates the QueryData media type instance.
+func (mt *QueryData) Validate() (err error) {
+	if mt.Series == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "series"))
+	}
+	if err2 := mt.Series.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// SeriesData media type (default view)
+//
+// Identifier: application/vnd.app.series+json; view=default
+type SeriesData struct {
+	Name string        `form:"name" json:"name" xml:"name"`
+	Rows []interface{} `form:"rows" json:"rows" xml:"rows"`
+}
+
+// Validate validates the SeriesData media type instance.
+func (mt *SeriesData) Validate() (err error) {
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Rows == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "rows"))
+	}
+	return
+}
+
+// SeriesDataCollection is the media type for an array of SeriesData (default view)
+//
+// Identifier: application/vnd.app.series+json; type=collection; view=default
+type SeriesDataCollection []*SeriesData
+
+// Validate validates the SeriesDataCollection media type instance.
+func (mt SeriesDataCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // Source media type (default view)
 //
 // Identifier: application/vnd.app.source+json; view=default

@@ -336,6 +336,13 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	})
 	app.MountExportController(service, c14)
 
+	// Mount "export" controller
+	c15 := api.NewQueryController(service, api.QueryControllerOptions{
+		Database: database,
+		Backend:  be,
+	})
+	app.MountQueryController(service, c15)
+
 	setupErrorHandling()
 
 	return
