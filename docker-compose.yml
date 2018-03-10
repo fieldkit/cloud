@@ -13,6 +13,16 @@ services:
     environment:
       - FIELDKIT_ADDR=:8080
       - FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+    depends_on:
+      - postgres
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
   postgres:
     image: mdillon/postgis:9.6-alpine
     ports:

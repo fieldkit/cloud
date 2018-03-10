@@ -4,3 +4,4 @@ build
 schema-production
 active-schema
 migration
+grafana-storage
