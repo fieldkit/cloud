@@ -182,6 +182,21 @@ CREATE TABLE fieldkit.record (
 CREATE INDEX ON fieldkit.record (timestamp, source_id);
 CREATE INDEX ON fieldkit.record USING GIST (location);
 
+CREATE TABLE fieldkit.record_analysis (
+  record_id BIGINT REFERENCES fieldkit.record (id) ON DELETE CASCADE,
+  manually_excluded BOOL NOT NULL DEFAULT false,
+  outlier BOOL NOT NULL DEFAULT false
+);
+
+CREATE UNIQUE INDEX ON fieldkit.record_analysis (record_id);
+
+CREATE VIEW fieldkit.record_visible AS
+SELECT * FROM fieldkit.record r LEFT JOIN fieldkit.record_analysis a ON (r.id = a.record_id)
+WHERE
+  r.visible AND
+  (a.outlier IS NULL OR NOT a.outlier) AND
+  (a.manually_excluded IS NULL OR NOT a.manually_excluded);
+
 -- user
 
 DO
