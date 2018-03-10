@@ -4,8 +4,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"math"
-	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -76,7 +74,7 @@ func (d *Record) SetData(data interface{}) error {
 	return nil
 }
 
-func (d *Record) GetRawFields() (fields map[string]string, err error) {
+func (d *Record) GetRawFields() (fields map[string]interface{}, err error) {
 	err = json.Unmarshal(d.Data, &fields)
 	if err != nil {
 		return nil, err
@@ -85,20 +83,5 @@ func (d *Record) GetRawFields() (fields map[string]string, err error) {
 }
 
 func (d *Record) GetParsedFields() (fields map[string]interface{}, err error) {
-	raw, err := d.GetRawFields()
-	if err != nil {
-		return nil, err
-	}
-
-	fields = make(map[string]interface{})
-	for key, value := range raw {
-		value, err := strconv.ParseFloat(value, 32)
-		if err == nil {
-			if !math.IsNaN(value) {
-				fields[key] = value
-			}
-		}
-	}
-
-	return
+	return d.GetRawFields()
 }
