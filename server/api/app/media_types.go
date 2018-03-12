@@ -657,6 +657,38 @@ func (mt *QueryData) Validate() (err error) {
 	return
 }
 
+// ReadingSummary media type (default view)
+//
+// Identifier: application/vnd.app.reading_summary+json; view=default
+type ReadingSummary struct {
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// Validate validates the ReadingSummary media type instance.
+func (mt *ReadingSummary) Validate() (err error) {
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// ReadingSummaryCollection is the media type for an array of ReadingSummary (default view)
+//
+// Identifier: application/vnd.app.reading_summary+json; type=collection; view=default
+type ReadingSummaryCollection []*ReadingSummary
+
+// Validate validates the ReadingSummaryCollection media type instance.
+func (mt ReadingSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // SeriesData media type (default view)
 //
 // Identifier: application/vnd.app.series+json; view=default
@@ -720,6 +752,7 @@ func (mt *Source) Validate() (err error) {
 type SourceSummary struct {
 	ID       int                              `form:"id" json:"id" xml:"id"`
 	Name     string                           `form:"name" json:"name" xml:"name"`
+	Readings ReadingSummaryCollection         `form:"readings,omitempty" json:"readings,omitempty" xml:"readings,omitempty"`
 	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
 	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
 }
@@ -735,6 +768,9 @@ func (mt *SourceSummary) Validate() (err error) {
 	}
 	if mt.Spatial == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
+	}
+	if err2 := mt.Readings.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	if err2 := mt.Spatial.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)

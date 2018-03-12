@@ -494,6 +494,10 @@ func (b *Backend) ListRecordsBySource(ctx context.Context, sourceID int, descend
 	}, nextToken, nil
 }
 
+type ReadingSummary struct {
+	Name string
+}
+
 type FeatureSummary struct {
 	UpdatedAt        time.Time
 	NumberOfFeatures int
@@ -562,6 +566,14 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
 		  WHERE c.source_id = $1
 	      `, sourceId); err != nil {
+		return nil, err
+	}
+	return summaries, nil
+}
+
+func (b *Backend) ReadingsBySourceID(ctx context.Context, sourceId int) (summaries []*ReadingSummary, err error) {
+	summaries = []*ReadingSummary{}
+	if err := b.db.SelectContext(ctx, &summaries, `SELECT DISTINCT key AS name FROM (SELECT jsonb_object_keys(data) AS key FROM fieldkit.record_visible r WHERE r.source_id = $1) AS sq`, sourceId); err != nil {
 		return nil, err
 	}
 	return summaries, nil

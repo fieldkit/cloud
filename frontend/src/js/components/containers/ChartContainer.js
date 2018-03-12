@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import React, { Component } from 'react';
 
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Area } from 'recharts';
+import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Area } from 'recharts';
 
 import { Loading } from '../Loading';
 

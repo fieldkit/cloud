@@ -9,7 +9,7 @@ import _ from 'lodash';
 import * as ActionTypes from './types';
 import FkApi from '../api/calls';
 
-import { changePlaybackMode, focusLocation, focusExpeditionTime, chartDataLoaded } from './index';
+import { changePlaybackMode, focusLocation, focusExpeditionTime } from './index';
 
 import { PlaybackModes } from '../components/PlaybackControl';
 
@@ -111,11 +111,7 @@ export function* loadSources(ids) {
     const newIds = _.difference(ids, _.keys(cache));
     const sources = yield all(newIds.map(id => FkApi.getSource(id)));
     const summaries = yield all(newIds.map(id => FkApi.getSourceSummary(id)));
-    const indexed = _(sources).keyBy('id').value();
-    const features = yield all(sources.filter(source => source.lastFeatureId > 0).map(source => FkApi.getFeatureGeoJson(source.lastFeatureId)));
-    console.log("LatestFeatures", features);
-    console.log('Summaries', summaries);
-    Object.assign(cache, indexed);
+    console.log('Summaries', summaries, sources);
 }
 
 export function* loadExpedition(projectSlug, expeditionSlug) {

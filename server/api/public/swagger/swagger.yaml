@@ -408,7 +408,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
         type: Qui et aperiam.
       - geometry:
           coordinates:
@@ -416,7 +416,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
         type: Qui et aperiam.
       - geometry:
           coordinates:
@@ -424,7 +424,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
         type: Qui et aperiam.
       type: Nulla dolore laboriosam soluta quia molestias.
     properties:
@@ -447,7 +447,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
       type: Qui et aperiam.
     properties:
       geometry:
@@ -455,7 +455,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
         type: object
       type:
         example: Qui et aperiam.
@@ -476,7 +476,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
       type: Qui et aperiam.
     - geometry:
         coordinates:
@@ -484,7 +484,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
       type: Qui et aperiam.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -666,7 +666,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
           type: Qui et aperiam.
         - geometry:
             coordinates:
@@ -674,7 +674,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
           type: Qui et aperiam.
         - geometry:
             coordinates:
@@ -682,7 +682,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 8fcabb6b-48d6-43d2-af06-d61d2f44c10c
+            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
           type: Qui et aperiam.
         type: Nulla dolore laboriosam soluta quia molestias.
       hasMore: false
@@ -840,6 +840,28 @@ definitions:
     - series
     title: 'Mediatype identifier: application/vnd.app.queried+json; view=default'
     type: object
+  ReadingSummary:
+    description: ReadingSummary media type (default view)
+    example:
+      name: Et hic sunt.
+    properties:
+      name:
+        example: Et hic sunt.
+        type: string
+    required:
+    - name
+    title: 'Mediatype identifier: application/vnd.app.reading_summary+json; view=default'
+    type: object
+  ReadingSummaryCollection:
+    description: ReadingSummaryCollection is the media type for an array of ReadingSummary
+      (default view)
+    example:
+    - name: Et hic sunt.
+    items:
+      $ref: '#/definitions/ReadingSummary'
+    title: 'Mediatype identifier: application/vnd.app.reading_summary+json; type=collection;
+      view=default'
+    type: array
   RefreshUserPayload:
     example:
       refresh_token: Doloremque eum quia et occaecati ut sint.
@@ -891,32 +913,32 @@ definitions:
     description: Source media type (default view)
     example:
       active: false
-      expeditionId: 8.5731494e+18
-      id: 3.7542398e+18
-      name: Qui perspiciatis adipisci aut ducimus.
-      teamId: 1.6790341e+18
-      userId: 4.9983243e+18
+      expeditionId: 1.6790341e+18
+      id: 4.9983243e+18
+      name: Sunt iste expedita.
+      teamId: 5.6952063e+18
+      userId: 4.0889983e+18
     properties:
       active:
         example: false
         type: boolean
       expeditionId:
-        example: 8.5731494e+18
-        format: int64
-        type: integer
-      id:
-        example: 3.7542398e+18
-        format: int64
-        type: integer
-      name:
-        example: Qui perspiciatis adipisci aut ducimus.
-        type: string
-      teamId:
         example: 1.6790341e+18
         format: int64
         type: integer
-      userId:
+      id:
         example: 4.9983243e+18
+        format: int64
+        type: integer
+      name:
+        example: Sunt iste expedita.
+        type: string
+      teamId:
+        example: 5.6952063e+18
+        format: int64
+        type: integer
+      userId:
+        example: 4.0889983e+18
         format: int64
         type: integer
     required:
@@ -928,8 +950,10 @@ definitions:
   SourceSummary:
     description: SourceSummary media type (default view)
     example:
-      id: 5.239963e+18
-      name: Iste expedita libero.
+      id: 6.1743026e+18
+      name: Ut cum iusto iusto quia.
+      readings:
+      - name: Et hic sunt.
       spatial:
       - centroid:
         - 0.707477
@@ -954,12 +978,14 @@ definitions:
         startTime: 1996-09-08T18:00:07Z
     properties:
       id:
-        example: 5.239963e+18
+        example: 6.1743026e+18
         format: int64
         type: integer
       name:
-        example: Iste expedita libero.
+        example: Ut cum iusto iusto quia.
         type: string
+      readings:
+        $ref: '#/definitions/ReadingSummaryCollection'
       spatial:
         $ref: '#/definitions/GeometryClusterSummaryCollection'
       temporal:
@@ -974,20 +1000,20 @@ definitions:
   SourceToken:
     description: SourceToken media type (default view)
     example:
-      expeditionId: 9.087875e+17
-      id: 7.769316e+18
-      token: Iusto iusto quia officia fuga.
+      expeditionId: 7.5812465e+18
+      id: 6.7189545e+18
+      token: Quia id.
     properties:
       expeditionId:
-        example: 9.087875e+17
+        example: 7.5812465e+18
         format: int64
         type: integer
       id:
-        example: 7.769316e+18
+        example: 6.7189545e+18
         format: int64
         type: integer
       token:
-        example: Iusto iusto quia officia fuga.
+        example: Quia id.
         type: string
     required:
     - id
@@ -999,9 +1025,15 @@ definitions:
     description: SourceTokenCollection is the media type for an array of SourceToken
       (default view)
     example:
-    - expeditionId: 9.087875e+17
-      id: 7.769316e+18
-      token: Iusto iusto quia officia fuga.
+    - expeditionId: 7.5812465e+18
+      id: 6.7189545e+18
+      token: Quia id.
+    - expeditionId: 7.5812465e+18
+      id: 6.7189545e+18
+      token: Quia id.
+    - expeditionId: 7.5812465e+18
+      id: 6.7189545e+18
+      token: Quia id.
     items:
       $ref: '#/definitions/SourceToken'
     title: 'Mediatype identifier: application/vnd.app.source_token+json; type=collection;
@@ -1011,9 +1043,9 @@ definitions:
     description: SourceTokens media type (default view)
     example:
       sourceTokens:
-      - expeditionId: 9.087875e+17
-        id: 7.769316e+18
-        token: Iusto iusto quia officia fuga.
+      - expeditionId: 7.5812465e+18
+        id: 6.7189545e+18
+        token: Quia id.
     properties:
       sourceTokens:
         $ref: '#/definitions/SourceTokenCollection'
@@ -1034,24 +1066,24 @@ definitions:
         token: Non ut voluptatum ducimus perspiciatis quasi.
         userId: 8.3444345e+18
       twitterAccountSources:
-      - expeditionId: 3.8838217e+16
-        id: 7.2464166e+18
-        name: Aliquam error et asperiores qui quas.
-        screenName: Ad consectetur occaecati occaecati omnis sint.
+      - expeditionId: 3.1106553e+18
+        id: 8.3874683e+18
+        name: Voluptates ad consectetur occaecati.
+        screenName: Omnis sint.
         teamId: 2.5665125e+18
         twitterAccountId: 1.24473865e+17
         userId: 8.349478e+18
-      - expeditionId: 3.8838217e+16
-        id: 7.2464166e+18
-        name: Aliquam error et asperiores qui quas.
-        screenName: Ad consectetur occaecati occaecati omnis sint.
+      - expeditionId: 3.1106553e+18
+        id: 8.3874683e+18
+        name: Voluptates ad consectetur occaecati.
+        screenName: Omnis sint.
         teamId: 2.5665125e+18
         twitterAccountId: 1.24473865e+17
         userId: 8.349478e+18
-      - expeditionId: 3.8838217e+16
-        id: 7.2464166e+18
-        name: Aliquam error et asperiores qui quas.
-        screenName: Ad consectetur occaecati occaecati omnis sint.
+      - expeditionId: 3.1106553e+18
+        id: 8.3874683e+18
+        name: Voluptates ad consectetur occaecati.
+        screenName: Omnis sint.
         teamId: 2.5665125e+18
         twitterAccountId: 1.24473865e+17
         userId: 8.349478e+18
@@ -1097,14 +1129,6 @@ definitions:
   TeamCollection:
     description: TeamCollection is the media type for an array of Team (default view)
     example:
-    - description: Sint velit.
-      id: 6.939366e+18
-      name: 6cingd200j
-      slug: uckup4mrpl
-    - description: Sint velit.
-      id: 6.939366e+18
-      name: 6cingd200j
-      slug: uckup4mrpl
     - description: Sint velit.
       id: 6.939366e+18
       name: 6cingd200j
@@ -1175,6 +1199,10 @@ definitions:
         id: 6.939366e+18
         name: 6cingd200j
         slug: uckup4mrpl
+      - description: Sint velit.
+        id: 6.939366e+18
+        name: 6cingd200j
+        slug: uckup4mrpl
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -1185,27 +1213,27 @@ definitions:
   TwitterAccountSource:
     description: TwitterAccountSource media type (default view)
     example:
-      expeditionId: 3.8838217e+16
-      id: 7.2464166e+18
-      name: Aliquam error et asperiores qui quas.
-      screenName: Ad consectetur occaecati occaecati omnis sint.
+      expeditionId: 3.1106553e+18
+      id: 8.3874683e+18
+      name: Voluptates ad consectetur occaecati.
+      screenName: Omnis sint.
       teamId: 2.5665125e+18
       twitterAccountId: 1.24473865e+17
       userId: 8.349478e+18
     properties:
       expeditionId:
-        example: 3.8838217e+16
+        example: 3.1106553e+18
         format: int64
         type: integer
       id:
-        example: 7.2464166e+18
+        example: 8.3874683e+18
         format: int64
         type: integer
       name:
-        example: Aliquam error et asperiores qui quas.
+        example: Voluptates ad consectetur occaecati.
         type: string
       screenName:
-        example: Ad consectetur occaecati occaecati omnis sint.
+        example: Omnis sint.
         type: string
       teamId:
         example: 2.5665125e+18
@@ -1232,17 +1260,17 @@ definitions:
     description: TwitterAccountSourceCollection is the media type for an array of
       TwitterAccountSource (default view)
     example:
-    - expeditionId: 3.8838217e+16
-      id: 7.2464166e+18
-      name: Aliquam error et asperiores qui quas.
-      screenName: Ad consectetur occaecati occaecati omnis sint.
+    - expeditionId: 3.1106553e+18
+      id: 8.3874683e+18
+      name: Voluptates ad consectetur occaecati.
+      screenName: Omnis sint.
       teamId: 2.5665125e+18
       twitterAccountId: 1.24473865e+17
       userId: 8.349478e+18
-    - expeditionId: 3.8838217e+16
-      id: 7.2464166e+18
-      name: Aliquam error et asperiores qui quas.
-      screenName: Ad consectetur occaecati occaecati omnis sint.
+    - expeditionId: 3.1106553e+18
+      id: 8.3874683e+18
+      name: Voluptates ad consectetur occaecati.
+      screenName: Omnis sint.
       teamId: 2.5665125e+18
       twitterAccountId: 1.24473865e+17
       userId: 8.349478e+18
@@ -1255,10 +1283,10 @@ definitions:
     description: TwitterAccountSources media type (default view)
     example:
       twitterAccountSources:
-      - expeditionId: 3.8838217e+16
-        id: 7.2464166e+18
-        name: Aliquam error et asperiores qui quas.
-        screenName: Ad consectetur occaecati occaecati omnis sint.
+      - expeditionId: 3.1106553e+18
+        id: 8.3874683e+18
+        name: Voluptates ad consectetur occaecati.
+        screenName: Omnis sint.
         teamId: 2.5665125e+18
         twitterAccountId: 1.24473865e+17
         userId: 8.349478e+18
@@ -1445,11 +1473,6 @@ definitions:
       id: 9.117392e+18
       name: oe7n4jt477
       username: ketl8qkueb
-    - bio: Doloribus perferendis minus doloremque aut dolore sed.
-      email: cristal_block@pfeffer.biz
-      id: 9.117392e+18
-      name: oe7n4jt477
-      username: ketl8qkueb
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -1459,6 +1482,11 @@ definitions:
     description: Users media type (default view)
     example:
       users:
+      - bio: Doloribus perferendis minus doloremque aut dolore sed.
+        email: cristal_block@pfeffer.biz
+        id: 9.117392e+18
+        name: oe7n4jt477
+        username: ketl8qkueb
       - bio: Doloribus perferendis minus doloremque aut dolore sed.
         email: cristal_block@pfeffer.biz
         id: 9.117392e+18

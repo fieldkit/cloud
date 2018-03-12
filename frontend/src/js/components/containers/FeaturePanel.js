@@ -17,23 +17,6 @@ export default class FeaturePanel extends Component {
         style: React.CSSProperties
     }
 
-    constructor() {
-        super();
-        this.state = {
-            chart: null
-        };
-    }
-
-    onShowChart(key) {
-        const { onShowChart, feature } = this.props;
-
-        onShowChart({
-            id: ["chart", feature.properties.source.sourceId, key].join('-'),
-            sourceId: feature.properties.source.sourceId,
-            keys: [key]
-        });
-    }
-
     renderProperties(feature) {
         const properties = _(Object.entries(feature.properties.data));
 
@@ -48,7 +31,7 @@ export default class FeaturePanel extends Component {
                 <tbody>
                 { properties.value().map(([ k , v ]) => (
                     <tr key={k}>
-                        <td style={{ width: '50%' }}> <div onClick={() => this.onShowChart(k)} style={{ cursor: 'pointer' }}>{k}</div> </td>
+                        <td style={{ width: '50%' }}> <div style={{ cursor: 'pointer' }}>{k}</div> </td>
                         <td> {Number(v).toFixed(2)} </td>
                     </tr>
                 )) }
@@ -58,7 +41,7 @@ export default class FeaturePanel extends Component {
     }
 
     render() {
-        const { style, feature/*, onShowChart*/ } = this.props;
+        const { style, feature } = this.props;
 
         const date = moment(new Date(feature.properties['timestamp'])).format('MMM Do YYYY, h:mm:ss a');
 

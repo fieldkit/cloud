@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactMapboxGl, { ScaleControl, ZoomControl, Popup } from 'react-mapbox-gl';
+import ReactMapboxGl, { ScaleControl, ZoomControl } from 'react-mapbox-gl';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
 

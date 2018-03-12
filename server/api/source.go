@@ -49,10 +49,21 @@ func GeometryClusterSummariesType(s []*backend.GeometryClusterSummary) []*app.Ge
 	return summaries
 }
 
-func SourceSummaryType(source *data.DeviceSource, spatial, temporal []*backend.GeometryClusterSummary) *app.SourceSummary {
+func ReadingSummariesType(s []*backend.ReadingSummary) []*app.ReadingSummary {
+	summaries := make([]*app.ReadingSummary, len(s))
+	for i, summary := range s {
+		summaries[i] = &app.ReadingSummary{
+			Name: summary.Name,
+		}
+	}
+	return summaries
+}
+
+func SourceSummaryType(source *data.DeviceSource, spatial, temporal []*backend.GeometryClusterSummary, readings []*backend.ReadingSummary) *app.SourceSummary {
 	return &app.SourceSummary{
 		ID:       int(source.ID),
 		Name:     source.Name,
+		Readings: ReadingSummariesType(readings),
 		Temporal: GeometryClusterSummariesType(temporal),
 		Spatial:  GeometryClusterSummariesType(spatial),
 	}
@@ -148,7 +159,12 @@ func (c *SourceController) SummaryByID(ctx *app.SummaryByIDSourceContext) error 
 		return err
 	}
 
-	return ctx.OK(SourceSummaryType(deviceSource, spatial, temporal))
+	readings, err := c.options.Backend.ReadingsBySourceID(ctx, ctx.SourceID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OK(SourceSummaryType(deviceSource, spatial, temporal, readings))
 }
 
 func (c *SourceController) ListExpeditionID(ctx *app.ListExpeditionIDSourceContext) error {

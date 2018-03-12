@@ -1,32 +1,64 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import MapContainer from '../containers/MapContainer';
-import FeaturePanel from '../containers/FeaturePanel';
-import ChartComponent from '../ChartComponent';
 import SimpleChartContainer from '../containers/ChartContainer';
 import CriteriaPanel from '../CriteriaPanel';
 
 import { generatePointDecorator } from '../../common/utilities';
 
-import { loadChartData, changeCriteria } from '../../actions';
+import { loadSourceCharts, loadChartData, changeCriteria } from '../../actions';
 
 import '../../../css/source.css';
 
 type Props = {};
 
 class SourceOverview extends Component {
-    render() {
+    props: {
+        style: React.CSSProperties
+    }
+
+    onShowChart(key) {
         const { data, onShowChart } = this.props;
-        const { source, summary, lastFeature } = data;
+        const { source } = data;
+
+        onShowChart({
+            id: ["chart", source.id, key].join('-'),
+            sourceId: source.id,
+            keys: [key]
+        });
+    }
+
+    renderReadings(data) {
+        const { summary } = data;
 
         return (
-            <div className="source-overview">
-                <FeaturePanel feature={lastFeature} onShowChart={ onShowChart } />
+            <table style={{ padding: '5px', width: '100%' }} className="feature-data">
+                <thead>
+                    <tr>
+                        <th>Reading</th>
+                    </tr>
+                </thead>
+                <tbody>
+                { summary.readings.map(reading => (
+                    <tr key={reading.name}>
+                        <td style={{ width: '50%' }}> <div onClick={() => this.onShowChart(reading.name)} style={{ cursor: 'pointer' }}>{reading.name}</div> </td>
+                    </tr>
+                )) }
+                </tbody>
+            </table>
+        )
+    }
+
+    render() {
+        const { style, data } = this.props;
+
+        return (
+            <div style={{ ...style }} className="feature-panel">
+                {this.renderReadings(data)}
             </div>
         );
     }
@@ -44,30 +76,32 @@ class Source extends Component {
     props: Props;
     state: {};
 
-    constructor(props) {
-        super(props)
+    getSourceId() {
+        const { match } = this.props;
+        const { sourceId } = match.params;
+
+        return sourceId;
+    }
+
+    componentWillMount() {
+        this.props.loadSourceCharts(this.getSourceId());
     }
 
     onShowChart(chart) {
-        const { loadChartData } = this.props;
-
-        loadChartData(chart);
-
+        this.props.loadChartData(chart);
     }
 
     onCriteriaChanged(newCriteria) {
-        const { changeCriteria } = this.props;
-
-        changeCriteria(newCriteria);
+        this.props.changeCriteria(newCriteria);
     }
 
     render() {
-        const { match, visibleFeatures, chartData } = this.props;
-        const { params } = match;
-        const { sourceId } = params;
+        const { visibleFeatures, chartData } = this.props;
+
+        const sourceId = this.getSourceId();
 
         const sourceData = visibleFeatures.sources[sourceId];
-        if (!sourceData || !sourceData.summary || !sourceData.source || !sourceData.lastFeature) {
+        if (!sourceData || !sourceData.summary || !sourceData.source) {
             return <div></div>;
         }
 
@@ -117,7 +151,25 @@ const mapStateToProps = state => ({
     chartData: state.chartData,
 });
 
+function showWhenReady(WrappedComponent, isReady) {
+    return class extends React.Component {
+        render() {
+            if (!isReady(this.props)) {
+                return <div>Loading</div>;
+            }
+
+            return <WrappedComponent {...this.props} />
+        }
+    }
+}
+
 export default connect(mapStateToProps, {
+    loadSourceCharts,
     loadChartData,
     changeCriteria
-})(Source);
+})(showWhenReady(Source, props => {
+    const { match, visibleFeatures } = props;
+    const { sourceId } = match.params;
+    const data = visibleFeatures.sources[sourceId];
+    return data && data.source && data.summary;
+}));

@@ -70,6 +70,17 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 	})
 })
 
+var ReadingSummary = MediaType("application/vnd.app.reading_summary+json", func() {
+	TypeName("ReadingSummary")
+	Attributes(func() {
+		Attribute("name", String)
+		Required("name")
+	})
+	View("default", func() {
+		Attribute("name")
+	})
+})
+
 var SourceSummary = MediaType("application/vnd.app.source_summary+json", func() {
 	TypeName("SourceSummary")
 	Attributes(func() {
@@ -77,6 +88,7 @@ var SourceSummary = MediaType("application/vnd.app.source_summary+json", func() 
 		Attribute("name", String)
 		Attribute("temporal", CollectionOf(GeometryClusterSummary))
 		Attribute("spatial", CollectionOf(GeometryClusterSummary))
+		Attribute("readings", CollectionOf(ReadingSummary))
 		Required("id", "name", "temporal", "spatial")
 	})
 	View("default", func() {
@@ -84,6 +96,7 @@ var SourceSummary = MediaType("application/vnd.app.source_summary+json", func() 
 		Attribute("name")
 		Attribute("temporal")
 		Attribute("spatial")
+		Attribute("readings")
 	})
 })
 

@@ -55,12 +55,10 @@ class SourcePanel extends Component {
 
     render() {
         const { info } = this.props;
-        const { source, lastFeature } = info;
+        const { source } = info;
         const { expanded } = this.state;
 
-        const lastFeatureDate = moment(new Date(lastFeature.properties.timestamp));
-        const lastFeatureAge = lastFeatureDate.fromNow();
-
+        const lastFeatureAge = moment(new Date(source.endTime)).fromNow();
         const numberOfFeatures = source.numberOfFeatures;
 
         return (
@@ -77,8 +75,8 @@ class SourcePanel extends Component {
     }
 
     renderExpanded() {
-        const { onShowSource, onShowFeature, info } = this.props;
-        const { source, lastFeature } = info;
+        const { info } = this.props;
+        const { source } = info;
 
         const featuresUrl = API_HOST + "/sources/" + source.id + "/geojson?descending=true";
         const csvUrl = API_HOST + "/sources/" + source.id + "/csv";
@@ -118,7 +116,7 @@ export default class FiltersPanel extends Component {
             <div>
                 <div style={sourcesTitleStyle}>Sources</div>
                 <div style={listContainerStyle}>
-                    {_.values(sources).filter(r => r.source && r.summary && r.lastFeature).map((r, i) => <SourcePanel key={i} info={r} onShowFeature={onShowFeature} onShowSource={onShowSource} />)}
+                    {_.values(sources).filter(r => r.source && r.summary).map((r, i) => <SourcePanel key={i} info={r} onShowFeature={onShowFeature} onShowSource={onShowSource} />)}
                 </div>
             </div>
         );

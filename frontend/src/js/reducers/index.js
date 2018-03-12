@@ -141,6 +141,9 @@ function getOrCreateChart(state, chart) {
 
 function chartData(state = initialChartDataState, action) {
     switch (action.type) {
+    case ActionTypes.CHART_SOURCE_LOAD: {
+        return { ...state, ...{ charts: [] } };
+    }
     case ActionTypes.CHART_CRITERIA_CHANGE: {
         return { ...state, ...{ criteria: action.criteria } };
     }

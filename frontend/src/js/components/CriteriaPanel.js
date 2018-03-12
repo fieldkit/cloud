@@ -41,13 +41,6 @@ export default class CriteriaPanel extends Component {
         })
     }
 
-    render() {
-        return <div className="criteria-panel">
-            <div onClick={this.onOpenToggle.bind(this)} className="button">Critera</div>
-            {this.state.open && this.renderOpen()}
-        </div>;
-    }
-
     renderOpen() {
         const ranges = [
             [
@@ -75,6 +68,13 @@ export default class CriteriaPanel extends Component {
                     })}
                 </ul>
             )}
+        </div>;
+    }
+
+    render() {
+        return <div className="criteria-panel">
+            <div onClick={this.onOpenToggle.bind(this)} className="button">Critera</div>
+            {this.state.open && this.renderOpen()}
         </div>;
     }
 }

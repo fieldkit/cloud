@@ -24,7 +24,7 @@ class ChartComponent extends Component {
         const { chart: oldChart, loadChartData } = this.props;
         const { chart: newChart } = nextProps;
 
-        if (newChart != oldChart) {
+        if (newChart !== oldChart) {
             loadChartData(newChart);
         }
     }

@@ -9,8 +9,7 @@ export default store => dispatch => action => {
     }
 
     dispatch(Object.assign({}, callApi, {
-        type: callApi.types.START,
-        message: callApi.message,
+        type: callApi.types.START
     }));
 
 
