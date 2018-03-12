@@ -1,4 +1,6 @@
 import * as ActionTypes from './types';
+import { CALL_WEB_API } from '../api/middleware';
+import { getQuery } from '../api/creators';
 
 export function changePlaybackMode(mode) {
     return {
@@ -45,15 +47,31 @@ export function focusFeature(feature) {
 }
 
 export function loadChartData(chart) {
-    return {
-        type: ActionTypes.CHART_DATA_LOAD,
-        chart: chart
+    return (dispatch, getState) => {
+        const criteria = getState().chartData.criteria;
+
+        dispatch({
+            type: ActionTypes.CHART_DATA_LOAD,
+            chart: chart
+        });
+
+        dispatch({
+            [CALL_WEB_API]: getQuery(chart, criteria)
+        });
     };
 }
 
-export function chartDataLoaded(chart) {
-    return {
-        type: ActionTypes.CHART_DATA_LOADED,
-        chart: chart
+export function changeCriteria(criteria) {
+    return (dispatch, getState) => {
+        const charts = getState().chartData.charts;
+        dispatch({
+            type: ActionTypes.CHART_CRITERIA_CHANGE,
+            criteria: criteria
+        });
+        for (let c of charts) {
+            dispatch({
+                [CALL_WEB_API]: getQuery(c, criteria)
+            });
+        }
     };
 }

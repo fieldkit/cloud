@@ -13,6 +13,7 @@ import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './js/actions/sagas';
 import { isVerboseActionType } from './js/actions/types';
 import reducer from './js/reducers';
+import webApiMiddleware from './js/api/middleware';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -26,6 +27,7 @@ const loggerMiddleware = createLogger({
 
 const createStoreWithMiddleware = applyMiddleware(
     thunkMiddleware,
+    webApiMiddleware,
     sagaMiddleware,
     loggerMiddleware,
 )(createStore);

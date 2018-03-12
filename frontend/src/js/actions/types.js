@@ -16,6 +16,7 @@ export const API_SOURCE_GET = expandApiTypes("API_SOURCE_GET");
 export const API_SOURCE_SUMMARY_GET = expandApiTypes("API_SOURCE_SUMMARY_GET");
 export const API_FEATURE_GEOJSON_GET = expandApiTypes("API_FEATURE_GEOJSON_GET");
 export const API_SOURCE_GEOJSON_GET = expandApiTypes("API_SOURCE_GEOJSON_GET");
+export const API_SOURCE_QUERY_GET = expandApiTypes("API_SOURCE_QUERY_GET");
 
 export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
 
@@ -27,7 +28,7 @@ export const FOCUS_LOCATION = 'FOCUS_LOCATION';
 export const USER_MAP_ACTIVITY = 'USER_MAP_ACTIVITY';
 
 export const CHART_DATA_LOAD = 'CHART_DATA_LOAD';
-export const CHART_DATA_LOADED = 'CHART_DATA_LOADED';
+export const CHART_CRITERIA_CHANGE = 'CHART_CRITERIA_CHANGE';
 
 export function isVerboseActionType(type) {
     return type === FOCUS_TIME;

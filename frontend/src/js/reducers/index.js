@@ -115,20 +115,55 @@ function playbackMode(state = { }, action) {
     }
 }
 
-function chartData(state = { geo: [], loading: true }, action) {
+const now = new Date();
+const start = new Date();
+start.setDate(start.getDate() - 1);
+
+const initialChartDataState = {
+    charts: [],
+    criteria: {
+        startTime: Math.trunc(start.getTime() / 1000),
+        endTime: Math.trunc(now.getTime() / 1000),
+    }
+};
+
+function getOrCreateChart(state, chart) {
+    for (let c of state.charts) {
+        if (c.id === chart.id) {
+            return c;
+        }
+    }
+
+    const newChart = Object.assign({}, chart);
+    state.charts.push(newChart);
+    return newChart;
+}
+
+function chartData(state = initialChartDataState, action) {
     switch (action.type) {
-    case ActionTypes.CHART_DATA_LOAD:
-        return {
-            geo: [],
-            loading: true
-        };
-    case ActionTypes.API_SOURCE_GEOJSON_GET.SUCCESS:
-        return {
-            geo: [ ...state.geo, ...action.response.geo.features ],
-            loading: true
-        };
-    case ActionTypes.CHART_DATA_LOADED:
-        return { ...state, ...{ loading: false } };
+    case ActionTypes.CHART_CRITERIA_CHANGE: {
+        return { ...state, ...{ criteria: action.criteria } };
+    }
+    case ActionTypes.CHART_DATA_LOAD: {
+        const nextState = Object.assign({}, state);
+        const chart = getOrCreateChart(nextState, action.chart);
+        Object.assign(chart, action.chart);
+        return nextState;
+    }
+    case ActionTypes.API_SOURCE_QUERY_GET.START: {
+        const nextState = Object.assign({}, state);
+        const chart = getOrCreateChart(nextState, action.chart);
+        chart.loading = true;
+        chart.query = {};
+        return nextState;
+    }
+    case ActionTypes.API_SOURCE_QUERY_GET.SUCCESS: {
+        const nextState = Object.assign({}, state);
+        const chart = getOrCreateChart(nextState, action.chart);
+        chart.loading = false;
+        chart.query = action.response;
+        return nextState;
+    }
     default:
         return state;
     }

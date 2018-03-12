@@ -99,16 +99,6 @@ export function* walkGeoJson(summary) {
     }
 }
 
-export function* loadCharts() {
-    yield takeLatest([ActionTypes.CHART_DATA_LOAD], function* (chartAction) {
-        let page = yield FkApi.getSourceGeoJson(chartAction.chart.source.sourceId);
-        while (page.hasMore) {
-            page = yield FkApi.getNextSourceGeoJson(page);
-        }
-        yield put(chartDataLoaded(chartAction.chart));
-    });
-}
-
 export function* manageMap() {
     yield takeLatest([ActionTypes.FOCUS_SOURCE], function* (focusSourceAction) {
         const source = focusSourceAction.source.source;
@@ -184,7 +174,6 @@ export function* loadActiveProject() {
         yield all([
             manageMap(),
             loadExpedition(projectSlug, expeditions[0].slug),
-            loadCharts(),
         ]);
         console.log("Done");
     }

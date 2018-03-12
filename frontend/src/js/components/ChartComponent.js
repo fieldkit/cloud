@@ -15,24 +15,29 @@ class ChartComponent extends Component {
     props: Props;
 
     componentWillMount() {
-        const { loadChartData , chart } = this.props;
+        const { loadChartData, chart } = this.props;
 
         loadChartData(chart);
     }
 
-    render() {
-        const { chart, geojson } = this.props;
+    componentWillReceiveProps(nextProps) {
+        const { chart: oldChart, loadChartData } = this.props;
+        const { chart: newChart } = nextProps;
 
-        if (!geojson.geo || geojson.geo.length < 2) {
-            return <div className="loading">Loading</div>;
+        if (newChart != oldChart) {
+            loadChartData(newChart);
         }
+    }
 
-        return <SimpleChartContainer chart={chart} geojson={geojson} />
+    render() {
+        const { chart, data } = this.props;
+
+        return <SimpleChartContainer chart={chart} data={data} />
     }
 }
 
 const mapStateToProps = state => ({
-    geojson: state.chartData
+    data: state.chartData
 });
 
 export default connect(mapStateToProps, {

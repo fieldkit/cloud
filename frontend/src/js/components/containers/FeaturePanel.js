@@ -28,8 +28,9 @@ export default class FeaturePanel extends Component {
         const { onShowChart, feature } = this.props;
 
         onShowChart({
-            source: feature.properties.source,
-            key: key
+            id: ["chart", feature.properties.source.sourceId, key].join('-'),
+            sourceId: feature.properties.source.sourceId,
+            keys: [key]
         });
     }
 

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import * as ActionTypes from '../actions/types';
 
 export function getProject(projectSlug) {
@@ -105,5 +107,39 @@ export function getSourceSummary(id) {
         path: '/sources/' + id + '/summary',
         method: 'GET',
         unwrap: (r) => r
+    };
+}
+
+function objectToQueryString(obj) {
+    return _.reduce(obj, function (result, value, key) {
+        if (!_.isNull(value) && !_.isUndefined(value)) {
+            if (_.isArray(value)) {
+                result += _.reduce(value, function (result1, value1) {
+                    if (!_.isNull(value1) && !_.isUndefined(value1)) {
+                        result1 += key + '=' + value1 + '&';
+                        return result1
+                    } else {
+                        return result1;
+                    }
+                }, '')
+            } else {
+                result += key + '=' + value + '&';
+            }
+            return result;
+        } else {
+            return result
+        }
+    }, '').slice(0, -1);
+};
+
+export function getQuery(chart, criteria) {
+    const queryString = objectToQueryString(Object.assign({}, chart, criteria));
+    return {
+        types: ActionTypes.API_SOURCE_QUERY_GET,
+        path: '/sources/' + chart.sourceId + '/query?' + queryString,
+        method: 'GET',
+        unwrap: (r) => r,
+        chart: chart,
+        criteria: criteria
     };
 }

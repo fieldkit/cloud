@@ -1,17 +1,17 @@
 // @flow weak
 
 import _ from 'lodash';
+import moment from 'moment';
 
 import React, { Component } from 'react';
 
-import { Loading } from '../Loading';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Area } from 'recharts';
 
-import { TimeSeries } from "pondjs";
-import { Charts, ChartContainer, ChartRow, YAxis, LineChart, styler, Resizable } from "react-timeseries-charts";
+import { Loading } from '../Loading';
 
 type Props = {
     chart: {},
-    geojson: {},
+    data: {},
 };
 
 export default class SimpleChartContainer extends Component {
@@ -22,49 +22,32 @@ export default class SimpleChartContainer extends Component {
     }
 
     render() {
-        const { chart, geojson } = this.props;
+        const { chart } = this.props;
 
-        if (geojson.loading) {
-            return (<Loading />);
+        if (chart.loading) {
+            return <Loading />;
         }
 
-        const samples = _(geojson.geo).map(f => {
-            return [
-                f.properties.timestamp,
-                Number(f.properties.data[chart.key])
-            ];
+        const samples = _(chart.query.series[0].rows).map(r => {
+            const row = {
+                x: r[0],
+            };
+            _.each(chart.keys, (key, i) => {
+                row[key] = r[i + 1];
+            });
+            return row;
         }).value();
 
-        const data = {
-            name: 'Data',
-            columns: [ "time", "value" ],
-            points: samples
-        };
-        const timeseries = new TimeSeries(data);
-        const lineStyle = styler([
-            // { key: "value", color: "#9467bd", width: 2 },
-            // { key: "value", color: "#9acd32", width: 2 },
-            { key: "value", color: "#20b2aa", width: 2 }
-        ]);
-        /*
-        const begin = moment();
-        const end =  moment().subtract(3, 'days');
-        const tr = new TimeRange(begin, end);
-        */
-        const tr = timeseries.timerange();
-        return (
-            <div style={{ padding: '10px' }}>
-                <Resizable>
-                    <ChartContainer timeRange={tr} onChartResize={width => this.handleChartResize(width)} showGrid={true}>
-                        <ChartRow height="180">
-                            <YAxis id="y" label={chart.key} min={timeseries.min()} max={timeseries.max()} width="100" type="linear" format=",.2f" labelOffset={-40} />
-                            <Charts>
-                                <LineChart axis="y" series={timeseries} style={lineStyle} />
-                            </Charts>
-                        </ChartRow>
-                    </ChartContainer>
-                </Resizable>
-            </div>
-        );
+        return <div>
+            <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={samples} margin={{top: 5, right: 30, left: 20, bottom: 5}} title={"HI"}>
+                <XAxis dataKey="x"  tickFormatter={timeStr => moment(timeStr).format('HH:mm')} />
+                <YAxis />
+                <CartesianGrid stroke="#626262" />
+                <Legend verticalAlign="top" height={36} />
+                { chart.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>;
     }
 }

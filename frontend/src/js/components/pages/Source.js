@@ -3,12 +3,17 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import MapContainer from '../containers/MapContainer';
 import FeaturePanel from '../containers/FeaturePanel';
 import ChartComponent from '../ChartComponent';
+import SimpleChartContainer from '../containers/ChartContainer';
+import CriteriaPanel from '../CriteriaPanel';
 
 import { generatePointDecorator } from '../../common/utilities';
+
+import { loadChartData, changeCriteria } from '../../actions';
 
 import '../../../css/source.css';
 
@@ -27,38 +32,39 @@ class SourceOverview extends Component {
     }
 };
 
+class ChartsContainer extends Component {
+    render() {
+        const { chartData } = this.props;
+
+        return <div className="charts">{chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChartContainer key={chart.id} chart={chart} /></div>)}</div>;
+    }
+};
+
 class Source extends Component {
     props: Props;
     state: {};
 
     constructor(props) {
         super(props)
-
-        this.state = {
-            chart: null
-        };
-    }
-
-    // Not sure how I feel about this. I'm open to suggestions.
-    componentWillMount() {
-        document.body.style.overflow = "hidden";
-    }
-
-    componentWillUnmount() {
-        document.body.style.overflow = null;
     }
 
     onShowChart(chart) {
-        this.setState({
-            chart
-        })
+        const { loadChartData } = this.props;
+
+        loadChartData(chart);
+
+    }
+
+    onCriteriaChanged(newCriteria) {
+        const { changeCriteria } = this.props;
+
+        changeCriteria(newCriteria);
     }
 
     render() {
-        const { match, visibleFeatures } = this.props;
+        const { match, visibleFeatures, chartData } = this.props;
         const { params } = match;
         const { sourceId } = params;
-        const { chart } = this.state;
 
         const sourceData = visibleFeatures.sources[sourceId];
         if (!sourceData || !sourceData.summary || !sourceData.source || !sourceData.lastFeature) {
@@ -67,6 +73,7 @@ class Source extends Component {
 
         const newSources = {};
         newSources[sourceId] = sourceData;
+
         const narrowed = {
             geojson: { features: [] },
             sources: newSources,
@@ -76,30 +83,29 @@ class Source extends Component {
         };
 
         const pointDecorator = generatePointDecorator('constant', 'constant');
+
         return (
             <div className="source page">
                 <div className="header">
-                    <div className="project-name">FieldKit Project / Device: {sourceData.source.name}</div>
+                    <div className="project-name"><Link to='/'>FieldKit Project</Link> / Device: {sourceData.source.name}</div>
+                    <CriteriaPanel onChangeTimeCiteria={ r => this.onCriteriaChanged(r) }/>
                 </div>
-                <div>
-                    <section className="wrapper dashboard">
-                        <div className="row top">
-                            <div className="column-6 map">
-                                <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100%" }}
-                                    pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
-                                    playbackMode={ () => false } focusFeature={ () => false }
-                                    focusSource={ () => false } notifyOfUserMapActivity={ () => false }
-                                    onChangePlaybackMode={ () => false } />
-
-                                <div className="chart">
-                                    { chart && <ChartComponent chart={chart} /> }
-                                </div>
-                            </div>
-                            <div className="column-6 source">
-                                <SourceOverview data={sourceData} onShowChart={ this.onShowChart.bind(this) } />
-                            </div>
+                <div className="main-container">
+                    <div className="middle-container">
+                        <ChartsContainer chartData={chartData} />
+                    </div>
+                    <div className="side-container">
+                        <div className="map">
+                            <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100%" }}
+                                pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
+                                playbackMode={ () => false } focusFeature={ () => false }
+                                focusSource={ () => false } notifyOfUserMapActivity={ () => false }
+                                onChangePlaybackMode={ () => false } />
                         </div>
-                    </section>
+                        <div className="">
+                            <SourceOverview data={sourceData} onShowChart={ this.onShowChart.bind(this) } />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -107,9 +113,11 @@ class Source extends Component {
 }
 
 const mapStateToProps = state => ({
-    visibleFeatures : state.visibleFeatures
+    visibleFeatures: state.visibleFeatures,
+    chartData: state.chartData,
 });
 
 export default connect(mapStateToProps, {
-
+    loadChartData,
+    changeCriteria
 })(Source);

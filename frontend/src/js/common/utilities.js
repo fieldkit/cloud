@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
 
 export function getFitBounds(geojson: GeoJSON) {
