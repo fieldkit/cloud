@@ -225,12 +225,12 @@ func (b *Backend) ListAllDeviceSources(ctx context.Context) ([]*data.DeviceSourc
 func (b *Backend) ListDeviceSources(ctx context.Context, project, expedition string) ([]*data.DeviceSource, error) {
 	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
-		SELECT i.*, d.source_id, d.key, d.token
+		SELECT s.*, d.source_id, d.key, d.token
 			FROM fieldkit.device AS d
-				JOIN fieldkit.source AS i ON i.id = d.source_id
-				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.source AS s ON s.id = d.source_id
+				JOIN fieldkit.expedition AS e ON e.id = s.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE p.slug = $1 AND e.slug = $2
+					WHERE p.slug = $1 AND e.slug = $2 AND s.visible
 		`, project, expedition); err != nil {
 		return nil, err
 	}
@@ -241,13 +241,13 @@ func (b *Backend) ListDeviceSources(ctx context.Context, project, expedition str
 func (b *Backend) ListTwitterAccountSources(ctx context.Context, project, expedition string) ([]*data.TwitterAccountSource, error) {
 	twitterAccounts := []*data.TwitterAccountSource{}
 	if err := b.db.SelectContext(ctx, &twitterAccounts, `
-		SELECT i.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
+		SELECT s.*, ita.twitter_account_id, ta.screen_name, ta.access_token, ta.access_secret
 			FROM fieldkit.twitter_account AS ta
 				JOIN fieldkit.source_twitter_account AS ita ON ita.twitter_account_id = ta.id
-				JOIN fieldkit.source AS i ON i.id = ita.source_id
-				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.source AS s ON s.id = ita.source_id
+				JOIN fieldkit.expedition AS e ON e.id = s.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
-					WHERE p.slug = $1 AND e.slug = $2
+					WHERE p.slug = $1 AND e.slug = $2 AND s.visible
 		`, project, expedition); err != nil {
 		return nil, err
 	}

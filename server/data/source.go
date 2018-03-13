@@ -11,6 +11,7 @@ type Source struct {
 	TeamID       *int32 `db:"team_id"`
 	UserID       *int32 `db:"user_id"`
 	Active       bool   `db:"active"`
+	Visible      bool   `db:"visible"`
 }
 
 type SourceToken struct {

@@ -84,7 +84,8 @@ CREATE TABLE fieldkit.source (
 	name varchar(256) NOT NULL,
 	team_id int REFERENCES fieldkit.team (id),
 	user_id int REFERENCES fieldkit.user (id),
-	active boolean NOT NULL DEFAULT false
+	active boolean NOT NULL DEFAULT false,
+	visible boolean NOT NULL DEFAULT true
 );
 
 CREATE TABLE fieldkit.source_token (
