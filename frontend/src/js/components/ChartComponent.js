@@ -8,7 +8,9 @@ import { loadChartData } from '../actions';
 import SimpleChartContainer from './containers/ChartContainer';
 
 type Props = {
-    data: {}[],
+    loadChartData: (any) => void,
+    chart: any,
+    data: any,
 };
 
 class ChartComponent extends Component {

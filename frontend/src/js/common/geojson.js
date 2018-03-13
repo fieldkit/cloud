@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
+import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
 
 class FkGeoJSONFeature {
     constructor(feature) {

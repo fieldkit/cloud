@@ -6,7 +6,9 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import FeaturePanel from './FeaturePanel';
 
-const containerStyle: React.CSSProperties = {
+import type { StyleSheet, GeoJSON } from '../../types';
+
+const containerStyle: StyleSheet = {
     position: 'absolute',
     width: '300px',
     zIndex: 10,
@@ -14,21 +16,21 @@ const containerStyle: React.CSSProperties = {
     flexDirection: 'column',
 };
 
-const panelStyle: React.CSSProperties = {
+const panelStyle: StyleSheet = {
     boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
     border: '1px solid rgba(0, 0, 0, 0.4)'
 };
 
-const separatorStyle: React.CSSProperties = {
+const separatorStyle: StyleSheet = {
     marginTop: '10px'
 };
 
-type Props = {
-    geojson: GeoJSON
-};
-
 export default class NotificationsPanel extends Component {
-    props: Props
+    props: {
+        sidePanelVisible: bool,
+        features: any,
+        geojson: GeoJSON
+    }
 
     positionStyle() {
         const { sidePanelVisible } = this.props;

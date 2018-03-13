@@ -4,13 +4,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { Layer, Feature } from 'react-mapbox-gl';
 
-import type { GeoJSON } from '../../types/MapTypes';
-
-type Props = {
-    pointDecorator: PointDecorator,
-    data: GeoJSON,
-    click: () => mixed,
-};
+import type { GeoJSON } from '../../types';
 
 function onToggleHover(cursor) {
     const body = document.body;
@@ -20,13 +14,17 @@ function onToggleHover(cursor) {
 }
 
 export default class BubbleMap extends Component {
-    props: Props;
+    props: {
+        pointDecorator: PointDecorator,
+        data: GeoJSON,
+        onClick: () => mixed,
+    }
     state: {
         circleColor: {},
         circleRadius: {},
-    };
+    }
 
-    constructor(props: Props) {
+    constructor(props) {
         super(props);
         this.state = {
             circleColor: {},
@@ -51,14 +49,14 @@ export default class BubbleMap extends Component {
         if (color.type === 'constant') {
             circleColor = color.colors[0].color;
         } else {
-            const { dateKey, bounds } = color;
+            const { dataKey, bounds } = color;
             let min;
             let max;
             if (bounds) {
                 min = bounds[0];
                 max = bounds[1];
             } else {
-                const values = data.features.map(f => f.properties[dateKey]);
+                const values = data.features.map(f => f.properties[dataKey]);
                 min = d3.min(values);
                 max = d3.max(values);
             }
@@ -68,7 +66,7 @@ export default class BubbleMap extends Component {
                 c.color,
             ]);
             circleColor = {
-                property: dateKey,
+                property: dataKey,
                 type: 'exponential',
                 stops,
             };
@@ -83,10 +81,10 @@ export default class BubbleMap extends Component {
         if (size.type === 'constant') {
             circleRadius = size.bounds[0];
         } else {
-            const { dateKey } = size;
-            const values = data.features.map(f => f.properties[dateKey]);
+            const { dataKey } = size;
+            const values = data.features.map(f => f.properties[dataKey]);
             circleRadius = {
-                property: dateKey,
+                property: dataKey,
                 type: 'exponential',
                 stops: [
                     [d3.min(values), size.bounds[0]],

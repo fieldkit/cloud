@@ -4,13 +4,12 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { Layer, Feature } from 'react-mapbox-gl';
 
-import type { GeoJSON } from '../../types/MapTypes';
-
-type Props = {
-    data: GeoJSON,
-};
+import type { GeoJSON } from '../../types';
 
 class DataColors {
+    colors: Array<string>
+    index: number
+
     constructor() {
         this.colors = [
             '#ECA400',
@@ -42,9 +41,13 @@ class DataColors {
 };
 
 export default class ClusterMap extends Component {
-    props: Props;
+    props: {
+        data: GeoJSON,
+        onClick: () => mixed,
+    }
+
     state: {
-    };
+    }
 
     onToggleHover(cursor: string, { map }: { map: any }) {
         map.getCanvas().style.cursor = cursor;

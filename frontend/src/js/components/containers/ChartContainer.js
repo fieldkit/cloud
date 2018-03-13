@@ -10,16 +10,11 @@ import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Ar
 import { Loading } from '../Loading';
 
 type Props = {
-    chart: {},
-    data: {},
+    chart: any,
 };
 
 export default class SimpleChartContainer extends Component {
     props: Props;
-
-    handleChartResize(width) {
-        this.setState({ width });
-    }
 
     render() {
         const { chart } = this.props;

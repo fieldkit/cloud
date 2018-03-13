@@ -21,22 +21,9 @@ import { RadialMenu } from '../RadialMenu';
 
 import { FieldKitLogo } from '../icons/Icons';
 
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
-import type { Focus } from '../../types';
+import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
 
-type Props = {
-    playbackMode: mixed,
-    focusSource: () => mixed,
-    onChangePlaybackMode: () => mixed,
-    notifyOfUserMapActivity: () => mixed,
-    pointDecorator: PointDecorator,
-    visibleFeatures: {
-        geojson: GeoJSON,
-        focus: Focus,
-    }
-};
-
-const panelContainerStyle = {
+const panelContainerStyle: StyleSheet = {
     backgroundColor: '#f9f9f9',
     color: "#000",
     position: 'absolute',
@@ -46,7 +33,7 @@ const panelContainerStyle = {
     boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
 };
 
-const panelHeaderStyle = {
+const panelHeaderStyle: StyleSheet = {
     padding: '5px',
     backgroundColor: 'rgb(196, 196, 196)',
     borderBottom: '1px solid rgb(128, 128, 128)',
@@ -100,14 +87,34 @@ const Map = ReactMapboxGl({
     accessToken: MAPBOX_ACCESS_TOKEN
 });
 
+type Props = {
+    containerStyle?: StyleSheet,
+    style?: StyleSheet,
+    playbackMode: mixed,
+    focusSource: () => mixed,
+    focusFeature: () => mixed,
+    onChangePlaybackMode: () => mixed,
+    notifyOfUserMapActivity: () => mixed,
+    pointDecorator: PointDecorator,
+    controls: ?bool,
+    visibleFeatures: {
+        geojson: GeoJSON,
+        focus: Focus,
+        sources: any,
+    }
+};
+
 export default class MapContainer extends Component {
     props: Props
     state: {
-        fitBounds: Bounds,
-        center: Coordinates,
+        feature: any,
+        fitBounds: ?Bounds,
+        center: ?Coordinates,
         zoom: [number],
         feature: ?GeoJSONFeature,
-    };
+        menu: any,
+    }
+    onUserActivityThrottled: () => mixed
 
     static contextTypes = {
         router: PropTypes.shape({
@@ -125,10 +132,7 @@ export default class MapContainer extends Component {
             center: null,
             zoom: [14],
             feature: null,
-            panels: {
-                sidePanelVisible: false,
-                bottomPanelVisible: false,
-            }
+            menu: null,
         };
         this.onUserActivityThrottled = _.throttle(this.onUserActivity.bind(this), 500, { leading: true });
     }
@@ -171,9 +175,6 @@ export default class MapContainer extends Component {
     onMarkerClick(feature) {
         this.setState({
             feature,
-            panels: {
-                sidePanelVisible: true,
-            },
         });
     }
 
@@ -184,19 +185,6 @@ export default class MapContainer extends Component {
 
         this.setState({
             feature,
-            panels: {
-                sidePanelVisible: true,
-            },
-        });
-    }
-
-    onShowChart(chart) {
-        this.setState({
-            chart,
-            panels: {
-                sidePanelVisible: true,
-                bottomPanelVisible: true,
-            },
         });
     }
 
@@ -210,26 +198,6 @@ export default class MapContainer extends Component {
         const { notifyOfUserMapActivity } = this.props;
 
         notifyOfUserMapActivity();
-    }
-
-    renderPanels() {
-        const { visibleFeatures, playbackMode } = this.props;
-        const { panels, chart, feature } = this.state;
-
-        const { mode } = playbackMode;
-        const paused = mode === "Pause";
-
-        return (
-            <div>
-                { !paused && <NotificationsPanel features={visibleFeatures.focus.features} sidePanelVisible={panels.sidePanelVisible} />}
-                { panels.sidePanelVisible && <MapRight onHide={() => this.setState({ panels: { ...panels, sidePanelVisible: false, bottomPanelVisible: false }})}>
-                  <FeaturePanel feature={feature} onShowChart={chart => this.onShowChart(chart)}/>
-                </MapRight> }
-                { panels.bottomPanelVisible && <MapBottom onHide={() => this.setState({ panels: { ...panels, bottomPanelVisible: false }})} sidePanelVisible={panels.sidePanelVisible}>
-                  <ChartComponent chart={chart} />
-                </MapBottom> }
-            </div>
-        );
     }
 
     onMouseMove(target, ev) {
@@ -361,7 +329,6 @@ export default class MapContainer extends Component {
 
                     {this.renderRadialMenu()}
                 </Map>
-                { controls && this.renderPanels()}
                 <div className="disclaimer-panel">
                     <div className="disclaimer-body">
                         <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.

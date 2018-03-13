@@ -1,0 +1,3 @@
+declare module 'react-mapbox-gl' {
+        declare module.exports: any;
+}

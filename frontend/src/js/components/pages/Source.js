@@ -15,11 +15,11 @@ import { loadSourceCharts, loadChartData, changeCriteria } from '../../actions';
 
 import '../../../css/source.css';
 
-type Props = {};
-
 class SourceOverview extends Component {
     props: {
-        style: React.CSSProperties
+        style?: any,
+        data: any,
+        onShowChart: any,
     }
 
     onShowChart(key) {
@@ -66,6 +66,10 @@ class SourceOverview extends Component {
 };
 
 class ChartsContainer extends Component {
+    props: {
+        chartData: any,
+    }
+
     render() {
         const { chartData } = this.props;
 
@@ -76,7 +80,16 @@ class ChartsContainer extends Component {
 };
 
 class Source extends Component {
-    props: Props;
+    props: {
+        loadSourceCharts: number => void,
+        loadChartData: any => void,
+        changeCriteria: any => void,
+        visibleFeatures: any,
+        chartData: any,
+        match: any,
+        style: any,
+    };
+
     state: {};
 
     getSourceId() {
@@ -112,10 +125,12 @@ class Source extends Component {
         newSources[sourceId] = sourceData;
 
         const narrowed = {
-            geojson: { features: [] },
+            geojson: { type: '', features: [] },
             sources: newSources,
             focus: {
                 center: sourceData.source.centroid,
+                feature: null,
+                time: 0,
             }
         };
 

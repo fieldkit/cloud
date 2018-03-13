@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import React, { Component } from 'react';
 
-const panelStyle: React.CSSProperties = {
+const panelStyle = {
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
     borderBottomLeftRadius: 2,
@@ -14,7 +14,8 @@ const panelStyle: React.CSSProperties = {
 
 export default class FeaturePanel extends Component {
     props: {
-        style: React.CSSProperties
+        style: any,
+        feature: any,
     }
 
     renderProperties(feature) {

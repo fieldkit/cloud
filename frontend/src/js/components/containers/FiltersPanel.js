@@ -5,9 +5,11 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
+import type { StyleSheet } from '../../types';
+
 import { API_HOST } from '../../secrets';
 
-const panelStyle: React.CSSProperties = {
+const panelStyle: StyleSheet = {
     color: "#000",
     borderTopLeftRadius: 2,
     borderTopRightRadius: 2,
@@ -15,7 +17,7 @@ const panelStyle: React.CSSProperties = {
     borderBottomRightRadius: 2,
 };
 
-const containerStyle: React.CSSProperties = {
+const containerStyle: StyleSheet = {
     position: 'absolute',
     width: '300px',
     zIndex: 10,
@@ -23,7 +25,7 @@ const containerStyle: React.CSSProperties = {
     flexDirection: 'column',
 };
 
-const sourcesTitleStyle: React.CSSProperties = {
+const sourcesTitleStyle: StyleSheet = {
     padding: '10px',
     fontSize: '18px',
     fontWeight: 'bold',
@@ -32,20 +34,25 @@ const sourcesTitleStyle: React.CSSProperties = {
     color: 'white',
 };
 
-const listContainerStyle: React.CSSProperties = {
+const listContainerStyle: StyleSheet = {
     backgroundColor: "rgba(255, 255, 255, 1.00)",
     padding: '10px',
 };
 
-const sourceContainerStyle: React.CSSProperties = {
+const sourceContainerStyle: StyleSheet = {
     paddingBottom: '10px',
 };
 
-const sourceFirstLineStyle: React.CSSProperties = {
+const sourceFirstLineStyle: StyleSheet = {
     fontSize: '14px',
 };
 
 class SourcePanel extends Component {
+    props: {
+        style?: StyleSheet,
+        info: any,
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -91,7 +98,10 @@ class SourcePanel extends Component {
 
 export default class FiltersPanel extends Component {
     props: {
-        style: React.CSSProperties
+        style?: StyleSheet,
+        visibleFeatures: any,
+        onShowSource: () => void,
+        onShowFeature: () => void,
     }
 
     render() {

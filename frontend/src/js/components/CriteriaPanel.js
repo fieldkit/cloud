@@ -1,16 +1,29 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
 
 class Range {
+    title: string
+    range: number
+
     constructor(title, range) {
         this.title = title;
         this.range = range;
     }
 }
 
+type Props = {
+    onChangeTimeCiteria: any,
+};
+
+type State = {
+    open: bool,
+};
+
 export default class CriteriaPanel extends Component {
+    props: Props
+    state: State
+
     constructor(props) {
         super(props)
         this.state = {

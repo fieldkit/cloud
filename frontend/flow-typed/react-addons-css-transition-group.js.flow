@@ -1,0 +1,3 @@
+declare module 'react-addons-css-transition-group' {
+        declare module.exports: any;
+}

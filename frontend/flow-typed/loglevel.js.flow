@@ -1,0 +1,3 @@
+declare module 'loglevel' {
+        declare module.exports: any;
+}

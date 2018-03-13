@@ -3,8 +3,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
-import type { GeoJSON } from '../../types/MapTypes';
-import type { ActiveExpedition  } from '../../types';
+import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../../types';
 
 import MapContainer from '../containers/MapContainer';
 
@@ -17,9 +16,15 @@ type Props = {
     activeExpedition: ActiveExpedition,
     visibleFeatures: {
         geojson: GeoJSON,
-        focus: mixed
+        focus: {
+            feature: ?GeoJSONFeature,
+            time: number,
+        },
+        sources: any,
     },
     playbackMode: {},
+    focusFeature: () => mixed,
+    focusSource: () => mixed,
     changePlaybackMode: () => mixed,
     notifyOfUserMapActivity: () => mixed,
 };
@@ -39,10 +44,12 @@ class Map extends Component {
 
     // Not sure how I feel about this. I'm open to suggestions.
     componentWillMount() {
+        // $FlowFixMe
         document.body.style.overflow = "hidden";
     }
 
     componentWillUnmount() {
+        // $FlowFixMe
         document.body.style.overflow = null;
     }
 

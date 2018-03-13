@@ -1,4 +1,4 @@
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types/MapTypes';
+import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
 
 export function getFitBounds(geojson: GeoJSON) {
     const lon = geojson.features.map(f => f.geometry.coordinates[0]);
@@ -17,7 +17,7 @@ export function generateConstantColor() {
             location: 0,
             color: '#C0392B'
         }],
-        dateKey: null,
+        dataKey: null,
         bounds: null,
     };
 }
@@ -47,7 +47,7 @@ export function generateLinearColor() {
                 color: 'rgb(189, 0, 38)'
             } ,
         ],
-        dateKey: 'temp',
+        dataKey: 'temp',
         bounds: null,
     };
 }
@@ -55,7 +55,7 @@ export function generateLinearColor() {
 export function generateConstantSize() {
     return {
         type: 'constant',
-        dateKey: null,
+        dataKey: null,
         bounds: [10, 10],
     };
 }
@@ -63,7 +63,7 @@ export function generateConstantSize() {
 export function generateLinearSize() {
     return {
         type: 'linear',
-        dateKey: 'temp',
+        dataKey: 'temp',
         bounds: [15, 40],
     };
 }
@@ -73,7 +73,6 @@ export function generatePointDecorator(colorType: string, sizeType: string) {
         points: {
             color: colorType === 'constant' ? generateConstantColor() : generateLinearColor(),
             size: sizeType === 'constant' ? generateConstantSize() : generateLinearSize(),
-            sprite: 'circle.png',
         },
         title: '',
         type: 'point',
