@@ -5,16 +5,16 @@ import { connect } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 
-import MapContainer from '../containers/MapContainer';
-import CriteriaPanel from '../CriteriaPanel';
-import SourceOverview from './SourceOverview';
-import ChartsContainer  from '../ChartsContainer';
+import MapContainer from '../components/MapContainer';
+import CriteriaPanel from '../components/CriteriaPanel';
+import SourceOverview from '../components/SourceOverview';
+import ChartsContainer  from '../components/ChartsContainer';
 
-import { generatePointDecorator } from '../../common/utilities';
+import { generatePointDecorator } from '../common/utilities';
 
-import { loadChartData, changeCriteria } from '../../actions';
+import { loadChartData, changeCriteria } from '../actions';
 
-import '../../../css/source.css';
+import '../../css/source.css';
 
 class Source extends Component {
     props: {
@@ -26,8 +26,6 @@ class Source extends Component {
         style: any,
     };
 
-    state: {};
-
     getSourceId() {
         const { match } = this.props;
         const { sourceId } = match.params;
@@ -35,16 +33,12 @@ class Source extends Component {
         return sourceId;
     }
 
-    onShowChart(chart) {
-        this.props.loadChartData(chart);
-    }
-
     onCriteriaChanged(newCriteria) {
         this.props.changeCriteria(newCriteria);
     }
 
     render() {
-        const { visibleFeatures, chartData } = this.props;
+        const { visibleFeatures, chartData, loadChartData } = this.props;
 
         const sourceId = this.getSourceId();
 
@@ -78,7 +72,7 @@ class Source extends Component {
                 </div>
                 <div className="main-container">
                     <div className="middle-container">
-                        <ChartsContainer chartData={chartData} />
+                        <ChartsContainer chartData={chartData} loadChartData={ loadChartData } />
                     </div>
                     <div className="side-container">
                         <div className="map">
@@ -89,7 +83,7 @@ class Source extends Component {
                                 onChangePlaybackMode={ () => false } />
                         </div>
                         <div className="">
-                            <SourceOverview data={sourceData} onShowChart={ this.onShowChart.bind(this) } />
+                            <SourceOverview data={sourceData} />
                         </div>
                     </div>
                 </div>

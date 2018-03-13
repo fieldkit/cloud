@@ -7,27 +7,28 @@ import React, { Component } from 'react';
 
 import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Area } from 'recharts';
 
-import { Loading } from '../Loading';
+import { Loading } from './Loading';
 
 type Props = {
-    chart: any,
+    chartDef: any,
+    data: any,
 };
 
-export default class SimpleChartContainer extends Component {
+export default class SimpleChart extends Component {
     props: Props;
 
     render() {
-        const { chart } = this.props;
+        const { chartDef, data } = this.props;
 
-        if (chart.loading) {
+        if (data.loading) {
             return <Loading />;
         }
 
-        const samples = _(chart.query.series[0].rows).map(r => {
+        const samples = _(data.series[0].rows).map(r => {
             const row = {
                 x: r[0],
             };
-            _.each(chart.keys, (key, i) => {
+            _.each(chartDef.keys, (key, i) => {
                 row[key] = r[i + 1];
             });
             return row;
@@ -40,7 +41,7 @@ export default class SimpleChartContainer extends Component {
                     <YAxis />
                     <CartesianGrid stroke="#626262" />
                     <Legend verticalAlign="top" height={36} />
-                    { chart.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
+                    { chartDef.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
                 </AreaChart>
             </ResponsiveContainer>
         </div>;

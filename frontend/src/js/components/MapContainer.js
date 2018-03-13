@@ -6,18 +6,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactMapboxGl, { ScaleControl, ZoomControl } from 'react-mapbox-gl';
 
-import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
+import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../types';
 
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../secrets';
 
-import BubbleMap from '../visualizations/BubbleMap';
-import ClusterMap from '../visualizations/ClusterMap';
-import PlaybackControl from '../PlaybackControl';
+import BubbleMap from './visualizations/BubbleMap';
+import ClusterMap from './visualizations/ClusterMap';
+import PlaybackControl from './PlaybackControl';
 import FiltersPanel from './FiltersPanel';
 
-import { RadialMenu } from '../RadialMenu';
+import { RadialMenu } from './RadialMenu';
 
-import { FieldKitLogo } from '../icons/Icons';
+import { FieldKitLogo } from './icons/Icons';
 
 const panelContainerStyle: StyleSheet = {
     backgroundColor: '#f9f9f9',

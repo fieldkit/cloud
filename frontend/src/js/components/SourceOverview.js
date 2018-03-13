@@ -6,18 +6,20 @@ export default class SourceOverview extends Component {
     props: {
         style?: any,
         data: any,
-        onShowChart: any,
+        onShowChart?: any,
     }
 
     onShowChart(key) {
         const { data, onShowChart } = this.props;
         const { source } = data;
 
-        onShowChart({
-            id: ["chart", source.id, key].join('-'),
-            sourceId: source.id,
-            keys: [key]
-        });
+        if (onShowChart) {
+            onShowChart({
+                id: ["chart", source.id, key].join('-'),
+                sourceId: source.id,
+                keys: [key]
+            });
+        }
     }
 
     renderReadings(data) {

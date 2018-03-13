@@ -5,9 +5,9 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import type { StyleSheet } from '../../types';
+import type { StyleSheet } from '../types';
 
-import { API_HOST } from '../../secrets';
+import { API_HOST } from '../secrets';
 
 const panelStyle: StyleSheet = {
     color: "#000",

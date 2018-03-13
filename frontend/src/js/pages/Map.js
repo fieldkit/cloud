@@ -3,14 +3,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
-import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../../types';
+import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../types';
 
-import MapContainer from '../containers/MapContainer';
+import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource } from '../actions';
+import { generatePointDecorator } from '../common/utilities';
 
-import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource } from '../../actions';
-import { generatePointDecorator } from '../../common/utilities';
+import MapContainer from '../components/MapContainer';
 
-import '../../../css/map.css';
+import '../../css/map.css';
 
 type Props = {
     activeExpedition: ActiveExpedition,

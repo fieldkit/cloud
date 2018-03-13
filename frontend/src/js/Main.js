@@ -10,9 +10,9 @@ import Map from './pages/Map';
 import Source from './pages/Source';
 import About from './pages/About';
 
-import type { ActiveExpedition  } from '../types';
+import type { ActiveExpedition  } from './types';
 
-import '../../css/main.css';
+import '../css/main.css';
 
 type Props = {
     activeExpedition: ActiveExpedition

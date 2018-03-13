@@ -2,18 +2,22 @@
 
 import React, { Component } from 'react';
 
-import SimpleChartContainer from '../components/ChartsContainer.js';
+import SimpleChart from './ChartsContainer';
+
+type Props = {
+    chartData: {
+        charts: Array<any>
+    },
+}
 
 export default class ChartsContainer extends Component {
-    props: {
-        chartData: any,
-    }
+    props: Props
 
     render() {
         const { chartData } = this.props;
 
         return <div className="charts">
-            {chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChartContainer chart={chart} /></div>)}
+            {chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChart chartDef={chart} /></div>)}
         </div>;
     }
 };

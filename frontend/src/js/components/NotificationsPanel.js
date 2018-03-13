@@ -6,7 +6,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import FeaturePanel from './FeaturePanel';
 
-import type { StyleSheet, GeoJSON } from '../../types';
+import type { StyleSheet, GeoJSON } from '../types';
 
 const containerStyle: StyleSheet = {
     position: 'absolute',
