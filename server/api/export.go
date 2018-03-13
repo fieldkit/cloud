@@ -37,8 +37,15 @@ func BoolTo0or1(flag bool) int {
 }
 
 func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) error {
+	source, err := c.options.Backend.GetSourceByID(ctx, int32(ctx.SourceID))
+	if err != nil {
+		return err
+	}
+
+	fileName := fmt.Sprintf("source-%d-%s.csv", source.ID, source.Name)
+
 	ctx.ResponseData.Header().Set("Content-Type", "text/csv")
-	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"source-%d.csv\"", ctx.SourceID))
+	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
 	ctx.ResponseData.WriteHeader(200)
 
 	writer := bufio.NewWriter(ctx.ResponseData)
@@ -49,8 +56,7 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 	for {
 		page, newToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, false, true, token)
 		if err != nil {
-			log.Printf("Error querying: %v", err)
-			break
+			return err
 		}
 		if len(page.Records) == 0 {
 			break
@@ -66,7 +72,7 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 						keys = append(keys, key)
 					}
 					sort.Strings(keys)
-					row := []string{"id", "time", "longitude", "latitude", "visible", "outlier", "manually_excluded"}
+					row := []string{"id", "time", "longitude", "latitude", "visible", "fixed", "outlier", "manually_excluded"}
 					row = append(row, keys...)
 					writer.WriteString(strings.Join(row, ",") + "\n")
 				}
@@ -86,6 +92,7 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 					fmt.Sprintf("%f", record.Location.Coordinates()[0]),
 					fmt.Sprintf("%f", record.Location.Coordinates()[1]),
 					fmt.Sprintf("%d", BoolTo0or1(record.Visible)),
+					fmt.Sprintf("%d", BoolTo0or1(record.Fixed)),
 					fmt.Sprintf("%d", BoolTo0or1(record.Outlier)),
 					fmt.Sprintf("%d", BoolTo0or1(record.ManuallyExcluded)),
 				}

@@ -269,6 +269,19 @@ func (b *Backend) ListDeviceSourcesByExpeditionID(ctx context.Context, expeditio
 	return devices, nil
 }
 
+func (b *Backend) GetSourceByID(ctx context.Context, id int32) (*data.Source, error) {
+	sources := []*data.Source{}
+	if err := b.db.SelectContext(ctx, &sources, `SELECT s.* FROM fieldkit.source AS s WHERE s.id = $1`, id); err != nil {
+		return nil, err
+	}
+
+	if len(sources) != 1 {
+		return nil, fmt.Errorf("No such Source")
+	}
+
+	return sources[0], nil
+}
+
 func (b *Backend) GetDeviceSourceByID(ctx context.Context, id int32) (*data.DeviceSource, error) {
 	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `
