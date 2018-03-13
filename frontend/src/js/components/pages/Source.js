@@ -6,82 +6,18 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import MapContainer from '../containers/MapContainer';
-import SimpleChartContainer from '../containers/ChartContainer';
 import CriteriaPanel from '../CriteriaPanel';
+import SourceOverview from './SourceOverview';
+import ChartsContainer  from '../ChartsContainer';
 
 import { generatePointDecorator } from '../../common/utilities';
 
-import { loadSourceCharts, loadChartData, changeCriteria } from '../../actions';
+import { loadChartData, changeCriteria } from '../../actions';
 
 import '../../../css/source.css';
 
-class SourceOverview extends Component {
-    props: {
-        style?: any,
-        data: any,
-        onShowChart: any,
-    }
-
-    onShowChart(key) {
-        const { data, onShowChart } = this.props;
-        const { source } = data;
-
-        onShowChart({
-            id: ["chart", source.id, key].join('-'),
-            sourceId: source.id,
-            keys: [key]
-        });
-    }
-
-    renderReadings(data) {
-        const { summary } = data;
-
-        return (
-            <table style={{ padding: '5px', width: '100%' }} className="feature-data">
-                <thead>
-                    <tr>
-                        <th>Reading</th>
-                    </tr>
-                </thead>
-                <tbody>
-                { summary.readings.map(reading => (
-                    <tr key={reading.name}>
-                        <td style={{ width: '50%' }}> <div onClick={() => this.onShowChart(reading.name)} style={{ cursor: 'pointer' }}>{reading.name}</div> </td>
-                    </tr>
-                )) }
-                </tbody>
-            </table>
-        )
-    }
-
-    render() {
-        const { style, data } = this.props;
-
-        return (
-            <div style={{ ...style }} className="feature-panel">
-                {this.renderReadings(data)}
-            </div>
-        );
-    }
-};
-
-class ChartsContainer extends Component {
-    props: {
-        chartData: any,
-    }
-
-    render() {
-        const { chartData } = this.props;
-
-        return <div className="charts">
-            {chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChartContainer chart={chart} /></div>)}
-        </div>;
-    }
-};
-
 class Source extends Component {
     props: {
-        loadSourceCharts: number => void,
         loadChartData: any => void,
         changeCriteria: any => void,
         visibleFeatures: any,
@@ -97,10 +33,6 @@ class Source extends Component {
         const { sourceId } = match.params;
 
         return sourceId;
-    }
-
-    componentWillMount() {
-        this.props.loadSourceCharts(this.getSourceId());
     }
 
     onShowChart(chart) {
@@ -123,6 +55,8 @@ class Source extends Component {
 
         const newSources = {};
         newSources[sourceId] = sourceData;
+
+        console.log(sourceData);
 
         const narrowed = {
             geojson: { type: '', features: [] },
@@ -182,7 +116,6 @@ function showWhenReady(WrappedComponent, isReady) {
 }
 
 export default connect(mapStateToProps, {
-    loadSourceCharts,
     loadChartData,
     changeCriteria
 })(showWhenReady(Source, props => {

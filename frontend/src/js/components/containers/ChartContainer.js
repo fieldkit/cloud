@@ -35,12 +35,12 @@ export default class SimpleChartContainer extends Component {
 
         return <div>
             <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={samples} margin={{top: 5, right: 30, left: 20, bottom: 5}} title={"HI"}>
-                <XAxis dataKey="x"  tickFormatter={timeStr => moment(timeStr).format('HH:mm')} />
-                <YAxis />
-                <CartesianGrid stroke="#626262" />
-                <Legend verticalAlign="top" height={36} />
-                { chart.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
+                <AreaChart data={samples} margin={{top: 5, right: 30, left: 20, bottom: 5}}>
+                    <XAxis dataKey="x"  tickFormatter={t => moment.unix(t).format('HH:mm')} />
+                    <YAxis />
+                    <CartesianGrid stroke="#626262" />
+                    <Legend verticalAlign="top" height={36} />
+                    { chart.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
                 </AreaChart>
             </ResponsiveContainer>
         </div>;

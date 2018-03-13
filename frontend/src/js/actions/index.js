@@ -46,30 +46,6 @@ export function focusFeature(feature) {
     };
 }
 
-export function loadSourceCharts(sourceId) {
-    return (dispatch, getState) => {
-        dispatch({
-            type: ActionTypes.CHART_SOURCE_LOAD,
-            source: {
-                id: sourceId
-            }
-        });
-
-        const source = getState().visibleFeatures.sources[sourceId];
-        console.log(source);
-        if (source && source.summary) {
-            for (let r of source.summary.readings) {
-                loadChartData({
-                    id: ["chart", sourceId, r.name].join("-"),
-                    sourceId: sourceId,
-                    keys: [ r.name ]
-                })(dispatch, getState);
-
-            }
-        }
-    };
-}
-
 export function loadChartData(chart) {
     return (dispatch, getState) => {
         const criteria = getState().chartData.criteria;

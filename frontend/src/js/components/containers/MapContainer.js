@@ -6,22 +6,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactMapboxGl, { ScaleControl, ZoomControl } from 'react-mapbox-gl';
 
+import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
+
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../../secrets';
 
 import BubbleMap from '../visualizations/BubbleMap';
 import ClusterMap from '../visualizations/ClusterMap';
 import PlaybackControl from '../PlaybackControl';
-
-import FeaturePanel from './FeaturePanel';
-import NotificationsPanel from './NotificationsPanel';
-import ChartComponent from '../ChartComponent';
 import FiltersPanel from './FiltersPanel';
 
 import { RadialMenu } from '../RadialMenu';
 
 import { FieldKitLogo } from '../icons/Icons';
-
-import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
 
 const panelContainerStyle: StyleSheet = {
     backgroundColor: '#f9f9f9',
@@ -114,6 +110,7 @@ export default class MapContainer extends Component {
         feature: ?GeoJSONFeature,
         menu: any,
     }
+
     onUserActivityThrottled: () => mixed
 
     static contextTypes = {

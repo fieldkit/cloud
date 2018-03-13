@@ -1,4 +1,4 @@
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
+import type { Bounds, GeoJSON } from '../../types';
 
 export function getFitBounds(geojson: GeoJSON) {
     const lon = geojson.features.map(f => f.geometry.coordinates[0]);

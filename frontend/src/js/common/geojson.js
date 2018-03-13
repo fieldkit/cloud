@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import type { Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../../types';
+import type { GeoJSONFeature, GeoJSON } from '../../types';
 
 class FkGeoJSONFeature {
-    constructor(feature) {
+    constructor(feature: GeoJSONFeature) {
         this.feature = feature;
     }
 
@@ -50,7 +50,7 @@ export function map(val, domain1, domain2, range1, range2) {
  * means timestamped GeoJSON data.
  */
 export class FkGeoJSON {
-    constructor(geojson) {
+    constructor(geojson: GeoJSON) {
         // Usually sorted server-side, though this should be fine.
         this.features = _(geojson.features).map(f => new FkGeoJSONFeature(f)).sortBy(f => f.time()).value();
     }
