@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	invalidLocationError = errors.New("invalid location")
+	invalidLocationError = errors.New("Invalid location")
 )
 
 type Location struct {
@@ -46,6 +46,12 @@ func (l *Location) String() string {
 	return l.point.String()
 }
 
+type RecordAnalysis struct {
+	RecordID         int64 `db:"record_id"`
+	ManuallyExcluded bool  `db:"manually_excluded"`
+	Outlier          bool  `db:"outlier"`
+}
+
 type Record struct {
 	ID        int64          `db:"id,omitempty"`
 	SchemaID  int32          `db:"schema_id"`
@@ -60,8 +66,17 @@ type Record struct {
 	Visible   bool           `db:"visible"`
 }
 
+type AnalysedRecord struct {
+	Record
+	RecordAnalysis
+}
+
 type RecordsPage struct {
 	Records []*Record
+}
+
+type AnalysedRecordsPage struct {
+	Records []*AnalysedRecord
 }
 
 func (d *Record) SetData(data interface{}) error {

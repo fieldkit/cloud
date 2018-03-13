@@ -29,7 +29,7 @@ func NewGeoJSONController(service *goa.Service, options GeoJSONControllerOptions
 	}
 }
 
-func createProperties(d *data.Record) map[string]interface{} {
+func createProperties(d *data.AnalysedRecord) map[string]interface{} {
 	p := make(map[string]interface{})
 
 	timestamp := d.Timestamp.UnixNano() / int64(time.Millisecond)
@@ -58,7 +58,7 @@ func createProperties(d *data.Record) map[string]interface{} {
 	return p
 }
 
-func MakeGeoJSON(docs *data.RecordsPage) *app.GeoJSON {
+func MakeGeoJSON(docs *data.AnalysedRecordsPage) *app.GeoJSON {
 	features := make([]*app.GeoJSONFeature, 0)
 	for _, d := range docs.Records {
 		c := d.Location.Coordinates()
@@ -81,34 +81,18 @@ func MakeGeoJSON(docs *data.RecordsPage) *app.GeoJSON {
 	}
 }
 
-func (c *GeoJSONController) List(ctx *app.ListGeoJSONContext) error {
-	token := backend.NewPagingTokenFromString(ctx.RequestData.Params.Get("token"))
-	docs, nextToken, err := c.options.Backend.ListRecords(ctx, ctx.Project, ctx.Expedition, token)
-	if err != nil {
-		return err
-	}
-
-	geoJson := MakeGeoJSON(docs)
-
-	return ctx.OK(&app.PagedGeoJSON{
-		NextURL: client.ListGeoJSONPath(ctx.Project, ctx.Expedition) + fmt.Sprintf("?token=%s", nextToken.String()),
-		Geo:     geoJson,
-		HasMore: len(geoJson.Features) >= backend.DefaultPageSize,
-	})
-}
-
 func (c *GeoJSONController) ListBySource(ctx *app.ListBySourceGeoJSONContext) error {
 	token := backend.NewPagingTokenFromString(ctx.RequestData.Params.Get("token"))
 	descending := false
 	if ctx.Descending != nil {
 		descending = *ctx.Descending
 	}
-	docs, nextToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, descending, token)
+	records, nextToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, descending, false, token)
 	if err != nil {
 		return err
 	}
 
-	geoJson := MakeGeoJSON(docs)
+	geoJson := MakeGeoJSON(records)
 
 	return ctx.OK(&app.PagedGeoJSON{
 		NextURL: client.ListBySourceGeoJSONPath(ctx.SourceID) + fmt.Sprintf("?token=%s&descending=%v", nextToken.String(), descending),
@@ -118,12 +102,12 @@ func (c *GeoJSONController) ListBySource(ctx *app.ListBySourceGeoJSONContext) er
 }
 
 func (c *GeoJSONController) ListByID(ctx *app.ListByIDGeoJSONContext) error {
-	docs, err := c.options.Backend.ListRecordsByID(ctx, ctx.FeatureID)
+	records, err := c.options.Backend.ListRecordsByID(ctx, ctx.FeatureID)
 	if err != nil {
 		return err
 	}
 
-	geoJson := MakeGeoJSON(docs)
+	geoJson := MakeGeoJSON(records)
 
 	return ctx.OK(&app.PagedGeoJSON{
 		Geo:     geoJson,

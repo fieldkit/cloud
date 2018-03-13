@@ -15,37 +15,6 @@ import (
 	"strconv"
 )
 
-// ListGeoJSONPath computes a request path to the list action of GeoJSON.
-func ListGeoJSONPath(project string, expedition string) string {
-	param0 := project
-	param1 := expedition
-
-	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/geojson", param0, param1)
-}
-
-// List a expedition's features in a GeoJSON.
-func (c *Client) ListGeoJSON(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListGeoJSONRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewListGeoJSONRequest create the request corresponding to the list action endpoint of the GeoJSON resource.
-func (c *Client) NewListGeoJSONRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
 // ListByIDGeoJSONPath computes a request path to the list by id action of GeoJSON.
 func ListByIDGeoJSONPath(featureID int) string {
 	param0 := strconv.Itoa(featureID)
@@ -101,8 +70,8 @@ func (c *Client) NewListBySourceGeoJSONRequest(ctx context.Context, path string,
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if descending != nil {
-		tmp122 := strconv.FormatBool(*descending)
-		values.Set("descending", tmp122)
+		tmp121 := strconv.FormatBool(*descending)
+		values.Set("descending", tmp121)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

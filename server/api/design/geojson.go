@@ -68,20 +68,6 @@ var PagedGeoJSON = MediaType("application/vnd.app.paged-geojson+json", func() {
 })
 
 var _ = Resource("GeoJSON", func() {
-	Action("list", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/geojson"))
-		Description("List a expedition's features in a GeoJSON.")
-		Params(func() {
-			Param("project", String, ProjectSlug)
-			Param("expedition", String, ExpeditionSlug)
-			Required("project", "expedition")
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(PagedGeoJSON)
-		})
-	})
-
 	Action("list by source", func() {
 		Routing(GET("sources/:sourceId/geojson"))
 		Description("List an source's features in a GeoJSON.")

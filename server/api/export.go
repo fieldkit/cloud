@@ -29,6 +29,13 @@ func NewExportController(service *goa.Service, options ExportControllerOptions) 
 	}
 }
 
+func BoolTo0or1(flag bool) int {
+	if flag {
+		return 1
+	}
+	return 0
+}
+
 func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/csv")
 	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"source-%d.csv\"", ctx.SourceID))
@@ -40,7 +47,7 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 	var keys []string
 
 	for {
-		page, newToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, false, token)
+		page, newToken, err := c.options.Backend.ListRecordsBySource(ctx, ctx.SourceID, false, true, token)
 		if err != nil {
 			log.Printf("Error querying: %v", err)
 			break
@@ -59,7 +66,7 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 						keys = append(keys, key)
 					}
 					sort.Strings(keys)
-					row := []string{"ID", "Time", "Location"}
+					row := []string{"id", "time", "longitude", "latitude", "visible", "outlier", "manually_excluded"}
 					row = append(row, keys...)
 					writer.WriteString(strings.Join(row, ",") + "\n")
 				}
@@ -76,7 +83,11 @@ func (c *ExportController) ListBySource(ctx *app.ListBySourceExportContext) erro
 				row := []string{
 					fmt.Sprintf("%d", record.ID),
 					fmt.Sprintf("%v", record.Timestamp),
-					record.Location.String(),
+					fmt.Sprintf("%f", record.Location.Coordinates()[0]),
+					fmt.Sprintf("%f", record.Location.Coordinates()[1]),
+					fmt.Sprintf("%d", BoolTo0or1(record.Visible)),
+					fmt.Sprintf("%d", BoolTo0or1(record.Outlier)),
+					fmt.Sprintf("%d", BoolTo0or1(record.ManuallyExcluded)),
 				}
 				row = append(row, fieldValues...)
 				writer.WriteString(strings.Join(row, ",") + "\n")

@@ -408,7 +408,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+          Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
         type: Qui et aperiam.
       - geometry:
           coordinates:
@@ -416,7 +416,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+          Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
         type: Qui et aperiam.
       - geometry:
           coordinates:
@@ -424,7 +424,7 @@ definitions:
           - 0.15517601
           type: Qui eum enim deleniti sint velit.
         properties:
-          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+          Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
         type: Qui et aperiam.
       type: Nulla dolore laboriosam soluta quia molestias.
     properties:
@@ -447,7 +447,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+        Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
       type: Qui et aperiam.
     properties:
       geometry:
@@ -455,7 +455,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+          Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
         type: object
       type:
         example: Qui et aperiam.
@@ -476,7 +476,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+        Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
       type: Qui et aperiam.
     - geometry:
         coordinates:
@@ -484,7 +484,7 @@ definitions:
         - 0.15517601
         type: Qui eum enim deleniti sint velit.
       properties:
-        Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+        Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
       type: Qui et aperiam.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -597,26 +597,6 @@ definitions:
       numberOfFeatures: 9.023151e+18
       radius: 0.90857327
       startTime: 1996-09-08T18:00:07Z
-    - centroid:
-      - 0.707477
-      endTime: 1986-01-17T16:31:06Z
-      geometry:
-      - - 0.8317134
-        - 0.8317134
-      id: 7.24424e+17
-      numberOfFeatures: 9.023151e+18
-      radius: 0.90857327
-      startTime: 1996-09-08T18:00:07Z
-    - centroid:
-      - 0.707477
-      endTime: 1986-01-17T16:31:06Z
-      geometry:
-      - - 0.8317134
-        - 0.8317134
-      id: 7.24424e+17
-      numberOfFeatures: 9.023151e+18
-      radius: 0.90857327
-      startTime: 1996-09-08T18:00:07Z
     items:
       $ref: '#/definitions/GeometryClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -666,7 +646,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+            Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
           type: Qui et aperiam.
         - geometry:
             coordinates:
@@ -674,7 +654,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+            Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
           type: Qui et aperiam.
         - geometry:
             coordinates:
@@ -682,7 +662,7 @@ definitions:
             - 0.15517601
             type: Qui eum enim deleniti sint velit.
           properties:
-            Et quidem quis fugit.: 77e515c9-5f06-4367-877b-897174ebdab3
+            Et quidem quis fugit.: 2dba73e1-69e1-4e4e-807a-71f70131d99b
           type: Qui et aperiam.
         type: Nulla dolore laboriosam soluta quia molestias.
       hasMore: false
@@ -856,6 +836,8 @@ definitions:
     description: ReadingSummaryCollection is the media type for an array of ReadingSummary
       (default view)
     example:
+    - name: Et hic sunt.
+    - name: Et hic sunt.
     - name: Et hic sunt.
     items:
       $ref: '#/definitions/ReadingSummary'
@@ -2164,39 +2146,6 @@ paths:
       summary: get expedition
       tags:
       - expedition
-  /projects/@/{project}/expeditions/@/{expedition}/geojson:
-    get:
-      description: List a expedition's features in a GeoJSON.
-      operationId: GeoJSON#list
-      parameters:
-      - description: Expedition slug
-        in: path
-        maxLength: 40
-        name: expedition
-        pattern: ^[\da-z]+(?:-[\da-z]+)*$
-        required: true
-        type: string
-      - description: Project slug
-        in: path
-        maxLength: 40
-        name: project
-        pattern: ^[\da-z]+(?:-[\da-z]+)*$
-        required: true
-        type: string
-      produces:
-      - application/vnd.app.paged-geojson+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/PagedGeoJSON'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: list GeoJSON
-      tags:
-      - GeoJSON
   /projects/@/{project}/expeditions/@/{expedition}/source-tokens:
     get:
       description: |-
