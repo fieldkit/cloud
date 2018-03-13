@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
 import { Link } from 'react-router-dom';
 
 import MapContainer from '../containers/MapContainer';
@@ -68,7 +69,9 @@ class ChartsContainer extends Component {
     render() {
         const { chartData } = this.props;
 
-        return <div className="charts">{chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChartContainer key={chart.id} chart={chart} /></div>)}</div>;
+        return <div className="charts">
+            {chartData.charts.map(chart => <div key={chart.id} className="chart"><SimpleChartContainer chart={chart} /></div>)}
+        </div>;
     }
 };
 
