@@ -46,33 +46,29 @@ export function focusFeature(feature) {
     };
 }
 
-export function loadChartData(chart) {
+export function loadChartData(chartDef) {
     return (dispatch, getState) => {
         const criteria = getState().chartData.criteria;
 
         dispatch({
-            type: ActionTypes.CHART_DATA_LOAD,
-            chart: chart
-        });
-
-        dispatch({
-            [CALL_WEB_API]: getQuery(chart, criteria)
+            [CALL_WEB_API]: getQuery(chartDef, criteria)
         });
     };
 }
 
 export function changeCriteria(criteria) {
     return (dispatch, getState) => {
-        const charts = getState().chartData.charts;
+        const queries = getState().chartData.queries;
 
         dispatch({
             type: ActionTypes.CHART_CRITERIA_CHANGE,
             criteria: criteria
         });
 
-        for (let c of charts) {
+        for (let id of Object.keys(queries)) {
+            const query = queries[id];
             dispatch({
-                [CALL_WEB_API]: getQuery(c, criteria)
+                [CALL_WEB_API]: getQuery(query.chartDef, criteria)
             });
         }
     };

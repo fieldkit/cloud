@@ -2442,11 +2442,16 @@ html, body {
     .source.page .side-container .map .disclaimer-panel {
       display: none; }
 
-.source.page .charts .chart {
-  padding: 10px; }
+.source.page .readings .reading-container {
+  padding: 0px 10px 10px 10px;
+  height: 354px; }
 
-.source.page .charts .chart > div {
-  background-color: #212124; }
+.source.page .readings .reading {
+  background-color: #212124;
+  padding: 10px; }
+  .source.page .readings .reading .title {
+    font-weight: bold;
+    font-size: 1.3em; }
 
 .source.page .header {
   padding: 30px;

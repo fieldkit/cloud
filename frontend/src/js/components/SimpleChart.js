@@ -10,7 +10,11 @@ import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend, AreaChart, Ar
 import { Loading } from './Loading';
 
 type Props = {
-    chartDef: any,
+    chartDef: {
+        id: string,
+        sourceId: number,
+        keys: Array<string>,
+    },
     data: any,
 };
 
@@ -20,11 +24,11 @@ export default class SimpleChart extends Component {
     render() {
         const { chartDef, data } = this.props;
 
-        if (data.loading) {
+        if (!data || data.loading) {
             return <Loading />;
         }
 
-        const samples = _(data.series[0].rows).map(r => {
+        const samples = _(data.query.series[0].rows).map(r => {
             const row = {
                 x: r[0],
             };
@@ -40,8 +44,8 @@ export default class SimpleChart extends Component {
                     <XAxis dataKey="x"  tickFormatter={t => moment.unix(t).format('HH:mm')} />
                     <YAxis />
                     <CartesianGrid stroke="#626262" />
-                    <Legend verticalAlign="top" height={36} />
-                    { chartDef.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} animationDuration={100} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} />)}
+                    { false && <Legend verticalAlign="top" height={36} />}
+                    { chartDef.keys.map(k => <Area key={k} type="monotone" dataKey={k} dot={false} stroke="#82ca9d" strokeWidth={2} fill="#82ca9d" fillOpacity={0.3} isAnimationActive={false} />)}
                 </AreaChart>
             </ResponsiveContainer>
         </div>;

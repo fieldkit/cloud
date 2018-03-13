@@ -132,14 +132,14 @@ function objectToQueryString(obj) {
     }, '').slice(0, -1);
 };
 
-export function getQuery(chart, criteria) {
-    const queryString = objectToQueryString(Object.assign({}, chart, criteria));
+export function getQuery(chartDef, criteria) {
+    const queryString = objectToQueryString(Object.assign({}, chartDef, criteria));
     return {
         types: ActionTypes.API_SOURCE_QUERY_GET,
-        path: '/sources/' + chart.sourceId + '/query?' + queryString,
+        path: '/sources/' + chartDef.sourceId + '/query?' + queryString,
         method: 'GET',
         unwrap: (r) => r,
-        chart: chart,
+        chartDef: chartDef,
         criteria: criteria
     };
 }

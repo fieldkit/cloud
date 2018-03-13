@@ -33,6 +33,17 @@ function mergeFeatures(state, action) {
     });
 }
 
+function createSummary(summary) {
+    _.each(summary.readings, reading => {
+        reading.chartDef = {
+            id: ["reading", summary.id, reading.name].join("-"),
+            sourceId: summary.id,
+            keys: [reading.name],
+        };
+    });
+    return summary;
+}
+
 function visibleFeatures(state = visibleFeaturesInitialState, action) {
     switch (action.type) {
     case ActionTypes.API_EXPEDITION_GEOJSON_GET.SUCCESS: {
@@ -63,7 +74,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
         return nextState;
     }
     case ActionTypes.API_SOURCE_SUMMARY_GET.SUCCESS: {
-        const summary = action.response;
+        const summary = createSummary(action.response);
         const container = state.sources[summary.id] || { };
         const nextState = Object.assign({}, state);
         nextState.sources[summary.id] = {...container, ...{ summary: summary } };
@@ -106,6 +117,13 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
     }
 }
 
+function sources(state = {}, action) {
+    switch (action.type) {
+    default:
+        return state;
+    }
+}
+
 function playbackMode(state = { }, action) {
     switch (action.type) {
     case ActionTypes.CHANGE_PLAYBACK_MODE:
@@ -120,51 +138,34 @@ const start = new Date();
 start.setDate(start.getDate() - 1);
 
 const initialChartDataState = {
-    charts: [],
+    queries: {},
     criteria: {
         startTime: Math.trunc(start.getTime() / 1000),
         endTime: Math.trunc(now.getTime() / 1000),
     }
 };
 
-function getOrCreateChart(state, chart) {
-    for (let c of state.charts) {
-        if (c.id === chart.id) {
-            return c;
-        }
-    }
-
-    const newChart = Object.assign({}, chart);
-    state.charts.push(newChart);
-    return newChart;
-}
-
 function chartData(state = initialChartDataState, action) {
     switch (action.type) {
-    case ActionTypes.CHART_SOURCE_LOAD: {
-        return { ...state, ...{ charts: [] } };
-    }
     case ActionTypes.CHART_CRITERIA_CHANGE: {
         return { ...state, ...{ criteria: action.criteria } };
     }
-    case ActionTypes.CHART_DATA_LOAD: {
-        const nextState = Object.assign({}, state);
-        const chart = getOrCreateChart(nextState, action.chart);
-        Object.assign(chart, action.chart);
-        return nextState;
-    }
     case ActionTypes.API_SOURCE_QUERY_GET.START: {
         const nextState = Object.assign({}, state);
-        const chart = getOrCreateChart(nextState, action.chart);
-        chart.loading = true;
-        chart.query = {};
+        const pending = nextState.queries[action.chartDef.id] || {};
+        pending.chartDef = action.chartDef;
+        pending.loading = true;
+        pending.query = {};
+        nextState.queries[action.chartDef.id] = pending;
         return nextState;
     }
     case ActionTypes.API_SOURCE_QUERY_GET.SUCCESS: {
         const nextState = Object.assign({}, state);
-        const chart = getOrCreateChart(nextState, action.chart);
-        chart.loading = false;
-        chart.query = action.response;
+        const loaded = nextState.queries[action.chartDef.id];
+        loaded.chartDef = action.chartDef;
+        loaded.loading = false;
+        loaded.query = action.response;
+        nextState.queries[action.chartDef.id] = loaded;
         return nextState;
     }
     default:
@@ -175,6 +176,7 @@ function chartData(state = initialChartDataState, action) {
 export default combineReducers({
     activeExpedition,
     visibleFeatures,
+    sources,
     playbackMode,
     chartData
 });

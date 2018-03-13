@@ -73,12 +73,20 @@ html, body {
         }
     }
 
-    .charts {
-        .chart {
-            padding: 10px;
+    .readings {
+        .reading-container {
+            padding: 0px 10px 10px 10px;
+            height: 354px;
         }
-        .chart > div {
+
+        .reading {
             background-color: #212124;
+            padding: 10px;
+
+            .title {
+                font-weight: bold;
+                font-size: 1.3em;
+            }
         }
     }
 

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import MapContainer from '../components/MapContainer';
 import CriteriaPanel from '../components/CriteriaPanel';
 import SourceOverview from '../components/SourceOverview';
-import ChartsContainer  from '../components/ChartsContainer';
+import ReadingsList  from '../components/ReadingsList';
 
 import { generatePointDecorator } from '../common/utilities';
 
@@ -50,8 +50,6 @@ class Source extends Component {
         const newSources = {};
         newSources[sourceId] = sourceData;
 
-        console.log(sourceData);
-
         const narrowed = {
             geojson: { type: '', features: [] },
             sources: newSources,
@@ -72,7 +70,7 @@ class Source extends Component {
                 </div>
                 <div className="main-container">
                     <div className="middle-container">
-                        <ChartsContainer chartData={chartData} loadChartData={ loadChartData } />
+                        <ReadingsList sourceData={ sourceData } chartData={chartData} loadChartData={ loadChartData } />
                     </div>
                     <div className="side-container">
                         <div className="map">
