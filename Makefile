@@ -54,6 +54,11 @@ deps:
 clean:
 	rm -rf build
 
+clean-production:
+	rm -rf schema-production
+
+refresh-production: clean-production clone-production
+
 schema-production:
 	mkdir schema-production
 	@if [ -d ~/conservify/dev-ops ]; then                                           \
@@ -68,5 +73,10 @@ schema-production:
 clone-production: schema-production
 	rm -f active-schema
 	ln -sf schema-production active-schema
+
+restart-postgres:
+	docker-compose stop postgres
+	docker-compose rm -f postgres
+	docker-compose up -d postgres
 
 veryclean:
