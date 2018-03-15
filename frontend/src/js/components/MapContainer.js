@@ -5,7 +5,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import ReactMapboxGl, { ScaleControl, ZoomControl } from 'react-mapbox-gl';
 
-import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../types';
+import type { Focus, StyleSheet, Coordinates, GeoJSON } from '../types';
 
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE } from '../secrets';
 
@@ -18,66 +18,6 @@ import { RadialMenu } from './RadialMenu';
 
 import { FieldKitLogo } from './icons/Icons';
 
-const panelContainerStyle: StyleSheet = {
-    backgroundColor: '#f9f9f9',
-    color: "#000",
-    position: 'absolute',
-    zIndex: 10,
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0px 1px 4px rgba(0, 0, 0, .3)',
-};
-
-const panelHeaderStyle: StyleSheet = {
-    padding: '5px',
-    backgroundColor: 'rgb(196, 196, 196)',
-    borderBottom: '1px solid rgb(128, 128, 128)',
-    fontWeight: 'bold',
-};
-
-const panelBodyStyle = {
-};
-
-export class MapBottom extends Component {
-    positionStyle() {
-        const { sidePanelVisible } = this.props;
-        if (!sidePanelVisible) {
-            return { top: 'auto', right: 0, bottom: 0, left: 0, height: '250px', width: '100%' };
-        }
-        return { top: 'auto', right: 300, bottom: 0, left: 0, height: '250px' };
-    }
-
-    render() {
-        const { onHide, children } = this.props;
-        const position = this.positionStyle();
-
-        return (
-            <div style={{...panelContainerStyle, ...position}}>
-                <div style={{ ...panelHeaderStyle }}><span style={{ cursor: 'pointer' }} onClick={() => onHide()}>Close</span></div>
-                <div style={{ ...panelBodyStyle }}>
-                    {children}
-                </div>
-            </div>
-        );
-    }
-}
-
-export class MapRight extends Component {
-    render() {
-        const { onHide, children } = this.props;
-        const position = { top: 0, right: 0, bottom: 'auto', left: 'auto', width: '300px', height: '100%' };
-
-        return (
-            <div style={{...panelContainerStyle, ...position}}>
-                <div style={{ ...panelHeaderStyle }}><span style={{ cursor: 'pointer' }} onClick={() => onHide()}>Close</span></div>
-                <div style={{ ...panelBodyStyle }}>
-                    {children}
-                </div>
-            </div>
-        );
-    }
-}
-
 const Map = ReactMapboxGl({
     accessToken: MAPBOX_ACCESS_TOKEN
 });
@@ -87,7 +27,6 @@ type Props = {
     style?: StyleSheet,
     playbackMode: mixed,
     focusSource: () => mixed,
-    focusFeature: () => mixed,
     onChangePlaybackMode: () => mixed,
     onUserActivity: () => mixed,
     pointDecorator: PointDecorator,
@@ -103,10 +42,8 @@ export default class MapContainer extends Component {
     props: Props
     state: {
         feature: any,
-        fitBounds: ?Bounds,
         center: ?Coordinates,
         zoom: [number],
-        feature: ?GeoJSONFeature,
         menu: any,
     }
 
@@ -115,10 +52,8 @@ export default class MapContainer extends Component {
     constructor(props: Props) {
         super(props);
         this.state = {
-            fitBounds: null,
             center: null,
             zoom: [14],
-            feature: null,
             menu: null,
         };
         this.onUserActivityThrottled = _.throttle(this.onUserActivity.bind(this), 500, { leading: true });
@@ -128,13 +63,7 @@ export default class MapContainer extends Component {
         const { visibleFeatures } = props;
         const { focus } = visibleFeatures;
 
-        if (focus.feature) {
-            return {
-                center: focus.feature.geometry.coordinates,
-                zoom: [focus.center.length === 3 ? focus.center[2] : 14],
-            };
-        }
-        else if (focus.center) {
+        if (focus.center) {
             return {
                 center: focus.center,
                 zoom: [focus.center.length === 3 ? focus.center[2] : 14],
@@ -161,20 +90,8 @@ export default class MapContainer extends Component {
         }
     }
 
-    onMarkerClick(feature) {
-        this.setState({
-            feature,
-        });
-    }
-
-    onFocusFeature(feature) {
-        const { focusFeature } = this.props;
-
-        focusFeature(feature);
-
-        this.setState({
-            feature,
-        });
+    onMarkerClick(thing) {
+        console.log(thing);
     }
 
     onFocusSource(source) {
@@ -187,12 +104,6 @@ export default class MapContainer extends Component {
         const { onUserActivity } = this.props;
 
         onUserActivity(how);
-    }
-
-    onMouseMove(target, ev) {
-    }
-
-    onMouseOut(target, ev) {
     }
 
     onClick(target, ev) {
@@ -289,7 +200,7 @@ export default class MapContainer extends Component {
 
     render() {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode, containerStyle, style, controls } = this.props;
-        const { fitBounds, center, zoom } = this.state;
+        const { center, zoom } = this.state;
 
         if (!center) {
             return <div></div>;
@@ -298,12 +209,11 @@ export default class MapContainer extends Component {
         return (
             <div style={style}>
                 <Map style={MAPBOX_STYLE} containerStyle={containerStyle}
-                    movingMethod="easeTo" center={ center } zoom={ zoom } fitBounds={ fitBounds }
-                    onMouseMove={ this.onMouseMove.bind(this) }
-                    onMouseOut={ this.onMouseOut.bind(this) }
+                    movingMethod="easeTo" center={ center } zoom={ zoom }
                     onClick={ this.onClick.bind(this) }
                     onZoomEnd={ this.onUserActivityThrottled.bind(this) }
-                    onDrag={ this.onUserActivityThrottled.bind(this) }>
+                    onDrag={ this.onUserActivityThrottled.bind(this) }
+                    onDragEnd={ this.onUserActivityThrottled.bind(this) }>
 
                     <ClusterMap data={ visibleFeatures.sources } onClick={ this.onMarkerClick.bind(this) } />
 
@@ -315,7 +225,7 @@ export default class MapContainer extends Component {
 
                     { controls && <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />}
 
-                    { controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ this.onFocusFeature.bind(this) } />}
+                    { controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log(arguments) } />}
 
                     {this.renderRadialMenu()}
                 </Map>
