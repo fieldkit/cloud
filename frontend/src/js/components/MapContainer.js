@@ -14,7 +14,7 @@ import ClusterMap from './visualizations/ClusterMap';
 import PlaybackControl from './PlaybackControl';
 import FiltersPanel from './FiltersPanel';
 
-import { RadialMenu } from './RadialMenu';
+import { FancyMenu } from './FancyMenu';
 
 import { FieldKitLogo } from './icons/Icons';
 
@@ -41,7 +41,6 @@ type Props = {
 export default class MapContainer extends Component {
     props: Props
     state: {
-        feature: any,
         center: ?Coordinates,
         zoom: [number],
         menu: any,
@@ -107,95 +106,76 @@ export default class MapContainer extends Component {
     }
 
     onClick(target, ev) {
-        const features = target.queryRenderedFeatures(ev.point);
+        const selected = _.uniqBy(target.queryRenderedFeatures(ev.point), f => f.properties.name);
         const coordinates = ev.lngLat;
 
-        let options = this.clusterOptions(features);
-        if (features.length > 1) {
-            options = this.selectFeatureOptions(features);
+        if (selected.length === 0) {
+            this.setState({
+                menu: null
+            });
+            return;
         }
+
+        const options = this.getOptions(selected);
 
         this.setState({
             menu: {
                 mouse: ev.point,
                 coordinates: coordinates,
-                features: features,
+                selected: selected,
                 options: options,
             }
         });
     }
 
-    onMenuClose() {
-        const { menu } = this.state;
-
-
-        if (menu.nextOptions) {
-            this.setState({
-                menu: {
-                    mouse: menu.mouse,
-                    coordinates: menu.coordinates,
-                    features: menu.features,
-                    options: menu.nextOptions,
+    getOptions(selected) {
+        if (selected.length === 1) {
+            return [
+                {
+                    title: "Graph",
+                    onClick: () => {
+                    }
+                },
+                {
+                    title: "Playback",
+                    onClick: () => {
+                    }
+                },
+                {
+                    title: "Hide",
+                    onClick: () => {
+                    }
                 }
-            });
+            ];
         }
-        else {
-            this.setState({
-                menu: null
-            });
-        }
+
+        return selected.map(feature => {
+            return {
+                title: feature.properties.name,
+                onClick: () => {
+                    const { menu } = this.state;
+                    this.setState({
+                        menu: { ...menu, ...{ options: this.getOptions([feature]) } },
+                    });
+                    return true;
+                }
+            };
+        });
+    }
+
+    onMenuClose() {
+        this.setState({
+            menu: null
+        });
     }
 
     renderRadialMenu() {
         const { menu } = this.state;
 
-        if (!menu || menu.features.length === 0) {
-            return <div></div>;
-        }
+        const visible = menu != null && menu.mouse != null;
+        const position = visible ? menu.mouse : { x: 0, y: 0};
 
-        const { options } = menu;
-
-        return <RadialMenu key={options.key} delay={80} duration={400} strokeWidth={2} innerRadius={20} outerRadius={120}
-                stroke={"rgba(255, 255, 255, 1)"} fill={"rgba(0, 0, 0, 0.8)"}
-                buttons={options.buttons} buttonFunctions={options.functions}
-                position={menu.mouse} onClosed={ this.onMenuClose.bind(this) } />;
-    }
-
-    selectFeatureOptions(features) {
-        const options = _(features).map(f => f.properties).map(f => {
-            return {
-                title: f.name,
-                function: () => {
-                    const { menu } = this.state;
-                    const nextMenu = { ...menu, ...{ features: [f], nextOptions: this.clusterOptions([f]) } };
-                    this.setState({
-                        menu: nextMenu
-                    });
-                }
-            };
-        });
-
-        return {
-            key: 1,
-            buttons: options.map(o => o.title).value(),
-            functions: options.map(o => o.function).value()
-        };
-    }
-
-    clusterOptions(features) {
-        return {
-            key: 0,
-            buttons: [
-                "Data",
-                "Graph",
-                "Summary"
-            ],
-            functions: [
-                () => console.log("Data"),
-                () => console.log("Graph"),
-                () => console.log("Summary"),
-            ]
-        };
+        return <FancyMenu visible={visible} options={menu ? menu.options : []} position={position} onClosed={ this.onMenuClose.bind(this) } />
     }
 
     render() {

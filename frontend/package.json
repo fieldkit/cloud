@@ -16,6 +16,7 @@
     "react-dom": "^15.5.4",
     "react-lazyload": "^2.3.0",
     "react-mapbox-gl": "^3.8.0",
+    "react-move": "^2.7.0",
     "react-radial": "^1.0.8",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.1.1",
@@ -25,6 +26,7 @@
     "redux-logger": "^3.0.6",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
+    "resonance": "^0.9.5",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
