@@ -1,6 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 
 import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../types';
@@ -35,8 +36,18 @@ class Map extends Component {
         pointDecorator: PointDecorator
     };
 
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+            }).isRequired
+        }).isRequired
+    };
+
     constructor(props: Props) {
         super(props);
+
         this.state = {
             pointDecorator: generatePointDecorator('constant', 'constant')
         };
@@ -53,8 +64,23 @@ class Map extends Component {
         document.body.style.overflow = null;
     }
 
+    onUserActivity(map) {
+        this.props.notifyOfUserMapActivity(map);
+        this.updateCoordinates(map);
+    }
+
+    updateCoordinates(map) {
+        const newZoom = map.getZoom();
+        const mapCenter = map.getCenter();
+        const newCenter = [ mapCenter.lng, mapCenter.lat, newZoom ];
+        this.context.router.history.push({
+            pathname: '/',
+            search: '?center=' + newCenter.join(","),
+        })
+    }
+
     render() {
-        const { visibleFeatures, playbackMode, notifyOfUserMapActivity, focusFeature, focusSource, changePlaybackMode } = this.props;
+        const { visibleFeatures, playbackMode, focusFeature, focusSource, changePlaybackMode } = this.props;
         const { pointDecorator } = this.state;
 
         return (
@@ -69,7 +95,7 @@ class Map extends Component {
                         playbackMode={ playbackMode }
                         focusFeature={ focusFeature }
                         focusSource={ focusSource }
-                        notifyOfUserMapActivity={ notifyOfUserMapActivity }
+                        onUserActivity={ this.onUserActivity.bind(this) }
                         onChangePlaybackMode={ changePlaybackMode } />
                 </div>
             </div>

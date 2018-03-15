@@ -3,7 +3,6 @@
 import _ from 'lodash';
 
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import ReactMapboxGl, { ScaleControl, ZoomControl } from 'react-mapbox-gl';
 
 import type { Focus, StyleSheet, Coordinates, Bounds, GeoJSONFeature, GeoJSON } from '../types';
@@ -90,7 +89,7 @@ type Props = {
     focusSource: () => mixed,
     focusFeature: () => mixed,
     onChangePlaybackMode: () => mixed,
-    notifyOfUserMapActivity: () => mixed,
+    onUserActivity: () => mixed,
     pointDecorator: PointDecorator,
     controls: ?bool,
     visibleFeatures: {
@@ -113,21 +112,12 @@ export default class MapContainer extends Component {
 
     onUserActivityThrottled: () => mixed
 
-    static contextTypes = {
-        router: PropTypes.shape({
-            history: PropTypes.shape({
-                push: PropTypes.func.isRequired,
-                replace: PropTypes.func.isRequired,
-            }).isRequired
-        }).isRequired
-    };
-
     constructor(props: Props) {
         super(props);
         this.state = {
             fitBounds: null,
             center: null,
-            zoom: [14],
+            zoom: null,
             feature: null,
             menu: null,
         };
@@ -140,12 +130,14 @@ export default class MapContainer extends Component {
 
         if (focus.feature) {
             return {
-                center: focus.feature.geometry.coordinates
+                center: focus.feature.geometry.coordinates,
+                zoom: [focus.center.length === 3 ? focus.center[2] : 14],
             };
         }
         else if (focus.center) {
             return {
-                center: focus.center
+                center: focus.center,
+                zoom: [focus.center.length === 3 ? focus.center[2] : 14],
             };
         }
         return {};
@@ -192,9 +184,9 @@ export default class MapContainer extends Component {
     }
 
     onUserActivity(how) {
-        const { notifyOfUserMapActivity } = this.props;
+        const { onUserActivity } = this.props;
 
-        notifyOfUserMapActivity();
+        onUserActivity(how);
     }
 
     onMouseMove(target, ev) {
@@ -310,6 +302,7 @@ export default class MapContainer extends Component {
                     onMouseMove={ this.onMouseMove.bind(this) }
                     onMouseOut={ this.onMouseOut.bind(this) }
                     onClick={ this.onClick.bind(this) }
+                    onZoomEnd={ this.onUserActivityThrottled.bind(this) }
                     onDrag={ this.onUserActivityThrottled.bind(this) }>
 
                     <ClusterMap data={ visibleFeatures.sources } onClick={ this.onMarkerClick.bind(this) } />

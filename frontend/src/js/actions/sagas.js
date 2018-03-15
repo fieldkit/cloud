@@ -114,13 +114,32 @@ export function* loadSources(ids) {
     console.log('Summaries', summaries, sources);
 }
 
+function getMapLocationFromQueryString() {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get('center') || "";
+    const center = value.split(",").map(v => Number(v));
+    if (center.length < 2) {
+        return null;
+    }
+    return center;
+}
+
+function getDefaultMapLocation() {
+    const fromQuery = getMapLocationFromQueryString();
+    if (fromQuery != null) {
+        return fromQuery;
+    }
+
+    return [-118.2688137, 34.0309388, 14];
+}
+
 export function* loadExpedition(projectSlug, expeditionSlug) {
     const [ expedition, sources ] = yield all([
         FkApi.getExpedition(projectSlug, expeditionSlug),
         FkApi.getExpeditionSources(projectSlug, expeditionSlug)
     ]);
 
-    yield put(focusLocation([-118.2688137, 34.0309388]));
+    yield put(focusLocation(getDefaultMapLocation()));
 
     const sourceIds = _(sources.deviceSources).map('id').uniq().value();
     const detailedSources = yield loadSources(sourceIds);

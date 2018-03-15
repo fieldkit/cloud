@@ -18,7 +18,9 @@ function activeExpedition(state = { project: null, expedition: null }, action) {
 }
 
 const visibleFeaturesInitialState = {
-    focus: { features: [] },
+    focus: {
+        center: null,
+    },
     sources: { },
     geojson: { features: []}
 };

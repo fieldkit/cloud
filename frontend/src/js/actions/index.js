@@ -9,11 +9,11 @@ export function changePlaybackMode(mode) {
     };
 }
 
-export function focusLocation(center, altitude) {
+export function focusLocation(center) {
     return {
         type: ActionTypes.FOCUS_LOCATION,
         center: center,
-        altitude: altitude
+        altitude: center.length === 3 ? center[2] : 10,
     };
 }
 
