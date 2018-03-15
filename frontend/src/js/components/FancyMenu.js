@@ -118,10 +118,11 @@ export class FancyMenu extends Component {
                 id: data.key,
             },
             background: {
+                id: data.key + "-bg",
                 cx: [0, center.x],
                 cy: [0, center.y],
                 r: backgroundRadius,
-                opacity: [0, 0.8],
+                opacity: [0, 0.7],
                 style: {
                     fill: 'black',
                     strokeWidth: 2,
@@ -153,6 +154,14 @@ export class FancyMenu extends Component {
 
         data.forEach((d, i) => {
             d3.select('#' + d.key)
+                .on('mouseover', function () {
+                    d3.select(`#${d.key}-bg`).style('opacity', 1);
+                    document.body.style.cursor = "pointer";
+                })
+                .on('mouseout', function () {
+                    d3.select(`#${d.key}-bg`).style('opacity', 0.7);
+                    document.body.style.cursor = "default";
+                })
                 .on('click', ev => {
                     d3.event.stopPropagation();
                     if (options[i].onClick) {
