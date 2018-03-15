@@ -77,7 +77,7 @@ class Source extends Component {
                             <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100%" }}
                                 pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
                                 playbackMode={ () => false } focusFeature={ () => false }
-                                focusSource={ () => false } notifyOfUserMapActivity={ () => false }
+                                focusSource={ () => false } onUserActivity={ () => false }
                                 onChangePlaybackMode={ () => false } />
                         </div>
                         <div className="">

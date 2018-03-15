@@ -5,11 +5,14 @@ BUILD=build
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
 
-default: binaries
+default: binaries tests
 
 binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy
 
 all: binaries
+
+tests:
+	cd frontend && yarn run flow
 
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go

@@ -117,7 +117,7 @@ export default class MapContainer extends Component {
         this.state = {
             fitBounds: null,
             center: null,
-            zoom: null,
+            zoom: [14],
             feature: null,
             menu: null,
         };
