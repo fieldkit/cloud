@@ -123,10 +123,10 @@ source AS (
 		MAX(d.timestamp) AS max_timestamp,
 		MAX(d.timestamp) - MIN(d.timestamp) AS min_max_diff,
 		d.location,
-    (SELECT bool_or(ST_DWithin(d.location::geography, spatial.bounding_envelope::geography, 50)) FROM fieldkit.fk_spatial_clusters(desired_source_id) spatial WHERE spatial.source_id = 125) AS in_spatial,
+    (SELECT bool_or(ST_DWithin(d.location::geography, spatial.bounding_envelope::geography, 50)) FROM fieldkit.fk_spatial_clusters(desired_source_id) spatial WHERE spatial.source_id = desired_source_id) AS in_spatial,
     COUNT(d.location) AS actual_size
 	FROM fieldkit.record d
-  WHERE d.source_id IN (125) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+  WHERE d.source_id IN (desired_source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
   GROUP BY d.location
 ),
 with_timestamp_differences AS (
