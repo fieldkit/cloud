@@ -14,6 +14,7 @@ export const API_EXPEDITION_GET = expandApiTypes("API_EXPEDITION_GET");
 export const API_PROJECT_GET = expandApiTypes("API_PROJECT_GET");
 export const API_SOURCE_GET = expandApiTypes("API_SOURCE_GET");
 export const API_SOURCE_SUMMARY_GET = expandApiTypes("API_SOURCE_SUMMARY_GET");
+export const API_CLUSTER_GEOMETRY_GET = expandApiTypes("API_CLUSTER_GEOMETRY_GET");
 export const API_FEATURE_GEOJSON_GET = expandApiTypes("API_FEATURE_GEOJSON_GET");
 export const API_SOURCE_GEOJSON_GET = expandApiTypes("API_SOURCE_GEOJSON_GET");
 export const API_SOURCE_QUERY_GET = expandApiTypes("API_SOURCE_QUERY_GET");

@@ -47,8 +47,8 @@ var Sources = MediaType("application/vnd.app.sources+json", func() {
 	})
 })
 
-var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_summary+json", func() {
-	TypeName("GeometryClusterSummary")
+var ClusterSummary = MediaType("application/vnd.app.geometry_cluster_summary+json", func() {
+	TypeName("ClusterSummary")
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("startTime", DateTime)
@@ -56,8 +56,7 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 		Attribute("numberOfFeatures", Integer)
 		Attribute("centroid", ArrayOf(Number))
 		Attribute("radius", Number)
-		Attribute("geometry", ArrayOf(ArrayOf(Number)))
-		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius", "geometry")
+		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -66,7 +65,6 @@ var GeometryClusterSummary = MediaType("application/vnd.app.geometry_cluster_sum
 		Attribute("numberOfFeatures")
 		Attribute("centroid")
 		Attribute("radius")
-		Attribute("geometry")
 	})
 })
 
@@ -81,13 +79,28 @@ var ReadingSummary = MediaType("application/vnd.app.reading_summary+json", func(
 	})
 })
 
+var ClusterGeometrySummary = MediaType("application/vnd.app.cluster_geometry_summary+json", func() {
+	TypeName("ClusterGeometrySummary")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("sourceId", Integer)
+		Attribute("geometry", ArrayOf(ArrayOf(Number)))
+		Required("id", "sourceId", "geometry")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("sourceId")
+		Attribute("geometry")
+	})
+})
+
 var SourceSummary = MediaType("application/vnd.app.source_summary+json", func() {
 	TypeName("SourceSummary")
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("name", String)
-		Attribute("temporal", CollectionOf(GeometryClusterSummary))
-		Attribute("spatial", CollectionOf(GeometryClusterSummary))
+		Attribute("temporal", CollectionOf(ClusterSummary))
+		Attribute("spatial", CollectionOf(ClusterSummary))
 		Attribute("readings", CollectionOf(ReadingSummary))
 		Required("id", "name", "temporal", "spatial")
 	})
@@ -162,6 +175,23 @@ var _ = Resource("source", func() {
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(SourceSummary)
+		})
+	})
+
+	Action("temporal cluster geometry by id", func() {
+		NoSecurity()
+
+		Routing(GET("sources/:sourceId/temporal/:clusterId/geometry"))
+		Description("Retrieve temporal cluster geometry")
+		Params(func() {
+			Param("sourceId", Integer)
+			Param("clusterId", Integer)
+			Required("sourceId")
+			Required("clusterId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(ClusterGeometrySummary)
 		})
 	})
 

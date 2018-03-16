@@ -1937,6 +1937,57 @@ func (ctx *SummaryByIDSourceContext) BadRequest() error {
 	return nil
 }
 
+// TemporalClusterGeometryByIDSourceContext provides the source temporal cluster geometry by id action context.
+type TemporalClusterGeometryByIDSourceContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ClusterID int
+	SourceID  int
+}
+
+// NewTemporalClusterGeometryByIDSourceContext parses the incoming request URL and body, performs validations and creates the
+// context used by the source controller temporal cluster geometry by id action.
+func NewTemporalClusterGeometryByIDSourceContext(ctx context.Context, r *http.Request, service *goa.Service) (*TemporalClusterGeometryByIDSourceContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := TemporalClusterGeometryByIDSourceContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramClusterID := req.Params["clusterId"]
+	if len(paramClusterID) > 0 {
+		rawClusterID := paramClusterID[0]
+		if clusterID, err2 := strconv.Atoi(rawClusterID); err2 == nil {
+			rctx.ClusterID = clusterID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("clusterId", rawClusterID, "integer"))
+		}
+	}
+	paramSourceID := req.Params["sourceId"]
+	if len(paramSourceID) > 0 {
+		rawSourceID := paramSourceID[0]
+		if sourceID, err2 := strconv.Atoi(rawSourceID); err2 == nil {
+			rctx.SourceID = sourceID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("sourceId", rawSourceID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *TemporalClusterGeometryByIDSourceContext) OK(r *ClusterGeometrySummary) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.cluster_geometry_summary+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *TemporalClusterGeometryByIDSourceContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // UpdateSourceContext provides the source update action context.
 type UpdateSourceContext struct {
 	context.Context

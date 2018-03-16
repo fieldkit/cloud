@@ -111,7 +111,18 @@ export function* loadSources(ids) {
     const newIds = _.difference(ids, _.keys(cache));
     const sources = yield all(newIds.map(id => FkApi.getSource(id)));
     const summaries = yield all(newIds.map(id => FkApi.getSourceSummary(id)));
-    console.log('Summaries', summaries, sources);
+    const temporal = yield all(_(summaries).map(s => {
+        return s.temporal.map(t => {
+            return {
+                sourceId: s.id,
+                clusterId: t.id,
+            };
+        })
+    }).flatten().map(ids => {
+        return FkApi.getTemporalClusterGeometry(ids.sourceId, ids.clusterId);
+    }).value());
+
+    console.log(summaries, sources, temporal.length);
 }
 
 function getMapLocationFromQueryString() {

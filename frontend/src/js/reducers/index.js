@@ -79,7 +79,13 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
         const summary = createSummary(action.response);
         const container = state.sources[summary.id] || { };
         const nextState = Object.assign({}, state);
-        nextState.sources[summary.id] = {...container, ...{ summary: summary } };
+        nextState.sources[summary.id] = {...container, ...{ summary: summary, geometries: {} } };
+        return nextState;
+    }
+    case ActionTypes.API_CLUSTER_GEOMETRY_GET.SUCCESS: {
+        const geometry = action.response;
+        const nextState = Object.assign({}, state);
+        nextState.sources[geometry.sourceId].geometries[geometry.id] = geometry;
         return nextState;
     }
     case ActionTypes.API_SOURCE_GET.SUCCESS: {

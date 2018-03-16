@@ -2140,6 +2140,7 @@ type SourceController interface {
 	ListExpeditionID(*ListExpeditionIDSourceContext) error
 	ListID(*ListIDSourceContext) error
 	SummaryByID(*SummaryByIDSourceContext) error
+	TemporalClusterGeometryByID(*TemporalClusterGeometryByIDSourceContext) error
 	Update(*UpdateSourceContext) error
 }
 
@@ -2151,6 +2152,7 @@ func MountSourceController(service *goa.Service, ctrl SourceController) {
 	service.Mux.Handle("OPTIONS", "/expeditions/:expeditionId/sources", ctrl.MuxHandler("preflight", handleSourceOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/sources/:sourceId", ctrl.MuxHandler("preflight", handleSourceOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/sources/:sourceId/summary", ctrl.MuxHandler("preflight", handleSourceOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/sources/:sourceId/temporal/:clusterId/geometry", ctrl.MuxHandler("preflight", handleSourceOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -2216,6 +2218,22 @@ func MountSourceController(service *goa.Service, ctrl SourceController) {
 	h = handleSourceOrigin(h)
 	service.Mux.Handle("GET", "/sources/:sourceId/summary", ctrl.MuxHandler("summary by id", h, nil))
 	service.LogInfo("mount", "ctrl", "Source", "action", "SummaryByID", "route", "GET /sources/:sourceId/summary")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewTemporalClusterGeometryByIDSourceContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.TemporalClusterGeometryByID(rctx)
+	}
+	h = handleSourceOrigin(h)
+	service.Mux.Handle("GET", "/sources/:sourceId/temporal/:clusterId/geometry", ctrl.MuxHandler("temporal cluster geometry by id", h, nil))
+	service.LogInfo("mount", "ctrl", "Source", "action", "TemporalClusterGeometryByID", "route", "GET /sources/:sourceId/temporal/:clusterId/geometry")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

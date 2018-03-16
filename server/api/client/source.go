@@ -142,6 +142,37 @@ func (c *Client) NewSummaryByIDSourceRequest(ctx context.Context, path string) (
 	return req, nil
 }
 
+// TemporalClusterGeometryByIDSourcePath computes a request path to the temporal cluster geometry by id action of source.
+func TemporalClusterGeometryByIDSourcePath(sourceID int, clusterID int) string {
+	param0 := strconv.Itoa(sourceID)
+	param1 := strconv.Itoa(clusterID)
+
+	return fmt.Sprintf("/sources/%s/temporal/%s/geometry", param0, param1)
+}
+
+// Retrieve temporal cluster geometry
+func (c *Client) TemporalClusterGeometryByIDSource(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewTemporalClusterGeometryByIDSourceRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewTemporalClusterGeometryByIDSourceRequest create the request corresponding to the temporal cluster geometry by id action endpoint of the source resource.
+func (c *Client) NewTemporalClusterGeometryByIDSourceRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // UpdateSourcePath computes a request path to the update action of source.
 func UpdateSourcePath(sourceID int) string {
 	param0 := strconv.Itoa(sourceID)

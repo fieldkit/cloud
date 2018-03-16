@@ -29,22 +29,21 @@ func SourceType(source *data.Source) *app.Source {
 	return sourceType
 }
 
-func GeometryClusterSummaryType(s *backend.GeometryClusterSummary) *app.GeometryClusterSummary {
-	return &app.GeometryClusterSummary{
+func ClusterSummaryType(s *backend.GeometryClusterSummary) *app.ClusterSummary {
+	return &app.ClusterSummary{
 		ID:               s.ID,
 		NumberOfFeatures: s.NumberOfFeatures,
 		StartTime:        s.StartTime,
 		EndTime:          s.EndTime,
 		Centroid:         s.Centroid.Coordinates(),
 		Radius:           s.Radius,
-		Geometry:         s.Geometry.Coordinates(),
 	}
 }
 
-func GeometryClusterSummariesType(s []*backend.GeometryClusterSummary) []*app.GeometryClusterSummary {
-	summaries := make([]*app.GeometryClusterSummary, len(s))
+func ClusterSummariesType(s []*backend.GeometryClusterSummary) []*app.ClusterSummary {
+	summaries := make([]*app.ClusterSummary, len(s))
 	for i, summary := range s {
-		summaries[i] = GeometryClusterSummaryType(summary)
+		summaries[i] = ClusterSummaryType(summary)
 	}
 	return summaries
 }
@@ -64,8 +63,16 @@ func SourceSummaryType(source *data.DeviceSource, spatial, temporal []*backend.G
 		ID:       int(source.ID),
 		Name:     source.Name,
 		Readings: ReadingSummariesType(readings),
-		Temporal: GeometryClusterSummariesType(temporal),
-		Spatial:  GeometryClusterSummariesType(spatial),
+		Temporal: ClusterSummariesType(temporal),
+		Spatial:  ClusterSummariesType(spatial),
+	}
+}
+
+func ClusterGeometryType(sourceId int, source *backend.GeometryClusterSummary) *app.ClusterGeometrySummary {
+	return &app.ClusterGeometrySummary{
+		SourceID: sourceId,
+		ID:       source.ID,
+		Geometry: source.Geometry.Coordinates(),
 	}
 }
 
@@ -165,6 +172,21 @@ func (c *SourceController) SummaryByID(ctx *app.SummaryByIDSourceContext) error 
 	}
 
 	return ctx.OK(SourceSummaryType(deviceSource, spatial, temporal, readings))
+}
+
+func (c *SourceController) TemporalClusterGeometryByID(ctx *app.TemporalClusterGeometryByIDSourceContext) error {
+	temporal, err := c.options.Backend.TemporalClustersBySourceID(ctx, ctx.SourceID)
+	if err != nil {
+		return err
+	}
+
+	for _, cluster := range temporal {
+		if cluster.ID == ctx.ClusterID {
+			return ctx.OK(ClusterGeometryType(ctx.SourceID, cluster))
+		}
+	}
+
+	return ctx.BadRequest()
 }
 
 func (c *SourceController) ListExpeditionID(ctx *app.ListExpeditionIDSourceContext) error {

@@ -59,6 +59,24 @@ func (mt *ProjectAdministrators) Validate() (err error) {
 	return
 }
 
+// ClusterGeometrySummary media type (default view)
+//
+// Identifier: application/vnd.app.cluster_geometry_summary+json; view=default
+type ClusterGeometrySummary struct {
+	Geometry [][]float64 `form:"geometry" json:"geometry" xml:"geometry"`
+	ID       int         `form:"id" json:"id" xml:"id"`
+	SourceID int         `form:"sourceId" json:"sourceId" xml:"sourceId"`
+}
+
+// Validate validates the ClusterGeometrySummary media type instance.
+func (mt *ClusterGeometrySummary) Validate() (err error) {
+
+	if mt.Geometry == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometry"))
+	}
+	return
+}
+
 // DeviceSchema media type (default view)
 //
 // Identifier: application/vnd.app.device_schema+json; view=default
@@ -432,39 +450,35 @@ func (mt *GeoJSONGeometry) Validate() (err error) {
 	return
 }
 
-// GeometryClusterSummary media type (default view)
+// ClusterSummary media type (default view)
 //
 // Identifier: application/vnd.app.geometry_cluster_summary+json; view=default
-type GeometryClusterSummary struct {
-	Centroid         []float64   `form:"centroid" json:"centroid" xml:"centroid"`
-	EndTime          time.Time   `form:"endTime" json:"endTime" xml:"endTime"`
-	Geometry         [][]float64 `form:"geometry" json:"geometry" xml:"geometry"`
-	ID               int         `form:"id" json:"id" xml:"id"`
-	NumberOfFeatures int         `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
-	Radius           float64     `form:"radius" json:"radius" xml:"radius"`
-	StartTime        time.Time   `form:"startTime" json:"startTime" xml:"startTime"`
+type ClusterSummary struct {
+	Centroid         []float64 `form:"centroid" json:"centroid" xml:"centroid"`
+	EndTime          time.Time `form:"endTime" json:"endTime" xml:"endTime"`
+	ID               int       `form:"id" json:"id" xml:"id"`
+	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
+	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
+	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
 }
 
-// Validate validates the GeometryClusterSummary media type instance.
-func (mt *GeometryClusterSummary) Validate() (err error) {
+// Validate validates the ClusterSummary media type instance.
+func (mt *ClusterSummary) Validate() (err error) {
 
 	if mt.Centroid == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "centroid"))
 	}
 
-	if mt.Geometry == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometry"))
-	}
 	return
 }
 
-// GeometryClusterSummaryCollection is the media type for an array of GeometryClusterSummary (default view)
+// ClusterSummaryCollection is the media type for an array of ClusterSummary (default view)
 //
 // Identifier: application/vnd.app.geometry_cluster_summary+json; type=collection; view=default
-type GeometryClusterSummaryCollection []*GeometryClusterSummary
+type ClusterSummaryCollection []*ClusterSummary
 
-// Validate validates the GeometryClusterSummaryCollection media type instance.
-func (mt GeometryClusterSummaryCollection) Validate() (err error) {
+// Validate validates the ClusterSummaryCollection media type instance.
+func (mt ClusterSummaryCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
@@ -750,11 +764,11 @@ func (mt *Source) Validate() (err error) {
 //
 // Identifier: application/vnd.app.source_summary+json; view=default
 type SourceSummary struct {
-	ID       int                              `form:"id" json:"id" xml:"id"`
-	Name     string                           `form:"name" json:"name" xml:"name"`
-	Readings ReadingSummaryCollection         `form:"readings,omitempty" json:"readings,omitempty" xml:"readings,omitempty"`
-	Spatial  GeometryClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
-	Temporal GeometryClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
+	ID       int                      `form:"id" json:"id" xml:"id"`
+	Name     string                   `form:"name" json:"name" xml:"name"`
+	Readings ReadingSummaryCollection `form:"readings,omitempty" json:"readings,omitempty" xml:"readings,omitempty"`
+	Spatial  ClusterSummaryCollection `form:"spatial" json:"spatial" xml:"spatial"`
+	Temporal ClusterSummaryCollection `form:"temporal" json:"temporal" xml:"temporal"`
 }
 
 // Validate validates the SourceSummary media type instance.

@@ -110,6 +110,15 @@ export function getSourceSummary(id) {
     };
 }
 
+export function getTemporalClusterGeometry(sourceId, clusterId) {
+    return {
+        types: ActionTypes.API_CLUSTER_GEOMETRY_GET,
+        path: '/sources/' + sourceId + '/temporal/' + clusterId + '/geometry',
+        method: 'GET',
+        unwrap: (r) => r
+    };
+}
+
 function objectToQueryString(obj) {
     return _.reduce(obj, function (result, value, key) {
         if (!_.isNull(value) && !_.isUndefined(value)) {
