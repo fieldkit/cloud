@@ -3,6 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -112,5 +115,64 @@ func (c *GeoJSONController) ListByID(ctx *app.ListByIDGeoJSONContext) error {
 	return ctx.OK(&app.PagedGeoJSON{
 		Geo:     geoJson,
 		HasMore: len(geoJson.Features) >= backend.DefaultPageSize,
+	})
+}
+
+type BoundingBox struct {
+	NorthEast *data.Location
+	SouthWest *data.Location
+}
+
+func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSONContext) (l *data.Location, err error) {
+	strs := strings.Split(ctx.RequestData.Params.Get(key), ",")
+	if len(strs) != 2 {
+		return nil, fmt.Errorf("Expected two values for data.Location")
+	}
+
+	lng, err := strconv.ParseFloat(strs[0], 64)
+	if err != nil {
+		return nil, err
+	}
+	lat, err := strconv.ParseFloat(strs[0], 64)
+	if err != nil {
+		return nil, err
+	}
+
+	return data.NewLocation([]float64{lng, lat}), nil
+}
+
+func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext) (bb *BoundingBox, err error) {
+	ne, err := ExtractLocationFromQueryString("ne", ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sw, err := ExtractLocationFromQueryString("sw", ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	bb = &BoundingBox{
+		NorthEast: ne,
+		SouthWest: sw,
+	}
+	return
+}
+
+func (c *GeoJSONController) GeographicalQuery(ctx *app.GeographicalQueryGeoJSONContext) error {
+	bb, err := ExtractBoundingBoxFromQueryString(ctx)
+	if err != nil {
+		return fmt.Errorf("Error parsing bounding box: %v", err)
+	}
+	log.Printf("Querying over %+v", bb)
+
+	features := make([]*app.GeoJSONFeature, 0)
+	geoJson := &app.GeoJSON{
+		Type:     "FeatureCollection",
+		Features: features,
+	}
+	return ctx.OK(&app.PagedGeoJSON{
+		Geo:     geoJson,
+		HasMore: false,
 	})
 }

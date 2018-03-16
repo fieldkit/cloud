@@ -18,6 +18,7 @@ export const API_CLUSTER_GEOMETRY_GET = expandApiTypes("API_CLUSTER_GEOMETRY_GET
 export const API_FEATURE_GEOJSON_GET = expandApiTypes("API_FEATURE_GEOJSON_GET");
 export const API_SOURCE_GEOJSON_GET = expandApiTypes("API_SOURCE_GEOJSON_GET");
 export const API_SOURCE_QUERY_GET = expandApiTypes("API_SOURCE_QUERY_GET");
+export const API_MAP_FEATURES_GET = expandApiTypes("API_MAP_FEATURES_GET");
 
 export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
 

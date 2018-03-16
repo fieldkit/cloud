@@ -178,6 +178,7 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 // GeoJSONController is the controller interface for the GeoJSON actions.
 type GeoJSONController interface {
 	goa.Muxer
+	GeographicalQuery(*GeographicalQueryGeoJSONContext) error
 	ListByID(*ListByIDGeoJSONContext) error
 	ListBySource(*ListBySourceGeoJSONContext) error
 }
@@ -186,8 +187,25 @@ type GeoJSONController interface {
 func MountGeoJSONController(service *goa.Service, ctrl GeoJSONController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/features", ctrl.MuxHandler("preflight", handleGeoJSONOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/features/:featureId/geojson", ctrl.MuxHandler("preflight", handleGeoJSONOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/sources/:sourceId/geojson", ctrl.MuxHandler("preflight", handleGeoJSONOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGeographicalQueryGeoJSONContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GeographicalQuery(rctx)
+	}
+	h = handleGeoJSONOrigin(h)
+	service.Mux.Handle("GET", "/features", ctrl.MuxHandler("geographical query", h, nil))
+	service.LogInfo("mount", "ctrl", "GeoJSON", "action", "GeographicalQuery", "route", "GET /features")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

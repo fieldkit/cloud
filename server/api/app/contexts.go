@@ -58,6 +58,37 @@ func (ctx *ListBySourceExportContext) BadRequest() error {
 	return nil
 }
 
+// GeographicalQueryGeoJSONContext provides the GeoJSON geographical query action context.
+type GeographicalQueryGeoJSONContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewGeographicalQueryGeoJSONContext parses the incoming request URL and body, performs validations and creates the
+// context used by the GeoJSON controller geographical query action.
+func NewGeographicalQueryGeoJSONContext(ctx context.Context, r *http.Request, service *goa.Service) (*GeographicalQueryGeoJSONContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GeographicalQueryGeoJSONContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GeographicalQueryGeoJSONContext) OK(r *PagedGeoJSON) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GeographicalQueryGeoJSONContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListByIDGeoJSONContext provides the GeoJSON list by id action context.
 type ListByIDGeoJSONContext struct {
 	context.Context

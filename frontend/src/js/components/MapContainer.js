@@ -29,6 +29,7 @@ type Props = {
     focusSource: () => mixed,
     onChangePlaybackMode: () => mixed,
     onUserActivity: () => mixed,
+    loadMapFeatures: () => mixed,
     pointDecorator: PointDecorator,
     controls: ?bool,
     visibleFeatures: {
@@ -99,10 +100,15 @@ export default class MapContainer extends Component {
         focusSource(source);
     }
 
-    onUserActivity(how) {
-        const { onUserActivity } = this.props;
+    onUserActivity(map) {
+        const { onUserActivity, loadMapFeatures } = this.props;
 
-        onUserActivity(how);
+        const bounds = map.getBounds();
+        loadMapFeatures({
+            ne: bounds.getNorthEast().toArray(),
+            sw: bounds.getSouthWest().toArray(),
+        });
+        onUserActivity(map);
     }
 
     onClick(target, ev) {

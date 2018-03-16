@@ -15,6 +15,35 @@ import (
 	"strconv"
 )
 
+// GeographicalQueryGeoJSONPath computes a request path to the geographical query action of GeoJSON.
+func GeographicalQueryGeoJSONPath() string {
+
+	return fmt.Sprintf("/features")
+}
+
+// List features in a geographical area.
+func (c *Client) GeographicalQueryGeoJSON(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGeographicalQueryGeoJSONRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGeographicalQueryGeoJSONRequest create the request corresponding to the geographical query action endpoint of the GeoJSON resource.
+func (c *Client) NewGeographicalQueryGeoJSONRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListByIDGeoJSONPath computes a request path to the list by id action of GeoJSON.
 func ListByIDGeoJSONPath(featureID int) string {
 	param0 := strconv.Itoa(featureID)
@@ -70,8 +99,8 @@ func (c *Client) NewListBySourceGeoJSONRequest(ctx context.Context, path string,
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if descending != nil {
-		tmp124 := strconv.FormatBool(*descending)
-		values.Set("descending", tmp124)
+		tmp125 := strconv.FormatBool(*descending)
+		values.Set("descending", tmp125)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

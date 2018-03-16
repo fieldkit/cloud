@@ -152,3 +152,18 @@ export function getQuery(chartDef, criteria) {
         criteria: criteria
     };
 }
+
+export function queryMapFeatures(criteria) {
+    const queryString = objectToQueryString({
+        ne: criteria.ne.join(","),
+        sw: criteria.sw.join(","),
+    });
+
+    return {
+        types: ActionTypes.API_MAP_FEATURES_GET,
+        path: '/features?' + queryString,
+        method: 'GET',
+        unwrap: (r) => r,
+        criteria: criteria
+    };
+}

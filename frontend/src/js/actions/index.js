@@ -1,6 +1,6 @@
 import * as ActionTypes from './types';
 import { CALL_WEB_API } from '../api/middleware';
-import { getQuery } from '../api/creators';
+import { getQuery, queryMapFeatures } from '../api/creators';
 
 export function changePlaybackMode(mode) {
     return {
@@ -71,5 +71,13 @@ export function changeCriteria(criteria) {
                 [CALL_WEB_API]: getQuery(query.chartDef, criteria)
             });
         }
+    };
+}
+
+export function loadMapFeatures(criteria) {
+    return (dispatch, getState) => {
+        return dispatch({
+            [CALL_WEB_API]: queryMapFeatures(criteria)
+        });
     };
 }

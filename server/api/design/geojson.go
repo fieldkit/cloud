@@ -94,4 +94,15 @@ var _ = Resource("GeoJSON", func() {
 			Media(PagedGeoJSON)
 		})
 	})
+
+	Action("geographical query", func() {
+		Routing(GET("features"))
+		Description("List features in a geographical area.")
+		Params(func() {
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(PagedGeoJSON)
+		})
+	})
 })

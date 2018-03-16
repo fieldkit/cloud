@@ -1890,6 +1890,24 @@ paths:
       summary: add team
       tags:
       - team
+  /features:
+    get:
+      description: List features in a geographical area.
+      operationId: GeoJSON#geographical query
+      produces:
+      - application/vnd.app.paged-geojson+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PagedGeoJSON'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: geographical query GeoJSON
+      tags:
+      - GeoJSON
   /features/{featureId}/geojson:
     get:
       description: List a feature's GeoJSON by id.

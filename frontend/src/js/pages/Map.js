@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 
 import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../types';
 
-import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource } from '../actions';
+import { notifyOfUserMapActivity, changePlaybackMode, focusFeature, focusSource, loadMapFeatures } from '../actions';
 import { generatePointDecorator } from '../common/utilities';
 
 import MapContainer from '../components/MapContainer';
@@ -27,6 +27,7 @@ type Props = {
     focusFeature: () => mixed,
     focusSource: () => mixed,
     changePlaybackMode: () => mixed,
+    loadMapFeatures: () => mixed,
     notifyOfUserMapActivity: () => mixed,
 };
 
@@ -80,7 +81,7 @@ class Map extends Component {
     }
 
     render() {
-        const { visibleFeatures, playbackMode, focusFeature, focusSource, changePlaybackMode } = this.props;
+        const { visibleFeatures, playbackMode, focusFeature, focusSource, changePlaybackMode, loadMapFeatures } = this.props;
         const { pointDecorator } = this.state;
 
         return (
@@ -96,6 +97,7 @@ class Map extends Component {
                         focusFeature={ focusFeature }
                         focusSource={ focusSource }
                         onUserActivity={ this.onUserActivity.bind(this) }
+                        loadMapFeatures={ loadMapFeatures }
                         onChangePlaybackMode={ changePlaybackMode } />
                 </div>
             </div>
@@ -113,5 +115,6 @@ export default connect(mapStateToProps, {
     notifyOfUserMapActivity,
     changePlaybackMode,
     focusFeature,
-    focusSource
+    focusSource,
+    loadMapFeatures
 })(Map);

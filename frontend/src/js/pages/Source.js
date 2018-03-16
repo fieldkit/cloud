@@ -78,6 +78,7 @@ class Source extends Component {
                                 pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
                                 playbackMode={ () => false } focusFeature={ () => false }
                                 focusSource={ () => false } onUserActivity={ () => false }
+                                loadMapFeatures={ () => false }
                                 onChangePlaybackMode={ () => false } />
                         </div>
                         <div className="">
