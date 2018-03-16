@@ -106,6 +106,30 @@ func (c *Client) DecodeClusterGeometrySummary(resp *http.Response) (*ClusterGeom
 	return &decoded, err
 }
 
+// ClusterGeometrySummaryCollection is the media type for an array of ClusterGeometrySummary (default view)
+//
+// Identifier: application/vnd.app.cluster_geometry_summary+json; type=collection; view=default
+type ClusterGeometrySummaryCollection []*ClusterGeometrySummary
+
+// Validate validates the ClusterGeometrySummaryCollection media type instance.
+func (mt ClusterGeometrySummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeClusterGeometrySummaryCollection decodes the ClusterGeometrySummaryCollection instance encoded in resp body.
+func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (ClusterGeometrySummaryCollection, error) {
+	var decoded ClusterGeometrySummaryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // DeviceSchema media type (default view)
 //
 // Identifier: application/vnd.app.device_schema+json; view=default
@@ -607,6 +631,7 @@ type ClusterSummary struct {
 	ID               int       `form:"id" json:"id" xml:"id"`
 	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
 	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
+	SourceID         int       `form:"sourceId" json:"sourceId" xml:"sourceId"`
 	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
 }
 
@@ -672,6 +697,61 @@ func (mt *Location) Validate() (err error) {
 // DecodeLocation decodes the Location instance encoded in resp body.
 func (c *Client) DecodeLocation(resp *http.Response) (*Location, error) {
 	var decoded Location
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// MapFeatures media type (default view)
+//
+// Identifier: application/vnd.app.map_features+json; view=default
+type MapFeatures struct {
+	GeoJSON    *PagedGeoJSON                    `form:"geoJSON" json:"geoJSON" xml:"geoJSON"`
+	Geometries ClusterGeometrySummaryCollection `form:"geometries" json:"geometries" xml:"geometries"`
+	Readings   ReadingSummaryCollection         `form:"readings" json:"readings" xml:"readings"`
+	Spatial    ClusterSummaryCollection         `form:"spatial" json:"spatial" xml:"spatial"`
+	Temporal   ClusterSummaryCollection         `form:"temporal" json:"temporal" xml:"temporal"`
+}
+
+// Validate validates the MapFeatures media type instance.
+func (mt *MapFeatures) Validate() (err error) {
+	if mt.GeoJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geoJSON"))
+	}
+	if mt.Temporal == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "temporal"))
+	}
+	if mt.Spatial == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
+	}
+	if mt.Readings == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "readings"))
+	}
+	if mt.Geometries == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometries"))
+	}
+	if mt.GeoJSON != nil {
+		if err2 := mt.GeoJSON.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if err2 := mt.Geometries.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Readings.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Spatial.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Temporal.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeMapFeatures decodes the MapFeatures instance encoded in resp body.
+func (c *Client) DecodeMapFeatures(resp *http.Response) (*MapFeatures, error) {
+	var decoded MapFeatures
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
@@ -752,7 +832,7 @@ func (c *Client) DecodeTeamMembers(resp *http.Response) (*TeamMembers, error) {
 
 // PagedGeoJSON media type (default view)
 //
-// Identifier: application/vnd.app.paged-geojson+json; view=default
+// Identifier: application/vnd.app.paged_geojson+json; view=default
 type PagedGeoJSON struct {
 	Geo         *GeoJSON `form:"geo" json:"geo" xml:"geo"`
 	HasMore     bool     `form:"hasMore" json:"hasMore" xml:"hasMore"`

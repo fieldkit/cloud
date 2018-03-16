@@ -3,11 +3,14 @@ package backend
 import (
 	"context"
 	"fmt"
-	"github.com/conservify/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
+	_ "log"
+	"time"
+
 	_ "github.com/lib/pq"
 	_ "github.com/paulmach/go.geo"
-	"time"
+
+	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type SourceChange struct {
@@ -475,6 +478,7 @@ type ReadingSummary struct {
 }
 
 type FeatureSummary struct {
+	SourceID         int
 	UpdatedAt        time.Time
 	NumberOfFeatures int
 	LastFeatureID    int
@@ -488,7 +492,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 	summaries := []*FeatureSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.last_feature_id AS lastFeatureId, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.last_feature_id AS lastFeatureId, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_summaries c
 		  WHERE c.source_id = $1
@@ -509,6 +513,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 
 type GeometryClusterSummary struct {
 	ID               int
+	SourceID         int
 	UpdatedAt        time.Time
 	NumberOfFeatures int
 	StartTime        time.Time
@@ -522,7 +527,7 @@ func (b *Backend) SpatialClustersBySourceID(ctx context.Context, sourceId int) (
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.cluster_id AS id, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_spatial_clusters c
 		  WHERE c.source_id = $1
@@ -536,7 +541,7 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.cluster_id AS id, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
+		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
 		  FROM
 		    fieldkit.sources_temporal_clusters c JOIN
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
@@ -545,6 +550,57 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
 		return nil, err
 	}
 	return summaries, nil
+}
+
+type BoundingBox struct {
+	NorthEast *data.Location
+	SouthWest *data.Location
+}
+
+type MapFeatures struct {
+	TemporalClusters   []*GeometryClusterSummary
+	SpatialClusters    []*GeometryClusterSummary
+	TemporalGeometries []*GeometryClusterSummary
+}
+
+func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *MapFeatures, err error) {
+	ne := bb.NorthEast.Coordinates()
+	sw := bb.SouthWest.Coordinates()
+
+	spatialClusters := []*GeometryClusterSummary{}
+	temporalClusters := []*GeometryClusterSummary{}
+
+	// TODO: Note that this uses the centroid and doesn't take into consideration the radius.
+	if err := b.db.SelectContext(ctx, &spatialClusters, `
+		  SELECT
+		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		  FROM
+		    fieldkit.sources_spatial_clusters c
+                  WHERE
+                    c.centroid && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
+		`, ne[0], ne[1], sw[0], sw[1]); err != nil {
+		return nil, err
+	}
+
+	if err := b.db.SelectContext(ctx, &temporalClusters, `
+		  SELECT
+		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
+		  FROM
+		    fieldkit.sources_temporal_clusters c JOIN
+                    fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
+                  WHERE
+                    g.geometry && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
+		`, ne[0], ne[1], sw[0], sw[1]); err != nil {
+		return nil, err
+	}
+
+	mf = &MapFeatures{
+		SpatialClusters:    spatialClusters,
+		TemporalClusters:   temporalClusters,
+		TemporalGeometries: temporalClusters,
+	}
+
+	return
 }
 
 func (b *Backend) ReadingsBySourceID(ctx context.Context, sourceId int) (summaries []*ReadingSummary, err error) {

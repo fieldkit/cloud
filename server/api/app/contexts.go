@@ -78,8 +78,8 @@ func NewGeographicalQueryGeoJSONContext(ctx context.Context, r *http.Request, se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *GeographicalQueryGeoJSONContext) OK(r *PagedGeoJSON) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+func (ctx *GeographicalQueryGeoJSONContext) OK(r *MapFeatures) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.map_features+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -120,7 +120,7 @@ func NewListByIDGeoJSONContext(ctx context.Context, r *http.Request, service *go
 
 // OK sends a HTTP response with status code 200.
 func (ctx *ListByIDGeoJSONContext) OK(r *PagedGeoJSON) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged_geojson+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -172,7 +172,7 @@ func NewListBySourceGeoJSONContext(ctx context.Context, r *http.Request, service
 
 // OK sends a HTTP response with status code 200.
 func (ctx *ListBySourceGeoJSONContext) OK(r *PagedGeoJSON) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged-geojson+json")
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged_geojson+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 

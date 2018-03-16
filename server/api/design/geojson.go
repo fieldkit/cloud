@@ -50,7 +50,7 @@ var GeoJSON = MediaType("application/vnd.app.geojson+json", func() {
 	})
 })
 
-var PagedGeoJSON = MediaType("application/vnd.app.paged-geojson+json", func() {
+var PagedGeoJSON = MediaType("application/vnd.app.paged_geojson+json", func() {
 	TypeName("PagedGeoJSON")
 	Attributes(func() {
 		Attribute("nextUrl", String)
@@ -64,6 +64,25 @@ var PagedGeoJSON = MediaType("application/vnd.app.paged-geojson+json", func() {
 		Attribute("previousUrl")
 		Attribute("hasMore")
 		Attribute("geo")
+	})
+})
+
+var MapFeatures = MediaType("application/vnd.app.map_features+json", func() {
+	TypeName("MapFeatures")
+	Attributes(func() {
+		Attribute("geoJSON", PagedGeoJSON)
+		Attribute("temporal", CollectionOf(ClusterSummary))
+		Attribute("spatial", CollectionOf(ClusterSummary))
+		Attribute("readings", CollectionOf(ReadingSummary))
+		Attribute("geometries", CollectionOf(ClusterGeometrySummary))
+		Required("geoJSON", "temporal", "spatial", "readings", "geometries")
+	})
+	View("default", func() {
+		Attribute("geoJSON")
+		Attribute("temporal")
+		Attribute("spatial")
+		Attribute("readings")
+		Attribute("geometries")
 	})
 })
 
@@ -102,7 +121,7 @@ var _ = Resource("GeoJSON", func() {
 		})
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(PagedGeoJSON)
+			Media(MapFeatures)
 		})
 	})
 })

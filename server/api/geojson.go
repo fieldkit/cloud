@@ -32,7 +32,7 @@ func NewGeoJSONController(service *goa.Service, options GeoJSONControllerOptions
 	}
 }
 
-func createProperties(d *data.AnalysedRecord) map[string]interface{} {
+func CreateProperties(d *data.AnalysedRecord) map[string]interface{} {
 	p := make(map[string]interface{})
 
 	timestamp := d.Timestamp.UnixNano() / int64(time.Millisecond)
@@ -73,7 +73,7 @@ func MakeGeoJSON(docs *data.AnalysedRecordsPage) *app.GeoJSON {
 					c[0], c[1],
 				},
 			},
-			Properties: createProperties(d),
+			Properties: CreateProperties(d),
 		}
 		features = append(features, f)
 	}
@@ -118,11 +118,6 @@ func (c *GeoJSONController) ListByID(ctx *app.ListByIDGeoJSONContext) error {
 	})
 }
 
-type BoundingBox struct {
-	NorthEast *data.Location
-	SouthWest *data.Location
-}
-
 func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSONContext) (l *data.Location, err error) {
 	strs := strings.Split(ctx.RequestData.Params.Get(key), ",")
 	if len(strs) != 2 {
@@ -133,7 +128,7 @@ func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSO
 	if err != nil {
 		return nil, err
 	}
-	lat, err := strconv.ParseFloat(strs[0], 64)
+	lat, err := strconv.ParseFloat(strs[1], 64)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +136,7 @@ func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSO
 	return data.NewLocation([]float64{lng, lat}), nil
 }
 
-func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext) (bb *BoundingBox, err error) {
+func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext) (bb *backend.BoundingBox, err error) {
 	ne, err := ExtractLocationFromQueryString("ne", ctx)
 	if err != nil {
 		return nil, err
@@ -152,7 +147,7 @@ func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext)
 		return nil, err
 	}
 
-	bb = &BoundingBox{
+	bb = &backend.BoundingBox{
 		NorthEast: ne,
 		SouthWest: sw,
 	}
@@ -166,13 +161,24 @@ func (c *GeoJSONController) GeographicalQuery(ctx *app.GeographicalQueryGeoJSONC
 	}
 	log.Printf("Querying over %+v", bb)
 
+	mapFeatures, err := c.options.Backend.QueryMapFeatures(ctx, bb)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("MapFeatures: %+v", mapFeatures)
+
 	features := make([]*app.GeoJSONFeature, 0)
 	geoJson := &app.GeoJSON{
 		Type:     "FeatureCollection",
 		Features: features,
 	}
-	return ctx.OK(&app.PagedGeoJSON{
-		Geo:     geoJson,
-		HasMore: false,
+	return ctx.OK(&app.MapFeatures{
+		Geometries: ClusterGeometriesType(mapFeatures.TemporalGeometries),
+		Spatial:    ClusterSummariesType(mapFeatures.SpatialClusters),
+		Temporal:   ClusterSummariesType(mapFeatures.TemporalClusters),
+		GeoJSON: &app.PagedGeoJSON{
+			Geo: geoJson,
+		},
 	})
 }

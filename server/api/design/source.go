@@ -51,15 +51,17 @@ var ClusterSummary = MediaType("application/vnd.app.geometry_cluster_summary+jso
 	TypeName("ClusterSummary")
 	Attributes(func() {
 		Attribute("id", Integer)
+		Attribute("sourceId", Integer)
 		Attribute("startTime", DateTime)
 		Attribute("endTime", DateTime)
 		Attribute("numberOfFeatures", Integer)
 		Attribute("centroid", ArrayOf(Number))
 		Attribute("radius", Number)
-		Required("id", "startTime", "endTime", "numberOfFeatures", "centroid", "radius")
+		Required("id", "sourceId", "startTime", "endTime", "numberOfFeatures", "centroid", "radius")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("sourceId")
 		Attribute("startTime")
 		Attribute("endTime")
 		Attribute("numberOfFeatures")
