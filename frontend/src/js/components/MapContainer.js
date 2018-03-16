@@ -122,16 +122,32 @@ export default class MapContainer extends Component {
             return;
         }
 
-        const options = this.getOptions(selected);
-
         this.setState({
             menu: {
-                mouse: ev.point,
-                coordinates: coordinates,
-                selected: selected,
-                options: options,
+                ...{
+                    mouse: ev.point,
+                    coordinates: coordinates,
+                    selected: selected,
+                },
+                ...this.getMenu(selected)
             }
         });
+    }
+
+    getMenu(selected) {
+        return {
+            options: this.getOptions(selected),
+            center: this.getCenter(selected),
+        };
+    }
+
+    getCenter(selected) {
+        if (selected.length === 1) {
+            return {
+                text: selected[0].properties.name,
+            }
+        }
+        return null;
     }
 
     getOptions(selected) {
@@ -161,7 +177,7 @@ export default class MapContainer extends Component {
                 onClick: () => {
                     const { menu } = this.state;
                     this.setState({
-                        menu: { ...menu, ...{ options: this.getOptions([feature]) } },
+                        menu: { ...menu, ...this.getMenu([feature]) },
                     });
                     return true;
                 }
@@ -181,7 +197,7 @@ export default class MapContainer extends Component {
         const visible = menu != null && menu.mouse != null;
         const position = visible ? menu.mouse : { x: 0, y: 0};
 
-        return <FancyMenu visible={visible} options={menu ? menu.options : []} position={position} onClosed={ this.onMenuClose.bind(this) } />
+        return <FancyMenu visible={visible} options={menu ? menu.options : []} center={menu ? menu.center : null} position={position} onClosed={ this.onMenuClose.bind(this) } />
     }
 
     render() {
