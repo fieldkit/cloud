@@ -38,7 +38,8 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 	if err := ds.db.SelectContext(context.TODO(), &locations, `
                   SELECT l.timestamp, ST_AsBinary(l.location) AS location
                   FROM fieldkit.device_location AS l
-                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC`, devices[0].SourceID); err != nil {
+                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC LIMIT 1
+		`, devices[0].SourceID); err != nil {
 		return nil, err
 	}
 
