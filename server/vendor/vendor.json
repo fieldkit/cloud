@@ -408,10 +408,10 @@
 			"revisionTime": "2016-08-03T19:07:31Z"
 		},
 		{
-			"checksumSHA1": "P8NVGrG1KbJD2PXeqnwm6cK0Fmo=",
+			"checksumSHA1": "PnLxuIAASaeI73PQpQe+TYlvOgw=",
 			"path": "github.com/jmoiron/sqlx",
-			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
-			"revisionTime": "2017-03-08T17:16:22Z"
+			"revision": "3379e5993990b1f927fc8db926485e6f6becf2d2",
+			"revisionTime": "2017-10-20T20:55:21Z"
 		},
 		{
 			"checksumSHA1": "xXjxKqs3ECyWO5zjIVb2qgj9rcU=",
@@ -432,10 +432,10 @@
 			"revisionTime": "2017-02-06T22:33:54Z"
 		},
 		{
-			"checksumSHA1": "5f/QhGjPgETWzP3aS9WdGFqoT1I=",
+			"checksumSHA1": "3HVfwgLpCDH8JX211UWdrSi/GU4=",
 			"path": "github.com/lib/pq",
-			"revision": "472a0745531a17dbac346e828b4c60e73ddff30c",
-			"revisionTime": "2017-03-13T20:04:23Z"
+			"revision": "b609790bd85edf8e9ab7e0f8912750a786177bcf",
+			"revisionTime": "2017-10-22T19:20:43Z"
 		},
 		{
 			"checksumSHA1": "Gk3jTNQ5uGDUE0WMJFWcYz9PMps=",

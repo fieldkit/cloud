@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -25,64 +27,103 @@ func newDB(db *sqlx.DB) *DB {
 }
 
 func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
-	/*
-		db.mu.Lock()
-		defer db.mu.Unlock()
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
-		if stmt, ok := db.cache[query]; ok {
-			return stmt, nil
-		}
-	*/
+	if false {
+		log.Printf("%s", strings.TrimSpace(query))
+	}
+
+	if stmt, ok := db.cache[query]; ok {
+		return stmt, nil
+	}
 
 	stmt, err := db.db.Preparex(query)
 	if err != nil {
 		return nil, err
 	}
 
-	//db.cache[query] = stmt
+	db.cache[query] = stmt
+	return stmt, nil
+}
+func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
+	tx := db.Transaction(ctx)
+	if tx != nil {
+		stmt, err := tx.Preparex(query)
+		if err != nil {
+			return nil, err
+		}
+		return stmt, nil
+	}
+	stmt, err := db.db.PreparexContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
 	return stmt, nil
 }
 
-func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
-	/*
-		db.mu.Lock()
-		defer db.mu.Unlock()
-
-		if stmt, ok := db.cache[query]; ok {
-			return db.stmtWithTx(ctx, stmt), nil
+func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
+	tx := db.Transaction(ctx)
+	if tx != nil {
+		namedStmt, err := tx.PrepareNamed(query)
+		if err != nil {
+			return nil, err
 		}
-	*/
+		return namedStmt, nil
+	}
+	namedStmt, err := db.db.PrepareNamedContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	return namedStmt, nil
+}
+
+/*
+func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	if false {
+		log.Printf("%s", strings.Replace(strings.TrimSpace(query), "\n", " ", -1))
+	}
+
+	if stmt, ok := db.cache[query]; ok {
+		return db.stmtWithTx(ctx, stmt), nil
+	}
 
 	stmt, err := db.db.PreparexContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	// db.cache[query] = stmt
+	db.cache[query] = stmt
 	return db.stmtWithTx(ctx, stmt), nil
 }
 
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
-	/*
-		db.mu.Lock()
-		defer db.mu.Unlock()
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
-		if namedStmt, ok := db.cacheNamed[query]; ok {
-			return db.namedStmtWithTx(ctx, namedStmt), nil
-		}
-	*/
+	if false {
+		log.Printf("%s", strings.TrimSpace(query))
+	}
+
+	if namedStmt, ok := db.cacheNamed[query]; ok {
+		return db.namedStmtWithTx(ctx, namedStmt), nil
+	}
 
 	namedStmt, err := db.db.PrepareNamedContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	// db.cacheNamed[query] = namedStmt
+	db.cacheNamed[query] = namedStmt
 	return db.namedStmtWithTx(ctx, namedStmt), nil
 }
+*/
 
 func (db *DB) stmtWithTx(ctx context.Context, stmt *sqlx.Stmt) *sqlx.Stmt {
-	tx := db.GetTransaction(ctx)
+	tx := db.Transaction(ctx)
 	if tx == nil {
 		return stmt
 	}
@@ -90,7 +131,7 @@ func (db *DB) stmtWithTx(ctx context.Context, stmt *sqlx.Stmt) *sqlx.Stmt {
 }
 
 func (db *DB) namedStmtWithTx(ctx context.Context, stmt *sqlx.NamedStmt) *sqlx.NamedStmt {
-	tx := db.GetTransaction(ctx)
+	tx := db.Transaction(ctx)
 	if tx == nil {
 		return stmt
 	}
@@ -221,25 +262,31 @@ type transactionContextKey string
 
 var TxContextKey = transactionContextKey("sqlx.tx")
 
-func (db *DB) WithNewTransaction(ctx context.Context, fn func(txCtx context.Context, tx *sqlx.Tx) error) error {
-	log.Printf("Begin transaction")
+func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) error) error {
+	started := time.Now()
+	log.Printf("Begin")
 	tx, err := db.db.Beginx()
 	if err != nil {
 		return err
 	}
-	txCtx := context.WithValue(context.Background(), TxContextKey, tx)
-	err = fn(txCtx, tx)
+
+	txCtx := context.WithValue(ctx, TxContextKey, tx)
+	err = fn(txCtx)
+	elapsed := time.Now().Sub(started)
+
+	log.Printf("Commit/Rollback (%v)", err)
 	if err != nil {
-		log.Printf("Rollback")
 		tx.Rollback()
+		log.Printf("Rollback (%v)", elapsed)
 		return err
 	}
-	log.Printf("Commit")
-	tx.Commit()
-	return nil
+
+	err = tx.Commit()
+	log.Printf("Commit (%v)", elapsed)
+	return err
 }
 
-func (db *DB) GetTransaction(ctx context.Context) (tx *sqlx.Tx) {
+func (db *DB) Transaction(ctx context.Context) (tx *sqlx.Tx) {
 	if v := ctx.Value(TxContextKey); v != nil {
 		return v.(*sqlx.Tx)
 	}
