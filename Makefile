@@ -41,7 +41,6 @@ install: all
 	cp build/testing-random $(INSTALLDIR)
 	cp build/sqs-sender $(INSTALLDIR)
 	cp build/sqs-worker $(INSTALLDIR)
-	cp build/db-tester $(INSTALLDIR)
 	@for d in $(modules); do                           \
 		(cd $$d && echo $$d && go install) || exit 1;  \
 	done
