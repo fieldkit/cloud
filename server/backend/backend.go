@@ -218,6 +218,7 @@ func (b *Backend) ListAllDeviceSources(ctx context.Context) ([]*data.DeviceSourc
 				JOIN fieldkit.source AS i ON i.id = d.source_id
 				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
 				JOIN fieldkit.project AS p ON p.id = e.project_id
+                        ORDER BY i.name
 		`); err != nil {
 		return nil, err
 	}
@@ -601,7 +602,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
 
 func (b *Backend) ReadingsBySourceID(ctx context.Context, sourceId int) (summaries []*ReadingSummary, err error) {
 	summaries = []*ReadingSummary{}
-	if err := b.db.SelectContext(ctx, &summaries, `SELECT DISTINCT key AS name FROM (SELECT jsonb_object_keys(data) AS key FROM fieldkit.record_visible r WHERE r.source_id = $1) AS sq`, sourceId); err != nil {
+	if err := b.db.SelectContext(ctx, &summaries, `SELECT DISTINCT key AS name FROM (SELECT jsonb_object_keys(data) AS key FROM fieldkit.record_visible r WHERE r.source_id = $1 ORDER BY r.timestamp DESC LIMIT 10) AS sq`, sourceId); err != nil {
 		return nil, err
 	}
 	return summaries, nil

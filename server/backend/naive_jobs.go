@@ -20,8 +20,6 @@ func NewNaiveBackgroundJobs(be *Backend) *NaiveBackgroundJobs {
 func (j *NaiveBackgroundJobs) Start() error {
 	delayed := make(chan SourceChange, 100)
 
-	ctx := context.TODO()
-
 	go func() {
 		log.Printf("Started background jobs...")
 
@@ -50,6 +48,7 @@ func (j *NaiveBackgroundJobs) Start() error {
 				started := time.Now()
 				log.Printf("Processing %v...", c)
 				generator := NewPregenerator(j.be)
+				ctx := context.Background()
 				err := generator.Pregenerate(ctx, c.SourceID)
 				if err != nil {
 					log.Printf("Error: %v", err)
@@ -59,13 +58,15 @@ func (j *NaiveBackgroundJobs) Start() error {
 		}
 	}()
 
+	ctx := context.Background()
 	devices, err := j.be.ListAllDeviceSources(ctx)
 	if err != nil {
 		return err
 	}
 
 	for _, device := range devices {
-		delayed <- SourceChange{SourceID: int64(device.ID)}
+		log.Printf("Queuing refresh %d", device.ID)
+		// delayed <- SourceChange{SourceID: int64(device.ID)}
 	}
 
 	return nil

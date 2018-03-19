@@ -95,13 +95,14 @@ func (da *RecordAdder) AddRecord(ctx context.Context, im *ingestion.IngestedMess
 }
 
 func backgroundIngestion(rmi *RawMessageIngester) {
+	ctx := context.Background()
 	for row := range rmi.incoming {
 		raw, err := ingestion.CreateRawMessageFromRow(row)
 		if err != nil {
 			log.Printf("(%s)[Error] %v", row.Id, err)
 			log.Printf("%s", row.Data)
 		} else {
-			im, pm, err := rmi.ingester.Ingest(context.TODO(), raw)
+			im, pm, err := rmi.ingester.Ingest(ctx, raw)
 			if err != nil {
 				if pm != nil {
 					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
@@ -112,7 +113,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
 				}
 			} else {
-				rmi.recordAdder.AddRecord(context.TODO(), im)
+				rmi.recordAdder.AddRecord(ctx, im)
 				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
 		}

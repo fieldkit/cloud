@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/jmoiron/sqlx"
 	"github.com/robinpowered/go-proto/message"
 	"github.com/robinpowered/go-proto/stream"
 
@@ -41,7 +40,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	si.backend.db.WithNewTransaction(context.TODO(), func(txCtx context.Context, tx *sqlx.Tx) error {
+	err := si.backend.db.WithNewTransaction(req.Context(), func(txCtx context.Context) error {
 		log.Printf("Stream [%s]: begin %v", req.RemoteAddr, contentType)
 
 		binaryReader := NewFkBinaryReader(si.backend)
@@ -54,7 +53,11 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return nil, err
 			}
 
-			_ = binaryReader.Push(txCtx, &record)
+			err = binaryReader.Push(txCtx, &record)
+			if err != nil {
+				log.Printf("Stream [%s]: error: %v", req.RemoteAddr, err)
+				return nil, err
+			}
 
 			return &record, nil
 		})
@@ -70,6 +73,10 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		return nil
 	})
+
+	if err != nil {
+		log.Printf("Error: %v", err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

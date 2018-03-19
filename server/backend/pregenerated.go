@@ -3,10 +3,12 @@ package backend
 import (
 	"context"
 	"database/sql/driver"
+	"log"
+
+	"github.com/paulmach/go.geo"
+
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/paulmach/go.geo"
-	"log"
 )
 
 type Pregenerator struct {
@@ -71,27 +73,29 @@ func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) error {
 }
 
 func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) error {
-	err := p.Summaries(ctx, sourceId)
-	if err != nil {
-		return err
-	}
+	return p.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		err := p.Summaries(txCtx, sourceId)
+		if err != nil {
+			return err
+		}
 
-	err = p.SpatialClusters(ctx, sourceId)
-	if err != nil {
-		return err
-	}
+		err = p.SpatialClusters(txCtx, sourceId)
+		if err != nil {
+			return err
+		}
 
-	err = p.TemporalClusters(ctx, sourceId)
-	if err != nil {
-		return err
-	}
+		err = p.TemporalClusters(txCtx, sourceId)
+		if err != nil {
+			return err
+		}
 
-	err = p.TemporalGeometries(ctx, sourceId)
-	if err != nil {
-		return err
-	}
+		err = p.TemporalGeometries(txCtx, sourceId)
+		if err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 type TemporalPath struct {

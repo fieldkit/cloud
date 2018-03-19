@@ -73,7 +73,7 @@ func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id ingestion.Devi
 	}
 	return ds.db.NamedGetContext(ctx, dl, `
                INSERT INTO fieldkit.device_location (device_id, timestamp, location)
-	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326)) RETURNING *`, dl)
+	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))`, dl)
 
 }
 
