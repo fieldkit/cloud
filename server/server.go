@@ -8,8 +8,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
 
 	"github.com/O-C-R/singlepage"
@@ -43,22 +47,39 @@ type Config struct {
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
+
+	Help          bool
+	CpuProfile    string
+	MemoryProfile string
 }
 
-var help bool
-
-func init() {
-	flag.BoolVar(&help, "h", false, "print usage")
+func configureProfiling(config *Config) {
 }
 
 func main() {
-	flag.Parse()
-
 	var config Config
 
-	if help {
+	flag.BoolVar(&config.Help, "help", false, "usage")
+	flag.StringVar(&config.CpuProfile, "profile-cpu", "", "write cpu profile")
+	flag.StringVar(&config.MemoryProfile, "profile-memory", "", "write memory profile")
+
+	flag.Parse()
+
+	if config.Help {
+		flag.Usage()
 		envconfig.Usage("fieldkit", &config)
 		os.Exit(0)
+	}
+
+	if false && config.CpuProfile != "" {
+		f, err := os.Create(config.CpuProfile)
+		if err != nil {
+			log.Fatal("Unable to create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("Unable to start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
 	}
 
 	if err := envconfig.Process("fieldkit", &config); err != nil {
@@ -202,8 +223,24 @@ func main() {
 		}),
 	}
 
+	go func() {
+		log.Println(http.ListenAndServe("127.0.0.1:6060", nil))
+	}()
+
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
+	}
+
+	if config.MemoryProfile != "" {
+		f, err := os.Create(config.MemoryProfile)
+		if err != nil {
+			log.Fatal("Unable to create memory profile: ", err)
+		}
+		runtime.GC()
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("Unable to write memory profile: ", err)
+		}
+		f.Close()
 	}
 }
 

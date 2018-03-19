@@ -112,8 +112,11 @@ export default class MapContainer extends Component {
     }
 
     onClick(target, ev) {
-        const selected = _.uniqBy(target.queryRenderedFeatures(ev.point), f => f.properties.name);
+        const features =  target.queryRenderedFeatures(ev.point);
+        const selected = _.uniqBy(features, f => f.properties.name);
         const coordinates = ev.lngLat;
+
+        console.log(features);
 
         if (selected.length === 0) {
             this.setState({

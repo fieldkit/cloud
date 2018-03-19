@@ -7,4 +7,4 @@ export FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@127.0.0.1/fieldkit?ssl
 
 make build/server
 
-build/server
+build/server "$@"
