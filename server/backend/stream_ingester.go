@@ -41,31 +41,35 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Printf("Stream [%s]: begin %v", req.RemoteAddr, contentType)
+	si.backend.db.WithNewTransaction(context.TODO(), func(txCtx context.Context, tx *sqlx.Tx) error {
+		log.Printf("Stream [%s]: begin %v", req.RemoteAddr, contentType)
 
-	binaryReader := NewFkBinaryReader(si.backend)
+		binaryReader := NewFkBinaryReader(si.backend)
 
-	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
-		var record pb.DataRecord
-		err := proto.Unmarshal(b, &record)
+		unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
+			var record pb.DataRecord
+			err := proto.Unmarshal(b, &record)
+			if err != nil {
+				log.Printf("Error unmarshalling record: %v", err)
+				return nil, err
+			}
+
+			_ = binaryReader.Push(txCtx, &record)
+
+			return &record, nil
+		})
+
+		_, err := stream.ReadLengthPrefixedCollection(req.Body, unmarshalFunc)
 		if err != nil {
-			log.Printf("Error unmarshalling record: %v", err)
-			return nil, err
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Printf("Stream [%s]: ingesting error: %v", req.RemoteAddr, err)
+			return nil
 		}
 
-		_ = binaryReader.Push(&record)
+		binaryReader.Done(txCtx)
 
-		return &record, nil
+		return nil
 	})
-
-	_, err := stream.ReadLengthPrefixedCollection(req.Body, unmarshalFunc)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Stream [%s]: ingesting error: %v", req.RemoteAddr, err)
-		return
-	}
-
-	binaryReader.Done()
 
 	w.WriteHeader(http.StatusOK)
 }

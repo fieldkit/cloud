@@ -3,6 +3,7 @@ package sqlxcache
 import (
 	"context"
 	"database/sql"
+	"log"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -24,71 +25,76 @@ func newDB(db *sqlx.DB) *DB {
 }
 
 func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
+	/*
+		db.mu.Lock()
+		defer db.mu.Unlock()
 
-	if stmt, ok := db.cache[query]; ok {
-		return stmt, nil
-	}
+		if stmt, ok := db.cache[query]; ok {
+			return stmt, nil
+		}
+	*/
 
 	stmt, err := db.db.Preparex(query)
 	if err != nil {
 		return nil, err
 	}
 
-	db.cache[query] = stmt
+	//db.cache[query] = stmt
 	return stmt, nil
 }
 
 func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
+	/*
+		db.mu.Lock()
+		defer db.mu.Unlock()
 
-	if stmt, ok := db.cache[query]; ok {
-		return stmt, nil
-	}
+		if stmt, ok := db.cache[query]; ok {
+			return db.stmtWithTx(ctx, stmt), nil
+		}
+	*/
 
 	stmt, err := db.db.PreparexContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	db.cache[query] = stmt
-	return stmt, nil
-}
-
-func (db *DB) cacheNamedStmt(query string) (*sqlx.NamedStmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if namedStmt, ok := db.cacheNamed[query]; ok {
-		return namedStmt, nil
-	}
-
-	namedStmt, err := db.db.PrepareNamed(query)
-	if err != nil {
-		return nil, err
-	}
-
-	db.cacheNamed[query] = namedStmt
-	return namedStmt, nil
+	// db.cache[query] = stmt
+	return db.stmtWithTx(ctx, stmt), nil
 }
 
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
+	/*
+		db.mu.Lock()
+		defer db.mu.Unlock()
 
-	if namedStmt, ok := db.cacheNamed[query]; ok {
-		return namedStmt, nil
-	}
+		if namedStmt, ok := db.cacheNamed[query]; ok {
+			return db.namedStmtWithTx(ctx, namedStmt), nil
+		}
+	*/
 
 	namedStmt, err := db.db.PrepareNamedContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	db.cacheNamed[query] = namedStmt
-	return namedStmt, nil
+	// db.cacheNamed[query] = namedStmt
+	return db.namedStmtWithTx(ctx, namedStmt), nil
+}
+
+func (db *DB) stmtWithTx(ctx context.Context, stmt *sqlx.Stmt) *sqlx.Stmt {
+	tx := db.GetTransaction(ctx)
+	if tx == nil {
+		return stmt
+	}
+	return tx.Stmtx(stmt)
+}
+
+func (db *DB) namedStmtWithTx(ctx context.Context, stmt *sqlx.NamedStmt) *sqlx.NamedStmt {
+	tx := db.GetTransaction(ctx)
+	if tx == nil {
+		return stmt
+	}
+	return tx.NamedStmt(stmt)
 }
 
 func Connect(driverName, dataSourceName string) (*DB, error) {
@@ -121,9 +127,6 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 	return newDB(db), nil
 }
 
-// func (db *DB) Beginx() (*sqlx.Tx, error)
-// func (db *DB) BindNamed(query string, arg interface{}) (string, []interface{}, error)
-
 func (db *DB) DriverName() string {
 	return db.db.DriverName()
 }
@@ -135,6 +138,15 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	}
 
 	return stmt.Get(dest, args...)
+}
+
+func (db *DB) Select(dest interface{}, query string, args ...interface{}) error {
+	stmt, err := db.cacheStmt(query)
+	if err != nil {
+		return err
+	}
+
+	return stmt.Select(dest, args...)
 }
 
 func (db *DB) GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
@@ -155,28 +167,6 @@ func (db *DB) ExecContext(ctx context.Context, query string, args ...interface{}
 	return stmt.ExecContext(ctx, args...)
 }
 
-// func (db *DB) MapperFunc(mf func(string) string)
-// func (db *DB) MustBegin() *sqlx.Tx
-
-// func (db *DB) MustExec(query string, args ...interface{}) sql.Result {
-// 	stmt, err := db.cacheStmt(query)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return stmt.MustExec(args...)
-// }
-
-// not sqlx
-func (db *DB) NamedGet(dest interface{}, query string, arg interface{}) error {
-	namedStmt, err := db.cacheNamedStmt(query)
-	if err != nil {
-		return err
-	}
-
-	return namedStmt.Get(dest, arg)
-}
-
 // not sqlx
 func (db *DB) NamedGetContext(ctx context.Context, dest interface{}, query string, arg interface{}) error {
 	namedStmt, err := db.cacheNamedStmtContext(ctx, query)
@@ -185,15 +175,6 @@ func (db *DB) NamedGetContext(ctx context.Context, dest interface{}, query strin
 	}
 
 	return namedStmt.GetContext(ctx, dest, arg)
-}
-
-func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
-	namedStmt, err := db.cacheNamedStmt(query)
-	if err != nil {
-		return nil, err
-	}
-
-	return namedStmt.Exec(arg)
 }
 
 func (db *DB) NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error) {
@@ -205,15 +186,6 @@ func (db *DB) NamedExecContext(ctx context.Context, query string, arg interface{
 	return namedStmt.ExecContext(ctx, arg)
 }
 
-func (db *DB) NamedQuery(query string, arg interface{}) (*sqlx.Rows, error) {
-	namedStmt, err := db.cacheNamedStmt(query)
-	if err != nil {
-		return nil, err
-	}
-
-	return namedStmt.Queryx(arg)
-}
-
 func (db *DB) NamedQueryContext(ctx context.Context, query string, arg interface{}) (*sqlx.Rows, error) {
 	namedStmt, err := db.cacheNamedStmtContext(ctx, query)
 	if err != nil {
@@ -223,17 +195,6 @@ func (db *DB) NamedQueryContext(ctx context.Context, query string, arg interface
 	return namedStmt.QueryxContext(ctx, arg)
 }
 
-// func (db *DB) QueryRowx(query string, args ...interface{}) *sqlx.Row
-
-func (db *DB) Queryx(query string, args ...interface{}) (*sqlx.Rows, error) {
-	stmt, err := db.cacheStmt(query)
-	if err != nil {
-		return nil, err
-	}
-
-	return stmt.Queryx(args...)
-}
-
 func (db *DB) QueryxContext(ctx context.Context, query string, args ...interface{}) (*sqlx.Rows, error) {
 	stmt, err := db.cacheStmtContext(ctx, query)
 	if err != nil {
@@ -241,19 +202,6 @@ func (db *DB) QueryxContext(ctx context.Context, query string, args ...interface
 	}
 
 	return stmt.QueryxContext(ctx, args...)
-}
-
-func (db *DB) Rebind(query string) string {
-	return db.db.Rebind(query)
-}
-
-func (db *DB) Select(dest interface{}, query string, args ...interface{}) error {
-	stmt, err := db.cacheStmt(query)
-	if err != nil {
-		return err
-	}
-
-	return stmt.Select(dest, args...)
 }
 
 func (db *DB) SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
@@ -267,4 +215,33 @@ func (db *DB) SelectContext(ctx context.Context, dest interface{}, query string,
 
 func (db *DB) Unsafe() *DB {
 	return newDB(db.db.Unsafe())
+}
+
+type transactionContextKey string
+
+var TxContextKey = transactionContextKey("sqlx.tx")
+
+func (db *DB) WithNewTransaction(ctx context.Context, fn func(txCtx context.Context, tx *sqlx.Tx) error) error {
+	log.Printf("Begin transaction")
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return err
+	}
+	txCtx := context.WithValue(context.Background(), TxContextKey, tx)
+	err = fn(txCtx, tx)
+	if err != nil {
+		log.Printf("Rollback")
+		tx.Rollback()
+		return err
+	}
+	log.Printf("Commit")
+	tx.Commit()
+	return nil
+}
+
+func (db *DB) GetTransaction(ctx context.Context) (tx *sqlx.Tx) {
+	if v := ctx.Value(TxContextKey); v != nil {
+		return v.(*sqlx.Tx)
+	}
+	return nil
 }
