@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"log"
@@ -24,6 +25,7 @@ type FkBinaryReader struct {
 	Readings        map[uint32]float32
 	Ingester        *ingestion.MessageIngester
 	RecordAdder     *RecordAdder
+	SourceIDs       map[int64]bool
 }
 
 func NewFkBinaryReader(b *Backend) *FkBinaryReader {
@@ -37,6 +39,7 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		Readings:    make(map[uint32]float32),
 		Modules:     make([]string, 0),
 		RecordAdder: NewRecordAdder(b),
+		SourceIDs:   make(map[int64]bool),
 	}
 }
 
@@ -127,14 +130,19 @@ var (
 	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
 )
 
-func (br *FkBinaryReader) Done() error {
+func (br *FkBinaryReader) Done(ctx context.Context) error {
 	if br.ReadingsSeen > 0 {
 		log.Printf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
 	}
+
+	for id, _ := range br.SourceIDs {
+		br.RecordAdder.EmitSourceChanged(id)
+	}
+
 	return nil
 }
 
-func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
+func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
 	if record.Metadata != nil {
 		if br.DeviceId == "" {
 			br.DeviceId = hex.EncodeToString(record.Metadata.DeviceId)
@@ -186,17 +194,20 @@ func (br *FkBinaryReader) Push(record *pb.DataRecord) error {
 
 				log.Printf("(%s)(%s)[Ingesting] %v, %v, %d values", pm.MessageId, pm.SchemaId, br.Modules, pm.Location, len(pm.MapValues))
 
-				im, err := br.Ingester.IngestProcessedMessage(pm)
+				im, err := br.Ingester.IngestProcessedMessage(ctx, pm)
 				if err != nil {
 					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
 					return err
 				}
 
-				err = br.RecordAdder.AddRecord(im)
+				err = br.RecordAdder.AddRecord(ctx, im)
 				if err != nil {
 					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
 					return err
 				}
+
+				ids := im.Schema.Ids.(DatabaseIds)
+				br.SourceIDs[ids.DeviceID] = true
 
 				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}

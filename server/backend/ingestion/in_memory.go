@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"context"
 	"log"
 	"sort"
 )
@@ -25,7 +26,7 @@ func NewInMemoryStreams() StreamsRepository {
 	}
 }
 
-func (msr *InMemoryStreams) LookupStream(id DeviceId) (ms *Stream, err error) {
+func (msr *InMemoryStreams) LookupStream(ctx context.Context, id DeviceId) (ms *Stream, err error) {
 	if msr.Streams[id] == nil {
 		msr.Streams[id] = &inMemoryStream{
 			Locations: Locations{},
@@ -35,7 +36,7 @@ func (msr *InMemoryStreams) LookupStream(id DeviceId) (ms *Stream, err error) {
 	return
 }
 
-func (msr *InMemoryStreams) UpdateLocation(id DeviceId, l *Location) (err error) {
+func (msr *InMemoryStreams) UpdateLocation(ctx context.Context, id DeviceId, l *Location) (err error) {
 	ms := msr.Streams[id]
 	ms.Locations = append(ms.Locations, l)
 	sort.Sort(msr.Streams[id].Locations)
@@ -60,7 +61,7 @@ func (sr *InMemorySchemas) DefineSchema(id SchemaId, ms interface{}) (err error)
 	return
 }
 
-func (sr *InMemorySchemas) LookupSchema(id SchemaId) (ms []interface{}, err error) {
+func (sr *InMemorySchemas) LookupSchema(ctx context.Context, id SchemaId) (ms []interface{}, err error) {
 	ms = make([]interface{}, 0)
 
 	if sr.Map[id.Device] != nil {

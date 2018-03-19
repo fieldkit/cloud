@@ -402,10 +402,6 @@ func (b *Backend) AddRecord(ctx context.Context, record *data.Record) error {
 			VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
 		`, record)
 
-	b.SourceChanges <- SourceChange{
-		SourceID: int64(record.SourceID),
-	}
-
 	return err
 }
 

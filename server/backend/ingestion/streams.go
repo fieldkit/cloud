@@ -1,7 +1,7 @@
 package ingestion
 
 import (
-	_ "log"
+	"context"
 	"time"
 )
 
@@ -32,6 +32,6 @@ func NewStream(id DeviceId, l *Location) (ms *Stream) {
 }
 
 type StreamsRepository interface {
-	LookupStream(id DeviceId) (ms *Stream, err error)
-	UpdateLocation(id DeviceId, l *Location) error
+	LookupStream(ctx context.Context, id DeviceId) (ms *Stream, err error)
+	UpdateLocation(ctx context.Context, id DeviceId, l *Location) error
 }

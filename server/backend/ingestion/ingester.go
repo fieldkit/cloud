@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -67,7 +68,7 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 	return nil, nil
 }
 
-func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchema) (im *IngestedMessage, err error) {
+func (i *MessageIngester) ApplySchema(ctx context.Context, pm *ProcessedMessage, ms *JsonMessageSchema) (im *IngestedMessage, err error) {
 	// This works with MapValues, too as they'll be zero for now.
 	if pm.ArrayValues != nil && len(pm.ArrayValues) != len(ms.Fields) {
 		return nil, fmt.Errorf("%s: fields S=%v != M=%v", pm.SchemaId, len(ms.Fields), len(pm.ArrayValues))
@@ -87,7 +88,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 
 	// TODO: Eventually we'll be able to link a secondary 'Location' stream
 	// to any other stream.
-	stream, err := i.Streams.LookupStream(pm.SchemaId.Device)
+	stream, err := i.Streams.LookupStream(ctx, pm.SchemaId.Device)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 	if location != nil {
 		if location.Valid() {
 			log.Printf("(%s)(%s)[Updating Location] %v", pm.MessageId, pm.SchemaId, location)
-			i.Streams.UpdateLocation(pm.SchemaId.Device, location)
+			i.Streams.UpdateLocation(ctx, pm.SchemaId.Device, location)
 			stream.Location = location
 		}
 	}
@@ -127,7 +128,7 @@ func (i *MessageIngester) ApplySchema(pm *ProcessedMessage, ms *JsonMessageSchem
 	return
 }
 
-func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface{}) (im *IngestedMessage, err error) {
+func (i *MessageIngester) ApplySchemas(ctx context.Context, pm *ProcessedMessage, schemas []interface{}) (im *IngestedMessage, err error) {
 	errors := make([]error, 0)
 
 	if len(schemas) == 0 {
@@ -137,7 +138,7 @@ func (i *MessageIngester) ApplySchemas(pm *ProcessedMessage, schemas []interface
 	for _, schema := range schemas {
 		jsonSchema, ok := schema.(*JsonMessageSchema)
 		if ok {
-			im, applyErr := i.ApplySchema(pm, jsonSchema)
+			im, applyErr := i.ApplySchema(ctx, pm, jsonSchema)
 			if applyErr != nil {
 				errors = append(errors, applyErr)
 			} else {
@@ -159,7 +160,7 @@ func makePretty(errors []error) (m string) {
 	return strings.Join(strs, ", ")
 }
 
-func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *ProcessedMessage, err error) {
+func (i *MessageIngester) Ingest(ctx context.Context, raw *RawMessage) (im *IngestedMessage, pm *ProcessedMessage, err error) {
 	i.Statistics.Processed += 1
 
 	mp, err := IdentifyMessageProvider(raw)
@@ -175,7 +176,7 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 		return nil, nil, fmt.Errorf("(ProcessMessage) %v", err)
 	}
 	if pm != nil {
-		im, err := i.IngestProcessedMessage(pm)
+		im, err := i.IngestProcessedMessage(ctx, pm)
 		if err != nil {
 			return nil, pm, err
 		}
@@ -185,12 +186,12 @@ func (i *MessageIngester) Ingest(raw *RawMessage) (im *IngestedMessage, pm *Proc
 	return
 }
 
-func (i *MessageIngester) IngestProcessedMessage(pm *ProcessedMessage) (im *IngestedMessage, err error) {
-	schemas, err := i.Schemas.LookupSchema(pm.SchemaId)
+func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, pm *ProcessedMessage) (im *IngestedMessage, err error) {
+	schemas, err := i.Schemas.LookupSchema(ctx, pm.SchemaId)
 	if err != nil {
 		return nil, fmt.Errorf("(LookupSchema) %v", err)
 	}
-	im, err = i.ApplySchemas(pm, schemas)
+	im, err = i.ApplySchemas(ctx, pm, schemas)
 	if err != nil {
 		return nil, fmt.Errorf("(ApplySchemas) %v", err)
 	}
@@ -198,8 +199,8 @@ func (i *MessageIngester) IngestProcessedMessage(pm *ProcessedMessage) (im *Inge
 	return im, nil
 }
 
-func (i *MessageIngester) HandleMessage(raw *RawMessage) error {
-	_, pm, err := i.Ingest(raw)
+func (i *MessageIngester) HandleMessage(ctx context.Context, raw *RawMessage) error {
+	_, pm, err := i.Ingest(ctx, raw)
 	if err != nil {
 		log.Printf("%v", err)
 	} else {

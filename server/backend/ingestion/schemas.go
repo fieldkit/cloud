@@ -1,8 +1,12 @@
 package ingestion
 
+import (
+	"context"
+)
+
 type MessageSchema struct {
 }
 
 type SchemaRepository interface {
-	LookupSchema(id SchemaId) (ms []interface{}, err error)
+	LookupSchema(ctx context.Context, id SchemaId) (ms []interface{}, err error)
 }

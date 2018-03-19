@@ -24,9 +24,9 @@ func NewDatabaseStreams(db *sqlxcache.DB) ingestion.StreamsRepository {
 	}
 }
 
-func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.Stream, err error) {
+func (ds *DatabaseStreams) LookupStream(ctx context.Context, id ingestion.DeviceId) (ms *ingestion.Stream, err error) {
 	devices := []*data.Device{}
-	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
+	if err := ds.db.SelectContext(ctx, &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 	}
 
 	locations := []*data.DeviceLocation{}
-	if err := ds.db.SelectContext(context.TODO(), &locations, `
+	if err := ds.db.SelectContext(ctx, &locations, `
                   SELECT l.timestamp, ST_AsBinary(l.location) AS location
                   FROM fieldkit.device_location AS l
                   WHERE l.device_id = $1 ORDER BY l.timestamp DESC LIMIT 1
@@ -56,9 +56,9 @@ func (ds *DatabaseStreams) LookupStream(id ingestion.DeviceId) (ms *ingestion.St
 	return
 }
 
-func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Location) (err error) {
+func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id ingestion.DeviceId, l *ingestion.Location) (err error) {
 	devices := []*data.Device{}
-	if err := ds.db.SelectContext(context.TODO(), &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
+	if err := ds.db.SelectContext(ctx, &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (ds *DatabaseStreams) UpdateLocation(id ingestion.DeviceId, l *ingestion.Lo
 		Timestamp: l.UpdatedAt,
 		Location:  data.NewLocation(l.Coordinates),
 	}
-	return ds.db.NamedGetContext(context.TODO(), dl, `
+	return ds.db.NamedGetContext(ctx, dl, `
                INSERT INTO fieldkit.device_location (device_id, timestamp, location)
 	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326)) RETURNING *`, dl)
 
@@ -87,9 +87,9 @@ func NewDatabaseSchemas(db *sqlxcache.DB) ingestion.SchemaRepository {
 	}
 }
 
-func (ds *DatabaseSchemas) LookupSchema(id ingestion.SchemaId) (ms []interface{}, err error) {
+func (ds *DatabaseSchemas) LookupSchema(ctx context.Context, id ingestion.SchemaId) (ms []interface{}, err error) {
 	schemas := []*data.DeviceJSONSchema{}
-	if err := ds.db.SelectContext(context.TODO(), &schemas, `
+	if err := ds.db.SelectContext(ctx, &schemas, `
                   SELECT ds.*, s.* FROM fieldkit.device AS d
                   JOIN fieldkit.device_schema AS ds ON (d.source_id = ds.device_id)
                   JOIN fieldkit.schema AS s ON (ds.schema_id = s.id)

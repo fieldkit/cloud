@@ -6,13 +6,15 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/conservify/sqlxcache"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
-	"github.com/fieldkit/cloud/server/data"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/conservify/sqlxcache"
+
+	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type IncomingMessageContext struct {
@@ -69,7 +71,13 @@ func NewRecordAdder(backend *Backend) *RecordAdder {
 	}
 }
 
-func (da *RecordAdder) AddRecord(im *ingestion.IngestedMessage) error {
+func (da *RecordAdder) EmitSourceChanged(id int64) {
+	da.backend.SourceChanges <- SourceChange{
+		SourceID: id,
+	}
+}
+
+func (da *RecordAdder) AddRecord(ctx context.Context, im *ingestion.IngestedMessage) error {
 	// TODO: Not terribly happy with this hack.
 	ids := im.Schema.Ids.(DatabaseIds)
 	d := data.Record{
@@ -83,7 +91,7 @@ func (da *RecordAdder) AddRecord(im *ingestion.IngestedMessage) error {
 		Visible:   true,
 	}
 	d.SetData(im.Fields)
-	return da.backend.AddRecord(context.TODO(), &d)
+	return da.backend.AddRecord(ctx, &d)
 }
 
 func backgroundIngestion(rmi *RawMessageIngester) {
@@ -93,7 +101,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 			log.Printf("(%s)[Error] %v", row.Id, err)
 			log.Printf("%s", row.Data)
 		} else {
-			im, pm, err := rmi.ingester.Ingest(raw)
+			im, pm, err := rmi.ingester.Ingest(context.TODO(), raw)
 			if err != nil {
 				if pm != nil {
 					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
@@ -104,7 +112,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
 				}
 			} else {
-				rmi.recordAdder.AddRecord(im)
+				rmi.recordAdder.AddRecord(context.TODO(), im)
 				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}
 		}
