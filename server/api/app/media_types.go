@@ -531,7 +531,6 @@ func (mt *Location) Validate() (err error) {
 type MapFeatures struct {
 	GeoJSON    *PagedGeoJSON                    `form:"geoJSON" json:"geoJSON" xml:"geoJSON"`
 	Geometries ClusterGeometrySummaryCollection `form:"geometries" json:"geometries" xml:"geometries"`
-	Readings   ReadingSummaryCollection         `form:"readings" json:"readings" xml:"readings"`
 	Spatial    ClusterSummaryCollection         `form:"spatial" json:"spatial" xml:"spatial"`
 	Temporal   ClusterSummaryCollection         `form:"temporal" json:"temporal" xml:"temporal"`
 }
@@ -547,9 +546,6 @@ func (mt *MapFeatures) Validate() (err error) {
 	if mt.Spatial == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "spatial"))
 	}
-	if mt.Readings == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "readings"))
-	}
 	if mt.Geometries == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "geometries"))
 	}
@@ -559,9 +555,6 @@ func (mt *MapFeatures) Validate() (err error) {
 		}
 	}
 	if err2 := mt.Geometries.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	if err2 := mt.Readings.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	if err2 := mt.Spatial.Validate(); err2 != nil {
