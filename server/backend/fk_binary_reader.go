@@ -138,7 +138,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 	br.RecordsProcessed += 1
 
 	if record.Metadata != nil {
-		if br.DeviceId == "" {
+		if record.Metadata.DeviceId != nil && len(record.Metadata.DeviceId) > 0 {
 			br.DeviceId = hex.EncodeToString(record.Metadata.DeviceId)
 		}
 		if record.Metadata.Sensors != nil {

@@ -274,17 +274,23 @@ func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) e
 
 	txCtx := context.WithValue(ctx, TxContextKey, tx)
 	err = fn(txCtx)
-	elapsed := time.Now().Sub(started)
 
-	log.Printf("Commit/Rollback (%v)", err)
+	elapsed := time.Now().Sub(started)
+	log.Printf("Commit/Rollback (%v) (%v)", elapsed, err)
+
 	if err != nil {
 		tx.Rollback()
+
+		elapsed = time.Now().Sub(started)
 		log.Printf("Rollback (%v)", elapsed)
 		return err
 	}
 
 	err = tx.Commit()
+
+	elapsed = time.Now().Sub(started)
 	log.Printf("Commit (%v)", elapsed)
+
 	return err
 }
 

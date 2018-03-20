@@ -86,8 +86,7 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, pm *ProcessedMessage,
 		}
 	}
 
-	// TODO: Eventually we'll be able to link a secondary 'Location' stream
-	// to any other stream.
+	// TODO: Eventually we'll be able to link a secondary 'Location' stream to any other stream.
 	stream, err := i.Streams.LookupStream(ctx, pm.SchemaId.Device)
 	if err != nil {
 		return nil, err
@@ -160,6 +159,19 @@ func makePretty(errors []error) (m string) {
 	return strings.Join(strs, ", ")
 }
 
+func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, pm *ProcessedMessage) (im *IngestedMessage, err error) {
+	schemas, err := i.Schemas.LookupSchema(ctx, pm.SchemaId)
+	if err != nil {
+		return nil, fmt.Errorf("(LookupSchema) %v", err)
+	}
+	im, err = i.ApplySchemas(ctx, pm, schemas)
+	if err != nil {
+		return nil, fmt.Errorf("(ApplySchemas) %v", err)
+	}
+	i.Statistics.Successes += 1
+	return im, nil
+}
+
 func (i *MessageIngester) Ingest(ctx context.Context, raw *RawMessage) (im *IngestedMessage, pm *ProcessedMessage, err error) {
 	i.Statistics.Processed += 1
 
@@ -184,29 +196,6 @@ func (i *MessageIngester) Ingest(ctx context.Context, raw *RawMessage) (im *Inge
 	}
 
 	return
-}
-
-func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, pm *ProcessedMessage) (im *IngestedMessage, err error) {
-	schemas, err := i.Schemas.LookupSchema(ctx, pm.SchemaId)
-	if err != nil {
-		return nil, fmt.Errorf("(LookupSchema) %v", err)
-	}
-	im, err = i.ApplySchemas(ctx, pm, schemas)
-	if err != nil {
-		return nil, fmt.Errorf("(ApplySchemas) %v", err)
-	}
-	i.Statistics.Successes += 1
-	return im, nil
-}
-
-func (i *MessageIngester) HandleMessage(ctx context.Context, raw *RawMessage) error {
-	_, pm, err := i.Ingest(ctx, raw)
-	if err != nil {
-		log.Printf("%v", err)
-	} else {
-		log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
-	}
-	return nil
 }
 
 type IngestionStatistics struct {

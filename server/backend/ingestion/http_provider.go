@@ -52,11 +52,11 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 
 func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *ProcessedMessage, err error) {
 	if message.Device == "" {
-		return nil, fmt.Errorf("Malformed HttpJsonMessage. Device is required.")
+		return nil, fmt.Errorf("Malformed HttpJsonMessage: Device is required.")
 	}
 
 	if len(message.Location) < 2 {
-		return nil, fmt.Errorf("Malformed HttpJsonMessage. Location is required.")
+		return nil, fmt.Errorf("Malformed HttpJsonMessage: Location is required.")
 	}
 
 	messageTime := time.Unix(message.Time, 0)
