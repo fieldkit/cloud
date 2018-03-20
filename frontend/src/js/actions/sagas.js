@@ -4,8 +4,6 @@ import {
     all, put, take, race, takeLatest, select
 } from 'redux-saga/effects';
 
-import _ from 'lodash';
-
 import * as ActionTypes from './types';
 import FkApi from '../api/calls';
 

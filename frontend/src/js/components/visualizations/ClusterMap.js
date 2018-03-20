@@ -123,23 +123,32 @@ export default class ClusterMap extends Component {
 
         const temporalWidth = 8;
 
-        const temporal = _(data).filter(s => s.summary != null && s.summary.spatial != null).map(s => {
-            return _(s.summary.temporal).filter(c => s.geometries[c.id]).map(c => {
-                return {
-                    geometry: {
-                        coordinates: s.geometries[c.id].geometry,
-                    },
-                    properties: {
-                        name: s.summary.name,
-                        source: s.summary.id,
-                        cluster: c.id,
-                        type: 'temporal',
-                        color: colors.get(),
-                        numberOfFeatures: c.numberOfFeatures
-                    }
-                };
-            }).value();
-        }).flatten().value();
+        const temporal = _(data)
+            .filter(s => s.summary != null && s.summary.spatial != null)
+            .sortBy(s => s.source.id)
+            .map(s => {
+                return _(s.summary.temporal)
+                    .filter(c => s.geometries[c.id])
+                    .sortBy(c => c.id)
+                    .map(c => {
+                        return {
+                            geometry: {
+                                coordinates: s.geometries[c.id].geometry,
+                            },
+                            properties: {
+                                name: s.summary.name,
+                                source: s.summary.id,
+                                cluster: c.id,
+                                type: 'temporal',
+                                color: colors.get(),
+                                numberOfFeatures: c.numberOfFeatures
+                            }
+                        };
+                    })
+                    .value();
+            })
+            .flatten()
+            .value();
 
         const spatialColor ={
             type: 'identity',
