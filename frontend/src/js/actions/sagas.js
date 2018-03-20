@@ -106,25 +106,6 @@ export function* manageMap() {
     });
 }
 
-export function* loadSources(ids) {
-    const cache = {};
-    const newIds = _.difference(ids, _.keys(cache));
-    const sources = yield all(newIds.map(id => FkApi.getSource(id)));
-    const summaries = yield all(newIds.map(id => FkApi.getSourceSummary(id)));
-    const temporal = yield all(_(summaries).map(s => {
-        return s.temporal.map(t => {
-            return {
-                sourceId: s.id,
-                clusterId: t.id,
-            };
-        })
-    }).flatten().map(ids => {
-        return FkApi.getTemporalClusterGeometry(ids.sourceId, ids.clusterId);
-    }).value());
-
-    console.log(summaries, sources, temporal.length);
-}
-
 function getMapLocationFromQueryString() {
     const params = new URLSearchParams(window.location.search);
     const value = params.get('center') || "";
@@ -145,17 +126,7 @@ function getDefaultMapLocation() {
 }
 
 export function* loadExpedition(projectSlug, expeditionSlug) {
-    const [ expedition, sources ] = yield all([
-        FkApi.getExpedition(projectSlug, expeditionSlug),
-        FkApi.getExpeditionSources(projectSlug, expeditionSlug)
-    ]);
-
     yield put(focusLocation(getDefaultMapLocation()));
-
-    const sourceIds = _(sources.deviceSources).map('id').uniq().value();
-    const detailedSources = yield loadSources(sourceIds);
-
-    return [ expedition, sources, sources, detailedSources ];
 }
 
 function* loadGeojson(lastPage, call) {

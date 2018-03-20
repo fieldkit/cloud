@@ -65,6 +65,16 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
                 features: []
             }
         });
+    case ActionTypes.API_MAP_FEATURES_GET.SUCCESS: {
+        const nextState = Object.assign({ }, state);
+        const geometries = action.response.geometries;
+        geometries.forEach(g => {
+            nextState.sources[g.sourceId] = nextState.sources[g.sourceId] || {};
+            nextState.sources[g.sourceId].geometries = nextState.sources[g.sourceId].geometries || {};
+            nextState.sources[g.sourceId].geometries[g.id] = g;
+        });
+        return nextState;
+    }
     case ActionTypes.API_FEATURE_GEOJSON_GET.SUCCESS: {
         const feature = action.response.geo.features[0];
         const nextState = Object.assign({}, state);
@@ -79,7 +89,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
         const summary = createSummary(action.response);
         const container = state.sources[summary.id] || { };
         const nextState = Object.assign({}, state);
-        nextState.sources[summary.id] = {...container, ...{ summary: summary, geometries: {} } };
+        nextState.sources[summary.id] = {...container, ...{ summary: summary } };
         return nextState;
     }
     case ActionTypes.API_CLUSTER_GEOMETRY_GET.SUCCESS: {
@@ -120,13 +130,6 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
                 features: features
             }
         });
-    default:
-        return state;
-    }
-}
-
-function sources(state = {}, action) {
-    switch (action.type) {
     default:
         return state;
     }
@@ -181,10 +184,46 @@ function chartData(state = initialChartDataState, action) {
     }
 }
 
+const initialMapState = {
+    loaded: [],
+};
+
+function map(state = initialMapState, action) {
+    switch (action.type) {
+    case ActionTypes.API_MAP_FEATURES_GET.SUCCESS: {
+        const nextState = Object.assign({}, state);
+        nextState.loaded.push(action.criteria);
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
+const initialSourcesState = {
+    sources: {},
+    summaries: {},
+    geometries: {}
+};
+
+function sources(state = initialSourcesState, action) {
+    switch (action.type) {
+    case ActionTypes.API_SOURCE_GET.SUCCESS: {
+        const nextState = Object.assign({}, state);
+        const source = action.response;
+        nextState[source.id] = source;
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     activeExpedition,
     visibleFeatures,
-    sources,
     playbackMode,
-    chartData
+    chartData,
+    map,
+    sources,
 });

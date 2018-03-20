@@ -18,10 +18,14 @@ export default store => dispatch => action => {
             type: callApi.types.SUCCESS,
             response: response,
         }));
+
+        return response;
     }, err => {
         dispatch(Object.assign({}, callApi, {
             type: callApi.types.FAILURE,
             error: err,
         }));
+
+        return err;
     })
 };

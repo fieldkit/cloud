@@ -1,6 +1,11 @@
+import _ from 'lodash';
+import Promise from 'bluebird';
+
 import * as ActionTypes from './types';
+import { GeoRectSet, GeoRect } from '../common/geo';
 import { CALL_WEB_API } from '../api/middleware';
-import { getQuery, queryMapFeatures } from '../api/creators';
+import { getQuery } from '../api/creators';
+import { FkApi } from '../api/calls';
 
 export function changePlaybackMode(mode) {
     return {
@@ -76,8 +81,32 @@ export function changeCriteria(criteria) {
 
 export function loadMapFeatures(criteria) {
     return (dispatch, getState) => {
-        return dispatch({
-            [CALL_WEB_API]: queryMapFeatures(criteria)
+        const { map } = getState();
+
+        const desired = new GeoRect(criteria);
+        const loaded = new GeoRectSet(map.loaded);
+        if (loaded.contains(desired)) {
+            return;
+        }
+
+        const loading = desired.enlarge(2);
+        loaded.add(loading);
+
+        const api = new FkApi(dispatch);
+        return api.queryMapFeatures({
+            ne: loading.ne,
+            sw: loading.sw,
+        }).then(data => {
+            const { sources } = getState();
+            const sourceIds = _.union(_(data.spatial).map(s => s.sourceId).value(), _(data.temporal).map(s => s.sourceId).value());
+            return Promise.all(sourceIds.map(id => {
+                if (sources[id]) {
+                    return Promise.resolve(sources[id]);
+                }
+                return api.getSource(id).then(source => {
+                    return api.getSourceSummary(id);
+                });
+            }));
         });
     };
 }

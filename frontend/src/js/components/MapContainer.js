@@ -100,6 +100,18 @@ export default class MapContainer extends Component {
         focusSource(source);
     }
 
+    onRender(map) {
+        const { loadMapFeatures } = this.props;
+
+        const bounds = map.getBounds();
+        if (map.loaded()) {
+            loadMapFeatures({
+                ne: bounds.getNorthEast().toArray(),
+                sw: bounds.getSouthWest().toArray(),
+            });
+        }
+    }
+
     onUserActivity(map) {
         const { onUserActivity, loadMapFeatures } = this.props;
 
@@ -167,6 +179,11 @@ export default class MapContainer extends Component {
                     }
                 },
                 {
+                    title: "Show Only",
+                    onClick: () => {
+                    }
+                },
+                {
                     title: "Hide",
                     onClick: () => {
                     }
@@ -216,6 +233,7 @@ export default class MapContainer extends Component {
                 <Map style={MAPBOX_STYLE} containerStyle={containerStyle}
                     movingMethod="easeTo" center={ center } zoom={ zoom }
                     onClick={ this.onClick.bind(this) }
+                    onRender={ this.onRender.bind(this) }
                     onZoomEnd={ this.onUserActivityThrottled.bind(this) }
                     onDrag={ this.onUserActivityThrottled.bind(this) }
                     onDragEnd={ this.onUserActivityThrottled.bind(this) }>

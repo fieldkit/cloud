@@ -29,9 +29,6 @@ export class FancyMenu extends Component {
     componentWillReceiveProps(nextProps) {
     }
 
-    getCenterData() {
-    }
-
     getOptionsData() {
         const { options } = this.props;
         const angle = i => (i / options.length) * 360.0;
@@ -67,7 +64,7 @@ export class FancyMenu extends Component {
         else if (text.length >= 8) {
             return {
                 radius: 40,
-                fontSize: 16,
+                fontSize: 14,
             };
         }
         return {

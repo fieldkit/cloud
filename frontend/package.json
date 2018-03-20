@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bluebird": "^3.5.1",
     "d3": "4.13.0",
     "immutable": "^3.8.2",
     "lodash": "^4.17.4",
