@@ -11,37 +11,48 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 	pb "github.com/fieldkit/data-protocol"
+
+	"github.com/fieldkit/cloud/server/backend/ingestion"
+)
+
+var (
+	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
 )
 
 type FkBinaryReader struct {
-	DeviceId         string
-	Location         *pb.DeviceLocation
-	Time             int64
-	NumberOfSensors  uint32
-	ReadingsSeen     uint32
 	RecordsProcessed uint32
-	Modules          []string
-	Sensors          map[uint32]*pb.SensorInfo
-	Readings         map[uint32]float32
-	Ingester         *ingestion.MessageIngester
-	RecordAdder      *RecordAdder
-	SourceIDs        map[int64]bool
+
+	DeviceId        string
+	Location        *pb.DeviceLocation
+	Time            int64
+	NumberOfSensors uint32
+	ReadingsSeen    uint32
+
+	Modules   []string
+	Sensors   map[uint32]*pb.SensorInfo
+	Readings  map[uint32]float32
+	SourceIDs map[int64]bool
+
+	Ingester    *ingestion.MessageIngester
+	Cache       *ingestion.IngestionCache
+	RecordAdder *RecordAdder
 }
 
 func NewFkBinaryReader(b *Backend) *FkBinaryReader {
-	sr := NewDatabaseSchemas(b.db)
-	streams := NewDatabaseStreams(b.db)
+	sr := ingestion.NewDatabaseSchemas(b.db)
+	streams := ingestion.NewDatabaseStreams(b.db)
 	ingester := ingestion.NewMessageIngester(sr, streams)
 
 	return &FkBinaryReader{
+		Modules:   make([]string, 0),
+		Sensors:   make(map[uint32]*pb.SensorInfo),
+		Readings:  make(map[uint32]float32),
+		SourceIDs: make(map[int64]bool),
+
 		Ingester:    ingester,
-		Sensors:     make(map[uint32]*pb.SensorInfo),
-		Readings:    make(map[uint32]float32),
-		Modules:     make([]string, 0),
+		Cache:       ingestion.NewIngestionCache(),
 		RecordAdder: NewRecordAdder(b),
-		SourceIDs:   make(map[int64]bool),
 	}
 }
 
@@ -130,10 +141,6 @@ func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessa
 	return
 }
 
-var (
-	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
-)
-
 func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
 	br.RecordsProcessed += 1
 
@@ -169,6 +176,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 				log.Printf("Ignored: Unknown sensor. (%+v)", record)
 				return nil
 			}
+
 			if reading.Sensor == 0 {
 				br.ReadingsSeen = 0
 			}
@@ -188,7 +196,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 				log.Printf("(%s)(%s)[Ingesting] %v, %v, %d values", pm.MessageId, pm.SchemaId, br.Modules, pm.Location, len(pm.MapValues))
 
-				im, err := br.Ingester.IngestProcessedMessage(ctx, pm)
+				im, err := br.Ingester.IngestProcessedMessage(ctx, br.Cache, pm)
 				if err != nil {
 					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
 					return fmt.Errorf("Unable to ingest message (%v)", err)
@@ -200,8 +208,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 					return fmt.Errorf("Unable to add record (%v)", err)
 				}
 
-				ids := im.Schema.Ids.(DatabaseIds)
-				br.SourceIDs[ids.DeviceID] = true
+				br.SourceIDs[im.Schema.Ids.DeviceID] = true
 
 				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 			}

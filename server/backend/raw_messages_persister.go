@@ -14,7 +14,6 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
-	"github.com/fieldkit/cloud/server/data"
 )
 
 type IncomingMessageContext struct {
@@ -44,8 +43,8 @@ type RawMessageIngester struct {
 func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	incoming := make(chan *ingestion.RawMessageRow, 100)
 
-	sr := NewDatabaseSchemas(b.db)
-	streams := NewDatabaseStreams(b.db)
+	sr := ingestion.NewDatabaseSchemas(b.db)
+	streams := ingestion.NewDatabaseStreams(b.db)
 	ingester := ingestion.NewMessageIngester(sr, streams)
 
 	rmi = &RawMessageIngester{
@@ -61,39 +60,6 @@ func NewRawMessageIngester(b *Backend) (rmi *RawMessageIngester, err error) {
 	return
 }
 
-type RecordAdder struct {
-	backend *Backend
-}
-
-func NewRecordAdder(backend *Backend) *RecordAdder {
-	return &RecordAdder{
-		backend: backend,
-	}
-}
-
-func (da *RecordAdder) EmitSourceChanged(id int64) {
-	da.backend.SourceChanges <- SourceChange{
-		SourceID: id,
-	}
-}
-
-func (da *RecordAdder) AddRecord(ctx context.Context, im *ingestion.IngestedMessage) error {
-	// TODO: Not terribly happy with this hack.
-	ids := im.Schema.Ids.(DatabaseIds)
-	d := data.Record{
-		SchemaID:  int32(ids.SchemaID),
-		SourceID:  int32(ids.DeviceID),
-		TeamID:    nil,
-		UserID:    nil,
-		Timestamp: *im.Time,
-		Location:  data.NewLocation(im.Location.Coordinates),
-		Fixed:     im.Fixed,
-		Visible:   true,
-	}
-	d.SetData(im.Fields)
-	return da.backend.AddRecord(ctx, &d)
-}
-
 func backgroundIngestion(rmi *RawMessageIngester) {
 	ctx := context.Background()
 	for row := range rmi.incoming {
@@ -102,7 +68,7 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 			log.Printf("(%s)[Error] %v", row.Id, err)
 			log.Printf("%s", row.Data)
 		} else {
-			im, pm, err := rmi.ingester.Ingest(ctx, raw)
+			im, pm, err := rmi.ingester.IngestRawMessage(ctx, ingestion.NewIngestionCache(), raw)
 			if err != nil {
 				if pm != nil {
 					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)

@@ -1,30 +1,26 @@
-package backend
+package ingestion
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/conservify/sqlxcache"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
+
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type DatabaseIds struct {
-	SchemaID int64
-	DeviceID int64
-}
 
 type DatabaseStreams struct {
 	db *sqlxcache.DB
 }
 
-func NewDatabaseStreams(db *sqlxcache.DB) ingestion.StreamsRepository {
+func NewDatabaseStreams(db *sqlxcache.DB) StreamsRepository {
 	return &DatabaseStreams{
 		db: db,
 	}
 }
 
-func (ds *DatabaseStreams) LookupStream(ctx context.Context, id ingestion.DeviceId) (ms *ingestion.Stream, err error) {
+func (ds *DatabaseStreams) LookupStream(ctx context.Context, id DeviceId) (ms *Stream, err error) {
 	devices := []*data.Device{}
 	if err := ds.db.SelectContext(ctx, &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
 		return nil, err
@@ -44,33 +40,28 @@ func (ds *DatabaseStreams) LookupStream(ctx context.Context, id ingestion.Device
 	}
 
 	if len(locations) == 0 {
-		ms = ingestion.NewStream(id, nil)
+		ms = NewStream(id, nil, devices[0])
 	} else {
 		c := locations[0].Location.Coordinates()
-		ms = ingestion.NewStream(id, &ingestion.Location{
+
+		ms = NewStream(id, &Location{
 			UpdatedAt:   locations[0].Timestamp,
 			Coordinates: c,
-		})
+		}, devices[0])
 	}
 
 	return
 }
 
-func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id ingestion.DeviceId, l *ingestion.Location) (err error) {
-	devices := []*data.Device{}
-	if err := ds.db.SelectContext(ctx, &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
-		return err
-	}
-
-	if len(devices) == 0 {
-		return fmt.Errorf("No such device: %s", id)
-	}
-
+func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id DeviceId, stream *Stream, l *Location) (err error) {
 	dl := data.DeviceLocation{
-		DeviceID:  devices[0].SourceID,
+		DeviceID:  stream.Device.SourceID,
 		Timestamp: l.UpdatedAt,
 		Location:  data.NewLocation(l.Coordinates),
 	}
+
+	stream.Location = l
+
 	return ds.db.NamedGetContext(ctx, dl, `
                INSERT INTO fieldkit.device_location (device_id, timestamp, location)
 	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))`, dl)
@@ -81,13 +72,13 @@ type DatabaseSchemas struct {
 	db *sqlxcache.DB
 }
 
-func NewDatabaseSchemas(db *sqlxcache.DB) ingestion.SchemaRepository {
+func NewDatabaseSchemas(db *sqlxcache.DB) SchemaRepository {
 	return &DatabaseSchemas{
 		db: db,
 	}
 }
 
-func (ds *DatabaseSchemas) LookupSchema(ctx context.Context, id ingestion.SchemaId) (ms []interface{}, err error) {
+func (ds *DatabaseSchemas) LookupSchemas(ctx context.Context, id SchemaId) (ms []*MessageSchema, err error) {
 	schemas := []*data.DeviceJSONSchema{}
 	if err := ds.db.SelectContext(ctx, &schemas, `
                   SELECT ds.*, s.* FROM fieldkit.device AS d
@@ -97,7 +88,7 @@ func (ds *DatabaseSchemas) LookupSchema(ctx context.Context, id ingestion.Schema
 		return nil, err
 	}
 
-	ms = make([]interface{}, 0)
+	ms = make([]*MessageSchema, 0)
 
 	for _, s := range schemas {
 		if id.Stream == "" || s.Key == id.Stream {
@@ -105,14 +96,17 @@ func (ds *DatabaseSchemas) LookupSchema(ctx context.Context, id ingestion.Schema
 				SchemaID: s.SchemaID,
 				DeviceID: s.DeviceID,
 			}
-			js := &ingestion.JsonMessageSchema{
+			js := &JsonMessageSchema{
 				Ids: ids,
 			}
 			err = json.Unmarshal([]byte(*s.JSONSchema), js)
 			if err != nil {
 				return nil, fmt.Errorf("Malformed schema: %v", err)
 			}
-			ms = append(ms, js)
+			ms = append(ms, &MessageSchema{
+				Ids:    ids,
+				Schema: js,
+			})
 		}
 	}
 
