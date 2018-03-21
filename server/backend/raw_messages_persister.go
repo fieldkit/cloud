@@ -68,20 +68,20 @@ func backgroundIngestion(rmi *RawMessageIngester) {
 			log.Printf("(%s)[Error] %v", row.Id, err)
 			log.Printf("%s", row.Data)
 		} else {
-			im, pm, err := rmi.ingester.IngestRawMessage(ctx, ingestion.NewIngestionCache(), raw)
+			pm, err := rmi.ingester.CreateProcessedMessagFromRawMessage(ctx, raw)
 			if err != nil {
-				if pm != nil {
-					log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
-				} else {
-					log.Printf("(%s)[Error] %v", row.Id, err)
-				}
-				if true {
-					log.Printf("RawMessage: contentType=%s queryString=%v", raw.ContentType, raw.QueryString)
-				}
-			} else {
-				rmi.recordAdder.AddRecord(ctx, im)
-				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				log.Printf("(%s)[Error] %v", row.Id, err)
+				continue
 			}
+
+			im, err := rmi.ingester.IngestProcessedMessage(ctx, ingestion.NewIngestionCache(), pm)
+			if err != nil {
+				log.Printf("(%s)(%s)[Error]: %v %s", pm.MessageId, pm.SchemaId, err, pm.ArrayValues)
+				continue
+			}
+
+			rmi.recordAdder.AddRecord(ctx, im)
+			log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
 		}
 	}
 }

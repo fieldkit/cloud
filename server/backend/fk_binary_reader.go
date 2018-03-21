@@ -190,27 +190,22 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 				pm, err := br.CreateProcessedMessage()
 				if err != nil {
-					log.Printf("[Error] %v (%+v)", err, record)
 					return fmt.Errorf("Unable to create processed message (%v)", err)
 				}
 
-				log.Printf("(%s)(%s)[Ingesting] %v, %v, %d values", pm.MessageId, pm.SchemaId, br.Modules, pm.Location, len(pm.MapValues))
-
 				im, err := br.Ingester.IngestProcessedMessage(ctx, br.Cache, pm)
 				if err != nil {
-					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
-					return fmt.Errorf("Unable to ingest message (%v)", err)
+					return err
 				}
 
 				err = br.RecordAdder.AddRecord(ctx, im)
 				if err != nil {
-					log.Printf("(%s)(%s)[Error] %v", pm.MessageId, pm.SchemaId, err)
-					return fmt.Errorf("Unable to add record (%v)", err)
+					return err
 				}
 
 				br.SourceIDs[im.Schema.Ids.DeviceID] = true
 
-				log.Printf("(%s)(%s)[Success]", pm.MessageId, pm.SchemaId)
+				log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", pm.MessageId, pm.SchemaId, br.Modules, len(pm.MapValues), im.LocationUpdated, pm.Location)
 			}
 		}
 	}
@@ -220,7 +215,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 func (br *FkBinaryReader) Done(ctx context.Context) error {
 	if br.ReadingsSeen > 0 {
-		log.Printf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
+		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
 	}
 
 	log.Printf("Processed %d records", br.RecordsProcessed)

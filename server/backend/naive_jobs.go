@@ -65,7 +65,6 @@ func (j *NaiveBackgroundJobs) Start() error {
 	}
 
 	for _, device := range devices {
-		log.Printf("Queuing refresh %d...", device.ID)
 		delayed <- SourceChange{SourceID: int64(device.ID)}
 	}
 

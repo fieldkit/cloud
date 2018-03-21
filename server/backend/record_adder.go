@@ -36,5 +36,10 @@ func (da *RecordAdder) AddRecord(ctx context.Context, im *ingestion.IngestedMess
 		Visible:   true,
 	}
 	d.SetData(im.Fields)
-	return da.backend.AddRecord(ctx, &d)
+	err := da.backend.AddRecord(ctx, &d)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

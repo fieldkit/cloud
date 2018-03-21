@@ -43,7 +43,6 @@ func (ds *DatabaseStreams) LookupStream(ctx context.Context, id DeviceId) (ms *S
 		ms = NewStream(id, nil, devices[0])
 	} else {
 		c := locations[0].Location.Coordinates()
-
 		ms = NewStream(id, &Location{
 			UpdatedAt:   locations[0].Timestamp,
 			Coordinates: c,
@@ -62,10 +61,12 @@ func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id DeviceId, stre
 
 	stream.Location = l
 
-	return ds.db.NamedGetContext(ctx, dl, `
-               INSERT INTO fieldkit.device_location (device_id, timestamp, location)
-	       VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))`, dl)
+	_, err = ds.db.NamedExecContext(ctx, `
+		   INSERT INTO fieldkit.device_location (device_id, timestamp, location)
+		   VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		   `, dl)
 
+	return err
 }
 
 type DatabaseSchemas struct {
