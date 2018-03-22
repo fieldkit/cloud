@@ -28,13 +28,14 @@ func NewAWSSESEmailer(client *ses.SES, source, domain string) *AWSSESEmailer {
 }
 
 func (a AWSSESEmailer) SendSourceSilenceWarning(source *data.Source, age time.Duration) error {
-	subject := fmt.Sprintf("FieldKit: Warning, source %s silent.", source.Name)
-	body := fmt.Sprintf("The source '%s' has been silent for %v.", source.Name, age)
+	subject := fmt.Sprintf("FieldKit: Warning! Device %s offline.", source.Name)
+	body := fmt.Sprintf("Your device named '%s' is offline. The last reading from the device was %v ago.", source.Name, age)
 
 	sendEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
 				aws.String("jacob@conservify.org"),
+				aws.String("shah@conservify.org"),
 			},
 		},
 		Message: &ses.Message{
@@ -49,11 +50,11 @@ func (a AWSSESEmailer) SendSourceSilenceWarning(source *data.Source, age time.Du
 				Charset: aws.String("utf8"),
 			},
 		},
-		Source: a.sourceEmail,
+		Source:     a.sourceEmail,
+		ReturnPath: a.sourceEmail,
 		ReplyToAddresses: []*string{
 			a.sourceEmail,
 		},
-		ReturnPath: a.sourceEmail,
 	}
 
 	if _, err := a.client.SendEmail(sendEmailInput); err != nil {
@@ -107,11 +108,11 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 				Charset: aws.String("utf8"),
 			},
 		},
-		Source: a.sourceEmail,
+		Source:     a.sourceEmail,
+		ReturnPath: a.sourceEmail,
 		ReplyToAddresses: []*string{
 			a.sourceEmail,
 		},
-		ReturnPath: a.sourceEmail,
 	}
 
 	if _, err := a.client.SendEmail(sendEmailInput); err != nil {

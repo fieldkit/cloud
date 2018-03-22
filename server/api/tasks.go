@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -34,18 +36,32 @@ var (
 	ThirtyMinutes = 30 * time.Minute
 	TwoHours      = 2 * time.Hour
 	SixHours      = 6 * time.Hour
-	OneDay        = 24 * time.Hour
 	TwoDays       = 2 * 24 * time.Hour
 )
 
-func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
+type Notifier struct {
+	Database *sqlxcache.DB
+	Backend  *backend.Backend
+	Emailer  email.Emailer
+}
+
+func NewNotifier(backend *backend.Backend, database *sqlxcache.DB, emailer email.Emailer) *Notifier {
+	return &Notifier{
+		Database: database,
+		Backend:  backend,
+		Emailer:  emailer,
+	}
+}
+
+// TODO: Should narrow this query down eventually.
+func (n *Notifier) Check(ctx context.Context) error {
 	summaries := []*backend.FeatureSummary{}
-	if err := c.options.Database.SelectContext(ctx, &summaries, `SELECT c.source_id, c.end_time FROM fieldkit.sources_summaries c`); err != nil {
+	if err := n.Database.SelectContext(ctx, &summaries, `SELECT c.source_id, c.end_time FROM fieldkit.sources_summaries c ORDER BY c.end_time`); err != nil {
 		return err
 	}
 
 	notifications := []*backend.NotificationStatus{}
-	if err := c.options.Database.SelectContext(ctx, &notifications, `SELECT * FROM fieldkit.notification n`); err != nil {
+	if err := n.Database.SelectContext(ctx, &notifications, `SELECT * FROM fieldkit.notification n`); err != nil {
 		return err
 	}
 
@@ -66,41 +82,39 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 		age := now.Sub(summary.EndTime)
 		lastNotification := now.Sub(notification.UpdatedAt)
 
+		prefix := fmt.Sprintf("SourceId: %d EndTime: %v: Age: %v LastNotification: %v", summary.SourceID, summary.EndTime, age, lastNotification)
+
 		if age < ThirtyMinutes {
-			log.Printf("Have readings: sourceId=%v endTime=%v age=%v", summary.SourceID, summary.EndTime, age)
-			_, err := c.options.Database.NamedExecContext(ctx, `DELETE FROM fieldkit.notification WHERE source_id = :source_id`, notification)
-			if err != nil {
+			log.Printf("%s: Have readings", prefix)
+			if err := n.ClearNotifications(ctx, notification); err != nil {
 				return err
 			}
 			continue
 		}
 
 		if age > TwoDays {
-			log.Printf("Two old to notify: sourceId=%v endTime=%v age=%v", summary.SourceID, summary.EndTime, age)
+			log.Printf("%s: Too old", prefix)
 			continue
 		}
 
 		for _, interval := range []time.Duration{SixHours, TwoHours, ThirtyMinutes} {
 			if age > interval {
 				if lastNotification < interval {
-					log.Printf("Already notified (%v): sourceId=%v endTime=%v age=%v lastNotification=%v", interval, summary.SourceID, summary.EndTime, age, lastNotification)
+					log.Printf("%s: Already notified (%v)", prefix, interval)
 				} else {
-					source, err := c.options.Backend.GetSourceByID(ctx, int32(summary.SourceID))
+					source, err := n.Backend.GetSourceByID(ctx, int32(summary.SourceID))
 					if err != nil {
 						return err
 					}
 
-					log.Printf("Notifying! (%v): sourceId=%v endTime=%v age=%v lastNotification=%v source=%v", interval, summary.SourceID, summary.EndTime, age, lastNotification, source)
+					log.Printf("%s: Notifying! (%v)", prefix, interval)
 
-					err = c.options.Emailer.SendSourceSilenceWarning(source, age)
+					err = n.Emailer.SendSourceSilenceWarning(source, age)
 					if err != nil {
 						return err
 					}
 
-					_, err = c.options.Database.NamedExecContext(ctx,
-						`INSERT INTO fieldkit.notification (source_id, updated_at) VALUES (:source_id, NOW()) ON CONFLICT (source_id) DO UPDATE SET updated_at = :updated_at`,
-						notification)
-					if err != nil {
+					if err := n.MarkNotified(ctx, notification); err != nil {
 						return err
 					}
 				}
@@ -109,5 +123,29 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 		}
 	}
 
+	return nil
+}
+
+func (n *Notifier) ClearNotifications(ctx context.Context, notification *backend.NotificationStatus) error {
+	_, err := n.Database.NamedExecContext(ctx, `DELETE FROM fieldkit.notification WHERE source_id = :source_id`, notification)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *Notifier) MarkNotified(ctx context.Context, notification *backend.NotificationStatus) error {
+	_, err := n.Database.NamedExecContext(ctx, `INSERT INTO fieldkit.notification (source_id, updated_at) VALUES (:source_id, NOW()) ON CONFLICT (source_id) DO UPDATE SET updated_at = excluded.updated_at`, notification)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
+	notifier := NewNotifier(c.options.Backend, c.options.Database, c.options.Emailer)
+	if err := notifier.Check(ctx); err != nil {
+		return err
+	}
 	return ctx.OK([]byte("Ok"))
 }
