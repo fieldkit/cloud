@@ -31,7 +31,7 @@ func SourceType(source *data.Source) *app.Source {
 
 func ClusterSummaryType(s *backend.GeometryClusterSummary) *app.ClusterSummary {
 	return &app.ClusterSummary{
-		ID:               s.ID,
+		ID:               s.ClusterID,
 		SourceID:         s.SourceID,
 		NumberOfFeatures: s.NumberOfFeatures,
 		StartTime:        s.StartTime,
@@ -71,7 +71,7 @@ func SourceSummaryType(source *data.DeviceSource, spatial, temporal []*backend.G
 
 func ClusterGeometryType(source *backend.GeometryClusterSummary) *app.ClusterGeometrySummary {
 	return &app.ClusterGeometrySummary{
-		ID:       source.ID,
+		ID:       source.ClusterID,
 		SourceID: source.SourceID,
 		Geometry: source.Geometry.Coordinates(),
 	}
@@ -191,7 +191,7 @@ func (c *SourceController) TemporalClusterGeometryByID(ctx *app.TemporalClusterG
 	}
 
 	for _, cluster := range temporal {
-		if cluster.ID == ctx.ClusterID {
+		if cluster.ClusterID == ctx.ClusterID {
 			return ctx.OK(ClusterGeometryType(cluster))
 		}
 	}

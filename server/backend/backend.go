@@ -478,7 +478,7 @@ type FeatureSummary struct {
 	SourceID         int           `db:"source_id"`
 	UpdatedAt        time.Time     `db:"updated_at"`
 	NumberOfFeatures int           `db:"number_of_features"`
-	LastFeatureID    int           `db:"timestamp"`
+	LastFeatureID    int           `db:"last_feature_id"`
 	StartTime        time.Time     `db:"start_time"`
 	EndTime          time.Time     `db:"end_time"`
 	Centroid         data.Location `db:"centroid"`
@@ -495,7 +495,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 	summaries := []*FeatureSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.last_feature_id AS lastFeatureId, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.source_id, c.updated_at, c.number_of_features, c.last_feature_id, c.start_time, c.end_time, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_summaries c
 		  WHERE c.source_id = $1
@@ -515,7 +515,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 }
 
 type GeometryClusterSummary struct {
-	ID               int           `db:"id"`
+	ClusterID        int           `db:"cluster_id"`
 	SourceID         int           `db:"source_id"`
 	UpdatedAt        time.Time     `db:"updated_at"`
 	NumberOfFeatures int           `db:"number_of_features"`
@@ -530,7 +530,7 @@ func (b *Backend) SpatialClustersBySourceID(ctx context.Context, sourceId int) (
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.cluster_id, c.source_id, c.updated_at, c.number_of_features, c.start_time, c.end_time, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_spatial_clusters c
 		  WHERE c.source_id = $1
@@ -544,7 +544,7 @@ func (b *Backend) TemporalClustersBySourceID(ctx context.Context, sourceId int) 
 	summaries = []*GeometryClusterSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
+		    c.cluster_id, c.source_id, c.updated_at, c.number_of_features, c.start_time, c.end_time, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
 		  FROM
 		    fieldkit.sources_temporal_clusters c JOIN
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
@@ -576,7 +576,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
 	// TODO: Note that this uses the centroid and doesn't take into consideration the radius.
 	if err := b.db.SelectContext(ctx, &spatialClusters, `
 		  SELECT
-		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.cluster_id, c.source_id, c.updated_at, c.number_of_features, c.start_time, c.end_time, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_spatial_clusters c
                   WHERE
@@ -587,7 +587,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
 
 	if err := b.db.SelectContext(ctx, &temporalClusters, `
 		  SELECT
-		    c.cluster_id AS id, c.source_id AS sourceId, c.updated_at AS updatedAt, c.number_of_features AS numberOfFeatures, c.start_time AS startTime, c.end_time AS endTime, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
+		    c.cluster_id, c.source_id, c.updated_at, c.number_of_features, c.start_time, c.end_time, ST_AsBinary(c.centroid) AS centroid, c.radius, ST_AsBinary(g.geometry) AS geometry
 		  FROM
 		    fieldkit.sources_temporal_clusters c JOIN
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
