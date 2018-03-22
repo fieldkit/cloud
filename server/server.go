@@ -373,12 +373,20 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	})
 	app.MountExportController(service, c14)
 
-	// Mount "export" controller
+	// Mount "query" controller
 	c15 := api.NewQueryController(service, api.QueryControllerOptions{
 		Database: database,
 		Backend:  be,
 	})
 	app.MountQueryController(service, c15)
+
+	// Mount "tasks" controller
+	c16 := api.NewTasksController(service, api.TasksControllerOptions{
+		Database: database,
+		Backend:  be,
+		Emailer:  emailer,
+	})
+	app.MountTasksController(service, c16)
 
 	setupErrorHandling()
 

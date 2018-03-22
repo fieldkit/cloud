@@ -220,6 +220,18 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -622,24 +634,6 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
-    - geometry:
-        coordinates:
-        - 0.11635985
-        - 0.11635985
-        - 0.11635985
-        type: Eum enim deleniti sint velit qui.
-      properties:
-        Quidem quis fugit commodi ut.: 0.8188737
-      type: Amet nulla dolore laboriosam soluta quia molestias.
-    - geometry:
-        coordinates:
-        - 0.11635985
-        - 0.11635985
-        - 0.11635985
-        type: Eum enim deleniti sint velit qui.
-      properties:
-        Quidem quis fugit commodi ut.: 0.8188737
-      type: Amet nulla dolore laboriosam soluta quia molestias.
     - geometry:
         coordinates:
         - 0.11635985
@@ -3427,6 +3421,22 @@ paths:
       schemes:
       - https
       summary: Download api/public/swagger/swagger.yaml
+  /tasks/check:
+    get:
+      description: Run periodic checks
+      operationId: Tasks#check
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: check Tasks
+      tags:
+      - Tasks
   /teams/{teamId}:
     delete:
       description: |-

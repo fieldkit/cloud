@@ -475,14 +475,20 @@ type ReadingSummary struct {
 }
 
 type FeatureSummary struct {
-	SourceID         int
-	UpdatedAt        time.Time
-	NumberOfFeatures int
-	LastFeatureID    int
-	StartTime        time.Time
-	EndTime          time.Time
-	Centroid         data.Location
-	Radius           float64
+	SourceID         int           `db:"source_id"`
+	UpdatedAt        time.Time     `db:"updated_at"`
+	NumberOfFeatures int           `db:"number_of_features"`
+	LastFeatureID    int           `db:"timestamp"`
+	StartTime        time.Time     `db:"start_time"`
+	EndTime          time.Time     `db:"end_time"`
+	Centroid         data.Location `db:"centroid"`
+	Radius           float64       `db:"radius"`
+}
+
+type NotificationStatus struct {
+	ID        int       `db:"id"`
+	SourceID  int       `db:"source_id"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*FeatureSummary, error) {
@@ -509,15 +515,15 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 }
 
 type GeometryClusterSummary struct {
-	ID               int
-	SourceID         int
-	UpdatedAt        time.Time
-	NumberOfFeatures int
-	StartTime        time.Time
-	EndTime          time.Time
-	Centroid         data.Location
-	Radius           float64
-	Geometry         TemporalPath
+	ID               int           `db:"id"`
+	SourceID         int           `db:"source_id"`
+	UpdatedAt        time.Time     `db:"updated_at"`
+	NumberOfFeatures int           `db:"number_of_features"`
+	StartTime        time.Time     `db:"start_time"`
+	EndTime          time.Time     `db:"end_time"`
+	Centroid         data.Location `db:"centroid"`
+	Radius           float64       `db:"radius"`
+	Geometry         TemporalPath  `db:"geometry"`
 }
 
 func (b *Backend) SpatialClustersBySourceID(ctx context.Context, sourceId int) (summaries []*GeometryClusterSummary, err error) {

@@ -2,6 +2,8 @@ package email
 
 import (
 	"bytes"
+	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -23,6 +25,42 @@ func NewAWSSESEmailer(client *ses.SES, source, domain string) *AWSSESEmailer {
 		domain:      domain,
 		sourceEmail: aws.String(source + "@" + domain),
 	}
+}
+
+func (a AWSSESEmailer) SendSourceSilenceWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Warning, source %s silent.", source.Name)
+	body := fmt.Sprintf("The source '%s' has been silent for %v.", source.Name, age)
+
+	sendEmailInput := &ses.SendEmailInput{
+		Destination: &ses.Destination{
+			ToAddresses: []*string{
+				aws.String("jacob@conservify.org"),
+			},
+		},
+		Message: &ses.Message{
+			Body: &ses.Body{
+				Text: &ses.Content{
+					Data:    aws.String(body),
+					Charset: aws.String("utf8"),
+				},
+			},
+			Subject: &ses.Content{
+				Data:    aws.String(subject),
+				Charset: aws.String("utf8"),
+			},
+		},
+		Source: a.sourceEmail,
+		ReplyToAddresses: []*string{
+			a.sourceEmail,
+		},
+		ReturnPath: a.sourceEmail,
+	}
+
+	if _, err := a.client.SendEmail(sendEmailInput); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {

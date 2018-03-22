@@ -312,3 +312,11 @@ BEGIN
      geometry = excluded.geometry;
 END
 ' LANGUAGE plpgsql;
+
+CREATE TABLE fieldkit.notification (
+    id serial PRIMARY KEY,
+    source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
+    updated_at timestamp NOT NULL
+);
+
+CREATE UNIQUE INDEX ON fieldkit.notification (source_id);

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	html "html/template"
 	text "text/template"
+	"time"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -40,11 +41,19 @@ func init() {
 
 type Emailer interface {
 	SendValidationToken(person *data.User, validationToken *data.ValidationToken) error
+	SendSourceSilenceWarning(source *data.Source, age time.Duration) error
 }
 
 type emailer struct {
 	source string
 	domain string
+}
+
+func (e emailer) SendSourceSilenceWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Warning, source %s silent.", source.Name)
+	body := fmt.Sprintf("The source '%s' has been silent for %v.", source.Name, age)
+	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", "jacob@conservify.org", subject, body)
+	return nil
 }
 
 func (e emailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {
