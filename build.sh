@@ -63,6 +63,8 @@ for e in css csv html js json map svg txt; do
     find build -iname '*.$e' -exec gzip -k9 {} \;
 done
 
+cp /etc/ssl/certs/ca-certificates.crt build
+
 echo '.DS_Store
 Dockerfile' > build/.dockerignore
 
@@ -72,6 +74,7 @@ ENV FIELDKIT_ADMIN_ROOT=/admin
 ENV FIELDKIT_FRONTEND_ROOT=/frontend
 ENV FIELDKIT_LANDING_ROOT=/landing
 COPY . /
+ADD ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
 ENTRYPOINT ["/server"]' > build/Dockerfile
 
