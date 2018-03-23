@@ -24,12 +24,14 @@ func (a *DevNullStreamArchiver) Archive(contentType string, reader io.Reader) er
 }
 
 type S3StreamArchiver struct {
-	session *session.Session
+	session    *session.Session
+	bucketName string
 }
 
-func NewS3StreamArchiver(session *session.Session) *S3StreamArchiver {
+func NewS3StreamArchiver(session *session.Session, bucketName string) *S3StreamArchiver {
 	return &S3StreamArchiver{
-		session: session,
+		session:    session,
+		bucketName: bucketName,
 	}
 }
 
@@ -46,7 +48,7 @@ func (a *S3StreamArchiver) Archive(contentType string, reader io.Reader) error {
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
 		ContentType: aws.String(contentType),
-		Bucket:      aws.String("fk-streams"),
+		Bucket:      aws.String(a.bucketName),
 		Key:         aws.String(id.String()),
 		Body:        reader,
 		Metadata:    metadata,

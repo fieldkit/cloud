@@ -48,6 +48,7 @@ type Config struct {
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
+	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 
 	Help          bool
 	CpuProfile    string
@@ -263,7 +264,7 @@ func createArchiver(awsSession *session.Session, config Config) (archiver backen
 	case "default":
 		archiver = &backend.DevNullStreamArchiver{}
 	case "aws":
-		archiver = backend.NewS3StreamArchiver(awsSession)
+		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
 		panic("Invalid archiver")
 	}
