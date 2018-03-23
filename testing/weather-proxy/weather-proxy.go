@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	fktesting "github.com/fieldkit/cloud/server/api/tool"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"log"
 	"net/http"
 	"os"
+
+	fktesting "github.com/fieldkit/cloud/server/api/tool"
+	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
 )
 
 type options struct {
@@ -72,7 +73,7 @@ func main() {
 	body := bytes.NewBufferString(string(b))
 	url := fmt.Sprintf("%s://%s/messages/ingestion", o.Scheme, o.Host)
 	url += "?token=" + "IGNORED"
-	_, err = http.Post(url, ingestion.HttpProviderJsonContentType, body)
+	_, err = http.Post(url, formatting.HttpProviderJsonContentType, body)
 	if err != nil {
 		log.Fatalf("%s %s", url, err)
 	}
@@ -82,8 +83,8 @@ func kToF(k float64) float64 {
 	return k*9/5.0 - 459.67
 }
 
-func createFieldKitMessageFromWeather(w *OwmWeatherInfo, device string) *ingestion.HttpJsonMessage {
-	return &ingestion.HttpJsonMessage{
+func createFieldKitMessageFromWeather(w *OwmWeatherInfo, device string) *formatting.HttpJsonMessage {
+	return &formatting.HttpJsonMessage{
 		Location: []float64{w.Coords.Longitude, w.Coords.Latitude},
 		Time:     w.Time,
 		Device:   device,

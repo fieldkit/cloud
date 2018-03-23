@@ -7,12 +7,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	fktesting "github.com/fieldkit/cloud/server/api/tool"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
+
+	fktesting "github.com/fieldkit/cloud/server/api/tool"
+	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
 )
 
 type options struct {
@@ -40,7 +41,7 @@ func (o *options) postRawMessage(m *FakeMessage) error {
 	} else {
 		body := bytes.NewBufferString(m.Body)
 		url := o.getUrl()
-		if m.ContentType == ingestion.HttpProviderJsonContentType {
+		if m.ContentType == formatting.HttpProviderJsonContentType {
 			url += "?token=" + "IGNORED"
 		}
 		_, err := http.Post(url, m.ContentType, body)
@@ -82,7 +83,7 @@ func (o *options) createMessage(key string, e *FakeEvent) *FakeMessage {
 	}
 
 	if o.WebDevice {
-		m := ingestion.HttpJsonMessage{
+		m := formatting.HttpJsonMessage{
 			Location: e.Coordinates,
 			Time:     e.Timestamp,
 			Device:   key,
@@ -100,7 +101,7 @@ func (o *options) createMessage(key string, e *FakeEvent) *FakeMessage {
 		}
 
 		return &FakeMessage{
-			ContentType: ingestion.HttpProviderJsonContentType,
+			ContentType: formatting.HttpProviderJsonContentType,
 			Body:        string(bytes),
 		}
 	}

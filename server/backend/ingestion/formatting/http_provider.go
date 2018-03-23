@@ -1,9 +1,11 @@
-package ingestion
+package formatting
 
 import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
 type HttpMessageProvider struct {
@@ -26,7 +28,7 @@ type HttpJsonMessage struct {
 	Values   map[string]interface{} `json:"values"`
 }
 
-func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
+func (i *HttpMessageProvider) CanFormatMessage(raw *RawMessage) bool {
 	if raw.ContentType == HttpProviderJsonContentType {
 		if raw.QueryString.Get(HttpProviderTokenKey) == "" {
 			return false
@@ -36,7 +38,7 @@ func (i *HttpMessageProvider) CanProcessMessage(raw *RawMessage) bool {
 	return false
 }
 
-func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
+func (i *HttpMessageProvider) FormatMessage(raw *RawMessage) (fm *ingestion.FormattedMessage, err error) {
 	if raw.ContentType == HttpProviderJsonContentType {
 		message := &HttpJsonMessage{}
 		err = json.Unmarshal([]byte(raw.RawBody), message)
@@ -44,13 +46,13 @@ func (i *HttpMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMess
 			return nil, fmt.Errorf("JSON Error: '%v': '%s'", err, raw.RawBody)
 		}
 
-		return message.ToProcessedMessage(MessageId(raw.RequestId))
+		return message.ToFormattedMessage(ingestion.MessageId(raw.RequestId))
 	}
 
 	return nil, fmt.Errorf("Unknown ContentType: %s", raw.ContentType)
 }
 
-func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *ProcessedMessage, err error) {
+func (message *HttpJsonMessage) ToFormattedMessage(messageId ingestion.MessageId) (fm *ingestion.FormattedMessage, err error) {
 	if message.Device == "" {
 		return nil, fmt.Errorf("Malformed HttpJsonMessage: Device is required.")
 	}
@@ -61,9 +63,9 @@ func (message *HttpJsonMessage) ToProcessedMessage(messageId MessageId) (pm *Pro
 
 	messageTime := time.Unix(message.Time, 0)
 
-	pm = &ProcessedMessage{
+	fm = &ingestion.FormattedMessage{
 		MessageId: messageId,
-		SchemaId:  NewSchemaId(NewDeviceId(message.Device), message.Stream),
+		SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(message.Device), message.Stream),
 		Time:      &messageTime,
 		Location:  message.Location,
 		Fixed:     message.Fixed,

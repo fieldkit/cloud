@@ -109,14 +109,15 @@ func main() {
 		panic(err)
 	}
 
-	streamIngester, err := backend.NewStreamIngester(be)
-	if err != nil {
+	background := backend.NewNaiveBackgroundJobs(be)
+	if err := background.Start(); err != nil {
 		panic(err)
 	}
 
-	background := backend.NewNaiveBackgroundJobs(be)
-
-	background.Start()
+	ingester, err := backend.NewStreamIngester(be, background)
+	if err != nil {
+		panic(err)
+	}
 
 	if flag.Arg(0) == "twitter" {
 		twitterListCredentialer := be.TwitterListCredentialer()
@@ -175,8 +176,10 @@ func main() {
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/messages/ingestion/stream" {
-			streamIngester.ServeHTTP(w, req)
+		if req.URL.Path == "/messages/ingestion" {
+			ingester.ServeHTTP(w, req)
+		} else if req.URL.Path == "/messages/ingestion/stream" {
+			ingester.ServeHTTP(w, req)
 		} else {
 			service.Mux.ServeHTTP(w, req)
 		}

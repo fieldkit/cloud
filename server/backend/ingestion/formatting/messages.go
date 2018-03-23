@@ -1,4 +1,4 @@
-package ingestion
+package formatting
 
 import (
 	"net/url"

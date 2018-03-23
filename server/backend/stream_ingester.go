@@ -21,14 +21,16 @@ const (
 )
 
 type StreamIngester struct {
-	backend *Backend
-	db      *sqlxcache.DB
+	backend       *Backend
+	db            *sqlxcache.DB
+	sourceChanges ingestion.SourceChangesPublisher
 }
 
-func NewStreamIngester(b *Backend) (si *StreamIngester, err error) {
+func NewStreamIngester(b *Backend, sourceChanges ingestion.SourceChangesPublisher) (si *StreamIngester, err error) {
 	si = &StreamIngester{
-		backend: b,
-		db:      b.db,
+		backend:       b,
+		db:            b.db,
+		sourceChanges: sourceChanges,
 	}
 
 	return
@@ -80,7 +82,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
-		binaryReader.Done(txCtx)
+		binaryReader.Done(txCtx, si.sourceChanges)
 
 		return nil
 	})

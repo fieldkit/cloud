@@ -13,13 +13,8 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type SourceChange struct {
-	SourceID int64
-}
-
 type Backend struct {
-	SourceChanges chan SourceChange
-	db            *sqlxcache.DB
+	db *sqlxcache.DB
 }
 
 func New(url string) (*Backend, error) {
@@ -29,8 +24,7 @@ func New(url string) (*Backend, error) {
 	}
 
 	return &Backend{
-		SourceChanges: make(chan SourceChange, 100),
-		db:            db,
+		db: db,
 	}, nil
 }
 

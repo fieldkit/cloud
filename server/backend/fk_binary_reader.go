@@ -34,15 +34,14 @@ type FkBinaryReader struct {
 	Readings  map[uint32]float32
 	SourceIDs map[int64]bool
 
-	Ingester    *ingestion.MessageIngester
-	Repository  *ingestion.Repository
-	Resolver    *ingestion.Resolver
-	RecordAdder *RecordAdder
+	SchemaApplier *ingestion.SchemaApplier
+	Repository    *ingestion.Repository
+	Resolver      *ingestion.Resolver
+	RecordAdder   *ingestion.RecordAdder
 }
 
 func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 	r := ingestion.NewRepository(b.db)
-	ingester := ingestion.NewMessageIngester()
 
 	return &FkBinaryReader{
 		Modules:   make([]string, 0),
@@ -50,11 +49,10 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		Readings:  make(map[uint32]float32),
 		SourceIDs: make(map[int64]bool),
 
-		Ingester:    ingester,
-		Repository:  r,
-		Resolver:    ingestion.NewResolver(r),
-		RecordAdder: NewRecordAdder(b),
-	}
+		Repository:    r,
+		SchemaApplier: ingestion.NewSchemaApplier(),
+		Resolver:      ingestion.NewResolver(r),
+		RecordAdder:   ingestion.NewRecordAdder(b.db)}
 }
 
 type HashedData struct {
@@ -94,7 +92,7 @@ func ToUniqueHash(data []byte) (uuid.UUID, error) {
 	return uuid.NewSHA1(FkBinaryMessagesSpace, data), nil
 }
 
-func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessage, err error) {
+func (br *FkBinaryReader) CreateFormattedMessage() (fm *ingestion.FormattedMessage, err error) {
 	values := make(map[string]interface{})
 	for key, value := range br.Readings {
 		if math.IsNaN(float64(value)) {
@@ -120,7 +118,7 @@ func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessa
 	messageTime := time.Unix(br.Time, 0)
 
 	if br.Location != nil {
-		pm = &ingestion.ProcessedMessage{
+		fm = &ingestion.FormattedMessage{
 			MessageId: ingestion.MessageId(messageId),
 			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
 			Time:      &messageTime,
@@ -129,7 +127,7 @@ func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessa
 			MapValues: values,
 		}
 	} else {
-		pm = &ingestion.ProcessedMessage{
+		fm = &ingestion.FormattedMessage{
 			MessageId: ingestion.MessageId(messageId),
 			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
 			Time:      &messageTime,
@@ -140,6 +138,40 @@ func (br *FkBinaryReader) CreateProcessedMessage() (pm *ingestion.ProcessedMessa
 	}
 
 	return
+}
+
+func (br *FkBinaryReader) Ingest(ctx context.Context) error {
+	fm, err := br.CreateFormattedMessage()
+	if err != nil {
+		return fmt.Errorf("Unable to create processed message (%v)", err)
+	}
+
+	ds, err := br.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
+	if err != nil {
+		return err
+	}
+
+	im, err := br.SchemaApplier.ApplySchemas(ctx, ds, fm)
+	if err != nil {
+		return err
+	}
+
+	if im.LocationUpdated {
+		if err := br.Repository.UpdateLocation(ctx, fm.SchemaId.Device, ds.Stream, im.Location); err != nil {
+			return fmt.Errorf("%s: Unable to update location (%v)", fm.SchemaId, err)
+		}
+	}
+
+	err = br.RecordAdder.AddRecord(ctx, im)
+	if err != nil {
+		return err
+	}
+
+	br.SourceIDs[im.Schema.Ids.DeviceID] = true
+
+	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, br.Modules, len(fm.MapValues), im.LocationUpdated, fm.Location)
+
+	return nil
 }
 
 func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
@@ -189,35 +221,9 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 				br.Time = int64(record.LoggedReading.Reading.Time)
 				br.ReadingsSeen = 0
 
-				pm, err := br.CreateProcessedMessage()
-				if err != nil {
-					return fmt.Errorf("Unable to create processed message (%v)", err)
-				}
-
-				ds, err := br.Resolver.ResolveDeviceAndSchemas(ctx, pm.SchemaId)
-				if err != nil {
+				if err := br.Ingest(ctx); err != nil {
 					return err
 				}
-
-				im, err := br.Ingester.IngestProcessedMessage(ctx, ds, pm)
-				if err != nil {
-					return err
-				}
-
-				if im.LocationUpdated {
-					if err := br.Repository.UpdateLocation(ctx, pm.SchemaId.Device, ds.Stream, im.Location); err != nil {
-						return ingestion.NewErrorf(true, "%s: Unable to update location (%v)", pm.SchemaId, err)
-					}
-				}
-
-				err = br.RecordAdder.AddRecord(ctx, im)
-				if err != nil {
-					return err
-				}
-
-				br.SourceIDs[im.Schema.Ids.DeviceID] = true
-
-				log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", pm.MessageId, pm.SchemaId, br.Modules, len(pm.MapValues), im.LocationUpdated, pm.Location)
 			}
 		}
 	}
@@ -225,7 +231,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 	return nil
 }
 
-func (br *FkBinaryReader) Done(ctx context.Context) error {
+func (br *FkBinaryReader) Done(ctx context.Context, sourceChanges ingestion.SourceChangesPublisher) error {
 	if br.ReadingsSeen > 0 {
 		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
 	}
@@ -233,7 +239,7 @@ func (br *FkBinaryReader) Done(ctx context.Context) error {
 	log.Printf("Processed %d records", br.RecordsProcessed)
 
 	for id, _ := range br.SourceIDs {
-		br.RecordAdder.EmitSourceChanged(id)
+		sourceChanges.SourceChanged(ingestion.NewSourceChange(id))
 	}
 
 	return nil

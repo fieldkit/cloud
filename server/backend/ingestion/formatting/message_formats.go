@@ -1,4 +1,4 @@
-package ingestion
+package formatting
 
 import (
 	"fmt"
@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
 const (
@@ -21,7 +23,7 @@ const (
 var LegacyMessageTypeRe = regexp.MustCompile(LegacyMessageTypePattern)
 var LegacyStationNameRe = regexp.MustCompile(LegacyStationNamePattern)
 
-func normalizeCommaSeparated(provider, providerId string, raw *RawMessage, text string) (pm *ProcessedMessage, err error) {
+func normalizeCommaSeparated(provider, providerId string, raw *RawMessage, text string) (fm *ingestion.FormattedMessage, err error) {
 	if len(text) == 0 {
 		return nil, fmt.Errorf("%s(Empty message)", provider)
 	}
@@ -29,7 +31,7 @@ func normalizeCommaSeparated(provider, providerId string, raw *RawMessage, text 
 	trimmed := strings.TrimSpace(text)
 	fields := strings.Split(trimmed, ",")
 	if len(fields) < 2 {
-		return nil, fmt.Errorf("%s(Not enough fields: '%s')", provider, StripNewLines(text))
+		return nil, fmt.Errorf("%s(Not enough fields: '%s')", provider, stripNewLines(text))
 	}
 
 	maybeTime := fields[0]
@@ -46,16 +48,16 @@ func normalizeCommaSeparated(provider, providerId string, raw *RawMessage, text 
 		return nil, fmt.Errorf("%s(Invalid legacy CSV name: '%s' from '%s')", provider, maybeStationName, text)
 	}
 
-	pm = &ProcessedMessage{
-		MessageId:   MessageId(raw.RequestId),
-		SchemaId:    NewSchemaId(NewProviderDeviceId(provider, providerId), maybeMessageType),
+	fm = &ingestion.FormattedMessage{
+		MessageId:   ingestion.MessageId(raw.RequestId),
+		SchemaId:    ingestion.NewSchemaId(ingestion.NewProviderDeviceId(provider, providerId), maybeMessageType),
 		ArrayValues: fields,
 	}
 
 	return
 }
 
-func normalizeBinary(provider, providerId string, raw *RawMessage, bytes []byte) (pm *ProcessedMessage, err error) {
+func normalizeBinary(provider, providerId string, raw *RawMessage, bytes []byte) (fm *ingestion.FormattedMessage, err error) {
 	// This is a protobuf message or some other kind of similar low level binary.
 	buffer := proto.NewBuffer(bytes)
 
@@ -89,12 +91,16 @@ func normalizeBinary(provider, providerId string, raw *RawMessage, bytes []byte)
 
 	time := time.Unix(int64(unix), 0)
 
-	pm = &ProcessedMessage{
-		MessageId:   MessageId(raw.RequestId),
-		SchemaId:    NewSchemaId(NewProviderDeviceId(provider, providerId), strconv.Itoa(int(id))),
+	fm = &ingestion.FormattedMessage{
+		MessageId:   ingestion.MessageId(raw.RequestId),
+		SchemaId:    ingestion.NewSchemaId(ingestion.NewProviderDeviceId(provider, providerId), strconv.Itoa(int(id))),
 		Time:        &time,
 		ArrayValues: values,
 	}
 
 	return
+}
+
+func stripNewLines(text string) string {
+	return strings.Replace(strings.Replace(text, "\r", "", -1), "\n", "", -1)
 }

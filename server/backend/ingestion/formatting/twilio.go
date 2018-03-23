@@ -1,4 +1,8 @@
-package ingestion
+package formatting
+
+import (
+	"github.com/fieldkit/cloud/server/backend/ingestion"
+)
 
 const (
 	TwilioProviderName = "TWILIO"
@@ -11,10 +15,10 @@ type TwilioMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *TwilioMessageProvider) CanProcessMessage(raw *RawMessage) bool {
+func (i *TwilioMessageProvider) CanFormatMessage(raw *RawMessage) bool {
 	return false
 }
 
-func (i *TwilioMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
+func (i *TwilioMessageProvider) FormatMessage(raw *RawMessage) (fm *ingestion.FormattedMessage, err error) {
 	return normalizeCommaSeparated(TwilioProviderName, raw.Form.Get(TwilioFormFrom), raw, raw.Form.Get(TwilioFormData))
 }

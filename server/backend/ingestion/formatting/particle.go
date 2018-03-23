@@ -1,8 +1,10 @@
-package ingestion
+package formatting
 
 import (
 	"strings"
 	"time"
+
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
 const (
@@ -17,11 +19,11 @@ type ParticleMessageProvider struct {
 	MessageProviderBase
 }
 
-func (i *ParticleMessageProvider) CanProcessMessage(raw *RawMessage) bool {
+func (i *ParticleMessageProvider) CanFormatMessage(raw *RawMessage) bool {
 	return raw.Form.Get(ParticleFormCoreId) != ""
 }
 
-func (i *ParticleMessageProvider) ProcessMessage(raw *RawMessage) (pm *ProcessedMessage, err error) {
+func (i *ParticleMessageProvider) FormatMessage(raw *RawMessage) (fm *ingestion.FormattedMessage, err error) {
 	coreId := strings.TrimSpace(raw.Form.Get(ParticleFormCoreId))
 	trimmed := strings.TrimSpace(raw.Form.Get(ParticleFormData))
 	fields := strings.Split(trimmed, ",")
@@ -31,9 +33,9 @@ func (i *ParticleMessageProvider) ProcessMessage(raw *RawMessage) (pm *Processed
 		return nil, err
 	}
 
-	pm = &ProcessedMessage{
-		MessageId:   MessageId(raw.RequestId),
-		SchemaId:    NewSchemaId(NewProviderDeviceId(ParticleProviderName, coreId), ""),
+	fm = &ingestion.FormattedMessage{
+		MessageId:   ingestion.MessageId(raw.RequestId),
+		SchemaId:    ingestion.NewSchemaId(ingestion.NewProviderDeviceId(ParticleProviderName, coreId), ""),
 		Time:        &publishedAt,
 		ArrayValues: fields,
 	}
