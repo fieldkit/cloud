@@ -43,6 +43,7 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
 	Emailer               string `split_words:"true" default:"default" required:"true"`
+	Archiver              string `split_words:"true" default:"default" required:"true"`
 	AdminRoot             string `split_words:"true"`
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
@@ -114,7 +115,12 @@ func main() {
 		panic(err)
 	}
 
-	ingester, err := backend.NewStreamIngester(be, background)
+	archiver, err := createArchiver(awsSession, config)
+	if err != nil {
+		panic(err)
+	}
+
+	ingester, err := backend.NewStreamIngester(be, archiver, background)
 	if err != nil {
 		panic(err)
 	}
@@ -248,6 +254,18 @@ func createEmailer(awsSession *session.Session, config Config) (emailer email.Em
 		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
 	default:
 		panic("Invalid emailer")
+	}
+	return
+}
+
+func createArchiver(awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
+	switch config.Archiver {
+	case "default":
+		archiver = &backend.DevNullStreamArchiver{}
+	case "aws":
+		archiver = backend.NewS3StreamArchiver(awsSession)
+	default:
+		panic("Invalid archiver")
 	}
 	return
 }
@@ -439,7 +457,6 @@ func setupErrorHandling() {
 		if err, ok := message.(*goa.ErrorResponse); ok {
 			return err
 		}
-
 		return errBadRequest(message, keyvals...)
 	}
 }
