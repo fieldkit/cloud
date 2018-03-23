@@ -50,7 +50,8 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	err := si.backend.db.WithNewTransaction(req.Context(), func(txCtx context.Context) error {
 		log.Printf("Stream [%s]: begin %v", req.RemoteAddr, contentType)
 
-		binaryReader := NewFkBinaryReader(si.backend)
+		saver := NewFormattedMessageSaver(si.backend)
+		binaryReader := NewFkBinaryReader(saver)
 
 		unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
 			var record pb.DataRecord
@@ -82,7 +83,9 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
-		binaryReader.Done(txCtx, si.sourceChanges)
+		saver.EmitChanges(si.sourceChanges)
+
+		binaryReader.Done()
 
 		return nil
 	})

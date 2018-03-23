@@ -5,6 +5,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+)
+
+var (
+	FkBinaryMessagesSpace = uuid.Must(uuid.Parse("0b8a5016-7410-4a1a-a2ed-2c48fec6903d"))
 )
 
 type DatabaseIds struct {
@@ -76,6 +82,7 @@ type FormattedMessage struct {
 	Fixed       bool
 	ArrayValues []string
 	MapValues   map[string]interface{}
+	Modules     []string
 }
 
 type ProcessedMessage struct {
