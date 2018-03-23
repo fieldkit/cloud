@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -26,4 +27,34 @@ func ToSnake(in string) string {
 
 func StripNewLines(text string) string {
 	return strings.Replace(strings.Replace(text, "\r", "", -1), "\n", "", -1)
+}
+
+type IngestError struct {
+	Cause    error
+	Critical bool
+}
+
+func (e *IngestError) Error() string {
+	return e.Cause.Error()
+}
+
+func NewErrorf(critical bool, f string, a ...interface{}) *IngestError {
+	return &IngestError{
+		Cause:    fmt.Errorf(f, a...),
+		Critical: critical,
+	}
+}
+
+func NewError(cause error) *IngestError {
+	if err, ok := cause.(*IngestError); ok {
+		return &IngestError{
+			Cause:    err,
+			Critical: err.Critical,
+		}
+	}
+	return &IngestError{
+		Cause:    cause,
+		Critical: true,
+	}
+
 }

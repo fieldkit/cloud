@@ -13,16 +13,6 @@ type RawMessageRow struct {
 	Time uint64
 }
 
-type HandlerFunc func(raw *RawMessage) error
-
-func (f HandlerFunc) HandleMessage(raw *RawMessage) error {
-	return f(raw)
-}
-
-type RawMessageHandler interface {
-	HandleMessage(raw *RawMessage) error
-}
-
 type RawMessage struct {
 	RequestId   string
 	RawBody     []byte

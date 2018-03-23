@@ -3,7 +3,6 @@ package ingestion
 import (
 	"context"
 	"fmt"
-	_ "log"
 	"strconv"
 	"strings"
 	"time"
@@ -18,16 +17,8 @@ type IngestedMessage struct {
 	Fields          map[string]interface{}
 }
 
-type IngestionStatistics struct {
-	Processed uint64
-	Successes uint64
-}
-
 type MessageIngester struct {
-	RawMessageHandler
-	Schemas    SchemaRepository
-	Streams    StreamsRepository
-	Statistics IngestionStatistics
+	Repository *Repository
 }
 
 const (
@@ -37,10 +28,9 @@ const (
 	FieldNameTime      = "time"
 )
 
-func NewMessageIngester(sr SchemaRepository, streams StreamsRepository) *MessageIngester {
+func NewMessageIngester(r *Repository) *MessageIngester {
 	return &MessageIngester{
-		Schemas: sr,
-		Streams: streams,
+		Repository: r,
 	}
 }
 
@@ -93,7 +83,7 @@ func determineLocation(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string
 	}, nil
 }
 
-func (i *MessageIngester) ApplySchema(ctx context.Context, cache *IngestionCache, pm *ProcessedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (im *IngestedMessage, err error) {
+func (i *MessageIngester) ApplySchema(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (im *IngestedMessage, err error) {
 	// This works with MapValues, too as they'll be zero for now.
 	if pm.ArrayValues != nil && len(pm.ArrayValues) != len(jsonSchema.Fields) {
 		return nil, NewErrorf(true, "%s: fields S=%v != M=%v", pm.SchemaId, len(jsonSchema.Fields), len(pm.ArrayValues))
@@ -111,14 +101,6 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, cache *IngestionCache
 		}
 	}
 
-	// TODO: Eventually we'll be able to link a secondary 'Location' stream to any other stream.
-	stream, err := cache.LookupStream(pm.SchemaId.Device, func(id DeviceId) (*Stream, error) {
-		return i.Streams.LookupStream(ctx, id)
-	})
-	if err != nil {
-		return nil, NewErrorf(true, "%s: Unable to find stream (%v)", pm.SchemaId, err)
-	}
-
 	time, err := determineTime(pm, jsonSchema, mapped)
 	if err != nil {
 		return nil, NewErrorf(true, "%s: Unable to get time (%v)", pm.SchemaId, err)
@@ -131,19 +113,19 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, cache *IngestionCache
 
 	haveLocation := location != nil && location.Valid()
 	if haveLocation {
-		err := i.Streams.UpdateLocation(ctx, pm.SchemaId.Device, stream, location)
+		err := i.Repository.UpdateLocation(ctx, pm.SchemaId.Device, ds.Stream, location)
 		if err != nil {
 			return nil, NewErrorf(true, "%s: Unable to update location (%v)", pm.SchemaId, err)
 		}
 	}
-	if stream.Location == nil {
+	if ds.Stream.Location == nil {
 		return nil, NewErrorf(false, "%s: Stream has no location.", pm.SchemaId)
 	}
 
 	im = &IngestedMessage{
 		Schema:          schema,
 		Time:            time,
-		Location:        stream.Location,
+		Location:        ds.Stream.Location,
 		LocationUpdated: haveLocation,
 		Fixed:           pm.Fixed,
 		Fields:          mapped,
@@ -152,13 +134,13 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, cache *IngestionCache
 	return
 }
 
-func (i *MessageIngester) ApplySchemas(ctx context.Context, cache *IngestionCache, pm *ProcessedMessage, schemas []*MessageSchema) (im *IngestedMessage, err error) {
+func (i *MessageIngester) ApplySchemas(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (im *IngestedMessage, err error) {
 	errors := make([]error, 0)
 
-	for _, schema := range schemas {
+	for _, schema := range ds.Schemas {
 		jsonSchema, ok := schema.Schema.(*JsonMessageSchema)
 		if ok {
-			im, applyErr := i.ApplySchema(ctx, cache, pm, schema, jsonSchema)
+			im, applyErr := i.ApplySchema(ctx, ds, pm, schema, jsonSchema)
 			if applyErr != nil {
 				errors = append(errors, applyErr)
 			} else {
@@ -172,24 +154,16 @@ func (i *MessageIngester) ApplySchemas(ctx context.Context, cache *IngestionCach
 	return nil, NewErrorf(true, "%v", makePretty(errors))
 }
 
-func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, cache *IngestionCache, pm *ProcessedMessage) (im *IngestedMessage, err error) {
-	schemas, err := cache.LookupSchemas(pm.SchemaId, func(id SchemaId) ([]*MessageSchema, error) {
-		return i.Schemas.LookupSchemas(ctx, pm.SchemaId)
-	})
-	if err != nil {
-		return nil, NewErrorf(true, "(%s)(%s)[Error] (LookupSchema) %v", pm.MessageId, pm.SchemaId, err)
-	}
-
-	if len(schemas) == 0 {
+func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (im *IngestedMessage, err error) {
+	if len(ds.Schemas) == 0 {
 		return nil, NewErrorf(false, "(%s)(%s)[Error] (ApplySchemas) No device or schemas", pm.MessageId, pm.SchemaId)
 	}
 
-	im, err = i.ApplySchemas(ctx, cache, pm, schemas)
+	im, err = i.ApplySchemas(ctx, ds, pm)
 	if err != nil {
 		return nil, NewErrorf(true, "(%s)(%s)[Error] (ApplySchemas) %v", pm.MessageId, pm.SchemaId, err)
 	}
 
-	i.Statistics.Successes += 1
 	return im, nil
 }
 
@@ -217,34 +191,4 @@ func makePretty(errors []error) (m string) {
 	}
 
 	return strings.Join(strs, ", ")
-}
-
-type IngestError struct {
-	Cause    error
-	Critical bool
-}
-
-func (e *IngestError) Error() string {
-	return e.Cause.Error()
-}
-
-func NewErrorf(critical bool, f string, a ...interface{}) *IngestError {
-	return &IngestError{
-		Cause:    fmt.Errorf(f, a...),
-		Critical: critical,
-	}
-}
-
-func NewError(cause error) *IngestError {
-	if err, ok := cause.(*IngestError); ok {
-		return &IngestError{
-			Cause:    err,
-			Critical: err.Critical,
-		}
-	}
-	return &IngestError{
-		Cause:    cause,
-		Critical: true,
-	}
-
 }

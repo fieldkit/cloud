@@ -35,14 +35,13 @@ type FkBinaryReader struct {
 	SourceIDs map[int64]bool
 
 	Ingester    *ingestion.MessageIngester
-	Cache       *ingestion.IngestionCache
+	Resolver    *ingestion.Resolver
 	RecordAdder *RecordAdder
 }
 
 func NewFkBinaryReader(b *Backend) *FkBinaryReader {
-	sr := ingestion.NewDatabaseSchemas(b.db)
-	streams := ingestion.NewDatabaseStreams(b.db)
-	ingester := ingestion.NewMessageIngester(sr, streams)
+	r := ingestion.NewRepository(b.db)
+	ingester := ingestion.NewMessageIngester(r)
 
 	return &FkBinaryReader{
 		Modules:   make([]string, 0),
@@ -51,7 +50,7 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		SourceIDs: make(map[int64]bool),
 
 		Ingester:    ingester,
-		Cache:       ingestion.NewIngestionCache(),
+		Resolver:    ingestion.NewResolver(r),
 		RecordAdder: NewRecordAdder(b),
 	}
 }
@@ -193,7 +192,12 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 					return fmt.Errorf("Unable to create processed message (%v)", err)
 				}
 
-				im, err := br.Ingester.IngestProcessedMessage(ctx, br.Cache, pm)
+				ds, err := br.Resolver.ResolveDeviceAndSchemas(ctx, pm.SchemaId)
+				if err != nil {
+					return err
+				}
+
+				im, err := br.Ingester.IngestProcessedMessage(ctx, ds, pm)
 				if err != nil {
 					return err
 				}

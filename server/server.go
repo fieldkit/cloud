@@ -109,11 +109,6 @@ func main() {
 		panic(err)
 	}
 
-	rawMessageIngester, err := backend.NewRawMessageIngester(be)
-	if err != nil {
-		panic(err)
-	}
-
 	streamIngester, err := backend.NewStreamIngester(be)
 	if err != nil {
 		panic(err)
@@ -180,9 +175,7 @@ func main() {
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/messages/ingestion" {
-			rawMessageIngester.ServeHTTP(w, req)
-		} else if req.URL.Path == "/messages/ingestion/stream" {
+		if req.URL.Path == "/messages/ingestion/stream" {
 			streamIngester.ServeHTTP(w, req)
 		} else {
 			service.Mux.ServeHTTP(w, req)

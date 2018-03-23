@@ -2,13 +2,14 @@ package ingestion
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"io"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/golang/protobuf/proto"
 )
 
 const (

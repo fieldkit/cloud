@@ -10,49 +10,114 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type DatabaseStreams struct {
+type Repository struct {
 	db *sqlxcache.DB
 }
 
-func NewDatabaseStreams(db *sqlxcache.DB) StreamsRepository {
-	return &DatabaseStreams{
+func NewRepository(db *sqlxcache.DB) *Repository {
+	return &Repository{
 		db: db,
 	}
 }
 
-func (ds *DatabaseStreams) LookupStream(ctx context.Context, id DeviceId) (ms *Stream, err error) {
-	devices := []*data.Device{}
-	if err := ds.db.SelectContext(ctx, &devices, `SELECT d.* FROM fieldkit.device AS d WHERE d.key = $1`, id.String()); err != nil {
-		return nil, err
+type DeviceStream struct {
+	DeviceSource *data.DeviceSource
+	Stream       *Stream
+	Schemas      []*MessageSchema
+}
+
+type Resolver struct {
+	Cache      *IngestionCache
+	Repository *Repository
+}
+
+func NewResolver(repository *Repository) *Resolver {
+	return &Resolver{
+		Cache:      NewIngestionCache(),
+		Repository: repository,
+	}
+}
+
+func (r *Resolver) ResolveDeviceAndSchemas(ctx context.Context, schemaId SchemaId) (rs *DeviceStream, err error) {
+	device, err := r.Cache.LookupDevice(schemaId.Device, func(id DeviceId) (*data.DeviceSource, error) {
+		return r.Repository.LookupDevice(ctx, id)
+	})
+	if err != nil {
+		return nil, NewErrorf(true, "(%s)[Error] (LookupDevice) %v", schemaId, err)
 	}
 
-	if len(devices) == 0 {
-		return nil, fmt.Errorf("No such device: %s", id)
+	if device == nil {
+		return nil, NewErrorf(true, "(%s)[Error] (LookupDevice) No such device", schemaId)
 	}
 
-	locations := []*data.DeviceLocation{}
-	if err := ds.db.SelectContext(ctx, &locations, `
-                  SELECT l.timestamp, ST_AsBinary(l.location) AS location
-                  FROM fieldkit.device_location AS l
-                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC LIMIT 1
-		`, devices[0].SourceID); err != nil {
-		return nil, err
+	stream, err := r.Cache.LookupStream(schemaId.Device, func(id DeviceId) (*Stream, error) {
+		return r.Repository.LookupStream(ctx, device)
+	})
+	if err != nil {
+		return nil, NewErrorf(true, "(%s)[Error]: (LookupStream) (%v)", schemaId, err)
 	}
 
-	if len(locations) == 0 {
-		ms = NewStream(id, nil, devices[0])
-	} else {
-		c := locations[0].Location.Coordinates()
-		ms = NewStream(id, &Location{
-			UpdatedAt:   locations[0].Timestamp,
-			Coordinates: c,
-		}, devices[0])
+	schemas, err := r.Cache.LookupSchemas(schemaId, func(id SchemaId) ([]*MessageSchema, error) {
+		return r.Repository.LookupSchemas(ctx, schemaId)
+	})
+	if err != nil {
+		return nil, NewErrorf(true, "(%s)[Error] (LookupSchema) %v", schemaId, err)
+	}
+
+	rs = &DeviceStream{
+		DeviceSource: device,
+		Stream:       stream,
+		Schemas:      schemas,
 	}
 
 	return
 }
 
-func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id DeviceId, stream *Stream, l *Location) (err error) {
+func (r *Repository) LookupDevice(ctx context.Context, id DeviceId) (device *data.DeviceSource, err error) {
+	devices := []*data.DeviceSource{}
+	if err := r.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.source_id, d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
+					WHERE d.key = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	if len(devices) != 1 {
+		return
+	}
+
+	device = devices[0]
+
+	return
+}
+
+func (r *Repository) LookupStream(ctx context.Context, device *data.DeviceSource) (ms *Stream, err error) {
+	locations := []*data.DeviceLocation{}
+	if err := r.db.SelectContext(ctx, &locations, `
+                  SELECT l.timestamp, ST_AsBinary(l.location) AS location
+                  FROM fieldkit.device_location AS l
+                  WHERE l.device_id = $1 ORDER BY l.timestamp DESC LIMIT 1
+		`, device.SourceID); err != nil {
+		return nil, err
+	}
+
+	id := DeviceId(device.Key)
+	if len(locations) == 0 {
+		ms = NewStream(id, nil, device)
+	} else {
+		c := locations[0].Location.Coordinates()
+		ms = NewStream(id, &Location{
+			UpdatedAt:   locations[0].Timestamp,
+			Coordinates: c,
+		}, device)
+	}
+
+	return
+}
+
+func (r *Repository) UpdateLocation(ctx context.Context, id DeviceId, stream *Stream, l *Location) (err error) {
 	dl := data.DeviceLocation{
 		DeviceID:  stream.Device.SourceID,
 		Timestamp: l.UpdatedAt,
@@ -61,7 +126,7 @@ func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id DeviceId, stre
 
 	stream.Location = l
 
-	_, err = ds.db.NamedExecContext(ctx, `
+	_, err = r.db.NamedExecContext(ctx, `
 		   INSERT INTO fieldkit.device_location (device_id, timestamp, location)
 		   VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))
 		   `, dl)
@@ -69,19 +134,9 @@ func (ds *DatabaseStreams) UpdateLocation(ctx context.Context, id DeviceId, stre
 	return err
 }
 
-type DatabaseSchemas struct {
-	db *sqlxcache.DB
-}
-
-func NewDatabaseSchemas(db *sqlxcache.DB) SchemaRepository {
-	return &DatabaseSchemas{
-		db: db,
-	}
-}
-
-func (ds *DatabaseSchemas) LookupSchemas(ctx context.Context, id SchemaId) (ms []*MessageSchema, err error) {
+func (r *Repository) LookupSchemas(ctx context.Context, id SchemaId) (ms []*MessageSchema, err error) {
 	schemas := []*data.DeviceJSONSchema{}
-	if err := ds.db.SelectContext(ctx, &schemas, `
+	if err := r.db.SelectContext(ctx, &schemas, `
                   SELECT ds.*, s.* FROM fieldkit.device AS d
                   JOIN fieldkit.device_schema AS ds ON (d.source_id = ds.device_id)
                   JOIN fieldkit.schema AS s ON (ds.schema_id = s.id)

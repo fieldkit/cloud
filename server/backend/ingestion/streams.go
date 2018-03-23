@@ -1,7 +1,6 @@
 package ingestion
 
 import (
-	"context"
 	"time"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -24,18 +23,13 @@ func (l *Location) Valid() bool {
 type Stream struct {
 	Id       DeviceId
 	Location *Location
-	Device   *data.Device
+	Device   *data.DeviceSource
 }
 
-func NewStream(id DeviceId, l *Location, device *data.Device) (ms *Stream) {
+func NewStream(id DeviceId, l *Location, device *data.DeviceSource) (ms *Stream) {
 	return &Stream{
 		Id:       id,
 		Location: l,
 		Device:   device,
 	}
-}
-
-type StreamsRepository interface {
-	LookupStream(ctx context.Context, id DeviceId) (ms *Stream, err error)
-	UpdateLocation(ctx context.Context, id DeviceId, stream *Stream, l *Location) error
 }
