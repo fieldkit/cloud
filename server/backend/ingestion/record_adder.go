@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -28,18 +26,18 @@ type SourceChangesPublisher interface {
 }
 
 type RecordAdder struct {
-	db *sqlxcache.DB
+	repository *Repository
 }
 
-func NewRecordAdder(db *sqlxcache.DB) *RecordAdder {
+func NewRecordAdder(repository *Repository) *RecordAdder {
 	return &RecordAdder{
-		db: db,
+		repository: repository,
 	}
 }
 
-func (da *RecordAdder) AddRecord(ctx context.Context, pm *ProcessedMessage) error {
+func (da *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) error {
 	ids := pm.Schema.Ids
-	record := data.Record{
+	record := &data.Record{
 		SchemaID:  int32(ids.SchemaID),
 		SourceID:  int32(ids.DeviceID),
 		TeamID:    nil,
@@ -49,14 +47,17 @@ func (da *RecordAdder) AddRecord(ctx context.Context, pm *ProcessedMessage) erro
 		Fixed:     pm.Fixed,
 		Visible:   true,
 	}
+
 	record.SetData(pm.Fields)
 
-	_, err := da.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)
-		VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
-		`, record)
-	if err != nil {
+	if err := da.repository.AddRecord(ctx, record); err != nil {
 		return err
+	}
+
+	if pm.LocationUpdated {
+		if err := da.repository.UpdateLocation(ctx, ds.Stream, pm.Location); err != nil {
+			return err
+		}
 	}
 
 	return nil

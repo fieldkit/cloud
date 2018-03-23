@@ -3,7 +3,6 @@ package backend
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -52,15 +51,7 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		Repository:    r,
 		SchemaApplier: ingestion.NewSchemaApplier(),
 		Resolver:      ingestion.NewResolver(r),
-		RecordAdder:   ingestion.NewRecordAdder(b.db)}
-}
-
-type HashedData struct {
-	DeviceId string
-	Stream   string
-	Time     int64
-	Values   map[string]interface{}
-	Location []float64
+		RecordAdder:   ingestion.NewRecordAdder(r)}
 }
 
 func (br *FkBinaryReader) LocationArray() []float64 {
@@ -69,27 +60,6 @@ func (br *FkBinaryReader) LocationArray() []float64 {
 	} else {
 		return []float64{}
 	}
-}
-
-func (br *FkBinaryReader) ToHashingData(values map[string]interface{}) (data []byte, err error) {
-	hashed := &HashedData{
-		DeviceId: br.DeviceId,
-		Stream:   "",
-		Time:     br.Time,
-		Values:   values,
-		Location: br.LocationArray(),
-	}
-
-	data, err = json.Marshal(hashed)
-	if err != nil {
-		return nil, err
-	}
-
-	return
-}
-
-func ToUniqueHash(data []byte) (uuid.UUID, error) {
-	return uuid.NewSHA1(FkBinaryMessagesSpace, data), nil
 }
 
 func (br *FkBinaryReader) CreateFormattedMessage() (fm *ingestion.FormattedMessage, err error) {
@@ -104,37 +74,21 @@ func (br *FkBinaryReader) CreateFormattedMessage() (fm *ingestion.FormattedMessa
 		}
 	}
 
-	hd, err := br.ToHashingData(values)
-	if err != nil {
-		return nil, err
-	}
-
-	token, err := ToUniqueHash(hd)
-	if err != nil {
-		return nil, err
-	}
-
-	messageId := token.String()
 	messageTime := time.Unix(br.Time, 0)
+	location := br.LocationArray()
 
-	if br.Location != nil {
-		fm = &ingestion.FormattedMessage{
-			MessageId: ingestion.MessageId(messageId),
-			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
-			Time:      &messageTime,
-			Location:  br.LocationArray(),
-			Fixed:     true,
-			MapValues: values,
-		}
-	} else {
-		fm = &ingestion.FormattedMessage{
-			MessageId: ingestion.MessageId(messageId),
-			SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
-			Time:      &messageTime,
-			Location:  []float64{},
-			Fixed:     false,
-			MapValues: values,
-		}
+	messageId, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+
+	fm = &ingestion.FormattedMessage{
+		MessageId: ingestion.MessageId(messageId.String()),
+		SchemaId:  ingestion.NewSchemaId(ingestion.NewDeviceId(br.DeviceId), ""),
+		Time:      &messageTime,
+		Location:  location,
+		Fixed:     len(location) > 0,
+		MapValues: values,
 	}
 
 	return
@@ -151,25 +105,19 @@ func (br *FkBinaryReader) Ingest(ctx context.Context) error {
 		return err
 	}
 
-	im, err := br.SchemaApplier.ApplySchemas(ctx, ds, fm)
+	pm, err := br.SchemaApplier.ApplySchemas(ds, fm)
 	if err != nil {
 		return err
 	}
 
-	if im.LocationUpdated {
-		if err := br.Repository.UpdateLocation(ctx, fm.SchemaId.Device, ds.Stream, im.Location); err != nil {
-			return fmt.Errorf("%s: Unable to update location (%v)", fm.SchemaId, err)
-		}
-	}
-
-	err = br.RecordAdder.AddRecord(ctx, im)
+	err = br.RecordAdder.AddRecord(ctx, ds, pm)
 	if err != nil {
 		return err
 	}
 
-	br.SourceIDs[im.Schema.Ids.DeviceID] = true
+	br.SourceIDs[pm.Schema.Ids.DeviceID] = true
 
-	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, br.Modules, len(fm.MapValues), im.LocationUpdated, fm.Location)
+	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, br.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
 
 	return nil
 }

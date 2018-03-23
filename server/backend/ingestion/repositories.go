@@ -117,7 +117,7 @@ func (r *Repository) LookupStream(ctx context.Context, device *data.DeviceSource
 	return
 }
 
-func (r *Repository) UpdateLocation(ctx context.Context, id DeviceId, stream *Stream, l *Location) (err error) {
+func (r *Repository) UpdateLocation(ctx context.Context, stream *Stream, l *Location) (err error) {
 	dl := data.DeviceLocation{
 		DeviceID:  stream.Device.SourceID,
 		Timestamp: l.UpdatedAt,
@@ -132,6 +132,17 @@ func (r *Repository) UpdateLocation(ctx context.Context, id DeviceId, stream *St
 		   `, dl)
 
 	return err
+}
+
+func (r *Repository) AddRecord(ctx context.Context, record *data.Record) error {
+	if _, err := r.db.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)
+			VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
+		`, record); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *Repository) LookupSchemas(ctx context.Context, id SchemaId) (ms []*MessageSchema, err error) {

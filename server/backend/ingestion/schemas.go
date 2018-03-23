@@ -1,7 +1,6 @@
 package ingestion
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -102,10 +101,10 @@ func NewSchemaApplier() *SchemaApplier {
 	return &SchemaApplier{}
 }
 
-func (i *SchemaApplier) ApplySchema(ctx context.Context, ds *DeviceStream, fm *FormattedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (im *ProcessedMessage, err error) {
+func (i *SchemaApplier) ApplySchema(ds *DeviceStream, fm *FormattedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (im *ProcessedMessage, err error) {
 	// This works with MapValues, too as they'll be zero for now.
 	if fm.ArrayValues != nil && len(fm.ArrayValues) != len(jsonSchema.Fields) {
-		return nil, NewErrorf(true, "%s: fields S=%v != M=%v", fm.SchemaId, len(jsonSchema.Fields), len(fm.ArrayValues))
+		return nil, fmt.Errorf("%s: fields S=%v != M=%v", fm.SchemaId, len(jsonSchema.Fields), len(fm.ArrayValues))
 	}
 
 	mapped := make(map[string]interface{})
@@ -120,19 +119,22 @@ func (i *SchemaApplier) ApplySchema(ctx context.Context, ds *DeviceStream, fm *F
 		}
 	}
 
-	time, err := determineTime(fm, jsonSchema, mapped)
+	time, err := getTime(fm, jsonSchema, mapped)
 	if err != nil {
-		return nil, NewErrorf(true, "%s: Unable to get time (%v)", fm.SchemaId, err)
+		return nil, fmt.Errorf("%s: Unable to get time (%v)", fm.SchemaId, err)
 	}
 
-	location, err := determineLocation(fm, jsonSchema, mapped, time)
+	location, err := getLocation(fm, jsonSchema, mapped, time)
 	if err != nil {
-		return nil, NewErrorf(true, "%s: Unable to get location (%v)", fm.SchemaId, err)
+		return nil, fmt.Errorf("%s: Unable to get location (%v)", fm.SchemaId, err)
 	}
 
 	haveLocation := location != nil && location.Valid()
+	if haveLocation {
+		ds.Stream.Location = location
+	}
 	if ds.Stream.Location == nil {
-		return nil, NewErrorf(false, "%s: Stream has no location.", fm.SchemaId)
+		return nil, fmt.Errorf("%s: Stream has no location.", fm.SchemaId)
 	}
 
 	im = &ProcessedMessage{
@@ -147,7 +149,7 @@ func (i *SchemaApplier) ApplySchema(ctx context.Context, ds *DeviceStream, fm *F
 	return
 }
 
-func (i *SchemaApplier) ApplySchemas(ctx context.Context, ds *DeviceStream, fm *FormattedMessage) (im *ProcessedMessage, err error) {
+func (i *SchemaApplier) ApplySchemas(ds *DeviceStream, fm *FormattedMessage) (im *ProcessedMessage, err error) {
 	if len(ds.Schemas) == 0 {
 		return nil, NewErrorf(false, "(%s)(%s)[Error] (ApplySchemas) No device or schemas", fm.MessageId, fm.SchemaId)
 	}
@@ -157,32 +159,32 @@ func (i *SchemaApplier) ApplySchemas(ctx context.Context, ds *DeviceStream, fm *
 	for _, schema := range ds.Schemas {
 		jsonSchema, ok := schema.Schema.(*JsonMessageSchema)
 		if ok {
-			im, applyErr := i.ApplySchema(ctx, ds, fm, schema, jsonSchema)
+			fm, applyErr := i.ApplySchema(ds, fm, schema, jsonSchema)
 			if applyErr != nil {
 				errors = append(errors, applyErr)
 			} else {
-				return im, nil
+				return fm, nil
 			}
 		} else {
-			return nil, NewErrorf(true, "Unexpected MessageSchema type: %v", schema)
+			return nil, fmt.Errorf("Unexpected MessageSchema type: %v", schema)
 		}
 	}
 
-	return nil, NewErrorf(true, "%v", makePretty(errors))
+	return nil, fmt.Errorf("%v", joinErrors(errors))
 }
 
-func determineTime(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
+func getTime(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
 	if ms.UseProviderTime {
 		t = fm.Time
 	} else {
 		if !ms.HasTime {
-			return nil, NewErrorf(true, "No time information")
+			return nil, fmt.Errorf("No time information")
 		}
 
 		raw := m[FieldNameTime].(string)
 		unix, err := strconv.ParseInt(raw, 10, 64)
 		if err != nil {
-			return nil, NewErrorf(true, "Unable to parse time '%s' (%v)", raw, err)
+			return nil, fmt.Errorf("Unable to parse time '%s' (%v)", raw, err)
 		}
 
 		parsed := time.Unix(unix, 0)
@@ -192,7 +194,7 @@ func determineTime(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]int
 	return
 }
 
-func determineLocation(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]interface{}, t *time.Time) (l *Location, err error) {
+func getLocation(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]interface{}, t *time.Time) (l *Location, err error) {
 	if ms.UseProviderLocation {
 		return &Location{UpdatedAt: t, Coordinates: fm.Location}, nil
 	}
@@ -220,7 +222,7 @@ func determineLocation(fm *FormattedMessage, ms *JsonMessageSchema, m map[string
 	}, nil
 }
 
-func makePretty(errors []error) (m string) {
+func joinErrors(errors []error) (m string) {
 	strs := []string{}
 	for _, err := range errors {
 		strs = append(strs, fmt.Sprintf("(%v)", err))
