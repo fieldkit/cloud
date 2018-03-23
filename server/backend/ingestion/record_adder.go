@@ -10,14 +10,16 @@ import (
 )
 
 type SourceChange struct {
-	Time     time.Time
-	SourceID int64
+	QueuedAt   time.Time
+	StartedAt  time.Time
+	FinishedAt time.Time
+	SourceID   int64
 }
 
 func NewSourceChange(sourceId int64) SourceChange {
 	return SourceChange{
 		SourceID: sourceId,
-		Time:     time.Now(),
+		QueuedAt: time.Now(),
 	}
 }
 

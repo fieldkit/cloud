@@ -56,9 +56,13 @@ func (j *NaiveBackgroundJobs) Start() error {
 			select {
 			case c := <-delayed:
 				if previous.SourceID == c.SourceID {
+					if previous.StartedAt.After(c.QueuedAt) {
+						log.Printf("Skipping %v", c)
+						continue
+					}
 				}
 
-				started := time.Now()
+				c.StartedAt = time.Now()
 				log.Printf("Processing %v...", c)
 				generator := NewPregenerator(j.be)
 				ctx := context.Background()
@@ -66,7 +70,8 @@ func (j *NaiveBackgroundJobs) Start() error {
 				if err != nil {
 					log.Printf("Error: %v", err)
 				}
-				log.Printf("Done %v in %v", c, time.Now().Sub(started))
+				c.FinishedAt = time.Now()
+				log.Printf("Done %v in %v", c, c.FinishedAt.Sub(c.StartedAt))
 
 				previous = c
 			}
