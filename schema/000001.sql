@@ -177,6 +177,7 @@ CREATE TABLE fieldkit.record (
 	location geometry(POINT, 4326) NOT NULL,
 	visible boolean NOT NULL DEFAULT true,
 	fixed boolean NOT NULL DEFAULT true,
+	metadata boolean NOT NULL DEFAULT false,
 	data jsonb NOT NULL
 );
 

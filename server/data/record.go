@@ -64,6 +64,7 @@ type Record struct {
 	Data      types.JSONText `db:"data"`
 	Fixed     bool           `db:"fixed"`
 	Visible   bool           `db:"visible"`
+	Metadata  bool           `db:"metadata"`
 }
 
 type AnalysedRecord struct {
