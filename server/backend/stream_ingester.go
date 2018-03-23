@@ -5,13 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/robinpowered/go-proto/message"
-	"github.com/robinpowered/go-proto/stream"
-
 	"github.com/conservify/sqlxcache"
-
-	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
@@ -53,31 +47,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		saver := NewFormattedMessageSaver(si.backend)
 		binaryReader := NewFkBinaryReader(saver)
 
-		unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
-			var record pb.DataRecord
-			err := proto.Unmarshal(b, &record)
-			if err != nil {
-				// We keep reading, this may just be a protocol version issue.
-				log.Printf("Error unmarshalling record: %v", err)
-				return nil, nil
-			}
-
-			err = binaryReader.Push(txCtx, &record)
-			if err, ok := err.(*ingestion.IngestError); ok {
-				if err.Critical {
-					return nil, err
-				} else {
-					log.Printf("Error: %v", err)
-				}
-			} else if err != nil {
-				return nil, err
-			}
-
-			return &record, nil
-		})
-
-		_, err := stream.ReadLengthPrefixedCollection(req.Body, unmarshalFunc)
-		if err != nil {
+		if err := binaryReader.Read(txCtx, req.Body); err != nil {
 			status = http.StatusInternalServerError
 			log.Printf("Stream [%s]: error: %v", req.RemoteAddr, err)
 			return nil
@@ -85,11 +55,11 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		saver.EmitChanges(si.sourceChanges)
 
-		binaryReader.Done()
-
 		return nil
 	})
+
 	if err != nil {
+		status = http.StatusInternalServerError
 		log.Printf("Error: %v", err)
 	}
 

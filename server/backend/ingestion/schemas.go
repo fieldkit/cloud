@@ -109,21 +109,9 @@ func NewSchemaApplier() *SchemaApplier {
 }
 
 func (i *SchemaApplier) ApplySchema(ds *DeviceStream, fm *FormattedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (im *ProcessedMessage, err error) {
-	// This works with MapValues, too as they'll be zero for now.
-	if fm.ArrayValues != nil && len(fm.ArrayValues) != len(jsonSchema.Fields) {
-		return nil, fmt.Errorf("%s: fields S=%v != M=%v", fm.SchemaId, len(jsonSchema.Fields), len(fm.ArrayValues))
-	}
-
-	mapped := make(map[string]interface{})
-
-	for i, field := range jsonSchema.Fields {
-		mapped[ToSnake(field.Name)] = fm.ArrayValues[i]
-	}
-
-	if fm.MapValues != nil {
-		for k, v := range fm.MapValues {
-			mapped[k] = v
-		}
+	mapped, err := getMappedValues(fm, schema, jsonSchema)
+	if err != nil {
+		return nil, fmt.Errorf("%s: Unable to map values (%v)", fm.SchemaId, err)
 	}
 
 	time, err := getTime(fm, jsonSchema, mapped)
@@ -178,6 +166,27 @@ func (i *SchemaApplier) ApplySchemas(ds *DeviceStream, fm *FormattedMessage) (im
 	}
 
 	return nil, fmt.Errorf("%v", joinErrors(errors))
+}
+
+func getMappedValues(fm *FormattedMessage, schema *MessageSchema, jsonSchema *JsonMessageSchema) (mapped map[string]interface{}, err error) {
+	// This works with MapValues, too as they'll be zero for now.
+	if fm.ArrayValues != nil && len(fm.ArrayValues) != len(jsonSchema.Fields) {
+		return nil, fmt.Errorf("%s: fields S=%v != M=%v", fm.SchemaId, len(jsonSchema.Fields), len(fm.ArrayValues))
+	}
+
+	mapped = make(map[string]interface{})
+
+	for i, field := range jsonSchema.Fields {
+		mapped[ToSnake(field.Name)] = fm.ArrayValues[i]
+	}
+
+	if fm.MapValues != nil {
+		for k, v := range fm.MapValues {
+			mapped[k] = v
+		}
+	}
+
+	return
 }
 
 func getTime(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {

@@ -4,11 +4,16 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/robinpowered/go-proto/message"
+	"github.com/robinpowered/go-proto/stream"
 
 	pb "github.com/fieldkit/data-protocol"
 
@@ -42,6 +47,44 @@ func NewFkBinaryReader(receiver FormattedMessageReceiver) *FkBinaryReader {
 		Readings: make(map[uint32]float32),
 		Receiver: receiver,
 	}
+}
+
+func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
+	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
+		var record pb.DataRecord
+		err := proto.Unmarshal(b, &record)
+		if err != nil {
+			// We keep reading, this may just be a protocol version issue.
+			log.Printf("Error unmarshalling record: %v", err)
+			return nil, nil
+		}
+
+		err = br.Push(ctx, &record)
+		if err, ok := err.(*ingestion.IngestError); ok {
+			if err.Critical {
+				return nil, err
+			} else {
+				log.Printf("Error: %v", err)
+			}
+		} else if err != nil {
+			return nil, err
+		}
+
+		return &record, nil
+	})
+
+	_, err := stream.ReadLengthPrefixedCollection(body, unmarshalFunc)
+	if err != nil {
+		return err
+	}
+
+	if br.ReadingsSeen > 0 {
+		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
+	}
+
+	log.Printf("Processed %d records", br.RecordsProcessed)
+
+	return nil
 }
 
 func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
@@ -102,16 +145,6 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 			}
 		}
 	}
-
-	return nil
-}
-
-func (br *FkBinaryReader) Done() error {
-	if br.ReadingsSeen > 0 {
-		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
-	}
-
-	log.Printf("Processed %d records", br.RecordsProcessed)
 
 	return nil
 }
