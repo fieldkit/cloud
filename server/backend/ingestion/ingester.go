@@ -18,7 +18,6 @@ type IngestedMessage struct {
 }
 
 type MessageIngester struct {
-	Repository *Repository
 }
 
 const (
@@ -28,10 +27,8 @@ const (
 	FieldNameTime      = "time"
 )
 
-func NewMessageIngester(r *Repository) *MessageIngester {
-	return &MessageIngester{
-		Repository: r,
-	}
+func NewMessageIngester() *MessageIngester {
+	return &MessageIngester{}
 }
 
 func determineTime(pm *ProcessedMessage, ms *JsonMessageSchema, m map[string]interface{}) (t *time.Time, err error) {
@@ -112,12 +109,6 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, ds *DeviceStream, pm 
 	}
 
 	haveLocation := location != nil && location.Valid()
-	if haveLocation {
-		err := i.Repository.UpdateLocation(ctx, pm.SchemaId.Device, ds.Stream, location)
-		if err != nil {
-			return nil, NewErrorf(true, "%s: Unable to update location (%v)", pm.SchemaId, err)
-		}
-	}
 	if ds.Stream.Location == nil {
 		return nil, NewErrorf(false, "%s: Stream has no location.", pm.SchemaId)
 	}
@@ -135,6 +126,10 @@ func (i *MessageIngester) ApplySchema(ctx context.Context, ds *DeviceStream, pm 
 }
 
 func (i *MessageIngester) ApplySchemas(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (im *IngestedMessage, err error) {
+	if len(ds.Schemas) == 0 {
+		return nil, NewErrorf(false, "(%s)(%s)[Error] (ApplySchemas) No device or schemas", pm.MessageId, pm.SchemaId)
+	}
+
 	errors := make([]error, 0)
 
 	for _, schema := range ds.Schemas {
@@ -155,33 +150,12 @@ func (i *MessageIngester) ApplySchemas(ctx context.Context, ds *DeviceStream, pm
 }
 
 func (i *MessageIngester) IngestProcessedMessage(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (im *IngestedMessage, err error) {
-	if len(ds.Schemas) == 0 {
-		return nil, NewErrorf(false, "(%s)(%s)[Error] (ApplySchemas) No device or schemas", pm.MessageId, pm.SchemaId)
-	}
-
 	im, err = i.ApplySchemas(ctx, ds, pm)
 	if err != nil {
 		return nil, NewErrorf(true, "(%s)(%s)[Error] (ApplySchemas) %v", pm.MessageId, pm.SchemaId, err)
 	}
 
 	return im, nil
-}
-
-func (i *MessageIngester) CreateProcessedMessagFromRawMessage(ctx context.Context, raw *RawMessage) (pm *ProcessedMessage, err error) {
-	mp, err := IdentifyMessageProvider(raw)
-	if err != nil {
-		return nil, err
-	}
-	if mp == nil {
-		return nil, NewErrorf(true, "No message provider: (ContentType: %s)", raw.ContentType)
-	}
-
-	pm, err = mp.ProcessMessage(raw)
-	if err != nil {
-		return nil, NewErrorf(true, "(ProcessMessage) %v", err)
-	}
-
-	return pm, nil
 }
 
 func makePretty(errors []error) (m string) {

@@ -35,13 +35,14 @@ type FkBinaryReader struct {
 	SourceIDs map[int64]bool
 
 	Ingester    *ingestion.MessageIngester
+	Repository  *ingestion.Repository
 	Resolver    *ingestion.Resolver
 	RecordAdder *RecordAdder
 }
 
 func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 	r := ingestion.NewRepository(b.db)
-	ingester := ingestion.NewMessageIngester(r)
+	ingester := ingestion.NewMessageIngester()
 
 	return &FkBinaryReader{
 		Modules:   make([]string, 0),
@@ -50,6 +51,7 @@ func NewFkBinaryReader(b *Backend) *FkBinaryReader {
 		SourceIDs: make(map[int64]bool),
 
 		Ingester:    ingester,
+		Repository:  r,
 		Resolver:    ingestion.NewResolver(r),
 		RecordAdder: NewRecordAdder(b),
 	}
@@ -200,6 +202,12 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 				im, err := br.Ingester.IngestProcessedMessage(ctx, ds, pm)
 				if err != nil {
 					return err
+				}
+
+				if im.LocationUpdated {
+					if err := br.Repository.UpdateLocation(ctx, pm.SchemaId.Device, ds.Stream, im.Location); err != nil {
+						return ingestion.NewErrorf(true, "%s: Unable to update location (%v)", pm.SchemaId, err)
+					}
 				}
 
 				err = br.RecordAdder.AddRecord(ctx, im)
