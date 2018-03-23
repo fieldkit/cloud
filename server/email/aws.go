@@ -27,10 +27,7 @@ func NewAWSSESEmailer(client *ses.SES, source, domain string) *AWSSESEmailer {
 	}
 }
 
-func (a AWSSESEmailer) SendSourceSilenceWarning(source *data.Source, age time.Duration) error {
-	subject := fmt.Sprintf("FieldKit: Warning! Device %s offline.", source.Name)
-	body := fmt.Sprintf("Your device named '%s' is offline. The last reading from the device was %v ago.", source.Name, age)
-
+func (a AWSSESEmailer) send(subject, body string, addresses []*string) error {
 	sendEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
@@ -64,6 +61,28 @@ func (a AWSSESEmailer) SendSourceSilenceWarning(source *data.Source, age time.Du
 	return nil
 }
 
+func (a AWSSESEmailer) SendSourceOfflineWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Device %s is offline.", source.Name)
+	body := fmt.Sprintf("Your device named '%s' is offline. The last reading from the device was %v ago.", source.Name, age)
+	toAddresses := []*string{
+		aws.String("jacob@conservify.org"),
+		aws.String("shah@conservify.org"),
+	}
+
+	return a.send(subject, body, toAddresses)
+}
+
+func (a AWSSESEmailer) SendSourceOnlineWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Device %s is back online.", source.Name)
+	body := fmt.Sprintf("Your device named '%s' is online. The last reading from the device was %v ago.", source.Name, age)
+	toAddresses := []*string{
+		aws.String("jacob@conservify.org"),
+		aws.String("shah@conservify.org"),
+	}
+
+	return a.send(subject, body, toAddresses)
+}
+
 func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {
 	options := &templateOptions{
 		ValidationToken: validationToken,
@@ -81,43 +100,9 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 		return err
 	}
 
-	bodyHTMLBuffer := bytes.NewBuffer([]byte{})
-	if err := bodyHTMLTemplate.Execute(bodyHTMLBuffer, options); err != nil {
-		return err
+	toAddresses := []*string{
+		aws.String(person.Email),
 	}
 
-	sendEmailInput := &ses.SendEmailInput{
-		Destination: &ses.Destination{
-			ToAddresses: []*string{
-				aws.String(person.Email),
-			},
-		},
-		Message: &ses.Message{
-			Body: &ses.Body{
-				Text: &ses.Content{
-					Data:    aws.String(bodyTextBuffer.String()),
-					Charset: aws.String("utf8"),
-				},
-				Html: &ses.Content{
-					Data:    aws.String(bodyHTMLBuffer.String()),
-					Charset: aws.String("utf8"),
-				},
-			},
-			Subject: &ses.Content{
-				Data:    aws.String(subjectBuffer.String()),
-				Charset: aws.String("utf8"),
-			},
-		},
-		Source:     a.sourceEmail,
-		ReturnPath: a.sourceEmail,
-		ReplyToAddresses: []*string{
-			a.sourceEmail,
-		},
-	}
-
-	if _, err := a.client.SendEmail(sendEmailInput); err != nil {
-		return err
-	}
-
-	return nil
+	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
 }

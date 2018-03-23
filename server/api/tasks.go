@@ -79,15 +79,29 @@ func (n *Notifier) Check(ctx context.Context) error {
 	now := time.Now()
 	for _, summary := range summaries {
 		notification := notificationsBySource[summary.SourceID]
+		wasNotified := !notification.UpdatedAt.IsZero()
 		age := now.Sub(summary.EndTime)
 		lastNotification := now.Sub(notification.UpdatedAt)
 
 		prefix := fmt.Sprintf("SourceId: %d EndTime: %v: Age: %v LastNotification: %v", summary.SourceID, summary.EndTime, age, lastNotification)
 
 		if age < ThirtyMinutes {
-			log.Printf("%s: Have readings", prefix)
-			if err := n.ClearNotifications(ctx, notification); err != nil {
-				return err
+			if wasNotified {
+				log.Printf("%s: Online!", prefix)
+				source, err := n.Backend.GetSourceByID(ctx, int32(summary.SourceID))
+				if err != nil {
+					return err
+				}
+
+				if err := n.Emailer.SendSourceOnlineWarning(source, age); err != nil {
+					return err
+				}
+
+				if err := n.ClearNotifications(ctx, notification); err != nil {
+					return err
+				}
+			} else {
+				log.Printf("%s: Have readings", prefix)
 			}
 			continue
 		}
@@ -107,10 +121,9 @@ func (n *Notifier) Check(ctx context.Context) error {
 						return err
 					}
 
-					log.Printf("%s: Notifying! (%v)", prefix, interval)
+					log.Printf("%s: Offline! (%v)", prefix, interval)
 
-					err = n.Emailer.SendSourceSilenceWarning(source, age)
-					if err != nil {
+					if err = n.Emailer.SendSourceOfflineWarning(source, age); err != nil {
 						return err
 					}
 

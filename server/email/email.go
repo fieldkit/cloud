@@ -41,7 +41,8 @@ func init() {
 
 type Emailer interface {
 	SendValidationToken(person *data.User, validationToken *data.ValidationToken) error
-	SendSourceSilenceWarning(source *data.Source, age time.Duration) error
+	SendSourceOfflineWarning(source *data.Source, age time.Duration) error
+	SendSourceOnlineWarning(source *data.Source, age time.Duration) error
 }
 
 type emailer struct {
@@ -49,9 +50,16 @@ type emailer struct {
 	domain string
 }
 
-func (e emailer) SendSourceSilenceWarning(source *data.Source, age time.Duration) error {
-	subject := fmt.Sprintf("FieldKit: Warning, source %s silent.", source.Name)
-	body := fmt.Sprintf("The source '%s' has been silent for %v.", source.Name, age)
+func (e emailer) SendSourceOfflineWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Device %s is offline.", source.Name)
+	body := fmt.Sprintf("Your device named '%s' has been offline for %v.", source.Name, age)
+	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", "jacob@conservify.org", subject, body)
+	return nil
+}
+
+func (e emailer) SendSourceOnlineWarning(source *data.Source, age time.Duration) error {
+	subject := fmt.Sprintf("FieldKit: Device %s is back online.", source.Name)
+	body := fmt.Sprintf("Your device named '%s' is back online.", source.Name)
 	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", "jacob@conservify.org", subject, body)
 	return nil
 }
