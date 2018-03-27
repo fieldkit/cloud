@@ -190,10 +190,13 @@ const initialMapState = {
 
 function map(state = initialMapState, action) {
     switch (action.type) {
-    case ActionTypes.API_MAP_FEATURES_GET.SUCCESS: {
+    case ActionTypes.API_MAP_FEATURES_GET.START: {
         const nextState = Object.assign({}, state);
         nextState.loaded.push(action.criteria);
         return nextState;
+    }
+    case ActionTypes.API_MAP_FEATURES_GET.SUCCESS: {
+        return state;
     }
     default:
         return state;
