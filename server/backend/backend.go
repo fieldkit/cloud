@@ -602,7 +602,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
 
 func (b *Backend) ReadingsBySourceID(ctx context.Context, sourceId int) (summaries []*ReadingSummary, err error) {
 	summaries = []*ReadingSummary{}
-	if err := b.db.SelectContext(ctx, &summaries, `SELECT jsonb_object_keys(q.data) AS name FROM (SELECT data FROM fieldkit.record_visible r WHERE r.source_id = $1 ORDER BY r.timestamp DESC LIMIT 10) q GROUP BY name`, sourceId); err != nil {
+	if err := b.db.SelectContext(ctx, &summaries, `SELECT jsonb_object_keys(q.data) AS name FROM (SELECT data FROM fieldkit.record r WHERE r.source_id = $1 ORDER BY r.timestamp DESC LIMIT 10) q GROUP BY name`, sourceId); err != nil {
 		return nil, err
 	}
 	return summaries, nil
