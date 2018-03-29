@@ -124,6 +124,30 @@
             }
           }
         },
+        "LogMessage": {
+          "fields": {
+            "time": {
+              "type": "uint64",
+              "id": 1
+            },
+            "uptime": {
+              "type": "uint32",
+              "id": 2
+            },
+            "level": {
+              "type": "uint32",
+              "id": 3
+            },
+            "facility": {
+              "type": "string",
+              "id": 4
+            },
+            "message": {
+              "type": "string",
+              "id": 5
+            }
+          }
+        },
         "DataRecord": {
           "fields": {
             "loggedReading": {
@@ -133,6 +157,10 @@
             "metadata": {
               "type": "Metadata",
               "id": 2
+            },
+            "log": {
+              "type": "LogMessage",
+              "id": 3
             }
           }
         }

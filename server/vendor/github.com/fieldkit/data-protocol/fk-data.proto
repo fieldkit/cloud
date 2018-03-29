@@ -43,7 +43,16 @@ message Metadata {
   repeated ModuleInfo modules = 6;
 }
 
+message LogMessage {
+  uint64 time = 1;
+  uint32 uptime = 2;
+  uint32 level = 3;
+  string facility = 4;
+  string message = 5;
+}
+
 message DataRecord {
   LoggedReading loggedReading = 1;
   Metadata metadata = 2;
+  LogMessage log = 3;
 }
