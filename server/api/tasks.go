@@ -53,6 +53,40 @@ func NewNotifier(backend *backend.Backend, database *sqlxcache.DB, emailer email
 	}
 }
 
+func (n *Notifier) SendOffline(ctx context.Context, sourceId int32, age time.Duration, notification *backend.NotificationStatus) error {
+	source, err := n.Backend.GetSourceByID(ctx, int32(sourceId))
+	if err != nil {
+		return err
+	}
+
+	if err = n.Emailer.SendSourceOfflineWarning(source, age); err != nil {
+		return err
+	}
+
+	if err := n.MarkNotified(ctx, notification); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (n *Notifier) SendOnline(ctx context.Context, sourceId int32, age time.Duration, notification *backend.NotificationStatus) error {
+	source, err := n.Backend.GetSourceByID(ctx, int32(sourceId))
+	if err != nil {
+		return err
+	}
+
+	if err := n.Emailer.SendSourceOnlineWarning(source, age); err != nil {
+		return err
+	}
+
+	if err := n.ClearNotifications(ctx, notification); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // TODO: Should narrow this query down eventually.
 func (n *Notifier) Check(ctx context.Context) error {
 	summaries := []*backend.FeatureSummary{}
@@ -88,16 +122,7 @@ func (n *Notifier) Check(ctx context.Context) error {
 		if age < ThirtyMinutes {
 			if wasNotified {
 				log.Printf("%s: Online!", prefix)
-				source, err := n.Backend.GetSourceByID(ctx, int32(summary.SourceID))
-				if err != nil {
-					return err
-				}
-
-				if err := n.Emailer.SendSourceOnlineWarning(source, age); err != nil {
-					return err
-				}
-
-				if err := n.ClearNotifications(ctx, notification); err != nil {
+				if err := n.SendOnline(ctx, int32(summary.SourceID), age, notification); err != nil {
 					return err
 				}
 			} else {
@@ -116,18 +141,8 @@ func (n *Notifier) Check(ctx context.Context) error {
 				if lastNotification < interval {
 					log.Printf("%s: Already notified (%v)", prefix, interval)
 				} else {
-					source, err := n.Backend.GetSourceByID(ctx, int32(summary.SourceID))
-					if err != nil {
-						return err
-					}
-
 					log.Printf("%s: Offline! (%v)", prefix, interval)
-
-					if err = n.Emailer.SendSourceOfflineWarning(source, age); err != nil {
-						return err
-					}
-
-					if err := n.MarkNotified(ctx, notification); err != nil {
+					if err := n.SendOffline(ctx, int32(summary.SourceID), age, notification); err != nil {
 						return err
 					}
 				}
