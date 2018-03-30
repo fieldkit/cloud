@@ -2,6 +2,8 @@ package backend
 
 import (
 	"context"
+	"crypto/sha1"
+	"hash"
 	"io"
 	"log"
 	"net/http"
@@ -40,11 +42,13 @@ func NewStreamIngester(b *Backend, streamArchiver StreamArchiver, sourceChanges 
 type ReaderWrapper struct {
 	BytesRead int64
 	Target    io.Reader
+	Hash      hash.Hash
 }
 
 func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	n, err = rw.Target.Read(p)
 	rw.BytesRead += int64(n)
+	rw.Hash.Write(p)
 	return n, err
 }
 
@@ -58,6 +62,7 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
 		Target:    req.Body,
+		Hash:      sha1.New(),
 	}
 
 	err := si.backend.db.WithNewTransaction(req.Context(), func(txCtx context.Context) error {
@@ -77,9 +82,9 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Printf("Stream [%s]: error: %v (%d bytes)", id, err, reader.BytesRead)
+		log.Printf("Stream [%s]: error: %v (%d bytes) (%x)", id, err, reader.BytesRead, reader.Hash.Sum(nil))
 	} else {
-		log.Printf("Stream [%s]: done (%d bytes)", id, reader.BytesRead)
+		log.Printf("Stream [%s]: done (%d bytes) (%x)", id, reader.BytesRead, reader.Hash.Sum(nil))
 	}
 
 	w.WriteHeader(status)
