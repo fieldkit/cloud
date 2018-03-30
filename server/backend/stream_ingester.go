@@ -2,10 +2,12 @@ package backend
 
 import (
 	"context"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/conservify/sqlxcache"
+	"github.com/google/uuid"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
@@ -13,6 +15,7 @@ import (
 const (
 	FkDataBinaryContentType = "application/vnd.fk.data+binary"
 	ContentTypeHeaderName   = "Content-Type"
+	ContentLengthHeaderName = "Content-Length"
 	FkProcessingHeaderName  = "Fk-Processing"
 )
 
@@ -34,18 +37,36 @@ func NewStreamIngester(b *Backend, streamArchiver StreamArchiver, sourceChanges 
 	return
 }
 
-func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request) {
+type ReaderWrapper struct {
+	BytesRead int64
+	Target    io.Reader
+}
+
+func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
+	n, err = rw.Target.Read(p)
+	rw.BytesRead += int64(n)
+	return n, err
+}
+
+func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
+	contentLength := req.Header.Get(ContentLengthHeaderName)
+
 	status := http.StatusOK
 
-	log.Printf("Stream [%s]: begin", req.RemoteAddr)
+	log.Printf("Stream [%s]: begin (%v)", id, contentLength)
+
+	reader := &ReaderWrapper{
+		BytesRead: 0,
+		Target:    req.Body,
+	}
 
 	err := si.backend.db.WithNewTransaction(req.Context(), func(txCtx context.Context) error {
 		saver := NewFormattedMessageSaver(si.backend)
 		binaryReader := NewFkBinaryReader(saver)
 
-		if err := binaryReader.Read(txCtx, req.Body); err != nil {
+		if err := binaryReader.Read(txCtx, reader); err != nil {
 			status = http.StatusInternalServerError
-			log.Printf("Stream [%s]: error: %v", req.RemoteAddr, err)
+			log.Printf("Stream [%s]: error: %v", id, err)
 			return nil
 		}
 
@@ -56,19 +77,22 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request) 
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Printf("Error: %v", err)
+		log.Printf("Stream [%s]: error: %v (%d bytes)", id, err, reader.BytesRead)
+	} else {
+		log.Printf("Stream [%s]: done (%d bytes)", id, reader.BytesRead)
 	}
 
 	w.WriteHeader(status)
 }
 
-func (si *StreamIngester) asynchronous(w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) asynchronous(w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
 	contentType := req.Header.Get(ContentTypeHeaderName)
+	contentLength := req.Header.Get(ContentLengthHeaderName)
 
-	log.Printf("Stream [%s]: begin (async)", req.RemoteAddr)
+	log.Printf("Stream [%s]: begin (%v) (async)", id, contentLength)
 
 	if err := si.streamArchiver.Archive(contentType, req.Body); err != nil {
-		log.Printf("Error: %v", err)
+		log.Printf("Stream [%s]: error (%v) (async)", id, err)
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -79,15 +103,20 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get(ContentTypeHeaderName)
 	fkProcessing := req.Header.Get(FkProcessingHeaderName)
 
+	id, err := uuid.NewRandom()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 	if contentType != FkDataBinaryContentType {
-		log.Printf("Stream [%s]: unknown content type: %v", req.RemoteAddr, contentType)
+		log.Printf("Stream [%v]: unknown content type: %v", id, contentType)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if fkProcessing == "" {
-		si.synchronous(w, req)
+		si.synchronous(w, req, &id)
 	} else if fkProcessing == "async" {
-		si.asynchronous(w, req)
+		si.asynchronous(w, req, &id)
 	}
 }
