@@ -146,6 +146,12 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 		}
 	}
 
+	if record.Log != nil {
+		if false {
+			fmt.Printf("%-10d %-30s %s\n", record.Log.Uptime, record.Log.Facility, record.Log.Message)
+		}
+	}
+
 	return nil
 }
 
