@@ -63,7 +63,7 @@ func (j *NaiveBackgroundJobs) Start() error {
 				}
 
 				c.StartedAt = time.Now()
-				log.Printf("Processing %v...", c)
+				log.Printf("Processing %v...", c.SourceID)
 				generator := NewPregenerator(j.be)
 				ctx := context.Background()
 				err := generator.Pregenerate(ctx, c.SourceID)
@@ -71,7 +71,7 @@ func (j *NaiveBackgroundJobs) Start() error {
 					log.Printf("Error: %v", err)
 				}
 				c.FinishedAt = time.Now()
-				log.Printf("Done %v in %v", c, c.FinishedAt.Sub(c.StartedAt))
+				log.Printf("Done %v in %v", c.SourceID, c.FinishedAt.Sub(c.StartedAt))
 
 				previous = c
 			}
