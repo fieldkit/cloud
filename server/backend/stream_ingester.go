@@ -48,7 +48,8 @@ type ReaderWrapper struct {
 func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	n, err = rw.Target.Read(p)
 	rw.BytesRead += int64(n)
-	rw.Hash.Write(p)
+	sliced := p[:n]
+	rw.Hash.Write(sliced)
 	return n, err
 }
 
@@ -71,7 +72,7 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 
 		if err := binaryReader.Read(txCtx, reader); err != nil {
 			status = http.StatusInternalServerError
-			log.Printf("Stream [%s]: error: %v", id, err)
+			log.Printf("Stream [%s]: error: %v (%d bytes)", id, err, reader.BytesRead)
 			return nil
 		}
 
