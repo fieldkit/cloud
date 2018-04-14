@@ -18,6 +18,7 @@ CREATE TABLE fieldkit.sources_summaries (
     last_feature_id integer NOT NULL,
     start_time timestamp NOT NULL,
     end_time timestamp NOT NULL,
+    envelope geometry NOT NULL,
     centroid geometry(POINT, 4326) NOT NULL,
     radius decimal NOT NULL,
     PRIMARY KEY (source_id)
@@ -30,6 +31,7 @@ CREATE TABLE fieldkit.sources_temporal_clusters (
     number_of_features integer NOT NULL,
     start_time timestamp NOT NULL,
     end_time timestamp NOT NULL,
+    envelope geometry NOT NULL,
     centroid geometry(POINT, 4326) NOT NULL,
     radius decimal NOT NULL,
     PRIMARY KEY (source_id, cluster_id)
@@ -50,6 +52,7 @@ CREATE TABLE fieldkit.sources_spatial_clusters (
     number_of_features integer NOT NULL,
     start_time timestamp NOT NULL,
     end_time timestamp NOT NULL,
+    envelope geometry NOT NULL,
     centroid geometry(POINT, 4326) NOT NULL,
     bounding_circle geometry NOT NULL,
     bounding_envelope geometry NOT NULL,
@@ -62,8 +65,8 @@ RETURNS TABLE (
 	"source_id" INTEGER,
 	"location" geometry,
 	"size" BIGINT,
-  "min_timestamp" timestamp,
-  "max_timestamp" timestamp,
+	"min_timestamp" timestamp,
+	"max_timestamp" timestamp,
 	"copy" BIGINT,
 	"spatial_cluster_id" integer
 ) AS
@@ -108,7 +111,7 @@ RETURNS TABLE (
 	"min_timestamp" timestamp,
 	"max_timestamp" timestamp,
 	"time_difference" float,
-  "actual_size" bigint,
+	"actual_size" bigint,
 	"temporal_cluster_id" BIGINT,
 	"location" geometry
 ) AS
@@ -157,7 +160,7 @@ with_assigned_temporal_clustering AS (
 	FROM with_temporal_clustering s
 )
 SELECT
-	desired_source_id AS source_id,
+  desired_source_id AS source_id,
   s.timestamp,
   s.min_timestamp,
   s.max_timestamp,
@@ -182,7 +185,8 @@ SELECT
   SUM(CASE copy WHEN 0 THEN f.size ELSE 0 END)::integer,
   MIN(min_timestamp),
   MAX(max_timestamp),
-  ST_Centroid(ST_Collect(f.location))::geometry(Point, 4326) AS centroid,
+  ST_Envelope(ST_Collect(f.location)) AS envelope,
+  ST_Centroid(ST_Collect(f.location))::geometry(POINT, 4326) AS centroid,
   ST_MinimumBoundingCircle(ST_Collect(f.location)) AS bounding_circle,
   ST_Envelope(ST_Collect(f.location)) AS bounding_envelope,
   SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(f.location))::geography) / pi())::numeric AS radius
@@ -204,7 +208,8 @@ SELECT
   SUM(actual_size)::integer,
   MIN(min_timestamp),
   MAX(max_timestamp),
-  ST_Centroid(ST_Collect(f.location))::geometry(Point, 4326) AS centroid,
+  ST_Envelope(ST_Collect(f.location)) AS envelope,
+  ST_Centroid(ST_Collect(f.location))::geometry(POINT, 4326) AS centroid,
   SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(f.location))::geography) / pi())::numeric AS radius
 FROM fieldkit.fk_tracks(desired_source_id) AS f
 GROUP BY temporal_cluster_id;
@@ -240,7 +245,8 @@ SELECT
 	(SELECT d.Id::integer AS last_feature_id FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
 	(SELECT MIN(d.timestamp) AS start_time FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
 	(SELECT MAX(d.timestamp) AS end_time FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(Point, 4326) AS centroid FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT ST_Envelope(ST_Collect(d.location)) AS envelope FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(POINT, 4326) AS centroid FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
 	(SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location))::geography))::numeric AS radius FROM fieldkit.record AS d WHERE d.visible AND d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0);
 END
 ' LANGUAGE plpgsql;
@@ -252,12 +258,13 @@ AS
 BEGIN
   INSERT INTO fieldkit.sources_summaries
   SELECT * FROM fieldkit.fk_source_summary(desired_source_id)
-	ON CONFLICT (source_id) DO UPDATE SET
+  ON CONFLICT (source_id) DO UPDATE SET
     updated_at = excluded.updated_at,
     number_of_features = excluded.number_of_features,
     last_feature_id = excluded.last_feature_id,
     start_time = excluded.start_time,
     end_time = excluded.end_time,
+    envelope = excluded.envelope,
     centroid = excluded.centroid,
     radius = excluded.radius;
 END
@@ -276,6 +283,7 @@ BEGIN
     number_of_features = excluded.number_of_features,
     start_time = excluded.start_time,
     end_time = excluded.end_time,
+    envelope = excluded.envelope,
     centroid = excluded.centroid,
     radius = excluded.radius;
 END
@@ -294,6 +302,7 @@ BEGIN
     number_of_features = excluded.number_of_features,
     start_time = excluded.start_time,
     end_time = excluded.end_time,
+    envelope = excluded.envelope,
     centroid = excluded.centroid,
     radius = excluded.radius;
 END
