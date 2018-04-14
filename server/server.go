@@ -116,6 +116,15 @@ func main() {
 		panic(err)
 	}
 
+	jq, err := backend.NewPqJobQueue(config.PostgresURL, "messages")
+	if err != nil {
+		panic(err)
+	}
+	err = jq.Start()
+	if err != nil {
+		panic(err)
+	}
+
 	archiver, err := createArchiver(awsSession, config)
 	if err != nil {
 		panic(err)

@@ -14,7 +14,8 @@ import (
 )
 
 type Backend struct {
-	db *sqlxcache.DB
+	db  *sqlxcache.DB
+	url string
 }
 
 func New(url string) (*Backend, error) {
@@ -24,7 +25,8 @@ func New(url string) (*Backend, error) {
 	}
 
 	return &Backend{
-		db: db,
+		url: url,
+		db:  db,
 	}, nil
 }
 

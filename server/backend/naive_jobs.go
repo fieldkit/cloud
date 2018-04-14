@@ -1,13 +1,91 @@
 package backend
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"log"
-	_ "sync"
 	"time"
 
+	"github.com/lib/pq"
+
+	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
+
+type PgJobQueue struct {
+	db       *sqlxcache.DB
+	name     string
+	listener *pq.Listener
+}
+
+func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
+	onProblem := func(ev pq.ListenerEventType, err error) {
+		if err != nil {
+			log.Printf("JobQueue: %v", err)
+		}
+	}
+
+	db, err := sqlxcache.Open("postgres", url)
+	if err != nil {
+		return nil, err
+	}
+
+	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)
+
+	return &PgJobQueue{
+		name:     name,
+		db:       db,
+		listener: listener,
+	}, nil
+
+}
+
+func (jq *PgJobQueue) Start() error {
+	err := jq.listener.Listen(jq.name)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Start monitoring %s...", jq.name)
+
+	go jq.waitForNotification()
+
+	return nil
+}
+
+func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
+	bytes, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+	_, err = jq.db.ExecContext(ctx, `SELECT pg_notify($1, $2)`, jq.name, bytes)
+	return err
+}
+
+func (jq *PgJobQueue) waitForNotification() {
+	log.Printf("Waiting!")
+	for {
+		select {
+		case n := <-jq.listener.Notify:
+			log.Printf("Received data from channel [%v]:", n.Channel)
+			var prettyJSON bytes.Buffer
+			err := json.Indent(&prettyJSON, []byte(n.Extra), "", "\t")
+			if err != nil {
+				log.Printf("Error processing JSON: %v", err)
+				break
+			}
+			log.Printf(string(prettyJSON.Bytes()))
+			break
+		case <-time.After(90 * time.Second):
+			log.Printf("Received no events for 90 seconds, checking connection")
+			go func() {
+				jq.listener.Ping()
+			}()
+			break
+		}
+	}
+}
 
 type NaiveBackgroundJobs struct {
 	be            *Backend
