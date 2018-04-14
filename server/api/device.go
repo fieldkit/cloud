@@ -23,6 +23,7 @@ func DeviceSourcePublicType(deviceSource *data.DeviceSource, summary *backend.Fe
 		LastFeatureID:    &summary.LastFeatureID,
 		StartTime:        &summary.StartTime,
 		EndTime:          &summary.EndTime,
+		Envelope:         summary.Envelope.Coordinates(),
 		Centroid:         summary.Centroid.Coordinates(),
 		Radius:           &summary.Radius,
 	}

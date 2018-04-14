@@ -2,10 +2,7 @@ package backend
 
 import (
 	"context"
-	"database/sql/driver"
 	"log"
-
-	"github.com/paulmach/go.geo"
 
 	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
@@ -96,34 +93,4 @@ func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) error {
 
 		return nil
 	})
-}
-
-type TemporalPath struct {
-	path *geo.Path
-}
-
-func (l *TemporalPath) Coordinates() [][]float64 {
-	if l.path == nil {
-		return make([][]float64, 0)
-	}
-	ps := l.path.Points()
-	c := make([][]float64, len(ps))
-	for i, p := range ps {
-		c[i] = []float64{p.Lng(), p.Lat()}
-	}
-	return c
-}
-
-func (l *TemporalPath) Scan(data interface{}) error {
-	path := &geo.Path{}
-	if err := path.Scan(data); err != nil {
-		return err
-	}
-
-	l.path = path
-	return nil
-}
-
-func (l *TemporalPath) Value() (driver.Value, error) {
-	return l.path.ToWKT(), nil
 }

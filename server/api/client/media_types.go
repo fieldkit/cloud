@@ -243,18 +243,19 @@ func (mt *DeviceSource) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device_source+json; view=public
 type DeviceSourcePublic struct {
-	Active           bool       `form:"active" json:"active" xml:"active"`
-	Centroid         []float64  `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
-	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	ExpeditionID     int        `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
-	ID               int        `form:"id" json:"id" xml:"id"`
-	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
-	Name             string     `form:"name" json:"name" xml:"name"`
-	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
-	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
-	StartTime        *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	TeamID           *int       `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
-	UserID           *int       `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+	Active           bool        `form:"active" json:"active" xml:"active"`
+	Centroid         []float64   `form:"centroid,omitempty" json:"centroid,omitempty" xml:"centroid,omitempty"`
+	EndTime          *time.Time  `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Envelope         [][]float64 `form:"envelope,omitempty" json:"envelope,omitempty" xml:"envelope,omitempty"`
+	ExpeditionID     int         `form:"expeditionId" json:"expeditionId" xml:"expeditionId"`
+	ID               int         `form:"id" json:"id" xml:"id"`
+	LastFeatureID    *int        `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
+	Name             string      `form:"name" json:"name" xml:"name"`
+	NumberOfFeatures *int        `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
+	Radius           *float64    `form:"radius,omitempty" json:"radius,omitempty" xml:"radius,omitempty"`
+	StartTime        *time.Time  `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	TeamID           *int        `form:"teamId,omitempty" json:"teamId,omitempty" xml:"teamId,omitempty"`
+	UserID           *int        `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
 }
 
 // Validate validates the DeviceSourcePublic media type instance.
@@ -626,13 +627,14 @@ func (c *Client) DecodeGeoJSONGeometry(resp *http.Response) (*GeoJSONGeometry, e
 //
 // Identifier: application/vnd.app.geometry_cluster_summary+json; view=default
 type ClusterSummary struct {
-	Centroid         []float64 `form:"centroid" json:"centroid" xml:"centroid"`
-	EndTime          time.Time `form:"endTime" json:"endTime" xml:"endTime"`
-	ID               int       `form:"id" json:"id" xml:"id"`
-	NumberOfFeatures int       `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
-	Radius           float64   `form:"radius" json:"radius" xml:"radius"`
-	SourceID         int       `form:"sourceId" json:"sourceId" xml:"sourceId"`
-	StartTime        time.Time `form:"startTime" json:"startTime" xml:"startTime"`
+	Centroid         []float64   `form:"centroid" json:"centroid" xml:"centroid"`
+	EndTime          time.Time   `form:"endTime" json:"endTime" xml:"endTime"`
+	Envelope         [][]float64 `form:"envelope,omitempty" json:"envelope,omitempty" xml:"envelope,omitempty"`
+	ID               int         `form:"id" json:"id" xml:"id"`
+	NumberOfFeatures int         `form:"numberOfFeatures" json:"numberOfFeatures" xml:"numberOfFeatures"`
+	Radius           float64     `form:"radius" json:"radius" xml:"radius"`
+	SourceID         int         `form:"sourceId" json:"sourceId" xml:"sourceId"`
+	StartTime        time.Time   `form:"startTime" json:"startTime" xml:"startTime"`
 }
 
 // Validate validates the ClusterSummary media type instance.

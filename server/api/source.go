@@ -36,6 +36,7 @@ func ClusterSummaryType(s *backend.GeometryClusterSummary) *app.ClusterSummary {
 		NumberOfFeatures: s.NumberOfFeatures,
 		StartTime:        s.StartTime,
 		EndTime:          s.EndTime,
+		Envelope:         s.Envelope.Coordinates(),
 		Centroid:         s.Centroid.Coordinates(),
 		Radius:           s.Radius,
 	}
