@@ -11,6 +11,14 @@ DROP FUNCTION IF EXISTS fieldkit.fk_update_temporal_clusters(desired_source_id B
 DROP FUNCTION IF EXISTS fieldkit.fk_update_temporal_geometries(desired_source_id BIGINT);
 DROP FUNCTION IF EXISTS fieldkit.fk_update_source_summary(desired_source_id BIGINT);
 
+/*
+DROP TABLE fieldkit.sources_summaries;
+DROP TABLE fieldkit.sources_temporal_clusters;
+DROP TABLE fieldkit.sources_spatial_clusters;
+DROP TABLE fieldkit.sources_temporal_geometries;
+DROP TABLE fieldkit.notification;
+*/
+
 CREATE TABLE fieldkit.sources_summaries (
     source_id integer REFERENCES fieldkit.source (id) ON DELETE CASCADE NOT NULL,
     updated_at timestamp NOT NULL,
@@ -53,9 +61,8 @@ CREATE TABLE fieldkit.sources_spatial_clusters (
     start_time timestamp NOT NULL,
     end_time timestamp NOT NULL,
     envelope geometry NOT NULL,
+    circle geometry NOT NULL,
     centroid geometry(POINT, 4326) NOT NULL,
-    bounding_circle geometry NOT NULL,
-    bounding_envelope geometry NOT NULL,
     radius decimal NOT NULL,
     PRIMARY KEY (source_id, cluster_id)
 );
@@ -126,7 +133,7 @@ source AS (
 		MAX(d.timestamp) AS max_timestamp,
 		MAX(d.timestamp) - MIN(d.timestamp) AS min_max_diff,
 		d.location,
-    (SELECT bool_or(ST_DWithin(d.location::geography, spatial.bounding_envelope::geography, 50)) FROM fieldkit.fk_spatial_clusters(desired_source_id) spatial WHERE spatial.source_id = desired_source_id) AS in_spatial,
+    (SELECT bool_or(ST_DWithin(d.location::geography, spatial.envelope::geography, 50)) FROM fieldkit.fk_spatial_clusters(desired_source_id) spatial WHERE spatial.source_id = desired_source_id) AS in_spatial,
     COUNT(d.location) AS actual_size
 	FROM fieldkit.record d
   WHERE d.source_id IN (desired_source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
@@ -186,9 +193,8 @@ SELECT
   MIN(min_timestamp),
   MAX(max_timestamp),
   ST_Envelope(ST_Collect(f.location)) AS envelope,
+  ST_MinimumBoundingCircle(ST_Collect(f.location)) AS circle,
   ST_Centroid(ST_Collect(f.location))::geometry(POINT, 4326) AS centroid,
-  ST_MinimumBoundingCircle(ST_Collect(f.location)) AS bounding_circle,
-  ST_Envelope(ST_Collect(f.location)) AS bounding_envelope,
   SQRT(ST_Area(ST_MinimumBoundingCircle(ST_Collect(f.location))::geography) / pi())::numeric AS radius
 FROM fieldkit.fk_clustered_identical(desired_source_id) AS f
 GROUP BY spatial_cluster_id;
@@ -252,10 +258,11 @@ END
 ' LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION fieldkit.fk_update_source_summary(desired_source_id BIGINT)
-RETURNS SETOF integer
+RETURNS SETOF fieldkit.sources_summaries
 AS
 '
 BEGIN
+  RETURN QUERY
   INSERT INTO fieldkit.sources_summaries
   SELECT * FROM fieldkit.fk_source_summary(desired_source_id)
   ON CONFLICT (source_id) DO UPDATE SET
@@ -266,16 +273,18 @@ BEGIN
     end_time = excluded.end_time,
     envelope = excluded.envelope,
     centroid = excluded.centroid,
-    radius = excluded.radius;
+    radius = excluded.radius
+  RETURNING *;
 END
 ' LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION fieldkit.fk_update_spatial_clusters(desired_source_id BIGINT)
-RETURNS SETOF integer
+RETURNS SETOF fieldkit.sources_spatial_clusters
 AS
 '
 BEGIN
   DELETE FROM fieldkit.sources_spatial_clusters WHERE (source_id = desired_source_id);
+  RETURN QUERY
   INSERT INTO fieldkit.sources_spatial_clusters
   SELECT * FROM fieldkit.fk_spatial_clusters(desired_source_id)
   ON CONFLICT (source_id, cluster_id) DO UPDATE SET
@@ -284,17 +293,20 @@ BEGIN
     start_time = excluded.start_time,
     end_time = excluded.end_time,
     envelope = excluded.envelope,
+    circle = excluded.circle,
     centroid = excluded.centroid,
-    radius = excluded.radius;
+    radius = excluded.radius
+  RETURNING *;
 END
 ' LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION fieldkit.fk_update_temporal_clusters(desired_source_id BIGINT)
-RETURNS SETOF integer
+RETURNS SETOF fieldkit.sources_temporal_clusters
 AS
 '
 BEGIN
-  DELETE FROM fieldkit.sources_temporal_clusters WHERE (source_id = desired_source_id);
+  DELETE FROM fieldkit.sources_temporal_clusters c WHERE (c.source_id = desired_source_id);
+  RETURN QUERY
   INSERT INTO fieldkit.sources_temporal_clusters
   SELECT * FROM fieldkit.fk_temporal_clusters(desired_source_id)
   ON CONFLICT (source_id, cluster_id) DO UPDATE SET
@@ -304,21 +316,24 @@ BEGIN
     end_time = excluded.end_time,
     envelope = excluded.envelope,
     centroid = excluded.centroid,
-    radius = excluded.radius;
+    radius = excluded.radius
+  RETURNING *;
 END
 ' LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION fieldkit.fk_update_temporal_geometries(desired_source_id BIGINT)
-RETURNS SETOF integer
+RETURNS SETOF fieldkit.sources_temporal_geometries
 AS
 '
 BEGIN
   DELETE FROM fieldkit.sources_temporal_geometries WHERE (source_id = desired_source_id);
+  RETURN QUERY
   INSERT INTO fieldkit.sources_temporal_geometries
   SELECT * FROM fieldkit.fk_temporal_geometries(desired_source_id)
   ON CONFLICT (source_id, cluster_id) DO UPDATE SET
      updated_at = excluded.updated_at,
-     geometry = excluded.geometry;
+     geometry = excluded.geometry
+  RETURNING *;
 END
 ' LANGUAGE plpgsql;
 
