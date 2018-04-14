@@ -134,15 +134,16 @@ func (r *Repository) UpdateLocation(ctx context.Context, stream *Stream, l *Loca
 	return err
 }
 
-func (r *Repository) AddRecord(ctx context.Context, record *data.Record) error {
-	if _, err := r.db.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)
-			VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
-		`, record); err != nil {
-		return err
+func (r *Repository) AddRecord(ctx context.Context, record *data.Record) (int64, error) {
+	res, err := r.db.NamedExecContext(ctx, `
+		    INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)
+		    VALUES (:schema_id, :source_id, :team_id, :user_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data, :fixed, :visible)
+                    RETURNING id
+		    `, record)
+	if err != nil {
+		return 0, err
 	}
-
-	return nil
+	return res.LastInsertId()
 }
 
 func (r *Repository) LookupSchemas(ctx context.Context, id SchemaId) (ms []*MessageSchema, err error) {

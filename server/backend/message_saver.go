@@ -13,6 +13,7 @@ type FormattedMessageSaver struct {
 	Resolver      *ingestion.Resolver
 	RecordAdder   *ingestion.RecordAdder
 	SourceIDs     map[int64]bool
+	RecordIDs     map[int64]bool
 }
 
 func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
@@ -38,12 +39,13 @@ func (br *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm 
 		return err
 	}
 
-	err = br.RecordAdder.AddRecord(ctx, ds, pm)
+	record, err := br.RecordAdder.AddRecord(ctx, ds, pm)
 	if err != nil {
 		return err
 	}
 
 	br.SourceIDs[pm.Schema.Ids.DeviceID] = true
+	br.RecordIDs[record.ID] = true
 
 	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, fm.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
 

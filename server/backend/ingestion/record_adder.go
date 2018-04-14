@@ -7,11 +7,16 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type RecordChange struct {
+	ID        int64
+	Location  data.Location
+	Timestamp *time.Time
+}
+
 type SourceChange struct {
-	QueuedAt   time.Time
-	StartedAt  time.Time
-	FinishedAt time.Time
-	SourceID   int64
+	QueuedAt time.Time
+	SourceID int64
+	Records  []RecordChange
 }
 
 func NewSourceChange(sourceId int64) SourceChange {
@@ -35,7 +40,7 @@ func NewRecordAdder(repository *Repository) *RecordAdder {
 	}
 }
 
-func (da *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) error {
+func (ra *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (*data.Record, error) {
 	ids := pm.Schema.Ids
 	record := &data.Record{
 		SchemaID:  int32(ids.SchemaID),
@@ -50,15 +55,18 @@ func (da *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *Proc
 
 	record.SetData(pm.Fields)
 
-	if err := da.repository.AddRecord(ctx, record); err != nil {
-		return err
+	id, err := ra.repository.AddRecord(ctx, record)
+	if err != nil {
+		return nil, err
 	}
 
+	record.ID = id
+
 	if pm.LocationUpdated {
-		if err := da.repository.UpdateLocation(ctx, ds.Stream, pm.Location); err != nil {
-			return err
+		if err := ra.repository.UpdateLocation(ctx, ds.Stream, pm.Location); err != nil {
+			return nil, err
 		}
 	}
 
-	return nil
+	return record, nil
 }
