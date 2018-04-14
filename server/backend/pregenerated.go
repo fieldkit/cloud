@@ -23,10 +23,13 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating temporal tracks (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_temporal_clusters($1)", sourceId)
+	summaries := []*GeometryClusterSummary{}
+	err := p.db.SelectContext(ctx, &summaries, `SELECT source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_temporal_clusters($1)`, sourceId)
 	if err != nil {
 		return err
 	}
+
+	log.Printf("%v", summaries)
 
 	return err
 }
@@ -39,7 +42,8 @@ type ClusteredRow struct {
 func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating temporal geometries (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_temporal_geometries($1)", sourceId)
+	summaries := []*TemporalGeometry{}
+	err := p.db.SelectContext(ctx, &summaries, "SELECT source_id, cluster_id, updated_at, ST_AsBinary(geometry) AS geometry FROM fieldkit.fk_update_temporal_geometries($1)", sourceId)
 	if err != nil {
 		return err
 	}
@@ -50,10 +54,13 @@ func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) e
 func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating spatial clusters (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_spatial_clusters($1)", sourceId)
+	summaries := []*GeometryClusterSummary{}
+	err := p.db.SelectContext(ctx, &summaries, `SELECT source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_spatial_clusters($1)`, sourceId)
 	if err != nil {
 		return err
 	}
+
+	log.Printf("%v", summaries)
 
 	return err
 }
@@ -61,10 +68,13 @@ func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) erro
 func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating summaries (%v)...", sourceId)
 
-	_, err := p.db.ExecContext(ctx, "SELECT fieldkit.fk_update_source_summary($1)", sourceId)
+	summaries := []*FeatureSummary{}
+	err := p.db.SelectContext(ctx, &summaries, "SELECT source_id, updated_at, number_of_features, last_feature_id, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_source_summary($1)", sourceId)
 	if err != nil {
 		return err
 	}
+
+	log.Printf("%v", summaries)
 
 	return err
 }

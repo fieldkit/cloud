@@ -70,7 +70,7 @@ func SourceSummaryType(source *data.DeviceSource, spatial, temporal []*backend.G
 	}
 }
 
-func ClusterGeometryType(source *backend.GeometryClusterSummary) *app.ClusterGeometrySummary {
+func ClusterGeometryType(source *backend.TemporalGeometry) *app.ClusterGeometrySummary {
 	return &app.ClusterGeometrySummary{
 		ID:       source.ClusterID,
 		SourceID: source.SourceID,
@@ -78,7 +78,7 @@ func ClusterGeometryType(source *backend.GeometryClusterSummary) *app.ClusterGeo
 	}
 }
 
-func ClusterGeometriesType(source []*backend.GeometryClusterSummary) []*app.ClusterGeometrySummary {
+func ClusterGeometriesType(source []*backend.TemporalGeometry) []*app.ClusterGeometrySummary {
 	summaries := make([]*app.ClusterGeometrySummary, len(source))
 	for i, summary := range source {
 		summaries[i] = ClusterGeometryType(summary)
@@ -186,7 +186,7 @@ func (c *SourceController) SummaryByID(ctx *app.SummaryByIDSourceContext) error 
 }
 
 func (c *SourceController) TemporalClusterGeometryByID(ctx *app.TemporalClusterGeometryByIDSourceContext) error {
-	temporal, err := c.options.Backend.TemporalClustersBySourceID(ctx, ctx.SourceID)
+	temporal, err := c.options.Backend.TemporalGeometriesBySourceID(ctx, ctx.SourceID)
 	if err != nil {
 		return err
 	}
