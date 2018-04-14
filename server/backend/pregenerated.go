@@ -24,7 +24,10 @@ func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) err
 	log.Printf("Generating temporal tracks (%v)...", sourceId)
 
 	summaries := []*GeometryClusterSummary{}
-	err := p.db.SelectContext(ctx, &summaries, `SELECT source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_temporal_clusters($1)`, sourceId)
+	err := p.db.SelectContext(ctx, &summaries, `
+	      SELECT
+                source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius
+              FROM fieldkit.fk_update_temporal_clusters($1)`, sourceId)
 	if err != nil {
 		return err
 	}
@@ -43,7 +46,10 @@ func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) e
 	log.Printf("Generating temporal geometries (%v)...", sourceId)
 
 	summaries := []*TemporalGeometry{}
-	err := p.db.SelectContext(ctx, &summaries, "SELECT source_id, cluster_id, updated_at, ST_AsBinary(geometry) AS geometry FROM fieldkit.fk_update_temporal_geometries($1)", sourceId)
+	err := p.db.SelectContext(ctx, &summaries, `
+               SELECT
+                 source_id, cluster_id, updated_at, ST_AsBinary(geometry) AS geometry
+               FROM fieldkit.fk_update_temporal_geometries($1)`, sourceId)
 	if err != nil {
 		return err
 	}
@@ -55,7 +61,10 @@ func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) erro
 	log.Printf("Generating spatial clusters (%v)...", sourceId)
 
 	summaries := []*GeometryClusterSummary{}
-	err := p.db.SelectContext(ctx, &summaries, `SELECT source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_spatial_clusters($1)`, sourceId)
+	err := p.db.SelectContext(ctx, &summaries, `
+               SELECT
+                 source_id, cluster_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius
+               FROM fieldkit.fk_update_spatial_clusters($1)`, sourceId)
 	if err != nil {
 		return err
 	}
@@ -69,7 +78,10 @@ func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) error {
 	log.Printf("Generating summaries (%v)...", sourceId)
 
 	summaries := []*FeatureSummary{}
-	err := p.db.SelectContext(ctx, &summaries, "SELECT source_id, updated_at, number_of_features, last_feature_id, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius FROM fieldkit.fk_update_source_summary($1)", sourceId)
+	err := p.db.SelectContext(ctx, &summaries, `
+               SELECT
+                 source_id, updated_at, number_of_features, last_feature_id, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius
+               FROM fieldkit.fk_update_source_summary($1)`, sourceId)
 	if err != nil {
 		return err
 	}
