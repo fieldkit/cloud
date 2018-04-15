@@ -12,15 +12,14 @@ type FormattedMessageSaver struct {
 	Repository    *ingestion.Repository
 	Resolver      *ingestion.Resolver
 	RecordAdder   *ingestion.RecordAdder
-	SourceIDs     map[int64]bool
-	RecordIDs     map[int64]bool
+	Changes       map[int64]*ingestion.RecordChange
 }
 
 func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 	r := ingestion.NewRepository(b.db)
 
 	return &FormattedMessageSaver{
-		SourceIDs:     make(map[int64]bool),
+		Changes:       make(map[int64]*ingestion.RecordChange),
 		Repository:    r,
 		SchemaApplier: ingestion.NewSchemaApplier(),
 		Resolver:      ingestion.NewResolver(r),
@@ -39,21 +38,27 @@ func (br *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm 
 		return err
 	}
 
-	record, err := br.RecordAdder.AddRecord(ctx, ds, pm)
+	change, err := br.RecordAdder.AddRecord(ctx, ds, pm)
 	if err != nil {
 		return err
 	}
 
-	br.SourceIDs[pm.Schema.Ids.DeviceID] = true
-	br.RecordIDs[record.ID] = true
+	br.Changes[change.ID] = change
 
 	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, fm.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
 
 	return nil
 }
 
-func (br *FormattedMessageSaver) EmitChanges(sourceChanges ingestion.SourceChangesPublisher) {
-	for id, _ := range br.SourceIDs {
-		sourceChanges.SourceChanged(ingestion.NewSourceChange(id))
+func (br *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges ingestion.SourceChangesPublisher) {
+	sources := make(map[int64][]*ingestion.RecordChange)
+	for _, change := range br.Changes {
+		if sources[change.SourceID] == nil {
+			sources[change.SourceID] = make([]*ingestion.RecordChange, 0)
+		}
+		sources[change.SourceID] = append(sources[change.SourceID], change)
+	}
+	for id, changes := range sources {
+		sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(id, changes))
 	}
 }

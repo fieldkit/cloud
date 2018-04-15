@@ -30,6 +30,7 @@ import (
 	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
@@ -111,26 +112,30 @@ func main() {
 		panic(err)
 	}
 
-	background := backend.NewNaiveBackgroundJobs(be)
-	if err := background.Start(); err != nil {
-		panic(err)
-	}
-
 	jq, err := backend.NewPqJobQueue(config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
+	sourceModifiedHandler := &backend.SourceModifiedHandler{
+		Backend:   be,
+		Publisher: jq,
+	}
+	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
 	err = jq.Start()
 	if err != nil {
 		panic(err)
 	}
+
+	publisher := backend.NewJobQueuePublisher(jq)
+
+	sourceModifiedHandler.QueueChangesForAllSources(publisher)
 
 	archiver, err := createArchiver(awsSession, config)
 	if err != nil {
 		panic(err)
 	}
 
-	ingester, err := backend.NewStreamIngester(be, archiver, background)
+	ingester, err := backend.NewStreamIngester(be, archiver, publisher)
 	if err != nil {
 		panic(err)
 	}

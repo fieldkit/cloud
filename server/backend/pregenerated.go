@@ -79,28 +79,46 @@ func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries
 	return
 }
 
-func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) error {
-	return p.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		_, err := p.Summaries(txCtx, sourceId)
+func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) (*Pregenerated, error) {
+	pregenerated := &Pregenerated{}
+
+	if err := p.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		summaries, err := p.Summaries(txCtx, sourceId)
 		if err != nil {
 			return err
 		}
 
-		_, err = p.SpatialClusters(txCtx, sourceId)
+		spatial, err := p.SpatialClusters(txCtx, sourceId)
 		if err != nil {
 			return err
 		}
 
-		_, err = p.TemporalClusters(txCtx, sourceId)
+		temporal, err := p.TemporalClusters(txCtx, sourceId)
 		if err != nil {
 			return err
 		}
 
-		_, err = p.TemporalGeometries(txCtx, sourceId)
+		temporalGeometries, err := p.TemporalGeometries(txCtx, sourceId)
 		if err != nil {
 			return err
 		}
+
+		pregenerated.Summaries = summaries
+		pregenerated.Spatial = spatial
+		pregenerated.Temporal = temporal
+		pregenerated.TemporalGeometries = temporalGeometries
 
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
+
+	return pregenerated, nil
+}
+
+type Pregenerated struct {
+	Summaries          []*FeatureSummary
+	Spatial            []*GeometryClusterSummary
+	Temporal           []*GeometryClusterSummary
+	TemporalGeometries []*TemporalGeometry
 }

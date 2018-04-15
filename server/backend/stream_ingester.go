@@ -76,7 +76,7 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 			return nil
 		}
 
-		saver.EmitChanges(si.sourceChanges)
+		saver.EmitChanges(txCtx, si.sourceChanges)
 
 		return nil
 	})

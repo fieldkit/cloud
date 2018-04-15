@@ -9,25 +9,43 @@ import (
 
 type RecordChange struct {
 	ID        int64
-	Location  data.Location
-	Timestamp *time.Time
+	SourceID  int64
+	Timestamp time.Time
+	Location  *data.Location
 }
 
 type SourceChange struct {
 	QueuedAt time.Time
 	SourceID int64
-	Records  []RecordChange
+	Records  []*RecordChange
 }
 
-func NewSourceChange(sourceId int64) SourceChange {
+func NewSourceChange(sourceId int64, records []*RecordChange) SourceChange {
 	return SourceChange{
 		SourceID: sourceId,
+		Records:  records,
 		QueuedAt: time.Now(),
 	}
 }
 
 type SourceChangesPublisher interface {
-	SourceChanged(sourceChange SourceChange)
+	SourceChanged(ctx context.Context, sourceChange SourceChange)
+}
+
+type SourceChangesBroadcaster struct {
+	Publishers []SourceChangesPublisher
+}
+
+func NewSourceChangesBroadcaster(publishers []SourceChangesPublisher) *SourceChangesBroadcaster {
+	return &SourceChangesBroadcaster{
+		Publishers: publishers,
+	}
+}
+
+func (b *SourceChangesBroadcaster) SourceChanged(ctx context.Context, sourceChange SourceChange) {
+	for _, p := range b.Publishers {
+		p.SourceChanged(ctx, sourceChange)
+	}
 }
 
 type RecordAdder struct {
@@ -40,7 +58,7 @@ func NewRecordAdder(repository *Repository) *RecordAdder {
 	}
 }
 
-func (ra *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (*data.Record, error) {
+func (ra *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *ProcessedMessage) (*RecordChange, error) {
 	ids := pm.Schema.Ids
 	record := &data.Record{
 		SchemaID:  int32(ids.SchemaID),
@@ -60,13 +78,18 @@ func (ra *RecordAdder) AddRecord(ctx context.Context, ds *DeviceStream, pm *Proc
 		return nil, err
 	}
 
-	record.ID = id
-
 	if pm.LocationUpdated {
 		if err := ra.repository.UpdateLocation(ctx, ds.Stream, pm.Location); err != nil {
 			return nil, err
 		}
 	}
 
-	return record, nil
+	change := &RecordChange{
+		ID:        id,
+		SourceID:  ids.DeviceID,
+		Location:  record.Location,
+		Timestamp: record.Timestamp,
+	}
+
+	return change, nil
 }

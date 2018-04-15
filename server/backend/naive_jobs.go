@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"github.com/lib/pq"
@@ -13,10 +15,25 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
+type MessageHandler interface {
+	Handle(ctx context.Context, message interface{}) error
+}
+
+type MessagePublisher interface {
+	Publish(ctx context.Context, message interface{}) error
+}
+
 type PgJobQueue struct {
 	db       *sqlxcache.DB
 	name     string
 	listener *pq.Listener
+	handlers map[reflect.Type]MessageHandler
+}
+
+type TransportMessage struct {
+	Package string
+	Type    string
+	Body    []byte
 }
 
 func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
@@ -34,11 +51,16 @@ func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
 	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)
 
 	return &PgJobQueue{
+		handlers: make(map[reflect.Type]MessageHandler),
 		name:     name,
 		db:       db,
 		listener: listener,
 	}, nil
+}
 
+func (jq *PgJobQueue) Register(messageExample interface{}, handler MessageHandler) {
+	messageType := reflect.TypeOf(messageExample)
+	jq.handlers[messageType] = handler
 }
 
 func (jq *PgJobQueue) Start() error {
@@ -55,27 +77,80 @@ func (jq *PgJobQueue) Start() error {
 }
 
 func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
-	bytes, err := json.Marshal(message)
+	body, err := json.Marshal(message)
 	if err != nil {
 		return err
 	}
+
+	messageType := reflect.TypeOf(message)
+	if messageType.Kind() == reflect.Ptr {
+		messageType = messageType.Elem()
+	}
+
+	transport := TransportMessage{
+		Package: messageType.PkgPath(),
+		Type:    messageType.Name(),
+		Body:    body,
+	}
+
+	bytes, err := json.Marshal(transport)
+	if err != nil {
+		return err
+	}
+
 	_, err = jq.db.ExecContext(ctx, `SELECT pg_notify($1, $2)`, jq.name, bytes)
 	return err
 }
 
+func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) error {
+	for messageType, handler := range jq.handlers {
+		if messageType.Name() == tm.Type && messageType.PkgPath() == tm.Package {
+
+			message := reflect.New(messageType).Interface()
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return err
+			}
+
+			if err := handler.Handle(ctx, message); err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+	return fmt.Errorf("No handlers for: %v.%v", tm.Package, tm.Type)
+}
+
 func (jq *PgJobQueue) waitForNotification() {
-	log.Printf("Waiting!")
+	ctx := context.Background()
+
 	for {
 		select {
 		case n := <-jq.listener.Notify:
 			log.Printf("Received data from channel [%v]:", n.Channel)
-			var prettyJSON bytes.Buffer
-			err := json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
+
+			if true {
+				var prettyJSON bytes.Buffer
+				err := json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
+				if err != nil {
+					log.Printf("Error processing JSON: %v", err)
+					break
+				}
+				log.Printf(string(prettyJSON.Bytes()))
+			}
+
+			transport := &TransportMessage{}
+			err := json.Unmarshal([]byte(n.Extra), transport)
 			if err != nil {
 				log.Printf("Error processing JSON: %v", err)
 				break
 			}
-			log.Printf(string(prettyJSON.Bytes()))
+
+			if err := jq.dispatch(ctx, transport); err != nil {
+				log.Printf("Error dispatching: %v", err)
+				break
+			}
+
 			break
 		case <-time.After(90 * time.Second):
 			log.Printf("Received no events for 90 seconds, checking connection")
@@ -87,72 +162,48 @@ func (jq *PgJobQueue) waitForNotification() {
 	}
 }
 
-type NaiveBackgroundJobs struct {
-	be            *Backend
-	sourceChanges chan ingestion.SourceChange
+type JobQueuePublisher struct {
+	JobQueue *PgJobQueue
 }
 
-func NewNaiveBackgroundJobs(be *Backend) *NaiveBackgroundJobs {
-	return &NaiveBackgroundJobs{
-		be:            be,
-		sourceChanges: make(chan ingestion.SourceChange, 100),
+func NewJobQueuePublisher(jobQueue *PgJobQueue) *JobQueuePublisher {
+	return &JobQueuePublisher{
+		JobQueue: jobQueue,
 	}
 }
 
-func (j *NaiveBackgroundJobs) SourceChanged(sourceChange ingestion.SourceChange) {
-	j.sourceChanges <- sourceChange
+func (p *JobQueuePublisher) SourceChanged(ctx context.Context, sourceChange ingestion.SourceChange) {
+	p.JobQueue.Publish(ctx, sourceChange)
 }
 
-func (j *NaiveBackgroundJobs) Start() error {
-	delayed := make(chan ingestion.SourceChange, 100)
+type SourceModifiedHandler struct {
+	Backend   *Backend
+	Publisher MessagePublisher
+}
 
-	go func() {
-		log.Printf("Started background jobs...")
+func (h *SourceModifiedHandler) Handle(ctx context.Context, message interface{}) error {
+	m := message.(*ingestion.SourceChange)
 
-		tick := time.Tick(1000 * time.Millisecond)
+	generator := NewPregenerator(h.Backend)
+	generated, err := generator.Pregenerate(ctx, m.SourceID)
+	if err != nil {
+		return err
+	}
 
-		buffer := make(map[int64]ingestion.SourceChange)
+	h.Publisher.Publish(ctx, generated)
 
-		for {
-			select {
-			case <-tick:
-				for _, value := range buffer {
-					delayed <- value
-				}
-				buffer = make(map[int64]ingestion.SourceChange)
-			case c := <-j.sourceChanges:
-				buffer[c.SourceID] = c
-			}
+	return nil
+}
 
-		}
-	}()
-
-	go func() {
-		for {
-			select {
-			case c := <-delayed:
-				startedAt := time.Now()
-				log.Printf("Processing %v...", c.SourceID)
-				generator := NewPregenerator(j.be)
-				ctx := context.Background()
-				err := generator.Pregenerate(ctx, c.SourceID)
-				if err != nil {
-					log.Printf("Error: %v", err)
-				}
-				finishedAt := time.Now()
-				log.Printf("Done %v in %v", c.SourceID, finishedAt.Sub(startedAt))
-			}
-		}
-	}()
-
+func (h *SourceModifiedHandler) QueueChangesForAllSources(publisher ingestion.SourceChangesPublisher) error {
 	ctx := context.Background()
-	devices, err := j.be.ListAllDeviceSources(ctx)
+	devices, err := h.Backend.ListAllDeviceSources(ctx)
 	if err != nil {
 		return err
 	}
 
 	for _, device := range devices {
-		delayed <- ingestion.NewSourceChange(int64(device.ID))
+		publisher.SourceChanged(ctx, ingestion.NewSourceChange(int64(device.ID), make([]*ingestion.RecordChange, 0)))
 	}
 
 	return nil
