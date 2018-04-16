@@ -176,6 +176,12 @@
 			"revisionTime": "2017-11-09T22:46:40Z"
 		},
 		{
+			"checksumSHA1": "CSPbwbyzqA6sfORicn4HFtIhF/c=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "8991bc29aa16c548c550c7ff78260e27b9ab7c73",
+			"revisionTime": "2018-02-21T22:46:20Z"
+		},
+		{
 			"checksumSHA1": "mO6yxa23lXY/HZ5nLTr1XgPAuXU=",
 			"path": "github.com/dghubble/go-twitter/twitter",
 			"revision": "fc93bb35701bb85903d17daa80a21a824b9c592f",
@@ -216,6 +222,84 @@
 			"path": "github.com/dimfeld/httptreemux",
 			"revision": "86f7c217d9043ebc6adfd8e2ed04a0bb1e1db651",
 			"revisionTime": "2017-02-26T06:22:14Z"
+		},
+		{
+			"checksumSHA1": "yH+P1yJAERe2k2c8DqlU+LeJIyI=",
+			"path": "github.com/fieldkit/cloud/server/api",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "jirXh+GaZos3cQ3isydR53pL+yU=",
+			"path": "github.com/fieldkit/cloud/server/api/app",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "6Y8CXRCdHu6Dng7G2P8U90hoGTw=",
+			"path": "github.com/fieldkit/cloud/server/api/client",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "gPIq8h7/OfOj3OLvWQLVuNz2USU=",
+			"path": "github.com/fieldkit/cloud/server/api/design",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "+hpduGcIqOVCKyASnpeG7LbiQ9o=",
+			"path": "github.com/fieldkit/cloud/server/api/tool",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "j+l4IN88iIAz903Cn8TbbbH/x9g=",
+			"path": "github.com/fieldkit/cloud/server/api/tool/cli",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "280oG5aVI57bs/FU979C0L67KDI=",
+			"path": "github.com/fieldkit/cloud/server/backend",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "iMCiw3BNE5B4iZNptc8/kOVQ23Y=",
+			"path": "github.com/fieldkit/cloud/server/backend/ingestion",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "5sArwvSy0PZMFcTBdhIPKevdRyM=",
+			"path": "github.com/fieldkit/cloud/server/data",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "7eDYWwPyKmOj8TS5/XXaEEGzw94=",
+			"path": "github.com/fieldkit/cloud/server/data/jsondocument",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "OATEaQO32euZWwahN6PUoyVCOeo=",
+			"path": "github.com/fieldkit/cloud/server/email",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "MBtm5xlmmKHW5UMfwotZK2ygCgE=",
+			"path": "github.com/fieldkit/cloud/server/social",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
+		},
+		{
+			"checksumSHA1": "mBmvKaFckWHTxLLdFJk5yWgDnis=",
+			"path": "github.com/fieldkit/cloud/server/social/twitter",
+			"revision": "62152ebe8d7dd5d7d31d10b73c2819f4ae6b5985",
+			"revisionTime": "2018-04-14T19:20:02Z"
 		},
 		{
 			"checksumSHA1": "akSHu/+wJXMNIbpLeP2NX2Hx0Jw=",
