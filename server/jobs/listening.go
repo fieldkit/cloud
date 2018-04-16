@@ -1,4 +1,4 @@
-package backend
+package jobs
 
 import (
 	"bytes"
@@ -12,7 +12,6 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/conservify/sqlxcache"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
 type MessageHandler interface {
@@ -160,51 +159,4 @@ func (jq *PgJobQueue) waitForNotification() {
 			break
 		}
 	}
-}
-
-type JobQueuePublisher struct {
-	JobQueue *PgJobQueue
-}
-
-func NewJobQueuePublisher(jobQueue *PgJobQueue) *JobQueuePublisher {
-	return &JobQueuePublisher{
-		JobQueue: jobQueue,
-	}
-}
-
-func (p *JobQueuePublisher) SourceChanged(ctx context.Context, sourceChange ingestion.SourceChange) {
-	p.JobQueue.Publish(ctx, sourceChange)
-}
-
-type SourceModifiedHandler struct {
-	Backend   *Backend
-	Publisher MessagePublisher
-}
-
-func (h *SourceModifiedHandler) Handle(ctx context.Context, message interface{}) error {
-	m := message.(*ingestion.SourceChange)
-
-	generator := NewPregenerator(h.Backend)
-	generated, err := generator.Pregenerate(ctx, m.SourceID)
-	if err != nil {
-		return err
-	}
-
-	h.Publisher.Publish(ctx, generated)
-
-	return nil
-}
-
-func (h *SourceModifiedHandler) QueueChangesForAllSources(publisher ingestion.SourceChangesPublisher) error {
-	ctx := context.Background()
-	devices, err := h.Backend.ListAllDeviceSources(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, device := range devices {
-		publisher.SourceChanged(ctx, ingestion.NewSourceChange(int64(device.ID), make([]*ingestion.RecordChange, 0)))
-	}
-
-	return nil
 }

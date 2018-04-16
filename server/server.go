@@ -32,6 +32,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
 )
@@ -112,7 +113,7 @@ func main() {
 		panic(err)
 	}
 
-	jq, err := backend.NewPqJobQueue(config.PostgresURL, "messages")
+	jq, err := jobs.NewPqJobQueue(config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +121,9 @@ func main() {
 		Backend:   be,
 		Publisher: jq,
 	}
+
 	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
+
 	err = jq.Start()
 	if err != nil {
 		panic(err)
