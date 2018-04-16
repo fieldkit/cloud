@@ -63,6 +63,10 @@ func (l *Location) String() string {
 	return l.point.String()
 }
 
+func (l *Location) Distance(o *Location) float64 {
+	return l.point.GeoDistanceFrom(o.point)
+}
+
 type RecordAnalysis struct {
 	RecordID         int64 `db:"record_id"`
 	ManuallyExcluded bool  `db:"manually_excluded"`

@@ -397,6 +397,23 @@ func (b *Backend) ListSchemasByID(ctx context.Context, projectID int32) ([]*data
 	return schemas, nil
 }
 
+type FindRecordsOpt struct {
+	StartTime time.Time
+	EndTime   time.Time
+}
+
+func (b *Backend) FindRecords(ctx context.Context, opts *FindRecordsOpt) ([]*data.Record, error) {
+	records := []*data.Record{}
+	if err := b.db.SelectContext(ctx, &records, `
+		SELECT id, schema_id, source_id, team_id, user_id, timestamp, ST_AsBinary(location) AS location, data, fixed, visible FROM fieldkit.record
+		WHERE (EXTRACT(epoch FROM timestamp) > $1) AND (EXTRACT(epoch FROM timestamp) < $2)
+		`, opts.StartTime.Unix(), opts.EndTime.Unix()); err != nil {
+		return nil, err
+	}
+
+	return records, nil
+}
+
 func (b *Backend) AddRecord(ctx context.Context, record *data.Record) error {
 	_, err := b.db.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.record (schema_id, source_id, team_id, user_id, timestamp, location, data, fixed, visible)

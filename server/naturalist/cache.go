@@ -14,6 +14,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/jobs"
 )
 
 type CachedObservation struct {
@@ -21,23 +22,28 @@ type CachedObservation struct {
 	UpdatedAt time.Time      `db:"updated_at"`
 	Timestamp time.Time      `db:"timestamp"`
 	Location  *data.Location `db:"location"`
-	Data      types.JSONText `db:"data"`
 }
 
-func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *CachedObservation, err error) {
-	co = &CachedObservation{
-		ID:        o.Id,
-		UpdatedAt: time.Now(),
-		Timestamp: o.TimeObservedAtUtc,
-		Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
-	}
+type FullCachedObservation struct {
+	CachedObservation
+	Data types.JSONText `db:"data"`
+}
 
+func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *FullCachedObservation, err error) {
 	jsonData, err := json.Marshal(o)
 	if err != nil {
 		return nil, err
 	}
 
-	co.Data = jsonData
+	co = &FullCachedObservation{
+		CachedObservation: CachedObservation{
+			ID:        o.Id,
+			UpdatedAt: time.Now(),
+			Timestamp: o.TimeObservedAtUtc,
+			Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
+		},
+		Data: jsonData,
+	}
 
 	return
 }
@@ -49,9 +55,10 @@ func (co *CachedObservation) Valid() bool {
 type INaturalistCache struct {
 	Database         *sqlxcache.DB
 	NaturalistClient *gonaturalist.Client
+	Queue            *jobs.PgJobQueue
 }
 
-func NewINaturalistCache(config *INaturalistConfig, url string) (in *INaturalistCache, err error) {
+func NewINaturalistCache(config *INaturalistConfig, url string, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
 	var authenticator = gonaturalist.NewAuthenticatorAtCustomRoot(config.ApplicationId, config.Secret, config.RedirectUrl, config.RootUrl)
 
 	c := authenticator.NewClientWithAccessToken(iNaturalistConfig.AccessToken)
@@ -64,19 +71,20 @@ func NewINaturalistCache(config *INaturalistConfig, url string) (in *INaturalist
 	in = &INaturalistCache{
 		Database:         db,
 		NaturalistClient: c,
+		Queue:            queue,
 	}
 
 	return
 }
 
-func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonaturalist.SimpleObservation) (bool, error) {
+func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonaturalist.SimpleObservation) error {
 	co, err := NewCachedObservation(o)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if !co.Valid() {
-		return false, nil
+		return nil
 	}
 
 	_, err = in.Database.NamedExecContext(ctx, `
@@ -85,36 +93,12 @@ func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonat
 		ON CONFLICT (id)
 		DO UPDATE SET updated_at = excluded.updated_at, timestamp = excluded.timestamp, location = excluded.location, data = excluded.data
 		`, co)
+	if err != nil {
+		return err
+	}
 
-	return true, err
-}
-
-func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *gonaturalist.GetObservationsOpt) error {
-	perPage := 100
-	page := 0
-
-	for {
-		options.Page = &page
-		options.PerPage = &perPage
-
-		log.Printf("Refresh(%v)", spew.Sdump("%v", options))
-
-		observations, err := in.NaturalistClient.GetObservations(options)
-		if err != nil {
-			return err
-		}
-
-		if len(observations.Observations) == 0 {
-			break
-		}
-
-		for _, o := range observations.Observations {
-			if _, err := in.AddOrUpdateObservation(ctx, o); err != nil {
-				return err
-			}
-		}
-
-		page += 1
+	if err := in.Queue.Publish(ctx, co.CachedObservation); err != nil {
+		return err
 	}
 
 	return nil
@@ -142,4 +126,39 @@ func (in *INaturalistCache) RefreshObservedOn(ctx context.Context, on time.Time)
 	}
 
 	return in.refreshUntilEmptyPage(ctx, options)
+}
+
+func (in *INaturalistCache) getLastUpdated() (time.Time, error) {
+	return time.Time{}, nil
+}
+
+func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *gonaturalist.GetObservationsOpt) error {
+	perPage := 100
+	page := 0
+
+	for {
+		options.Page = &page
+		options.PerPage = &perPage
+
+		log.Printf("Refresh(%v)", spew.Sdump("%v", options))
+
+		observations, err := in.NaturalistClient.GetObservations(options)
+		if err != nil {
+			return err
+		}
+
+		if len(observations.Observations) == 0 {
+			break
+		}
+
+		for _, o := range observations.Observations {
+			if err := in.AddOrUpdateObservation(ctx, o); err != nil {
+				return err
+			}
+		}
+
+		page += 1
+	}
+
+	return nil
 }

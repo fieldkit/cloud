@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+
+	"github.com/fieldkit/cloud/server/jobs"
 )
 
 type Config struct {
@@ -38,9 +40,21 @@ func main() {
 
 	flag.Parse()
 
-	cache, err := NewINaturalistCache(&iNaturalistConfigProduction, config.PostgresURL)
+	jq, err := jobs.NewPqJobQueue(config.PostgresURL, "inaturalist_observations")
 	if err != nil {
-		log.Fatalf("%v", err)
+		panic(err)
+	}
+
+	nc, err := NewINaturalistCorrelator(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	jq.Register(CachedObservation{}, nc)
+
+	cache, err := NewINaturalistCache(&iNaturalistConfigProduction, config.PostgresURL, jq)
+	if err != nil {
+		panic(err)
 	}
 
 	if config.RefreshRecentlyObserved {
@@ -52,16 +66,15 @@ func main() {
 
 			day = day.Add(-24 * time.Hour)
 		}
-	}
-
-	if config.RefreshRecentlyUpdated {
+	} else if config.RefreshRecentlyUpdated {
 		since := time.Now().Add(-1 * time.Hour)
 		if err := cache.RefreshRecentlyUpdated(context.Background(), since); err != nil {
 			log.Fatalf("%v", err)
 		}
-	}
-
-	if config.Listen {
+	} else if config.Listen {
+		for {
+			time.Sleep(1 * time.Second)
+		}
 
 	}
 }
