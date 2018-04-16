@@ -57,6 +57,10 @@ func main() {
 		panic(err)
 	}
 
+	if config.Listen {
+		jq.Listen(5)
+	}
+
 	if config.RefreshRecentlyObserved {
 		day := time.Now()
 		for i := 0; i < 7; i += 1 {

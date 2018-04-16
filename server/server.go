@@ -125,7 +125,7 @@ func main() {
 
 	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
 
-	err = jq.Start()
+	err = jq.Listen(1)
 	if err != nil {
 		panic(err)
 	}

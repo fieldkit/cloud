@@ -43,12 +43,14 @@ func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
 
 	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)
 
-	return &PgJobQueue{
+	jq := &PgJobQueue{
 		handlers: make(map[reflect.Type]MessageHandler),
 		name:     name,
 		db:       db,
 		listener: listener,
-	}, nil
+	}
+
+	return jq, nil
 }
 
 func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
