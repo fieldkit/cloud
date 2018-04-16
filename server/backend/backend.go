@@ -18,6 +18,10 @@ type Backend struct {
 	url string
 }
 
+func OpenDatabase(url string) (*sqlxcache.DB, error) {
+	return sqlxcache.Open("postgres", url)
+}
+
 func New(url string) (*Backend, error) {
 	db, err := sqlxcache.Open("postgres", url)
 	if err != nil {

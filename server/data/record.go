@@ -24,6 +24,10 @@ func NewLocation(coordinates []float64) *Location {
 	}
 }
 
+func (l *Location) IsZero() bool {
+	return l.point.Lng() == 0 && l.point.Lat() == 0
+}
+
 func (l *Location) Coordinates() []float64 {
 	return []float64{l.point.Lng(), l.point.Lat()}
 }
