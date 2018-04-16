@@ -12,8 +12,9 @@ import (
 type Config struct {
 	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 
-	RefreshRecentlyAdded bool
-	Refresh              bool
+	RefreshRecentlyUpdated  bool
+	RefreshRecentlyObserved bool
+	Listen                  bool
 }
 
 type INaturalistConfig struct {
@@ -27,8 +28,9 @@ type INaturalistConfig struct {
 func main() {
 	config := Config{}
 
-	flag.BoolVar(&config.RefreshRecentlyAdded, "refresh-recently-added", false, "refresh observations cache")
-	flag.BoolVar(&config.Refresh, "refresh", false, "refresh observations cache")
+	flag.BoolVar(&config.RefreshRecentlyUpdated, "refresh-recently-updated", false, "refresh observations cache")
+	flag.BoolVar(&config.RefreshRecentlyObserved, "refresh-recently-observed", false, "refresh observations cache")
+	flag.BoolVar(&config.Listen, "listen", false, "listen for observations to correlate")
 
 	if err := envconfig.Process("fieldkit", &config); err != nil {
 		panic(err)
@@ -41,7 +43,7 @@ func main() {
 		log.Fatalf("%v", err)
 	}
 
-	if config.Refresh {
+	if config.RefreshRecentlyObserved {
 		day := time.Now()
 		for i := 0; i < 7; i += 1 {
 			if err := cache.RefreshObservedOn(context.Background(), day); err != nil {
@@ -52,10 +54,14 @@ func main() {
 		}
 	}
 
-	if config.RefreshRecentlyAdded {
+	if config.RefreshRecentlyUpdated {
 		since := time.Now().Add(-1 * time.Hour)
-		if err := cache.RefreshRecentlyAdded(context.Background(), since); err != nil {
+		if err := cache.RefreshRecentlyUpdated(context.Background(), since); err != nil {
 			log.Fatalf("%v", err)
 		}
+	}
+
+	if config.Listen {
+
 	}
 }

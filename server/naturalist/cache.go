@@ -16,6 +16,36 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type CachedObservation struct {
+	ID        int64          `db:"id,omitempty"`
+	UpdatedAt time.Time      `db:"updated_at"`
+	Timestamp time.Time      `db:"timestamp"`
+	Location  *data.Location `db:"location"`
+	Data      types.JSONText `db:"data"`
+}
+
+func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *CachedObservation, err error) {
+	co = &CachedObservation{
+		ID:        o.Id,
+		UpdatedAt: time.Now(),
+		Timestamp: o.TimeObservedAtUtc,
+		Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
+	}
+
+	jsonData, err := json.Marshal(o)
+	if err != nil {
+		return nil, err
+	}
+
+	co.Data = jsonData
+
+	return
+}
+
+func (co *CachedObservation) Valid() bool {
+	return !co.Timestamp.IsZero() && !co.Location.IsZero()
+}
+
 type INaturalistCache struct {
 	Database         *sqlxcache.DB
 	NaturalistClient *gonaturalist.Client
@@ -39,43 +69,17 @@ func NewINaturalistCache(config *INaturalistConfig, url string) (in *INaturalist
 	return
 }
 
-type CachedObservation struct {
-	ID        int64          `db:"id,omitempty"`
-	UpdatedAt time.Time      `db:"updated_at"`
-	Timestamp time.Time      `db:"timestamp"`
-	Location  *data.Location `db:"location"`
-	Data      types.JSONText `db:"data"`
-}
-
-func (co *CachedObservation) Valid() bool {
-	return !co.Timestamp.IsZero() && !co.Location.IsZero()
-}
-
-func (co *CachedObservation) SetData(data interface{}) error {
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-
-	co.Data = jsonData
-	return nil
-}
-
 func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonaturalist.SimpleObservation) (bool, error) {
-	co := &CachedObservation{
-		ID:        o.Id,
-		UpdatedAt: time.Now(),
-		Timestamp: o.TimeObservedAtUtc,
-		Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
+	co, err := NewCachedObservation(o)
+	if err != nil {
+		return false, err
 	}
 
 	if !co.Valid() {
 		return false, nil
 	}
 
-	co.SetData(o)
-
-	_, err := in.Database.NamedExecContext(ctx, `
+	_, err = in.Database.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.inaturalist_observations (id, updated_at, timestamp, location, data)
 		VALUES (:id, :updated_at, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
 		ON CONFLICT (id)
@@ -93,7 +97,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Printf("Refresh(%v)", page)
+		log.Printf("Refresh(%v)", spew.Sdump("%v", options))
 
 		observations, err := in.NaturalistClient.GetObservations(options)
 		if err != nil {
@@ -116,13 +120,13 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 	return nil
 }
 
-func (in *INaturalistCache) RefreshRecentlyAdded(ctx context.Context, updatedSince time.Time) error {
+func (in *INaturalistCache) RefreshRecentlyUpdated(ctx context.Context, updatedSince time.Time) error {
 	orderBy := "created_at"
 	hasGeo := true
 
 	options := &gonaturalist.GetObservationsOpt{
-		OrderBy:      &orderBy,
 		HasGeo:       &hasGeo,
+		OrderBy:      &orderBy,
 		UpdatedSince: &updatedSince,
 	}
 
@@ -133,8 +137,8 @@ func (in *INaturalistCache) RefreshObservedOn(ctx context.Context, on time.Time)
 	hasGeo := true
 
 	options := &gonaturalist.GetObservationsOpt{
-		On:     &on,
 		HasGeo: &hasGeo,
+		On:     &on,
 	}
 
 	return in.refreshUntilEmptyPage(ctx, options)

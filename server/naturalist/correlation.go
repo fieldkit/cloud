@@ -22,3 +22,7 @@ func NewINaturalistCorrelator(url string) (nc *INaturalistCorrelator, err error)
 
 	return
 }
+
+func (nc *INaturalistCorrelator) Correlate(co *CachedObservation) (err error) {
+	return nil
+}
