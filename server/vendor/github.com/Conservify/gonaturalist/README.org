@@ -1,0 +1,3 @@
+* Go client library for the iNaturalist website.
+
+  This is a work in progress. Special thanks to https://github.com/zmb3/spotify.
