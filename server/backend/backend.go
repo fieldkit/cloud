@@ -406,7 +406,7 @@ func (b *Backend) FindRecords(ctx context.Context, opts *FindRecordsOpt) ([]*dat
 	records := []*data.Record{}
 	if err := b.db.SelectContext(ctx, &records, `
 		SELECT id, schema_id, source_id, team_id, user_id, timestamp, ST_AsBinary(location) AS location, data, fixed, visible FROM fieldkit.record
-		WHERE (EXTRACT(epoch FROM timestamp) > $1) AND (EXTRACT(epoch FROM timestamp) < $2)
+		WHERE (timestamp > to_timestamp($1)) AND (timestamp < to_timestamp($2))
 		`, opts.StartTime.Unix(), opts.EndTime.Unix()); err != nil {
 		return nil, err
 	}
