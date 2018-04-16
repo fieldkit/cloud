@@ -24,6 +24,19 @@ func NewLocation(coordinates []float64) *Location {
 	}
 }
 
+func (l *Location) MarshalJSON() ([]byte, error) {
+	return json.Marshal(l.Coordinates())
+}
+
+func (l *Location) UnmarshalJSON(data []byte) error {
+	c := []float64{}
+	if err := json.Unmarshal(data, &c); err != nil {
+		return err
+	}
+	l.point = geo.NewPointFromLatLng(c[1], c[0])
+	return nil
+}
+
 func (l *Location) IsZero() bool {
 	return l.point.Lng() == 0 && l.point.Lat() == 0
 }
