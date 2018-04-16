@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/Conservify/sqlxcache"
 )
 
 type Pregenerator struct {

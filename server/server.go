@@ -20,12 +20,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
-	"github.com/conservify/sqlxcache"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
+
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/api/app"

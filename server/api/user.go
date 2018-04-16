@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/conservify/sqlxcache"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
+
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"

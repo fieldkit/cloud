@@ -3,13 +3,12 @@ package backend
 import (
 	"context"
 	"fmt"
-	_ "log"
 	"time"
 
 	_ "github.com/lib/pq"
 	_ "github.com/paulmach/go.geo"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 )

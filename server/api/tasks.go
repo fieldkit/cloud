@@ -6,8 +6,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/conservify/sqlxcache"
 	"github.com/goadesign/goa"
+
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"

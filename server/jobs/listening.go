@@ -11,7 +11,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/Conservify/sqlxcache"
 )
 
 type MessageHandler interface {

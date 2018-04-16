@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx/types"
 
 	"github.com/Conservify/gonaturalist"
-	"github.com/conservify/sqlxcache"
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
