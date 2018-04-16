@@ -13,7 +13,7 @@ import (
 type INaturalistCorrelator struct {
 	Database *sqlxcache.DB
 	Backend  *backend.Backend
-	Verbose
+	Verbose  bool
 }
 
 func NewINaturalistCorrelator(url string) (nc *INaturalistCorrelator, err error) {
@@ -56,13 +56,12 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	for _, r := range records {
 		distance := r.Location.Distance(co.Location)
-		log.Printf("Record %d distance=%fm", r.ID, distance)
+		log.Printf("Record distance=%fm", distance)
 	}
 
 	return nil
 }
 
-func (nc *INaturalistCorrelator) Handle(ctx context.Context, message interface{}) error {
-	o := message.(*CachedObservation)
-	return nc.Correlate(ctx, o)
+func (nc *INaturalistCorrelator) Handle(ctx context.Context, co *CachedObservation) error {
+	return nc.Correlate(ctx, co)
 }

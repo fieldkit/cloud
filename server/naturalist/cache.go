@@ -140,7 +140,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Printf("Refresh(%v)", spew.Sdump("%v", options))
+		log.Printf("Refresh(%v)", spew.Sprintf("%v", options))
 
 		observations, err := in.NaturalistClient.GetObservations(options)
 		if err != nil {

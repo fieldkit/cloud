@@ -27,9 +27,7 @@ type SourceModifiedHandler struct {
 	Publisher jobs.MessagePublisher
 }
 
-func (h *SourceModifiedHandler) Handle(ctx context.Context, message interface{}) error {
-	m := message.(*ingestion.SourceChange)
-
+func (h *SourceModifiedHandler) Handle(ctx context.Context, m *ingestion.SourceChange) error {
 	generator := NewPregenerator(h.Backend)
 	generated, err := generator.Pregenerate(ctx, m.SourceID)
 	if err != nil {

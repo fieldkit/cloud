@@ -26,7 +26,7 @@ type PgJobQueue struct {
 	db       *sqlxcache.DB
 	name     string
 	listener *pq.Listener
-	handlers map[reflect.Type]MessageHandler
+	handlers map[reflect.Type]reflect.Value
 }
 
 func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
@@ -44,7 +44,7 @@ func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
 	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)
 
 	jq := &PgJobQueue{
-		handlers: make(map[reflect.Type]MessageHandler),
+		handlers: make(map[reflect.Type]reflect.Value),
 		name:     name,
 		db:       db,
 		listener: listener,
