@@ -20,10 +20,10 @@ type Client struct {
 	retryDuration time.Duration
 }
 
-type pageHeaders struct {
-	totalEntries int
-	perPage      int
-	page         int
+type PageHeaders struct {
+	TotalEntries int
+	PerPage      int
+	Page         int
 }
 
 func isFailure(code int, validCodes []int) bool {
@@ -70,7 +70,7 @@ func (c *Client) execute(req *http.Request, result interface{}, needsStatus ...i
 	return nil
 }
 
-func (c *Client) get(url string, result interface{}) (paging *pageHeaders, err error) {
+func (c *Client) get(url string, result interface{}) (paging *PageHeaders, err error) {
 	for {
 		resp, err := c.http.Get(url)
 		if err != nil {
@@ -81,15 +81,15 @@ func (c *Client) get(url string, result interface{}) (paging *pageHeaders, err e
 
 		total := resp.Header["X-Total-Entries"]
 		if len(total) > 0 {
-			perPage := resp.Header["X-Per-Page"][0]
-			page := resp.Header["X-Page"][0]
+			perPage := resp.Header["X-Per-Page"]
+			page := resp.Header["X-Page"]
 			t, _ := strconv.Atoi(string(total[0]))
 			p, _ := strconv.Atoi(string(page[0]))
 			pp, _ := strconv.Atoi(string(perPage[0]))
-			paging = &pageHeaders{
-				totalEntries: t,
-				page:         p,
-				perPage:      pp,
+			paging = &PageHeaders{
+				TotalEntries: t,
+				Page:         p,
+				PerPage:      pp,
 			}
 		}
 		if resp.StatusCode == rateLimitExceededStatusCode && c.autoRetry {

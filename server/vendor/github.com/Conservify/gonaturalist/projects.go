@@ -30,7 +30,7 @@ type FullProject struct {
 }
 
 type ProjectsPage struct {
-	paging   *pageHeaders
+	Paging   *PageHeaders
 	Projects []SimpleProject
 }
 
@@ -54,7 +54,7 @@ func (c *Client) GetProjects(opt *GetProjectsOpt) (*ProjectsPage, error) {
 
 	return &ProjectsPage{
 		Projects: result,
-		paging:   p,
+		Paging:   p,
 	}, nil
 }
 
@@ -81,7 +81,7 @@ func (c *Client) GetProjectsByLogin(login string) (*ProjectsPage, error) {
 
 	return &ProjectsPage{
 		Projects: result,
-		paging:   p,
+		Paging:   p,
 	}, nil
 }
 

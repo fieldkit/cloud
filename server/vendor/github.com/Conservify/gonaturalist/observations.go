@@ -18,27 +18,29 @@ type Rectangle struct {
 }
 
 type SimpleObservation struct {
-	Id                int64          `json:"id"`
-	UserLogin         string         `json:"user_login"`
-	PlaceGuess        string         `json:"place_guess"`
-	SpeciesGuess      string         `json:"species_guess"`
-	Latitude          float64        `json:"latitude,string"`
-	Longitude         float64        `json:"longitude,string"`
-	CreatedAt         time.Time      `json:"created_at_utc"`
-	ObservedOn        NaturalistTime `json:"observed_on"`
-	ObservedOnString  string         `json:"observed_on_string"`
-	UpdatedAt         time.Time      `json:"updated_at_utc"`
-	TaxonId           int32          `json:"taxon_id"`
-	UserId            int64          `json:"user_id"`
-	TimeZone          string         `json:"time_zone"`
-	Description       string         `json:"description"`
-	Uri               string         `json:"uri"`
-	Uuid              string         `json:"uuid"`
-	TimeObservedAtUtc time.Time      `json:"time_observed_at_utc"`
+	Id                       int64          `json:"id"`
+	UserLogin                string         `json:"user_login"`
+	PlaceGuess               string         `json:"place_guess"`
+	SpeciesGuess             string         `json:"species_guess"`
+	Latitude                 float64        `json:"latitude,string"`
+	Longitude                float64        `json:"longitude,string"`
+	CreatedAt                time.Time      `json:"created_at_utc"`
+	ObservedOn               NaturalistTime `json:"observed_on"`
+	ObservedOnString         string         `json:"observed_on_string"`
+	UpdatedAt                time.Time      `json:"updated_at_utc"`
+	TaxonId                  int32          `json:"taxon_id"`
+	UserId                   int64          `json:"user_id"`
+	TimeZone                 string         `json:"time_zone"`
+	Description              string         `json:"description"`
+	Uri                      string         `json:"uri"`
+	Uuid                     string         `json:"uuid"`
+	TimeObservedAtUtc        time.Time      `json:"time_observed_at_utc"`
+	PositionalAccuracy       int32          `json:"positional_accuracy"`
+	PublicPositionalAccuracy int32          `json:"public_positional_accuracy"`
 }
 
 type ObservationsPage struct {
-	paging       *pageHeaders
+	Paging       *PageHeaders
 	Observations []*SimpleObservation
 }
 
@@ -160,7 +162,7 @@ func (c *Client) GetObservations(opt *GetObservationsOpt) (*ObservationsPage, er
 
 	return &ObservationsPage{
 		Observations: result,
-		paging:       p,
+		Paging:       p,
 	}, nil
 }
 
@@ -173,6 +175,18 @@ func (c *Client) AddObservation(opt *AddObservationOpt) error {
 
 func (c *Client) GetObservation(id int64) (*FullObservation, error) {
 	var result FullObservation
+
+	u := c.buildUrl("/observations/%d.json", id)
+	_, err := c.get(u, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (c *Client) GetSimpleObservation(id int64) (*SimpleObservation, error) {
+	var result SimpleObservation
 
 	u := c.buildUrl("/observations/%d.json", id)
 	_, err := c.get(u, &result)
@@ -208,6 +222,6 @@ func (c *Client) GetObservationsByUsername(username string) (*ObservationsPage, 
 
 	return &ObservationsPage{
 		Observations: result,
-		paging:       p,
+		Paging:       p,
 	}, nil
 }

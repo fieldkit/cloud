@@ -60,7 +60,7 @@ func (p *SimplePlace) Rectangle() (r Rectangle, err error) {
 }
 
 type PlacesPage struct {
-	paging *pageHeaders
+	Paging *PageHeaders
 	Places []*SimplePlace
 }
 
@@ -96,6 +96,6 @@ func (c *Client) GetPlaces(opt *GetPlacesOpt) (*PlacesPage, error) {
 
 	return &PlacesPage{
 		Places: result,
-		paging: p,
+		Paging: p,
 	}, nil
 }
