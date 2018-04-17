@@ -19,10 +19,10 @@
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "5Sc0ERnGBiCH9nSRIHsAOpZjGkY=",
+			"checksumSHA1": "9SpkdvduFMRQA2Qfo6+VlAj2gsM=",
 			"path": "github.com/Conservify/gonaturalist",
-			"revision": "d5e820bf5a10273f4ea31cb7ee13c4b3b65852ef",
-			"revisionTime": "2018-04-17T17:16:54Z"
+			"revision": "1e6303a2c30fd5ae5fcef6372c3b876f41b5df3b",
+			"revisionTime": "2018-04-17T17:24:48Z"
 		},
 		{
 			"path": "github.com/Conservify/gonaturalist.git",

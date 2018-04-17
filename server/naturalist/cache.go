@@ -19,6 +19,7 @@ import (
 
 type CachedObservation struct {
 	ID        int64          `db:"id,omitempty"`
+	SiteID    int64          `db:"site_id,omitempty"`
 	UpdatedAt time.Time      `db:"updated_at"`
 	Timestamp time.Time      `db:"timestamp"`
 	Location  *data.Location `db:"location"`
@@ -38,6 +39,7 @@ func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *FullCachedObse
 	co = &FullCachedObservation{
 		CachedObservation: CachedObservation{
 			ID:        o.Id,
+			SiteID:    o.SiteId,
 			UpdatedAt: time.Now(),
 			Timestamp: o.TimeObservedAtUtc,
 			Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
@@ -88,9 +90,9 @@ func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonat
 	}
 
 	_, err = in.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.inaturalist_observations (id, updated_at, timestamp, location, data)
-		VALUES (:id, :updated_at, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
-		ON CONFLICT (id)
+		INSERT INTO fieldkit.inaturalist_observations (id, site_id, updated_at, timestamp, location, data)
+		VALUES (:id, :site_id, :updated_at, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326), :data)
+		ON CONFLICT (id, site_id)
 		DO UPDATE SET updated_at = excluded.updated_at, timestamp = excluded.timestamp, location = excluded.location, data = excluded.data
 		`, co)
 	if err != nil {

@@ -30,6 +30,7 @@ type SimpleObservation struct {
 	UpdatedAt                time.Time      `json:"updated_at_utc"`
 	TaxonId                  int32          `json:"taxon_id"`
 	UserId                   int64          `json:"user_id"`
+	SiteId                   int64          `json:"site_id"`
 	TimeZone                 string         `json:"time_zone"`
 	Description              string         `json:"description"`
 	Uri                      string         `json:"uri"`
