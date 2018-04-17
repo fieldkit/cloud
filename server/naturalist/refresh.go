@@ -14,7 +14,13 @@ import (
 func RefreshNaturalistObservations(ctx context.Context, db *sqlxcache.DB, be *backend.Backend) error {
 	jq, err := jobs.NewPqJobQueue(be.URL(), "inaturalist_observations")
 	if err != nil {
-		panic(err)
+		log.Printf("%v", err)
+		return nil
+	}
+
+	if err := jq.Listen(1); err != nil {
+		log.Printf("%v", err)
+		return nil
 	}
 
 	for index, naturalistConfig := range AllNaturalistConfigs {
@@ -32,6 +38,8 @@ func RefreshNaturalistObservations(ctx context.Context, db *sqlxcache.DB, be *ba
 			continue
 		}
 	}
+
+	jq.Stop()
 
 	return nil
 }

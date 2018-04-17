@@ -27,9 +27,16 @@ func (jq *PgJobQueue) Listen(concurrency int) error {
 		return err
 	}
 
-	log.Printf("Listening to [%s] / %d", jq.name, concurrency)
+	log.Printf("[%v] listening (%d)", jq.name, concurrency)
 
 	go jq.waitForNotification(concurrency)
+
+	return nil
+}
+
+func (jq *PgJobQueue) Stop() error {
+	jq.control <- true
+	jq.wg.Wait()
 
 	return nil
 }
@@ -60,11 +67,13 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) error 
 func (jq *PgJobQueue) waitForNotification(concurrency int) {
 	ctx := context.Background()
 
+	jq.wg.Add(1)
+
 	for {
 		select {
 		case n := <-jq.listener.Notify:
 			if false {
-				log.Printf("Received data from channel [%v]:", n.Channel)
+				log.Printf("[%v] received data from channel:", n.Channel)
 				var prettyJSON bytes.Buffer
 				err := json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
 				if err != nil {
@@ -86,6 +95,13 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 				break
 			}
 
+			break
+		case c := <-jq.control:
+			if c {
+				log.Printf("[%s] listener exiting", jq.name)
+				jq.wg.Done()
+				return
+			}
 			break
 		case <-time.After(90 * time.Second):
 			go func() {

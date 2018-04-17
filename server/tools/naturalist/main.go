@@ -65,7 +65,9 @@ func main() {
 	jq.Register(naturalist.CachedObservation{}, nc)
 
 	if config.Listen {
-		jq.Listen(5)
+		if err := jq.Listen(5); err != nil {
+			panic(err)
+		}
 	}
 
 	for index, naturalistConfig := range naturalist.AllNaturalistConfigs {

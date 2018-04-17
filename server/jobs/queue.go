@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/lib/pq"
@@ -27,6 +28,8 @@ type PgJobQueue struct {
 	name     string
 	listener *pq.Listener
 	handlers map[reflect.Type]reflect.Value
+	control  chan bool
+	wg       sync.WaitGroup
 }
 
 func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
@@ -48,6 +51,7 @@ func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
 		name:     name,
 		db:       db,
 		listener: listener,
+		control:  make(chan bool),
 	}
 
 	return jq, nil
