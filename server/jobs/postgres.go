@@ -16,7 +16,6 @@ func (jq *PgJobQueue) Register(messageExample interface{}, handler interface{}) 
 	if !method.IsValid() {
 		return fmt.Errorf("No Handle method on %v", handler)
 	}
-	log.Printf("Handle: %v %v", value, method)
 	messageType := reflect.TypeOf(messageExample)
 	jq.handlers[messageType] = method
 	return nil

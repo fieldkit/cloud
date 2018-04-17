@@ -28,6 +28,12 @@ type INaturalistConfig struct {
 	RootUrl       string
 }
 
+var (
+	INaturalistObservationsQueue = &jobs.QueueDef{
+		Name: "inaturalist_observations",
+	}
+)
+
 func main() {
 	config := Config{}
 
