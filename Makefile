@@ -7,7 +7,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: binaries tests
 
-binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy
+binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/naturalist
 
 all: binaries
 
@@ -34,6 +34,12 @@ $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES
 
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/weather-proxy/*.go
+
+$(BUILD)/naturalist: server/tools/naturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/tools/naturalist/*.go
+
+server/tools/naturalist/secrets.go: server/tools/naturalist/secrets.go.template
+	cp server/tools/naturalist/secrets.go.template server/tools/naturalist/secrets.go
 
 install: all
 	cp build/fktool $(INSTALLDIR)

@@ -1,4 +1,4 @@
-package main
+package naturalist
 
 import (
 	"context"
@@ -63,7 +63,7 @@ type INaturalistCache struct {
 func NewINaturalistCache(config *INaturalistConfig, url string, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
 	var authenticator = gonaturalist.NewAuthenticatorAtCustomRoot(config.ApplicationId, config.Secret, config.RedirectUrl, config.RootUrl)
 
-	c := authenticator.NewClientWithAccessToken(iNaturalistConfig.AccessToken)
+	c := authenticator.NewClientWithAccessToken(config.AccessToken)
 
 	db, err := backend.OpenDatabase(url)
 	if err != nil {

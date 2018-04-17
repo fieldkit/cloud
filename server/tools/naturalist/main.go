@@ -9,6 +9,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/jobs"
+	"github.com/fieldkit/cloud/server/naturalist"
 )
 
 type Config struct {
@@ -18,14 +19,6 @@ type Config struct {
 	RefreshRecentlyObserved bool
 	Listen                  bool
 	RefreshSpecific         int
-}
-
-type INaturalistConfig struct {
-	ApplicationId string
-	Secret        string
-	AccessToken   string
-	RedirectUrl   string
-	RootUrl       string
 }
 
 var (
@@ -53,46 +46,55 @@ func main() {
 		panic(err)
 	}
 
-	nc, err := NewINaturalistCorrelator(config.PostgresURL)
+	nc, err := naturalist.NewINaturalistCorrelator(config.PostgresURL)
 	if err != nil {
 		panic(err)
 	}
 
-	jq.Register(CachedObservation{}, nc)
-
-	cache, err := NewINaturalistCache(&iNaturalistConfigProduction, config.PostgresURL, jq)
-	if err != nil {
-		panic(err)
-	}
+	jq.Register(naturalist.CachedObservation{}, nc)
 
 	if config.Listen {
 		jq.Listen(5)
 	}
 
-	if config.RefreshRecentlyObserved {
-		day := time.Now()
-		for i := 0; i < 7; i += 1 {
-			if err := cache.RefreshObservedOn(context.Background(), day); err != nil {
-				log.Fatalf("%v", err)
-			}
+	for index, naturalistConfig := range naturalist.AllNaturalistConfigs {
+		log.Printf("Applying iNaturalist configuration: %d [%s]", index, naturalistConfig.RootUrl)
 
-			day = day.Add(-24 * time.Hour)
-		}
-	} else if config.RefreshRecentlyUpdated {
-		// since := time.Now().Add(-1 * time.Hour)
-		since := time.Now().Add(-10 * time.Minute)
-		if err := cache.RefreshRecentlyUpdated(context.Background(), since); err != nil {
+		cache, err := naturalist.NewINaturalistCache(&naturalistConfig, config.PostgresURL, jq)
+		if err != nil {
 			log.Fatalf("%v", err)
 		}
-	} else if config.RefreshSpecific > 0 {
-		log.Printf("Refreshing %d", config.RefreshSpecific)
-		if err := cache.RefreshObservation(context.Background(), config.RefreshSpecific); err != nil {
-			log.Fatalf("%v", err)
+
+		if config.RefreshRecentlyObserved {
+			day := time.Now()
+			for i := 0; i < 7; i += 1 {
+				if err := cache.RefreshObservedOn(context.Background(), day); err != nil {
+					log.Fatalf("%v", err)
+				}
+
+				day = day.Add(-24 * time.Hour)
+			}
+		} else if config.RefreshRecentlyUpdated {
+			// since := time.Now().Add(-1 * time.Hour)
+			since := time.Now().Add(-10 * time.Minute)
+			if err := cache.RefreshRecentlyUpdated(context.Background(), since); err != nil {
+				log.Printf("%v", err)
+				continue
+			}
+		} else if config.RefreshSpecific > 0 {
+			log.Printf("Refreshing %d", config.RefreshSpecific)
+			if err := cache.RefreshObservation(context.Background(), config.RefreshSpecific); err != nil {
+				log.Printf("%v", err)
+				continue
+			}
 		}
-	} else if config.Listen {
+	}
+
+	if config.Listen {
+		log.Printf("Listening...")
+
 		for {
 			time.Sleep(1 * time.Second)
 		}
-
 	}
 }
