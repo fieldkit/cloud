@@ -130,6 +130,14 @@ func (in *INaturalistCache) RefreshObservedOn(ctx context.Context, on time.Time)
 	return in.refreshUntilEmptyPage(ctx, options)
 }
 
+func (in *INaturalistCache) RefreshObservation(ctx context.Context, id int) error {
+	observation, err := in.NaturalistClient.GetSimpleObservation(int64(id))
+	if err != nil {
+		return err
+	}
+	return in.AddOrUpdateObservation(ctx, observation)
+}
+
 func (in *INaturalistCache) getLastUpdated() (time.Time, error) {
 	return time.Time{}, nil
 }

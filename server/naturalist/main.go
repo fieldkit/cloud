@@ -17,6 +17,7 @@ type Config struct {
 	RefreshRecentlyUpdated  bool
 	RefreshRecentlyObserved bool
 	Listen                  bool
+	RefreshSpecific         int
 }
 
 type INaturalistConfig struct {
@@ -33,6 +34,7 @@ func main() {
 	flag.BoolVar(&config.RefreshRecentlyUpdated, "refresh-recently-updated", false, "refresh observations cache")
 	flag.BoolVar(&config.RefreshRecentlyObserved, "refresh-recently-observed", false, "refresh observations cache")
 	flag.BoolVar(&config.Listen, "listen", false, "listen for observations to correlate")
+	flag.IntVar(&config.RefreshSpecific, "refresh-specific", 0, "refresh specific observation")
 
 	if err := envconfig.Process("fieldkit", &config); err != nil {
 		panic(err)
@@ -71,8 +73,14 @@ func main() {
 			day = day.Add(-24 * time.Hour)
 		}
 	} else if config.RefreshRecentlyUpdated {
-		since := time.Now().Add(-1 * time.Hour)
+		// since := time.Now().Add(-1 * time.Hour)
+		since := time.Now().Add(-10 * time.Minute)
 		if err := cache.RefreshRecentlyUpdated(context.Background(), since); err != nil {
+			log.Fatalf("%v", err)
+		}
+	} else if config.RefreshSpecific > 0 {
+		log.Printf("Refreshing %d", config.RefreshSpecific)
+		if err := cache.RefreshObservation(context.Background(), config.RefreshSpecific); err != nil {
 			log.Fatalf("%v", err)
 		}
 	} else if config.Listen {
