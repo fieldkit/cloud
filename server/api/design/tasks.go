@@ -14,4 +14,13 @@ var _ = Resource("Tasks", func() {
 		Response(BadRequest)
 		Response(OK)
 	})
+
+	Action("five", func() {
+		Routing(GET("tasks/five"))
+		Description("Run periodic checks")
+		Params(func() {
+		})
+		Response(BadRequest)
+		Response(OK)
+	})
 })

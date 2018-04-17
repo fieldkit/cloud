@@ -178,3 +178,7 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 	}
 	return ctx.OK([]byte("Ok"))
 }
+
+func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
+	return ctx.OK([]byte("Ok"))
+}

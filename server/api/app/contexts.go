@@ -256,6 +256,39 @@ func (ctx *CheckTasksContext) BadRequest() error {
 	return nil
 }
 
+// FiveTasksContext provides the Tasks five action context.
+type FiveTasksContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewFiveTasksContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Tasks controller five action.
+func NewFiveTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*FiveTasksContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := FiveTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *FiveTasksContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *FiveTasksContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddAdministratorContext provides the administrator add action context.
 type AddAdministratorContext struct {
 	context.Context

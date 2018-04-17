@@ -220,6 +220,18 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -309,21 +321,6 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
-    - centroid:
-      - 0.20284432
-      endTime: 2005-12-24T11:29:18Z
-      envelope:
-      - - 0.16648395
-        - 0.16648395
-      - - 0.16648395
-        - 0.16648395
-      - - 0.16648395
-        - 0.16648395
-      id: 1.5655853e+18
-      numberOfFeatures: 6.943343e+18
-      radius: 0.1424476
-      sourceId: 6.7501333e+18
-      startTime: 2013-11-06T11:29:32Z
     - centroid:
       - 0.20284432
       endTime: 2005-12-24T11:29:18Z
@@ -633,14 +630,6 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
-    - geometry:
-        coordinates:
-        - 0.6614825
-        - 0.6614825
-        type: Aut et quidem quis fugit commodi.
-      properties:
-        Et aperiam amet nulla dolore.: 1973-10-09T04:25:02Z
-      type: Molestias enim.
     - geometry:
         coordinates:
         - 0.6614825
@@ -3472,6 +3461,22 @@ paths:
       schemes:
       - https
       summary: check Tasks
+      tags:
+      - Tasks
+  /tasks/five:
+    get:
+      description: Run periodic checks
+      operationId: Tasks#five
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      summary: five Tasks
       tags:
       - Tasks
   /teams/{teamId}:

@@ -42,3 +42,32 @@ func (c *Client) NewCheckTasksRequest(ctx context.Context, path string) (*http.R
 	}
 	return req, nil
 }
+
+// FiveTasksPath computes a request path to the five action of Tasks.
+func FiveTasksPath() string {
+
+	return fmt.Sprintf("/tasks/five")
+}
+
+// Run periodic checks
+func (c *Client) FiveTasks(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewFiveTasksRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewFiveTasksRequest create the request corresponding to the five action endpoint of the Tasks resource.
+func (c *Client) NewFiveTasksRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
