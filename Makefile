@@ -38,8 +38,8 @@ $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_S
 $(BUILD)/naturalist: server/tools/naturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ server/tools/naturalist/*.go
 
-server/tools/naturalist/secrets.go: server/tools/naturalist/secrets.go.template
-	cp server/tools/naturalist/secrets.go.template server/tools/naturalist/secrets.go
+server/naturalist/secrets.go: server/naturalist/secrets.go.template
+	cp server/naturalist/secrets.go.template server/naturalist/secrets.go
 
 install: all
 	cp build/fktool $(INSTALLDIR)
