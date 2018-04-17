@@ -34,6 +34,10 @@ func New(url string) (*Backend, error) {
 	}, nil
 }
 
+func (b *Backend) URL() string {
+	return b.url
+}
+
 func (b *Backend) AddSource(ctx context.Context, source *data.Source) error {
 	return b.db.NamedGetContext(ctx, source, `
 		INSERT INTO fieldkit.source (expedition_id, name) VALUES (:expedition_id, :name) RETURNING *

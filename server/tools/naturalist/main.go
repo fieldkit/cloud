@@ -8,6 +8,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/naturalist"
 )
@@ -46,7 +47,17 @@ func main() {
 		panic(err)
 	}
 
-	nc, err := naturalist.NewINaturalistCorrelator(config.PostgresURL)
+	be, err := backend.New(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := backend.OpenDatabase(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	nc, err := naturalist.NewINaturalistCorrelator(db, be)
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +71,7 @@ func main() {
 	for index, naturalistConfig := range naturalist.AllNaturalistConfigs {
 		log.Printf("Applying iNaturalist configuration: %d [%s]", index, naturalistConfig.RootUrl)
 
-		cache, err := naturalist.NewINaturalistCache(&naturalistConfig, config.PostgresURL, jq)
+		cache, err := naturalist.NewINaturalistCache(&naturalistConfig, db, jq)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}

@@ -12,7 +12,6 @@ import (
 	"github.com/Conservify/gonaturalist"
 	"github.com/Conservify/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/jobs"
 )
@@ -60,15 +59,10 @@ type INaturalistCache struct {
 	Queue            *jobs.PgJobQueue
 }
 
-func NewINaturalistCache(config *INaturalistConfig, url string, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
+func NewINaturalistCache(config *INaturalistConfig, db *sqlxcache.DB, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
 	var authenticator = gonaturalist.NewAuthenticatorAtCustomRoot(config.ApplicationId, config.Secret, config.RedirectUrl, config.RootUrl)
 
 	c := authenticator.NewClientWithAccessToken(config.AccessToken)
-
-	db, err := backend.OpenDatabase(url)
-	if err != nil {
-		return nil, err
-	}
 
 	in = &INaturalistCache{
 		Database:         db,

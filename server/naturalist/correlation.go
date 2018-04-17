@@ -30,17 +30,7 @@ type INaturalistCorrelator struct {
 	Verbose  bool
 }
 
-func NewINaturalistCorrelator(url string) (nc *INaturalistCorrelator, err error) {
-	db, err := backend.OpenDatabase(url)
-	if err != nil {
-		return nil, err
-	}
-
-	be, err := backend.New(url)
-	if err != nil {
-		return nil, err
-	}
-
+func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend) (nc *INaturalistCorrelator, err error) {
 	nc = &INaturalistCorrelator{
 		Database: db,
 		Backend:  be,

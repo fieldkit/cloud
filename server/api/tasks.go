@@ -13,6 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/naturalist"
 )
 
 type TasksControllerOptions struct {
@@ -180,5 +181,7 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 }
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
+	go naturalist.RefreshNaturalistObservations(context.Background(), c.options.Database, c.options.Backend)
+
 	return ctx.OK([]byte("Ok"))
 }
