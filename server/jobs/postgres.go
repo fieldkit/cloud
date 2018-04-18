@@ -38,6 +38,9 @@ func (jq *PgJobQueue) Stop() error {
 	jq.control <- true
 	jq.wg.Wait()
 
+	jq.listener.Unlisten(jq.name)
+	jq.listener.Close()
+
 	return nil
 }
 
