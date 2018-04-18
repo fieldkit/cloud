@@ -119,27 +119,36 @@ func (c *Client) decodeError(resp *http.Response) error {
 	return nil
 }
 
+var AcceptableFormats = []string{
+	time.RFC3339,
+	"2006/01/02 3:04 PM MST",
+	"2006-01-02",
+}
+
+func TryParseObservedOn(s string) (time.Time, error) {
+	str := strings.Trim(s, "\"")
+	if str == "null" {
+		return time.Time{}, nil
+	}
+	for _, l := range AcceptableFormats {
+		time, err := time.Parse(l, str)
+		if err == nil {
+			return time, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("Unable to parse time: %s", s)
+}
+
 type NaturalistTime struct {
 	time.Time
 }
 
-var AcceptableFormats = []string{
-	time.RFC3339,
-	"2006-01-02",
-}
-
 func (t *NaturalistTime) UnmarshalJSON(b []byte) (err error) {
-	str := strings.Trim(string(b), "\"")
-	if str == "null" {
-		t.Time = time.Time{}
-		return
+	parsed, err := TryParseObservedOn(string(b))
+	if err != nil {
+		return err
 	}
-	for _, l := range AcceptableFormats {
-		t.Time, err = time.Parse(l, str)
-		if err == nil {
-			break
-		}
-	}
+	t.Time = parsed
 	return
 }
 

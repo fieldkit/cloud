@@ -18,26 +18,26 @@ type Rectangle struct {
 }
 
 type SimpleObservation struct {
-	Id                       int64          `json:"id"`
-	UserLogin                string         `json:"user_login"`
-	PlaceGuess               string         `json:"place_guess"`
-	SpeciesGuess             string         `json:"species_guess"`
-	Latitude                 float64        `json:"latitude,string"`
-	Longitude                float64        `json:"longitude,string"`
-	CreatedAt                time.Time      `json:"created_at_utc"`
-	ObservedOn               NaturalistTime `json:"observed_on"`
-	ObservedOnString         string         `json:"observed_on_string"`
-	UpdatedAt                time.Time      `json:"updated_at_utc"`
-	TaxonId                  int32          `json:"taxon_id"`
-	UserId                   int64          `json:"user_id"`
-	SiteId                   int64          `json:"site_id"`
-	TimeZone                 string         `json:"time_zone"`
-	Description              string         `json:"description"`
-	Uri                      string         `json:"uri"`
-	Uuid                     string         `json:"uuid"`
-	TimeObservedAtUtc        time.Time      `json:"time_observed_at_utc"`
-	PositionalAccuracy       int32          `json:"positional_accuracy"`
-	PublicPositionalAccuracy int32          `json:"public_positional_accuracy"`
+	Id                       int64     `json:"id"`
+	UserLogin                string    `json:"user_login"`
+	PlaceGuess               string    `json:"place_guess"`
+	SpeciesGuess             string    `json:"species_guess"`
+	Latitude                 float64   `json:"latitude,string"`
+	Longitude                float64   `json:"longitude,string"`
+	CreatedAt                time.Time `json:"created_at_utc"`
+	ObservedOn               string    `json:"observed_on"`
+	ObservedOnString         string    `json:"observed_on_string"`
+	UpdatedAt                time.Time `json:"updated_at_utc"`
+	TaxonId                  int32     `json:"taxon_id"`
+	UserId                   int64     `json:"user_id"`
+	SiteId                   int64     `json:"site_id"`
+	TimeZone                 string    `json:"time_zone"`
+	Description              string    `json:"description"`
+	Uri                      string    `json:"uri"`
+	Uuid                     string    `json:"uuid"`
+	TimeObservedAtUtc        time.Time `json:"time_observed_at_utc"`
+	PositionalAccuracy       int32     `json:"positional_accuracy"`
+	PublicPositionalAccuracy int32     `json:"public_positional_accuracy"`
 }
 
 type ObservationsPage struct {
@@ -110,6 +110,10 @@ type GetObservationsOpt struct {
 	OrderBy        *string
 	OrderAscending *bool
 	HasGeo         *bool
+}
+
+func (o *SimpleObservation) TryParseObservedOn() (time.Time, error) {
+	return TryParseObservedOn(o.ObservedOnString)
 }
 
 func (c *Client) GetObservations(opt *GetObservationsOpt) (*ObservationsPage, error) {

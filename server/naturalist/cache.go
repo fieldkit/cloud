@@ -35,12 +35,20 @@ func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *FullCachedObse
 		return nil, err
 	}
 
+	timestamp := o.TimeObservedAtUtc
+	if timestamp.IsZero() {
+		timestamp, err = o.TryParseObservedOn()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	co = &FullCachedObservation{
 		CachedObservation: CachedObservation{
 			ID:        o.Id,
 			SiteID:    o.SiteId,
 			UpdatedAt: time.Now(),
-			Timestamp: o.TimeObservedAtUtc,
+			Timestamp: timestamp,
 			Location:  data.NewLocation([]float64{o.Longitude, o.Latitude}),
 		},
 		Data: jsonData,
