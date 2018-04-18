@@ -60,11 +60,11 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		}
 
 		err = br.Push(ctx, &record)
-		if err, ok := err.(*ingestion.IngestError); ok {
-			if err.Critical {
-				return nil, err
+		if detailedErr, ok := err.(*ingestion.IngestError); ok {
+			if detailedErr.Critical {
+				return nil, detailedErr
 			} else {
-				log.Printf("Error: %v", err)
+				log.Printf("Error: %v", detailedErr)
 			}
 		} else if err != nil {
 			return nil, err
@@ -100,6 +100,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 					br.Sensors[sensor.Sensor] = sensor
 					br.NumberOfSensors += 1
 				}
+				br.ReadingsSeen = 0
 			}
 		}
 		if record.Metadata.Modules != nil {
