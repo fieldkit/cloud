@@ -82,7 +82,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
 	}
 
-	log.Printf("Processed %d records", br.RecordsProcessed)
+	log.Printf("[%s] processed %d records", br.DeviceId, br.RecordsProcessed)
 
 	return nil
 }
