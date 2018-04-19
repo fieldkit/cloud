@@ -42,17 +42,17 @@ func main() {
 
 	flag.Parse()
 
-	jq, err := jobs.NewPqJobQueue(config.PostgresURL, "inaturalist_observations")
-	if err != nil {
-		panic(err)
-	}
-
 	be, err := backend.New(config.PostgresURL)
 	if err != nil {
 		panic(err)
 	}
 
 	db, err := backend.OpenDatabase(config.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	jq, err := jobs.NewPqJobQueue(db, config.PostgresURL, "inaturalist_observations")
 	if err != nil {
 		panic(err)
 	}

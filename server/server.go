@@ -114,7 +114,7 @@ func main() {
 		panic(err)
 	}
 
-	jq, err := jobs.NewPqJobQueue(config.PostgresURL, "messages")
+	jq, err := jobs.NewPqJobQueue(database, config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}

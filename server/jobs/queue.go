@@ -32,16 +32,11 @@ type PgJobQueue struct {
 	wg       sync.WaitGroup
 }
 
-func NewPqJobQueue(url string, name string) (*PgJobQueue, error) {
+func NewPqJobQueue(db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
 	onProblem := func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			log.Printf("JobQueue: %v", err)
 		}
-	}
-
-	db, err := sqlxcache.Open("postgres", url)
-	if err != nil {
-		return nil, err
 	}
 
 	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)

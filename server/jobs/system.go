@@ -1,5 +1,9 @@
 package jobs
 
+import (
+	"github.com/Conservify/sqlxcache"
+)
+
 type QueueDef struct {
 	Name string
 }
@@ -13,8 +17,13 @@ func OpenQueueSystem(url string, defs []*QueueDef) (qs *QueueSystem, err error) 
 	queues := make(map[string]*PgJobQueue)
 	defsMap := make(map[string]*QueueDef)
 
+	db, err := sqlxcache.Open("postgres", url)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, def := range defs {
-		jq, err := NewPqJobQueue(url, def.Name)
+		jq, err := NewPqJobQueue(db, url, def.Name)
 		if err != nil {
 			return nil, err
 		}

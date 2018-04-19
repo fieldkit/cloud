@@ -12,7 +12,7 @@ import (
 )
 
 func RefreshNaturalistObservations(ctx context.Context, db *sqlxcache.DB, be *backend.Backend) error {
-	jq, err := jobs.NewPqJobQueue(be.URL(), "inaturalist_observations")
+	jq, err := jobs.NewPqJobQueue(db, be.URL(), "inaturalist_observations")
 	if err != nil {
 		log.Printf("%v", err)
 		return nil
