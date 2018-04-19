@@ -39,7 +39,8 @@ func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *FullCachedObse
 	if timestamp.IsZero() {
 		timestamp, err = o.TryParseObservedOn()
 		if err != nil {
-			return nil, err
+			log.Printf("%v", err)
+			return nil, nil
 		}
 	}
 
@@ -87,7 +88,7 @@ func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonat
 		return err
 	}
 
-	if !co.Valid() {
+	if co == nil || !co.Valid() {
 		return nil
 	}
 
