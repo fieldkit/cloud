@@ -29,6 +29,13 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "xxnBZZLJJw4bhN8JRnVJbEkVdSw=",
+			"origin": "github.com/fieldkit/cloud/server/vendor/github.com/Conservify/sqlxcache",
+			"path": "github.com/Conservify/sqlxcache",
+			"revision": "f531a9ef96c0ddd2cfa72873326ccdde91433345",
+			"revisionTime": "2018-04-20T16:34:12Z"
+		},
+		{
 			"checksumSHA1": "sMXTaE5P3q//jluejx9c0GqZPs0=",
 			"path": "github.com/O-C-R/singlepage",
 			"revision": "bbbe2159ecec95ee029557c8646d7904ec5aeec3",

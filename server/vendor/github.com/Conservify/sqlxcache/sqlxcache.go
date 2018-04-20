@@ -3,10 +3,7 @@ package sqlxcache
 import (
 	"context"
 	"database/sql"
-	"log"
-	"strings"
 	"sync"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -29,10 +26,6 @@ func newDB(db *sqlx.DB) *DB {
 func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-
-	if false {
-		log.Printf("%s", strings.TrimSpace(query))
-	}
 
 	if stmt, ok := db.cache[query]; ok {
 		return stmt, nil
@@ -83,10 +76,6 @@ func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, e
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
-	if false {
-		log.Printf("%s", strings.Replace(strings.TrimSpace(query), "\n", " ", -1))
-	}
-
 	if stmt, ok := db.cache[query]; ok {
 		return db.stmtWithTx(ctx, stmt), nil
 	}
@@ -103,10 +92,6 @@ func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, e
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-
-	if false {
-		log.Printf("%s", strings.TrimSpace(query))
-	}
 
 	if namedStmt, ok := db.cacheNamed[query]; ok {
 		return db.namedStmtWithTx(ctx, namedStmt), nil
@@ -263,10 +248,6 @@ type transactionContextKey string
 var TxContextKey = transactionContextKey("sqlx.tx")
 
 func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) error) error {
-	log.Printf("Begin")
-
-	started := time.Now()
-
 	tx, err := db.db.Beginx()
 	if err != nil {
 		return err
@@ -274,21 +255,13 @@ func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) e
 
 	txCtx := context.WithValue(ctx, TxContextKey, tx)
 	err = fn(txCtx)
-
-	work := time.Now().Sub(started)
-
 	if err != nil {
 		tx.Rollback()
-
-		elapsed := time.Now().Sub(started)
-		log.Printf("Rollback (%v) (%v)", work, elapsed)
 		return err
 	}
 
 	err = tx.Commit()
 
-	elapsed := time.Now().Sub(started)
-	log.Printf("Commit (work = %v) (total = %v)", work, elapsed)
 	return err
 }
 
