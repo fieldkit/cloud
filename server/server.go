@@ -3,13 +3,12 @@
 package main
 
 import (
-	_ "context"
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -72,6 +71,10 @@ func main() {
 	flag.StringVar(&config.MemoryProfile, "profile-memory", "", "write memory profile")
 
 	flag.Parse()
+
+	ctx := context.Background()
+
+	log := backend.Logger(backend.WithFacility(ctx, "startup")).Sugar()
 
 	if config.Help {
 		flag.Usage()
@@ -248,7 +251,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println(http.ListenAndServe("127.0.0.1:6060", nil))
+		log.Infof("%v", http.ListenAndServe("127.0.0.1:6060", nil))
 	}()
 
 	if err := server.ListenAndServe(); err != nil {

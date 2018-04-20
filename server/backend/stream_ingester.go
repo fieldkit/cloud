@@ -54,7 +54,7 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	return n, err
 }
 
-func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
+func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 
 	status := http.StatusOK
@@ -67,7 +67,7 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 		Hash:      sha1.New(),
 	}
 
-	err := si.backend.db.WithNewTransaction(req.Context(), func(txCtx context.Context) error {
+	err := si.backend.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		saver := NewFormattedMessageSaver(si.backend)
 		binaryReader := NewFkBinaryReader(saver)
 
@@ -92,7 +92,7 @@ func (si *StreamIngester) synchronous(w http.ResponseWriter, req *http.Request, 
 	w.WriteHeader(status)
 }
 
-func (si *StreamIngester) asynchronous(w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
+func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWriter, req *http.Request, id *uuid.UUID) {
 	contentType := req.Header.Get(ContentTypeHeaderName)
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 
@@ -122,8 +122,8 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if fkProcessing == "" {
-		si.synchronous(w, req, &id)
+		si.synchronous(req.Context(), w, req, &id)
 	} else if fkProcessing == "async" {
-		si.asynchronous(w, req, &id)
+		si.asynchronous(req.Context(), w, req, &id)
 	}
 }
