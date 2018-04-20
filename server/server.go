@@ -3,6 +3,7 @@
 package main
 
 import (
+	_ "context"
 	"crypto/rand"
 	"encoding/base64"
 	"flag"
@@ -17,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/O-C-R/singlepage"
+	goazap "github.com/PyYoshi/goa-logging-zap"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -24,6 +26,7 @@ import (
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
 	"github.com/kelseyhightower/envconfig"
+
 	_ "github.com/lib/pq"
 
 	"github.com/Conservify/sqlxcache"
@@ -296,6 +299,8 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	}
 
 	service = goa.New("fieldkit")
+
+	service.WithLogger(goazap.New(backend.Logger(nil)))
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
