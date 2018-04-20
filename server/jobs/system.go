@@ -1,6 +1,8 @@
 package jobs
 
 import (
+	"context"
+
 	"github.com/Conservify/sqlxcache"
 )
 
@@ -13,7 +15,7 @@ type QueueSystem struct {
 	Defs   map[string]*QueueDef
 }
 
-func OpenQueueSystem(url string, defs []*QueueDef) (qs *QueueSystem, err error) {
+func OpenQueueSystem(ctx context.Context, url string, defs []*QueueDef) (qs *QueueSystem, err error) {
 	queues := make(map[string]*PgJobQueue)
 	defsMap := make(map[string]*QueueDef)
 
@@ -23,7 +25,7 @@ func OpenQueueSystem(url string, defs []*QueueDef) (qs *QueueSystem, err error) 
 	}
 
 	for _, def := range defs {
-		jq, err := NewPqJobQueue(db, url, def.Name)
+		jq, err := NewPqJobQueue(ctx, db, url, def.Name)
 		if err != nil {
 			return nil, err
 		}

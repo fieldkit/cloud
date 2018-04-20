@@ -2,9 +2,9 @@ package backend
 
 import (
 	"context"
-	"log"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type FormattedMessageSaver struct {
@@ -28,6 +28,8 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 }
 
 func (br *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) error {
+	log := logging.Logger(ctx).Sugar()
+
 	ds, err := br.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
 	if err != nil {
 		return err
@@ -45,7 +47,7 @@ func (br *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm 
 
 	br.Changes[change.ID] = change
 
-	log.Printf("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, fm.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
+	log.Infof("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, fm.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
 
 	return nil
 }

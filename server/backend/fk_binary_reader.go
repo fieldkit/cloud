@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 	"math"
 	"time"
 
@@ -18,6 +17,7 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type FormattedMessageReceiver interface {
@@ -50,12 +50,14 @@ func NewFkBinaryReader(receiver FormattedMessageReceiver) *FkBinaryReader {
 }
 
 func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
+	log := logging.Logger(ctx).Sugar()
+
 	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var record pb.DataRecord
 		err := proto.Unmarshal(b, &record)
 		if err != nil {
 			// We keep reading, this may just be a protocol version issue.
-			log.Printf("Error unmarshalling record: %v", err)
+			log.Infof("Error unmarshalling record: %v", err)
 			return nil, nil
 		}
 
@@ -64,7 +66,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 			if detailedErr.Critical {
 				return nil, detailedErr
 			} else {
-				log.Printf("Error: %v", detailedErr)
+				log.Infof("Error: %v", detailedErr)
 			}
 		} else if err != nil {
 			return nil, err
@@ -79,15 +81,17 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 	}
 
 	if br.ReadingsSeen > 0 {
-		log.Printf("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
+		log.Infof("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
 	}
 
-	log.Printf("[%s] processed %d records", br.DeviceId, br.RecordsProcessed)
+	log.Infof("[%s] processed %d records", br.DeviceId, br.RecordsProcessed)
 
 	return nil
 }
 
 func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
+	log := logging.Logger(ctx).Sugar()
+
 	br.RecordsProcessed += 1
 
 	if record.Metadata != nil {
@@ -120,7 +124,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 		if reading != nil {
 			if br.NumberOfSensors == 0 {
-				log.Printf("Ignored: Unknown sensor. (%+v)", record)
+				log.Infof("Ignored: Unknown sensor. (%+v)", record)
 				return nil
 			}
 
@@ -144,12 +148,6 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 					return err
 				}
 			}
-		}
-	}
-
-	if record.Log != nil {
-		if false {
-			fmt.Printf("%-10d %-30s %s\n", record.Log.Uptime, record.Log.Facility, record.Log.Message)
 		}
 	}
 

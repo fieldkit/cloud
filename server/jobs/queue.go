@@ -11,6 +11,8 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/Conservify/sqlxcache"
+
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type MessageHandler interface {
@@ -18,9 +20,11 @@ type MessageHandler interface {
 }
 
 type TransportMessage struct {
+	Id      string
 	Package string
 	Type    string
 	Body    []byte
+	Trace   []string
 }
 
 type PgJobQueue struct {
@@ -32,7 +36,11 @@ type PgJobQueue struct {
 	wg       sync.WaitGroup
 }
 
-func NewPqJobQueue(db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
+var (
+	ids = logging.NewIdGenerator()
+)
+
+func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
 	onProblem := func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			log.Printf("JobQueue: %v", err)
@@ -64,8 +72,10 @@ func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
 	}
 
 	transport := TransportMessage{
+		Id:      ids.Generate(),
 		Package: messageType.PkgPath(),
 		Type:    messageType.Name(),
+		Trace:   logging.ServiceTrace(ctx),
 		Body:    body,
 	}
 

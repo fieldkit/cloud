@@ -1,25 +1,27 @@
 package backend
 
 import (
+	"context"
 	"io"
-	"log"
 
 	"github.com/google/uuid"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type StreamArchiver interface {
-	Archive(contentType string, read io.Reader) error
+	Archive(ctx context.Context, contentType string, read io.Reader) error
 }
 
 type DevNullStreamArchiver struct {
 }
 
-func (a *DevNullStreamArchiver) Archive(contentType string, reader io.Reader) error {
-	log.Printf("Streaming %s to /dev/null", contentType)
+func (a *DevNullStreamArchiver) Archive(ctx context.Context, contentType string, reader io.Reader) error {
+	logging.Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", contentType)
 	return nil
 }
 
@@ -35,7 +37,7 @@ func NewS3StreamArchiver(session *session.Session, bucketName string) *S3StreamA
 	}
 }
 
-func (a *S3StreamArchiver) Archive(contentType string, reader io.Reader) error {
+func (a *S3StreamArchiver) Archive(ctx context.Context, contentType string, reader io.Reader) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -58,7 +60,7 @@ func (a *S3StreamArchiver) Archive(contentType string, reader io.Reader) error {
 		return err
 	}
 
-	log.Printf("Done: %s", r.Location)
+	logging.Logger(ctx).Sugar().Infof("Done: %s", r.Location)
 
 	return nil
 }

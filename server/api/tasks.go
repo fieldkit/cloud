@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -13,6 +12,7 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/naturalist"
 )
 
@@ -91,6 +91,8 @@ func (n *Notifier) SendOnline(ctx context.Context, sourceId int32, age time.Dura
 
 // TODO: Should narrow this query down eventually.
 func (n *Notifier) Check(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
 	summaries := []*backend.FeatureSummary{}
 	if err := n.Database.SelectContext(ctx, &summaries, `SELECT c.source_id, c.end_time FROM fieldkit.sources_summaries c ORDER BY c.end_time`); err != nil {
 		return err
@@ -123,27 +125,27 @@ func (n *Notifier) Check(ctx context.Context) error {
 
 		if age < ThirtyMinutes {
 			if wasNotified {
-				log.Printf("%s: Online!", prefix)
+				log.Infof("%s: Online!", prefix)
 				if err := n.SendOnline(ctx, int32(summary.SourceID), age, notification); err != nil {
 					return err
 				}
 			} else {
-				log.Printf("%s: Have readings", prefix)
+				log.Infof("%s: Have readings", prefix)
 			}
 			continue
 		}
 
 		if age > TwoDays {
-			log.Printf("%s: Too old", prefix)
+			log.Infof("%s: Too old", prefix)
 			continue
 		}
 
 		for _, interval := range []time.Duration{SixHours, TwoHours, ThirtyMinutes} {
 			if age > interval {
 				if lastNotification < interval {
-					log.Printf("%s: Already notified (%v)", prefix, interval)
+					log.Infof("%s: Already notified (%v)", prefix, interval)
 				} else {
-					log.Printf("%s: Offline! (%v)", prefix, interval)
+					log.Infof("%s: Offline! (%v)", prefix, interval)
 					if err := n.SendOffline(ctx, int32(summary.SourceID), age, notification); err != nil {
 						return err
 					}
@@ -181,7 +183,7 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 }
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
-	go naturalist.RefreshNaturalistObservations(context.Background(), c.options.Database, c.options.Backend)
+	go naturalist.RefreshNaturalistObservations(ctx, c.options.Database, c.options.Backend)
 
 	return ctx.OK([]byte("Ok"))
 }

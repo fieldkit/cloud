@@ -3,7 +3,6 @@ package naturalist
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/jobs"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type CachedObservation struct {
@@ -39,7 +39,6 @@ func NewCachedObservation(o *gonaturalist.SimpleObservation) (co *FullCachedObse
 	if timestamp.IsZero() {
 		timestamp, err = o.TryParseObservedOn()
 		if err != nil {
-			log.Printf("%v", err)
 			return nil, nil
 		}
 	}
@@ -151,11 +150,13 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 	progress := 0.0
 	paging := &gonaturalist.PageHeaders{}
 
+	log := logging.Logger(ctx).Sugar()
+
 	for {
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Printf("Refresh(%v) (%v)", spew.Sprintf("%v", options), progress)
+		log.Infof("Refresh(%v) (%v)", spew.Sprintf("%v", options), progress)
 
 		observations, err := in.NaturalistClient.GetObservations(options)
 		if err != nil {

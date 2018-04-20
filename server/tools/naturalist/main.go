@@ -52,7 +52,9 @@ func main() {
 		panic(err)
 	}
 
-	jq, err := jobs.NewPqJobQueue(db, config.PostgresURL, "inaturalist_observations")
+	ctx := context.Background()
+
+	jq, err := jobs.NewPqJobQueue(ctx, db, config.PostgresURL, "inaturalist_observations")
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +67,7 @@ func main() {
 	jq.Register(naturalist.CachedObservation{}, nc)
 
 	if config.Listen {
-		if err := jq.Listen(5); err != nil {
+		if err := jq.Listen(ctx, 5); err != nil {
 			panic(err)
 		}
 	}

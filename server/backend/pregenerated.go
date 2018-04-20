@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/Conservify/sqlxcache"
+
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type Pregenerator struct {
@@ -19,7 +21,7 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 }
 
 func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	Logger(ctx).Sugar().Infof("Generating temporal tracks (%v)...", sourceId)
+	logging.Logger(ctx).Sugar().Infof("Generating temporal tracks (%v)...", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -34,7 +36,7 @@ func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (su
 }
 
 func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (summaries []*TemporalGeometry, err error) {
-	Logger(ctx).Sugar().Infof("Generating temporal geometries (%v)...", sourceId)
+	logging.Logger(ctx).Sugar().Infof("Generating temporal geometries (%v)...", sourceId)
 
 	summaries = []*TemporalGeometry{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -49,7 +51,7 @@ func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (
 }
 
 func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	Logger(ctx).Sugar().Infof("Generating spatial clusters (%v)...", sourceId)
+	logging.Logger(ctx).Sugar().Infof("Generating spatial clusters (%v)...", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -64,7 +66,7 @@ func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (sum
 }
 
 func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries []*FeatureSummary, err error) {
-	Logger(ctx).Sugar().Infof("Generating summaries (%v)...", sourceId)
+	logging.Logger(ctx).Sugar().Infof("Generating summaries (%v)...", sourceId)
 
 	summaries = []*FeatureSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -81,7 +83,7 @@ func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries
 func (p *Pregenerator) Pregenerate(ctx context.Context, sourceId int64) (*Pregenerated, error) {
 	pregenerated := &Pregenerated{}
 
-	if err := p.db.WithNewTransaction(WithNewTaskId(ctx), func(txCtx context.Context) error {
+	if err := p.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		summaries, err := p.Summaries(txCtx, sourceId)
 		if err != nil {
 			return err

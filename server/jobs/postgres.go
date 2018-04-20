@@ -5,9 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"time"
+
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 func (jq *PgJobQueue) Register(messageExample interface{}, handler interface{}) error {
@@ -21,13 +22,13 @@ func (jq *PgJobQueue) Register(messageExample interface{}, handler interface{}) 
 	return nil
 }
 
-func (jq *PgJobQueue) Listen(concurrency int) error {
+func (jq *PgJobQueue) Listen(ctx context.Context, concurrency int) error {
 	err := jq.listener.Listen(jq.name)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[%v] listening (%d)", jq.name, concurrency)
+	logging.Logger(ctx).Sugar().Infof("[%v] listening (%d)", jq.name, concurrency)
 
 	go jq.waitForNotification(concurrency)
 
@@ -70,38 +71,42 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) error 
 func (jq *PgJobQueue) waitForNotification(concurrency int) {
 	ctx := context.Background()
 
+	log := logging.Logger(ctx).Sugar()
+
 	jq.wg.Add(1)
 
 	for {
 		select {
 		case n := <-jq.listener.Notify:
 			if false {
-				log.Printf("[%v] received data from channel:", n.Channel)
+				log.Infof("[%v] received data from channel:", n.Channel)
 				var prettyJSON bytes.Buffer
 				err := json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
 				if err != nil {
-					log.Printf("Error processing JSON: %v", err)
+					log.Infof("Error processing JSON: %v", err)
 					break
 				}
-				log.Printf(string(prettyJSON.Bytes()))
+				log.Infof(string(prettyJSON.Bytes()))
 			}
 
 			transport := &TransportMessage{}
 			err := json.Unmarshal([]byte(n.Extra), transport)
 			if err != nil {
-				log.Printf("Error processing JSON: %v", err)
+				log.Infof("Error processing JSON: %v", err)
 				break
 			}
 
-			if err := jq.dispatch(ctx, transport); err != nil {
-				log.Printf("Error dispatching: %v", err)
+			messageCtx := logging.PushServiceTrace(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+
+			if err := jq.dispatch(messageCtx, transport); err != nil {
+				logging.Logger(messageCtx).Sugar().Infof("Error dispatching: %v", err)
 				break
 			}
 
 			break
 		case c := <-jq.control:
 			if c {
-				log.Printf("[%s] listener exiting", jq.name)
+				log.Infof("[%s] listener exiting", jq.name)
 				jq.wg.Done()
 				return
 			}

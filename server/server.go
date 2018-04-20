@@ -17,7 +17,6 @@ import (
 	"strings"
 
 	"github.com/O-C-R/singlepage"
-	goazap "github.com/PyYoshi/goa-logging-zap"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -36,6 +35,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/jobs"
+	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
 )
@@ -74,7 +74,7 @@ func main() {
 
 	ctx := context.Background()
 
-	log := backend.Logger(backend.WithFacility(ctx, "startup")).Sugar()
+	log := logging.Logger(logging.WithFacility(ctx, "startup")).Sugar()
 
 	if config.Help {
 		flag.Usage()
@@ -120,7 +120,7 @@ func main() {
 		panic(err)
 	}
 
-	jq, err := jobs.NewPqJobQueue(database, config.PostgresURL, "messages")
+	jq, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
@@ -131,14 +131,7 @@ func main() {
 
 	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
 
-	err = jq.Listen(1)
-	if err != nil {
-		panic(err)
-	}
-
 	publisher := backend.NewJobQueuePublisher(jq)
-
-	sourceModifiedHandler.QueueChangesForAllSources(publisher)
 
 	archiver, err := createArchiver(awsSession, config)
 	if err != nil {
@@ -254,6 +247,13 @@ func main() {
 		log.Infof("%v", http.ListenAndServe("127.0.0.1:6060", nil))
 	}()
 
+	err = jq.Listen(ctx, 1)
+	if err != nil {
+		panic(err)
+	}
+
+	sourceModifiedHandler.QueueChangesForAllSources(publisher)
+
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
 	}
@@ -295,6 +295,17 @@ func createArchiver(awsSession *session.Session, config Config) (archiver backen
 	return
 }
 
+func ServiceTraceMiddleware(h goa.Handler) goa.Handler {
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		id := middleware.ContextRequestID(ctx)
+		if len(id) == 0 {
+			return h(ctx, rw, req)
+		}
+		newCtx := logging.PushServiceTrace(ctx, id)
+		return h(newCtx, rw, req)
+	}
+}
+
 func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config Config) (service *goa.Service, err error) {
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
@@ -303,7 +314,7 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 
 	service = goa.New("fieldkit")
 
-	service.WithLogger(goazap.New(backend.Logger(nil)))
+	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
@@ -321,6 +332,7 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
+	service.Use(ServiceTraceMiddleware)
 
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)

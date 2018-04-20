@@ -2,7 +2,6 @@ package naturalist
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/Conservify/sqlxcache"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type CorrelationTier struct {
@@ -40,6 +40,8 @@ func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend) (nc *INatur
 }
 
 func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObservation) (err error) {
+	log := logging.Logger(ctx).Sugar()
+
 	offset := 1 * time.Minute
 	options := backend.FindRecordsOpt{
 		StartTime: co.Timestamp.Add(-1 * offset),
@@ -53,7 +55,7 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	if len(records) == 0 {
 		if nc.Verbose {
-			log.Printf("No contemporaneous records.")
+			log.Infof("No contemporaneous records.")
 		}
 		return nil
 	}
@@ -77,15 +79,15 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	if len(recordsByTier) == 0 {
 		if nc.Verbose {
-			log.Printf("No local records.")
+			log.Infof("No local records.")
 		}
 		return nil
 	}
 
 	if nc.Verbose {
-		log.Printf("%s", spew.Sdump(recordsByTier))
+		log.Infof("%s", spew.Sdump(recordsByTier))
 	} else {
-		log.Printf("Observation #%d has %d records across %d tier(s)", co.ID, numberOfRecords, len(recordsByTier))
+		log.Infof("Observation #%d has %d records across %d tier(s)", co.ID, numberOfRecords, len(recordsByTier))
 	}
 
 	return nil
