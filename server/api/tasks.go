@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -121,31 +120,31 @@ func (n *Notifier) Check(ctx context.Context) error {
 		age := now.Sub(summary.EndTime)
 		lastNotification := now.Sub(notification.UpdatedAt)
 
-		prefix := fmt.Sprintf("SourceId: %d EndTime: %v: Age: %v LastNotification: %v", summary.SourceID, summary.EndTime, age, lastNotification)
+		details := log.With("sourceId", summary.SourceID, "endTime", summary.EndTime, "age", age, "lastNotification", lastNotification)
 
 		if age < ThirtyMinutes {
 			if wasNotified {
-				log.Infof("%s: Online!", prefix)
+				details.Infof("Online!")
 				if err := n.SendOnline(ctx, int32(summary.SourceID), age, notification); err != nil {
 					return err
 				}
 			} else {
-				log.Infof("%s: Have readings", prefix)
+				details.Infof("Have readings")
 			}
 			continue
 		}
 
 		if age > TwoDays {
-			log.Infof("%s: Too old", prefix)
+			details.Infof("Too old")
 			continue
 		}
 
 		for _, interval := range []time.Duration{SixHours, TwoHours, ThirtyMinutes} {
 			if age > interval {
 				if lastNotification < interval {
-					log.Infof("%s: Already notified (%v)", prefix, interval)
+					details.Infof("Already notified (%v)", interval)
 				} else {
-					log.Infof("%s: Offline! (%v)", prefix, interval)
+					details.Infof("Offline! (%v)", interval)
 					if err := n.SendOffline(ctx, int32(summary.SourceID), age, notification); err != nil {
 						return err
 					}

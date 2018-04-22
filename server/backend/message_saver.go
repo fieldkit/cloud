@@ -47,7 +47,7 @@ func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm
 
 	fms.Changes[change.ID] = change
 
-	log.Infow("Record", "deviceId", fm.SchemaId.Device, "steramId", fm.SchemaId.Stream, "modules", fm.Modules, "location", fm.Location)
+	log.Infow("Record", "deviceId", fm.SchemaId.Device, "streamId", fm.SchemaId.Stream, "modules", fm.Modules, "location", fm.Location)
 
 	return nil
 }

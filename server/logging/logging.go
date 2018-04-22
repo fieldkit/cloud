@@ -30,12 +30,12 @@ var rootLogger *zap.Logger
 
 func init() {
 	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "T",
-		LevelKey:       "L",
-		NameKey:        "N",
-		CallerKey:      "C",
-		MessageKey:     "M",
-		StacktraceKey:  "S",
+		TimeKey:    "T",
+		LevelKey:   "L",
+		NameKey:    "N",
+		CallerKey:  "C",
+		MessageKey: "M",
+		//StacktraceKey:  "S",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
@@ -69,7 +69,11 @@ func ServiceTrace(ctx context.Context) []string {
 }
 
 func HandlerContext(ctx context.Context, queue string, handlerType reflect.Type) context.Context {
-	return context.WithValue(context.WithValue(ctx, queueKey, queue), handlerKey, handlerType.String())
+	name := handlerType.String()
+	if handlerType.Kind() == reflect.Ptr {
+		name = handlerType.Elem().String()
+	}
+	return context.WithValue(context.WithValue(ctx, queueKey, queue), handlerKey, name)
 }
 
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
@@ -152,7 +156,7 @@ func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 func (a *adapter) getTaskedLogger(fields *[]zapcore.Field) *zap.Logger {
 	id := a.getRequestId(fields)
 	if len(id) > 0 {
-		return a.Logger.Named(id)
+		return a.Logger.Named(id).With(zap.String("taskId", id))
 	}
 	return a.Logger
 }

@@ -329,10 +329,10 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 	service.Use(gzip.Middleware(6))
 	app.UseJWTMiddleware(service, jwtMiddleware)
 	service.Use(middleware.RequestID())
+	service.Use(ServiceTraceMiddleware)
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
-	service.Use(ServiceTraceMiddleware)
 
 	// Mount "swagger" controller
 	c := api.NewSwaggerController(service)
