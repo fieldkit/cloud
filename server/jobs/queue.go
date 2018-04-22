@@ -27,11 +27,16 @@ type TransportMessage struct {
 	Trace   []string
 }
 
+type HandlerRegistration struct {
+	HandlerType reflect.Type
+	Method      reflect.Value
+}
+
 type PgJobQueue struct {
 	db       *sqlxcache.DB
 	name     string
 	listener *pq.Listener
-	handlers map[reflect.Type]reflect.Value
+	handlers map[reflect.Type]*HandlerRegistration
 	control  chan bool
 	wg       sync.WaitGroup
 }
@@ -50,7 +55,7 @@ func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name strin
 	listener := pq.NewListener(url, 10*time.Second, time.Minute, onProblem)
 
 	jq := &PgJobQueue{
-		handlers: make(map[reflect.Type]reflect.Value),
+		handlers: make(map[reflect.Type]*HandlerRegistration),
 		name:     name,
 		db:       db,
 		listener: listener,

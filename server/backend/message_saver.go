@@ -27,34 +27,34 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 	}
 }
 
-func (br *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) error {
+func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) error {
 	log := logging.Logger(ctx).Sugar()
 
-	ds, err := br.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
+	ds, err := fms.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
 	if err != nil {
 		return err
 	}
 
-	pm, err := br.SchemaApplier.ApplySchemas(ds, fm)
+	pm, err := fms.SchemaApplier.ApplySchemas(ds, fm)
 	if err != nil {
 		return err
 	}
 
-	change, err := br.RecordAdder.AddRecord(ctx, ds, pm)
+	change, err := fms.RecordAdder.AddRecord(ctx, ds, pm)
 	if err != nil {
 		return err
 	}
 
-	br.Changes[change.ID] = change
+	fms.Changes[change.ID] = change
 
-	log.Infof("(%s)(%s)[Success] %v, %d values (location = %t), %v", fm.MessageId, fm.SchemaId, fm.Modules, len(fm.MapValues), pm.LocationUpdated, fm.Location)
+	log.Infow("Record", "deviceId", fm.SchemaId.Device, "steramId", fm.SchemaId.Stream, "modules", fm.Modules, "location", fm.Location)
 
 	return nil
 }
 
-func (br *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges ingestion.SourceChangesPublisher) {
+func (fms *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges ingestion.SourceChangesPublisher) {
 	sources := make(map[int64][]*ingestion.RecordChange)
-	for _, change := range br.Changes {
+	for _, change := range fms.Changes {
 		if sources[change.SourceID] == nil {
 			sources[change.SourceID] = make([]*ingestion.RecordChange, 0)
 		}

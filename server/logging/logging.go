@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"reflect"
 	"strings"
 	"sync/atomic"
 
@@ -21,6 +22,8 @@ const (
 	serviceTraceKey correlationIdType = iota
 	facilityKey     correlationIdType = iota
 	taskIdKey       correlationIdType = iota
+	handlerKey      correlationIdType = iota
+	queueKey        correlationIdType = iota
 )
 
 var rootLogger *zap.Logger
@@ -65,6 +68,10 @@ func ServiceTrace(ctx context.Context) []string {
 	return []string{}
 }
 
+func HandlerContext(ctx context.Context, queue string, handlerType reflect.Type) context.Context {
+	return context.WithValue(context.WithValue(ctx, queueKey, queue), handlerKey, handlerType.String())
+}
+
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
 	existing := ServiceTrace(ctx)
 	return context.WithValue(ctx, serviceTraceKey, append(existing, value...))
@@ -96,6 +103,12 @@ func Logger(ctx context.Context) *zap.Logger {
 		}
 		if ctxTaskId, ok := ctx.Value(taskIdKey).(string); ok {
 			newLogger = newLogger.With(zap.String("taskId", ctxTaskId))
+		}
+		if ctxHandler, ok := ctx.Value(handlerKey).(string); ok {
+			newLogger = newLogger.With(zap.String("handler", ctxHandler))
+		}
+		if ctxQueue, ok := ctx.Value(queueKey).(string); ok {
+			newLogger = newLogger.With(zap.String("queue", ctxQueue))
 		}
 		if ctxServiceTrace, ok := ctx.Value(serviceTraceKey).([]string); ok {
 			newLogger = newLogger.Named(strings.Join(ctxServiceTrace, "/"))

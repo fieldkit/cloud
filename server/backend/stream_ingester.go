@@ -59,7 +59,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 	status := http.StatusOK
 
-	log.Infof("Stream: begin (%v)", contentLength)
+	log.Infow("Stream: begin", "contentLength", contentLength)
 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
@@ -84,9 +84,9 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Infof("Stream: error: %v (%d bytes) (%x)", err, reader.BytesRead, reader.Hash.Sum(nil))
+		log.Infow("Stream: error", "error", err, reader.BytesRead, "hash", reader.Hash.Sum(nil))
 	} else {
-		log.Infof("Stream: done (%d bytes) (%x)", reader.BytesRead, reader.Hash.Sum(nil))
+		log.Infow("Stream: done", "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil))
 	}
 
 	w.WriteHeader(status)
@@ -98,10 +98,10 @@ func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWrite
 	contentType := req.Header.Get(ContentTypeHeaderName)
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 
-	log.Infof("Stream: begin (%v) (async)", contentLength)
+	log.Infof("Stream: begin (async)", "contentLength", contentLength)
 
 	if err := si.streamArchiver.Archive(ctx, contentType, req.Body); err != nil {
-		log.Infof("Stream: error (%v) (async)", err)
+		log.Infow("Stream: error", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(http.StatusOK)

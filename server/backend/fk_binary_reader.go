@@ -57,7 +57,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		err := proto.Unmarshal(b, &record)
 		if err != nil {
 			// We keep reading, this may just be a protocol version issue.
-			log.Infof("Error unmarshalling record: %v", err)
+			log.Errorw("Error unmarshalling record", "error", err)
 			return nil, nil
 		}
 
@@ -66,7 +66,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 			if detailedErr.Critical {
 				return nil, detailedErr
 			} else {
-				log.Infof("Error: %v", detailedErr)
+				log.Errorw("Error", "error", detailedErr)
 			}
 		} else if err != nil {
 			return nil, err
@@ -81,10 +81,10 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 	}
 
 	if br.ReadingsSeen > 0 {
-		log.Infof("Ignored: partial record (%v readings seen)", br.ReadingsSeen)
+		log.Warnf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
 	}
 
-	log.Infof("[%s] processed %d records", br.DeviceId, br.RecordsProcessed)
+	log.Infow("Processed", "deviceId", br.DeviceId, "numberOfRecords", br.RecordsProcessed)
 
 	return nil
 }
@@ -124,7 +124,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 		if reading != nil {
 			if br.NumberOfSensors == 0 {
-				log.Infof("Ignored: Unknown sensor. (%+v)", record)
+				log.Warnf("Ignored: Unknown sensor (%+v)", record)
 				return nil
 			}
 
