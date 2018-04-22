@@ -21,7 +21,7 @@ import (
 )
 
 type FormattedMessageReceiver interface {
-	HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) error
+	HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error)
 }
 
 type FkBinaryReader struct {
@@ -52,6 +52,8 @@ func NewFkBinaryReader(receiver FormattedMessageReceiver) *FkBinaryReader {
 func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 	log := logging.Logger(ctx).Sugar()
 
+	changes := make(map[int64][]*ingestion.RecordChange)
+
 	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var record pb.DataRecord
 		err := proto.Unmarshal(b, &record)
@@ -61,7 +63,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 			return nil, nil
 		}
 
-		err = br.Push(ctx, &record)
+		change, err := br.Push(ctx, &record)
 		if detailedErr, ok := err.(*ingestion.IngestError); ok {
 			if detailedErr.Critical {
 				return nil, detailedErr
@@ -70,6 +72,13 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 			}
 		} else if err != nil {
 			return nil, err
+		}
+
+		if change != nil {
+			if changes[change.SourceID] == nil {
+				changes[change.SourceID] = make([]*ingestion.RecordChange, 0)
+			}
+			changes[change.SourceID] = append(changes[change.SourceID], change)
 		}
 
 		return &record, nil
@@ -84,12 +93,14 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		log.Warnf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
 	}
 
-	log.Infow("Processed", "deviceId", br.DeviceId, "numberOfRecords", br.RecordsProcessed)
+	for sourceId, c := range changes {
+		log.Infow("Processed", "deviceId", br.DeviceId, "sourceId", sourceId, "recordsProcessed", br.RecordsProcessed, "recordsAdded", len(c))
+	}
 
 	return nil
 }
 
-func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error {
+func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) (*ingestion.RecordChange, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	br.RecordsProcessed += 1
@@ -125,7 +136,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 		if reading != nil {
 			if br.NumberOfSensors == 0 {
 				log.Warnf("Ignored: Unknown sensor (%+v)", record)
-				return nil
+				return nil, nil
 			}
 
 			if reading.Sensor == 0 {
@@ -141,17 +152,20 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) error
 
 				fm, err := br.getFormattedMessage()
 				if err != nil {
-					return fmt.Errorf("Unable to create formatted message (%v)", err)
+					return nil, fmt.Errorf("Unable to create formatted message (%v)", err)
 				}
 
-				if err := br.Receiver.HandleFormattedMessage(ctx, fm); err != nil {
-					return err
+				change, err := br.Receiver.HandleFormattedMessage(ctx, fm)
+				if err != nil {
+					return nil, err
 				}
+
+				return change, nil
 			}
 		}
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (br *FkBinaryReader) getLocationArray() []float64 {

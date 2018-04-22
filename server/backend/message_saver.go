@@ -27,29 +27,29 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 	}
 }
 
-func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) error {
+func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	ds, err := fms.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	pm, err := fms.SchemaApplier.ApplySchemas(ds, fm)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	change, err := fms.RecordAdder.AddRecord(ctx, ds, pm)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fms.Changes[change.ID] = change
 
-	log.Infow("Record", "deviceId", fm.SchemaId.Device, "streamId", fm.SchemaId.Stream, "modules", fm.Modules, "location", fm.Location)
+	log.Infow("Record", "deviceId", fm.SchemaId.Device, "streamId", fm.SchemaId.Stream, "modules", fm.Modules, "location", fm.Location, "sourceId", change.SourceID)
 
-	return nil
+	return change, nil
 }
 
 func (fms *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges ingestion.SourceChangesPublisher) {

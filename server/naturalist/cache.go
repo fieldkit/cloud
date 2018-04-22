@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/jmoiron/sqlx/types"
 
 	"github.com/Conservify/gonaturalist"
@@ -62,6 +61,7 @@ func (co *CachedObservation) Valid() bool {
 }
 
 type INaturalistCache struct {
+	Config           *INaturalistConfig
 	Database         *sqlxcache.DB
 	NaturalistClient *gonaturalist.Client
 	Queue            *jobs.PgJobQueue
@@ -73,6 +73,7 @@ func NewINaturalistCache(config *INaturalistConfig, db *sqlxcache.DB, queue *job
 	c := authenticator.NewClientWithAccessToken(config.AccessToken)
 
 	in = &INaturalistCache{
+		Config:           config,
 		Database:         db,
 		NaturalistClient: c,
 		Queue:            queue,
@@ -156,7 +157,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Infof("Refresh(%v) (%v)", spew.Sprintf("%v", options), progress)
+		log.Infow("Refresh", "options", options, "progress", progress, "naturalistUrl", in.Config.RootUrl)
 
 		observations, err := in.NaturalistClient.GetObservations(options)
 		if err != nil {

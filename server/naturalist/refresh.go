@@ -25,8 +25,8 @@ func RefreshNaturalistObservations(ctx context.Context, db *sqlxcache.DB, be *ba
 		return nil
 	}
 
-	for index, naturalistConfig := range AllNaturalistConfigs {
-		log.Infof("Applying iNaturalist configuration: %d [%s]", index, naturalistConfig.RootUrl)
+	for _, naturalistConfig := range AllNaturalistConfigs {
+		log.Infow("Refreshing iNaturalist", "naturalistUrl", naturalistConfig.RootUrl)
 
 		cache, err := NewINaturalistCache(&naturalistConfig, db, jq)
 		if err != nil {
