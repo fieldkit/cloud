@@ -154,7 +154,7 @@ func Logger(ctx context.Context) *zap.Logger {
 			newLogger = newLogger.With(zap.String("queue", ctxQueue))
 		}
 		if ctxServiceTrace, ok := ctx.Value(serviceTraceKey).([]string); ok {
-			newLogger = newLogger.Named(strings.Join(ctxServiceTrace, "/"))
+			newLogger = newLogger.With(zap.String("serviceTrace", strings.Join(ctxServiceTrace, " ")))
 		}
 	}
 	return newLogger

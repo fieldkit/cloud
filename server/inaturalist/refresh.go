@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend"
@@ -11,37 +13,64 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-func RefreshNaturalistObservations(ctx context.Context, db *sqlxcache.DB, be *backend.Backend) error {
-	log := logging.Logger(ctx).Sugar()
+type INaturalistService struct {
+	Log        *zap.SugaredLogger
+	DB         *sqlxcache.DB
+	Backend    *backend.Backend
+	Correlator *INaturalistCorrelator
+	Queue      *jobs.PgJobQueue
+}
 
+func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Backend, verbose bool) (*INaturalistService, error) {
 	jq, err := jobs.NewPqJobQueue(ctx, db, be.URL(), "inaturalist_observations")
 	if err != nil {
-		log.Infof("%v", err)
-		return nil
+		return nil, err
 	}
+
+	nc, err := NewINaturalistCorrelator(db, be, verbose)
+	if err != nil {
+		return nil, err
+	}
+
+	jq.Register(CachedObservation{}, nc)
 
 	if err := jq.Listen(ctx, 1); err != nil {
-		log.Infof("%v", err)
-		return nil
+		return nil, err
 	}
 
-	for _, naturalistConfig := range AllNaturalistConfigs {
-		log.Infow("Refreshing iNaturalist", "naturalistUrl", naturalistConfig.RootUrl)
+	return &INaturalistService{
+		Log:        nil,
+		Queue:      jq,
+		Correlator: nc,
+		Backend:    be,
+		DB:         db,
+	}, nil
+}
 
-		cache, err := NewINaturalistCache(&naturalistConfig, db, jq)
+func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
+	for _, naturalistConfig := range AllNaturalistConfigs {
+		log.Infow("Refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
+
+		cache, err := NewINaturalistCache(&naturalistConfig, ns.DB, ns.Queue)
 		if err != nil {
-			log.Infof("%v", err)
+			log.Errorw("Error building cache", "error", err)
 			return err
 		}
 
 		since := time.Now().Add(-10 * time.Minute)
 		if err := cache.RefreshRecentlyUpdated(ctx, since); err != nil {
-			log.Infof("%v", err)
+			log.Errorw("Error refreshing cache", "error", err)
 			continue
 		}
 	}
 
-	jq.Stop()
+	return nil
+}
+
+func (ns *INaturalistService) Stop(ctx context.Context) error {
+	ns.Queue.Stop()
 
 	return nil
 }

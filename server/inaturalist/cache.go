@@ -148,8 +148,6 @@ func (in *INaturalistCache) getLastUpdated() (time.Time, error) {
 func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *gonaturalist.GetObservationsOpt) error {
 	perPage := 100
 	page := 0
-	progress := 0.0
-	paging := &gonaturalist.PageHeaders{}
 
 	log := logging.Logger(ctx).Sugar()
 
@@ -157,7 +155,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Infow("Refresh", "options", options, "progress", progress, "naturalistUrl", in.Config.RootUrl)
+		log.Infow("Querying", "iNaturalistUrl", in.Config.RootUrl)
 
 		observations, err := in.NaturalistClient.GetObservations(options)
 		if err != nil {
@@ -175,8 +173,6 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		}
 
 		page += 1
-		paging = observations.Paging
-		progress = float64(paging.PerPage*paging.Page) / float64(paging.TotalEntries) * 100.0
 	}
 
 	return nil

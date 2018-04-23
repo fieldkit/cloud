@@ -30,10 +30,11 @@ type INaturalistCorrelator struct {
 	Verbose  bool
 }
 
-func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend) (nc *INaturalistCorrelator, err error) {
+func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend, verbose bool) (nc *INaturalistCorrelator, err error) {
 	nc = &INaturalistCorrelator{
 		Database: db,
 		Backend:  be,
+		Verbose:  verbose,
 	}
 
 	return

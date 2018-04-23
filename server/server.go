@@ -34,6 +34,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/inaturalist"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/social"
@@ -151,7 +152,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	service, err := createApiService(database, be, awsSession, config)
+	service, err := createApiService(ctx, database, be, awsSession, config)
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -298,8 +299,13 @@ func ServiceTraceMiddleware(h goa.Handler) goa.Handler {
 	}
 }
 
-func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config Config) (service *goa.Service, err error) {
+func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config Config) (service *goa.Service, err error) {
 	emailer, err := createEmailer(awsSession, config)
+	if err != nil {
+		panic(err)
+	}
+
+	ns, err := inaturalist.NewINaturalistService(ctx, database, be, false)
 	if err != nil {
 		panic(err)
 	}
@@ -427,9 +433,10 @@ func createApiService(database *sqlxcache.DB, be *backend.Backend, awsSession *s
 
 	// Mount "tasks" controller
 	c16 := api.NewTasksController(service, api.TasksControllerOptions{
-		Database: database,
-		Backend:  be,
-		Emailer:  emailer,
+		Database:           database,
+		Backend:            be,
+		Emailer:            emailer,
+		INaturalistService: ns,
 	})
 	app.MountTasksController(service, c16)
 
