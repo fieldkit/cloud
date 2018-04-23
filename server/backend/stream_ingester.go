@@ -6,6 +6,7 @@ import (
 	"hash"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/Conservify/sqlxcache"
 
@@ -55,11 +56,11 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
 	log := logging.Logger(ctx).Sugar()
 
+	startedAt := time.Now()
 	contentLength := req.Header.Get(ContentLengthHeaderName)
-
 	status := http.StatusOK
 
-	log.Infow("Stream begin", "contentLength", contentLength)
+	log.Infow("started", ContentLengthHeaderName, contentLength)
 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
@@ -73,7 +74,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 		if err := binaryReader.Read(txCtx, reader); err != nil {
 			status = http.StatusInternalServerError
-			log.Errorw("Stream error", "error", err, "bytesRead", reader.BytesRead)
+			log.Errorw("error", "error", err, "bytesRead", reader.BytesRead)
 			return nil
 		}
 
@@ -84,9 +85,9 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Infow("Stream error", "error", err, reader.BytesRead, "hash", reader.Hash.Sum(nil))
+		log.Infow("completed", "error", err, "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	} else {
-		log.Infow("Stream done", "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil))
+		log.Infow("completed", "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	}
 
 	w.WriteHeader(status)
@@ -95,15 +96,17 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
 	log := logging.Logger(ctx).Sugar()
 
+	startedAt := time.Now()
 	contentType := req.Header.Get(ContentTypeHeaderName)
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 
-	log.Infof("Stream begin (async)", "contentLength", contentLength)
+	log.Infof("started (async)", ContentLengthHeaderName, contentLength, ContentTypeHeaderName, contentType)
 
 	if err := si.streamArchiver.Archive(ctx, contentType, req.Body); err != nil {
-		log.Infow("Stream error", "error", err)
+		log.Infow("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
+		log.Infow("completed", "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusOK)
 	}
 }

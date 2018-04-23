@@ -28,21 +28,49 @@ const (
 
 var rootLogger *zap.Logger
 
-func init() {
+func getOurProductionConfig() *zap.Config {
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "zapts",
+		LevelKey:       "zaplevel",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "message",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.EpochTimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	return &zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		Development: false,
+		Sampling: &zap.SamplingConfig{
+			Initial:    100,
+			Thereafter: 100,
+		},
+		Encoding:         "json",
+		EncoderConfig:    encoderConfig,
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+}
+
+func getOurDevelopmentConfig() *zap.Config {
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:    "T",
 		LevelKey:   "L",
 		NameKey:    "N",
 		CallerKey:  "C",
 		MessageKey: "M",
-		//StacktraceKey:  "S",
+		// StacktraceKey:  "S",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
-	config := zap.Config{
+	return &zap.Config{
 		Level:            zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development:      true,
 		Encoding:         "console",
@@ -50,7 +78,18 @@ func init() {
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+}
+
+func getConfiguration(production bool) *zap.Config {
+	if production {
+		return getOurProductionConfig()
+	}
+	return getOurDevelopmentConfig()
+}
+
+func Configure(production bool) {
+	config := getConfiguration(production)
+
 	logger, err := config.Build()
 	if err != nil {
 		panic(err)

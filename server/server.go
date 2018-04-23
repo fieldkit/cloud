@@ -54,6 +54,7 @@ type Config struct {
 	LandingRoot           string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
+	ProductionLogging     bool   `envconfig:"production_logging"`
 
 	Help          bool
 	CpuProfile    string
@@ -74,28 +75,19 @@ func main() {
 
 	ctx := context.Background()
 
-	log := logging.Logger(logging.WithFacility(ctx, "startup")).Sugar()
-
 	if config.Help {
 		flag.Usage()
 		envconfig.Usage("fieldkit", &config)
 		os.Exit(0)
 	}
 
-	if false && config.CpuProfile != "" {
-		f, err := os.Create(config.CpuProfile)
-		if err != nil {
-			log.Fatal("Unable to create CPU profile: ", err)
-		}
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("Unable to start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
-
 	if err := envconfig.Process("fieldkit", &config); err != nil {
 		panic(err)
 	}
+
+	logging.Configure(config.ProductionLogging)
+
+	log := logging.Logger(logging.WithFacility(ctx, "startup")).Sugar()
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
