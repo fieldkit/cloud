@@ -1,4 +1,4 @@
-modules = server/sqs-worker server/sqs-sender server/tools/fkcli server/tools/fktool
+modules = server/sqs-worker server/sqs-sender server/tools/fktool
 
 BUILD=build
 
@@ -7,7 +7,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: binaries tests
 
-binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
+binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
 
 all: binaries
 
@@ -17,20 +17,17 @@ tests:
 $(BUILD)/server: $(SERVER_SOURCES)
 	go build -o $@ server/server.go
 
-$(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
-	go build -o $@ server/sqs-worker/*.go
-
-$(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
-	go build -o $@ server/sqs-sender/*.go
-
-$(BUILD)/fkcli: server/tools/fkcli/*.go $(SERVER_SOURCES)
-	go build -o $@ server/tools/fkcli/*.go
-
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ server/tools/fktool/*.go
 
 $(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ server/tools/inaturalist/*.go
+
+$(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
+	go build -o $@ server/sqs-worker/*.go
+
+$(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
+	go build -o $@ server/sqs-sender/*.go
 
 $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/random/*.go
@@ -43,7 +40,6 @@ server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 
 install: all
 	cp build/fktool $(INSTALLDIR)
-	cp build/fkcli $(INSTALLDIR)
 	cp build/testing-random $(INSTALLDIR)
 	cp build/sqs-sender $(INSTALLDIR)
 	cp build/sqs-worker $(INSTALLDIR)
