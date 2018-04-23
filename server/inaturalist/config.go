@@ -1,4 +1,4 @@
-package naturalist
+package inaturalist
 
 type INaturalistConfig struct {
 	ApplicationId string

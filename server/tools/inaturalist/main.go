@@ -9,8 +9,8 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/inaturalist"
 	"github.com/fieldkit/cloud/server/jobs"
-	"github.com/fieldkit/cloud/server/naturalist"
 )
 
 type Config struct {
@@ -59,12 +59,12 @@ func main() {
 		panic(err)
 	}
 
-	nc, err := naturalist.NewINaturalistCorrelator(db, be)
+	nc, err := inaturalist.NewINaturalistCorrelator(db, be)
 	if err != nil {
 		panic(err)
 	}
 
-	jq.Register(naturalist.CachedObservation{}, nc)
+	jq.Register(inaturalist.CachedObservation{}, nc)
 
 	if config.Listen {
 		if err := jq.Listen(ctx, 5); err != nil {
@@ -72,10 +72,10 @@ func main() {
 		}
 	}
 
-	for index, naturalistConfig := range naturalist.AllNaturalistConfigs {
+	for index, naturalistConfig := range inaturalist.AllNaturalistConfigs {
 		log.Printf("Applying iNaturalist configuration: %d [%s]", index, naturalistConfig.RootUrl)
 
-		cache, err := naturalist.NewINaturalistCache(&naturalistConfig, db, jq)
+		cache, err := inaturalist.NewINaturalistCache(&naturalistConfig, db, jq)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}

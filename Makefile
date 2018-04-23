@@ -7,7 +7,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: binaries tests
 
-binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/naturalist
+binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fkcli $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
 
 all: binaries
 
@@ -35,11 +35,11 @@ $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/weather-proxy/*.go
 
-$(BUILD)/naturalist: server/tools/naturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ server/tools/naturalist/*.go
+$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/tools/inaturalist/*.go
 
-server/naturalist/secrets.go: server/naturalist/secrets.go.template
-	cp server/naturalist/secrets.go.template server/naturalist/secrets.go
+server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
+	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
 
 install: all
 	cp build/fktool $(INSTALLDIR)

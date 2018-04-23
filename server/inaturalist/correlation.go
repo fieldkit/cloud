@@ -1,4 +1,4 @@
-package naturalist
+package inaturalist
 
 import (
 	"context"
