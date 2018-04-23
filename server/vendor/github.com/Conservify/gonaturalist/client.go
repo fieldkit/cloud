@@ -13,7 +13,18 @@ const (
 	rateLimitExceededStatusCode = 429
 )
 
+type Callbacks interface {
+	Completed(method, url string, elapsed time.Duration, err error)
+}
+
+type NoopCallbacks struct {
+}
+
+func (c *NoopCallbacks) Completed(method, url string, elapsed time.Duration, err error) {
+}
+
 type Client struct {
+	callbacks     Callbacks
 	rootUrl       string
 	http          *http.Client
 	autoRetry     bool
@@ -40,11 +51,14 @@ func shouldRetry(status int) bool {
 }
 
 func (c *Client) execute(req *http.Request, result interface{}, needsStatus ...int) error {
+	started := time.Now()
+
 	for {
 		req.Header.Set("Content-Type", "application/json")
 
 		resp, err := c.http.Do(req)
 		if err != nil {
+			c.callbacks.Completed(req.Method, req.URL.String(), time.Since(started), err)
 			return err
 		}
 
@@ -54,15 +68,20 @@ func (c *Client) execute(req *http.Request, result interface{}, needsStatus ...i
 			time.Sleep(c.retryDuration)
 			continue
 		} else if resp.StatusCode != http.StatusOK && isFailure(resp.StatusCode, needsStatus) {
-			errorMessage := c.decodeError(resp)
-			return errorMessage
+			err := c.decodeError(resp)
+			c.callbacks.Completed(req.Method, req.URL.String(), time.Since(started), err)
+			return err
 		}
 
 		if result != nil {
 			if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-				return fmt.Errorf("Decoding body: %v", err)
+				err := fmt.Errorf("Decoding body: %v", err)
+				c.callbacks.Completed(req.Method, req.URL.String(), time.Since(started), err)
+				return err
 			}
 		}
+
+		c.callbacks.Completed(req.Method, req.URL.String(), time.Since(started), err)
 
 		break
 	}
@@ -71,9 +90,12 @@ func (c *Client) execute(req *http.Request, result interface{}, needsStatus ...i
 }
 
 func (c *Client) get(url string, result interface{}) (paging *PageHeaders, err error) {
+	started := time.Now()
+
 	for {
 		resp, err := c.http.Get(url)
 		if err != nil {
+			c.callbacks.Completed("GET", url, time.Since(started), err)
 			return nil, err
 		}
 
@@ -96,13 +118,17 @@ func (c *Client) get(url string, result interface{}) (paging *PageHeaders, err e
 			time.Sleep(c.retryDuration)
 			continue
 		} else if resp.StatusCode != http.StatusOK {
-			return nil, c.decodeError(resp)
+			err := c.decodeError(resp)
+			c.callbacks.Completed("GET", url, time.Since(started), err)
+			return nil, err
 		}
 
 		err = json.NewDecoder(resp.Body).Decode(result)
 		if err != nil {
 			return nil, fmt.Errorf("Decoding body: %v (%s)", err, url)
 		}
+
+		c.callbacks.Completed("GET", url, time.Since(started), err)
 
 		break
 	}

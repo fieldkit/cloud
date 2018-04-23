@@ -70,7 +70,7 @@ type INaturalistCache struct {
 func NewINaturalistCache(config *INaturalistConfig, db *sqlxcache.DB, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
 	var authenticator = gonaturalist.NewAuthenticatorAtCustomRoot(config.ApplicationId, config.Secret, config.RedirectUrl, config.RootUrl)
 
-	c := authenticator.NewClientWithAccessToken(config.AccessToken)
+	c := authenticator.NewClientWithAccessToken(config.AccessToken, &gonaturalist.NoopCallbacks{})
 
 	in = &INaturalistCache{
 		Config:           config,

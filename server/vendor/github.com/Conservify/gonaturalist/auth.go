@@ -64,16 +64,17 @@ func (a Authenticator) Exchange(code string) (*oauth2.Token, error) {
 	return a.config.Exchange(a.context, code)
 }
 
-func (a *Authenticator) NewClientWithAccessToken(accessToken string) *Client {
+func (a *Authenticator) NewClientWithAccessToken(accessToken string, callbacks Callbacks) *Client {
 	var oauthToken oauth2.Token
 	oauthToken.AccessToken = accessToken
-	return a.NewClient(&oauthToken)
+	return a.NewClient(&oauthToken, callbacks)
 }
 
-func (a *Authenticator) NewClient(token *oauth2.Token) *Client {
+func (a *Authenticator) NewClient(token *oauth2.Token, callbacks Callbacks) *Client {
 	client := a.config.Client(a.context, token)
 	return &Client{
-		rootUrl: a.rootUrl,
-		http:    client,
+		callbacks: callbacks,
+		rootUrl:   a.rootUrl,
+		http:      client,
 	}
 }
