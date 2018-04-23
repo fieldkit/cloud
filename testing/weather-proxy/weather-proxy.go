@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"os"
 
-	fktesting "github.com/fieldkit/cloud/server/api/tool"
 	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
+	fktesting "github.com/fieldkit/cloud/server/tools"
 )
 
 type options struct {

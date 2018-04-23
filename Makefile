@@ -1,4 +1,4 @@
-modules = server/sqs-worker server/sqs-sender server/api/tool/fkcli server/api/tool/fktool
+modules = server/sqs-worker server/sqs-sender server/tools/fkcli server/tools/fktool
 
 BUILD=build
 
@@ -23,20 +23,20 @@ $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
 $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
 	go build -o $@ server/sqs-sender/*.go
 
-$(BUILD)/fkcli: server/api/tool/fkcli/*.go $(SERVER_SOURCES)
-	go build -o $@ server/api/tool/fkcli/*.go
+$(BUILD)/fkcli: server/tools/fkcli/*.go $(SERVER_SOURCES)
+	go build -o $@ server/tools/fkcli/*.go
 
-$(BUILD)/fktool: server/api/tool/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ server/api/tool/fktool/*.go
+$(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/tools/fktool/*.go
+
+$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/tools/inaturalist/*.go
 
 $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/random/*.go
 
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ testing/weather-proxy/*.go
-
-$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ server/tools/inaturalist/*.go
 
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go

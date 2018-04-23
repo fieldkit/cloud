@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	fktesting "github.com/fieldkit/cloud/server/api/tool"
+	fktesting "github.com/fieldkit/cloud/server/tools"
 	"log"
 )
 

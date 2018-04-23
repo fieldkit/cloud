@@ -12,8 +12,8 @@ import (
 	"net/url"
 	"time"
 
-	fktesting "github.com/fieldkit/cloud/server/api/tool"
 	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
+	fktesting "github.com/fieldkit/cloud/server/tools"
 )
 
 type options struct {
