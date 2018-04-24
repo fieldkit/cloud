@@ -14,13 +14,13 @@ all: binaries
 tests:
 	cd frontend && yarn run flow
 
-$(BUILD)/server: $(SERVER_SOURCES)
+$(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 	go build -o $@ server/server.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ server/tools/fktool/*.go
 
-$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
 	go build -o $@ server/tools/inaturalist/*.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
