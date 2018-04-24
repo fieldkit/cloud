@@ -26,6 +26,7 @@ type HttpJsonMessage struct {
 	Device   string                 `json:"device"`
 	Stream   string                 `json:"stream"`
 	Values   map[string]interface{} `json:"values"`
+	Modules  []string               `json:"modules"`
 }
 
 func (i *HttpMessageProvider) CanFormatMessage(raw *RawMessage) bool {
@@ -61,7 +62,7 @@ func (message *HttpJsonMessage) ToFormattedMessage(messageId ingestion.MessageId
 		return nil, fmt.Errorf("Malformed HttpJsonMessage: Location is required.")
 	}
 
-	messageTime := time.Unix(message.Time, 0)
+	messageTime := time.Unix(message.Time, 0).UTC()
 
 	fm = &ingestion.FormattedMessage{
 		MessageId: messageId,
@@ -69,6 +70,7 @@ func (message *HttpJsonMessage) ToFormattedMessage(messageId ingestion.MessageId
 		Time:      &messageTime,
 		Location:  message.Location,
 		Fixed:     message.Fixed,
+		Modules:   message.Modules,
 		MapValues: message.Values,
 	}
 
