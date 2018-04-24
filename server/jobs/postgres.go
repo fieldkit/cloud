@@ -151,6 +151,8 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 	for {
 		select {
 		case n := <-jq.listener.Notify:
+			startedAt := time.Now()
+
 			transport := &TransportMessage{}
 			err := json.Unmarshal([]byte(n.Extra), transport)
 			if err != nil {
@@ -161,6 +163,8 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 			messageCtx := logging.PushServiceTrace(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 
 			jq.dispatch(messageCtx, transport)
+
+			log.Infow("completed", "queue", jq.name, "messageType", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
 
 			break
 		case c := <-jq.control:
