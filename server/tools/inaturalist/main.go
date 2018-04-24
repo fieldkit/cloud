@@ -111,7 +111,7 @@ func updateObservation(ctx context.Context, log *zap.SugaredLogger, o *options, 
 	updateObservation := gonaturalist.UpdateObservationOpt{
 		Id:               obs.Id,
 		ObservedOnString: &now,
-		Description:      obs.Description + "\n" + time.Now().String(),
+		Description:      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris quis mi quam. Ut venenatis pulvinar magna, sit amet auctor mi vehicula in." + "\n" + time.Now().String(),
 	}
 	err = inc.UpdateObservation(&updateObservation)
 
