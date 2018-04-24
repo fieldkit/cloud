@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/Conservify/sqlxcache"
-
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type Pregenerator struct {
@@ -21,7 +19,7 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 }
 
 func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	logging.Logger(ctx).Sugar().Infow("Generating temporal tracks", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating temporal tracks", "sourceId", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -36,7 +34,7 @@ func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (su
 }
 
 func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (summaries []*TemporalGeometry, err error) {
-	logging.Logger(ctx).Sugar().Infow("Generating temporal geometries", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating temporal geometries", "sourceId", sourceId)
 
 	summaries = []*TemporalGeometry{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -51,7 +49,7 @@ func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (
 }
 
 func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	logging.Logger(ctx).Sugar().Infow("Generating spatial clusters", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating spatial clusters", "sourceId", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -66,7 +64,7 @@ func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (sum
 }
 
 func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries []*FeatureSummary, err error) {
-	logging.Logger(ctx).Sugar().Infow("Generating summaries", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating summaries", "sourceId", sourceId)
 
 	summaries = []*FeatureSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `

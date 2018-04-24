@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type FormattedMessageSaver struct {
@@ -28,7 +27,7 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 }
 
 func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	ds, err := fms.Resolver.ResolveDeviceAndSchemas(ctx, fm.SchemaId)
 	if err != nil {

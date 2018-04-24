@@ -13,7 +13,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/jobs"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type CachedObservation struct {
@@ -147,7 +146,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 	page := 1
 	numberOfObservations := 0
 
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	for {
 		options.Page = &page

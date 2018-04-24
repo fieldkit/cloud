@@ -9,7 +9,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type CorrelationTier struct {
@@ -43,7 +42,7 @@ func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend) (nc *INatur
 }
 
 func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObservation) (c *Correlation, err error) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 	verbose := true
 
 	offset := 1 * time.Minute

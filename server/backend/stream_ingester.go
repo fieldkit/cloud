@@ -59,7 +59,7 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 }
 
 func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
 	contentType := req.Header.Get(ContentTypeHeaderName)
@@ -124,7 +124,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 }
 
 func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
 	contentType := req.Header.Get(ContentTypeHeaderName)
@@ -150,7 +150,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	fkProcessing := req.Header.Get(FkProcessingHeaderName)
 
 	ctx := logging.WithTaskId(req.Context(), ids)
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	if contentType != FkDataBinaryContentType && contentType != formatting.HttpProviderJsonContentType {
 		log.Infow(fmt.Sprintf("Unknown content type '%v'", contentType), "Content-Type", contentType)

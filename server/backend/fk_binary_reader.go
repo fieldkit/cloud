@@ -17,7 +17,6 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type FormattedMessageReceiver interface {
@@ -50,7 +49,7 @@ func NewFkBinaryReader(receiver FormattedMessageReceiver) *FkBinaryReader {
 }
 
 func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	changes := make(map[int64][]*ingestion.RecordChange)
 
@@ -101,7 +100,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 }
 
 func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) (*ingestion.RecordChange, error) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	br.RecordsProcessed += 1
 

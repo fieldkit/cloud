@@ -31,7 +31,7 @@ var (
 func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
 	onProblem := func(ev pq.ListenerEventType, err error) {
 		if err != nil {
-			logging.Logger(nil).Sugar().Errorw("Problem", "error", err, "queue", name)
+			Logger(nil).Sugar().Errorw("Problem", "error", err, "queue", name)
 		}
 	}
 
@@ -96,7 +96,7 @@ func (jq *PgJobQueue) Listen(ctx context.Context, concurrency int) error {
 		return err
 	}
 
-	logging.Logger(ctx).Sugar().Infow("Listening", "queue", jq.name)
+	Logger(ctx).Sugar().Infow("Listening", "queue", jq.name)
 
 	go jq.waitForNotification(concurrency)
 
@@ -114,7 +114,7 @@ func (jq *PgJobQueue) Stop() error {
 }
 
 func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	for messageType, registration := range jq.handlers {
 		if messageType.Name() == tm.Type && messageType.PkgPath() == tm.Package {
@@ -144,7 +144,7 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) {
 func (jq *PgJobQueue) waitForNotification(concurrency int) {
 	ctx := context.Background()
 
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	jq.wg.Add(1)
 

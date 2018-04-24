@@ -10,7 +10,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/jobs"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type INaturalistService struct {
@@ -62,7 +61,7 @@ func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Ba
 }
 
 func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	for _, naturalistConfig := range AllNaturalistConfigs {
 		log.Infow("Refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)

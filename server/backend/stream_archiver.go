@@ -9,8 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type StreamArchiver interface {
@@ -21,7 +19,7 @@ type DevNullStreamArchiver struct {
 }
 
 func (a *DevNullStreamArchiver) Archive(ctx context.Context, contentType string, reader io.Reader) error {
-	logging.Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", contentType)
+	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", contentType)
 	return nil
 }
 
@@ -60,7 +58,7 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, contentType string, read
 		return err
 	}
 
-	logging.Logger(ctx).Sugar().Infof("Done: %s", r.Location)
+	Logger(ctx).Sugar().Infof("Done: %s", r.Location)
 
 	return nil
 }

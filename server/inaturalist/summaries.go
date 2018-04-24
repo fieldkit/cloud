@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/Conservify/gonaturalist"
-
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type INaturalistCommentor struct {
@@ -23,7 +21,7 @@ func NewINaturalistCommentor(correlator *INaturalistCorrelator, clients *Clients
 }
 
 func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservation) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	clientAndConfig := nc.Clients.GetClientAndConfig(co.SiteID)
 	if clientAndConfig == nil {

@@ -95,7 +95,7 @@ func Configure(production bool) (*zap.SugaredLogger, error) {
 		return nil, err
 	}
 
-	rootLogger = logger
+	rootLogger = logger.Named("fieldkit")
 
 	zap.RedirectStdLog(rootLogger)
 
@@ -167,7 +167,7 @@ type adapter struct {
 }
 
 func NewGoaAdapter(logger *zap.Logger) goa.LogAdapter {
-	return &adapter{Logger: logger}
+	return &adapter{Logger: logger.Named("goa")}
 }
 
 func (a *adapter) Info(msg string, data ...interface{}) {
@@ -197,7 +197,7 @@ func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 func (a *adapter) getTaskedLogger(fields *[]zapcore.Field) *zap.Logger {
 	id := a.getRequestId(fields)
 	if len(id) > 0 {
-		return a.Logger.Named(id).With(zap.String("taskId", id))
+		return a.Logger.With(zap.String("taskId", id))
 	}
 	return a.Logger
 }

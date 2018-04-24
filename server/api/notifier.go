@@ -8,7 +8,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 var (
@@ -68,7 +67,7 @@ func (n *Notifier) SendOnline(ctx context.Context, sourceId int32, age time.Dura
 
 // TODO: Should narrow this query down eventually.
 func (n *Notifier) Check(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	summaries := []*backend.FeatureSummary{}
 	if err := n.Database.SelectContext(ctx, &summaries, `SELECT c.source_id, c.end_time FROM fieldkit.sources_summaries c ORDER BY c.end_time`); err != nil {

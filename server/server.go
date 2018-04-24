@@ -88,7 +88,7 @@ func main() {
 
 	logging.Configure(config.ProductionLogging)
 
-	log := logging.Logger(logging.WithFacility(ctx, "startup")).Sugar()
+	log := logging.Logger(ctx).Sugar()
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
