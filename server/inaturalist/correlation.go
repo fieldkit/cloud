@@ -2,10 +2,10 @@ package inaturalist
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Conservify/sqlxcache"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
@@ -27,21 +27,24 @@ var Tiers = []*CorrelationTier{
 type INaturalistCorrelator struct {
 	Database *sqlxcache.DB
 	Backend  *backend.Backend
-	Verbose  bool
 }
 
-func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend, verbose bool) (nc *INaturalistCorrelator, err error) {
+type Correlation struct {
+	RecordsByTier map[*CorrelationTier][]*data.Record
+}
+
+func NewINaturalistCorrelator(db *sqlxcache.DB, be *backend.Backend) (nc *INaturalistCorrelator, err error) {
 	nc = &INaturalistCorrelator{
 		Database: db,
 		Backend:  be,
-		Verbose:  verbose,
 	}
 
 	return
 }
 
-func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObservation) (err error) {
+func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObservation) (c *Correlation, err error) {
 	log := logging.Logger(ctx).Sugar()
+	verbose := true
 
 	offset := 1 * time.Minute
 	options := backend.FindRecordsOpt{
@@ -51,14 +54,14 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	records, err := nc.Backend.FindRecords(ctx, &options)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if len(records) == 0 {
-		if nc.Verbose {
-			log.Infof("No contemporaneous records.")
+		if verbose {
+			log.Infow(fmt.Sprintf("No contemporaneous records (%v).", co.Timestamp), "observationId", co.ID, "siteId", co.SiteID)
 		}
-		return nil
+		return nil, nil
 	}
 
 	numberOfRecords := 0
@@ -79,23 +82,19 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 	}
 
 	if len(recordsByTier) == 0 {
-		if nc.Verbose {
-			log.Infof("No local records.")
+		if verbose {
+			log.Infow("No local records.", "observationId", co.ID, "siteId", co.SiteID)
 		}
-		return nil
+		return nil, nil
 	}
 
-	if nc.Verbose {
-		log.Infof("%s", spew.Sdump(recordsByTier))
-	} else {
-		log.Infof("Observation #%d has %d records across %d tier(s)", co.ID, numberOfRecords, len(recordsByTier))
+	log.Infow("Observation correlated with records.", "observationId", co.ID, "siteId", co.SiteID, "numberOfRecords", numberOfRecords, "numberOfTiers", len(recordsByTier))
+
+	c = &Correlation{
+		RecordsByTier: recordsByTier,
 	}
 
-	return nil
-}
-
-func (nc *INaturalistCorrelator) Handle(ctx context.Context, co *CachedObservation) error {
-	return nc.Correlate(ctx, co)
+	return
 }
 
 func (nc *INaturalistCorrelator) findTiers(distance float64) []*CorrelationTier {

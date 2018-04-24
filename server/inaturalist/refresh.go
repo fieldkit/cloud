@@ -18,6 +18,7 @@ type INaturalistService struct {
 	DB         *sqlxcache.DB
 	Backend    *backend.Backend
 	Correlator *INaturalistCorrelator
+	Clients    *Clients
 	Queue      *jobs.PgJobQueue
 }
 
@@ -27,12 +28,24 @@ func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Ba
 		return nil, err
 	}
 
-	nc, err := NewINaturalistCorrelator(db, be, verbose)
+	nc, err := NewINaturalistCorrelator(db, be)
 	if err != nil {
 		return nil, err
 	}
 
-	jq.Register(CachedObservation{}, nc)
+	clients, err := NewClients()
+	if err != nil {
+		return nil, err
+	}
+
+	commentor, err := NewINaturalistCommentor(nc, clients)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := jq.Register(CachedObservation{}, commentor); err != nil {
+		return nil, err
+	}
 
 	if err := jq.Listen(ctx, 1); err != nil {
 		return nil, err
@@ -40,6 +53,7 @@ func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Ba
 
 	return &INaturalistService{
 		Log:        nil,
+		Clients:    clients,
 		Queue:      jq,
 		Correlator: nc,
 		Backend:    be,
@@ -53,7 +67,13 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 	for _, naturalistConfig := range AllNaturalistConfigs {
 		log.Infow("Refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
 
-		cache, err := NewINaturalistCache(&naturalistConfig, ns.DB, ns.Queue)
+		clientAndConfig := ns.Clients.GetClientAndConfig(naturalistConfig.SiteID)
+		if clientAndConfig == nil {
+			log.Errorw("Error building cache, no client for site")
+			return nil
+		}
+
+		cache, err := NewINaturalistCache(&naturalistConfig, clientAndConfig.Client, ns.DB, ns.Queue)
 		if err != nil {
 			log.Errorw("Error building cache", "error", err)
 			return err
@@ -64,6 +84,8 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 			log.Errorw("Error refreshing cache", "error", err)
 			continue
 		}
+
+		log.Infow("Done refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
 	}
 
 	return nil

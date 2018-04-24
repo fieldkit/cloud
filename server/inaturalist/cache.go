@@ -3,6 +3,7 @@ package inaturalist
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -61,22 +62,18 @@ func (co *CachedObservation) Valid() bool {
 }
 
 type INaturalistCache struct {
-	Config           *INaturalistConfig
-	Database         *sqlxcache.DB
-	NaturalistClient *gonaturalist.Client
-	Queue            *jobs.PgJobQueue
+	Config            *INaturalistConfig
+	Database          *sqlxcache.DB
+	INaturalistClient *gonaturalist.Client
+	Queue             *jobs.PgJobQueue
 }
 
-func NewINaturalistCache(config *INaturalistConfig, db *sqlxcache.DB, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
-	var authenticator = gonaturalist.NewAuthenticatorAtCustomRoot(config.ApplicationId, config.Secret, config.RedirectUrl, config.RootUrl)
-
-	c := authenticator.NewClientWithAccessToken(config.AccessToken, &gonaturalist.NoopCallbacks{})
-
+func NewINaturalistCache(config *INaturalistConfig, client *gonaturalist.Client, db *sqlxcache.DB, queue *jobs.PgJobQueue) (in *INaturalistCache, err error) {
 	in = &INaturalistCache{
-		Config:           config,
-		Database:         db,
-		NaturalistClient: c,
-		Queue:            queue,
+		Config:            config,
+		INaturalistClient: client,
+		Database:          db,
+		Queue:             queue,
 	}
 
 	return
@@ -134,7 +131,7 @@ func (in *INaturalistCache) RefreshObservedOn(ctx context.Context, on time.Time)
 }
 
 func (in *INaturalistCache) RefreshObservation(ctx context.Context, id int) error {
-	observation, err := in.NaturalistClient.GetSimpleObservation(int64(id))
+	observation, err := in.INaturalistClient.GetSimpleObservation(int64(id))
 	if err != nil {
 		return err
 	}
@@ -147,7 +144,8 @@ func (in *INaturalistCache) getLastUpdated() (time.Time, error) {
 
 func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *gonaturalist.GetObservationsOpt) error {
 	perPage := 100
-	page := 0
+	page := 1
+	numberOfObservations := 0
 
 	log := logging.Logger(ctx).Sugar()
 
@@ -155,9 +153,9 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Infow("Querying", "iNaturalistUrl", in.Config.RootUrl)
+		log.Infow(fmt.Sprintf("Querying %d", page), "iNaturalistUrl", in.Config.RootUrl)
 
-		observations, err := in.NaturalistClient.GetObservations(options)
+		observations, err := in.INaturalistClient.GetObservations(options)
 		if err != nil {
 			return err
 		}
@@ -167,6 +165,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		}
 
 		for _, o := range observations.Observations {
+			numberOfObservations += 1
 			if err := in.AddOrUpdateObservation(ctx, o); err != nil {
 				return err
 			}
@@ -174,6 +173,8 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 
 		page += 1
 	}
+
+	log.Infow(fmt.Sprintf("Refreshed"), "iNaturalistUrl", in.Config.RootUrl, "numberOfObservations", numberOfObservations)
 
 	return nil
 }
