@@ -21,3 +21,7 @@ type HandlerRegistration struct {
 	HandlerType reflect.Type
 	Method      reflect.Value
 }
+
+type QueueDef struct {
+	Name string
+}

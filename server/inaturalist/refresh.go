@@ -22,7 +22,7 @@ type INaturalistService struct {
 }
 
 func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Backend, verbose bool) (*INaturalistService, error) {
-	jq, err := jobs.NewPqJobQueue(ctx, db, be.URL(), "inaturalist_observations")
+	jq, err := jobs.NewPqJobQueue(ctx, db, be.URL(), INaturalistObservationsQueue.Name)
 	if err != nil {
 		return nil, err
 	}

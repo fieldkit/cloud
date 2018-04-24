@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	fktesting "github.com/fieldkit/cloud/server/tools"
 	"log"
+
+	fktesting "github.com/fieldkit/cloud/server/tools"
 )
 
 type options struct {

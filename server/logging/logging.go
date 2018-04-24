@@ -87,17 +87,19 @@ func getConfiguration(production bool) *zap.Config {
 	return getOurDevelopmentConfig()
 }
 
-func Configure(production bool) {
+func Configure(production bool) (*zap.SugaredLogger, error) {
 	config := getConfiguration(production)
 
 	logger, err := config.Build()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	rootLogger = logger
 
 	zap.RedirectStdLog(rootLogger)
+
+	return rootLogger.Sugar(), nil
 }
 
 func ServiceTrace(ctx context.Context) []string {

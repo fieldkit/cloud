@@ -6,10 +6,6 @@ import (
 	"github.com/Conservify/sqlxcache"
 )
 
-type QueueDef struct {
-	Name string
-}
-
 type QueueSystem struct {
 	Queues map[string]*PgJobQueue
 	Defs   map[string]*QueueDef
