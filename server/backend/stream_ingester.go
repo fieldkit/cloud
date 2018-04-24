@@ -3,14 +3,19 @@ package backend
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
+	"fmt"
 	"hash"
 	"io"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -57,6 +62,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 	log := logging.Logger(ctx).Sugar()
 
 	startedAt := time.Now()
+	contentType := req.Header.Get(ContentTypeHeaderName)
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 	status := http.StatusOK
 
@@ -70,12 +76,36 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 	err := si.backend.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		saver := NewFormattedMessageSaver(si.backend)
-		binaryReader := NewFkBinaryReader(saver)
 
-		if err := binaryReader.Read(txCtx, reader); err != nil {
-			status = http.StatusInternalServerError
-			log.Errorw("error", "error", err, "bytesRead", reader.BytesRead)
-			return nil
+		if contentType == FkDataBinaryContentType {
+			binaryReader := NewFkBinaryReader(saver)
+			if err := binaryReader.Read(txCtx, reader); err != nil {
+				return err
+			}
+		} else {
+			decoder := json.NewDecoder(req.Body)
+			message := &formatting.HttpJsonMessage{}
+			err := decoder.Decode(message)
+			if err != nil {
+				return fmt.Errorf("JSON Error: '%v'", err)
+			}
+
+			messageId, err := uuid.NewRandom()
+			if err != nil {
+				return err
+			}
+
+			fm, err := message.ToFormattedMessage(ingestion.MessageId(messageId.String()))
+			if err != nil {
+				return err
+			}
+
+			recordChange, err := saver.HandleFormattedMessage(ctx, fm)
+			if err != nil {
+				return err
+			}
+
+			_ = recordChange
 		}
 
 		saver.EmitChanges(txCtx, si.sourceChanges)
@@ -85,7 +115,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Infow("completed", "error", err, "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
+		log.Errorw("completed", "error", err, "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	} else {
 		log.Infow("completed", "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	}
@@ -103,7 +133,7 @@ func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWrite
 	log.Infof("started (async)", ContentLengthHeaderName, contentLength, ContentTypeHeaderName, contentType)
 
 	if err := si.streamArchiver.Archive(ctx, contentType, req.Body); err != nil {
-		log.Infow("completed", "error", err, "time", time.Since(startedAt).String())
+		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		log.Infow("completed", "time", time.Since(startedAt).String())
@@ -122,8 +152,8 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := logging.WithTaskId(req.Context(), ids)
 	log := logging.Logger(ctx).Sugar()
 
-	if contentType != FkDataBinaryContentType {
-		log.Infof("Stream: unknown content type: %v", contentType)
+	if contentType != FkDataBinaryContentType && contentType != formatting.HttpProviderJsonContentType {
+		log.Infow(fmt.Sprintf("Unknown content type '%v'", contentType), "Content-Type", contentType)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
