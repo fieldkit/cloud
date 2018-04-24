@@ -185,25 +185,25 @@ type AddObservationOpt struct {
 	GeoPrivacy         string    `json:"geoprivacy"`
 }
 
-func (c *Client) AddObservation(opt *AddObservationOpt) error {
+func (c *Client) AddObservation(opt *AddObservationOpt) (*SimpleObservation, error) {
 	u := c.buildUrl("/observations.json")
 
 	bodyJson, err := json.Marshal(opt)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req, err := http.NewRequest("POST", u, bytes.NewReader(bodyJson))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	var p interface{}
-	err = c.execute(req, &p, http.StatusCreated)
+	var result []*SimpleObservation
+	err = c.execute(req, &result, http.StatusCreated)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return result[0], nil
 }
 
 func (c *Client) GetObservation(id int64) (*FullObservation, error) {
