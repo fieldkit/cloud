@@ -93,8 +93,10 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 	}
 
 	for sourceId, c := range changes {
-		log.Infow("Processed", "deviceId", br.DeviceId, "sourceId", sourceId, "recordsProcessed", br.RecordsProcessed, "recordsAdded", len(c))
+		log.Infow("Source changes", "deviceId", br.DeviceId, "sourceId", sourceId, "recordsAdded", len(c))
 	}
+
+	log.Infow("Processed", "deviceId", br.DeviceId, "recordsProcessed", br.RecordsProcessed)
 
 	return nil
 }
