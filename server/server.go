@@ -328,7 +328,7 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.UseJWTMiddleware(service, jwtMiddleware)
 	service.Use(middleware.RequestID())
 	service.Use(ServiceTraceMiddleware)
-	service.Use(middleware.LogRequest(true))
+	service.Use(middleware.LogRequest(false))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
