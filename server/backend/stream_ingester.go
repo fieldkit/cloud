@@ -3,10 +3,12 @@ package backend
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"hash"
 	"io"
+	"mime"
 	"net/http"
 	"time"
 
@@ -21,6 +23,7 @@ import (
 
 const (
 	FkDataBinaryContentType = "application/vnd.fk.data+binary"
+	FkDataBase64ContentType = "application/vnd.fk.data+base64"
 	ContentTypeHeaderName   = "Content-Type"
 	ContentLengthHeaderName = "Content-Length"
 	FkProcessingHeaderName  = "Fk-Processing"
@@ -58,11 +61,10 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	return n, err
 }
 
-func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) synchronous(ctx context.Context, mediaType string, w http.ResponseWriter, req *http.Request) {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
-	contentType := req.Header.Get(ContentTypeHeaderName)
 	contentLength := req.Header.Get(ContentLengthHeaderName)
 	status := http.StatusOK
 
@@ -77,9 +79,15 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 	err := si.backend.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		saver := NewFormattedMessageSaver(si.backend)
 
-		if contentType == FkDataBinaryContentType {
+		if mediaType == FkDataBinaryContentType {
 			binaryReader := NewFkBinaryReader(saver)
 			if err := binaryReader.Read(txCtx, reader); err != nil {
+				return err
+			}
+		} else if mediaType == FkDataBase64ContentType {
+			decoder := base64.NewDecoder(base64.StdEncoding, reader)
+			binaryReader := NewFkBinaryReader(saver)
+			if err := binaryReader.Read(txCtx, decoder); err != nil {
 				return err
 			}
 		} else {
@@ -123,7 +131,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, w http.ResponseWriter
 	w.WriteHeader(status)
 }
 
-func (si *StreamIngester) asynchronous(ctx context.Context, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) asynchronous(ctx context.Context, mediaType string, w http.ResponseWriter, req *http.Request) {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
@@ -146,21 +154,28 @@ var (
 )
 
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	contentType := req.Header.Get(ContentTypeHeaderName)
-	fkProcessing := req.Header.Get(FkProcessingHeaderName)
-
 	ctx := logging.WithTaskId(req.Context(), ids)
 	log := Logger(ctx).Sugar()
 
-	if contentType != FkDataBinaryContentType && contentType != formatting.HttpProviderJsonContentType {
+	contentType := req.Header.Get(ContentTypeHeaderName)
+	fkProcessing := req.Header.Get(FkProcessingHeaderName)
+
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Errorw("completed", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if mediaType != FkDataBinaryContentType && mediaType != FkDataBase64ContentType && mediaType != formatting.HttpProviderJsonContentType {
 		log.Infow(fmt.Sprintf("Unknown content type '%v'", contentType), "Content-Type", contentType)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if fkProcessing == "" {
-		si.synchronous(ctx, w, req)
+		si.synchronous(ctx, mediaType, w, req)
 	} else if fkProcessing == "async" {
-		si.asynchronous(ctx, w, req)
+		si.asynchronous(ctx, mediaType, w, req)
 	}
 }
