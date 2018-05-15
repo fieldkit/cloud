@@ -63,13 +63,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		}
 
 		change, err := br.Push(ctx, &record)
-		if detailedErr, ok := err.(*ingestion.IngestError); ok {
-			if detailedErr.Critical {
-				return nil, detailedErr
-			} else {
-				log.Errorw("Error", "error", detailedErr)
-			}
-		} else if err != nil {
+		if err != nil {
 			return nil, err
 		}
 

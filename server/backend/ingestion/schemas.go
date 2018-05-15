@@ -146,7 +146,7 @@ func (i *SchemaApplier) ApplySchema(ds *DeviceStream, fm *FormattedMessage, sche
 
 func (i *SchemaApplier) ApplySchemas(ds *DeviceStream, fm *FormattedMessage) (im *ProcessedMessage, err error) {
 	if len(ds.Schemas) == 0 {
-		return nil, NewErrorf(false, "(%s)(%s)[Error] (ApplySchemas) No device or schemas", fm.MessageId, fm.SchemaId)
+		return nil, fmt.Errorf("(%s)(%s)[Error] (ApplySchemas) No device or schemas", fm.MessageId, fm.SchemaId)
 	}
 
 	errors := make([]error, 0)
@@ -223,13 +223,13 @@ func getLocation(fm *FormattedMessage, ms *JsonMessageSchema, m map[string]inter
 	for _, key := range []string{FieldNameLongitude, FieldNameLatitude, FieldNameAltitude} {
 		f, err := strconv.ParseFloat(m[key].(string), 64)
 		if err != nil {
-			return nil, NewErrorf(true, "Unable to parse coordinate '%s' (%v)", m[key], err)
+			return nil, fmt.Errorf("Unable to parse coordinate '%s' (%v)", m[key], err)
 		}
 		coordinates = append(coordinates, f)
 	}
 
 	if len(coordinates) < 2 {
-		return nil, NewErrorf(true, "Not enough coordinates (%v)", coordinates)
+		return nil, fmt.Errorf("Not enough coordinates (%v)", coordinates)
 	}
 
 	return &Location{

@@ -43,25 +43,25 @@ func (r *Resolver) ResolveDeviceAndSchemas(ctx context.Context, schemaId SchemaI
 		return r.Repository.LookupDevice(ctx, id)
 	})
 	if err != nil {
-		return nil, NewErrorf(true, "(%s)[Error] (LookupDevice) %v", schemaId, err)
+		return nil, fmt.Errorf("(%s)[Error] (LookupDevice) %v", schemaId, err)
 	}
 
 	if device == nil {
-		return nil, NewErrorf(true, "(%s)[Error] (LookupDevice) No such device", schemaId)
+		return nil, fmt.Errorf("(%s)[Error] (LookupDevice) No such device", schemaId)
 	}
 
 	stream, err := r.Cache.LookupStream(schemaId.Device, func(id DeviceId) (*Stream, error) {
 		return r.Repository.LookupStream(ctx, device)
 	})
 	if err != nil {
-		return nil, NewErrorf(true, "(%s)[Error]: (LookupStream) (%v)", schemaId, err)
+		return nil, fmt.Errorf("(%s)[Error]: (LookupStream) (%v)", schemaId, err)
 	}
 
 	schemas, err := r.Cache.LookupSchemas(schemaId, func(id SchemaId) ([]*MessageSchema, error) {
 		return r.Repository.LookupSchemas(ctx, schemaId)
 	})
 	if err != nil {
-		return nil, NewErrorf(true, "(%s)[Error] (LookupSchema) %v", schemaId, err)
+		return nil, fmt.Errorf("(%s)[Error] (LookupSchema) %v", schemaId, err)
 	}
 
 	rs = &DeviceStream{
