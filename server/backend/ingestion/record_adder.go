@@ -17,13 +17,11 @@ type RecordChange struct {
 type SourceChange struct {
 	QueuedAt time.Time
 	SourceID int64
-	Records  []*RecordChange
 }
 
-func NewSourceChange(sourceId int64, records []*RecordChange) SourceChange {
+func NewSourceChange(sourceId int64) SourceChange {
 	return SourceChange{
 		SourceID: sourceId,
-		Records:  records,
 		QueuedAt: time.Now(),
 	}
 }

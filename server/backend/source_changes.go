@@ -47,7 +47,7 @@ func (h *SourceModifiedHandler) QueueChangesForAllSources(publisher ingestion.So
 	}
 
 	for _, device := range devices {
-		publisher.SourceChanged(ctx, ingestion.NewSourceChange(int64(device.ID), make([]*ingestion.RecordChange, 0)))
+		publisher.SourceChanged(ctx, ingestion.NewSourceChange(int64(device.ID)))
 	}
 
 	return nil

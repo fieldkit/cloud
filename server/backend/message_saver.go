@@ -59,7 +59,7 @@ func (fms *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges
 		}
 		sources[change.SourceID] = append(sources[change.SourceID], change)
 	}
-	for id, changes := range sources {
-		sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(id, changes))
+	for id, _ := range sources {
+		sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(id))
 	}
 }
