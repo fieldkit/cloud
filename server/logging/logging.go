@@ -123,14 +123,16 @@ func PushServiceTrace(ctx context.Context, value ...string) context.Context {
 }
 
 func WithFacility(ctx context.Context, facility string) context.Context {
-	existing := ServiceTrace(ctx)
-	return context.WithValue(context.WithValue(ctx, facilityKey, facility), serviceTraceKey, append(existing, facility))
+	return PushServiceTrace(context.WithValue(ctx, facilityKey, facility), facility)
 }
 
-func WithTaskId(ctx context.Context, g *IdGenerator) context.Context {
+func WithTaskId(ctx context.Context, taskId string) context.Context {
+	return PushServiceTrace(context.WithValue(ctx, taskIdKey, taskId), taskId)
+}
+
+func WithNewTaskId(ctx context.Context, g *IdGenerator) context.Context {
 	taskId := g.Generate()
-	existing := ServiceTrace(ctx)
-	return context.WithValue(context.WithValue(ctx, taskIdKey, taskId), serviceTraceKey, append(existing, taskId))
+	return PushServiceTrace(context.WithValue(ctx, taskIdKey, taskId), taskId)
 }
 
 func Logger(ctx context.Context) *zap.Logger {

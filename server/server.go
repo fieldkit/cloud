@@ -294,7 +294,7 @@ func ServiceTraceMiddleware(h goa.Handler) goa.Handler {
 		if len(id) == 0 {
 			return h(ctx, rw, req)
 		}
-		newCtx := logging.PushServiceTrace(ctx, id)
+		newCtx := logging.WithTaskId(ctx, id)
 		return h(newCtx, rw, req)
 	}
 }
