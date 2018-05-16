@@ -10,6 +10,8 @@ import (
 
 	"github.com/lib/pq"
 
+	"go.uber.org/zap"
+
 	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/logging"
@@ -113,9 +115,7 @@ func (jq *PgJobQueue) Stop() error {
 	return nil
 }
 
-func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) {
-	log := Logger(ctx).Sugar()
-
+func (jq *PgJobQueue) dispatch(ctx context.Context, log *zap.SugaredLogger, tm *TransportMessage) {
 	for messageType, registration := range jq.handlers {
 		if messageType.Name() == tm.Type && messageType.PkgPath() == tm.Package {
 			message := reflect.New(messageType).Interface()
@@ -124,21 +124,24 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, tm *TransportMessage) {
 				return
 			}
 
+			handlerCtx := logging.HandlerContext(ctx, jq.name, registration.HandlerType, messageType)
 			params := []reflect.Value{
-				reflect.ValueOf(logging.HandlerContext(ctx, jq.name, registration.HandlerType)),
+				reflect.ValueOf(handlerCtx),
 				reflect.ValueOf(message),
 			}
 			res := registration.Method.Call(params)
 			if !res[0].IsNil() {
 				err := res[0].Interface().(error)
-				log.Errorw("Error", "error", err)
+				f := logging.CreateFacilityForType(registration.HandlerType)
+				handlerLog := Logger(handlerCtx).Sugar().Named(f)
+				handlerLog.Errorw("Error", "error", err)
 			}
 
 			return
 		}
 	}
 
-	log.Warnw("No handlers", "messageType", tm.Package+"."+tm.Type, "queue", jq.name)
+	log.Warnw("No handlers", "message_type", tm.Package+"."+tm.Type, "queue", jq.name)
 }
 
 func (jq *PgJobQueue) waitForNotification(concurrency int) {
@@ -160,11 +163,12 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 				break
 			}
 
-			messageCtx := logging.PushServiceTrace(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+			messageCtx := logging.WithTaskId(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+			messageLog := Logger(messageCtx).Sugar()
 
-			jq.dispatch(messageCtx, transport)
+			jq.dispatch(messageCtx, messageLog, transport)
 
-			log.Infow("completed", "queue", jq.name, "messageType", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
+			messageLog.Infow("completed", "queue", jq.name, "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
 
 			break
 		case c := <-jq.control:

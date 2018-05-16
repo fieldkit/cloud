@@ -97,7 +97,7 @@ func (n *Notifier) Check(ctx context.Context) error {
 		age := now.Sub(summary.EndTime)
 		lastNotification := now.Sub(notification.UpdatedAt)
 
-		details := log.With("sourceId", summary.SourceID, "endTime", summary.EndTime, "age", age, "lastNotification", lastNotification)
+		details := log.With("source_id", summary.SourceID, "end_time", summary.EndTime, "age", age, "last_notification", lastNotification)
 
 		if age < ThirtyMinutes {
 			if wasNotified {

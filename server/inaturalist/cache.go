@@ -152,7 +152,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		options.Page = &page
 		options.PerPage = &perPage
 
-		log.Infow(fmt.Sprintf("Querying %d", page), "iNaturalistUrl", in.Config.RootUrl)
+		log.Infow(fmt.Sprintf("Querying %d", page), "api_url", in.Config.RootUrl)
 
 		observations, err := in.INaturalistClient.GetObservations(options)
 		if err != nil {
@@ -173,7 +173,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 		page += 1
 	}
 
-	log.Infow(fmt.Sprintf("Refreshed"), "iNaturalistUrl", in.Config.RootUrl, "numberOfObservations", numberOfObservations)
+	log.Infow(fmt.Sprintf("Refreshed"), "api_url", in.Config.RootUrl, "number_of_observations", numberOfObservations)
 
 	return nil
 }

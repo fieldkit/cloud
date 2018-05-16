@@ -68,7 +68,7 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 	}
 
 	for _, naturalistConfig := range AllNaturalistConfigs {
-		log.Infow("Refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
+		log.Infow("Refreshing iNaturalist", "api_url", naturalistConfig.RootUrl)
 
 		clientAndConfig := ns.Clients.GetClientAndConfig(naturalistConfig.SiteID)
 		if clientAndConfig == nil {
@@ -93,7 +93,7 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 			continue
 		}
 
-		log.Infow("Done refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
+		log.Infow("Done refreshing iNaturalist", "api_url", naturalistConfig.RootUrl)
 	}
 
 	return nil

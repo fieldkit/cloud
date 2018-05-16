@@ -24,6 +24,15 @@ const (
 	taskIdKey       correlationIdType = iota
 	handlerKey      correlationIdType = iota
 	queueKey        correlationIdType = iota
+
+	packagePrefix = "github.com/fieldkit/cloud/server/"
+
+	requestIdTagName    = "req_id"
+	facilityTagName     = "facility"
+	taskIdTagName       = "task_id"
+	queueTagName        = "queue"
+	handlerTagName      = "handler"
+	serviceTraceTagName = "service_trace"
 )
 
 var rootLogger *zap.Logger
@@ -109,7 +118,15 @@ func ServiceTrace(ctx context.Context) []string {
 	return []string{}
 }
 
-func HandlerContext(ctx context.Context, queue string, handlerType reflect.Type) context.Context {
+func CreateFacilityForType(t reflect.Type) string {
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	p := t.PkgPath()
+	return strings.Replace(p, packagePrefix, "", 1)
+}
+
+func HandlerContext(ctx context.Context, queue string, handlerType reflect.Type, messageType reflect.Type) context.Context {
 	name := handlerType.String()
 	if handlerType.Kind() == reflect.Ptr {
 		name = handlerType.Elem().String()
@@ -146,19 +163,19 @@ func Logger(ctx context.Context) *zap.Logger {
 		}
 
 		if ctxFacility, ok := ctx.Value(facilityKey).(string); ok {
-			newLogger = newLogger.With(zap.String("facility", ctxFacility))
+			newLogger = newLogger.With(zap.String(facilityTagName, ctxFacility))
 		}
 		if ctxTaskId, ok := ctx.Value(taskIdKey).(string); ok {
-			newLogger = newLogger.With(zap.String("taskId", ctxTaskId))
+			newLogger = newLogger.With(zap.String(taskIdTagName, ctxTaskId))
 		}
 		if ctxHandler, ok := ctx.Value(handlerKey).(string); ok {
-			newLogger = newLogger.With(zap.String("handler", ctxHandler))
+			newLogger = newLogger.With(zap.String(handlerTagName, ctxHandler))
 		}
 		if ctxQueue, ok := ctx.Value(queueKey).(string); ok {
-			newLogger = newLogger.With(zap.String("queue", ctxQueue))
+			newLogger = newLogger.With(zap.String(queueTagName, ctxQueue))
 		}
 		if ctxServiceTrace, ok := ctx.Value(serviceTraceKey).([]string); ok {
-			newLogger = newLogger.With(zap.String("serviceTrace", strings.Join(ctxServiceTrace, " ")))
+			newLogger = newLogger.With(zap.String(serviceTraceTagName, strings.Join(ctxServiceTrace, " ")))
 		}
 	}
 	return newLogger
@@ -189,7 +206,7 @@ func (a *adapter) New(data ...interface{}) goa.LogAdapter {
 
 func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 	for _, f := range *fields {
-		if f.Key == "req_id" {
+		if f.Key == requestIdTagName {
 			return f.String
 		}
 	}
@@ -199,7 +216,7 @@ func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 func (a *adapter) getTaskedLogger(fields *[]zapcore.Field) *zap.Logger {
 	id := a.getRequestId(fields)
 	if len(id) > 0 {
-		return a.Logger.With(zap.String("taskId", id))
+		return a.Logger.With(zap.String(taskIdTagName, id))
 	}
 	return a.Logger
 }

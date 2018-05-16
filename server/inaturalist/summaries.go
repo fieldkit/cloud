@@ -25,7 +25,8 @@ func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservatio
 
 	clientAndConfig := nc.Clients.GetClientAndConfig(co.SiteID)
 	if clientAndConfig == nil {
-		return fmt.Errorf("No Naturalist client for SiteID: %d", co.SiteID)
+		log.Errorw("No iNaturalist configuration", "site_id", co.SiteID)
+		return nil
 	}
 
 	client := clientAndConfig.Client
@@ -46,7 +47,7 @@ func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservatio
 		return err
 	}
 
-	log.Infow("GetObservationComments", "observationId", co.ID)
+	log.Infow("GetObservationComments", "observation_id", co.ID)
 	full, err := client.GetObservationComments(co.ID)
 	if err != nil {
 		return err
@@ -62,7 +63,7 @@ func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservatio
 				continue
 			}
 
-			log.Infow("Updating comment", "observationId", co.ID, "siteId", co.SiteID, "commentId", c.Id, "mutable", clientAndConfig.Config.Mutable)
+			log.Infow("Updating comment", "observation_id", co.ID, "site_id", co.SiteID, "comment_id", c.Id, "mutable", clientAndConfig.Config.Mutable)
 
 			if clientAndConfig.Config.Mutable {
 				err = client.UpdateCommentBody(c.Id, body)
@@ -74,7 +75,7 @@ func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservatio
 	}
 
 	if !updated {
-		log.Infow("Adding comment", "observationId", co.ID, "siteId", co.SiteID, "mutable", clientAndConfig.Config.Mutable)
+		log.Infow("Adding comment", "observation_id", co.ID, "site_id", co.SiteID, "mutable", clientAndConfig.Config.Mutable)
 
 		addComment := gonaturalist.AddCommentOpt{
 			ParentType: gonaturalist.Observation,

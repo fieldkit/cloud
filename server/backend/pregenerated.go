@@ -19,7 +19,7 @@ func NewPregenerator(backend *Backend) *Pregenerator {
 }
 
 func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	Logger(ctx).Sugar().Infow("Generating temporal tracks", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating temporal tracks", "source_id", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -34,7 +34,7 @@ func (p *Pregenerator) TemporalClusters(ctx context.Context, sourceId int64) (su
 }
 
 func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (summaries []*TemporalGeometry, err error) {
-	Logger(ctx).Sugar().Infow("Generating temporal geometries", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating temporal geometries", "source_id", sourceId)
 
 	summaries = []*TemporalGeometry{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -49,7 +49,7 @@ func (p *Pregenerator) TemporalGeometries(ctx context.Context, sourceId int64) (
 }
 
 func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (summaries []*GeometryClusterSummary, err error) {
-	Logger(ctx).Sugar().Infow("Generating spatial clusters", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating spatial clusters", "source_id", sourceId)
 
 	summaries = []*GeometryClusterSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
@@ -64,7 +64,7 @@ func (p *Pregenerator) SpatialClusters(ctx context.Context, sourceId int64) (sum
 }
 
 func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries []*FeatureSummary, err error) {
-	Logger(ctx).Sugar().Infow("Generating summaries", "sourceId", sourceId)
+	Logger(ctx).Sugar().Infow("Generating summaries", "source_id", sourceId)
 
 	summaries = []*FeatureSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `

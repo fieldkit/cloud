@@ -123,9 +123,9 @@ func (si *StreamIngester) synchronous(ctx context.Context, mediaType string, w h
 
 	if err != nil {
 		status = http.StatusInternalServerError
-		log.Errorw("completed", "error", err, "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
+		log.Errorw("completed", "error", err, "bytes_read", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	} else {
-		log.Infow("completed", "bytesRead", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
+		log.Infow("completed", "bytes_read", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	}
 
 	w.WriteHeader(status)

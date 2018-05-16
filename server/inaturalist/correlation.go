@@ -58,7 +58,7 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	if len(records) == 0 {
 		if verbose {
-			log.Infow(fmt.Sprintf("No contemporaneous records (%v).", co.Timestamp), "observationId", co.ID, "siteId", co.SiteID)
+			log.Infow(fmt.Sprintf("No contemporaneous records (%v).", co.Timestamp), "observation_id", co.ID, "site_id", co.SiteID)
 		}
 		return nil, nil
 	}
@@ -82,12 +82,12 @@ func (nc *INaturalistCorrelator) Correlate(ctx context.Context, co *CachedObserv
 
 	if len(recordsByTier) == 0 {
 		if verbose {
-			log.Infow("No local records.", "observationId", co.ID, "siteId", co.SiteID)
+			log.Infow("No local records.", "observation_id", co.ID, "site_id", co.SiteID)
 		}
 		return nil, nil
 	}
 
-	log.Infow("Observation correlated with records.", "observationId", co.ID, "siteId", co.SiteID, "numberOfRecords", numberOfRecords, "numberOfTiers", len(recordsByTier))
+	log.Infow("Observation correlated with records.", "observation_id", co.ID, "site_id", co.SiteID, "number_of_records", numberOfRecords, "number_of_tiers", len(recordsByTier))
 
 	c = &Correlation{
 		RecordsByTier: recordsByTier,
