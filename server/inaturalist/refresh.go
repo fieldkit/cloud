@@ -63,6 +63,10 @@ func NewINaturalistService(ctx context.Context, db *sqlxcache.DB, be *backend.Ba
 func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 
+	if len(AllNaturalistConfigs) == 0 {
+		log.Warnw("No iNaturalist configurations")
+	}
+
 	for _, naturalistConfig := range AllNaturalistConfigs {
 		log.Infow("Refreshing iNaturalist", "iNaturalistUrl", naturalistConfig.RootUrl)
 
@@ -70,6 +74,11 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 		if clientAndConfig == nil {
 			log.Errorw("Error building cache, no client for site")
 			return nil
+		}
+
+		if !naturalistConfig.Valid() {
+			log.Warnw("Invalid iNaturalist configuration", "config", naturalistConfig)
+			continue
 		}
 
 		cache, err := NewINaturalistCache(&naturalistConfig, clientAndConfig.Client, ns.DB, ns.Queue)

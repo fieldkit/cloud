@@ -154,7 +154,7 @@ var (
 )
 
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	ctx := logging.WithTaskId(req.Context(), ids)
+	ctx := logging.WithNewTaskId(req.Context(), ids)
 	log := Logger(ctx).Sugar()
 
 	contentType := req.Header.Get(ContentTypeHeaderName)

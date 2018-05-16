@@ -17,6 +17,10 @@ type INaturalistConfig struct {
 	Mutable       bool
 }
 
+func (c *INaturalistConfig) Valid() bool {
+	return len(c.AccessToken) > 0
+}
+
 var (
 	INaturalistObservationsQueue = &jobs.QueueDef{
 		Name: "inaturalist_observations",
