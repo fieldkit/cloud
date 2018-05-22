@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,6 +28,10 @@ const (
 	ContentTypeHeaderName   = "Content-Type"
 	ContentLengthHeaderName = "Content-Length"
 	FkProcessingHeaderName  = "Fk-Processing"
+	FkVersionHeaderName     = "Fk-Version"
+	FkBuildHeaderName       = "Fk-Build"
+	FkDeviceIdHeaderName    = "Fk-DeviceId"
+	FkFileIdHeaderName      = "Fk-FileId"
 )
 
 type StreamIngester struct {
@@ -61,14 +66,13 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	return n, err
 }
 
-func (si *StreamIngester) synchronous(ctx context.Context, mediaType string, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
-	contentLength := req.Header.Get(ContentLengthHeaderName)
 	status := http.StatusOK
 
-	log.Infow("started", ContentLengthHeaderName, contentLength)
+	log.Infow("started", headers.ToLoggingFields()...)
 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
@@ -79,12 +83,12 @@ func (si *StreamIngester) synchronous(ctx context.Context, mediaType string, w h
 	err := si.backend.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		saver := NewFormattedMessageSaver(si.backend)
 
-		if mediaType == FkDataBinaryContentType {
+		if headers.MediaType == FkDataBinaryContentType {
 			binaryReader := NewFkBinaryReader(saver)
 			if err := binaryReader.Read(txCtx, reader); err != nil {
 				return err
 			}
-		} else if mediaType == FkDataBase64ContentType {
+		} else if headers.MediaType == FkDataBase64ContentType {
 			decoder := base64.NewDecoder(base64.StdEncoding, reader)
 			binaryReader := NewFkBinaryReader(saver)
 			if err := binaryReader.Read(txCtx, decoder); err != nil {
@@ -131,16 +135,14 @@ func (si *StreamIngester) synchronous(ctx context.Context, mediaType string, w h
 	w.WriteHeader(status)
 }
 
-func (si *StreamIngester) asynchronous(ctx context.Context, mediaType string, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
-	contentType := req.Header.Get(ContentTypeHeaderName)
-	contentLength := req.Header.Get(ContentLengthHeaderName)
 
-	log.Infof("started (async)", ContentLengthHeaderName, contentLength, ContentTypeHeaderName, contentType)
+	log.Infow("started (async)", headers.ToLoggingFields()...)
 
-	if err := si.streamArchiver.Archive(ctx, contentType, req.Body); err != nil {
+	if err := si.streamArchiver.Archive(ctx, headers.ContentType, req.Body); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -153,29 +155,78 @@ var (
 	ids = logging.NewIdGenerator()
 )
 
+type IncomingHeaders struct {
+	ContentType   string
+	ContentLength int32
+	MediaType     string
+	FkProcessing  string
+	FkVersion     string
+	FkBuild       string
+	FkDeviceId    string
+	FkFileId      string
+}
+
+func (h *IncomingHeaders) ToLoggingFields() []interface{} {
+	keysAndValues := make([]interface{}, 0)
+
+	keysAndValues = append(keysAndValues, "content_type", h.ContentType)
+	keysAndValues = append(keysAndValues, "content_length", h.ContentLength)
+	keysAndValues = append(keysAndValues, "firmware_version", h.FkVersion)
+	keysAndValues = append(keysAndValues, "firmware_build", h.FkBuild)
+	keysAndValues = append(keysAndValues, "device_id", h.FkDeviceId)
+	keysAndValues = append(keysAndValues, "file_id", h.FkFileId)
+
+	return keysAndValues
+}
+
+func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
+	contentLengthString := req.Header.Get(ContentLengthHeaderName)
+	contentType := req.Header.Get(ContentTypeHeaderName)
+
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	contentLength, err := strconv.Atoi(contentLengthString)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := &IncomingHeaders{
+		ContentType:   contentType,
+		ContentLength: int32(contentLength),
+		MediaType:     mediaType,
+		FkProcessing:  req.Header.Get(FkProcessingHeaderName),
+		FkVersion:     req.Header.Get(FkVersionHeaderName),
+		FkBuild:       req.Header.Get(FkBuildHeaderName),
+		FkDeviceId:    req.Header.Get(FkDeviceIdHeaderName),
+		FkFileId:      req.Header.Get(FkFileIdHeaderName),
+	}
+
+	return headers, nil
+}
+
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := logging.WithNewTaskId(req.Context(), ids)
 	log := Logger(ctx).Sugar()
 
-	contentType := req.Header.Get(ContentTypeHeaderName)
-	fkProcessing := req.Header.Get(FkProcessingHeaderName)
-
-	mediaType, _, err := mime.ParseMediaType(contentType)
+	headers, err := NewIncomingHeaders(req)
 	if err != nil {
-		log.Errorw("completed", "error", err)
+		log.Errorw("failed", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if mediaType != FkDataBinaryContentType && mediaType != FkDataBase64ContentType && mediaType != formatting.HttpProviderJsonContentType {
-		log.Infow(fmt.Sprintf("Unknown content type '%v'", contentType), "Content-Type", contentType)
+	if headers.MediaType != FkDataBinaryContentType && headers.MediaType != FkDataBase64ContentType && headers.MediaType != formatting.HttpProviderJsonContentType {
+		log.Infow("Unknown content type", headers.ToLoggingFields()...)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if fkProcessing == "" {
-		si.synchronous(ctx, mediaType, w, req)
-	} else if fkProcessing == "async" {
-		si.asynchronous(ctx, mediaType, w, req)
+	if headers.FkProcessing == "" {
+		si.synchronous(ctx, headers, w, req)
+	} else if headers.FkProcessing == "async" {
+		si.asynchronous(ctx, headers, w, req)
 	}
 }
