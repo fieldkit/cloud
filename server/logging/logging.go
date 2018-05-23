@@ -52,12 +52,8 @@ func getOurProductionConfig() *zap.Config {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 	return &zap.Config{
-		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
-		Development: false,
-		Sampling: &zap.SamplingConfig{
-			Initial:    100,
-			Thereafter: 100,
-		},
+		Level:            zap.NewAtomicLevelAt(zap.InfoLevel),
+		Development:      false,
 		Encoding:         "json",
 		EncoderConfig:    encoderConfig,
 		OutputPaths:      []string{"stderr"},
@@ -67,12 +63,11 @@ func getOurProductionConfig() *zap.Config {
 
 func getOurDevelopmentConfig() *zap.Config {
 	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:    "T",
-		LevelKey:   "L",
-		NameKey:    "N",
-		CallerKey:  "C",
-		MessageKey: "M",
-		// StacktraceKey:  "S",
+		TimeKey:        "T",
+		LevelKey:       "L",
+		NameKey:        "N",
+		CallerKey:      "C",
+		MessageKey:     "M",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
@@ -104,7 +99,13 @@ func Configure(production bool) (*zap.SugaredLogger, error) {
 		return nil, err
 	}
 
-	rootLogger = logger.Named("fieldkit")
+	rootLogger = logger.WithOptions(
+		zap.WrapCore(
+			func(core zapcore.Core) zapcore.Core {
+				return NewStructuredErrorsCore(core)
+			},
+		),
+	).Named("fieldkit")
 
 	zap.RedirectStdLog(rootLogger)
 

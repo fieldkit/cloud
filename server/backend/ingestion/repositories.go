@@ -8,6 +8,7 @@ import (
 	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/errors"
 )
 
 type Repository struct {
@@ -43,25 +44,25 @@ func (r *Resolver) ResolveDeviceAndSchemas(ctx context.Context, schemaId SchemaI
 		return r.Repository.LookupDevice(ctx, id)
 	})
 	if err != nil {
-		return nil, fmt.Errorf("(%s)[Error] (LookupDevice) %v", schemaId, err)
+		return nil, errors.Structured(err, "device_id", schemaId.Device)
 	}
 
 	if device == nil {
-		return nil, fmt.Errorf("(%s)[Error] (LookupDevice) No such device", schemaId)
+		return nil, errors.Structured("No such device", "device_id", schemaId.Device)
 	}
 
 	stream, err := r.Cache.LookupStream(schemaId.Device, func(id DeviceId) (*Stream, error) {
 		return r.Repository.LookupStream(ctx, device)
 	})
 	if err != nil {
-		return nil, fmt.Errorf("(%s)[Error]: (LookupStream) (%v)", schemaId, err)
+		return nil, errors.Structured(err, "device_id", schemaId.Device)
 	}
 
 	schemas, err := r.Cache.LookupSchemas(schemaId, func(id SchemaId) ([]*MessageSchema, error) {
 		return r.Repository.LookupSchemas(ctx, schemaId)
 	})
 	if err != nil {
-		return nil, fmt.Errorf("(%s)[Error] (LookupSchema) %v", schemaId, err)
+		return nil, errors.Structured(err, "device_id", schemaId.Device)
 	}
 
 	rs = &DeviceStream{
