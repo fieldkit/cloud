@@ -25,7 +25,7 @@ func (nc *INaturalistCommentor) Handle(ctx context.Context, co *CachedObservatio
 
 	clientAndConfig := nc.Clients.GetClientAndConfig(co.SiteID)
 	if clientAndConfig == nil {
-		log.Errorw("No iNaturalist configuration", "site_id", co.SiteID)
+		log.Warnw("No iNaturalist configuration", "site_id", co.SiteID)
 		return nil
 	}
 

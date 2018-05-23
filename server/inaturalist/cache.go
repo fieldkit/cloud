@@ -156,7 +156,7 @@ func (in *INaturalistCache) refreshUntilEmptyPage(ctx context.Context, options *
 
 		observations, err := in.INaturalistClient.GetObservations(options)
 		if err != nil {
-			return err
+			return fmt.Errorf("Refresh error: %v", err)
 		}
 
 		if len(observations.Observations) == 0 {
