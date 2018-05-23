@@ -68,7 +68,9 @@ func (ns *INaturalistService) RefreshObservations(ctx context.Context) error {
 	}
 
 	for _, naturalistConfig := range AllNaturalistConfigs {
-		log.Infow("Refreshing iNaturalist", "api_url", naturalistConfig.RootUrl)
+		log = Logger(ctx).Sugar().With("api_url", naturalistConfig.RootUrl)
+
+		log.Infow("Refreshing iNaturalist")
 
 		clientAndConfig := ns.Clients.GetClientAndConfig(naturalistConfig.SiteID)
 		if clientAndConfig == nil {
