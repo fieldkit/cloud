@@ -90,6 +90,8 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
+	log.Info("Starting")
+
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
 		panic(err)
