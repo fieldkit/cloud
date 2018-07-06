@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"strings"
+	"time"
 
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
@@ -24,6 +24,8 @@ import (
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
 	"github.com/kelseyhightower/envconfig"
+
+	"go.uber.org/zap"
 
 	_ "github.com/lib/pq"
 
@@ -238,14 +240,18 @@ func main() {
 		}),
 	}
 
-	go func() {
-		log.Infof("%v", http.ListenAndServe("127.0.0.1:6060", nil))
-	}()
+	if false {
+		go func() {
+			log.Infof("%v", http.ListenAndServe("127.0.0.1:6060", nil))
+		}()
+	}
 
 	err = jq.Listen(ctx, 1)
 	if err != nil {
 		panic(err)
 	}
+
+	setupMemoryLogging(log)
 
 	sourceModifiedHandler.QueueChangesForAllSources(publisher)
 
@@ -499,4 +505,48 @@ func setupErrorHandling() {
 		}
 		return errBadRequest(message, keyvals...)
 	}
+}
+
+func setupMemoryLogging(log *zap.SugaredLogger) {
+	go func() {
+		for {
+			var mem runtime.MemStats
+			runtime.ReadMemStats(&mem)
+
+			logged := struct {
+				Alloc        uint64
+				TotalAlloc   uint64
+				Sys          uint64
+				Mallocs      uint64
+				Frees        uint64
+				HeapAlloc    uint64
+				HeapSys      uint64
+				HeapObjects  uint64
+				StackInuse   uint64
+				StackSys     uint64
+				LastGC       uint64
+				PauseTotalNs uint64
+				NumGC        uint32
+			}{
+				mem.Alloc,
+				mem.TotalAlloc,
+				mem.Sys,
+				mem.Mallocs,
+				mem.Frees,
+				mem.HeapAlloc,
+				mem.HeapSys,
+				mem.HeapObjects,
+				mem.StackInuse,
+				mem.StackSys,
+				mem.LastGC,
+				mem.PauseTotalNs,
+				mem.NumGC,
+			}
+
+			log.Infow("Memory", "memory", logged)
+
+			time.Sleep(10 * time.Second)
+		}
+	}()
+
 }
