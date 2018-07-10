@@ -5,3 +5,4 @@ schema-production
 active-schema
 migration
 grafana-storage
+aws.env

@@ -18,6 +18,7 @@ import (
 
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/goadesign/goa"
@@ -58,6 +59,8 @@ type Config struct {
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 	ProductionLogging     bool   `envconfig:"production_logging"`
+	AwsId                 string `split_words:"true" default:""`
+	AwsSecret             string `split_words:"true" default:""`
 
 	Help          bool
 	CpuProfile    string
@@ -65,6 +68,26 @@ type Config struct {
 }
 
 func configureProfiling(config *Config) {
+}
+
+func getAwsSessionOptions(config *Config) session.Options {
+	if config.AwsId == "" || config.AwsSecret == "" {
+		return session.Options{
+			Profile: config.AWSProfile,
+			Config: aws.Config{
+				Region: aws.String("us-east-1"),
+				CredentialsChainVerboseErrors: aws.Bool(true),
+			},
+		}
+	}
+	return session.Options{
+		Profile: config.AWSProfile,
+		Config: aws.Config{
+			Region:                        aws.String("us-east-1"),
+			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+	}
 }
 
 func main() {
@@ -99,13 +122,7 @@ func main() {
 		panic(err)
 	}
 
-	awsSessionOptions := session.Options{
-		Profile: config.AWSProfile,
-		Config: aws.Config{
-			Region: aws.String("us-east-1"),
-			CredentialsChainVerboseErrors: aws.Bool(true),
-		},
-	}
+	awsSessionOptions := getAwsSessionOptions(&config)
 
 	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
 	if err != nil {
