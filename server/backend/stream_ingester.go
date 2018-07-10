@@ -66,6 +66,10 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	return n, err
 }
 
+func (si *StreamIngester) download(ctx context.Context, path string) error {
+	return nil
+}
+
 func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
 	log := Logger(ctx).Sugar()
 
@@ -142,7 +146,7 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 
 	log.Infow("started (async)", headers.ToLoggingFields()...)
 
-	if err := si.streamArchiver.Archive(ctx, headers.ContentType, req.Body); err != nil {
+	if err := si.streamArchiver.Archive(ctx, headers, req.Body); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -224,9 +228,9 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if headers.FkProcessing == "" {
+	if headers.FkProcessing == "sync" {
 		si.synchronous(ctx, headers, w, req)
-	} else if headers.FkProcessing == "async" {
+	} else {
 		si.asynchronous(ctx, headers, w, req)
 	}
 }

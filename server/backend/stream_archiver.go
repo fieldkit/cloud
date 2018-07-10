@@ -12,14 +12,14 @@ import (
 )
 
 type StreamArchiver interface {
-	Archive(ctx context.Context, contentType string, read io.Reader) error
+	Archive(ctx context.Context, headers *IncomingHeaders, read io.Reader) error
 }
 
 type DevNullStreamArchiver struct {
 }
 
-func (a *DevNullStreamArchiver) Archive(ctx context.Context, contentType string, reader io.Reader) error {
-	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", contentType)
+func (a *DevNullStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) error {
+	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", headers.ContentType)
 	return nil
 }
 
@@ -35,7 +35,7 @@ func NewS3StreamArchiver(session *session.Session, bucketName string) *S3StreamA
 	}
 }
 
-func (a *S3StreamArchiver) Archive(ctx context.Context, contentType string, reader io.Reader) error {
+func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -45,9 +45,15 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, contentType string, read
 
 	metadata := make(map[string]*string)
 
+	metadata[FkProcessingHeaderName] = aws.String(headers.FkProcessing)
+	metadata[FkVersionHeaderName] = aws.String(headers.FkVersion)
+	metadata[FkBuildHeaderName] = aws.String(headers.FkBuild)
+	metadata[FkDeviceIdHeaderName] = aws.String(headers.FkDeviceId)
+	metadata[FkFileIdHeaderName] = aws.String(headers.FkFileId)
+
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
-		ContentType: aws.String(contentType),
+		ContentType: aws.String(headers.ContentType),
 		Bucket:      aws.String(a.bucketName),
 		Key:         aws.String(id.String()),
 		Body:        reader,
