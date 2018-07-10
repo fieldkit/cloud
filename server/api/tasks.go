@@ -16,6 +16,7 @@ type TasksControllerOptions struct {
 	Backend            *backend.Backend
 	Emailer            email.Emailer
 	INaturalistService *inaturalist.INaturalistService
+	StreamProcessor    backend.StreamProcessor
 }
 
 type TasksController struct {
@@ -40,6 +41,17 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
 	go c.options.INaturalistService.RefreshObservations(ctx)
+
+	return ctx.OK([]byte("Ok"))
+}
+
+func (c *TasksController) StreamsProcess(ctx *app.StreamsProcessTasksContext) error {
+	err := c.options.StreamProcessor.Process(ctx, ctx.ID)
+	if err != nil {
+		log := Logger(ctx).Sugar()
+		log.Infow("Error", "error", err)
+		return ctx.NotFound()
+	}
 
 	return ctx.OK([]byte("Ok"))
 }

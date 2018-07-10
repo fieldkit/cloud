@@ -514,6 +514,7 @@ type TasksController interface {
 	goa.Muxer
 	Check(*CheckTasksContext) error
 	Five(*FiveTasksContext) error
+	StreamsProcess(*StreamsProcessTasksContext) error
 }
 
 // MountTasksController "mounts" a Tasks resource controller on the given service.
@@ -522,6 +523,7 @@ func MountTasksController(service *goa.Service, ctrl TasksController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/tasks/check", ctrl.MuxHandler("preflight", handleTasksOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/tasks/five", ctrl.MuxHandler("preflight", handleTasksOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/tasks/streams/:id/process", ctrl.MuxHandler("preflight", handleTasksOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -554,6 +556,22 @@ func MountTasksController(service *goa.Service, ctrl TasksController) {
 	h = handleTasksOrigin(h)
 	service.Mux.Handle("GET", "/tasks/five", ctrl.MuxHandler("five", h, nil))
 	service.LogInfo("mount", "ctrl", "Tasks", "action", "Five", "route", "GET /tasks/five")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewStreamsProcessTasksContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.StreamsProcess(rctx)
+	}
+	h = handleTasksOrigin(h)
+	service.Mux.Handle("GET", "/tasks/streams/:id/process", ctrl.MuxHandler("streams/process", h, nil))
+	service.LogInfo("mount", "ctrl", "Tasks", "action", "StreamsProcess", "route", "GET /tasks/streams/:id/process")
 }
 
 // handleTasksOrigin applies the CORS response headers corresponding to the origin.

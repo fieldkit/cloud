@@ -66,21 +66,16 @@ func (rw *ReaderWrapper) Read(p []byte) (n int, err error) {
 	return n, err
 }
 
-func (si *StreamIngester) download(ctx context.Context, path string) error {
-	return nil
-}
-
-func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) download(ctx context.Context, headers *IncomingHeaders, target io.Reader) error {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
-	status := http.StatusOK
 
 	log.Infow("started", headers.ToLoggingFields()...)
 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
-		Target:    req.Body,
+		Target:    target,
 		Hash:      sha1.New(),
 	}
 
@@ -99,7 +94,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHead
 				return err
 			}
 		} else {
-			decoder := json.NewDecoder(req.Body)
+			decoder := json.NewDecoder(target)
 			message := &formatting.HttpJsonMessage{}
 			err := decoder.Decode(message)
 			if err != nil {
@@ -130,13 +125,22 @@ func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHead
 	})
 
 	if err != nil {
-		status = http.StatusInternalServerError
 		log.Errorw("completed", "error", err, "bytes_read", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	} else {
 		log.Infow("completed", "bytes_read", reader.BytesRead, "hash", reader.Hash.Sum(nil), "time", time.Since(startedAt).String())
 	}
 
-	w.WriteHeader(status)
+	return nil
+}
+
+func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
+	err := si.download(ctx, headers, req.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {

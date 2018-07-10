@@ -23,4 +23,15 @@ var _ = Resource("Tasks", func() {
 		Response(BadRequest)
 		Response(OK)
 	})
+
+	Action("streams/process", func() {
+		Routing(GET("tasks/streams/:id/process"))
+		Description("Process an uploaded stream")
+		Params(func() {
+			Param("id", String)
+		})
+		Response(BadRequest)
+		Response(NotFound)
+		Response(OK)
+	})
 })

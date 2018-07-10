@@ -173,7 +173,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	service, err := createApiService(ctx, database, be, awsSession, config)
+	service, err := createApiService(ctx, database, be, awsSession, ingester, config)
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -324,7 +324,8 @@ func ServiceTraceMiddleware(h goa.Handler) goa.Handler {
 	}
 }
 
-func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config Config) (service *goa.Service, err error) {
+func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend,
+	awsSession *session.Session, ingester *backend.StreamIngester, config Config) (service *goa.Service, err error) {
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		panic(err)
@@ -334,6 +335,8 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	if err != nil {
 		panic(err)
 	}
+
+	streamProcessor := backend.NewS3StreamProcessor(awsSession, ingester, config.BucketName)
 
 	service = goa.New("fieldkit")
 
@@ -462,6 +465,7 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Backend:            be,
 		Emailer:            emailer,
 		INaturalistService: ns,
+		StreamProcessor:    streamProcessor,
 	})
 	app.MountTasksController(service, c16)
 

@@ -289,6 +289,51 @@ func (ctx *FiveTasksContext) BadRequest() error {
 	return nil
 }
 
+// StreamsProcessTasksContext provides the Tasks streams/process action context.
+type StreamsProcessTasksContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ID string
+}
+
+// NewStreamsProcessTasksContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Tasks controller streams/process action.
+func NewStreamsProcessTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*StreamsProcessTasksContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := StreamsProcessTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		rctx.ID = rawID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *StreamsProcessTasksContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *StreamsProcessTasksContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *StreamsProcessTasksContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddAdministratorContext provides the administrator add action context.
 type AddAdministratorContext struct {
 	context.Context

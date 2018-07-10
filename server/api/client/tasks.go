@@ -71,3 +71,33 @@ func (c *Client) NewFiveTasksRequest(ctx context.Context, path string) (*http.Re
 	}
 	return req, nil
 }
+
+// StreamsProcessTasksPath computes a request path to the streams/process action of Tasks.
+func StreamsProcessTasksPath(id string) string {
+	param0 := id
+
+	return fmt.Sprintf("/tasks/streams/%s/process", param0)
+}
+
+// Process an uploaded stream
+func (c *Client) StreamsProcessTasks(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewStreamsProcessTasksRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewStreamsProcessTasksRequest create the request corresponding to the streams/process action endpoint of the Tasks resource.
+func (c *Client) NewStreamsProcessTasksRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
