@@ -12,15 +12,16 @@ import (
 )
 
 type StreamArchiver interface {
-	Archive(ctx context.Context, headers *IncomingHeaders, read io.Reader) error
+	Archive(ctx context.Context, headers *IncomingHeaders, read io.Reader) (string, error)
 }
 
 type DevNullStreamArchiver struct {
 }
 
-func (a *DevNullStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) error {
+func (a *DevNullStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (string, error) {
 	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", headers.ContentType)
-	return nil
+
+	return "", nil
 }
 
 type S3StreamArchiver struct {
@@ -35,10 +36,10 @@ func NewS3StreamArchiver(session *session.Session, bucketName string) *S3StreamA
 	}
 }
 
-func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) error {
+func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	uploader := s3manager.NewUploader(a.session)
@@ -61,10 +62,10 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 		Tagging:     nil,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	Logger(ctx).Sugar().Infof("Done: %s", r.Location)
 
-	return nil
+	return id.String(), err
 }

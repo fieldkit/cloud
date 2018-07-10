@@ -150,7 +150,7 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 
 	log.Infow("started (async)", headers.ToLoggingFields()...)
 
-	if err := si.streamArchiver.Archive(ctx, headers, req.Body); err != nil {
+	if _, err := si.streamArchiver.Archive(ctx, headers, req.Body); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
