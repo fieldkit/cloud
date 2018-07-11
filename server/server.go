@@ -16,6 +16,9 @@ import (
 	"strings"
 	"time"
 
+	_ "net/http"
+	_ "net/http/pprof"
+
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -257,11 +260,9 @@ func main() {
 		}),
 	}
 
-	if false {
-		go func() {
-			log.Infof("%v", http.ListenAndServe("127.0.0.1:6060", nil))
-		}()
-	}
+	go func() {
+		log.Infof("%v", http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 
 	err = jq.Listen(ctx, 1)
 	if err != nil {
