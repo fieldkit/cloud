@@ -29,12 +29,10 @@ type SourceModifiedHandler struct {
 
 func (h *SourceModifiedHandler) Handle(ctx context.Context, m *ingestion.SourceChange) error {
 	generator := NewPregenerator(h.Backend)
-	generated, err := generator.Pregenerate(ctx, m.SourceID)
+	_, err := generator.Pregenerate(ctx, m.SourceID)
 	if err != nil {
 		return err
 	}
-
-	h.Publisher.Publish(ctx, generated)
 
 	return nil
 }
