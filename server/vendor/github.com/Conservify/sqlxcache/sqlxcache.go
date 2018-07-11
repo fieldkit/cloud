@@ -39,39 +39,7 @@ func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
 	db.cache[query] = stmt
 	return stmt, nil
 }
-func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
-	tx := db.Transaction(ctx)
-	if tx != nil {
-		stmt, err := tx.Preparex(query)
-		if err != nil {
-			return nil, err
-		}
-		return stmt, nil
-	}
-	stmt, err := db.db.PreparexContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	return stmt, nil
-}
 
-func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
-	tx := db.Transaction(ctx)
-	if tx != nil {
-		namedStmt, err := tx.PrepareNamed(query)
-		if err != nil {
-			return nil, err
-		}
-		return namedStmt, nil
-	}
-	namedStmt, err := db.db.PrepareNamedContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	return namedStmt, nil
-}
-
-/*
 func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
@@ -105,7 +73,6 @@ func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.Na
 	db.cacheNamed[query] = namedStmt
 	return db.namedStmtWithTx(ctx, namedStmt), nil
 }
-*/
 
 func (db *DB) stmtWithTx(ctx context.Context, stmt *sqlx.Stmt) *sqlx.Stmt {
 	tx := db.Transaction(ctx)
