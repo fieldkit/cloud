@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	_ "io/ioutil"
 	"mime"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,15 +25,20 @@ import (
 )
 
 const (
-	FkDataBinaryContentType = "application/vnd.fk.data+binary"
-	FkDataBase64ContentType = "application/vnd.fk.data+base64"
-	ContentTypeHeaderName   = "Content-Type"
-	ContentLengthHeaderName = "Content-Length"
-	FkProcessingHeaderName  = "Fk-Processing"
-	FkVersionHeaderName     = "Fk-Version"
-	FkBuildHeaderName       = "Fk-Build"
-	FkDeviceIdHeaderName    = "Fk-DeviceId"
-	FkFileIdHeaderName      = "Fk-FileId"
+	FkDataBinaryContentType    = "application/vnd.fk.data+binary"
+	FkDataBase64ContentType    = "application/vnd.fk.data+base64"
+	MultiPartFormDataMediaType = "multipart/form-data"
+	ContentTypeHeaderName      = "Content-Type"
+	ContentLengthHeaderName    = "Content-Length"
+	FkProcessingHeaderName     = "Fk-Processing"
+	FkVersionHeaderName        = "Fk-Version"
+	FkBuildHeaderName          = "Fk-Build"
+	FkDeviceIdHeaderName       = "Fk-DeviceId"
+	FkFileIdHeaderName         = "Fk-FileId"
+	FkFileOffsetHeaderName     = "Fk-FileOffset"
+	FkFileNameHeaderName       = "Fk-FileName"
+	FkFileVersionHeaderName    = "Fk-FileVersion"
+	FkUploadNameHeaderName     = "Fk-UploadName"
 )
 
 type StreamIngester struct {
@@ -133,30 +140,34 @@ func (si *StreamIngester) download(ctx context.Context, headers *IncomingHeaders
 	return nil
 }
 
-func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
-	err := si.download(ctx, headers, req.Body)
+func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, reader io.Reader) error {
+	err := si.download(ctx, headers, reader)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	w.WriteHeader(http.StatusOK)
+
+	return nil
 }
 
-func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, req *http.Request) {
+func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, reader io.Reader) error {
 	log := Logger(ctx).Sugar()
 
 	startedAt := time.Now()
 
 	log.Infow("started (async)", headers.ToLoggingFields()...)
 
-	if _, err := si.streamArchiver.Archive(ctx, headers, req.Body); err != nil {
+	if _, err := si.streamArchiver.Archive(ctx, headers, reader); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		log.Infow("completed", "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusOK)
 	}
+
+	return nil
 }
 
 var (
@@ -164,14 +175,19 @@ var (
 )
 
 type IncomingHeaders struct {
-	ContentType   string
-	ContentLength int32
-	MediaType     string
-	FkProcessing  string
-	FkVersion     string
-	FkBuild       string
-	FkDeviceId    string
-	FkFileId      string
+	ContentType     string
+	ContentLength   int32
+	MediaType       string
+	MediaTypeParams map[string]string
+	FkProcessing    string
+	FkVersion       string
+	FkBuild         string
+	FkDeviceId      string
+	FkFileId        string
+	FkFileOffset    string
+	FkFileVersion   string
+	FkFileName      string
+	FkUploadName    string
 }
 
 func (h *IncomingHeaders) ToLoggingFields() []interface{} {
@@ -179,19 +195,44 @@ func (h *IncomingHeaders) ToLoggingFields() []interface{} {
 
 	keysAndValues = append(keysAndValues, "content_type", h.ContentType)
 	keysAndValues = append(keysAndValues, "content_length", h.ContentLength)
+	keysAndValues = append(keysAndValues, "media_type", h.MediaType)
 	keysAndValues = append(keysAndValues, "firmware_version", h.FkVersion)
 	keysAndValues = append(keysAndValues, "firmware_build", h.FkBuild)
 	keysAndValues = append(keysAndValues, "device_id", h.FkDeviceId)
 	keysAndValues = append(keysAndValues, "file_id", h.FkFileId)
+	keysAndValues = append(keysAndValues, "file_name", h.FkFileName)
+	keysAndValues = append(keysAndValues, "file_offset", h.FkFileOffset)
+	keysAndValues = append(keysAndValues, "file_version", h.FkFileVersion)
+	keysAndValues = append(keysAndValues, "upload_name", h.FkUploadName)
 
 	return keysAndValues
+}
+
+func (h *IncomingHeaders) ToPartHeaders(contentType string) *IncomingHeaders {
+	mediaType, mediaTypeParams, _ := mime.ParseMediaType(contentType)
+
+	return &IncomingHeaders{
+		ContentType:     contentType,
+		ContentLength:   0,
+		MediaType:       mediaType,
+		MediaTypeParams: mediaTypeParams,
+		FkProcessing:    h.FkProcessing,
+		FkVersion:       h.FkVersion,
+		FkBuild:         h.FkBuild,
+		FkDeviceId:      h.FkDeviceId,
+		FkFileId:        h.FkFileId,
+		FkFileOffset:    h.FkFileOffset,
+		FkFileVersion:   h.FkFileVersion,
+		FkFileName:      h.FkFileName,
+		FkUploadName:    h.FkUploadName,
+	}
 }
 
 func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	contentLengthString := req.Header.Get(ContentLengthHeaderName)
 	contentType := req.Header.Get(ContentTypeHeaderName)
 
-	mediaType, _, err := mime.ParseMediaType(contentType)
+	mediaType, mediaTypeParams, err := mime.ParseMediaType(contentType)
 	if err != nil {
 		return nil, err
 	}
@@ -202,14 +243,19 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	}
 
 	headers := &IncomingHeaders{
-		ContentType:   contentType,
-		ContentLength: int32(contentLength),
-		MediaType:     mediaType,
-		FkProcessing:  req.Header.Get(FkProcessingHeaderName),
-		FkVersion:     req.Header.Get(FkVersionHeaderName),
-		FkBuild:       req.Header.Get(FkBuildHeaderName),
-		FkDeviceId:    req.Header.Get(FkDeviceIdHeaderName),
-		FkFileId:      req.Header.Get(FkFileIdHeaderName),
+		ContentType:     contentType,
+		ContentLength:   int32(contentLength),
+		MediaType:       mediaType,
+		MediaTypeParams: mediaTypeParams,
+		FkProcessing:    req.Header.Get(FkProcessingHeaderName),
+		FkVersion:       req.Header.Get(FkVersionHeaderName),
+		FkBuild:         req.Header.Get(FkBuildHeaderName),
+		FkDeviceId:      req.Header.Get(FkDeviceIdHeaderName),
+		FkFileId:        req.Header.Get(FkFileIdHeaderName),
+		FkFileOffset:    req.Header.Get(FkFileOffsetHeaderName),
+		FkFileName:      req.Header.Get(FkFileNameHeaderName),
+		FkFileVersion:   req.Header.Get(FkFileVersionHeaderName),
+		FkUploadName:    req.Header.Get(FkUploadNameHeaderName),
 	}
 
 	return headers, nil
@@ -226,15 +272,45 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if headers.MediaType != FkDataBinaryContentType && headers.MediaType != FkDataBase64ContentType && headers.MediaType != formatting.HttpProviderJsonContentType {
-		log.Infow("Unknown content type", headers.ToLoggingFields()...)
+	if headers.MediaType != FkDataBinaryContentType && headers.MediaType != FkDataBase64ContentType && headers.MediaType != formatting.HttpProviderJsonContentType && headers.MediaType != MultiPartFormDataMediaType {
+		log.Infow("Unknown Content-Type", headers.ToLoggingFields()...)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if headers.FkProcessing == "sync" {
-		si.synchronous(ctx, headers, w, req)
+	if headers.MediaType == MultiPartFormDataMediaType {
+		log.Infow("Reading form", headers.ToLoggingFields()...)
+
+		mr := multipart.NewReader(req.Body, headers.MediaTypeParams["boundary"])
+		for {
+			p, err := mr.NextPart()
+			if err == io.EOF {
+				return
+			}
+			if err != nil {
+				log.Errorw("failed", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			contentDisposition := p.Header.Get("Content-Disposition")
+			contentType := p.Header.Get("Content-Type")
+			contentLength := p.Header.Get("Content-Length")
+
+			log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength)
+
+			partHeaders := headers.ToPartHeaders(contentType)
+			if headers.FkProcessing == "sync" {
+				si.synchronous(ctx, partHeaders, w, p)
+			} else {
+				si.asynchronous(ctx, partHeaders, w, p)
+			}
+		}
 	} else {
-		si.asynchronous(ctx, headers, w, req)
+		if headers.FkProcessing == "sync" {
+			si.synchronous(ctx, headers, w, req.Body)
+		} else {
+			si.asynchronous(ctx, headers, w, req.Body)
+		}
 	}
 }
