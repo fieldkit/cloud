@@ -29,6 +29,12 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "CTs0C05F+XVHqvwNvCJ/x0M/c4g=",
+			"path": "github.com/Conservify/protobuf-tools/tools",
+			"revision": "43b897198d1489bd3b7832567a74fbb0a080833b",
+			"revisionTime": "2018-07-15T16:45:06Z"
+		},
+		{
 			"checksumSHA1": "xxnBZZLJJw4bhN8JRnVJbEkVdSw=",
 			"path": "github.com/Conservify/sqlxcache",
 			"revision": "f531a9ef96c0ddd2cfa72873326ccdde91433345",

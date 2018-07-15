@@ -12,11 +12,13 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/robinpowered/go-proto/message"
-	"github.com/robinpowered/go-proto/stream"
+
+	pbtools "github.com/Conservify/protobuf-tools/tools"
 
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/errors"
 )
 
 type FormattedMessageReceiver interface {
@@ -58,8 +60,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		err := proto.Unmarshal(b, &record)
 		if err != nil {
 			// We keep reading, this may just be a protocol version issue.
-			log.Errorw("Error unmarshalling record", "error", err)
-			return nil, nil
+			return nil, errors.Structured(err)
 		}
 
 		change, err := br.Push(ctx, &record)
@@ -77,13 +78,17 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		return &record, nil
 	})
 
-	_, err := stream.ReadLengthPrefixedCollection(body, unmarshalFunc)
+	_, junk, err := pbtools.ReadLengthPrefixedCollectionIgnoringIncompleteBeginning(body, 4096, unmarshalFunc)
 	if err != nil {
 		return err
 	}
 
+	if junk > 0 {
+		log.Warnw("Malformed stream, ignored junk", "junk", junk)
+	}
+
 	if br.ReadingsSeen > 0 {
-		log.Warnf("Ignored: Partial record (%v readings seen)", br.ReadingsSeen)
+		log.Warnw("Ignored: Partial records", "partial_seen", br.ReadingsSeen)
 	}
 
 	for sourceId, c := range changes {
