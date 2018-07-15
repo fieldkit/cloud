@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"io"
+	"os"
 
 	"github.com/google/uuid"
 
@@ -20,6 +21,33 @@ type DevNullStreamArchiver struct {
 
 func (a *DevNullStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (string, error) {
 	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", headers.ContentType)
+
+	return "", nil
+}
+
+type FileStreamArchiver struct {
+}
+
+func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (string, error) {
+	log := Logger(ctx).Sugar()
+
+	if headers.FkUploadName != "" {
+		fn := headers.FkUploadName
+
+		log.Infof("Streaming %s to %s", headers.ContentType, fn)
+
+		file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			return "", err
+		}
+
+		defer file.Close()
+
+		io.Copy(file, reader)
+	} else {
+		log.Infof("Streaming %s to /dev/null (No UploadName)", headers.ContentType)
+
+	}
 
 	return "", nil
 }

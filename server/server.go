@@ -305,7 +305,7 @@ func createEmailer(awsSession *session.Session, config Config) (emailer email.Em
 func createArchiver(awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
 	switch config.Archiver {
 	case "default":
-		archiver = &backend.DevNullStreamArchiver{}
+		archiver = &backend.FileStreamArchiver{}
 	case "aws":
 		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
