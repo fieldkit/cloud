@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/robinpowered/go-proto/message"
+	"github.com/robinpowered/go-proto/stream"
 
 	pbtools "github.com/Conservify/protobuf-tools/tools"
 
@@ -78,13 +79,19 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		return &record, nil
 	})
 
-	_, junk, err := pbtools.ReadLengthPrefixedCollectionIgnoringIncompleteBeginning(body, 4096, unmarshalFunc)
-	if err != nil {
-		return err
-	}
-
-	if junk > 0 {
-		log.Warnw("Malformed stream, ignored junk", "junk", junk)
+	if false {
+		_, junk, err := pbtools.ReadLengthPrefixedCollectionIgnoringIncompleteBeginning(body, 4096, unmarshalFunc)
+		if err != nil {
+			return err
+		}
+		if junk > 0 {
+			log.Warnw("Malformed stream, ignored junk", "junk", junk)
+		}
+	} else {
+		_, err := stream.ReadLengthPrefixedCollection(body, unmarshalFunc)
+		if err != nil {
+			return err
+		}
 	}
 
 	if br.ReadingsSeen > 0 {
