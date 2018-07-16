@@ -31,25 +31,26 @@ type FileStreamArchiver struct {
 func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (string, error) {
 	log := Logger(ctx).Sugar()
 
-	if headers.FkUploadName != "" {
-		fn := headers.FkUploadName
-
-		log.Infof("Streaming %s to %s", headers.ContentType, fn)
-
-		file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
-		if err != nil {
-			return "", err
-		}
-
-		defer file.Close()
-
-		io.Copy(file, reader)
-	} else {
+	if headers.FkUploadName == "" {
 		log.Infof("Streaming %s to /dev/null (No UploadName)", headers.ContentType)
-
+		return "", nil
 	}
 
-	return "", nil
+	fn := headers.FkUploadName
+
+	log.Infof("Streaming %s to %s", headers.ContentType, fn)
+
+	file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return "", err
+	}
+
+	defer file.Close()
+
+	io.Copy(file, reader)
+
+	return fn, nil
+
 }
 
 type S3StreamArchiver struct {
