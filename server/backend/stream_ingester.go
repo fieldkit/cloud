@@ -261,6 +261,23 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	return headers, nil
 }
 
+func acceptableMediaType(mediaType string) bool {
+	if mediaType == FkDataBinaryContentType {
+		return true
+	}
+	if mediaType == FkDataBase64ContentType {
+		return true
+	}
+	if mediaType == formatting.HttpProviderJsonContentType {
+		return true
+	}
+	if mediaType == MultiPartFormDataMediaType {
+		return true
+	}
+	return false
+
+}
+
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := logging.WithNewTaskId(req.Context(), ids)
 	log := Logger(ctx).Sugar()
@@ -272,7 +289,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if headers.MediaType != FkDataBinaryContentType && headers.MediaType != FkDataBase64ContentType && headers.MediaType != formatting.HttpProviderJsonContentType && headers.MediaType != MultiPartFormDataMediaType {
+	if !acceptableMediaType(headers.MediaType) {
 		log.Infow("Unknown Content-Type", headers.ToLoggingFields()...)
 		w.WriteHeader(http.StatusBadRequest)
 		return
