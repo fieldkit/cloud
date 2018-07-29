@@ -3,10 +3,12 @@ package utilities
 import (
 	"context"
 	"fmt"
-	fk "github.com/fieldkit/cloud/server/api/client"
-	goaclient "github.com/goadesign/goa/client"
 	"log"
 	"net/http"
+
+	goaclient "github.com/goadesign/goa/client"
+
+	fk "github.com/fieldkit/cloud/server/api/client"
 )
 
 func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceSource, longitude, latitude float64) error {
@@ -16,15 +18,31 @@ func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceSource, 
 	}
 	res, err := c.UpdateLocationDevice(ctx, fk.UpdateLocationDevicePath(device.ID), &updateLocationPayload)
 	if err != nil {
-		log.Fatalf("Error updating device location: %v", err)
+		return fmt.Errorf("Error updating device location: %v", err)
 	}
 
 	updated, err := c.DecodeDeviceSource(res)
 	if err != nil {
-		log.Fatalf("Error adding device location: %v", err)
+		return fmt.Errorf("Error adding device location: %v", err)
 	}
 
 	log.Printf("Updated: %+v", updated)
+
+	return nil
+}
+
+func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, url, etag string) error {
+	updatePayload := fk.UpdateDeviceFirmwarePayload{
+		DeviceID: device.ID,
+		Etag:     etag,
+		URL:      url,
+	}
+	res, err := c.UpdateFirmware(ctx, fk.UpdateFirmwarePath(), &updatePayload)
+	if err != nil {
+		return fmt.Errorf("Error updating device firmware: %v", err)
+	}
+
+	log.Printf("Updated: %+v", res)
 
 	return nil
 }

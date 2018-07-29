@@ -24,6 +24,9 @@ type options struct {
 	Latitude         float64
 	Longitude        float64
 	LocationPrimeZip string
+
+	FirmwareURL  string
+	FirmwareETag string
 }
 
 func main() {
@@ -45,6 +48,9 @@ func main() {
 	flag.Float64Var(&o.Longitude, "longitude", 0, "longitude")
 	flag.Float64Var(&o.Latitude, "latitude", 0, "latitude")
 	flag.StringVar(&o.LocationPrimeZip, "location-prime-zip", "", "zipcode to prime the location with")
+
+	flag.StringVar(&o.FirmwareURL, "firmware-url", "", "firmware url")
+	flag.StringVar(&o.FirmwareETag, "firmware-etag", "", "firmware etag")
 
 	flag.Parse()
 
@@ -68,6 +74,14 @@ func main() {
 			err := fktesting.UpdateLocation(ctx, c, device, o.Longitude, o.Latitude)
 			if err != nil {
 				log.Fatalf("Error updating location: %v", err)
+			}
+		}
+
+		if o.FirmwareURL != "" && o.FirmwareETag != "" {
+			log.Printf("Updating firmware %v", o.FirmwareURL)
+			err := fktesting.UpdateFirmware(ctx, c, device, o.FirmwareURL, o.FirmwareETag)
+			if err != nil {
+				log.Fatalf("Error updating firmware: %v", err)
 			}
 		}
 	}

@@ -60,6 +60,96 @@ func (ctx *ListBySourceExportContext) BadRequest() error {
 	return nil
 }
 
+// CheckFirmwareContext provides the Firmware check action context.
+type CheckFirmwareContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	IfNoneMatch *string
+	DeviceID    string
+}
+
+// NewCheckFirmwareContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Firmware controller check action.
+func NewCheckFirmwareContext(ctx context.Context, r *http.Request, service *goa.Service) (*CheckFirmwareContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := CheckFirmwareContext{Context: ctx, ResponseData: resp, RequestData: req}
+	headerIfNoneMatch := req.Header["If-None-Match"]
+	if len(headerIfNoneMatch) > 0 {
+		rawIfNoneMatch := headerIfNoneMatch[0]
+		req.Params["If-None-Match"] = []string{rawIfNoneMatch}
+		rctx.IfNoneMatch = &rawIfNoneMatch
+	}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *CheckFirmwareContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotModified sends a HTTP response with status code 304.
+func (ctx *CheckFirmwareContext) NotModified() error {
+	ctx.ResponseData.WriteHeader(304)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *CheckFirmwareContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// UpdateFirmwareContext provides the Firmware update action context.
+type UpdateFirmwareContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *UpdateDeviceFirmwarePayload
+}
+
+// NewUpdateFirmwareContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Firmware controller update action.
+func NewUpdateFirmwareContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateFirmwareContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateFirmwareContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateFirmwareContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateFirmwareContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // GeographicalQueryGeoJSONContext provides the GeoJSON geographical query action context.
 type GeographicalQueryGeoJSONContext struct {
 	context.Context

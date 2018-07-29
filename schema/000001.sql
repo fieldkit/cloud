@@ -143,8 +143,22 @@ CREATE TABLE fieldkit.device (
     token bytea NOT NULL
 );
 
+CREATE UNIQUE INDEX ON fieldkit.raw_message (origin_id);
+
 CREATE UNIQUE INDEX ON fieldkit.device (key);
 CREATE UNIQUE INDEX ON fieldkit.device (token);
+
+-- device_firmware
+
+CREATE TABLE fieldkit.device_firmware (
+  id serial PRIMARY KEY,
+  device_id integer REFERENCES fieldkit.device (source_id) ON DELETE CASCADE,
+  time timestamp NOT NULL,
+  etag varchar NOT NULL,
+  url varchar NOT NULL
+);
+
+-- device_schema
 
 CREATE TABLE fieldkit.device_schema (
     id serial PRIMARY KEY,
@@ -154,6 +168,8 @@ CREATE TABLE fieldkit.device_schema (
 );
 
 CREATE UNIQUE INDEX ON fieldkit.device_schema (device_id, schema_id);
+
+-- device_location
 
 CREATE TABLE fieldkit.device_location (
   id serial PRIMARY KEY,

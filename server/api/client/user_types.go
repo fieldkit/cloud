@@ -611,6 +611,61 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// updateDeviceFirmwarePayload user type.
+type updateDeviceFirmwarePayload struct {
+	DeviceID *int    `form:"deviceId,omitempty" json:"deviceId,omitempty" yaml:"deviceId,omitempty" xml:"deviceId,omitempty"`
+	Etag     *string `form:"etag,omitempty" json:"etag,omitempty" yaml:"etag,omitempty" xml:"etag,omitempty"`
+	URL      *string `form:"url,omitempty" json:"url,omitempty" yaml:"url,omitempty" xml:"url,omitempty"`
+}
+
+// Validate validates the updateDeviceFirmwarePayload type instance.
+func (ut *updateDeviceFirmwarePayload) Validate() (err error) {
+	if ut.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "deviceId"))
+	}
+	if ut.Etag == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "etag"))
+	}
+	if ut.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
+	}
+	return
+}
+
+// Publicize creates UpdateDeviceFirmwarePayload from updateDeviceFirmwarePayload
+func (ut *updateDeviceFirmwarePayload) Publicize() *UpdateDeviceFirmwarePayload {
+	var pub UpdateDeviceFirmwarePayload
+	if ut.DeviceID != nil {
+		pub.DeviceID = *ut.DeviceID
+	}
+	if ut.Etag != nil {
+		pub.Etag = *ut.Etag
+	}
+	if ut.URL != nil {
+		pub.URL = *ut.URL
+	}
+	return &pub
+}
+
+// UpdateDeviceFirmwarePayload user type.
+type UpdateDeviceFirmwarePayload struct {
+	DeviceID int    `form:"deviceId" json:"deviceId" yaml:"deviceId" xml:"deviceId"`
+	Etag     string `form:"etag" json:"etag" yaml:"etag" xml:"etag"`
+	URL      string `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the UpdateDeviceFirmwarePayload type instance.
+func (ut *UpdateDeviceFirmwarePayload) Validate() (err error) {
+
+	if ut.Etag == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "etag"))
+	}
+	if ut.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
+	}
+	return
+}
+
 // updateDeviceSourceLocationPayload user type.
 type updateDeviceSourceLocationPayload struct {
 	Key       *string  `form:"key,omitempty" json:"key,omitempty" yaml:"key,omitempty" xml:"key,omitempty"`

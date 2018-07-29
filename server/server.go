@@ -470,6 +470,13 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountTasksController(service, c16)
 
+	// Mount "firmware" controller
+	c17 := api.NewFirmwareController(service, api.FirmwareControllerOptions{
+		Database: database,
+		Backend:  be,
+	})
+	app.MountFirmwareController(service, c17)
+
 	setupErrorHandling()
 
 	return

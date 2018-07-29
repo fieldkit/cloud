@@ -33,3 +33,11 @@ type DeviceLocation struct {
 	Timestamp *time.Time `db:"timestamp"`
 	Location  *Location  `db:"location"`
 }
+
+type DeviceFirmware struct {
+	ID       int64     `db:"id"`
+	DeviceID int64     `db:"device_id"`
+	Time     time.Time `db:"time"`
+	URL      string    `db:"url"`
+	ETag     string    `db:"etag"`
+}
