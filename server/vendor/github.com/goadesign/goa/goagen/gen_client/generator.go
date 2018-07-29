@@ -49,7 +49,7 @@ type Generator struct {
 func Generate() (files []string, err error) {
 	var (
 		outDir, target, toolDir, tool, ver string
-		notool                             bool
+		notool, regen                      bool
 	)
 	dtool := defaultToolName(design.Design)
 
@@ -60,6 +60,7 @@ func Generate() (files []string, err error) {
 	set.StringVar(&tool, "tool", dtool, "")
 	set.StringVar(&ver, "version", "", "")
 	set.BoolVar(&notool, "notool", false, "")
+	set.BoolVar(&regen, "regen", false, "")
 	set.String("design", "", "")
 	set.Bool("force", false, "")
 	set.Bool("notest", false, "")
@@ -222,11 +223,20 @@ func (g *Generator) Cleanup() {
 	g.genfiles = nil
 }
 
-func (g *Generator) generateClient(clientFile string, clientPkg string, funcs template.FuncMap) error {
-	file, err := codegen.SourceFileFor(clientFile)
-	if err != nil {
-		return err
+func (g *Generator) generateClient(clientFile string, clientPkg string, funcs template.FuncMap) (err error) {
+	var file *codegen.SourceFile
+	{
+		file, err = codegen.SourceFileFor(clientFile)
+		if err != nil {
+			return
+		}
 	}
+	defer func() {
+		file.Close()
+		if err == nil {
+			err = file.FormatCode()
+		}
+	}()
 	clientTmpl := template.Must(template.New("client").Funcs(funcs).Parse(clientTmpl))
 
 	// Compute list of encoders and decoders
@@ -264,7 +274,7 @@ func (g *Generator) generateClient(clientFile string, clientPkg string, funcs te
 		imports = append(imports, codegen.SimpleImport(packagePath))
 	}
 	title := fmt.Sprintf("%s: Client", g.API.Context())
-	if err := file.WriteHeader(title, g.Target, imports); err != nil {
+	if err = file.WriteHeader(title, g.Target, imports); err != nil {
 		return err
 	}
 	g.genfiles = append(g.genfiles, clientFile)
@@ -279,11 +289,8 @@ func (g *Generator) generateClient(clientFile string, clientPkg string, funcs te
 		Encoders: encoders,
 		Decoders: decoders,
 	}
-	if err := clientTmpl.Execute(file, data); err != nil {
-		return err
-	}
-
-	return file.FormatCode()
+	err = clientTmpl.Execute(file, data)
+	return
 }
 
 func (g *Generator) generateClientResources(pkgDir, clientPkg string, funcs template.FuncMap) error {
@@ -300,7 +307,7 @@ func (g *Generator) generateClientResources(pkgDir, clientPkg string, funcs temp
 	return g.generateMediaTypes(pkgDir, funcs)
 }
 
-func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDefinition, funcs template.FuncMap) error {
+func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDefinition, funcs template.FuncMap) (err error) {
 	payloadTmpl := template.Must(template.New("payload").Funcs(funcs).Parse(payloadTmpl))
 	pathTmpl := template.Must(template.New("pathTemplate").Funcs(funcs).Parse(pathTmpl))
 
@@ -310,20 +317,30 @@ func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDe
 		resFilename += "_client"
 	}
 	filename := filepath.Join(pkgDir, resFilename+".go")
-	file, err := codegen.SourceFileFor(filename)
+
+	var file *codegen.SourceFile
+	file, err = codegen.SourceFileFor(filename)
 	if err != nil {
 		return err
 	}
+	defer func() {
+		file.Close()
+		if err == nil {
+			err = file.FormatCode()
+		}
+	}()
 	imports := []*codegen.ImportSpec{
 		codegen.SimpleImport("bytes"),
 		codegen.SimpleImport("encoding/json"),
 		codegen.SimpleImport("fmt"),
 		codegen.SimpleImport("io"),
 		codegen.SimpleImport("io/ioutil"),
+		codegen.SimpleImport("mime/multipart"),
 		codegen.SimpleImport("net/http"),
 		codegen.SimpleImport("net/url"),
 		codegen.SimpleImport("os"),
 		codegen.SimpleImport("path"),
+		codegen.SimpleImport("path/filepath"),
 		codegen.SimpleImport("strconv"),
 		codegen.SimpleImport("strings"),
 		codegen.SimpleImport("time"),
@@ -332,7 +349,7 @@ func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDe
 		codegen.NewImport("uuid", "github.com/goadesign/goa/uuid"),
 	}
 	title := fmt.Sprintf("%s: %s Resource Client", g.API.Context(), res.Name)
-	if err := file.WriteHeader(title, g.Target, imports); err != nil {
+	if err = file.WriteHeader(title, g.Target, imports); err != nil {
 		return err
 	}
 	g.genfiles = append(g.genfiles, filename)
@@ -340,6 +357,9 @@ func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDe
 	err = res.IterateFileServers(func(fs *design.FileServerDefinition) error {
 		return g.generateFileServer(file, fs, funcs)
 	})
+	if err != nil {
+		return err
+	}
 
 	err = res.IterateActions(func(action *design.ActionDefinition) error {
 		if action.Payload != nil {
@@ -388,11 +408,7 @@ func (g *Generator) generateResourceClient(pkgDir string, res *design.ResourceDe
 		}
 		return g.generateActionClient(action, file, funcs)
 	})
-	if err != nil {
-		return err
-	}
-
-	return file.FormatCode()
+	return
 }
 
 func (g *Generator) generateFileServer(file *codegen.SourceFile, fs *design.FileServerDefinition, funcs template.FuncMap) error {
@@ -481,6 +497,8 @@ func (g *Generator) generateActionClient(action *design.ActionDefinition, file *
 		ResourceName       string
 		Description        string
 		Routes             []*design.RouteDefinition
+		Payload            *design.UserTypeDefinition
+		PayloadMultipart   bool
 		HasPayload         bool
 		HasMultiContent    bool
 		DefaultContentType string
@@ -495,6 +513,8 @@ func (g *Generator) generateActionClient(action *design.ActionDefinition, file *
 		ResourceName:       action.Parent.Name,
 		Description:        action.Description,
 		Routes:             action.Routes,
+		Payload:            action.Payload,
+		PayloadMultipart:   action.PayloadMultipart,
 		HasPayload:         action.Payload != nil,
 		HasMultiContent:    len(design.Design.Consumes) > 1,
 		DefaultContentType: design.Design.Consumes[0].MIMETypes[0],
@@ -546,15 +566,27 @@ func (g *Generator) fileServerMethod(fs *design.FileServerDefinition) string {
 
 // generateMediaTypes iterates through the media types and generate the data structures and
 // marshaling code.
-func (g *Generator) generateMediaTypes(pkgDir string, funcs template.FuncMap) error {
+func (g *Generator) generateMediaTypes(pkgDir string, funcs template.FuncMap) (err error) {
 	funcs["decodegotyperef"] = decodeGoTypeRef
 	funcs["decodegotypename"] = decodeGoTypeName
 	typeDecodeTmpl := template.Must(template.New("typeDecode").Funcs(funcs).Parse(typeDecodeTmpl))
-	mtFile := filepath.Join(pkgDir, "media_types.go")
-	mtWr, err := genapp.NewMediaTypesWriter(mtFile)
-	if err != nil {
-		panic(err) // bug
+	var (
+		mtFile string
+		mtWr   *genapp.MediaTypesWriter
+	)
+	{
+		mtFile = filepath.Join(pkgDir, "media_types.go")
+		mtWr, err = genapp.NewMediaTypesWriter(mtFile)
+		if err != nil {
+			return
+		}
 	}
+	defer func() {
+		mtWr.Close()
+		if err == nil {
+			err = mtWr.FormatCode()
+		}
+	}()
 	title := fmt.Sprintf("%s: Application Media Types", g.API.Context())
 	imports := []*codegen.ImportSpec{
 		codegen.SimpleImport("github.com/goadesign/goa"),
@@ -567,7 +599,10 @@ func (g *Generator) generateMediaTypes(pkgDir string, funcs template.FuncMap) er
 	for _, v := range g.API.MediaTypes {
 		imports = codegen.AttributeImports(v.AttributeDefinition, imports, nil)
 	}
-	mtWr.WriteHeader(title, g.Target, imports)
+	if err = mtWr.WriteHeader(title, g.Target, imports); err != nil {
+		return err
+	}
+	g.genfiles = append(g.genfiles, mtFile)
 	err = g.API.IterateMediaTypes(func(mt *design.MediaTypeDefinition) error {
 		if (mt.Type.IsObject() || mt.Type.IsArray()) && !mt.IsError() {
 			if err := mtWr.Execute(mt); err != nil {
@@ -579,28 +614,33 @@ func (g *Generator) generateMediaTypes(pkgDir string, funcs template.FuncMap) er
 			if err != nil {
 				return err
 			}
-			if err := typeDecodeTmpl.Execute(mtWr.SourceFile, p); err != nil {
-				return err
-			}
-			return nil
+			return typeDecodeTmpl.Execute(mtWr.SourceFile, p)
 		})
 		return err
 	})
-	g.genfiles = append(g.genfiles, mtFile)
-	if err != nil {
-		return err
-	}
-	return mtWr.FormatCode()
+	return
 }
 
 // generateUserTypes iterates through the user types and generates the data structures and
 // marshaling code.
-func (g *Generator) generateUserTypes(pkgDir string) error {
-	utFile := filepath.Join(pkgDir, "user_types.go")
-	utWr, err := genapp.NewUserTypesWriter(utFile)
-	if err != nil {
-		panic(err) // bug
+func (g *Generator) generateUserTypes(pkgDir string) (err error) {
+	var (
+		utFile string
+		utWr   *genapp.UserTypesWriter
+	)
+	{
+		utFile = filepath.Join(pkgDir, "user_types.go")
+		utWr, err = genapp.NewUserTypesWriter(utFile)
+		if err != nil {
+			return
+		}
 	}
+	defer func() {
+		utWr.Close()
+		if err == nil {
+			err = utWr.FormatCode()
+		}
+	}()
 	title := fmt.Sprintf("%s: Application User Types", g.API.Context())
 	imports := []*codegen.ImportSpec{
 		codegen.SimpleImport("github.com/goadesign/goa"),
@@ -612,15 +652,20 @@ func (g *Generator) generateUserTypes(pkgDir string) error {
 	for _, v := range g.API.Types {
 		imports = codegen.AttributeImports(v.AttributeDefinition, imports, nil)
 	}
-	utWr.WriteHeader(title, g.Target, imports)
-	err = g.API.IterateUserTypes(func(t *design.UserTypeDefinition) error {
-		return utWr.Execute(t)
-	})
-	g.genfiles = append(g.genfiles, utFile)
-	if err != nil {
+	if err = utWr.WriteHeader(title, g.Target, imports); err != nil {
 		return err
 	}
-	return utWr.FormatCode()
+	g.genfiles = append(g.genfiles, utFile)
+	err = g.API.IterateUserTypes(func(t *design.UserTypeDefinition) error {
+		o := t.Type.ToObject()
+		for _, att := range o {
+			if att.Type.Kind() == design.FileKind {
+				att.Type = design.String
+			}
+		}
+		return utWr.Execute(t)
+	})
+	return
 }
 
 // join is a code generation helper function that generates a function signature built from
@@ -760,6 +805,8 @@ func toString(name, target string, att *design.AttributeDefinition) string {
 		case design.UUIDKind:
 			return fmt.Sprintf("%s := %s.String()", target, strings.Replace(name, "*", "", -1)) // remove pointer if present
 		case design.AnyKind:
+			return fmt.Sprintf("%s := fmt.Sprintf(\"%%v\", %s)", target, name)
+		case design.FileKind:
 			return fmt.Sprintf("%s := fmt.Sprintf(\"%%v\", %s)", target, name)
 		default:
 			panic("unknown primitive type")
@@ -952,7 +999,8 @@ func (c *Client) {{ $funcName }}(ctx context.Context, path string{{ if .Params }
 
 // NON STRING
 */}}{{ else if .MustToString }}{{ $tmp := tempvar }}	{{ toString .ValueName $tmp .Attribute }}
-	values.Set("{{ .Name }}", {{ $tmp }}){{/*
+	values.Set("{{ .Name }}", {{ $tmp }})
+{{/*
 
 // STRING
 */}}{{ else }}	values.Set("{{ .Name }}", {{ .ValueName }})
@@ -1009,14 +1057,44 @@ func (c * Client) {{ .Name }}(ctx context.Context, {{ if .DirName }}filename, {{
 */}}// {{ $funcName }} create the request corresponding to the {{ .Name }} action endpoint of the {{ .ResourceName }} resource.
 func (c *Client) {{ $funcName }}(ctx context.Context, path string{{ if .Params }}, {{ .Params }}{{ end }}{{ if .HasPayload }}{{ if .HasMultiContent }}, contentType string{{ end }}{{ end }}) (*http.Request, error) {
 {{ if .HasPayload }}	var body bytes.Buffer
-{{ if .HasMultiContent }}	if contentType == "" {
+{{ if .PayloadMultipart }}	w := multipart.NewWriter(&body)
+{{ $o := .Payload.ToObject }}{{ range $name, $att := $o }}{{ if eq $att.Type.Kind 13 }}{{/*
+*/}}	{
+		_, file := filepath.Split({{ printf "payload.%s" (goify $name true) }})
+		fw, err := w.CreateFormFile("{{ $name }}", file)
+		if err != nil {
+			return nil, err
+		}
+		fh, err := os.Open({{ printf "payload.%s" (goify $name true) }})
+		if err != nil {
+			return nil, err
+		}
+		defer fh.Close()
+		if _, err := io.Copy(fw, fh); err != nil {
+			return nil, err
+		}
+	}
+{{ else }}	{
+		fw, err := w.CreateFormField("{{ $name }}")
+		if err != nil {
+			return nil, err
+		}
+		{{ toString (printf "payload.%s" (goify $name true)) "s" $att }}
+		if _, err := fw.Write([]byte(s)); err != nil {
+			return nil, err
+		}
+	}
+{{ end }}{{ end }}	if err := w.Close(); err != nil {
+		return nil, err
+	}
+{{ else }}{{ if .HasMultiContent }}	if contentType == "" {
 		contentType = "*/*" // Use default encoder
 	}
 {{ end }}	err := c.Encoder.Encode(payload, &body, {{ if .HasMultiContent }}contentType{{ else }}"*/*"{{ end }})
 	if err != nil {
 		return nil, fmt.Errorf("failed to encode body: %s", err)
 	}
-{{ end }}	scheme := c.Scheme
+{{ end }}{{ end }}	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "{{ .CanonicalScheme }}"
 	}
@@ -1050,19 +1128,22 @@ func (c *Client) {{ $funcName }}(ctx context.Context, path string{{ if .Params }
 		return nil, err
 	}
 {{ if or .HasPayload .Headers }}	header := req.Header
-{{ if .HasPayload }}{{ if .HasMultiContent }}	if contentType == "*/*" {
+{{ if .PayloadMultipart }}	header.Set("Content-Type", w.FormDataContentType())
+{{ else }}{{ if .HasPayload }}{{ if .HasMultiContent }}	if contentType == "*/*" {
 		header.Set("Content-Type", "{{ .DefaultContentType }}")
 	} else {
 		header.Set("Content-Type", contentType)
 	}
 {{ else }}	header.Set("Content-Type", "{{ .DefaultContentType }}")
-{{ end }}{{ end }}{{ range .Headers }}{{ if .CheckNil }}	if {{ .VarName }} != nil {
+{{ end }}{{ end }}{{ end }}{{ range .Headers }}{{ if .CheckNil }}	if {{ .VarName }} != nil {
 {{ end }}{{ if .MustToString }}{{ $tmp := tempvar }}	{{ toString .ValueName $tmp .Attribute }}
 	header.Set("{{ .Name }}", {{ $tmp }}){{ else }}
 	header.Set("{{ .Name }}", {{ .ValueName }})
 {{ end }}{{ if .CheckNil }}	}{{ end }}
 {{ end }}{{ end }}{{ if .Signer }}	if c.{{ .Signer }}Signer != nil {
-		c.{{ .Signer }}Signer.Sign(req)
+		if err := c.{{ .Signer }}Signer.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 {{ end }}	return req, nil
 }

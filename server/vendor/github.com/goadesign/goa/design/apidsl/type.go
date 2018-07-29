@@ -53,44 +53,37 @@ func Type(name string, dsl func()) *design.UserTypeDefinition {
 	return t
 }
 
-// ArrayOf creates an array type from its element type. The result can be used anywhere a type can.
-// Examples:
+// ArrayOf creates an array type from its element type. The result can be used
+// anywhere a type can. Examples:
 //
 //	var Bottle = Type("bottle", func() {
 //		Attribute("name")
 //	})
 //
-//	var Bottles = ArrayOf(Bottle)
-//
 //	Action("update", func() {
 //		Params(func() {
 //			Param("ids", ArrayOf(Integer))
 //		})
-//		Payload(ArrayOf(Bottle))  // Equivalent to Payload(Bottles)
+//		Payload(ArrayOf(Bottle))
 //	})
 //
-// ArrayOf accepts an optional DSL as second argument which allows providing validations for the
-// elements of the array:
+// ArrayOf accepts an optional DSL as second argument which allows providing
+// validations for the elements of the array:
 //
-//      var Names = ArrayOf(String, func() {
-//          Pattern("[a-zA-Z]+")
-//      })
+//	Action("update", func() {
+//		Params(func() {
+//			Param("ids", ArrayOf(Integer, func() {
+//				Minimum(1)
+//			}))
+//		})
+//		Payload(ArrayOf(Bottle))
+//	})
 //
-// If you are looking to return a collection of elements in a Response clause, refer to
-// CollectionOf.  ArrayOf creates a type, where CollectionOf creates a media type.
+// If you are looking to return a collection of elements in a Response clause,
+// refer to CollectionOf. ArrayOf creates a type, where CollectionOf creates a
+// media type.
 func ArrayOf(v interface{}, dsl ...func()) *design.Array {
-	var t design.DataType
-	var ok bool
-	t, ok = v.(design.DataType)
-	if !ok {
-		if name, ok := v.(string); ok {
-			if ut, ok := design.Design.Types[name]; ok {
-				t = ut
-			} else if mt, ok := design.Design.MediaTypes[name]; ok {
-				t = mt
-			}
-		}
-	}
+	t := resolveType(v)
 	// never return nil to avoid panics, errors are reported after DSL execution
 	res := &design.Array{ElemType: &design.AttributeDefinition{Type: design.String}}
 	if t == nil {
@@ -108,8 +101,8 @@ func ArrayOf(v interface{}, dsl ...func()) *design.Array {
 	return &design.Array{ElemType: &at}
 }
 
-// HashOf creates a hash map from its key and element types. The result can be used anywhere a type
-// can. Examples:
+// HashOf creates a hash map from its key and element types. The result can be
+// used anywhere a type can. Examples:
 //
 //	var Bottle = Type("bottle", func() {
 //		Attribute("name")
@@ -119,12 +112,13 @@ func ArrayOf(v interface{}, dsl ...func()) *design.Array {
 //
 //	Action("updateRatings", func() {
 //		Payload(func() {
-//			Member("ratings", HashOf(String, Integer))  // Artificial examples...
+//			Member("ratings", HashOf(String, Integer))
 //			Member("bottles", RatedBottles)
+//			// Member("bottles", "RatedBottles") // can use name of user type
 //	})
 //
-// HashOf accepts optional DSLs as third and fourth argument which allows providing validations for
-// the keys and values of the hash respectively:
+// HashOf accepts optional DSLs as third and fourth argument which allows
+// providing validations for the keys and values of the hash respectively:
 //
 //	var RatedBottles = HashOf(String, Bottle, func() {
 //          Pattern("[a-zA-Z]+") // Validate bottle names
@@ -140,9 +134,19 @@ func ArrayOf(v interface{}, dsl ...func()) *design.Array {
 //
 //	var Mappings = HashOf(String, String, ValidateKey, TypeValue)
 //
-func HashOf(k, v design.DataType, dsls ...func()) *design.Hash {
-	kat := design.AttributeDefinition{Type: k}
-	vat := design.AttributeDefinition{Type: v}
+func HashOf(k, v interface{}, dsls ...func()) *design.Hash {
+	tk := resolveType(k)
+	tv := resolveType(v)
+	if tk == nil || tv == nil {
+		// never return nil to avoid panics, errors are reported after DSL execution
+		dslengine.ReportError("HashOf: invalid type name")
+		return &design.Hash{
+			KeyType:  &design.AttributeDefinition{Type: design.String},
+			ElemType: &design.AttributeDefinition{Type: design.String},
+		}
+	}
+	kat := design.AttributeDefinition{Type: tk}
+	vat := design.AttributeDefinition{Type: tv}
 	if len(dsls) > 2 {
 		// never return nil to avoid panics, errors are reported after DSL execution
 		dslengine.ReportError("HashOf: too many arguments")
@@ -155,4 +159,19 @@ func HashOf(k, v design.DataType, dsls ...func()) *design.Hash {
 		}
 	}
 	return &design.Hash{KeyType: &kat, ElemType: &vat}
+}
+
+func resolveType(v interface{}) design.DataType {
+	if t, ok := v.(design.DataType); ok {
+		return t
+	}
+	if name, ok := v.(string); ok {
+		if ut, ok := design.Design.Types[name]; ok {
+			return ut
+		}
+		if mt, ok := design.Design.MediaTypes[name]; ok {
+			return mt
+		}
+	}
+	return nil
 }

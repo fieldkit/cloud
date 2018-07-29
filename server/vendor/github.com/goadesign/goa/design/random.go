@@ -3,6 +3,7 @@ package design
 import (
 	"crypto/md5"
 	"encoding/binary"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -55,12 +56,12 @@ func (r *RandomGenerator) DateTime() time.Time {
 	// values get generated for a given API.
 	max := time.Date(2016, time.July, 11, 23, 0, 0, 0, time.UTC).Unix()
 	unix := r.rand.Int63n(max)
-	return time.Unix(unix, 0)
+	return time.Unix(unix, 0).UTC()
 }
 
 // UUID produces a random UUID.
 func (r *RandomGenerator) UUID() uuid.UUID {
-	return uuid.NewV4()
+	return uuid.Must(uuid.NewV4())
 }
 
 // Bool produces a random boolean.
@@ -71,4 +72,9 @@ func (r *RandomGenerator) Bool() bool {
 // Float64 produces a random float64 value.
 func (r *RandomGenerator) Float64() float64 {
 	return r.rand.Float64()
+}
+
+// File produces a random file.
+func (r *RandomGenerator) File() string {
+	return fmt.Sprintf("%sjpg", r.faker.Sentence(1, false))
 }

@@ -69,6 +69,10 @@ var (
 	// ErrNotFound is the error returned to requests that don't match a registered handler.
 	ErrNotFound = NewErrorClass("not_found", 404)
 
+	// ErrMethodNotAllowed is the error returned to requests that match the path of a registered
+	// handler but not the HTTP method.
+	ErrMethodNotAllowed = NewErrorClass("method_not_allowed", 405)
+
 	// ErrInternal is the class of error used for uncaught errors.
 	ErrInternal = NewErrorClass("internal", 500)
 )
@@ -95,19 +99,29 @@ type (
 		Token() string
 	}
 
+	// ServiceMergeableError is the interface implemented by ServiceErrors that can merge
+	// another error into a combined error.
+	ServiceMergeableError interface {
+		// ServiceMergeableError extends from the ServiceError interface.
+		ServiceError
+
+		// Merge updates an error by combining another error into it.
+		Merge(other error) error
+	}
+
 	// ErrorResponse contains the details of a error response. It implements ServiceError.
 	// This struct is mainly intended for clients to decode error responses.
 	ErrorResponse struct {
 		// ID is the unique error instance identifier.
-		ID string `json:"id" xml:"id" form:"id"`
+		ID string `json:"id" yaml:"id" xml:"id" form:"id"`
 		// Code identifies the class of errors.
-		Code string `json:"code" xml:"code" form:"code"`
+		Code string `json:"code" yaml:"code" xml:"code" form:"code"`
 		// Status is the HTTP status code used by responses that cary the error.
-		Status int `json:"status" xml:"status" form:"status"`
+		Status int `json:"status" yaml:"status" xml:"status" form:"status"`
 		// Detail describes the specific error occurrence.
-		Detail string `json:"detail" xml:"detail" form:"detail"`
+		Detail string `json:"detail" yaml:"detail" xml:"detail" form:"detail"`
 		// Meta contains additional key/value pairs useful to clients.
-		Meta map[string]interface{} `json:"meta,omitempty" xml:"meta,omitempty" form:"meta,omitempty"`
+		Meta map[string]interface{} `json:"meta,omitempty" yaml:"meta,omitempty" xml:"meta,omitempty" form:"meta,omitempty"`
 	}
 )
 
@@ -224,7 +238,7 @@ func InvalidLengthError(ctx string, target interface{}, ln, value int, min bool)
 	if !min {
 		comp = "less than or equal to"
 	}
-	msg := fmt.Sprintf("length of %s must be %s than %d but got value %#v (len=%d)", ctx, comp, value, target, ln)
+	msg := fmt.Sprintf("length of %s must be %s %d but got value %#v (len=%d)", ctx, comp, value, target, ln)
 	return ErrInvalidRequest(msg, "attribute", ctx, "value", target, "len", ln, "comp", comp, "expected", value)
 }
 
@@ -233,6 +247,17 @@ func InvalidLengthError(ctx string, target interface{}, ln, value int, min bool)
 func NoAuthMiddleware(schemeName string) error {
 	msg := fmt.Sprintf("Auth middleware for security scheme %s is not mounted", schemeName)
 	return ErrNoAuthMiddleware(msg, "scheme", schemeName)
+}
+
+// MethodNotAllowedError is the error produced to requests that match the path of a registered
+// handler but not the HTTP method.
+func MethodNotAllowedError(method string, allowed []string) error {
+	var plural string
+	if len(allowed) > 1 {
+		plural = " one of"
+	}
+	msg := fmt.Sprintf("Method %s must be%s %s", method, plural, strings.Join(allowed, ", "))
+	return ErrMethodNotAllowed(msg, "method", method, "allowed", strings.Join(allowed, ", "))
 }
 
 // Error returns the error occurrence details.
@@ -254,6 +279,8 @@ func (e *ErrorResponse) Token() string { return e.ID }
 // ServiceError if not already one - producing an internal error in that case. The merge algorithm
 // is:
 //
+// * If any of e or other implements ServiceMergableError, it is handled by its Merge method.
+//
 // * If any of e or other is an internal error then the result is an internal error
 //
 // * If the status or code of e and other don't match then the result is a 400 "bad_request"
@@ -269,11 +296,20 @@ func MergeErrors(err, other error) error {
 		if other == nil {
 			return nil
 		}
-		return asErrorResponse(other)
+		return asServiceError(other)
 	}
 	if other == nil {
-		return asErrorResponse(err)
+		return asServiceError(err)
 	}
+
+	// If either error is a mergable error.
+	if me, ok := err.(ServiceMergeableError); ok {
+		return me.Merge(other)
+	}
+	if mo, ok := other.(ServiceMergeableError); ok {
+		return mo.Merge(err)
+	}
+
 	e := asErrorResponse(err)
 	o := asErrorResponse(other)
 	switch {
@@ -293,6 +329,14 @@ func MergeErrors(err, other error) error {
 	}
 	for k, v := range o.Meta {
 		e.Meta[k] = v
+	}
+	return e
+}
+
+func asServiceError(err error) ServiceError {
+	e, ok := err.(ServiceError)
+	if !ok {
+		return asErrorResponse(err)
 	}
 	return e
 }

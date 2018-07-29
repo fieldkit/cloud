@@ -19,10 +19,12 @@ import (
 //
 // The steps taken by the middleware are:
 //
-//     1. Validate the "Bearer" token present in the "Authorization" header against the key(s)
+//     1. Extract the "Bearer" token from the Authorization header or query parameter
+//     2. Validate the "Bearer" token against the key(s)
 //        given to New
-//     2. If scopes are defined in the design for the action validate them against the "scopes" JWT
-//        claim
+//     3. If scopes are defined in the design for the action, validate them
+//        against the scopes presented by the JWT in the claim "scope", or if
+//        that's not defined, "scopes".
 //
 // The `exp` (expiration) and `nbf` (not before) date checks are validated by the JWT library.
 //
@@ -61,24 +63,25 @@ func New(validationKeys interface{}, validationFunc goa.Middleware, scheme *goa.
 
 	return func(nextHandler goa.Handler) goa.Handler {
 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-			// TODO: implement the QUERY string handler too
-			if scheme.In != goa.LocHeader {
+			var (
+				incomingToken string
+				err           error
+			)
+
+			if scheme.In == goa.LocHeader {
+				if incomingToken, err = extractTokenFromHeader(scheme.Name, req); err != nil {
+					return err
+				}
+			} else if scheme.In == goa.LocQuery {
+				if incomingToken, err = extractTokenFromQueryParam(scheme.Name, req); err != nil {
+					return err
+				}
+			} else {
 				return fmt.Errorf("whoops, security scheme with location (in) %q not supported", scheme.In)
 			}
-			val := req.Header.Get(scheme.Name)
-			if val == "" {
-				return ErrJWTError(fmt.Sprintf("missing header %q", scheme.Name))
-			}
-
-			if !strings.HasPrefix(strings.ToLower(val), "bearer ") {
-				return ErrJWTError(fmt.Sprintf("invalid or malformed %q header, expected 'Authorization: Bearer JWT-token...'", val))
-			}
-
-			incomingToken := strings.Split(val, " ")[1]
 
 			var (
 				token     *jwt.Token
-				err       error
 				validated = false
 			)
 
@@ -111,7 +114,7 @@ func New(validationKeys interface{}, validationFunc goa.Middleware, scheme *goa.
 
 			for _, scope := range requiredScopes {
 				if !scopesInClaim[scope] {
-					msg := "authorization failed: required 'scopes' not present in JWT claim"
+					msg := "authorization failed: required 'scope' or 'scopes' not present in JWT claim"
 					return ErrJWTError(msg, "required", requiredScopes, "scopes", scopesInClaimList)
 				}
 			}
@@ -125,11 +128,41 @@ func New(validationKeys interface{}, validationFunc goa.Middleware, scheme *goa.
 	}
 }
 
-// parseClaimScopes parses the "scopes" parameter in the Claims. It supports two formats:
+func extractTokenFromHeader(schemeName string, req *http.Request) (string, error) {
+	val := req.Header.Get(schemeName)
+	if val == "" {
+		return "", ErrJWTError(fmt.Sprintf("missing header %q", schemeName))
+	}
+
+	if !strings.HasPrefix(strings.ToLower(val), "bearer ") {
+		return "", ErrJWTError(fmt.Sprintf("invalid or malformed %q header, expected 'Bearer JWT-token...'", val))
+	}
+
+	incomingToken := strings.Split(val, " ")[1]
+
+	return incomingToken, nil
+}
+
+func extractTokenFromQueryParam(schemeName string, req *http.Request) (string, error) {
+	incomingToken := req.URL.Query().Get(schemeName)
+	if incomingToken == "" {
+		return "", ErrJWTError(fmt.Sprintf("missing parameter %q", schemeName))
+	}
+
+	return incomingToken, nil
+}
+
+// validScopeClaimKeys are the claims under which scopes may be found in a token
+var validScopeClaimKeys = []string{"scope", "scopes"}
+
+// parseClaimScopes parses the "scope" or "scopes" parameter in the Claims. It
+// supports two formats:
 //
-// * a list of string
+// * a list of strings
 //
 // * a single string with space-separated scopes (akin to OAuth2's "scope").
+//
+// An empty string is an explicit claim of no scopes.
 func parseClaimScopes(token *jwt.Token) (map[string]bool, []string, error) {
 	scopesInClaim := make(map[string]bool)
 	var scopesInClaimList []string
@@ -137,22 +170,25 @@ func parseClaimScopes(token *jwt.Token) (map[string]bool, []string, error) {
 	if !ok {
 		return nil, nil, fmt.Errorf("unsupport claims shape")
 	}
-	if claims["scopes"] != nil {
-		switch scopes := claims["scopes"].(type) {
-		case string:
-			for _, scope := range strings.Split(scopes, " ") {
-				scopesInClaim[scope] = true
-				scopesInClaimList = append(scopesInClaimList, scope)
-			}
-		case []interface{}:
-			for _, scope := range scopes {
-				if val, ok := scope.(string); ok {
-					scopesInClaim[val] = true
-					scopesInClaimList = append(scopesInClaimList, val)
+	for _, k := range validScopeClaimKeys {
+		if rawscopes, ok := claims[k]; ok && rawscopes != nil {
+			switch scopes := rawscopes.(type) {
+			case string:
+				for _, scope := range strings.Split(scopes, " ") {
+					scopesInClaim[scope] = true
+					scopesInClaimList = append(scopesInClaimList, scope)
 				}
+			case []interface{}:
+				for _, scope := range scopes {
+					if val, ok := scope.(string); ok {
+						scopesInClaim[val] = true
+						scopesInClaimList = append(scopesInClaimList, val)
+					}
+				}
+			default:
+				return nil, nil, fmt.Errorf("unsupported scope format in incoming JWT claim, was type %T", scopes)
 			}
-		default:
-			return nil, nil, fmt.Errorf("unsupported 'scopes' format in incoming JWT claim, was type %T", scopes)
+			break
 		}
 	}
 	sort.Strings(scopesInClaimList)

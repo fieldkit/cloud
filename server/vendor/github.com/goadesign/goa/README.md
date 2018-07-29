@@ -9,6 +9,8 @@ unique design-first approach.
 [![Godoc](https://godoc.org/github.com/goadesign/goa?status.svg)](http://godoc.org/github.com/goadesign/goa)
 [![Slack](https://img.shields.io/badge/slack-gophers-orange.svg?style=flat)](https://gophers.slack.com/messages/goa/)
 
+*goa v1.4.0 released! [Release Notes](https://goa.design/blog/007-v_1_4_0/)*
+
 ## Why goa?
 
 goa takes a different approach to building micro-services. Instead of focusing
@@ -74,7 +76,7 @@ versions with the same `X` component without having to make changes.
 Releases are tagged with the corresponding version number. There is also a branch for each major
 version (only `v1` at the moment). The recommended practice is to vendor the stable branch.
 
-Current Release: `v1.2.0`
+Current Release: `v1.3.1`
 Stable Branch: `v1`
 
 ## Teaser

@@ -2,6 +2,7 @@ package genapp
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -98,20 +99,27 @@ func (g *Generator) generateResourceTest() error {
 		codegen.NewImport("uuid", "github.com/satori/go.uuid"),
 	}
 
-	return g.API.IterateResources(func(res *design.ResourceDefinition) error {
+	return g.API.IterateResources(func(res *design.ResourceDefinition) (err error) {
 		filename := filepath.Join(outDir, codegen.SnakeCase(res.Name)+"_testing.go")
-		file, err := codegen.SourceFileFor(filename)
+		var file *codegen.SourceFile
+		file, err = codegen.SourceFileFor(filename)
 		if err != nil {
 			return err
 		}
+		defer func() {
+			file.Close()
+			if err == nil {
+				err = file.FormatCode()
+			}
+		}()
 		title := fmt.Sprintf("%s: %s TestHelpers", g.API.Context(), res.Name)
-		if err := file.WriteHeader(title, "test", imports); err != nil {
+		if err = file.WriteHeader(title, "test", imports); err != nil {
 			return err
 		}
 
 		var methods []*TestMethod
 
-		if err := res.IterateActions(func(action *design.ActionDefinition) error {
+		if err = res.IterateActions(func(action *design.ActionDefinition) error {
 			if err := action.IterateResponses(func(response *design.ResponseDefinition) error {
 				if response.Status == 101 { // SwitchingProtocols, Don't currently handle WebSocket endpoints
 					return nil
@@ -139,10 +147,7 @@ func (g *Generator) generateResourceTest() error {
 		}
 		g.genfiles = append(g.genfiles, filename)
 		err = testTmpl.Execute(file, methods)
-		if err != nil {
-			panic(err)
-		}
-		return file.FormatCode()
+		return
 	})
 }
 
@@ -269,6 +274,7 @@ func headers(action *design.ActionDefinition, headers *design.AttributeDefinitio
 	objs := make([]*ObjectType, len(headrs))
 	for i, name := range headrs {
 		objs[i] = attToObject(name, hds, hds.Type.ToObject()[name])
+		objs[i].Label = http.CanonicalHeaderKey(objs[i].Label)
 	}
 	return objs
 }
@@ -363,9 +369,9 @@ func {{ $test.Name }}(t goatest.TInterface, ctx context.Context, service *goa.Se
 	// Setup service
 	var (
 		{{ $logBuf := $test.Escape "logBuf" }}{{ $logBuf }} bytes.Buffer
-		{{ $resp := $test.Escape "resp" }}{{ $resp }}   interface{}
+		{{ $resp := $test.Escape "resp" }}{{ if $test.ReturnType }}{{ $resp }}   interface{}{{ end }}
 
-		{{ $respSetter := $test.Escape "respSetter" }}{{ $respSetter }} goatest.ResponseSetterFunc = func(r interface{}) { {{ $resp }} = r }
+		{{ $respSetter := $test.Escape "respSetter" }}{{ $respSetter }} goatest.ResponseSetterFunc = func(r interface{}) { {{ if $test.ReturnType }}{{ $resp }} = r{{ end }} }
 	)
 	if service == nil {
 		service = goatest.Service(&{{ $logBuf }}, {{ $respSetter }})
@@ -419,7 +425,12 @@ func {{ $test.Name }}(t goatest.TInterface, ctx context.Context, service *goa.Se
 	{{ $goaCtx := $test.Escape "goaCtx" }}{{ $goaCtx }} := goa.NewContext(goa.WithAction(ctx, "{{ $test.ResourceName }}Test"), {{ $rw }}, {{ $req }}, {{ $prms }})
 	{{ $test.ContextVarName }}, {{ $err := $test.Escape "err" }}{{ $err }} := {{ $test.ContextType }}({{ $goaCtx }}, {{ $req }}, service)
 	if {{ $err }} != nil {
-		panic("invalid test data " + {{ $err }}.Error()) // bug
+		{{ $e := $test.Escape "e" }}{{ $e }}, {{ $ok := $test.Escape "ok" }}{{ $ok }} := {{ $err }}.(goa.ServiceError)
+		if !{{ $ok }} {
+			panic("invalid test data " + {{ $err }}.Error()) // bug
+		}
+{{ if not $test.ReturnsErrorMedia }}		t.Errorf("unexpected parameter validation error: %+v", {{ $e }})
+{{ end }}{{ if $test.ReturnType }}		return nil, {{ if $test.ReturnsErrorMedia }}{{ $e }}{{ else }}nil{{ end }}{{ else }}return nil{{ end }}
 	}
 	{{ if $test.Payload }}{{ $test.ContextVarName }}.Payload = {{ $test.Payload.Name }}{{ end }}
 
@@ -438,7 +449,7 @@ func {{ $test.Name }}(t goatest.TInterface, ctx context.Context, service *goa.Se
 		var {{ $ok := $test.Escape "ok" }}{{ $ok }} bool
 		mt, {{ $ok }} = {{ $resp }}.({{ $test.ReturnType.Pointer }}{{ $test.ReturnType.Type }})
 		if !{{ $ok }} {
-			t.Fatalf("invalid response media: got %+v, expected instance of {{ $test.ReturnType.Type }}", {{ $resp }})
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of {{ $test.ReturnType.Type }}", {{ $resp }}, {{ $resp }})
 		}
 {{ if $test.ReturnType.Validatable }}		{{ $err }} = mt.Validate()
 		if {{ $err }} != nil {

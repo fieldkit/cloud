@@ -1,6 +1,7 @@
 package design
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -244,6 +245,8 @@ type (
 		Payload *UserTypeDefinition
 		// PayloadOptional is true if the request payload is optional, false otherwise.
 		PayloadOptional bool
+		// PayloadOptional is true if the request payload is multipart, false otherwise.
+		PayloadMultipart bool
 		// Request headers that need to be made available to action
 		Headers *AttributeDefinition
 		// Metadata is a list of key/value pairs
@@ -485,17 +488,24 @@ func (a *APIDefinition) IterateSets(iterator dslengine.SetIterator) {
 	}
 	iterator(securitySchemes)
 
-	// And now that we have everything the resources.  The resource
-	// lifecycle handlers dispatch to their children elements, like
-	// Actions, etc..
-	resources := make([]dslengine.Definition, len(a.Resources))
+	// And now that we have everything - the resources. The resource
+	// lifecycle handlers dispatch to their children elements, like Actions,
+	// etc.. We must process parent resources first to ensure that query
+	// string and path parameters are initialized by the time a child
+	// resource action parameters are categorized.
+	resources := make([]*ResourceDefinition, len(a.Resources))
 	i = 0
 	a.IterateResources(func(res *ResourceDefinition) error {
 		resources[i] = res
 		i++
 		return nil
 	})
-	iterator(resources)
+	sort.Sort(byParent(resources))
+	defs := make([]dslengine.Definition, len(resources))
+	for i, r := range resources {
+		defs[i] = r
+	}
+	iterator(defs)
 }
 
 // Reset sets all the API definition fields to their zero value except the default responses and
@@ -606,15 +616,35 @@ func (a *APIDefinition) MediaTypeWithIdentifier(id string) *MediaTypeDefinition 
 // Iteration stops if an iterator returns an error and in this case IterateResources returns that
 // error.
 func (a *APIDefinition) IterateResources(it ResourceIterator) error {
-	names := make([]string, len(a.Resources))
+	res := make([]*ResourceDefinition, len(a.Resources))
 	i := 0
-	for n := range a.Resources {
-		names[i] = n
+	for _, r := range a.Resources {
+		res[i] = r
 		i++
 	}
-	sort.Strings(names)
-	for _, n := range names {
-		if err := it(a.Resources[n]); err != nil {
+	// Iterate parent resources first so that action parameters are
+	// finalized prior to child actions needing them.
+	isParent := func(p, c *ResourceDefinition) bool {
+		par := c.Parent()
+		for par != nil {
+			if par == p {
+				return true
+			}
+			par = par.Parent()
+		}
+		return false
+	}
+	sort.Slice(res, func(i, j int) bool {
+		if isParent(res[i], res[j]) {
+			return true
+		}
+		if isParent(res[j], res[i]) {
+			return false
+		}
+		return res[i].Name < res[j].Name
+	})
+	for _, r := range res {
+		if err := it(r); err != nil {
 			return err
 		}
 	}
@@ -635,23 +665,31 @@ func (a *APIDefinition) Finalize() {
 	if len(a.Produces) == 0 {
 		a.Produces = DefaultEncoders
 	}
-	found := false
 	a.IterateResources(func(r *ResourceDefinition) error {
-		if found {
-			return nil
+		returnsError := func(resp *ResponseDefinition) bool {
+			if resp.MediaType == ErrorMediaIdentifier {
+				if a.MediaTypes == nil {
+					a.MediaTypes = make(map[string]*MediaTypeDefinition)
+				}
+				a.MediaTypes[CanonicalIdentifier(ErrorMediaIdentifier)] = ErrorMedia
+				return true
+			}
+			return false
+		}
+		for _, resp := range a.Responses {
+			if returnsError(resp) {
+				return errors.New("done")
+			}
+		}
+		for _, resp := range r.Responses {
+			if returnsError(resp) {
+				return errors.New("done")
+			}
 		}
 		return r.IterateActions(func(action *ActionDefinition) error {
-			if found {
-				return nil
-			}
 			for _, resp := range action.Responses {
-				if resp.MediaType == ErrorMediaIdentifier {
-					if a.MediaTypes == nil {
-						a.MediaTypes = make(map[string]*MediaTypeDefinition)
-					}
-					a.MediaTypes[CanonicalIdentifier(ErrorMediaIdentifier)] = ErrorMedia
-					found = true
-					break
+				if returnsError(resp) {
+					return errors.New("done")
 				}
 			}
 			return nil
@@ -891,6 +929,22 @@ func (r *ResourceDefinition) UserTypes() map[string]*UserTypeDefinition {
 	return types
 }
 
+// byParent makes it possible to sort resources - parents first the children.
+type byParent []*ResourceDefinition
+
+func (p byParent) Len() int      { return len(p) }
+func (p byParent) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p byParent) Less(i, j int) bool {
+	for k := 0; k < i; k++ {
+		// We need to inspect _all_ previous fields to see if they are a parent. Sort doesn't do this.
+		if p[i].Name == p[k].ParentName {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Context returns the generic definition name used in error messages.
 func (cors *CORSDefinition) Context() string {
 	return fmt.Sprintf("CORS policy for resource %s origin %s", cors.Parent.Context(), cors.Origin)
@@ -1001,9 +1055,35 @@ func (a *AttributeDefinition) IsPrimitivePointer(attName string) bool {
 		return false
 	}
 	if att.Type.IsPrimitive() {
-		return !a.IsRequired(attName) && !a.HasDefaultValue(attName) && !a.IsNonZero(attName)
+		return (!a.IsRequired(attName) && !a.HasDefaultValue(attName) && !a.IsNonZero(attName) && !a.IsInterface(attName)) || a.IsFile(attName)
 	}
 	return false
+}
+
+// IsInterface returns true if the field generated for the given attribute has
+// an interface type that should not be referenced as a "*interface{}" pointer.
+// The target attribute must be an object.
+func (a *AttributeDefinition) IsInterface(attName string) bool {
+	if !a.Type.IsObject() {
+		panic("checking pointer field on non-object") // bug
+	}
+	att := a.Type.ToObject()[attName]
+	if att == nil {
+		return false
+	}
+	return att.Type.Kind() == AnyKind
+}
+
+// IsFile returns true if the attribute is of type File or if any its children attributes (if any) is.
+func (a *AttributeDefinition) IsFile(attName string) bool {
+	if !a.Type.IsObject() {
+		panic("checking pointer field on non-object") // bug
+	}
+	att := a.Type.ToObject()[attName]
+	if att == nil {
+		return false
+	}
+	return att.Type.Kind() == FileKind
 }
 
 // SetExample sets the custom example. SetExample also handles the case when the user doesn't
@@ -1066,6 +1146,22 @@ func (a *AttributeDefinition) GenerateExample(rand *RandomGenerator, seen []stri
 	}
 
 	return a.Example
+}
+
+// SetReadOnly sets the attribute's ReadOnly field as true.
+func (a *AttributeDefinition) SetReadOnly() {
+	if a.Metadata == nil {
+		a.Metadata = map[string][]string{}
+	}
+	a.Metadata["swagger:read-only"] = nil
+}
+
+// IsReadOnly returns true if attribute is read-only (set using SetReadOnly() method)
+func (a *AttributeDefinition) IsReadOnly() bool {
+	if _, readOnlyMetadataIsPresent := a.Metadata["swagger:read-only"]; readOnlyMetadataIsPresent {
+		return true
+	}
+	return false
 }
 
 func (a *AttributeDefinition) arrayExample(rand *RandomGenerator, seen []string) interface{} {
@@ -1159,18 +1255,26 @@ func (a *AttributeDefinition) Merge(other *AttributeDefinition) *AttributeDefini
 	for n, v := range right {
 		left[n] = v
 	}
+	if other.Validation != nil && len(other.Validation.Required) > 0 {
+		if a.Validation == nil {
+			a.Validation = &dslengine.ValidationDefinition{}
+		}
+		for _, r := range other.Validation.Required {
+			a.Validation.Required = append(a.Validation.Required, r)
+		}
+	}
 	return a
 }
 
 // Inherit merges the properties of existing target type attributes with the argument's.
 // The algorithm is recursive so that child attributes are also merged.
-func (a *AttributeDefinition) Inherit(parent *AttributeDefinition) {
+func (a *AttributeDefinition) Inherit(parent *AttributeDefinition, seen ...map[*AttributeDefinition]struct{}) {
 	if !a.shouldInherit(parent) {
 		return
 	}
 
 	a.inheritValidations(parent)
-	a.inheritRecursive(parent)
+	a.inheritRecursive(parent, seen...)
 }
 
 // DSL returns the initialization DSL.
@@ -1178,7 +1282,19 @@ func (a *AttributeDefinition) DSL() func() {
 	return a.DSLFunc
 }
 
-func (a *AttributeDefinition) inheritRecursive(parent *AttributeDefinition) {
+func (a *AttributeDefinition) inheritRecursive(parent *AttributeDefinition, seen ...map[*AttributeDefinition]struct{}) {
+	// prevent infinite recursions
+	var s map[*AttributeDefinition]struct{}
+	if len(seen) > 0 {
+		s = seen[0]
+		if _, ok := s[parent]; ok {
+			return
+		}
+	} else {
+		s = make(map[*AttributeDefinition]struct{})
+	}
+	s[parent] = struct{}{}
+
 	if !a.shouldInherit(parent) {
 		return
 	}
@@ -1199,11 +1315,23 @@ func (a *AttributeDefinition) inheritRecursive(parent *AttributeDefinition) {
 				att.Type = patt.Type
 			} else if att.shouldInherit(patt) {
 				for _, att := range att.Type.ToObject() {
-					att.Inherit(patt.Type.ToObject()[n])
+					att.Inherit(patt.Type.ToObject()[n], s)
 				}
 			}
 			if att.Example == nil {
 				att.Example = patt.Example
+			}
+			if patt.Metadata != nil {
+				if att.Metadata == nil {
+					att.Metadata = patt.Metadata
+				} else {
+					// Copy all key/value pairs from parent to child that DO NOT exist in child; existing ones will remain with the same value
+					for k, v := range patt.Metadata {
+						if _, keyMetadataIsPresent := att.Metadata[k]; !keyMetadataIsPresent {
+							att.Metadata[k] = v
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1739,7 +1867,14 @@ func (r *RouteDefinition) FullPath() string {
 	if r.Parent != nil && r.Parent.Parent != nil {
 		base = r.Parent.Parent.FullPath()
 	}
-	return httppath.Clean(path.Join(base, r.Path))
+
+	joinedPath := path.Join(base, r.Path)
+	if strings.HasSuffix(r.Path, "/") {
+		//add slash removed by Join back again (it may be important for routing)
+		joinedPath += "/"
+	}
+
+	return httppath.Clean(joinedPath)
 }
 
 // IsAbsolute returns true if the action path should not be concatenated to the resource and API

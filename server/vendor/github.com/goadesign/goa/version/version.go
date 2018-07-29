@@ -10,23 +10,14 @@ const (
 	// Major version number
 	Major = 1
 	// Minor version number
-	Minor = 2
+	Minor = 4
+	// Build version number
+	Build = 0
 )
-
-var (
-	// Build number
-	Build string
-)
-
-func init() {
-	if Build == "" { // Not set by link flags
-		Build = "0"
-	}
-}
 
 // String returns the complete version number.
 func String() string {
-	return "v" + strconv.Itoa(Major) + "." + strconv.Itoa(Minor) + "." + Build
+	return "v" + strconv.Itoa(Major) + "." + strconv.Itoa(Minor) + "." + strconv.Itoa(Build)
 }
 
 // Compatible returns true if Major matches the major version of the given version string.

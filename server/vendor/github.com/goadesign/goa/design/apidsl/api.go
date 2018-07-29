@@ -96,7 +96,7 @@ func Version(ver string) {
 }
 
 // Description sets the definition description.
-// Description can be called inside API, Resource, Action or MediaType.
+// Description can be called inside API, Resource, Action, MediaType, Attribute, Response or ResponseTemplate
 func Description(d string) {
 	switch def := dslengine.CurrentDefinition().(type) {
 	case *design.APIDefinition:
@@ -329,7 +329,9 @@ func Email(email string) {
 	}
 }
 
-// URL sets the contact or license URL.
+// URL can be used in: Contact, License, Docs
+//
+// URL sets the contact, license, or Docs URL.
 func URL(url string) {
 	switch def := dslengine.CurrentDefinition().(type) {
 	case *design.ContactDefinition:
