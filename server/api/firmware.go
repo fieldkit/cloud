@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -48,10 +49,10 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 	incomingETag := stripQuotes(ctx.IfNoneMatch)
 
-	log.Infow("Device", "device_id", ctx.DeviceID, "incoming_etag", incomingETag)
+	log.Infow("Device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag)
 
 	firmwares := []*data.DeviceFirmware{}
-	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 ORDER BY time DESC LIMIT 1", ctx.DeviceID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1", ctx.DeviceID, ctx.Module); err != nil {
 		return err
 	}
 
@@ -99,14 +100,15 @@ func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 
 	firmware := data.DeviceFirmware{
 		DeviceID: int64(device.ID),
+		Time:     time.Now(),
+		Module:   ctx.Payload.Module,
 		URL:      ctx.Payload.URL,
 		ETag:     ctx.Payload.Etag,
-		Time:     time.Now(),
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.device_firmware (device_id, time, url, etag)
-		   VALUES (:device_id, :time, :url, :etag)
+		   INSERT INTO fieldkit.device_firmware (device_id, time, module, url, etag)
+		   VALUES (:device_id, :time, :module, :url, :etag)
 		   `, firmware); err != nil {
 		return err
 	}
@@ -116,17 +118,26 @@ func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 
 func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 	log := Logger(ctx).Sugar()
-	log.Infow("Device", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL)
+
+	metaMap := make(map[string]string)
+	err := json.Unmarshal([]byte(ctx.Payload.Meta), &metaMap)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "meta", metaMap)
 
 	firmware := data.Firmware{
-		URL:  ctx.Payload.URL,
-		ETag: ctx.Payload.Etag,
-		Time: time.Now(),
+		Time:   time.Now(),
+		Module: ctx.Payload.Module,
+		URL:    ctx.Payload.URL,
+		ETag:   ctx.Payload.Etag,
+		Meta:   []byte(ctx.Payload.Meta),
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.firmware (time, url, etag)
-		   VALUES (:time, :url, :etag)
+		   INSERT INTO fieldkit.firmware (time, module, url, etag, meta)
+		   VALUES (:time, :module, :url, :etag, :meta)
 		   `, firmware); err != nil {
 		return err
 	}

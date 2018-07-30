@@ -2,6 +2,8 @@ package data
 
 import (
 	"time"
+
+	"github.com/jmoiron/sqlx/types"
 )
 
 type Device struct {
@@ -35,16 +37,19 @@ type DeviceLocation struct {
 }
 
 type Firmware struct {
-	ID   int64     `db:"id"`
-	Time time.Time `db:"time"`
-	URL  string    `db:"url"`
-	ETag string    `db:"etag"`
+	ID     int64          `db:"id"`
+	Time   time.Time      `db:"time"`
+	Module string         `db:"module"`
+	URL    string         `db:"url"`
+	ETag   string         `db:"etag"`
+	Meta   types.JSONText `db:"meta"`
 }
 
 type DeviceFirmware struct {
 	ID       int64     `db:"id"`
 	DeviceID int64     `db:"device_id"`
 	Time     time.Time `db:"time"`
+	Module   string    `db:"module"`
 	URL      string    `db:"url"`
 	ETag     string    `db:"etag"`
 }

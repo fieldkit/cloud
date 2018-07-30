@@ -8,14 +8,20 @@ import (
 var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 	Attribute("etag")
 	Required("etag")
+	Attribute("module")
+	Required("module")
 	Attribute("url")
 	Required("url")
+	Attribute("meta")
+	Required("meta")
 })
 
 var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
 	Reference(Source)
 	Attribute("deviceId", Integer)
 	Required("deviceId")
+	Attribute("module")
+	Required("module")
 	Attribute("etag")
 	Required("etag")
 	Attribute("url")
@@ -24,7 +30,7 @@ var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
 
 var _ = Resource("Firmware", func() {
 	Action("check", func() {
-		Routing(GET("devices/:deviceId/firmware"))
+		Routing(GET("devices/:deviceId/:module/firmware"))
 		Description("Return firmware for a device")
 		Headers(func() {
 			Header("If-None-Match")
@@ -32,6 +38,8 @@ var _ = Resource("Firmware", func() {
 		Params(func() {
 			Param("deviceId", String)
 			Required("deviceId")
+			Param("module", String)
+			Required("module")
 		})
 		Response(NotFound)
 		Response(NotModified)

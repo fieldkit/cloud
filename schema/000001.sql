@@ -153,14 +153,17 @@ CREATE UNIQUE INDEX ON fieldkit.device (token);
 CREATE TABLE fieldkit.firmware (
   id serial PRIMARY KEY,
   time timestamp NOT NULL,
+  module varchar NOT NULL,
   etag varchar NOT NULL,
-  url varchar NOT NULL
+  url varchar NOT NULL,
+  meta json NOT NULL
 );
 
 CREATE TABLE fieldkit.device_firmware (
   id serial PRIMARY KEY,
   device_id integer REFERENCES fieldkit.device (source_id) ON DELETE CASCADE,
   time timestamp NOT NULL,
+  module varchar NOT NULL,
   etag varchar NOT NULL,
   url varchar NOT NULL
 );
