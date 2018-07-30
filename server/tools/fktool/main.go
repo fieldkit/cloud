@@ -214,10 +214,11 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, filename 
 	}
 
 	addFirmwarePayload := fk.AddFirmwarePayload{
-		Etag:   metadata.ETag,
-		Module: metadata.Module,
-		URL:    r.Location,
-		Meta:   string(jsonData),
+		Etag:    metadata.ETag,
+		Module:  metadata.Module,
+		Profile: metadata.Profile,
+		URL:     r.Location,
+		Meta:    string(jsonData),
 	}
 	_, err = c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
 	if err != nil {

@@ -10,6 +10,8 @@ var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 	Required("etag")
 	Attribute("module")
 	Required("module")
+	Attribute("profile")
+	Required("profile")
 	Attribute("url")
 	Required("url")
 	Attribute("meta")

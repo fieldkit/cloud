@@ -125,19 +125,20 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 		return err
 	}
 
-	log.Infow("Firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "meta", metaMap)
+	log.Infow("Firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "profile", ctx.Payload.Profile, "meta", metaMap)
 
 	firmware := data.Firmware{
-		Time:   time.Now(),
-		Module: ctx.Payload.Module,
-		URL:    ctx.Payload.URL,
-		ETag:   ctx.Payload.Etag,
-		Meta:   []byte(ctx.Payload.Meta),
+		Time:    time.Now(),
+		Module:  ctx.Payload.Module,
+		Profile: ctx.Payload.Profile,
+		URL:     ctx.Payload.URL,
+		ETag:    ctx.Payload.Etag,
+		Meta:    []byte(ctx.Payload.Meta),
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.firmware (time, module, url, etag, meta)
-		   VALUES (:time, :module, :url, :etag, :meta)
+		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta)
+		   VALUES (:time, :module, :profile, :url, :etag, :meta)
 		   `, firmware); err != nil {
 		return err
 	}
@@ -150,9 +151,9 @@ func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
 		ID:      int(fw.ID),
 		Time:    fw.Time,
 		Module:  fw.Module,
+		Profile: fw.Profile,
 		Etag:    fw.ETag,
 		URL:     fw.URL,
-		Profile: fw.Profile(),
 	}
 }
 

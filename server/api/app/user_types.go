@@ -160,10 +160,11 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 
 // addFirmwarePayload user type.
 type addFirmwarePayload struct {
-	Etag   *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
-	Meta   *string `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
-	Module *string `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
-	URL    *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Etag    *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Meta    *string `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	Module  *string `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
+	Profile *string `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
+	URL     *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // Validate validates the addFirmwarePayload type instance.
@@ -173,6 +174,9 @@ func (ut *addFirmwarePayload) Validate() (err error) {
 	}
 	if ut.Module == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "module"))
+	}
+	if ut.Profile == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "profile"))
 	}
 	if ut.URL == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
@@ -195,6 +199,9 @@ func (ut *addFirmwarePayload) Publicize() *AddFirmwarePayload {
 	if ut.Module != nil {
 		pub.Module = *ut.Module
 	}
+	if ut.Profile != nil {
+		pub.Profile = *ut.Profile
+	}
 	if ut.URL != nil {
 		pub.URL = *ut.URL
 	}
@@ -203,10 +210,11 @@ func (ut *addFirmwarePayload) Publicize() *AddFirmwarePayload {
 
 // AddFirmwarePayload user type.
 type AddFirmwarePayload struct {
-	Etag   string `form:"etag" json:"etag" xml:"etag"`
-	Meta   string `form:"meta" json:"meta" xml:"meta"`
-	Module string `form:"module" json:"module" xml:"module"`
-	URL    string `form:"url" json:"url" xml:"url"`
+	Etag    string `form:"etag" json:"etag" xml:"etag"`
+	Meta    string `form:"meta" json:"meta" xml:"meta"`
+	Module  string `form:"module" json:"module" xml:"module"`
+	Profile string `form:"profile" json:"profile" xml:"profile"`
+	URL     string `form:"url" json:"url" xml:"url"`
 }
 
 // Validate validates the AddFirmwarePayload type instance.
@@ -216,6 +224,9 @@ func (ut *AddFirmwarePayload) Validate() (err error) {
 	}
 	if ut.Module == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "module"))
+	}
+	if ut.Profile == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "profile"))
 	}
 	if ut.URL == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
