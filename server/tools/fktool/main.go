@@ -64,7 +64,7 @@ func getProfileFromFile(module, path string) (string, error) {
 	re := regexp.MustCompile(fmt.Sprintf("%s-(.+).bin", module))
 	m := re.FindAllStringSubmatch(file, -1)
 	if len(m) == 0 {
-		return "", fmt.Errorf("Malformed file name %s, no profile for %s", path, module)
+		return "", fmt.Errorf("Malformed file name %s (%s), no profile for %s", path, file, module)
 	}
 	return m[0][1], nil
 }
@@ -89,7 +89,7 @@ func getMetaFromEnvironment(file string) (metadata *Metadata, err error) {
 
 	profile, err := getProfileFromFile(module, file)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting profile from file (%s)", file)
+		return nil, err
 	}
 	etag := fmt.Sprintf("%s_%s_%s", module, profile, buildTime)
 
