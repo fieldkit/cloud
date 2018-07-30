@@ -59,11 +59,12 @@ func getModuleFromJobName(name string) (string, error) {
 	return strings.Replace(name, "/", "-", 1), nil
 }
 
-func getProfileFromFile(module, file string) (string, error) {
+func getProfileFromFile(module, path string) (string, error) {
+	file := filepath.Base(path)
 	re := regexp.MustCompile(fmt.Sprintf("%s-(.+).bin", module))
 	m := re.FindAllStringSubmatch(file, -1)
 	if len(m) == 0 {
-		return "", fmt.Errorf("Malformed file name %s, no profile for %s", file, module)
+		return "", fmt.Errorf("Malformed file name %s, no profile for %s", path, module)
 	}
 	return m[0][1], nil
 }
@@ -76,7 +77,7 @@ func getMetaFromEnvironment(file string) (metadata *Metadata, err error) {
 
 	module, err := getModuleFromJobName(jobName)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting module from job name (%s).", jobName)
+		return nil, fmt.Errorf("Error getting module from job name: %v", err)
 	}
 
 	buildTime := os.Getenv("BUILD_TIMESTAMP")
