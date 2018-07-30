@@ -117,6 +117,7 @@ func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metad
 	metadata.Map["Build-Job-Base"] = aws.String(os.Getenv("JOB_BASE_NAME"))
 	metadata.Map["Build-Job-Name"] = aws.String(jobName)
 	metadata.Map["Build-Module"] = aws.String(module)
+	metadata.Map["Build-Profile"] = aws.String(profile)
 
 	return
 }
