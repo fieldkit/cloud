@@ -83,6 +83,9 @@ func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metad
 		if err != nil {
 			return nil, fmt.Errorf("Error getting module from job name: %v", err)
 		}
+		log.Printf("Found module name: '%s'", module)
+	} else {
+		log.Printf("Using module override: '%s'", module)
 	}
 
 	buildTime := os.Getenv("BUILD_TIMESTAMP")
