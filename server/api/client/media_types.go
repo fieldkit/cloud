@@ -509,6 +509,31 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// Firmwares media type (default view)
+//
+// Identifier: application/vnd.app.firmwares+json; view=default
+type Firmwares struct {
+	Firmwares FirmwareSummaryCollection `form:"firmwares" json:"firmwares" xml:"firmwares"`
+}
+
+// Validate validates the Firmwares media type instance.
+func (mt *Firmwares) Validate() (err error) {
+	if mt.Firmwares == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "firmwares"))
+	}
+	if err2 := mt.Firmwares.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeFirmwares decodes the Firmwares instance encoded in resp body.
+func (c *Client) DecodeFirmwares(resp *http.Response) (*Firmwares, error) {
+	var decoded Firmwares
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // GeoJSON media type (default view)
 //
 // Identifier: application/vnd.app.geojson+json; view=default
@@ -674,6 +699,67 @@ func (mt ClusterSummaryCollection) Validate() (err error) {
 // DecodeClusterSummaryCollection decodes the ClusterSummaryCollection instance encoded in resp body.
 func (c *Client) DecodeClusterSummaryCollection(resp *http.Response) (ClusterSummaryCollection, error) {
 	var decoded ClusterSummaryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// FirmwareSummary media type (default view)
+//
+// Identifier: application/vnd.app.ifmrware+json; view=default
+type FirmwareSummary struct {
+	Etag    string    `form:"etag" json:"etag" xml:"etag"`
+	ID      int       `form:"id" json:"id" xml:"id"`
+	Module  string    `form:"module" json:"module" xml:"module"`
+	Profile string    `form:"profile" json:"profile" xml:"profile"`
+	Time    time.Time `form:"time" json:"time" xml:"time"`
+	URL     string    `form:"url" json:"url" xml:"url"`
+}
+
+// Validate validates the FirmwareSummary media type instance.
+func (mt *FirmwareSummary) Validate() (err error) {
+
+	if mt.Etag == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "etag"))
+	}
+	if mt.Module == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "module"))
+	}
+	if mt.Profile == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "profile"))
+	}
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// DecodeFirmwareSummary decodes the FirmwareSummary instance encoded in resp body.
+func (c *Client) DecodeFirmwareSummary(resp *http.Response) (*FirmwareSummary, error) {
+	var decoded FirmwareSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FirmwareSummaryCollection is the media type for an array of FirmwareSummary (default view)
+//
+// Identifier: application/vnd.app.ifmrware+json; type=collection; view=default
+type FirmwareSummaryCollection []*FirmwareSummary
+
+// Validate validates the FirmwareSummaryCollection media type instance.
+func (mt FirmwareSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeFirmwareSummaryCollection decodes the FirmwareSummaryCollection instance encoded in resp body.
+func (c *Client) DecodeFirmwareSummaryCollection(resp *http.Response) (FirmwareSummaryCollection, error) {
+	var decoded FirmwareSummaryCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }

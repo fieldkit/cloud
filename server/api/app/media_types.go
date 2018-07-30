@@ -382,6 +382,24 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
+// Firmwares media type (default view)
+//
+// Identifier: application/vnd.app.firmwares+json; view=default
+type Firmwares struct {
+	Firmwares FirmwareSummaryCollection `form:"firmwares" json:"firmwares" xml:"firmwares"`
+}
+
+// Validate validates the Firmwares media type instance.
+func (mt *Firmwares) Validate() (err error) {
+	if mt.Firmwares == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "firmwares"))
+	}
+	if err2 := mt.Firmwares.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // GeoJSON media type (default view)
 //
 // Identifier: application/vnd.app.geojson+json; view=default
@@ -499,6 +517,53 @@ type ClusterSummaryCollection []*ClusterSummary
 
 // Validate validates the ClusterSummaryCollection media type instance.
 func (mt ClusterSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// FirmwareSummary media type (default view)
+//
+// Identifier: application/vnd.app.ifmrware+json; view=default
+type FirmwareSummary struct {
+	Etag    string    `form:"etag" json:"etag" xml:"etag"`
+	ID      int       `form:"id" json:"id" xml:"id"`
+	Module  string    `form:"module" json:"module" xml:"module"`
+	Profile string    `form:"profile" json:"profile" xml:"profile"`
+	Time    time.Time `form:"time" json:"time" xml:"time"`
+	URL     string    `form:"url" json:"url" xml:"url"`
+}
+
+// Validate validates the FirmwareSummary media type instance.
+func (mt *FirmwareSummary) Validate() (err error) {
+
+	if mt.Etag == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "etag"))
+	}
+	if mt.Module == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "module"))
+	}
+	if mt.Profile == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "profile"))
+	}
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// FirmwareSummaryCollection is the media type for an array of FirmwareSummary (default view)
+//
+// Identifier: application/vnd.app.ifmrware+json; type=collection; view=default
+type FirmwareSummaryCollection []*FirmwareSummary
+
+// Validate validates the FirmwareSummaryCollection media type instance.
+func (mt FirmwareSummaryCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -43,6 +44,18 @@ type Firmware struct {
 	URL    string         `db:"url"`
 	ETag   string         `db:"etag"`
 	Meta   types.JSONText `db:"meta"`
+}
+
+func (fw *Firmware) Profile() string {
+	metaMap := make(map[string]string)
+	err := json.Unmarshal(fw.Meta, &metaMap)
+	if err == nil {
+		profile := metaMap["Build-Profile"]
+		if profile != "" {
+			return profile
+		}
+	}
+	return "<unknown>"
 }
 
 type DeviceFirmware struct {

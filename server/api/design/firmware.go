@@ -28,6 +28,43 @@ var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
 	Required("url")
 })
 
+var FirmwareSummary = MediaType("application/vnd.app.ifmrware+json", func() {
+	TypeName("FirmwareSummary")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("time", DateTime)
+		Attribute("etag", String)
+		Attribute("module", String)
+		Attribute("profile", String)
+		Attribute("url", String)
+		Required("id")
+		Required("time")
+		Required("etag")
+		Required("module")
+		Required("profile")
+		Required("url")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("time")
+		Attribute("etag")
+		Attribute("module")
+		Attribute("profile")
+		Attribute("url")
+	})
+})
+
+var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
+	TypeName("Firmwares")
+	Attributes(func() {
+		Attribute("firmwares", CollectionOf(FirmwareSummary))
+		Required("firmwares")
+	})
+	View("default", func() {
+		Attribute("firmwares")
+	})
+})
+
 var _ = Resource("Firmware", func() {
 	Action("check", func() {
 		Routing(GET("devices/:deviceId/:module/firmware"))
@@ -69,5 +106,15 @@ var _ = Resource("Firmware", func() {
 		Payload(AddFirmwarePayload)
 		Response(BadRequest)
 		Response(OK)
+	})
+
+	Action("list", func() {
+		Routing(GET("firmware"))
+		Description("List firmware")
+		Params(func() {
+		})
+		Response(OK, func() {
+			Media(Firmwares)
+		})
 	})
 })

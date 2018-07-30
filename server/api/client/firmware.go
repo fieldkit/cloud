@@ -87,6 +87,35 @@ func (c *Client) NewCheckFirmwareRequest(ctx context.Context, path string, ifNon
 	return req, nil
 }
 
+// ListFirmwarePath computes a request path to the list action of Firmware.
+func ListFirmwarePath() string {
+
+	return fmt.Sprintf("/firmware")
+}
+
+// List firmware
+func (c *Client) ListFirmware(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListFirmwareRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListFirmwareRequest create the request corresponding to the list action endpoint of the Firmware resource.
+func (c *Client) NewListFirmwareRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // UpdateFirmwarePath computes a request path to the update action of Firmware.
 func UpdateFirmwarePath() string {
 

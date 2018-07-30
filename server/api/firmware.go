@@ -144,3 +144,37 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 
 	return ctx.OK([]byte("OK"))
 }
+
+func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
+	return &app.FirmwareSummary{
+		ID:      int(fw.ID),
+		Time:    fw.Time,
+		Module:  fw.Module,
+		Etag:    fw.ETag,
+		URL:     fw.URL,
+		Profile: fw.Profile(),
+	}
+}
+
+func FirmwareSummariesType(firmwares []*data.Firmware) []*app.FirmwareSummary {
+	summaries := make([]*app.FirmwareSummary, len(firmwares))
+	for i, summary := range firmwares {
+		summaries[i] = FirmwareSummaryType(summary)
+	}
+	return summaries
+}
+
+func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
+	return &app.Firmwares{
+		Firmwares: FirmwareSummariesType(firmwares),
+	}
+}
+
+func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f ORDER BY time DESC"); err != nil {
+		return err
+	}
+
+	return ctx.OK(FirmwaresType(firmwares))
+}

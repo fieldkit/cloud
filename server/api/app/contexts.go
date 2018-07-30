@@ -150,6 +150,31 @@ func (ctx *CheckFirmwareContext) NotFound() error {
 	return nil
 }
 
+// ListFirmwareContext provides the Firmware list action context.
+type ListFirmwareContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewListFirmwareContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Firmware controller list action.
+func NewListFirmwareContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListFirmwareContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListFirmwareContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListFirmwareContext) OK(r *Firmwares) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.firmwares+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // UpdateFirmwareContext provides the Firmware update action context.
 type UpdateFirmwareContext struct {
 	context.Context

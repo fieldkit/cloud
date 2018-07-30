@@ -180,6 +180,7 @@ type FirmwareController interface {
 	goa.Muxer
 	Add(*AddFirmwareContext) error
 	Check(*CheckFirmwareContext) error
+	List(*ListFirmwareContext) error
 	Update(*UpdateFirmwareContext) error
 }
 
@@ -228,6 +229,22 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("check", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListFirmwareContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleFirmwareOrigin(h)
+	service.Mux.Handle("GET", "/firmware", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
