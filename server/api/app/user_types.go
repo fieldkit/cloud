@@ -158,6 +158,52 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	return
 }
 
+// addFirmwarePayload user type.
+type addFirmwarePayload struct {
+	Etag *string `form:"etag,omitempty" json:"etag,omitempty" yaml:"etag,omitempty" xml:"etag,omitempty"`
+	URL  *string `form:"url,omitempty" json:"url,omitempty" yaml:"url,omitempty" xml:"url,omitempty"`
+}
+
+// Validate validates the addFirmwarePayload type instance.
+func (ut *addFirmwarePayload) Validate() (err error) {
+	if ut.Etag == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "etag"))
+	}
+	if ut.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
+	}
+	return
+}
+
+// Publicize creates AddFirmwarePayload from addFirmwarePayload
+func (ut *addFirmwarePayload) Publicize() *AddFirmwarePayload {
+	var pub AddFirmwarePayload
+	if ut.Etag != nil {
+		pub.Etag = *ut.Etag
+	}
+	if ut.URL != nil {
+		pub.URL = *ut.URL
+	}
+	return &pub
+}
+
+// AddFirmwarePayload user type.
+type AddFirmwarePayload struct {
+	Etag string `form:"etag" json:"etag" yaml:"etag" xml:"etag"`
+	URL  string `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the AddFirmwarePayload type instance.
+func (ut *AddFirmwarePayload) Validate() (err error) {
+	if ut.Etag == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "etag"))
+	}
+	if ut.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
+	}
+	return
+}
+
 // addMemberPayload user type.
 type addMemberPayload struct {
 	Role   *string `form:"role,omitempty" json:"role,omitempty" yaml:"role,omitempty" xml:"role,omitempty"`

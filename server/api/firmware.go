@@ -113,3 +113,23 @@ func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 
 	return ctx.OK([]byte("OK"))
 }
+
+func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
+	log := Logger(ctx).Sugar()
+	log.Infow("Device", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL)
+
+	firmware := data.Firmware{
+		URL:  ctx.Payload.URL,
+		ETag: ctx.Payload.Etag,
+		Time: time.Now(),
+	}
+
+	if _, err := c.options.Database.NamedExecContext(ctx, `
+		   INSERT INTO fieldkit.firmware (time, url, etag)
+		   VALUES (:time, :url, :etag)
+		   `, firmware); err != nil {
+		return err
+	}
+
+	return ctx.OK([]byte("OK"))
+}

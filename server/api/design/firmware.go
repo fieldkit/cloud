@@ -5,6 +5,13 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
+	Attribute("etag")
+	Required("etag")
+	Attribute("url")
+	Required("url")
+})
+
 var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
 	Reference(Source)
 	Attribute("deviceId", Integer)
@@ -42,6 +49,16 @@ var _ = Resource("Firmware", func() {
 		Params(func() {
 		})
 		Payload(UpdateDeviceFirmwarePayload)
+		Response(BadRequest)
+		Response(OK)
+	})
+
+	Action("add", func() {
+		Routing(PATCH("firmware"))
+		Description("Add firmware")
+		Params(func() {
+		})
+		Payload(AddFirmwarePayload)
 		Response(BadRequest)
 		Response(OK)
 	})

@@ -34,6 +34,13 @@ type DeviceLocation struct {
 	Location  *Location  `db:"location"`
 }
 
+type Firmware struct {
+	ID   int64     `db:"id"`
+	Time time.Time `db:"time"`
+	URL  string    `db:"url"`
+	ETag string    `db:"etag"`
+}
+
 type DeviceFirmware struct {
 	ID       int64     `db:"id"`
 	DeviceID int64     `db:"device_id"`

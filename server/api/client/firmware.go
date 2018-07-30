@@ -15,6 +15,42 @@ import (
 	"net/url"
 )
 
+// AddFirmwarePath computes a request path to the add action of Firmware.
+func AddFirmwarePath() string {
+
+	return fmt.Sprintf("/firmware")
+}
+
+// Add firmware
+func (c *Client) AddFirmware(ctx context.Context, path string, payload *AddFirmwarePayload) (*http.Response, error) {
+	req, err := c.NewAddFirmwareRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewAddFirmwareRequest create the request corresponding to the add action endpoint of the Firmware resource.
+func (c *Client) NewAddFirmwareRequest(ctx context.Context, path string, payload *AddFirmwarePayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	return req, nil
+}
+
 // CheckFirmwarePath computes a request path to the check action of Firmware.
 func CheckFirmwarePath(deviceID string) string {
 	param0 := deviceID

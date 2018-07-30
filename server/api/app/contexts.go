@@ -60,6 +60,42 @@ func (ctx *ListBySourceExportContext) BadRequest() error {
 	return nil
 }
 
+// AddFirmwareContext provides the Firmware add action context.
+type AddFirmwareContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *AddFirmwarePayload
+}
+
+// NewAddFirmwareContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Firmware controller add action.
+func NewAddFirmwareContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddFirmwareContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddFirmwareContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddFirmwareContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddFirmwareContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // CheckFirmwareContext provides the Firmware check action context.
 type CheckFirmwareContext struct {
 	context.Context

@@ -178,6 +178,7 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 // FirmwareController is the controller interface for the Firmware actions.
 type FirmwareController interface {
 	goa.Muxer
+	Add(*AddFirmwareContext) error
 	Check(*CheckFirmwareContext) error
 	Update(*UpdateFirmwareContext) error
 }
@@ -186,8 +187,31 @@ type FirmwareController interface {
 func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddFirmwareContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddFirmwarePayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleFirmwareOrigin(h)
+	service.Mux.Handle("PATCH", "/firmware", ctrl.MuxHandler("add", h, unmarshalAddFirmwarePayload))
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Add", "route", "PATCH /firmware")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -346,6 +370,21 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalAddFirmwarePayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddFirmwarePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addFirmwarePayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // unmarshalUpdateFirmwarePayload unmarshals the request body into the context request data Payload field.
