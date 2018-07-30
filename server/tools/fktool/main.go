@@ -128,20 +128,30 @@ func uploadAllFirmware(ctx context.Context, c *fk.Client, directory string) erro
 }
 
 func createAwsSession() (s *session.Session, err error) {
-	sessionOptions := session.Options{
-		Profile: "fieldkit",
-		Config: aws.Config{
+	configs := []aws.Config{
+		aws.Config{
+			Region: aws.String("us-east-1"),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+		aws.Config{
 			Region:                        aws.String("us-east-1"),
 			Credentials:                   credentials.NewEnvCredentials(),
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 	}
-	session, err := session.NewSessionWithOptions(sessionOptions)
-	if err != nil {
-		return nil, fmt.Errorf("Error creating AWS session: %v", err)
+
+	for _, config := range configs {
+		sessionOptions := session.Options{
+			Profile: "fieldkit",
+			Config:  config,
+		}
+		session, err := session.NewSessionWithOptions(sessionOptions)
+		if err == nil {
+			return session, nil
+		}
 	}
 
-	return session, nil
+	return nil, fmt.Errorf("Error creating AWS session: %v", err)
 }
 
 func uploadFirmware(ctx context.Context, c *fk.Client, filename string) error {
