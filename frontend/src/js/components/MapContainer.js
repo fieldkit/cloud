@@ -217,7 +217,7 @@ export default class MapContainer extends Component {
         const visible = menu != null && menu.mouse != null;
         const position = visible ? menu.mouse : { x: 0, y: 0};
 
-        return <FancyMenu visible={visible} options={menu ? menu.options : []} center={menu ? menu.center : null} position={position} onClosed={ this.onMenuClose.bind(this) } />
+        return <FancyMenu visible={visible} options={menu ? menu.options : []} center={menu ? menu.center : null} position={position} onClosed={ this.onMenuClose.bind(this) } />;
     }
 
     render() {
@@ -253,9 +253,6 @@ export default class MapContainer extends Component {
                     {this.renderRadialMenu()}
                 </Map>
                 <div className="disclaimer-panel">
-                    <div className="disclaimer-body">
-                        <span className="b">NOTE: </span> Map images have been obtained from a third-party and do not reflect the editorial decisions of National Geographic.
-                    </div>
                     <div className="fieldkit-logo">
                         <FieldKitLogo />
                     </div>
