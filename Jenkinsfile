@@ -1,7 +1,11 @@
+@Library('conservify') _
+
+conservifyProperties()
+
 timestamps {
     node () {
         stage ('git') {
-            checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'https://github.com/fieldkit/cloud.git']]]) 
+            checkout scm
         }
 
         stage ('build') {
@@ -22,5 +26,9 @@ cp build/fktool ~/workspace/bin
 #./cleanup.sh
 """
 	      }
+
+        stage ('archive') {
+            archiveArtifacts artifacts: 'build/fktool'
+        }
     }
 }
