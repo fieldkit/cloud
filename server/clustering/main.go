@@ -13,7 +13,7 @@ import (
 
 	"github.com/hongshibao/go-kdtree"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/Conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 )
