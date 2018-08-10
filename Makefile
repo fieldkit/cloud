@@ -52,7 +52,7 @@ generate:
 	(cd $(GOPATH)/src/github.com/fieldkit/cloud/server && go generate) || true
 	mv server/vendor-temp server/vendor
 
-deps:
+deps: server/inaturalist/secrets.go
 	cd server && go get ./...
 
 clean:
