@@ -75,6 +75,10 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		return ctx.NotFound()
+	}
+
 	ctx.ResponseData.Header().Set("ETag", fmt.Sprintf("\"%s\"", fw.ETag))
 	ctx.ResponseData.Header().Set("Content-Length", fmt.Sprintf("%d", resp.ContentLength))
 	ctx.ResponseData.WriteHeader(http.StatusOK)
