@@ -22,12 +22,8 @@ var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
 	Reference(Source)
 	Attribute("deviceId", Integer)
 	Required("deviceId")
-	Attribute("module")
-	Required("module")
-	Attribute("etag")
-	Required("etag")
-	Attribute("url")
-	Required("url")
+	Attribute("firmwareId", Integer)
+	Required("firmwareId")
 })
 
 var FirmwareSummary = MediaType("application/vnd.app.ifmrware+json", func() {
@@ -96,6 +92,7 @@ var _ = Resource("Firmware", func() {
 		Params(func() {
 		})
 		Payload(UpdateDeviceFirmwarePayload)
+		Response(NotFound)
 		Response(BadRequest)
 		Response(OK)
 	})

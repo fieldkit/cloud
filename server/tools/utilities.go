@@ -31,11 +31,10 @@ func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceSource, 
 	return nil
 }
 
-func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, url, etag string) error {
+func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, firmwareID int) error {
 	updatePayload := fk.UpdateDeviceFirmwarePayload{
-		DeviceID: device.ID,
-		Etag:     etag,
-		URL:      url,
+		DeviceID:   device.ID,
+		FirmwareID: firmwareID,
 	}
 	res, err := c.UpdateFirmware(ctx, fk.UpdateFirmwarePath(), &updatePayload)
 	if err != nil {

@@ -91,25 +91,36 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 	log := Logger(ctx).Sugar()
-	log.Infow("Device", "device_id", ctx.Payload.DeviceID, "etag", ctx.Payload.Etag, "url", ctx.Payload.URL)
+	log.Infow("Device", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID)
 
 	device, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.Payload.DeviceID))
 	if err != nil {
 		return err
 	}
 
-	firmware := data.DeviceFirmware{
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f WHERE f.id = $1", ctx.Payload.FirmwareID); err != nil {
+		return err
+	}
+
+	if len(firmwares) != 1 {
+		return ctx.NotFound()
+	}
+
+	firmware := firmwares[0]
+
+	deviceFirmware := data.DeviceFirmware{
 		DeviceID: int64(device.ID),
 		Time:     time.Now(),
-		Module:   ctx.Payload.Module,
-		URL:      ctx.Payload.URL,
-		ETag:     ctx.Payload.Etag,
+		Module:   firmware.Module,
+		URL:      firmware.URL,
+		ETag:     firmware.ETag,
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, `
 		   INSERT INTO fieldkit.device_firmware (device_id, time, module, url, etag)
 		   VALUES (:device_id, :time, :module, :url, :etag)
-		   `, firmware); err != nil {
+		   `, deviceFirmware); err != nil {
 		return err
 	}
 
