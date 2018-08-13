@@ -41,7 +41,11 @@ func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, 
 		return fmt.Errorf("Error updating device firmware: %v", err)
 	}
 
-	log.Printf("Updated: %+v", res)
+	if res.StatusCode != 200 {
+		return fmt.Errorf("Error updating device firmware: %v", res.Status)
+	}
+
+	log.Printf("Updated!")
 
 	return nil
 }
