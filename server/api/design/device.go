@@ -147,6 +147,10 @@ var _ = Resource("device", func() {
 		})
 		Payload(AddDeviceSourcePayload)
 		Response(BadRequest)
+		Response("DeviceExists", func() {
+			Media("text/plain")
+			Status(500)
+		})
 		Response(OK, func() {
 			Media(DeviceSource)
 		})

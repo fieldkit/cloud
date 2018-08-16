@@ -98,6 +98,19 @@ func NewDeviceController(service *goa.Service, options DeviceControllerOptions) 
 }
 
 func (c *DeviceController) Add(ctx *app.AddDeviceContext) error {
+	if ctx.Payload.Key != "" {
+		log := Logger(ctx).Sugar()
+
+		existing, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.Payload.Key)
+		if existing != nil {
+			log.Infow("Device exists", "device_id", ctx.Payload.Key)
+			return ctx.DeviceExists([]byte("Device key collision"))
+		}
+		if err != nil {
+			return err
+		}
+	}
+
 	source := &data.Source{}
 	source.ExpeditionID = int32(ctx.ExpeditionID)
 	source.Name = ctx.Payload.Name

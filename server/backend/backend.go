@@ -290,6 +290,24 @@ func (b *Backend) GetSourceByID(ctx context.Context, id int32) (*data.Source, er
 	return sources[0], nil
 }
 
+func (b *Backend) GetDeviceSourceByKey(ctx context.Context, key string) (*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
+	if err := b.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.source_id, d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
+					WHERE d.key = $1
+		`, key); err != nil {
+		return nil, err
+	}
+
+	if len(devices) != 1 {
+		return nil, nil
+	}
+
+	return devices[0], nil
+}
+
 func (b *Backend) GetDeviceSourceByID(ctx context.Context, id int32) (*data.DeviceSource, error) {
 	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `

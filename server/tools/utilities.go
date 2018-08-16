@@ -3,6 +3,7 @@ package utilities
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -106,12 +107,17 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 						log.Fatalf("Error adding device: %v", err)
 					}
 
-					added, err := c.DecodeDeviceSource(res)
-					if err != nil {
-						log.Fatalf("Error adding device: %v", err)
-					}
+					if res.StatusCode != 200 {
+						bytes, _ := ioutil.ReadAll(res.Body)
+						log.Fatalf("Error adding device: %v", string(bytes))
+					} else {
+						added, err := c.DecodeDeviceSource(res)
+						if err != nil {
+							log.Fatalf("Error adding device: %v", err)
+						}
 
-					theDevice = added
+						theDevice = added
+					}
 				} else {
 					if deviceId != "" && theDevice.Key != deviceId {
 						log.Printf("Device id/key is different (%s != %s) fixing...", deviceId, theDevice.Key)
