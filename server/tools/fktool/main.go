@@ -282,10 +282,10 @@ func main() {
 		}
 	}
 
-	if o.DeviceName != "" {
+	if o.DeviceId != "" && o.DeviceName != "" {
 		device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName, o.DeviceId, "")
 		if err != nil {
-			log.Fatalf("Error creating web device: %v", err)
+			log.Fatalf("Error creating device: %v", err)
 		}
 
 		log.Printf("Associated %v", device)
@@ -297,10 +297,21 @@ func main() {
 				log.Fatalf("Error updating location: %v", err)
 			}
 		}
+	}
 
-		if o.FirmwareID > 0 {
+	if o.FirmwareID > 0 {
+		device, err := fktesting.FindExistingDevice(ctx, c, o.Project, o.DeviceId)
+		if err != nil {
+			log.Fatalf("Error creating device: %v", err)
+		}
+
+		if device == nil {
+			log.Fatalf("Unable to find device")
+		}
+
+		if device != nil {
 			log.Printf("Updating firmware %v", o.FirmwareID)
-			err := fktesting.UpdateFirmware(ctx, c, device, o.FirmwareID)
+			err := fktesting.UpdateFirmware(ctx, c, device.ID, o.FirmwareID)
 			if err != nil {
 				log.Fatalf("Error updating firmware: %v", err)
 			}

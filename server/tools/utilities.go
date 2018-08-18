@@ -32,9 +32,9 @@ func UpdateLocation(ctx context.Context, c *fk.Client, device *fk.DeviceSource, 
 	return nil
 }
 
-func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, firmwareID int) error {
+func UpdateFirmware(ctx context.Context, c *fk.Client, deviceID int, firmwareID int) error {
 	updatePayload := fk.UpdateDeviceFirmwarePayload{
-		DeviceID:   device.ID,
+		DeviceID:   deviceID,
 		FirmwareID: firmwareID,
 	}
 	res, err := c.UpdateFirmware(ctx, fk.UpdateFirmwarePath(), &updatePayload)
@@ -51,14 +51,14 @@ func UpdateFirmware(ctx context.Context, c *fk.Client, device *fk.DeviceSource, 
 	return nil
 }
 
-func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceSource, err error) {
+func FindExpedition(ctx context.Context, c *fk.Client, projectSlug string) (exp *fk.Expedition, err error) {
 	res, err := c.ListProject(ctx, fk.ListProjectPath())
 	if err != nil {
-		log.Fatalf("Error listing projects: %v", err)
+		return nil, fmt.Errorf("Error listing projects: %v", err)
 	}
 	projects, err := c.DecodeProjects(res)
 	if err != nil {
-		log.Fatalf("Error listing projects: %v", err)
+		return nil, fmt.Errorf("Error listing projects: %v", err)
 	}
 
 	for _, project := range projects.Projects {
@@ -67,96 +67,116 @@ func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName,
 		if project.Slug == projectSlug {
 			res, err = c.ListExpedition(ctx, fk.ListExpeditionPath(project.Slug))
 			if err != nil {
-				log.Fatalf("%v", err)
+				return nil, fmt.Errorf("%v", err)
 			}
 			expeditions, err := c.DecodeExpeditions(res)
 			if err != nil {
-				log.Fatalf("%v", err)
+				return nil, fmt.Errorf("%v", err)
 			}
 
 			for _, exp := range expeditions.Expeditions {
-				log.Printf("Expedition: %+v\n", *exp)
-
-				res, err = c.ListDevice(ctx, fk.ListDevicePath(project.Slug, exp.Slug))
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-				devices, err := c.DecodeDeviceSources(res)
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-
-				var theDevice *fk.DeviceSource
-				for _, device := range devices.DeviceSources {
-					log.Printf("Device: %+v\n", *device)
-
-					if device.Name == deviceName {
-						theDevice = device
-					}
-				}
-
-				if theDevice == nil {
-					log.Printf("Creating new Device %v", deviceName)
-
-					addPayload := fk.AddDeviceSourcePayload{
-						Name: deviceName,
-						Key:  deviceId,
-					}
-					res, err = c.AddDevice(ctx, fk.AddDevicePath(exp.ID), &addPayload)
-					if err != nil {
-						log.Fatalf("Error adding device: %v", err)
-					}
-
-					if res.StatusCode != 200 {
-						bytes, _ := ioutil.ReadAll(res.Body)
-						log.Fatalf("Error adding device: %v", string(bytes))
-					} else {
-						added, err := c.DecodeDeviceSource(res)
-						if err != nil {
-							log.Fatalf("Error adding device: %v", err)
-						}
-
-						theDevice = added
-					}
-				} else {
-					if deviceId != "" && theDevice.Key != deviceId {
-						log.Printf("Device id/key is different (%s != %s) fixing...", deviceId, theDevice.Key)
-
-						updatePayload := fk.UpdateDeviceSourcePayload{
-							Name: deviceName,
-							Key:  deviceId,
-						}
-						res, err = c.UpdateDevice(ctx, fk.UpdateDevicePath(theDevice.ID), &updatePayload)
-						if err != nil {
-							log.Fatalf("Error updating device: %v", err)
-						}
-
-						updated, err := c.DecodeDeviceSource(res)
-						if err != nil {
-							log.Fatalf("Error adding device: %v", err)
-						}
-
-						log.Printf("Updated: %+v", updated)
-					}
-
-				}
-
-				schema := fk.UpdateDeviceSourceSchemaPayload{
-					Active:     true,
-					Key:        streamName,
-					JSONSchema: `{ "UseProviderTime": true, "UseProviderLocation": true }`,
-				}
-				_, err = c.UpdateSchemaDevice(ctx, fk.UpdateSchemaDevicePath(theDevice.ID), &schema)
-				if err != nil {
-					log.Fatalf("%v", err)
-				}
-
-				return theDevice, nil
+				return exp, nil
 			}
 		}
 	}
 
-	return nil, fmt.Errorf("Unable to create Web device")
+	return nil, fmt.Errorf("Unable to find expedition")
+}
+
+func FindExistingDevice(ctx context.Context, c *fk.Client, projectSlug, deviceKey string) (d *fk.DeviceSource, err error) {
+	exp, err := FindExpedition(ctx, c, projectSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Expedition: %+v\n", *exp)
+
+	res, err := c.ListDevice(ctx, fk.ListDevicePath(projectSlug, exp.Slug))
+	if err != nil {
+		return nil, fmt.Errorf("%v", err)
+	}
+	devices, err := c.DecodeDeviceSources(res)
+	if err != nil {
+		return nil, fmt.Errorf("%v", err)
+	}
+
+	for _, device := range devices.DeviceSources {
+		if device.Key == deviceKey {
+			log.Printf("Device: %+v\n", *device)
+			return device, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Unable to find device")
+}
+
+func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceSource, err error) {
+	theDevice, err := FindExistingDevice(ctx, c, projectSlug, deviceId)
+	if err != nil {
+		return nil, err
+	}
+
+	if theDevice == nil {
+		log.Printf("Creating new Device %v", deviceName)
+		exp, err := FindExpedition(ctx, c, projectSlug)
+		if err != nil {
+			return nil, err
+		}
+
+		addPayload := fk.AddDeviceSourcePayload{
+			Name: deviceName,
+			Key:  deviceId,
+		}
+		res, err := c.AddDevice(ctx, fk.AddDevicePath(exp.ID), &addPayload)
+		if err != nil {
+			return nil, fmt.Errorf("Error adding device: %v", err)
+		}
+
+		if res.StatusCode != 200 {
+			bytes, _ := ioutil.ReadAll(res.Body)
+			return nil, fmt.Errorf("Error adding device: %v", string(bytes))
+		} else {
+			added, err := c.DecodeDeviceSource(res)
+			if err != nil {
+				return nil, fmt.Errorf("Error adding device: %v", err)
+			}
+
+			theDevice = added
+		}
+	} else {
+		if deviceId != "" && theDevice.Key != deviceId {
+			log.Printf("Device id/key is different (%s != %s) fixing...", deviceId, theDevice.Key)
+
+			updatePayload := fk.UpdateDeviceSourcePayload{
+				Name: deviceName,
+				Key:  deviceId,
+			}
+			res, err := c.UpdateDevice(ctx, fk.UpdateDevicePath(theDevice.ID), &updatePayload)
+			if err != nil {
+				return nil, fmt.Errorf("Error updating device: %v", err)
+			}
+
+			updated, err := c.DecodeDeviceSource(res)
+			if err != nil {
+				return nil, fmt.Errorf("Error adding device: %v", err)
+			}
+
+			log.Printf("Updated: %+v", updated)
+		}
+
+	}
+
+	schema := fk.UpdateDeviceSourceSchemaPayload{
+		Active:     true,
+		Key:        streamName,
+		JSONSchema: `{ "UseProviderTime": true, "UseProviderLocation": true }`,
+	}
+	_, err = c.UpdateSchemaDevice(ctx, fk.UpdateSchemaDevicePath(theDevice.ID), &schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return theDevice, nil
 }
 
 func MapInt64(v, minV, maxV int, minRange, maxRange int64) int64 {
