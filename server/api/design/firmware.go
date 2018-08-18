@@ -107,10 +107,20 @@ var _ = Resource("Firmware", func() {
 		Response(OK)
 	})
 
+	Action("list device", func() {
+		Routing(GET("devices/:deviceId/firmware"))
+		Description("List device firmware")
+		Response(OK, func() {
+			Media(Firmwares)
+		})
+	})
+
 	Action("list", func() {
 		Routing(GET("firmware"))
 		Description("List firmware")
 		Params(func() {
+			Param("module", String)
+			Param("profile", String)
 		})
 		Response(OK, func() {
 			Media(Firmwares)

@@ -188,7 +188,21 @@ func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
 
 func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	firmwares := []*data.Firmware{}
-	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f ORDER BY time DESC"); err != nil {
+
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC", ctx.Module, ctx.Profile); err != nil {
+		return err
+	}
+
+	return ctx.OK(FirmwaresType(firmwares))
+}
+
+func (c *FirmwareController) ListDevice(ctx *app.ListDeviceFirmwareContext) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Device", "device_id", ctx.DeviceID)
+
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.id, f.time, f.module, f.profile, f.etag, f.url FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 ORDER BY time DESC", ctx.DeviceID); err != nil {
 		return err
 	}
 

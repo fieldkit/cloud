@@ -163,10 +163,10 @@ definitions:
     example:
       bio: Voluptatem rerum numquam voluptatem veritatis inventore incidunt.
       email: grover_kutch@schimmelmitchell.com
-      invite_token: Asperiores amet aliquid et corrupti laudantium.
-      name: 6g6qg0z6y1
-      password: o27o19cvxj
-      username: 1bm6qh9fli
+      invite_token: Amet aliquid et.
+      name: mp6g6qg0z6
+      password: 1io27o19cv
+      username: j91bm6qh9f
     properties:
       bio:
         example: Voluptatem rerum numquam voluptatem veritatis inventore incidunt.
@@ -176,20 +176,20 @@ definitions:
         format: email
         type: string
       invite_token:
-        example: Asperiores amet aliquid et corrupti laudantium.
+        example: Amet aliquid et.
         type: string
       name:
-        example: 6g6qg0z6y1
+        example: mp6g6qg0z6
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: o27o19cvxj
+        example: 1io27o19cv
         minLength: 10
         type: string
       username:
         description: Username
-        example: 1bm6qh9fli
+        example: j91bm6qh9f
         maxLength: 40
         pattern: ^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$
         type: string
@@ -245,18 +245,6 @@ definitions:
     description: ClusterGeometrySummaryCollection is the media type for an array of
       ClusterGeometrySummary (default view)
     example:
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
     - geometry:
       - - 0.96824837
       - - 0.96824837
@@ -805,6 +793,22 @@ definitions:
       properties:
         Dignissimos ea nobis in harum doloribus.: 8.3801093e+18
       type: Illo reprehenderit quod.
+    - geometry:
+        coordinates:
+        - 0.8243154
+        - 0.8243154
+        type: Cupiditate nemo.
+      properties:
+        Dignissimos ea nobis in harum doloribus.: 8.3801093e+18
+      type: Illo reprehenderit quod.
+    - geometry:
+        coordinates:
+        - 0.8243154
+        - 0.8243154
+        type: Cupiditate nemo.
+      properties:
+        Dignissimos ea nobis in harum doloribus.: 8.3801093e+18
+      type: Illo reprehenderit quod.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -838,10 +842,10 @@ definitions:
   Location:
     description: Location media type (default view)
     example:
-      location: http://howell.com/agustina
+      location: http://hoegergrimes.com/agustina
     properties:
       location:
-        example: http://howell.com/agustina
+        example: http://hoegergrimes.com/agustina
         format: uri
         type: string
     required:
@@ -850,16 +854,16 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: 9cd69as0lx
-      username: hnipyk1ltz
+      password: iq9cd69as0
+      username: xihnipyk1l
     properties:
       password:
-        example: 9cd69as0lx
+        example: iq9cd69as0
         minLength: 10
         type: string
       username:
         description: Username
-        example: hnipyk1ltz
+        example: xihnipyk1l
         maxLength: 40
         pattern: ^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$
         type: string
@@ -1215,10 +1219,10 @@ definitions:
     type: array
   RefreshUserPayload:
     example:
-      refresh_token: Facere tempora ut eveniet.
+      refresh_token: Quasi tempore facere.
     properties:
       refresh_token:
-        example: Facere tempora ut eveniet.
+        example: Quasi tempore facere.
         type: string
     required:
     - refresh_token
@@ -1844,16 +1848,16 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Fuga explicabo.
-      email: erick_trantow@daniel.net
+      bio: Ut eveniet alias fuga.
+      email: johnny.king@murazik.net
       name: nkyddwfvj3
       username: wa2lzzs51w
     properties:
       bio:
-        example: Fuga explicabo.
+        example: Ut eveniet alias fuga.
         type: string
       email:
-        example: erick_trantow@daniel.net
+        example: johnny.king@murazik.net
         format: email
         type: string
       name:
@@ -2022,6 +2026,27 @@ paths:
       schemes:
       - https
       summary: check Firmware
+      tags:
+      - Firmware
+  /devices/{deviceId}/firmware:
+    get:
+      description: List device firmware
+      operationId: Firmware#list device
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.firmwares+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Firmwares'
+      schemes:
+      - https
+      summary: list device Firmware
       tags:
       - Firmware
   /devices/firmware:
@@ -2432,6 +2457,15 @@ paths:
     get:
       description: List firmware
       operationId: Firmware#list
+      parameters:
+      - in: query
+        name: module
+        required: false
+        type: string
+      - in: query
+        name: profile
+        required: false
+        type: string
       produces:
       - application/vnd.app.firmwares+json
       responses:
