@@ -80,6 +80,7 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 	metadata[FkBuildHeaderName] = aws.String(headers.FkBuild)
 	metadata[FkDeviceIdHeaderName] = aws.String(headers.FkDeviceId)
 	metadata[FkFileIdHeaderName] = aws.String(headers.FkFileId)
+	metadata[FkFileNameHeaderName] = aws.String(headers.FkFileName)
 
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
