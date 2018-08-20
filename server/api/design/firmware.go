@@ -69,6 +69,7 @@ var _ = Resource("Firmware", func() {
 		Description("Return firmware for a device")
 		Headers(func() {
 			Header("If-None-Match")
+			Header("Fk-Compiled")
 		})
 		Params(func() {
 			Param("deviceId", String)

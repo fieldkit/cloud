@@ -163,10 +163,10 @@ definitions:
     example:
       bio: Voluptatem rerum numquam voluptatem veritatis inventore incidunt.
       email: grover_kutch@schimmelmitchell.com
-      invite_token: Amet aliquid et.
-      name: mp6g6qg0z6
-      password: 1io27o19cv
-      username: j91bm6qh9f
+      invite_token: Asperiores amet aliquid et corrupti laudantium.
+      name: 6g6qg0z6y1
+      password: o27o19cvxj
+      username: 1bm6qh9fli
     properties:
       bio:
         example: Voluptatem rerum numquam voluptatem veritatis inventore incidunt.
@@ -176,20 +176,20 @@ definitions:
         format: email
         type: string
       invite_token:
-        example: Amet aliquid et.
+        example: Asperiores amet aliquid et corrupti laudantium.
         type: string
       name:
-        example: mp6g6qg0z6
+        example: 6g6qg0z6y1
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: 1io27o19cv
+        example: o27o19cvxj
         minLength: 10
         type: string
       username:
         description: Username
-        example: j91bm6qh9f
+        example: 1bm6qh9fli
         maxLength: 40
         pattern: ^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$
         type: string
@@ -842,10 +842,10 @@ definitions:
   Location:
     description: Location media type (default view)
     example:
-      location: http://hoegergrimes.com/agustina
+      location: http://howell.com/agustina
     properties:
       location:
-        example: http://hoegergrimes.com/agustina
+        example: http://howell.com/agustina
         format: uri
         type: string
     required:
@@ -854,16 +854,16 @@ definitions:
     type: object
   LoginPayload:
     example:
-      password: iq9cd69as0
-      username: xihnipyk1l
+      password: 9cd69as0lx
+      username: hnipyk1ltz
     properties:
       password:
-        example: iq9cd69as0
+        example: 9cd69as0lx
         minLength: 10
         type: string
       username:
         description: Username
-        example: xihnipyk1l
+        example: hnipyk1ltz
         maxLength: 40
         pattern: ^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$
         type: string
@@ -1219,10 +1219,10 @@ definitions:
     type: array
   RefreshUserPayload:
     example:
-      refresh_token: Quasi tempore facere.
+      refresh_token: Facere tempora ut eveniet.
     properties:
       refresh_token:
-        example: Quasi tempore facere.
+        example: Facere tempora ut eveniet.
         type: string
     required:
     - refresh_token
@@ -1848,16 +1848,16 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Ut eveniet alias fuga.
-      email: johnny.king@murazik.net
+      bio: Fuga explicabo.
+      email: erick_trantow@daniel.net
       name: nkyddwfvj3
       username: wa2lzzs51w
     properties:
       bio:
-        example: Ut eveniet alias fuga.
+        example: Fuga explicabo.
         type: string
       email:
-        example: johnny.king@murazik.net
+        example: erick_trantow@daniel.net
         format: email
         type: string
       name:
@@ -2006,6 +2006,10 @@ paths:
       - in: path
         name: module
         required: true
+        type: string
+      - in: header
+        name: Fk-Compiled
+        required: false
         type: string
       - in: header
         name: If-None-Match

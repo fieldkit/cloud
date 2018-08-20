@@ -48,8 +48,9 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 	log := Logger(ctx).Sugar()
 
 	incomingETag := stripQuotes(ctx.IfNoneMatch)
+	compiled := ctx.FkCompiled
 
-	log.Infow("Device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag)
+	log.Infow("Device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag, "compiled", compiled)
 
 	firmwares := []*data.DeviceFirmware{}
 	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1", ctx.DeviceID, ctx.Module); err != nil {
