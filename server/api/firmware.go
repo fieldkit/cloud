@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -44,6 +45,15 @@ func stripQuotes(p *string) string {
 	return s
 }
 
+func isOutgoingFirmwareOlderThanIncoming(compiled string, fw *data.DeviceFirmware) bool {
+	unix, err := strconv.Atoi(compiled)
+	if err != nil {
+		return false
+	}
+	incoming := time.Unix(int64(unix), 0)
+	return incoming.After(fw.Time)
+}
+
 func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 	log := Logger(ctx).Sugar()
 
@@ -53,7 +63,8 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 	log.Infow("Device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag, "compiled", compiled)
 
 	firmwares := []*data.DeviceFirmware{}
-	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1", ctx.DeviceID, ctx.Module); err != nil {
+	query := "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1"
+	if err := c.options.Database.SelectContext(ctx, &firmwares, query, ctx.DeviceID, ctx.Module); err != nil {
 		return err
 	}
 
@@ -67,6 +78,13 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 	if incomingETag == fw.ETag {
 		return ctx.NotModified()
+	}
+
+	if compiled != nil {
+		if isOutgoingFirmwareOlderThanIncoming(*compiled, fw) {
+			log.Infow("Refusing to apply firmware compiled before device firmware", "incoming", compiled, "outgoing", fw.Time)
+			return ctx.NotFound()
+		}
 	}
 
 	resp, err := http.Get(fw.URL)
