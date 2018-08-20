@@ -38,6 +38,7 @@ const (
 	FkFileOffsetHeaderName     = "Fk-FileOffset"
 	FkFileNameHeaderName       = "Fk-FileName"
 	FkFileVersionHeaderName    = "Fk-FileVersion"
+	FkCompiledHeaderName       = "Fk-Compiled"
 	FkUploadNameHeaderName     = "Fk-UploadName"
 )
 
@@ -187,6 +188,7 @@ type IncomingHeaders struct {
 	FkFileOffset    string
 	FkFileVersion   string
 	FkFileName      string
+	FkCompiled      string
 	FkUploadName    string
 }
 
@@ -204,6 +206,7 @@ func (h *IncomingHeaders) ToLoggingFields() []interface{} {
 	keysAndValues = append(keysAndValues, "file_offset", h.FkFileOffset)
 	keysAndValues = append(keysAndValues, "file_version", h.FkFileVersion)
 	keysAndValues = append(keysAndValues, "upload_name", h.FkUploadName)
+	keysAndValues = append(keysAndValues, "compiled", h.FkCompiled)
 
 	return keysAndValues
 }
@@ -224,6 +227,7 @@ func (h *IncomingHeaders) ToPartHeaders(contentType string) *IncomingHeaders {
 		FkFileOffset:    h.FkFileOffset,
 		FkFileVersion:   h.FkFileVersion,
 		FkFileName:      h.FkFileName,
+		FkCompiled:      h.FkCompiled,
 		FkUploadName:    h.FkUploadName,
 	}
 }
@@ -255,6 +259,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		FkFileOffset:    req.Header.Get(FkFileOffsetHeaderName),
 		FkFileName:      req.Header.Get(FkFileNameHeaderName),
 		FkFileVersion:   req.Header.Get(FkFileVersionHeaderName),
+		FkCompiled:      req.Header.Get(FkCompiledHeaderName),
 		FkUploadName:    req.Header.Get(FkUploadNameHeaderName),
 	}
 
@@ -275,7 +280,6 @@ func acceptableMediaType(mediaType string) bool {
 		return true
 	}
 	return false
-
 }
 
 func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
