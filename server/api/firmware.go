@@ -208,7 +208,7 @@ func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
 func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	firmwares := []*data.Firmware{}
 
-	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC", ctx.Module, ctx.Profile); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC LIMIT 100", ctx.Module, ctx.Profile); err != nil {
 		return err
 	}
 
