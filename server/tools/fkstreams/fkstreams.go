@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -18,8 +21,13 @@ import (
 	"github.com/robinpowered/go-proto/message"
 	"github.com/robinpowered/go-proto/stream"
 
+	"github.com/Devatoria/go-graylog"
+
+	"github.com/Conservify/sqlxcache"
+
 	pbtools "github.com/Conservify/protobuf-tools/tools"
 
+	"github.com/fieldkit/cloud/server/data"
 	pb "github.com/fieldkit/data-protocol"
 )
 
@@ -67,6 +75,19 @@ type ObjectDetails struct {
 	Firmware     string
 	Build        string
 	FileId       string
+	URL          string
+	Meta         map[string]*string
+}
+
+func fixMeta(m map[string]*string) map[string]*string {
+	newM := make(map[string]*string)
+	newM["Fk-DeviceId"] = m["Fk-Deviceid"]
+	newM["Fk-FileId"] = m["Fk-Fileid"]
+	newM["Fk-Build"] = m["Fk-Build"]
+	newM["Fk-FileName"] = m["Fk-Filename"]
+	newM["Fk-Version"] = m["Fk-Version"]
+
+	return newM
 }
 
 func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
@@ -81,10 +102,12 @@ func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDeta
 			log.Printf("%v", err)
 		}
 
-		deviceId := obj.Metadata["Fk-Deviceid"]
-		firmware := obj.Metadata["Fk-Version"]
-		build := obj.Metadata["Fk-Build"]
-		fileId := obj.Metadata["Fk-Fileid"]
+		meta := fixMeta(obj.Metadata)
+
+		deviceId := meta["Fk-DeviceId"]
+		firmware := meta["Fk-Version"]
+		build := meta["Fk-Build"]
+		fileId := meta["Fk-FileId"]
 
 		if deviceId == nil || firmware == nil || build == nil || fileId == nil {
 			log.Printf("Incomplete metadata: %v", obj)
@@ -98,6 +121,8 @@ func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDeta
 				Build:        *build,
 				DeviceId:     *deviceId,
 				FileId:       *fileId,
+				URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", job.Bucket, job.Key),
+				Meta:         meta,
 			}
 		}
 	}
@@ -147,12 +172,18 @@ func process(job ObjectJob, svc *s3.S3) error {
 }
 
 func writeFile(details <-chan ObjectDetails) {
-	f, err := os.OpenFile("objects.csv", os.O_RDWR|os.O_CREATE, 0644)
+	csv, err := os.OpenFile("objects.csv", os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer csv.Close()
+
+	db, err := sqlxcache.Open("postgres", os.Getenv("FIELDKIT_POSTGRES_URL"))
 	if err != nil {
 		panic(err)
 	}
 
-	defer f.Close()
+	_ = db
 
 	for od := range details {
 		fields := []string{
@@ -166,7 +197,36 @@ func writeFile(details <-chan ObjectDetails) {
 			od.FileId,
 		}
 
-		f.WriteString(strings.Join(fields, ",") + "\n")
+		metaData, err := json.Marshal(od.Meta)
+		if err != nil {
+			panic(err)
+		}
+
+		stream := data.DeviceStream{
+			Time:     *od.LastModified,
+			StreamID: od.Key,
+			Firmware: od.Firmware,
+			DeviceID: od.DeviceId,
+			Size:     int64(od.Size),
+			FileID:   od.FileId,
+			URL:      od.URL,
+			Meta:     metaData,
+		}
+
+		log.Printf("%v\n", stream)
+
+		_ = stream
+
+		if false {
+			if _, err := db.NamedExecContext(context.TODO(), `
+				   INSERT INTO fieldkit.device_stream (time, stream_id, firmware, device_id, size, file_id, url, meta)
+				   VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
+				   `, stream); err != nil {
+				log.Printf("%v", err)
+			}
+		}
+
+		csv.WriteString(strings.Join(fields, ",") + "\n")
 	}
 }
 
@@ -236,8 +296,44 @@ func main() {
 
 	flag.Parse()
 
-	err := listStreams(ctx)
+	hn, err := os.Hostname()
 	if err != nil {
 		panic(err)
 	}
+
+	if true {
+		err := listStreams(ctx)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		g, err := graylog.NewGraylog(graylog.Endpoint{
+			Transport: graylog.TCP,
+			Address:   "172.31.58.48",
+			Port:      12201,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		defer g.Close()
+
+		err = g.Send(graylog.Message{
+			Version:      "1.1",
+			Host:         hn,
+			ShortMessage: "test",
+			FullMessage:  "test",
+			Timestamp:    time.Now().Unix(),
+			Level:        1,
+			Extra: map[string]string{
+				"tag":       "fkdev/devices",
+				"stream":    "",
+				"device_id": "",
+			},
+		})
+		if err != nil {
+			panic(err)
+		}
+	}
+
 }
