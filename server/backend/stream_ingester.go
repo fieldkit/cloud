@@ -21,6 +21,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -153,6 +154,33 @@ func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHead
 	return nil
 }
 
+func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeaders, saved *SavedStream) error {
+	metaData, err := json.Marshal(headers)
+	if err != nil {
+		return fmt.Errorf("JSON error: %v", err)
+	}
+
+	stream := data.DeviceStream{
+		Time:     time.Now(),
+		StreamID: saved.ID,
+		Firmware: headers.FkVersion,
+		DeviceID: headers.FkDeviceId,
+		Size:     int64(headers.ContentLength),
+		FileID:   headers.FkFileId,
+		URL:      saved.URL,
+		Meta:     metaData,
+	}
+
+	if _, err := si.db.NamedExecContext(ctx, `
+		   INSERT INTO fieldkit.device_stream (time, stream_id, firmware, device_id, size, file_id, url, meta)
+		   VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
+		   `, stream); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, reader io.Reader) error {
 	log := Logger(ctx).Sugar()
 
@@ -160,11 +188,18 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 
 	log.Infow("started (async)", headers.ToLoggingFields()...)
 
-	if _, err := si.streamArchiver.Archive(ctx, headers, reader); err != nil {
+	if saved, err := si.streamArchiver.Archive(ctx, headers, reader); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
-		log.Infow("completed", "time", time.Since(startedAt).String())
+		if saved != nil {
+			log.Infow("Save")
+			err = si.saveStream(ctx, headers, saved)
+			if err != nil {
+				log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
+			}
+		}
+		log.Infow("completed", "stream_id", saved.ID, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusOK)
 	}
 

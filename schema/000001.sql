@@ -170,6 +170,22 @@ CREATE TABLE fieldkit.device_firmware (
   url varchar NOT NULL
 );
 
+-- device_stream
+
+CREATE TABLE fieldkit.device_stream (
+  id serial PRIMARY KEY,
+  time timestamp NOT NULL,
+  stream_id varchar(64) NOT NULL,
+  firmware varchar(64) NOT NULL,
+  device_id varchar(64) NOT NULL,
+  size integer NOT NULL,
+  file_id varchar(32) NOT NULL,
+  url varchar NOT NULL,
+  meta json NOT NULL
+);
+
+CREATE UNIQUE INDEX ON fieldkit.device_stream (stream_id);
+
 -- device_schema
 
 CREATE TABLE fieldkit.device_schema (

@@ -51,6 +51,19 @@ type DeviceFirmware struct {
 	DeviceID int64     `db:"device_id"`
 	Time     time.Time `db:"time"`
 	Module   string    `db:"module"`
+	Profile  string    `db:"profile"`
 	URL      string    `db:"url"`
 	ETag     string    `db:"etag"`
+}
+
+type DeviceStream struct {
+	ID       int64          `db:"id"`
+	Time     time.Time      `db:"time"`
+	StreamID string         `db:"stream_id"`
+	Firmware string         `db:"firmware"`
+	DeviceID string         `db:"device_id"`
+	Size     int64          `db:"size"`
+	FileID   string         `db:"file_id"`
+	URL      string         `db:"url"`
+	Meta     types.JSONText `db:"meta"`
 }
