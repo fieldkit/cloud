@@ -193,13 +193,15 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		if saved != nil {
-			log.Infow("Save")
 			err = si.saveStream(ctx, headers, saved)
 			if err != nil {
 				log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
 			}
+
+			log.Infow("completed (saved)", "stream_id", saved.ID, "time", time.Since(startedAt).String())
+		} else {
+			log.Infow("completed", "stream_id", saved.ID, "time", time.Since(startedAt).String())
 		}
-		log.Infow("completed", "stream_id", saved.ID, "time", time.Since(startedAt).String())
 		w.WriteHeader(http.StatusOK)
 	}
 
