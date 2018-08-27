@@ -78,6 +78,20 @@ func NewINaturalistCache(config *INaturalistConfig, client *gonaturalist.Client,
 	return
 }
 
+func (in *INaturalistCache) DeleteOld(ctx context.Context) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Deleting old Observations")
+
+	empty := struct{}{}
+	_, err := in.Database.NamedExecContext(ctx, `DELETE FROM fieldkit.inaturalist_observations WHERE timestamp < NOW() - interval '7 days'`, empty)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonaturalist.SimpleObservation) error {
 	co, err := NewCachedObservation(o)
 	if err != nil {
@@ -108,6 +122,11 @@ func (in *INaturalistCache) AddOrUpdateObservation(ctx context.Context, o *gonat
 func (in *INaturalistCache) RefreshRecentlyUpdated(ctx context.Context, updatedSince time.Time) error {
 	orderBy := "created_at"
 	hasGeo := true
+
+	err := in.DeleteOld(ctx)
+	if err != nil {
+		return err
+	}
 
 	options := &gonaturalist.GetObservationsOpt{
 		HasGeo:       &hasGeo,
