@@ -283,6 +283,10 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, err
 	}
 
+	if contentLength < 0 {
+		return nil, fmt.Errorf("Invalid Content-Length (%v)", contentLength)
+	}
+
 	headers := &IncomingHeaders{
 		ContentType:     contentType,
 		ContentLength:   int32(contentLength),
