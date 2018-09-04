@@ -334,6 +334,8 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	nestedCtx := logging.WithDeviceId(ctx, headers.FkDeviceId)
+
 	if !acceptableMediaType(headers.MediaType) {
 		log.Infow("Unknown Content-Type", headers.ToLoggingFields()...)
 		w.WriteHeader(http.StatusBadRequest)
@@ -363,16 +365,16 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 			partHeaders := headers.ToPartHeaders(contentType)
 			if headers.FkProcessing == "sync" {
-				si.synchronous(ctx, partHeaders, w, p)
+				si.synchronous(nestedCtx, partHeaders, w, p)
 			} else {
-				si.asynchronous(ctx, partHeaders, w, p)
+				si.asynchronous(nestedCtx, partHeaders, w, p)
 			}
 		}
 	} else {
 		if headers.FkProcessing == "sync" {
-			si.synchronous(ctx, headers, w, req.Body)
+			si.synchronous(nestedCtx, headers, w, req.Body)
 		} else {
-			si.asynchronous(ctx, headers, w, req.Body)
+			si.asynchronous(nestedCtx, headers, w, req.Body)
 		}
 	}
 }

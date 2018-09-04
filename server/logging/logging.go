@@ -24,6 +24,7 @@ const (
 	taskIdKey       correlationIdType = iota
 	handlerKey      correlationIdType = iota
 	queueKey        correlationIdType = iota
+	deviceIdKey     correlationIdType = iota
 
 	packagePrefix = "github.com/fieldkit/cloud/server/"
 
@@ -33,6 +34,7 @@ const (
 	queueTagName        = "queue"
 	handlerTagName      = "handler"
 	serviceTraceTagName = "service_trace"
+	deviceIdTagName     = "device_id"
 )
 
 var rootLogger *zap.Logger
@@ -135,6 +137,13 @@ func HandlerContext(ctx context.Context, queue string, handlerType reflect.Type,
 	return context.WithValue(context.WithValue(ctx, queueKey, queue), handlerKey, name)
 }
 
+func WithDeviceId(ctx context.Context, deviceId string) context.Context {
+	if deviceId == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, deviceIdKey, deviceId)
+}
+
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
 	existing := ServiceTrace(ctx)
 	return context.WithValue(ctx, serviceTraceKey, append(existing, value...))
@@ -163,6 +172,9 @@ func Logger(ctx context.Context) *zap.Logger {
 			}
 		}
 
+		if ctxDeviceId, ok := ctx.Value(deviceIdKey).(string); ok {
+			newLogger = newLogger.With(zap.String(deviceIdTagName, ctxDeviceId))
+		}
 		if ctxFacility, ok := ctx.Value(facilityKey).(string); ok {
 			newLogger = newLogger.With(zap.String(facilityTagName, ctxFacility))
 		}
