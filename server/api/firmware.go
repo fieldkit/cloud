@@ -136,16 +136,19 @@ func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 		DeviceID: int64(device.ID),
 		Time:     time.Now(),
 		Module:   firmware.Module,
+		Profile:  firmware.Profile,
 		URL:      firmware.URL,
 		ETag:     firmware.ETag,
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.device_firmware (device_id, time, module, url, etag)
-		   VALUES (:device_id, :time, :module, :url, :etag)
+		   INSERT INTO fieldkit.device_firmware (device_id, time, module, profile, url, etag)
+		   VALUES (:device_id, :time, :module, :profile, :url, :etag)
 		   `, deviceFirmware); err != nil {
 		return err
 	}
+
+	log.Infow("Update firmware", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID, "module", firmware.Module, "profile", firmware.Profile, "url", firmware.URL)
 
 	return ctx.OK([]byte("OK"))
 }
