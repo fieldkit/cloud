@@ -300,7 +300,7 @@ func main() {
 	}
 
 	if o.FirmwareID > 0 {
-		device, err := fktesting.FindExistingDevice(ctx, c, o.Project, o.DeviceId)
+		device, err := fktesting.FindExistingDevice(ctx, c, o.Project, o.DeviceId, true)
 		if err != nil {
 			log.Fatalf("Error creating device: %v", err)
 		}

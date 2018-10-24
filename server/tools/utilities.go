@@ -83,7 +83,7 @@ func FindExpedition(ctx context.Context, c *fk.Client, projectSlug string) (exp 
 	return nil, fmt.Errorf("Unable to find expedition")
 }
 
-func FindExistingDevice(ctx context.Context, c *fk.Client, projectSlug, deviceKey string) (d *fk.DeviceSource, err error) {
+func FindExistingDevice(ctx context.Context, c *fk.Client, projectSlug, deviceKey string, required bool) (d *fk.DeviceSource, err error) {
 	exp, err := FindExpedition(ctx, c, projectSlug)
 	if err != nil {
 		return nil, err
@@ -107,11 +107,15 @@ func FindExistingDevice(ctx context.Context, c *fk.Client, projectSlug, deviceKe
 		}
 	}
 
-	return nil, fmt.Errorf("Unable to find device")
+	if required {
+		return nil, fmt.Errorf("Unable to find device")
+	}
+
+	return nil, nil
 }
 
 func CreateWebDevice(ctx context.Context, c *fk.Client, projectSlug, deviceName, deviceId, streamName string) (d *fk.DeviceSource, err error) {
-	theDevice, err := FindExistingDevice(ctx, c, projectSlug, deviceId)
+	theDevice, err := FindExistingDevice(ctx, c, projectSlug, deviceId, false)
 	if err != nil {
 		return nil, err
 	}
