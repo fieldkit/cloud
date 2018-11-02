@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha1"
 	"encoding/base64"
@@ -248,12 +249,12 @@ func (h *IncomingHeaders) ToLoggingFields() []interface{} {
 	return keysAndValues
 }
 
-func (h *IncomingHeaders) ToPartHeaders(contentType string) *IncomingHeaders {
+func (h *IncomingHeaders) ToPartHeaders(contentType string, contentLength int32) *IncomingHeaders {
 	mediaType, mediaTypeParams, _ := mime.ParseMediaType(contentType)
 
 	return &IncomingHeaders{
 		ContentType:     contentType,
-		ContentLength:   0,
+		ContentLength:   contentLength,
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
 		FkProcessing:    h.FkProcessing,
@@ -347,6 +348,9 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		mr := multipart.NewReader(req.Body, headers.MediaTypeParams["boundary"])
 		for {
+			var reader io.Reader
+
+			buffered := false
 			p, err := mr.NextPart()
 			if err == io.EOF {
 				return
@@ -359,15 +363,31 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 			contentDisposition := p.Header.Get("Content-Disposition")
 			contentType := p.Header.Get("Content-Type")
-			contentLength := p.Header.Get("Content-Length")
+			contentLengthString := p.Header.Get("Content-Length")
 
-			log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength)
-
-			partHeaders := headers.ToPartHeaders(contentType)
-			if headers.FkProcessing == "sync" {
-				si.synchronous(nestedCtx, partHeaders, w, p)
+			contentLength, err := strconv.Atoi(contentLengthString)
+			if err != nil || contentLength <= 0 {
+				buf := &bytes.Buffer{}
+				bytesCopied, err := io.Copy(buf, p)
+				if err != nil {
+					log.Errorw("failed", "error", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				contentLength = int(bytesCopied)
+				reader = buf
+				buffered = true
 			} else {
-				si.asynchronous(nestedCtx, partHeaders, w, p)
+				reader = p
+			}
+
+			log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength, "buffered", buffered)
+
+			partHeaders := headers.ToPartHeaders(contentType, int32(contentLength))
+			if headers.FkProcessing == "sync" {
+				si.synchronous(nestedCtx, partHeaders, w, reader)
+			} else {
+				si.asynchronous(nestedCtx, partHeaders, w, reader)
 			}
 		}
 	} else {
