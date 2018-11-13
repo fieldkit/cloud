@@ -5,9 +5,9 @@ BUILD=build
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
 
-default: binaries 
+default: binaries
 
-binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
+binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/fkflash $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
 
 all: binaries
 
@@ -19,6 +19,9 @@ $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	go build -o $@ server/tools/fktool/*.go
+
+$(BUILD)/fkflash: server/tools/fkflash/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	go build -o $@ server/tools/fkflash/*.go
 
 $(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
 	go build -o $@ server/tools/inaturalist/*.go

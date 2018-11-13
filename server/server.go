@@ -78,7 +78,7 @@ func getAwsSessionOptions(config *Config) session.Options {
 		return session.Options{
 			Profile: config.AWSProfile,
 			Config: aws.Config{
-				Region: aws.String("us-east-1"),
+				Region:                        aws.String("us-east-1"),
 				CredentialsChainVerboseErrors: aws.Bool(true),
 			},
 		}
@@ -472,6 +472,7 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "firmware" controller
 	c17 := api.NewFirmwareController(service, api.FirmwareControllerOptions{
+		Session:  awsSession,
 		Database: database,
 		Backend:  be,
 	})
