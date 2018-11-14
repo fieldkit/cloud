@@ -6,3 +6,4 @@ active-schema
 migration
 grafana-storage
 aws.env
+.fk

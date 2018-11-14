@@ -194,11 +194,20 @@ func MapFloat64(v, minV, maxV int, minRange, maxRange float64) float64 {
 	return float64(v-minV)/float64(maxV-minV)*(maxRange-minRange) + minRange
 }
 
-func CreateAndAuthenticate(ctx context.Context, host, scheme, username, password string) (*fk.Client, error) {
+func NewClient(ctx context.Context, host, scheme string) (*fk.Client, error) {
 	httpClient := newHTTPClient()
 	c := fk.New(goaclient.HTTPClientDoer(httpClient))
 	c.Host = host
 	c.Scheme = scheme
+
+	return c, nil
+}
+
+func CreateAndAuthenticate(ctx context.Context, host, scheme, username, password string) (*fk.Client, error) {
+	c, err := NewClient(ctx, host, scheme)
+	if err != nil {
+		return nil, err
+	}
 
 	loginPayload := fk.LoginPayload{}
 	loginPayload.Username = username
