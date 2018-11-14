@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"time"
 
@@ -50,11 +52,16 @@ Loop:
 		}
 	}
 
-	fmt.Printf(
-		"Finished %d successful, %d failed, %d incomplete.\n",
-		succeeded,
-		failed,
-		active)
+	for _, f := range fc.Firmwares {
+		metadataPath := f.Path + ".json"
+		bytes, err := json.Marshal(f)
+		err = ioutil.WriteFile(metadataPath, bytes, 0666)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Finished %d successful, %d failed, %d incomplete.\n", succeeded, failed, active)
 
 	return nil
 }

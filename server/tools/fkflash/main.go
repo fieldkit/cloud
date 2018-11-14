@@ -40,7 +40,7 @@ func main() {
 	flag.StringVar(&o.Host, "host", "api.fkdev.org", "fk instance hostname")
 	flag.StringVar(&o.Module, "module", "", "override module")
 
-	flag.BoolVar(&o.List, "list", true, "list firmware")
+	flag.BoolVar(&o.List, "list", false, "list firmware")
 	flag.BoolVar(&o.All, "all", false, "disable filtering by latest firmware")
 	flag.BoolVar(&o.Download, "download", false, "download firmware and cache locally")
 
@@ -129,6 +129,9 @@ func (fm *FirmwareManager) List(ctx context.Context, host, scheme string) (fc *F
 }
 
 func (fm *FirmwareManager) Download(fc *FirmwareCollection) error {
+	if fc.Empty() {
+		return nil
+	}
 	return DownloadAll(fc)
 }
 
@@ -201,6 +204,10 @@ func (fc *FirmwareCollection) Latest() *FirmwareCollection {
 	return newFc
 }
 
+func (fc *FirmwareCollection) Empty() bool {
+	return len(fc.Firmwares) == 0
+}
+
 func (fc *FirmwareCollection) Add(f *Firmware) {
 	fc.Firmwares = append(fc.Firmwares, f)
 }
@@ -210,7 +217,11 @@ func (fc *FirmwareCollection) Display() {
 	fmt.Fprintln(w, fmt.Sprintf("ID\t Module\t Profile\t Time\t Tag"))
 
 	for _, f := range fc.Firmwares {
-		fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s", f.ID, f.Module, f.Profile, f.Time, f.Etag))
+		if f.IsLocal() {
+			fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s\t %s", f.ID, f.Module, f.Profile, f.Time, f.Etag, f.Path))
+		} else {
+			fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s", f.ID, f.Module, f.Profile, f.Time, f.Etag))
+		}
 	}
 
 	w.Flush()
