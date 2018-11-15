@@ -78,7 +78,9 @@ func main() {
 			log.Fatalf("Error: %v", err)
 		}
 
-		tooling.Upload(&tooling.UploadOptions{
+		log.Printf("Preparing to flash new firmware. Please quickly double-press RST button on the board.")
+
+		err = tooling.Upload(&tooling.UploadOptions{
 			Arduino:     ae,
 			SkipTouch:   false,
 			Board:       "adafruit_feather_m0",
@@ -89,6 +91,11 @@ func main() {
 			Verify:      true,
 			Quietly:     false,
 		})
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		log.Printf("Success!")
 	} else {
 		fc, err := getFirmwareCollection(ctx, fm, o)
 		if err != nil {
