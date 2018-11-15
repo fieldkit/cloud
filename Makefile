@@ -1,6 +1,9 @@
 modules = server/sqs-worker server/sqs-sender server/tools/fktool
 
-BUILD=build
+GOARCH ?= amd64
+GOOS ?= linux
+GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
+BUILD ?= build
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
@@ -15,28 +18,28 @@ tests:
 	cd frontend && yarn run flow
 
 $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
-	go build -o $@ server/server.go
+	$(GO) build -o $@ server/server.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ server/tools/fktool/*.go
+	$(GO) build -o $@ server/tools/fktool/*.go
 
 $(BUILD)/fkflash: server/tools/fkflash/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ server/tools/fkflash/*.go
+	$(GO) build -o $@ server/tools/fkflash/*.go
 
 $(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
-	go build -o $@ server/tools/inaturalist/*.go
+	$(GO) build -o $@ server/tools/inaturalist/*.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
-	go build -o $@ server/sqs-worker/*.go
+	$(GO) build -o $@ server/sqs-worker/*.go
 
 $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
-	go build -o $@ server/sqs-sender/*.go
+	$(GO) build -o $@ server/sqs-sender/*.go
 
 $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ testing/random/*.go
+	$(GO) build -o $@ testing/random/*.go
 
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	go build -o $@ testing/weather-proxy/*.go
+	$(GO) build -o $@ testing/weather-proxy/*.go
 
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
@@ -87,3 +90,8 @@ restart-postgres:
 	docker-compose up -d postgres
 
 veryclean:
+
+distribution:
+	rm -rf distribution
+	GOOS=darwin GOARCH=amd64 BUILD=build/distribution/osx make build/distribution/osx/fkflash
+	cp -ar ~/.fk/tools build/distribution/osx
