@@ -57,7 +57,31 @@ func (fc *FirmwareCollection) NotLocal() *FirmwareCollection {
 	return newFc
 }
 
-func (fc *FirmwareCollection) Latest() *FirmwareCollection {
+func (fc *FirmwareCollection) FilterProfile(profile string) *FirmwareCollection {
+	newFc := NewFirmwareCollection()
+
+	for _, f := range fc.Firmwares {
+		if f.Profile == profile {
+			newFc.Firmwares = append(newFc.Firmwares, f)
+		}
+	}
+
+	return newFc
+}
+
+func (fc *FirmwareCollection) FilterModule(module string) *FirmwareCollection {
+	newFc := NewFirmwareCollection()
+
+	for _, f := range fc.Firmwares {
+		if f.Module == module {
+			newFc.Firmwares = append(newFc.Firmwares, f)
+		}
+	}
+
+	return newFc
+}
+
+func (fc *FirmwareCollection) FilterLatest() *FirmwareCollection {
 	newFc := NewFirmwareCollection()
 
 	seen := make(map[string]bool)
@@ -79,6 +103,26 @@ func (fc *FirmwareCollection) Empty() bool {
 	return len(fc.Firmwares) == 0
 }
 
+func (fc *FirmwareCollection) Merge(other *FirmwareCollection) *FirmwareCollection {
+	newFc := NewFirmwareCollection()
+
+	seen := make(map[string]bool)
+
+	for _, f := range fc.Firmwares {
+		newFc.Firmwares = append(newFc.Firmwares, f)
+		seen[f.Etag] = true
+	}
+
+	for _, f := range other.Firmwares {
+		if _, ok := seen[f.Etag]; !ok {
+			newFc.Firmwares = append(newFc.Firmwares, f)
+			seen[f.Etag] = true
+		}
+	}
+
+	return newFc
+}
+
 func (fc *FirmwareCollection) Add(f *Firmware) {
 	fc.Firmwares = append(fc.Firmwares, f)
 }
@@ -91,6 +135,7 @@ func (fc *FirmwareCollection) Display() {
 	sort.Sort(BySort(fc.Firmwares))
 
 	w := tabwriter.NewWriter(os.Stdout, 8, 0, 4, ' ', tabwriter.Debug)
+
 	fmt.Fprintln(w, fmt.Sprintf("ID\t Module\t Profile\t Time\t Tag\t Path"))
 
 	for _, f := range fc.Firmwares {
@@ -99,11 +144,21 @@ func (fc *FirmwareCollection) Display() {
 		if f.IsLocal() {
 			fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s\t %s", f.ID, f.Module, f.Profile, time, f.Etag, f.Path))
 		} else {
-			fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s", f.ID, f.Module, f.Profile, time, f.Etag))
+			fmt.Fprintln(w, fmt.Sprintf("%d\t %s\t %s\t %s\t %s\t NOT FOUND", f.ID, f.Module, f.Profile, time, f.Etag))
 		}
 	}
 
 	w.Flush()
+}
+
+func (fc *FirmwareCollection) Find(id int) *Firmware {
+	for _, f := range fc.Firmwares {
+		if f.ID == id {
+			return f
+		}
+	}
+
+	return nil
 }
 
 func (f *Firmware) IsLocal() bool {
@@ -115,11 +170,15 @@ func (f *Firmware) IsLocal() bool {
 
 type FirmwareManager struct {
 	Directory string
+	Host      string
+	Scheme    string
 }
 
-func NewFirmwareManager(ctx context.Context, directory string) (fm *FirmwareManager, err error) {
+func NewFirmwareManager(ctx context.Context, directory, host, scheme string) (fm *FirmwareManager, err error) {
 	fm = &FirmwareManager{
 		Directory: directory,
+		Host:      host,
+		Scheme:    scheme,
 	}
 
 	err = fm.Initialize(ctx)
@@ -164,8 +223,8 @@ func (fm *FirmwareManager) ListLocal(ctx context.Context) (fc *FirmwareCollectio
 	return
 }
 
-func (fm *FirmwareManager) ListRemote(ctx context.Context, host, scheme string) (fc *FirmwareCollection, err error) {
-	c, err := fktesting.NewClient(ctx, host, scheme)
+func (fm *FirmwareManager) ListRemote(ctx context.Context) (fc *FirmwareCollection, err error) {
+	c, err := fktesting.NewClient(ctx, fm.Host, fm.Scheme)
 	if err != nil {
 		return nil, err
 	}
@@ -196,15 +255,26 @@ func (fm *FirmwareManager) ListRemote(ctx context.Context, host, scheme string) 
 	return fc, nil
 }
 
-func (fm *FirmwareManager) Find(ctx context.Context, id int) (f *Firmware, err error) {
+func (fm *FirmwareManager) Find(ctx context.Context, id int, offline bool) (f *Firmware, err error) {
 	local, err := fm.ListLocal(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, f := range local.Firmwares {
-		if f.ID == id {
-			return f, nil
+	f = local.Find(id)
+	if f != nil {
+		return f, nil
+	}
+
+	if !offline {
+		remote, err := fm.ListRemote(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		f := remote.Find(id)
+		if f != nil {
+			return nil, fmt.Errorf("Firmware %v needs to be downloaded.", id)
 		}
 	}
 

@@ -12,37 +12,37 @@ import (
 )
 
 type options struct {
+	CacheDirectory string
 	Scheme         string
 	Host           string
-	ListRemote     bool
-	ListLocal      bool
-	ListPorts      bool
-	Download       bool
-	Offline        bool
-	All            bool
-	Module         string
-	CacheDirectory string
-	FirmwareID     int
-	Port           string
+
+	Download bool
+	Offline  bool
+	All      bool
+	Module   string
+	Profile  string
+
+	ListPorts  bool
+	Port       string
+	FirmwareID int
 }
 
 func main() {
 	ctx := context.TODO()
 
-	o := options{}
+	o := &options{}
 
 	flag.StringVar(&o.CacheDirectory, "cache-directory", getDefaultCacheDirectory(), "cache directory")
 
 	flag.StringVar(&o.Scheme, "scheme", "https", "fk instance scheme")
 	flag.StringVar(&o.Host, "host", "api.fkdev.org", "fk instance hostname")
 
-	flag.StringVar(&o.Module, "module", "", "module")
+	flag.StringVar(&o.Module, "module", "", "filter by module")
+	flag.StringVar(&o.Profile, "profile", "", "filter by profile")
 	flag.BoolVar(&o.All, "all", false, "disable filtering by latest firmware")
 
 	flag.BoolVar(&o.Offline, "offline", false, "work in offline mode")
 
-	flag.BoolVar(&o.ListRemote, "remote", false, "list firmware")
-	flag.BoolVar(&o.ListLocal, "local", false, "list firmware")
 	flag.BoolVar(&o.ListPorts, "ports", false, "list ports")
 
 	flag.BoolVar(&o.Download, "download", false, "download firmware and cache locally")
@@ -52,87 +52,21 @@ func main() {
 
 	flag.Parse()
 
-	firmware, err := NewFirmwareManager(ctx, o.CacheDirectory)
+	fm, err := NewFirmwareManager(ctx, o.CacheDirectory, o.Host, o.Scheme)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 		return
 	}
 
-	if !o.Offline {
-	}
-
-	if o.ListRemote {
-		fc, err := firmware.ListRemote(ctx, o.Host, o.Scheme)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-			return
-		}
-
-		if !o.All {
-			fc = fc.Latest()
-		}
-
-		if o.Download {
-			err := firmware.Download(fc.NotLocal())
-			if err != nil {
-				log.Fatalf("Error: %v", err)
-				return
-			}
-		}
-
-		fmt.Println("REMOTE:")
-
-		fc.Display()
-	}
-
-	if o.Download {
-		fc, err := firmware.ListRemote(ctx, o.Host, o.Scheme)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-			return
-		}
-
-		if !o.All {
-			fc = fc.Latest()
-		}
-
-		err = firmware.Download(fc.NotLocal())
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-			return
-		}
-	}
-
-	if o.ListLocal {
-		fc, err := firmware.ListLocal(ctx)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-			return
-		}
-
-		if fc.Empty() {
-			log.Printf("No local firmware. Try running with --download if you're online.")
-			return
-		}
-
-		if !o.All {
-			fc = fc.Latest()
-		}
-
-		fmt.Println("LOCAL:")
-
-		fc.Display()
-	}
-
 	if o.ListPorts {
 		pd := tooling.NewPortDiscoveror()
 		for _, p := range pd.List() {
-			fmt.Println("Port:", p.Name)
+			log.Printf("Port: %s", p.Name)
 		}
 	}
 
 	if o.FirmwareID > 0 {
-		f, err := firmware.Find(ctx, o.FirmwareID)
+		f, err := fm.Find(ctx, o.FirmwareID, o.Offline)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
@@ -155,6 +89,38 @@ func main() {
 			Verify:      true,
 			Quietly:     false,
 		})
+	} else {
+		fc, err := getFirmwareCollection(ctx, fm, o)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+			return
+		}
+
+		if !o.All {
+			fc = fc.FilterLatest()
+		}
+
+		if o.Module != "" {
+			fc = fc.FilterModule(o.Module)
+		}
+
+		if o.Profile != "" {
+			fc = fc.FilterProfile(o.Profile)
+		}
+
+		if o.Download {
+			err := fm.Download(fc.NotLocal())
+			if err != nil {
+				log.Fatalf("Error: %v", err)
+				return
+			}
+		}
+
+		if fc.Empty() {
+			fmt.Println("No firmware found matching that criteria.")
+		} else {
+			fc.Display()
+		}
 	}
 }
 
@@ -164,4 +130,24 @@ func getDefaultCacheDirectory() string {
 		panic("Unable to find HOME")
 	}
 	return path.Join(home, ".fk/firmware")
+}
+
+func getFirmwareCollection(ctx context.Context, fm *FirmwareManager, o *options) (*FirmwareCollection, error) {
+	fc, err := fm.ListLocal(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !o.Offline {
+		log.Printf("Querying %s...", o.Host)
+
+		remote, err := fm.ListRemote(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		fc = fc.Merge(remote)
+	}
+
+	return fc, nil
 }
