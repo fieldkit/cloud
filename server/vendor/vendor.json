@@ -232,6 +232,12 @@
 			"revisionTime": "2017-03-17T20:29:26Z"
 		},
 		{
+			"checksumSHA1": "Cnp4TbxtikVXlA7NHpoeX9oERww=",
+			"path": "github.com/cavaliercoder/grab",
+			"revision": "2c8601de6d9ac140430fd4c9de28509a0b855af5",
+			"revisionTime": "2018-11-08T21:42:16Z"
+		},
+		{
 			"checksumSHA1": "nA+gmB0uOk+I06FhtCMrWlhHp00=",
 			"path": "github.com/cenkalti/backoff",
 			"revision": "3db60c813733fce657c114634171689bbf1f8dee",
