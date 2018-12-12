@@ -93,7 +93,7 @@ veryclean:
 
 distribution:
 	rm -rf distribution
-	GOOS=darwin GOARCH=amd64 BUILD=build/distribution/darwin make build/distribution/darwin/fkflash
+	GOOS=darwin GOARCH=amd64 BUILD=build/distribution/darwin $(MAKE) build/distribution/darwin/fkflash
 	cp -ar ~/.fk/tools build/distribution/darwin
-	GOOS=windows GOARCH=amd64 BUILD=build/distribution/windows make build/distribution/windows/fkflash
+	GOOS=windows GOARCH=amd64 BUILD=build/distribution/windows $(MAKE) build/distribution/windows/fkflash
 	cp -ar ~/.fk/tools build/distribution/windows
