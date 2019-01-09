@@ -14,7 +14,7 @@ import (
 	"github.com/robinpowered/go-proto/message"
 	"github.com/robinpowered/go-proto/stream"
 
-	pbtools "github.com/Conservify/protobuf-tools/tools"
+	pbtools "github.com/conservify/protobuf-tools/tools"
 
 	pb "github.com/fieldkit/data-protocol"
 

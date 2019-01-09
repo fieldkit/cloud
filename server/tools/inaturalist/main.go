@@ -12,7 +12,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/Conservify/gonaturalist"
+	"github.com/conservify/gonaturalist"
 
 	fk "github.com/fieldkit/cloud/server/api/client"
 	fktesting "github.com/fieldkit/cloud/server/tools"

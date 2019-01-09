@@ -9,7 +9,7 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"

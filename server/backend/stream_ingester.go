@@ -18,7 +18,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Conservify/gonaturalist"
+	"github.com/conservify/gonaturalist"
 )
 
 type INaturalistCommentor struct {

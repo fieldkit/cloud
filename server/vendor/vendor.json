@@ -3,7 +3,7 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "@github.com/Conservify/gonaturalist.git",
+			"path": "@github.com/conservify/gonaturalist.git",
 			"revision": ""
 		},
 		{
@@ -20,23 +20,23 @@
 		},
 		{
 			"checksumSHA1": "eC+oLOZpuCWbyukQ4Ed2q7dimNc=",
-			"path": "github.com/Conservify/gonaturalist",
+			"path": "github.com/conservify/gonaturalist",
 			"revision": "89ee57d290732ee54861a77b4422723518390202",
 			"revisionTime": "2018-04-23T23:40:38Z"
 		},
 		{
-			"path": "github.com/Conservify/gonaturalist.git",
+			"path": "github.com/conservify/gonaturalist.git",
 			"revision": ""
 		},
 		{
 			"checksumSHA1": "CTs0C05F+XVHqvwNvCJ/x0M/c4g=",
-			"path": "github.com/Conservify/protobuf-tools/tools",
+			"path": "github.com/conservify/protobuf-tools/tools",
 			"revision": "43b897198d1489bd3b7832567a74fbb0a080833b",
 			"revisionTime": "2018-07-15T16:45:06Z"
 		},
 		{
 			"checksumSHA1": "xxnBZZLJJw4bhN8JRnVJbEkVdSw=",
-			"path": "github.com/Conservify/sqlxcache",
+			"path": "github.com/conservify/sqlxcache",
 			"revision": "f531a9ef96c0ddd2cfa72873326ccdde91433345",
 			"revisionTime": "2018-04-20T16:34:12Z"
 		},

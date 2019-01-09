@@ -8,8 +8,8 @@ import (
 
 	"github.com/jmoiron/sqlx/types"
 
-	"github.com/Conservify/gonaturalist"
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/gonaturalist"
+	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/jobs"

@@ -23,9 +23,9 @@ import (
 
 	"github.com/Devatoria/go-graylog"
 
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/sqlxcache"
 
-	pbtools "github.com/Conservify/protobuf-tools/tools"
+	pbtools "github.com/conservify/protobuf-tools/tools"
 
 	"github.com/fieldkit/cloud/server/data"
 	pb "github.com/fieldkit/data-protocol"

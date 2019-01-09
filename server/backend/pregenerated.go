@@ -3,7 +3,7 @@ package backend
 import (
 	"context"
 
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/sqlxcache"
 )
 
 type Pregenerator struct {

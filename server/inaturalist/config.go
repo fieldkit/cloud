@@ -1,7 +1,7 @@
 package inaturalist
 
 import (
-	"github.com/Conservify/gonaturalist"
+	"github.com/conservify/gonaturalist"
 
 	"github.com/fieldkit/cloud/server/jobs"
 )

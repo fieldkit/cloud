@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Conservify/sqlxcache"
+	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/errors"

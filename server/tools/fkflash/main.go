@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	tooling "github.com/Conservify/tooling"
+	tooling "github.com/conservify/tooling"
 )
 
 type options struct {
