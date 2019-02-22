@@ -130,6 +130,102 @@ func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (Cl
 	return decoded, err
 }
 
+// DeviceStream media type (default view)
+//
+// Identifier: application/vnd.app.device.stream+json; view=default
+type DeviceStream struct {
+	DeviceID string    `form:"device_id" json:"device_id" xml:"device_id"`
+	FileID   string    `form:"file_id" json:"file_id" xml:"file_id"`
+	Firmware string    `form:"firmware" json:"firmware" xml:"firmware"`
+	ID       int       `form:"id" json:"id" xml:"id"`
+	Meta     string    `form:"meta" json:"meta" xml:"meta"`
+	Size     int       `form:"size" json:"size" xml:"size"`
+	StreamID string    `form:"stream_id" json:"stream_id" xml:"stream_id"`
+	Time     time.Time `form:"time" json:"time" xml:"time"`
+	URL      string    `form:"url" json:"url" xml:"url"`
+}
+
+// Validate validates the DeviceStream media type instance.
+func (mt *DeviceStream) Validate() (err error) {
+
+	if mt.StreamID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "stream_id"))
+	}
+	if mt.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
+	}
+	if mt.Firmware == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "firmware"))
+	}
+	if mt.Meta == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+	if mt.FileID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_id"))
+	}
+
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// DecodeDeviceStream decodes the DeviceStream instance encoded in resp body.
+func (c *Client) DecodeDeviceStream(resp *http.Response) (*DeviceStream, error) {
+	var decoded DeviceStream
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceStreamCollection is the media type for an array of DeviceStream (default view)
+//
+// Identifier: application/vnd.app.device.stream+json; type=collection; view=default
+type DeviceStreamCollection []*DeviceStream
+
+// Validate validates the DeviceStreamCollection media type instance.
+func (mt DeviceStreamCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDeviceStreamCollection decodes the DeviceStreamCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceStreamCollection(resp *http.Response) (DeviceStreamCollection, error) {
+	var decoded DeviceStreamCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DeviceStreams media type (default view)
+//
+// Identifier: application/vnd.app.device.streams+json; view=default
+type DeviceStreams struct {
+	Streams DeviceStreamCollection `form:"streams" json:"streams" xml:"streams"`
+}
+
+// Validate validates the DeviceStreams media type instance.
+func (mt *DeviceStreams) Validate() (err error) {
+	if mt.Streams == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "streams"))
+	}
+	if err2 := mt.Streams.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeDeviceStreams decodes the DeviceStreams instance encoded in resp body.
+func (c *Client) DecodeDeviceStreams(resp *http.Response) (*DeviceStreams, error) {
+	var decoded DeviceStreams
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // DeviceSchema media type (default view)
 //
 // Identifier: application/vnd.app.device_schema+json; view=default
@@ -509,6 +605,67 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// FirmwareSummary media type (default view)
+//
+// Identifier: application/vnd.app.firmware+json; view=default
+type FirmwareSummary struct {
+	Etag    string    `form:"etag" json:"etag" xml:"etag"`
+	ID      int       `form:"id" json:"id" xml:"id"`
+	Module  string    `form:"module" json:"module" xml:"module"`
+	Profile string    `form:"profile" json:"profile" xml:"profile"`
+	Time    time.Time `form:"time" json:"time" xml:"time"`
+	URL     string    `form:"url" json:"url" xml:"url"`
+}
+
+// Validate validates the FirmwareSummary media type instance.
+func (mt *FirmwareSummary) Validate() (err error) {
+
+	if mt.Etag == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "etag"))
+	}
+	if mt.Module == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "module"))
+	}
+	if mt.Profile == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "profile"))
+	}
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// DecodeFirmwareSummary decodes the FirmwareSummary instance encoded in resp body.
+func (c *Client) DecodeFirmwareSummary(resp *http.Response) (*FirmwareSummary, error) {
+	var decoded FirmwareSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FirmwareSummaryCollection is the media type for an array of FirmwareSummary (default view)
+//
+// Identifier: application/vnd.app.firmware+json; type=collection; view=default
+type FirmwareSummaryCollection []*FirmwareSummary
+
+// Validate validates the FirmwareSummaryCollection media type instance.
+func (mt FirmwareSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeFirmwareSummaryCollection decodes the FirmwareSummaryCollection instance encoded in resp body.
+func (c *Client) DecodeFirmwareSummaryCollection(resp *http.Response) (FirmwareSummaryCollection, error) {
+	var decoded FirmwareSummaryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // Firmwares media type (default view)
 //
 // Identifier: application/vnd.app.firmwares+json; view=default
@@ -699,67 +856,6 @@ func (mt ClusterSummaryCollection) Validate() (err error) {
 // DecodeClusterSummaryCollection decodes the ClusterSummaryCollection instance encoded in resp body.
 func (c *Client) DecodeClusterSummaryCollection(resp *http.Response) (ClusterSummaryCollection, error) {
 	var decoded ClusterSummaryCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
-// FirmwareSummary media type (default view)
-//
-// Identifier: application/vnd.app.ifmrware+json; view=default
-type FirmwareSummary struct {
-	Etag    string    `form:"etag" json:"etag" xml:"etag"`
-	ID      int       `form:"id" json:"id" xml:"id"`
-	Module  string    `form:"module" json:"module" xml:"module"`
-	Profile string    `form:"profile" json:"profile" xml:"profile"`
-	Time    time.Time `form:"time" json:"time" xml:"time"`
-	URL     string    `form:"url" json:"url" xml:"url"`
-}
-
-// Validate validates the FirmwareSummary media type instance.
-func (mt *FirmwareSummary) Validate() (err error) {
-
-	if mt.Etag == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "etag"))
-	}
-	if mt.Module == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "module"))
-	}
-	if mt.Profile == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "profile"))
-	}
-	if mt.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
-	}
-	return
-}
-
-// DecodeFirmwareSummary decodes the FirmwareSummary instance encoded in resp body.
-func (c *Client) DecodeFirmwareSummary(resp *http.Response) (*FirmwareSummary, error) {
-	var decoded FirmwareSummary
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// FirmwareSummaryCollection is the media type for an array of FirmwareSummary (default view)
-//
-// Identifier: application/vnd.app.ifmrware+json; type=collection; view=default
-type FirmwareSummaryCollection []*FirmwareSummary
-
-// Validate validates the FirmwareSummaryCollection media type instance.
-func (mt FirmwareSummaryCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DecodeFirmwareSummaryCollection decodes the FirmwareSummaryCollection instance encoded in resp body.
-func (c *Client) DecodeFirmwareSummaryCollection(resp *http.Response) (FirmwareSummaryCollection, error) {
-	var decoded FirmwareSummaryCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }

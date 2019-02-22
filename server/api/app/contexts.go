@@ -430,6 +430,110 @@ func (ctx *ListBySourceQueryContext) BadRequest() error {
 	return nil
 }
 
+// ListAllStreamsContext provides the Streams list all action context.
+type ListAllStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	FileID *int
+	Page   *int
+}
+
+// NewListAllStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller list all action.
+func NewListAllStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListAllStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListAllStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramFileID := req.Params["file_id"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		if fileID, err2 := strconv.Atoi(rawFileID); err2 == nil {
+			tmp7 := fileID
+			tmp6 := &tmp7
+			rctx.FileID = tmp6
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("file_id", rawFileID, "integer"))
+		}
+	}
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp9 := page
+			tmp8 := &tmp9
+			rctx.Page = tmp8
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListAllStreamsContext) OK(r *DeviceStreams) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.streams+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// ListDeviceStreamsContext provides the Streams list device action context.
+type ListDeviceStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+	FileID   *int
+	Page     *int
+}
+
+// NewListDeviceStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller list device action.
+func NewListDeviceStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListDeviceStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramFileID := req.Params["file_id"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		if fileID, err2 := strconv.Atoi(rawFileID); err2 == nil {
+			tmp11 := fileID
+			tmp10 := &tmp11
+			rctx.FileID = tmp10
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("file_id", rawFileID, "integer"))
+		}
+	}
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp13 := page
+			tmp12 := &tmp13
+			rctx.Page = tmp12
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListDeviceStreamsContext) OK(r *DeviceStreams) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.streams+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // CheckTasksContext provides the Tasks check action context.
 type CheckTasksContext struct {
 	context.Context

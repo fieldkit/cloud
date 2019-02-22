@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -18,7 +16,6 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -215,38 +212,6 @@ func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
 	}
 }
 
-func getBucketAndKey(s3Url string) (bucket, key string, err error) {
-	u, err := url.Parse(s3Url)
-	if err != nil {
-		return "", "", err
-	}
-
-	parts := strings.Split(u.Host, ".")
-
-	return parts[0], u.Path[1:], nil
-}
-
-func signFirmwareURL(svc *s3.S3, f *data.Firmware) error {
-	bucket, key, err := getBucketAndKey(f.URL)
-	if err != nil {
-		return err
-	}
-
-	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-
-	signed, err := req.Presign(1 * time.Hour)
-	if err != nil {
-		return err
-	}
-
-	f.URL = signed
-
-	return nil
-}
-
 func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	firmwares := []*data.Firmware{}
 
@@ -258,10 +223,11 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	svc := s3.New(c.options.Session)
 
 	for _, f := range firmwares {
-		err := signFirmwareURL(svc, f)
+		signed, err := SignS3URL(svc, f.URL)
 		if err != nil {
 			return err
 		}
+		f.URL = signed
 	}
 
 	return ctx.OK(FirmwaresType(firmwares))
