@@ -3,6 +3,8 @@ package backend
 import (
 	"context"
 
+	pb "github.com/fieldkit/data-protocol"
+
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
@@ -24,6 +26,10 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 		Resolver:      ingestion.NewResolver(r),
 		RecordAdder:   ingestion.NewRecordAdder(r),
 	}
+}
+
+func (fms *FormattedMessageSaver) HandleRecord(ctx context.Context, r *pb.DataRecord) (error) {
+	return nil
 }
 
 func (fms *FormattedMessageSaver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {

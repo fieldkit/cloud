@@ -75,4 +75,37 @@ var _ = Resource("Streams", func() {
 			Media(DeviceStreams)
 		})
 	})
+
+	Action("binary", func() {
+		Routing(GET("streams/:streamId/binary"))
+		Description("Export stream")
+		Params(func() {
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+		})
+	})
+
+	Action("raw", func() {
+		Routing(GET("streams/:streamId/raw"))
+		Description("Export stream")
+		Params(func() {
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+		})
+	})
+
+	Action("csv", func() {
+		Routing(GET("streams/:streamId/csv"))
+		Description("Export stream")
+		Params(func() {
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+		})
+	})
 })

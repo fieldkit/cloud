@@ -15,6 +15,66 @@ import (
 	"strconv"
 )
 
+// BinaryStreamsPath computes a request path to the binary action of Streams.
+func BinaryStreamsPath(streamID string) string {
+	param0 := streamID
+
+	return fmt.Sprintf("/streams/%s/binary", param0)
+}
+
+// Export stream
+func (c *Client) BinaryStreams(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewBinaryStreamsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewBinaryStreamsRequest create the request corresponding to the binary action endpoint of the Streams resource.
+func (c *Client) NewBinaryStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// CsvStreamsPath computes a request path to the csv action of Streams.
+func CsvStreamsPath(streamID string) string {
+	param0 := streamID
+
+	return fmt.Sprintf("/streams/%s/csv", param0)
+}
+
+// Export stream
+func (c *Client) CsvStreams(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewCsvStreamsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewCsvStreamsRequest create the request corresponding to the csv action endpoint of the Streams resource.
+func (c *Client) NewCsvStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListAllStreamsPath computes a request path to the list all action of Streams.
 func ListAllStreamsPath() string {
 
@@ -39,12 +99,12 @@ func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, file
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp144 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp144)
+		tmp147 := strconv.Itoa(*fileID)
+		values.Set("file_id", tmp147)
 	}
 	if page != nil {
-		tmp145 := strconv.Itoa(*page)
-		values.Set("page", tmp145)
+		tmp148 := strconv.Itoa(*page)
+		values.Set("page", tmp148)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -79,14 +139,44 @@ func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, f
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp146 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp146)
+		tmp149 := strconv.Itoa(*fileID)
+		values.Set("file_id", tmp149)
 	}
 	if page != nil {
-		tmp147 := strconv.Itoa(*page)
-		values.Set("page", tmp147)
+		tmp150 := strconv.Itoa(*page)
+		values.Set("page", tmp150)
 	}
 	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// RawStreamsPath computes a request path to the raw action of Streams.
+func RawStreamsPath(streamID string) string {
+	param0 := streamID
+
+	return fmt.Sprintf("/streams/%s/raw", param0)
+}
+
+// Export stream
+func (c *Client) RawStreams(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRawStreamsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRawStreamsRequest create the request corresponding to the raw action endpoint of the Streams resource.
+func (c *Client) NewRawStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

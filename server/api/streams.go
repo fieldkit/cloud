@@ -1,25 +1,23 @@
 package api
 
 import (
-	_ "encoding/json"
-	_ "fmt"
-	_ "io"
-	_ "net/http"
-	_ "net/url"
-	_ "strconv"
-	_ "strings"
-	_ "time"
+	"context"
+	"io"
+	"net/http"
 
 	"github.com/goadesign/goa"
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+
+	pb "github.com/fieldkit/data-protocol"
+
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/data"
-
-	 "github.com/aws/aws-sdk-go/aws/session"
-	 "github.com/aws/aws-sdk-go/service/s3"
 )
 
 type StreamsControllerOptions struct {
@@ -42,15 +40,15 @@ func NewStreamsController(service *goa.Service, options StreamsControllerOptions
 
 func DeviceStreamSummaryType(s *data.DeviceStream) *app.DeviceStream {
 	return &app.DeviceStream{
-		DeviceID : s.DeviceID,
-		FileID   : s.FileID,
-		Firmware : s.Firmware,
-		ID       : int(s.ID),
-		Meta     : s.Meta.String(),
-		Size     : int(s.Size),
-		StreamID : s.StreamID,
-		Time     : s.Time,
-		URL      : s.URL,
+		DeviceID: s.DeviceID,
+		FileID:   s.FileID,
+		Firmware: s.Firmware,
+		ID:       int(s.ID),
+		Meta:     s.Meta.String(),
+		Size:     int(s.Size),
+		StreamID: s.StreamID,
+		Time:     s.Time,
+		URL:      s.URL,
 	}
 }
 
@@ -73,7 +71,7 @@ func (c *StreamsController) ListAll(ctx *app.ListAllStreamsContext) error {
 
 	streams := []*data.DeviceStream{}
 	if err := c.options.Database.SelectContext(ctx, &streams,
-		`SELECT s.* FROM fieldkit.device_stream AS s ORDER BY time DESC LIMIT $1 OFFSET $2`, pageSize, offset); err != nil {
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) ORDER BY time DESC LIMIT $2 OFFSET $3`, ctx.FileID, pageSize, offset); err != nil {
 		return err
 	}
 
@@ -103,9 +101,171 @@ func (c *StreamsController) ListDevice(ctx *app.ListDeviceStreamsContext) error 
 
 	streams := []*data.DeviceStream{}
 	if err := c.options.Database.SelectContext(ctx, &streams,
-		`SELECT s.* FROM fieldkit.device_stream AS s WHERE s.device_id = $1 ORDER BY time DESC LIMIT $2 OFFSET $3`, ctx.DeviceID, pageSize, offset); err != nil {
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.FileID, ctx.DeviceID, ctx.FileID, pageSize, offset); err != nil {
 		return err
 	}
 
 	return ctx.OK(DeviceStreamsType(streams))
+}
+
+type Streamer struct {
+	Stream    *data.DeviceStream
+	SignedURL string
+}
+
+func (c *StreamsController) lookupDeviceStream(ctx context.Context, streamID string) (*Streamer, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Stream", "stream_id", streamID)
+
+	streams := []*data.DeviceStream{}
+	if err := c.options.Database.SelectContext(ctx, &streams,
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE s.id = $1`, streamID); err != nil {
+		return nil, err
+	}
+
+	if len(streams) != 1 {
+		return nil, nil
+	}
+
+	stream := streams[0]
+
+	svc := s3.New(c.options.Session)
+
+	signed, err := SignS3URL(svc, stream.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	streamer := &Streamer{
+		Stream:    stream,
+		SignedURL: signed,
+	}
+
+	return streamer, nil
+}
+
+func (c *StreamsController) Binary(ctx *app.BinaryStreamsContext) error {
+	log := Logger(ctx).Sugar()
+
+	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
+	if err != nil {
+		return err
+	}
+	if streamer == nil {
+		return ctx.NotFound()
+	}
+
+	resp, err := http.Get(streamer.SignedURL)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return ctx.NotFound()
+	}
+
+	ctx.ResponseData.WriteHeader(http.StatusOK)
+
+	n, err := io.Copy(ctx.ResponseData, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Stream sent", "bytes", n, "size", streamer.Stream.Size)
+
+	return nil
+}
+
+func (c *StreamsController) Raw(ctx *app.RawStreamsContext) error {
+	log := Logger(ctx).Sugar()
+
+	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
+	if err != nil {
+		return err
+	}
+	if streamer == nil {
+		return ctx.NotFound()
+	}
+
+	resp, err := http.Get(streamer.SignedURL)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return ctx.NotFound()
+	}
+
+	ctx.ResponseData.WriteHeader(http.StatusOK)
+
+	n, err := io.Copy(ctx.ResponseData, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Stream sent", "bytes", n, "size", streamer.Stream.Size)
+
+	return nil
+}
+
+type TempReceiver struct {
+}
+
+func (tr *TempReceiver) HandleRecord(ctx context.Context, r *pb.DataRecord) (error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Record", "record", r)
+
+	return nil
+}
+
+func (tr *TempReceiver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {
+	return nil, nil
+}
+
+func (c *StreamsController) Csv(ctx *app.CsvStreamsContext) error {
+	log := Logger(ctx).Sugar()
+
+	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
+	if err != nil {
+		return err
+	}
+	if streamer == nil {
+		return ctx.NotFound()
+	}
+
+	resp, err := http.Get(streamer.SignedURL)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	receiver := &TempReceiver{}
+	binaryReader := backend.NewFkBinaryReader(receiver)
+
+	err = binaryReader.Read(ctx, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return ctx.NotFound()
+	}
+
+	ctx.ResponseData.WriteHeader(http.StatusOK)
+
+	n, err := io.Copy(ctx.ResponseData, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Stream sent", "bytes", n, "size", streamer.Stream.Size)
+
+	return nil
 }

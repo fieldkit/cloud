@@ -23,6 +23,7 @@ import (
 )
 
 type FormattedMessageReceiver interface {
+	HandleRecord(ctx context.Context, r *pb.DataRecord) (error)
 	HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error)
 }
 
@@ -62,6 +63,11 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		if err != nil {
 			// We keep reading, this may just be a protocol version issue.
 			return nil, errors.Structured(err)
+		}
+
+		err = br.Receiver.HandleRecord(ctx, &record)
+		if err != nil {
+			return nil, err
 		}
 
 		change, err := br.Push(ctx, &record)

@@ -1287,9 +1287,9 @@ definitions:
       series:
       - name: Quisquam voluptatem doloribus.
         rows:
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -1336,20 +1336,20 @@ definitions:
     example:
       name: Quisquam voluptatem doloribus.
       rows:
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
     properties:
       name:
         example: Quisquam voluptatem doloribus.
         type: string
       rows:
         example:
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
-        - cbd12db3-8506-447c-bd58-196f97aa21fe
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
         items:
-          example: cbd12db3-8506-447c-bd58-196f97aa21fe
+          example: a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
         type: array
     required:
     - name
@@ -1362,14 +1362,14 @@ definitions:
     example:
     - name: Quisquam voluptatem doloribus.
       rows:
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
     - name: Quisquam voluptatem doloribus.
       rows:
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
-      - cbd12db3-8506-447c-bd58-196f97aa21fe
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -3947,6 +3947,69 @@ paths:
       summary: get id twitter
       tags:
       - twitter
+  /streams/{streamId}/binary:
+    get:
+      description: Export stream
+      operationId: Streams#binary
+      parameters:
+      - in: path
+        name: streamId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: binary Streams
+      tags:
+      - Streams
+  /streams/{streamId}/csv:
+    get:
+      description: Export stream
+      operationId: Streams#csv
+      parameters:
+      - in: path
+        name: streamId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: csv Streams
+      tags:
+      - Streams
+  /streams/{streamId}/raw:
+    get:
+      description: Export stream
+      operationId: Streams#raw
+      parameters:
+      - in: path
+        name: streamId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: raw Streams
+      tags:
+      - Streams
   /swagger.json:
     get:
       operationId: swagger#/swagger.json

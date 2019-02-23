@@ -1,9 +1,9 @@
 package api
 
 import (
-	"time"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -36,5 +36,5 @@ func SignS3URL(svc *s3.S3, url string) (signed string, err error) {
 		return "", err
 	}
 
-	return 
+	return
 }
