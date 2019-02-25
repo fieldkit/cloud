@@ -251,6 +251,18 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -901,24 +913,6 @@ definitions:
       properties:
         Aut repellendus quam soluta.: 6.5464983e+18
       type: Ut repellendus ratione voluptatum.
-    - geometry:
-        coordinates:
-        - 0.18238065
-        - 0.18238065
-        - 0.18238065
-        type: Asperiores nostrum.
-      properties:
-        Aut repellendus quam soluta.: 6.5464983e+18
-      type: Ut repellendus ratione voluptatum.
-    - geometry:
-        coordinates:
-        - 0.18238065
-        - 0.18238065
-        - 0.18238065
-        type: Asperiores nostrum.
-      properties:
-        Aut repellendus quam soluta.: 6.5464983e+18
-      type: Ut repellendus ratione voluptatum.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -1287,9 +1281,9 @@ definitions:
       series:
       - name: Quisquam voluptatem doloribus.
         rows:
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -1336,20 +1330,20 @@ definitions:
     example:
       name: Quisquam voluptatem doloribus.
       rows:
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
     properties:
       name:
         example: Quisquam voluptatem doloribus.
         type: string
       rows:
         example:
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-        - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
         items:
-          example: a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+          example: 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
         type: array
     required:
     - name
@@ -1362,14 +1356,14 @@ definitions:
     example:
     - name: Quisquam voluptatem doloribus.
       rows:
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
     - name: Quisquam voluptatem doloribus.
       rows:
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
-      - a69a9bd0-adfb-4ca7-af5c-59daf5bc48ca
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -3947,27 +3941,6 @@ paths:
       summary: get id twitter
       tags:
       - twitter
-  /streams/{streamId}/binary:
-    get:
-      description: Export stream
-      operationId: Streams#binary
-      parameters:
-      - in: path
-        name: streamId
-        required: true
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: binary Streams
-      tags:
-      - Streams
   /streams/{streamId}/csv:
     get:
       description: Export stream

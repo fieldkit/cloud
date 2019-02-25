@@ -2,8 +2,12 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
+	"reflect"
+	"sort"
+	"strings"
 
 	"github.com/goadesign/goa"
 
@@ -101,7 +105,7 @@ func (c *StreamsController) ListDevice(ctx *app.ListDeviceStreamsContext) error 
 
 	streams := []*data.DeviceStream{}
 	if err := c.options.Database.SelectContext(ctx, &streams,
-		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.FileID, ctx.DeviceID, ctx.FileID, pageSize, offset); err != nil {
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.FileID, ctx.DeviceID, pageSize, offset); err != nil {
 		return err
 	}
 
@@ -113,7 +117,7 @@ type Streamer struct {
 	SignedURL string
 }
 
-func (c *StreamsController) lookupDeviceStream(ctx context.Context, streamID string) (*Streamer, error) {
+func (c *StreamsController) LookupDeviceStream(ctx context.Context, streamID string) (*Streamer, error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("Stream", "stream_id", streamID)
@@ -145,44 +149,10 @@ func (c *StreamsController) lookupDeviceStream(ctx context.Context, streamID str
 	return streamer, nil
 }
 
-func (c *StreamsController) Binary(ctx *app.BinaryStreamsContext) error {
-	log := Logger(ctx).Sugar()
-
-	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
-	if err != nil {
-		return err
-	}
-	if streamer == nil {
-		return ctx.NotFound()
-	}
-
-	resp, err := http.Get(streamer.SignedURL)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return ctx.NotFound()
-	}
-
-	ctx.ResponseData.WriteHeader(http.StatusOK)
-
-	n, err := io.Copy(ctx.ResponseData, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("Stream sent", "bytes", n, "size", streamer.Stream.Size)
-
-	return nil
-}
-
 func (c *StreamsController) Raw(ctx *app.RawStreamsContext) error {
 	log := Logger(ctx).Sugar()
 
-	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
+	streamer, err := c.LookupDeviceStream(ctx, ctx.StreamID)
 	if err != nil {
 		return err
 	}
@@ -213,31 +183,89 @@ func (c *StreamsController) Raw(ctx *app.RawStreamsContext) error {
 	return nil
 }
 
-type TempReceiver struct {
+type SimpleCsvExporter struct {
+	Stream        *data.DeviceStream
+	Writer        io.Writer
+	HeaderWritten bool
 }
 
-func (tr *TempReceiver) HandleRecord(ctx context.Context, r *pb.DataRecord) (error) {
-	log := Logger(ctx).Sugar()
+func NewSimpleCsvExporter(stream *data.DeviceStream, writer io.Writer) backend.FormattedMessageReceiver {
+	return &SimpleCsvExporter{Stream: stream, Writer: writer}
+}
 
-	log.Infow("Record", "record", r)
+func (ce *SimpleCsvExporter) HandleRecord(ctx context.Context, r *pb.DataRecord) error {
+	if r.Log != nil {
+		return ce.ExportLog(ctx, r)
+	}
 
 	return nil
 }
 
-func (tr *TempReceiver) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {
+func (ce *SimpleCsvExporter) ExportLog(ctx context.Context, r *pb.DataRecord) error {
+	if !ce.HeaderWritten {
+		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", "DeviceID", "StreamID", "StreamID", "Uptime", "Time", "Level", "Facility", "Message")
+		ce.HeaderWritten = true
+	}
+
+	fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", ce.Stream.DeviceID, ce.Stream.StreamID, ce.Stream.ID, r.Log.Uptime, r.Log.Time, r.Log.Level, r.Log.Facility, strings.TrimSpace(r.Log.Message))
+
+	return nil
+}
+
+func (ce *SimpleCsvExporter) HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error) {
+	opaqueKeys := reflect.ValueOf(fm.MapValues).MapKeys()
+	keys := make([]string, len(opaqueKeys))
+	for i := 0; i < len(opaqueKeys); i++ {
+		keys[i] = opaqueKeys[i].String()
+	}
+	sort.Strings(keys)
+
+	if !ce.HeaderWritten {
+		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v,", "Device", "Stream", "Stream", "Message", "Time", "Longitude", "Latitude", "Fixed")
+
+		for _, key := range keys {
+			fmt.Fprintf(ce.Writer, ",%v", key)
+		}
+
+		fmt.Fprintf(ce.Writer, "\n")
+
+		ce.HeaderWritten = true
+	}
+
+	fmt.Fprintf(ce.Writer, "%v,%v,%v,", ce.Stream.DeviceID, ce.Stream.StreamID, ce.Stream.ID)
+
+	fmt.Fprintf(ce.Writer, "%v,%v,", fm.MessageId, fm.Time)
+
+	if fm.Location != nil && len(fm.Location) >= 2 {
+		fmt.Fprintf(ce.Writer, "%v,%v", fm.Location[0], fm.Location[1])
+	} else {
+		fmt.Fprintf(ce.Writer, "%v,%v", 0.0, 0.0)
+	}
+
+	fmt.Fprintf(ce.Writer, ",%v", fm.Fixed)
+
+	for _, key := range keys {
+		fmt.Fprintf(ce.Writer, ",%v", fm.MapValues[key])
+	}
+
+	fmt.Fprintf(ce.Writer, "\n")
+
 	return nil, nil
 }
 
 func (c *StreamsController) Csv(ctx *app.CsvStreamsContext) error {
 	log := Logger(ctx).Sugar()
 
-	streamer, err := c.lookupDeviceStream(ctx, ctx.StreamID)
+	streamer, err := c.LookupDeviceStream(ctx, ctx.StreamID)
 	if err != nil {
 		return err
 	}
+
 	if streamer == nil {
 		return ctx.NotFound()
 	}
+
+	log.Infow("Exporting stream", "file_id", streamer.Stream.FileID)
 
 	resp, err := http.Get(streamer.SignedURL)
 	if err != nil {
@@ -246,26 +274,22 @@ func (c *StreamsController) Csv(ctx *app.CsvStreamsContext) error {
 
 	defer resp.Body.Close()
 
-	receiver := &TempReceiver{}
-	binaryReader := backend.NewFkBinaryReader(receiver)
+	if resp.StatusCode != 200 {
+		return ctx.NotFound()
+	}
+
+	exporter := NewSimpleCsvExporter(streamer.Stream, ctx.ResponseData)
+
+	binaryReader := backend.NewFkBinaryReader(exporter)
+
+	ctx.ResponseData.WriteHeader(http.StatusOK)
 
 	err = binaryReader.Read(ctx, resp.Body)
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		return ctx.NotFound()
-	}
-
-	ctx.ResponseData.WriteHeader(http.StatusOK)
-
-	n, err := io.Copy(ctx.ResponseData, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("Stream sent", "bytes", n, "size", streamer.Stream.Size)
+	log.Infow("Stream sent", "size", streamer.Stream.Size)
 
 	return nil
 }

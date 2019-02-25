@@ -76,17 +76,6 @@ var _ = Resource("Streams", func() {
 		})
 	})
 
-	Action("binary", func() {
-		Routing(GET("streams/:streamId/binary"))
-		Description("Export stream")
-		Params(func() {
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
 	Action("raw", func() {
 		Routing(GET("streams/:streamId/raw"))
 		Description("Export stream")

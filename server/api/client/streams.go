@@ -15,36 +15,6 @@ import (
 	"strconv"
 )
 
-// BinaryStreamsPath computes a request path to the binary action of Streams.
-func BinaryStreamsPath(streamID string) string {
-	param0 := streamID
-
-	return fmt.Sprintf("/streams/%s/binary", param0)
-}
-
-// Export stream
-func (c *Client) BinaryStreams(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewBinaryStreamsRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewBinaryStreamsRequest create the request corresponding to the binary action endpoint of the Streams resource.
-func (c *Client) NewBinaryStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
 // CsvStreamsPath computes a request path to the csv action of Streams.
 func CsvStreamsPath(streamID string) string {
 	param0 := streamID
@@ -99,12 +69,12 @@ func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, file
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp147 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp147)
+		tmp146 := strconv.Itoa(*fileID)
+		values.Set("file_id", tmp146)
 	}
 	if page != nil {
-		tmp148 := strconv.Itoa(*page)
-		values.Set("page", tmp148)
+		tmp147 := strconv.Itoa(*page)
+		values.Set("page", tmp147)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -139,12 +109,12 @@ func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, f
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp149 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp149)
+		tmp148 := strconv.Itoa(*fileID)
+		values.Set("file_id", tmp148)
 	}
 	if page != nil {
-		tmp150 := strconv.Itoa(*page)
-		values.Set("page", tmp150)
+		tmp149 := strconv.Itoa(*page)
+		values.Set("page", tmp149)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

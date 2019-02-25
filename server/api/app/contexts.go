@@ -430,45 +430,6 @@ func (ctx *ListBySourceQueryContext) BadRequest() error {
 	return nil
 }
 
-// BinaryStreamsContext provides the Streams binary action context.
-type BinaryStreamsContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	StreamID string
-}
-
-// NewBinaryStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller binary action.
-func NewBinaryStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*BinaryStreamsContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := BinaryStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramStreamID := req.Params["streamId"]
-	if len(paramStreamID) > 0 {
-		rawStreamID := paramStreamID[0]
-		rctx.StreamID = rawStreamID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *BinaryStreamsContext) OK(resp []byte) error {
-	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *BinaryStreamsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
 // CsvStreamsContext provides the Streams csv action context.
 type CsvStreamsContext struct {
 	context.Context
