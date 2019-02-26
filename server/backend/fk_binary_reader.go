@@ -23,8 +23,9 @@ import (
 )
 
 type FormattedMessageReceiver interface {
-	HandleRecord(ctx context.Context, r *pb.DataRecord) (error)
+	HandleRecord(ctx context.Context, r *pb.DataRecord) error
 	HandleFormattedMessage(ctx context.Context, fm *ingestion.FormattedMessage) (*ingestion.RecordChange, error)
+	Finish(ctx context.Context) error
 }
 
 type FkBinaryReader struct {

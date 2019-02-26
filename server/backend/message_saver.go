@@ -28,7 +28,7 @@ func NewFormattedMessageSaver(b *Backend) *FormattedMessageSaver {
 	}
 }
 
-func (fms *FormattedMessageSaver) HandleRecord(ctx context.Context, r *pb.DataRecord) (error) {
+func (fms *FormattedMessageSaver) HandleRecord(ctx context.Context, r *pb.DataRecord) error {
 	return nil
 }
 
@@ -68,4 +68,8 @@ func (fms *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges
 	for id, _ := range sources {
 		sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(id))
 	}
+}
+
+func (fms *FormattedMessageSaver) Finish(ctx context.Context) error {
+	return nil
 }
