@@ -45,6 +45,106 @@ func (c *Client) NewCsvStreamsRequest(ctx context.Context, path string) (*http.R
 	return req, nil
 }
 
+// DeviceCsvStreamsPath computes a request path to the device csv action of Streams.
+func DeviceCsvStreamsPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/devices/%s/streams/csv", param0)
+}
+
+// Export device streams
+func (c *Client) DeviceCsvStreams(ctx context.Context, path string, fileID *string) (*http.Response, error) {
+	req, err := c.NewDeviceCsvStreamsRequest(ctx, path, fileID)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeviceCsvStreamsRequest create the request corresponding to the device csv action endpoint of the Streams resource.
+func (c *Client) NewDeviceCsvStreamsRequest(ctx context.Context, path string, fileID *string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if fileID != nil {
+		values.Set("file_id", *fileID)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// DeviceRawStreamsPath computes a request path to the device raw action of Streams.
+func DeviceRawStreamsPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/devices/%s/streams/raw", param0)
+}
+
+// Export device streams
+func (c *Client) DeviceRawStreams(ctx context.Context, path string, fileID *string) (*http.Response, error) {
+	req, err := c.NewDeviceRawStreamsRequest(ctx, path, fileID)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeviceRawStreamsRequest create the request corresponding to the device raw action endpoint of the Streams resource.
+func (c *Client) NewDeviceRawStreamsRequest(ctx context.Context, path string, fileID *string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if fileID != nil {
+		values.Set("file_id", *fileID)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// JSONStreamsPath computes a request path to the json action of Streams.
+func JSONStreamsPath(streamID string) string {
+	param0 := streamID
+
+	return fmt.Sprintf("/streams/%s/json", param0)
+}
+
+// Export stream
+func (c *Client) JSONStreams(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewJSONStreamsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewJSONStreamsRequest create the request corresponding to the json action endpoint of the Streams resource.
+func (c *Client) NewJSONStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListAllStreamsPath computes a request path to the list all action of Streams.
 func ListAllStreamsPath() string {
 
@@ -52,7 +152,7 @@ func ListAllStreamsPath() string {
 }
 
 // List streams
-func (c *Client) ListAllStreams(ctx context.Context, path string, fileID *int, page *int) (*http.Response, error) {
+func (c *Client) ListAllStreams(ctx context.Context, path string, fileID *string, page *int) (*http.Response, error) {
 	req, err := c.NewListAllStreamsRequest(ctx, path, fileID, page)
 	if err != nil {
 		return nil, err
@@ -61,7 +161,7 @@ func (c *Client) ListAllStreams(ctx context.Context, path string, fileID *int, p
 }
 
 // NewListAllStreamsRequest create the request corresponding to the list all action endpoint of the Streams resource.
-func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, fileID *int, page *int) (*http.Request, error) {
+func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, fileID *string, page *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -69,12 +169,11 @@ func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, file
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp146 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp146)
+		values.Set("file_id", *fileID)
 	}
 	if page != nil {
-		tmp147 := strconv.Itoa(*page)
-		values.Set("page", tmp147)
+		tmp145 := strconv.Itoa(*page)
+		values.Set("page", tmp145)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -92,7 +191,7 @@ func ListDeviceStreamsPath(deviceID string) string {
 }
 
 // List device streams
-func (c *Client) ListDeviceStreams(ctx context.Context, path string, fileID *int, page *int) (*http.Response, error) {
+func (c *Client) ListDeviceStreams(ctx context.Context, path string, fileID *string, page *int) (*http.Response, error) {
 	req, err := c.NewListDeviceStreamsRequest(ctx, path, fileID, page)
 	if err != nil {
 		return nil, err
@@ -101,7 +200,7 @@ func (c *Client) ListDeviceStreams(ctx context.Context, path string, fileID *int
 }
 
 // NewListDeviceStreamsRequest create the request corresponding to the list device action endpoint of the Streams resource.
-func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, fileID *int, page *int) (*http.Request, error) {
+func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, fileID *string, page *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -109,12 +208,11 @@ func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, f
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if fileID != nil {
-		tmp148 := strconv.Itoa(*fileID)
-		values.Set("file_id", tmp148)
+		values.Set("file_id", *fileID)
 	}
 	if page != nil {
-		tmp149 := strconv.Itoa(*page)
-		values.Set("page", tmp149)
+		tmp146 := strconv.Itoa(*page)
+		values.Set("page", tmp146)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

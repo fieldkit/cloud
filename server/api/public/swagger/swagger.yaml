@@ -370,38 +370,6 @@ definitions:
       radius: 0.46260285
       sourceId: 6.118231e+17
       startTime: 1990-04-10T08:14:24Z
-    - centroid:
-      - 0.90146583
-      - 0.90146583
-      endTime: 2008-06-16T18:57:48Z
-      envelope:
-      - - 0.60454303
-        - 0.60454303
-      - - 0.60454303
-        - 0.60454303
-      - - 0.60454303
-        - 0.60454303
-      id: 1.5765196e+18
-      numberOfFeatures: 5.0119533e+18
-      radius: 0.46260285
-      sourceId: 6.118231e+17
-      startTime: 1990-04-10T08:14:24Z
-    - centroid:
-      - 0.90146583
-      - 0.90146583
-      endTime: 2008-06-16T18:57:48Z
-      envelope:
-      - - 0.60454303
-        - 0.60454303
-      - - 0.60454303
-        - 0.60454303
-      - - 0.60454303
-        - 0.60454303
-      id: 1.5765196e+18
-      numberOfFeatures: 5.0119533e+18
-      radius: 0.46260285
-      sourceId: 6.118231e+17
-      startTime: 1990-04-10T08:14:24Z
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -913,6 +881,24 @@ definitions:
       properties:
         Aut repellendus quam soluta.: 6.5464983e+18
       type: Ut repellendus ratione voluptatum.
+    - geometry:
+        coordinates:
+        - 0.18238065
+        - 0.18238065
+        - 0.18238065
+        type: Asperiores nostrum.
+      properties:
+        Aut repellendus quam soluta.: 6.5464983e+18
+      type: Ut repellendus ratione voluptatum.
+    - geometry:
+        coordinates:
+        - 0.18238065
+        - 0.18238065
+        - 0.18238065
+        type: Asperiores nostrum.
+      properties:
+        Aut repellendus quam soluta.: 6.5464983e+18
+      type: Ut repellendus ratione voluptatum.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -1281,9 +1267,9 @@ definitions:
       series:
       - name: Quisquam voluptatem doloribus.
         rows:
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -1330,20 +1316,20 @@ definitions:
     example:
       name: Quisquam voluptatem doloribus.
       rows:
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
     properties:
       name:
         example: Quisquam voluptatem doloribus.
         type: string
       rows:
         example:
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-        - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
+        - 9d3d31f0-683b-4272-88ec-46999b474f80
         items:
-          example: 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+          example: 9d3d31f0-683b-4272-88ec-46999b474f80
         type: array
     required:
     - name
@@ -1356,14 +1342,14 @@ definitions:
     example:
     - name: Quisquam voluptatem doloribus.
       rows:
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
     - name: Quisquam voluptatem doloribus.
       rows:
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
-      - 5c5fba20-a24c-4b29-9803-00e4be8ec4d6
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
+      - 9d3d31f0-683b-4272-88ec-46999b474f80
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -2178,7 +2164,7 @@ paths:
       - in: query
         name: file_id
         required: false
-        type: integer
+        type: string
       - in: query
         name: page
         required: false
@@ -2193,6 +2179,56 @@ paths:
       schemes:
       - https
       summary: list device Streams
+      tags:
+      - Streams
+  /devices/{deviceId}/streams/csv:
+    get:
+      description: Export device streams
+      operationId: Streams#device csv
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      - in: query
+        name: file_id
+        required: false
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: device csv Streams
+      tags:
+      - Streams
+  /devices/{deviceId}/streams/raw:
+    get:
+      description: Export device streams
+      operationId: Streams#device raw
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      - in: query
+        name: file_id
+        required: false
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: device raw Streams
       tags:
       - Streams
   /devices/firmware:
@@ -2227,7 +2263,7 @@ paths:
       - in: query
         name: file_id
         required: false
-        type: integer
+        type: string
       - in: query
         name: page
         required: false
@@ -3960,6 +3996,27 @@ paths:
       schemes:
       - https
       summary: csv Streams
+      tags:
+      - Streams
+  /streams/{streamId}/json:
+    get:
+      description: Export stream
+      operationId: Streams#json
+      parameters:
+      - in: path
+        name: streamId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: json Streams
       tags:
       - Streams
   /streams/{streamId}/raw:

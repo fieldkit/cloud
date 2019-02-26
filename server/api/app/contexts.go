@@ -469,12 +469,141 @@ func (ctx *CsvStreamsContext) NotFound() error {
 	return nil
 }
 
+// DeviceCsvStreamsContext provides the Streams device csv action context.
+type DeviceCsvStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+	FileID   *string
+}
+
+// NewDeviceCsvStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller device csv action.
+func NewDeviceCsvStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceCsvStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeviceCsvStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramFileID := req.Params["file_id"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		rctx.FileID = &rawFileID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeviceCsvStreamsContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeviceCsvStreamsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// DeviceRawStreamsContext provides the Streams device raw action context.
+type DeviceRawStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+	FileID   *string
+}
+
+// NewDeviceRawStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller device raw action.
+func NewDeviceRawStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceRawStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeviceRawStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramFileID := req.Params["file_id"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		rctx.FileID = &rawFileID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeviceRawStreamsContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeviceRawStreamsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// JSONStreamsContext provides the Streams json action context.
+type JSONStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StreamID string
+}
+
+// NewJSONStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller json action.
+func NewJSONStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*JSONStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := JSONStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStreamID := req.Params["streamId"]
+	if len(paramStreamID) > 0 {
+		rawStreamID := paramStreamID[0]
+		rctx.StreamID = rawStreamID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *JSONStreamsContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *JSONStreamsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // ListAllStreamsContext provides the Streams list all action context.
 type ListAllStreamsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	FileID *int
+	FileID *string
 	Page   *int
 }
 
@@ -490,21 +619,15 @@ func NewListAllStreamsContext(ctx context.Context, r *http.Request, service *goa
 	paramFileID := req.Params["file_id"]
 	if len(paramFileID) > 0 {
 		rawFileID := paramFileID[0]
-		if fileID, err2 := strconv.Atoi(rawFileID); err2 == nil {
-			tmp7 := fileID
-			tmp6 := &tmp7
-			rctx.FileID = tmp6
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("file_id", rawFileID, "integer"))
-		}
+		rctx.FileID = &rawFileID
 	}
 	paramPage := req.Params["page"]
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp9 := page
-			tmp8 := &tmp9
-			rctx.Page = tmp8
+			tmp7 := page
+			tmp6 := &tmp7
+			rctx.Page = tmp6
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -524,7 +647,7 @@ type ListDeviceStreamsContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	DeviceID string
-	FileID   *int
+	FileID   *string
 	Page     *int
 }
 
@@ -545,21 +668,15 @@ func NewListDeviceStreamsContext(ctx context.Context, r *http.Request, service *
 	paramFileID := req.Params["file_id"]
 	if len(paramFileID) > 0 {
 		rawFileID := paramFileID[0]
-		if fileID, err2 := strconv.Atoi(rawFileID); err2 == nil {
-			tmp11 := fileID
-			tmp10 := &tmp11
-			rctx.FileID = tmp10
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("file_id", rawFileID, "integer"))
-		}
+		rctx.FileID = &rawFileID
 	}
 	paramPage := req.Params["page"]
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp13 := page
-			tmp12 := &tmp13
-			rctx.Page = tmp12
+			tmp9 := page
+			tmp8 := &tmp9
+			rctx.Page = tmp8
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
