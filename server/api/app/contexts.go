@@ -690,6 +690,37 @@ func (ctx *ListDeviceStreamsContext) OK(r *DeviceStreams) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// ListDevicesStreamsContext provides the Streams list devices action context.
+type ListDevicesStreamsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewListDevicesStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller list devices action.
+func NewListDevicesStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDevicesStreamsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListDevicesStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListDevicesStreamsContext) OK(r *Devices) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.devices+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ListDevicesStreamsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // RawStreamsContext provides the Streams raw action context.
 type RawStreamsContext struct {
 	context.Context

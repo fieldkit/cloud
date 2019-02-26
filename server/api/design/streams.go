@@ -51,6 +51,37 @@ var DeviceStreams = MediaType("application/vnd.app.device.streams+json", func() 
 	})
 })
 
+var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
+	TypeName("Device")
+	Attributes(func() {
+		Attribute("device_id", String)
+		Attribute("number_of_streams", Integer)
+		Attribute("last_stream_time", DateTime)
+		Attribute("last_stream_id", String)
+		Required("device_id")
+		Required("number_of_streams")
+		Required("last_stream_time")
+		Required("last_stream_id")
+	})
+	View("default", func() {
+		Attribute("device_id")
+		Attribute("number_of_streams")
+		Attribute("last_stream_time")
+		Attribute("last_stream_id")
+	})
+})
+
+var Devices = MediaType("application/vnd.app.devices+json", func() {
+	TypeName("Devices")
+	Attributes(func() {
+		Attribute("devices", CollectionOf(DeviceSummary))
+		Required("devices")
+	})
+	View("default", func() {
+		Attribute("devices")
+	})
+})
+
 var _ = Resource("Streams", func() {
 	Action("list device", func() {
 		Routing(GET("devices/:deviceId/streams"))
@@ -61,6 +92,15 @@ var _ = Resource("Streams", func() {
 		})
 		Response(OK, func() {
 			Media(DeviceStreams)
+		})
+	})
+
+	Action("list devices", func() {
+		Routing(GET("streams/devices"))
+		Description("List devices")
+		Response(NotFound)
+		Response(OK, func() {
+			Media(Devices)
 		})
 	})
 

@@ -172,8 +172,8 @@ func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, file
 		values.Set("file_id", *fileID)
 	}
 	if page != nil {
-		tmp145 := strconv.Itoa(*page)
-		values.Set("page", tmp145)
+		tmp146 := strconv.Itoa(*page)
+		values.Set("page", tmp146)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -211,10 +211,39 @@ func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, f
 		values.Set("file_id", *fileID)
 	}
 	if page != nil {
-		tmp146 := strconv.Itoa(*page)
-		values.Set("page", tmp146)
+		tmp147 := strconv.Itoa(*page)
+		values.Set("page", tmp147)
 	}
 	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// ListDevicesStreamsPath computes a request path to the list devices action of Streams.
+func ListDevicesStreamsPath() string {
+
+	return fmt.Sprintf("/streams/devices")
+}
+
+// List devices
+func (c *Client) ListDevicesStreams(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListDevicesStreamsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListDevicesStreamsRequest create the request corresponding to the list devices action endpoint of the Streams resource.
+func (c *Client) NewListDevicesStreamsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

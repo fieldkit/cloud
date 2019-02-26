@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/goadesign/goa"
 
@@ -111,6 +112,47 @@ func (c *StreamsController) ListDevice(ctx *app.ListDeviceStreamsContext) error 
 	}
 
 	return ctx.OK(DeviceStreamsType(streams))
+}
+
+type Device struct {
+	DeviceID        string    `db:"device_id"`
+	LastStreamID    string    `db:"last_stream_id"`
+	LastStreamTime  time.Time `db:"last_stream_time"`
+	NumberOfStreams int       `db:"number_of_streams"`
+}
+
+func DeviceSummaryType(s *Device) *app.Device {
+	return &app.Device{
+		DeviceID:        s.DeviceID,
+		LastStreamID:    s.LastStreamID,
+		LastStreamTime:  s.LastStreamTime,
+		NumberOfStreams: s.NumberOfStreams,
+	}
+}
+
+func DevicesType(devices []*Device) *app.Devices {
+	summaries := make([]*app.Device, len(devices))
+	for i, summary := range devices {
+		summaries[i] = DeviceSummaryType(summary)
+	}
+	return &app.Devices{
+		Devices: summaries,
+	}
+}
+
+func (c *StreamsController) ListDevices(ctx *app.ListDevicesStreamsContext) error {
+	devices := []*Device{}
+	if err := c.options.Database.SelectContext(ctx, &devices,
+		`SELECT s.device_id,
+		    (SELECT stream_id FROM fieldkit.device_stream AS s2 ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
+		    MAX(s.time) AS last_stream_time,
+		    COUNT(s.*) AS number_of_streams
+		 FROM fieldkit.device_stream AS s
+                 GROUP BY s.device_id ORDER BY last_stream_time DESC`); err != nil {
+		return err
+	}
+
+	return ctx.OK(DevicesType(devices))
 }
 
 type Streamer struct {

@@ -94,6 +94,28 @@ func (mt ClusterGeometrySummaryCollection) Validate() (err error) {
 	return
 }
 
+// Device media type (default view)
+//
+// Identifier: application/vnd.app.device+json; view=default
+type Device struct {
+	DeviceID        string    `form:"device_id" json:"device_id" xml:"device_id"`
+	LastStreamID    string    `form:"last_stream_id" json:"last_stream_id" xml:"last_stream_id"`
+	LastStreamTime  time.Time `form:"last_stream_time" json:"last_stream_time" xml:"last_stream_time"`
+	NumberOfStreams int       `form:"number_of_streams" json:"number_of_streams" xml:"number_of_streams"`
+}
+
+// Validate validates the Device media type instance.
+func (mt *Device) Validate() (err error) {
+	if mt.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
+	}
+
+	if mt.LastStreamID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "last_stream_id"))
+	}
+	return
+}
+
 // DeviceStream media type (default view)
 //
 // Identifier: application/vnd.app.device.stream+json; view=default
@@ -165,6 +187,23 @@ func (mt *DeviceStreams) Validate() (err error) {
 	}
 	if err2 := mt.Streams.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DeviceCollection is the media type for an array of Device (default view)
+//
+// Identifier: application/vnd.app.device+json; type=collection; view=default
+type DeviceCollection []*Device
+
+// Validate validates the DeviceCollection media type instance.
+func (mt DeviceCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }
@@ -332,6 +371,24 @@ func (mt *DeviceSources) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "deviceSources"))
 	}
 	if err2 := mt.DeviceSources.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// Devices media type (default view)
+//
+// Identifier: application/vnd.app.devices+json; view=default
+type Devices struct {
+	Devices DeviceCollection `form:"devices" json:"devices" xml:"devices"`
+}
+
+// Validate validates the Devices media type instance.
+func (mt *Devices) Validate() (err error) {
+	if mt.Devices == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "devices"))
+	}
+	if err2 := mt.Devices.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return

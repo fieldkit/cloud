@@ -780,6 +780,7 @@ type StreamsController interface {
 	JSON(*JSONStreamsContext) error
 	ListAll(*ListAllStreamsContext) error
 	ListDevice(*ListDeviceStreamsContext) error
+	ListDevices(*ListDevicesStreamsContext) error
 	Raw(*RawStreamsContext) error
 }
 
@@ -793,6 +794,7 @@ func MountStreamsController(service *goa.Service, ctrl StreamsController) {
 	service.Mux.Handle("OPTIONS", "/streams/:streamId/json", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/streams", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/streams", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/streams/devices", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/streams/:streamId/raw", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -890,6 +892,22 @@ func MountStreamsController(service *goa.Service, ctrl StreamsController) {
 	h = handleStreamsOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/streams", ctrl.MuxHandler("list device", h, nil))
 	service.LogInfo("mount", "ctrl", "Streams", "action", "ListDevice", "route", "GET /devices/:deviceId/streams")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListDevicesStreamsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListDevices(rctx)
+	}
+	h = handleStreamsOrigin(h)
+	service.Mux.Handle("GET", "/streams/devices", ctrl.MuxHandler("list devices", h, nil))
+	service.LogInfo("mount", "ctrl", "Streams", "action", "ListDevices", "route", "GET /streams/devices")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
