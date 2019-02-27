@@ -65,6 +65,9 @@ type Config struct {
 	AwsId                 string `split_words:"true" default:""`
 	AwsSecret             string `split_words:"true" default:""`
 
+	DisableMemoryLogging  bool `envconfig:"disable_memory_logging" default:"false"`
+	DisableStartupRefresh bool `envconfig:"disable_startup_refresh" default:"false"`
+
 	Help          bool
 	CpuProfile    string
 	MemoryProfile string
@@ -269,9 +272,13 @@ func main() {
 		panic(err)
 	}
 
-	setupMemoryLogging(log)
+	if !config.DisableMemoryLogging {
+		setupMemoryLogging(log)
+	}
 
-	sourceModifiedHandler.QueueChangesForAllSources(publisher)
+	if !config.DisableStartupRefresh {
+		sourceModifiedHandler.QueueChangesForAllSources(publisher)
+	}
 
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
