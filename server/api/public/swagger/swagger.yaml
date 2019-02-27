@@ -251,18 +251,6 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -993,6 +981,22 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
+    - geometry:
+        coordinates:
+        - 0.51674664
+        - 0.51674664
+        type: Dolores quo suscipit.
+      properties:
+        In ipsam asperiores nostrum.: 1995-09-27T15:41:47Z
+      type: Repellendus quam soluta.
+    - geometry:
+        coordinates:
+        - 0.51674664
+        - 0.51674664
+        type: Dolores quo suscipit.
+      properties:
+        In ipsam asperiores nostrum.: 1995-09-27T15:41:47Z
+      type: Repellendus quam soluta.
     - geometry:
         coordinates:
         - 0.51674664
@@ -2225,6 +2229,27 @@ paths:
       summary: check Firmware
       tags:
       - Firmware
+  /devices/{deviceId}/data:
+    get:
+      description: Export device data
+      operationId: Streams#device data
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: device data Streams
+      tags:
+      - Streams
   /devices/{deviceId}/firmware:
     get:
       description: List device firmware
@@ -2246,6 +2271,27 @@ paths:
       summary: list device Firmware
       tags:
       - Firmware
+  /devices/{deviceId}/logs:
+    get:
+      description: Export device logs
+      operationId: Streams#device logs
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: device logs Streams
+      tags:
+      - Streams
   /devices/{deviceId}/streams:
     get:
       description: List device streams
@@ -2275,56 +2321,6 @@ paths:
       summary: list device Streams
       tags:
       - Streams
-  /devices/{deviceId}/streams/csv:
-    get:
-      description: Export device streams
-      operationId: Streams#device csv
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: query
-        name: file_id
-        required: false
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: device csv Streams
-      tags:
-      - Streams
-  /devices/{deviceId}/streams/raw:
-    get:
-      description: Export device streams
-      operationId: Streams#device raw
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: query
-        name: file_id
-        required: false
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: device raw Streams
-      tags:
-      - Streams
   /devices/firmware:
     patch:
       description: Update an Device firmware
@@ -2349,31 +2345,6 @@ paths:
       summary: update Firmware
       tags:
       - Firmware
-  /devices/streams:
-    get:
-      description: List streams
-      operationId: Streams#list all
-      parameters:
-      - in: query
-        name: file_id
-        required: false
-        type: string
-      - in: query
-        name: page
-        required: false
-        type: integer
-      produces:
-      - application/vnd.app.device.streams+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/DeviceStreams'
-      schemes:
-      - https
-      summary: list all Streams
-      tags:
-      - Streams
   /expeditions/{expeditionId}:
     get:
       description: |-
@@ -4071,6 +4042,31 @@ paths:
       summary: get id twitter
       tags:
       - twitter
+  /streams:
+    get:
+      description: List streams
+      operationId: Streams#list all
+      parameters:
+      - in: query
+        name: file_id
+        required: false
+        type: string
+      - in: query
+        name: page
+        required: false
+        type: integer
+      produces:
+      - application/vnd.app.device.streams+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DeviceStreams'
+      schemes:
+      - https
+      summary: list all Streams
+      tags:
+      - Streams
   /streams/{streamId}/csv:
     get:
       description: Export stream
@@ -4111,27 +4107,6 @@ paths:
       schemes:
       - https
       summary: json Streams
-      tags:
-      - Streams
-  /streams/{streamId}/raw:
-    get:
-      description: Export stream
-      operationId: Streams#raw
-      parameters:
-      - in: path
-        name: streamId
-        required: true
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: raw Streams
       tags:
       - Streams
   /streams/devices:

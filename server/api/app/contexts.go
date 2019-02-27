@@ -469,39 +469,33 @@ func (ctx *CsvStreamsContext) NotFound() error {
 	return nil
 }
 
-// DeviceCsvStreamsContext provides the Streams device csv action context.
-type DeviceCsvStreamsContext struct {
+// DeviceDataStreamsContext provides the Streams device data action context.
+type DeviceDataStreamsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	DeviceID string
-	FileID   *string
 }
 
-// NewDeviceCsvStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller device csv action.
-func NewDeviceCsvStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceCsvStreamsContext, error) {
+// NewDeviceDataStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller device data action.
+func NewDeviceDataStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceDataStreamsContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := DeviceCsvStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := DeviceDataStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramDeviceID := req.Params["deviceId"]
 	if len(paramDeviceID) > 0 {
 		rawDeviceID := paramDeviceID[0]
 		rctx.DeviceID = rawDeviceID
 	}
-	paramFileID := req.Params["file_id"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = &rawFileID
-	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *DeviceCsvStreamsContext) OK(resp []byte) error {
+func (ctx *DeviceDataStreamsContext) OK(resp []byte) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
@@ -509,44 +503,38 @@ func (ctx *DeviceCsvStreamsContext) OK(resp []byte) error {
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *DeviceCsvStreamsContext) NotFound() error {
+func (ctx *DeviceDataStreamsContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
 
-// DeviceRawStreamsContext provides the Streams device raw action context.
-type DeviceRawStreamsContext struct {
+// DeviceLogsStreamsContext provides the Streams device logs action context.
+type DeviceLogsStreamsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	DeviceID string
-	FileID   *string
 }
 
-// NewDeviceRawStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller device raw action.
-func NewDeviceRawStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceRawStreamsContext, error) {
+// NewDeviceLogsStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller device logs action.
+func NewDeviceLogsStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceLogsStreamsContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := DeviceRawStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := DeviceLogsStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramDeviceID := req.Params["deviceId"]
 	if len(paramDeviceID) > 0 {
 		rawDeviceID := paramDeviceID[0]
 		rctx.DeviceID = rawDeviceID
 	}
-	paramFileID := req.Params["file_id"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = &rawFileID
-	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *DeviceRawStreamsContext) OK(resp []byte) error {
+func (ctx *DeviceLogsStreamsContext) OK(resp []byte) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
@@ -554,7 +542,7 @@ func (ctx *DeviceRawStreamsContext) OK(resp []byte) error {
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *DeviceRawStreamsContext) NotFound() error {
+func (ctx *DeviceLogsStreamsContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
@@ -717,45 +705,6 @@ func (ctx *ListDevicesStreamsContext) OK(r *Devices) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *ListDevicesStreamsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// RawStreamsContext provides the Streams raw action context.
-type RawStreamsContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	StreamID string
-}
-
-// NewRawStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller raw action.
-func NewRawStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*RawStreamsContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := RawStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramStreamID := req.Params["streamId"]
-	if len(paramStreamID) > 0 {
-		rawStreamID := paramStreamID[0]
-		rctx.StreamID = rawStreamID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *RawStreamsContext) OK(resp []byte) error {
-	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *RawStreamsContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }

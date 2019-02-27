@@ -105,7 +105,7 @@ var _ = Resource("Streams", func() {
 	})
 
 	Action("list all", func() {
-		Routing(GET("devices/streams"))
+		Routing(GET("streams"))
 		Description("List streams")
 		Params(func() {
 			Param("page", Integer)
@@ -116,35 +116,18 @@ var _ = Resource("Streams", func() {
 		})
 	})
 
-	Action("device raw", func() {
-		Routing(GET("devices/:deviceId/streams/raw"))
-		Description("Export device streams")
-		Params(func() {
-			Param("file_id", String)
-		})
+	Action("device data", func() {
+		Routing(GET("devices/:deviceId/data"))
+		Description("Export device data")
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
 		})
 	})
 
-	Action("device csv", func() {
-		Routing(GET("devices/:deviceId/streams/csv"))
-		Description("Export device streams")
-		Params(func() {
-			Param("file_id", String)
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
-	Action("raw", func() {
-		Routing(GET("streams/:streamId/raw"))
-		Description("Export stream")
-		Params(func() {
-		})
+	Action("device logs", func() {
+		Routing(GET("devices/:deviceId/logs"))
+		Description("Export device logs")
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
@@ -154,8 +137,6 @@ var _ = Resource("Streams", func() {
 	Action("csv", func() {
 		Routing(GET("streams/:streamId/csv"))
 		Description("Export stream")
-		Params(func() {
-		})
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
@@ -165,8 +146,6 @@ var _ = Resource("Streams", func() {
 	Action("json", func() {
 		Routing(GET("streams/:streamId/json"))
 		Description("Export stream")
-		Params(func() {
-		})
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
