@@ -185,38 +185,38 @@ func main() {
 
 	adminServer := notFoundHandler
 	if config.AdminRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
 			Root: config.AdminRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		adminServer = http.StripPrefix("/admin", singlepageApplication)
+		adminServer = http.StripPrefix("/admin", singlePageApplication)
 	}
 
-	frontendServer := notFoundHandler
+	frontEndServer := notFoundHandler
 	if config.FrontendRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
 			Root: config.FrontendRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		frontendServer = singlepageApplication
+		frontEndServer = singlePageApplication
 	}
 
 	landingServer := notFoundHandler
 	if config.LandingRoot != "" {
-		singlepageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
 			Root: config.LandingRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		landingServer = singlepageApplication
+		landingServer = singlePageApplication
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {

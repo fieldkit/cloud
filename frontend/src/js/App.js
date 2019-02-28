@@ -10,13 +10,13 @@ import '../css/App.css';
 
 type Props = {
     store: mixed,
-}
+};
 
 class App extends Component {
     props: Props
 
     render() {
-        const { store } = this.props
+        const { store } = this.props;
 
         return (
             <div className="App">

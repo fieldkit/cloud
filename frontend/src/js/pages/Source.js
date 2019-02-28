@@ -103,9 +103,9 @@ function showWhenReady(WrappedComponent, isReady) {
                 return <div>Loading</div>;
             }
 
-            return <WrappedComponent {...this.props} />
+            return <WrappedComponent {...this.props} />;
         }
-    }
+    };
 }
 
 export default connect(mapStateToProps, {
