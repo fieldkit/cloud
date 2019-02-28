@@ -134,10 +134,10 @@ func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (Cl
 //
 // Identifier: application/vnd.app.device+json; view=default
 type Device struct {
-	DeviceID        string    `form:"device_id" json:"device_id" xml:"device_id"`
-	LastStreamID    string    `form:"last_stream_id" json:"last_stream_id" xml:"last_stream_id"`
-	LastStreamTime  time.Time `form:"last_stream_time" json:"last_stream_time" xml:"last_stream_time"`
-	NumberOfStreams int       `form:"number_of_streams" json:"number_of_streams" xml:"number_of_streams"`
+	DeviceID      string    `form:"device_id" json:"device_id" xml:"device_id"`
+	LastFileID    string    `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
+	LastFileTime  time.Time `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
+	NumberOfFiles int       `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
 }
 
 // Validate validates the Device media type instance.
@@ -146,8 +146,8 @@ func (mt *Device) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
 	}
 
-	if mt.LastStreamID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "last_stream_id"))
+	if mt.LastFileID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "last_file_id"))
 	}
 	return
 }
@@ -159,26 +159,26 @@ func (c *Client) DecodeDevice(resp *http.Response) (*Device, error) {
 	return &decoded, err
 }
 
-// DeviceStream media type (default view)
+// DeviceFile media type (default view)
 //
-// Identifier: application/vnd.app.device.stream+json; view=default
-type DeviceStream struct {
-	DeviceID string    `form:"device_id" json:"device_id" xml:"device_id"`
-	FileID   string    `form:"file_id" json:"file_id" xml:"file_id"`
-	Firmware string    `form:"firmware" json:"firmware" xml:"firmware"`
-	ID       int       `form:"id" json:"id" xml:"id"`
-	Meta     string    `form:"meta" json:"meta" xml:"meta"`
-	Size     int       `form:"size" json:"size" xml:"size"`
-	StreamID string    `form:"stream_id" json:"stream_id" xml:"stream_id"`
-	Time     time.Time `form:"time" json:"time" xml:"time"`
-	URL      string    `form:"url" json:"url" xml:"url"`
+// Identifier: application/vnd.app.device.file+json; view=default
+type DeviceFile struct {
+	DeviceID   string    `form:"device_id" json:"device_id" xml:"device_id"`
+	FileID     string    `form:"file_id" json:"file_id" xml:"file_id"`
+	FileTypeID string    `form:"file_type_id" json:"file_type_id" xml:"file_type_id"`
+	Firmware   string    `form:"firmware" json:"firmware" xml:"firmware"`
+	ID         int       `form:"id" json:"id" xml:"id"`
+	Meta       string    `form:"meta" json:"meta" xml:"meta"`
+	Size       int       `form:"size" json:"size" xml:"size"`
+	Time       time.Time `form:"time" json:"time" xml:"time"`
+	URL        string    `form:"url" json:"url" xml:"url"`
 }
 
-// Validate validates the DeviceStream media type instance.
-func (mt *DeviceStream) Validate() (err error) {
+// Validate validates the DeviceFile media type instance.
+func (mt *DeviceFile) Validate() (err error) {
 
-	if mt.StreamID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "stream_id"))
+	if mt.FileID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_id"))
 	}
 	if mt.DeviceID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
@@ -189,8 +189,8 @@ func (mt *DeviceStream) Validate() (err error) {
 	if mt.Meta == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
 	}
-	if mt.FileID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_id"))
+	if mt.FileTypeID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_type_id"))
 	}
 
 	if mt.URL == "" {
@@ -199,20 +199,20 @@ func (mt *DeviceStream) Validate() (err error) {
 	return
 }
 
-// DecodeDeviceStream decodes the DeviceStream instance encoded in resp body.
-func (c *Client) DecodeDeviceStream(resp *http.Response) (*DeviceStream, error) {
-	var decoded DeviceStream
+// DecodeDeviceFile decodes the DeviceFile instance encoded in resp body.
+func (c *Client) DecodeDeviceFile(resp *http.Response) (*DeviceFile, error) {
+	var decoded DeviceFile
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
 
-// DeviceStreamCollection is the media type for an array of DeviceStream (default view)
+// DeviceFileCollection is the media type for an array of DeviceFile (default view)
 //
-// Identifier: application/vnd.app.device.stream+json; type=collection; view=default
-type DeviceStreamCollection []*DeviceStream
+// Identifier: application/vnd.app.device.file+json; type=collection; view=default
+type DeviceFileCollection []*DeviceFile
 
-// Validate validates the DeviceStreamCollection media type instance.
-func (mt DeviceStreamCollection) Validate() (err error) {
+// Validate validates the DeviceFileCollection media type instance.
+func (mt DeviceFileCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
@@ -223,34 +223,34 @@ func (mt DeviceStreamCollection) Validate() (err error) {
 	return
 }
 
-// DecodeDeviceStreamCollection decodes the DeviceStreamCollection instance encoded in resp body.
-func (c *Client) DecodeDeviceStreamCollection(resp *http.Response) (DeviceStreamCollection, error) {
-	var decoded DeviceStreamCollection
+// DecodeDeviceFileCollection decodes the DeviceFileCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceFileCollection(resp *http.Response) (DeviceFileCollection, error) {
+	var decoded DeviceFileCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }
 
-// DeviceStreams media type (default view)
+// DeviceFiles media type (default view)
 //
-// Identifier: application/vnd.app.device.streams+json; view=default
-type DeviceStreams struct {
-	Streams DeviceStreamCollection `form:"streams" json:"streams" xml:"streams"`
+// Identifier: application/vnd.app.device.files+json; view=default
+type DeviceFiles struct {
+	Files DeviceFileCollection `form:"files" json:"files" xml:"files"`
 }
 
-// Validate validates the DeviceStreams media type instance.
-func (mt *DeviceStreams) Validate() (err error) {
-	if mt.Streams == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "streams"))
+// Validate validates the DeviceFiles media type instance.
+func (mt *DeviceFiles) Validate() (err error) {
+	if mt.Files == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
 	}
-	if err2 := mt.Streams.Validate(); err2 != nil {
+	if err2 := mt.Files.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return
 }
 
-// DecodeDeviceStreams decodes the DeviceStreams instance encoded in resp body.
-func (c *Client) DecodeDeviceStreams(resp *http.Response) (*DeviceStreams, error) {
-	var decoded DeviceStreams
+// DecodeDeviceFiles decodes the DeviceFiles instance encoded in resp body.
+func (c *Client) DecodeDeviceFiles(resp *http.Response) (*DeviceFiles, error) {
+	var decoded DeviceFiles
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

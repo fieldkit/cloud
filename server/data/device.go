@@ -56,6 +56,18 @@ type DeviceFirmware struct {
 	ETag     string    `db:"etag"`
 }
 
+type DeviceFile struct {
+	ID       int64          `db:"id"`
+	Time     time.Time      `db:"time"`
+	StreamID string         `db:"stream_id"`
+	Firmware string         `db:"firmware"`
+	DeviceID string         `db:"device_id"`
+	Size     int64          `db:"size"`
+	FileID   string         `db:"file_id"`
+	URL      string         `db:"url"`
+	Meta     types.JSONText `db:"meta"`
+}
+
 type DeviceStream struct {
 	ID       int64          `db:"id"`
 	Time     time.Time      `db:"time"`
