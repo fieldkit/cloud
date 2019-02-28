@@ -83,18 +83,6 @@ var Devices = MediaType("application/vnd.app.devices+json", func() {
 })
 
 var _ = Resource("Streams", func() {
-	Action("list device", func() {
-		Routing(GET("devices/:deviceId/streams"))
-		Description("List device streams")
-		Params(func() {
-			Param("page", Integer)
-			Param("file_id", String)
-		})
-		Response(OK, func() {
-			Media(DeviceStreams)
-		})
-	})
-
 	Action("list devices", func() {
 		Routing(GET("streams/devices"))
 		Description("List devices")
@@ -104,12 +92,22 @@ var _ = Resource("Streams", func() {
 		})
 	})
 
-	Action("list all", func() {
-		Routing(GET("streams"))
-		Description("List streams")
+	Action("list device data streams", func() {
+		Routing(GET("devices/:deviceId/streams/data"))
+		Description("List device streams")
 		Params(func() {
 			Param("page", Integer)
-			Param("file_id", String)
+		})
+		Response(OK, func() {
+			Media(DeviceStreams)
+		})
+	})
+
+	Action("list device log streams", func() {
+		Routing(GET("devices/:deviceId/streams/logs"))
+		Description("List device streams")
+		Params(func() {
+			Param("page", Integer)
 		})
 		Response(OK, func() {
 			Media(DeviceStreams)

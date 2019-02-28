@@ -586,28 +586,28 @@ func (ctx *JSONStreamsContext) NotFound() error {
 	return nil
 }
 
-// ListAllStreamsContext provides the Streams list all action context.
-type ListAllStreamsContext struct {
+// ListDeviceDataStreamsStreamsContext provides the Streams list device data streams action context.
+type ListDeviceDataStreamsStreamsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	FileID *string
-	Page   *int
+	DeviceID string
+	Page     *int
 }
 
-// NewListAllStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller list all action.
-func NewListAllStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListAllStreamsContext, error) {
+// NewListDeviceDataStreamsStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller list device data streams action.
+func NewListDeviceDataStreamsStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceDataStreamsStreamsContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := ListAllStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramFileID := req.Params["file_id"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = &rawFileID
+	rctx := ListDeviceDataStreamsStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
 	}
 	paramPage := req.Params["page"]
 	if len(paramPage) > 0 {
@@ -624,39 +624,33 @@ func NewListAllStreamsContext(ctx context.Context, r *http.Request, service *goa
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListAllStreamsContext) OK(r *DeviceStreams) error {
+func (ctx *ListDeviceDataStreamsStreamsContext) OK(r *DeviceStreams) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.streams+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// ListDeviceStreamsContext provides the Streams list device action context.
-type ListDeviceStreamsContext struct {
+// ListDeviceLogStreamsStreamsContext provides the Streams list device log streams action context.
+type ListDeviceLogStreamsStreamsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	DeviceID string
-	FileID   *string
 	Page     *int
 }
 
-// NewListDeviceStreamsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Streams controller list device action.
-func NewListDeviceStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceStreamsContext, error) {
+// NewListDeviceLogStreamsStreamsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Streams controller list device log streams action.
+func NewListDeviceLogStreamsStreamsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceLogStreamsStreamsContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := ListDeviceStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := ListDeviceLogStreamsStreamsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramDeviceID := req.Params["deviceId"]
 	if len(paramDeviceID) > 0 {
 		rawDeviceID := paramDeviceID[0]
 		rctx.DeviceID = rawDeviceID
-	}
-	paramFileID := req.Params["file_id"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = &rawFileID
 	}
 	paramPage := req.Params["page"]
 	if len(paramPage) > 0 {
@@ -673,7 +667,7 @@ func NewListDeviceStreamsContext(ctx context.Context, r *http.Request, service *
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListDeviceStreamsContext) OK(r *DeviceStreams) error {
+func (ctx *ListDeviceLogStreamsStreamsContext) OK(r *DeviceStreams) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.streams+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

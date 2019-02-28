@@ -37,6 +37,11 @@ type StreamsController struct {
 	options StreamsControllerOptions
 }
 
+const (
+	DataFileId = "4"
+	LogFileId  = "2"
+)
+
 func NewStreamsController(service *goa.Service, options StreamsControllerOptions) *StreamsController {
 	return &StreamsController{
 		Controller: service.NewController("StreamsController"),
@@ -68,33 +73,7 @@ func DeviceStreamsType(streams []*data.DeviceStream) *app.DeviceStreams {
 	}
 }
 
-func (c *StreamsController) ListAll(ctx *app.ListAllStreamsContext) error {
-	pageSize := 100
-	offset := 0
-	if ctx.Page != nil {
-		offset = *ctx.Page * pageSize
-	}
-
-	streams := []*data.DeviceStream{}
-	if err := c.options.Database.SelectContext(ctx, &streams,
-		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) ORDER BY time DESC LIMIT $2 OFFSET $3`, ctx.FileID, pageSize, offset); err != nil {
-		return err
-	}
-
-	svc := s3.New(c.options.Session)
-
-	for _, s := range streams {
-		signed, err := SignS3URL(svc, s.URL)
-		if err != nil {
-			return err
-		}
-		s.URL = signed
-	}
-
-	return ctx.OK(DeviceStreamsType(streams))
-}
-
-func (c *StreamsController) ListDevice(ctx *app.ListDeviceStreamsContext) error {
+func (c *StreamsController) ListDeviceDataStreams(ctx *app.ListDeviceDataStreamsStreamsContext) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("Device", "device_id", ctx.DeviceID)
@@ -107,7 +86,27 @@ func (c *StreamsController) ListDevice(ctx *app.ListDeviceStreamsContext) error 
 
 	streams := []*data.DeviceStream{}
 	if err := c.options.Database.SelectContext(ctx, &streams,
-		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.FileID, ctx.DeviceID, pageSize, offset); err != nil {
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, DataFileId, ctx.DeviceID, pageSize, offset); err != nil {
+		return err
+	}
+
+	return ctx.OK(DeviceStreamsType(streams))
+}
+
+func (c *StreamsController) ListDeviceLogStreams(ctx *app.ListDeviceLogStreamsStreamsContext) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Device", "device_id", ctx.DeviceID)
+
+	pageSize := 100
+	offset := 0
+	if ctx.Page != nil {
+		offset = *ctx.Page * pageSize
+	}
+
+	streams := []*data.DeviceStream{}
+	if err := c.options.Database.SelectContext(ctx, &streams,
+		`SELECT s.* FROM fieldkit.device_stream AS s WHERE ($1::text IS NULL OR s.file_id = $1) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`, LogFileId, ctx.DeviceID, pageSize, offset); err != nil {
 		return err
 	}
 
@@ -178,7 +177,7 @@ func (c *StreamsController) JSON(ctx *app.JSONStreamsContext) error {
 }
 
 func (c *StreamsController) DeviceData(ctx *app.DeviceDataStreamsContext) error {
-	streamer, err := c.LookupDeviceStreams(ctx, ctx.DeviceID, "4")
+	streamer, err := c.LookupDeviceStreams(ctx, ctx.DeviceID, DataFileId)
 	if err != nil {
 		return err
 	}
@@ -189,7 +188,7 @@ func (c *StreamsController) DeviceData(ctx *app.DeviceDataStreamsContext) error 
 }
 
 func (c *StreamsController) DeviceLogs(ctx *app.DeviceLogsStreamsContext) error {
-	streamer, err := c.LookupDeviceStreams(ctx, ctx.DeviceID, "2")
+	streamer, err := c.LookupDeviceStreams(ctx, ctx.DeviceID, LogFileId)
 	if err != nil {
 		return err
 	}

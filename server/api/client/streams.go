@@ -135,32 +135,30 @@ func (c *Client) NewJSONStreamsRequest(ctx context.Context, path string) (*http.
 	return req, nil
 }
 
-// ListAllStreamsPath computes a request path to the list all action of Streams.
-func ListAllStreamsPath() string {
+// ListDeviceDataStreamsStreamsPath computes a request path to the list device data streams action of Streams.
+func ListDeviceDataStreamsStreamsPath(deviceID string) string {
+	param0 := deviceID
 
-	return fmt.Sprintf("/streams")
+	return fmt.Sprintf("/devices/%s/streams/data", param0)
 }
 
-// List streams
-func (c *Client) ListAllStreams(ctx context.Context, path string, fileID *string, page *int) (*http.Response, error) {
-	req, err := c.NewListAllStreamsRequest(ctx, path, fileID, page)
+// List device streams
+func (c *Client) ListDeviceDataStreamsStreams(ctx context.Context, path string, page *int) (*http.Response, error) {
+	req, err := c.NewListDeviceDataStreamsStreamsRequest(ctx, path, page)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewListAllStreamsRequest create the request corresponding to the list all action endpoint of the Streams resource.
-func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, fileID *string, page *int) (*http.Request, error) {
+// NewListDeviceDataStreamsStreamsRequest create the request corresponding to the list device data streams action endpoint of the Streams resource.
+func (c *Client) NewListDeviceDataStreamsStreamsRequest(ctx context.Context, path string, page *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	if fileID != nil {
-		values.Set("file_id", *fileID)
-	}
 	if page != nil {
 		tmp145 := strconv.Itoa(*page)
 		values.Set("page", tmp145)
@@ -173,33 +171,30 @@ func (c *Client) NewListAllStreamsRequest(ctx context.Context, path string, file
 	return req, nil
 }
 
-// ListDeviceStreamsPath computes a request path to the list device action of Streams.
-func ListDeviceStreamsPath(deviceID string) string {
+// ListDeviceLogStreamsStreamsPath computes a request path to the list device log streams action of Streams.
+func ListDeviceLogStreamsStreamsPath(deviceID string) string {
 	param0 := deviceID
 
-	return fmt.Sprintf("/devices/%s/streams", param0)
+	return fmt.Sprintf("/devices/%s/streams/logs", param0)
 }
 
 // List device streams
-func (c *Client) ListDeviceStreams(ctx context.Context, path string, fileID *string, page *int) (*http.Response, error) {
-	req, err := c.NewListDeviceStreamsRequest(ctx, path, fileID, page)
+func (c *Client) ListDeviceLogStreamsStreams(ctx context.Context, path string, page *int) (*http.Response, error) {
+	req, err := c.NewListDeviceLogStreamsStreamsRequest(ctx, path, page)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewListDeviceStreamsRequest create the request corresponding to the list device action endpoint of the Streams resource.
-func (c *Client) NewListDeviceStreamsRequest(ctx context.Context, path string, fileID *string, page *int) (*http.Request, error) {
+// NewListDeviceLogStreamsStreamsRequest create the request corresponding to the list device log streams action endpoint of the Streams resource.
+func (c *Client) NewListDeviceLogStreamsStreamsRequest(ctx context.Context, path string, page *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	if fileID != nil {
-		values.Set("file_id", *fileID)
-	}
 	if page != nil {
 		tmp146 := strconv.Itoa(*page)
 		values.Set("page", tmp146)

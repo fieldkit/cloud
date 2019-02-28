@@ -778,8 +778,8 @@ type StreamsController interface {
 	DeviceData(*DeviceDataStreamsContext) error
 	DeviceLogs(*DeviceLogsStreamsContext) error
 	JSON(*JSONStreamsContext) error
-	ListAll(*ListAllStreamsContext) error
-	ListDevice(*ListDeviceStreamsContext) error
+	ListDeviceDataStreams(*ListDeviceDataStreamsStreamsContext) error
+	ListDeviceLogStreams(*ListDeviceLogStreamsStreamsContext) error
 	ListDevices(*ListDevicesStreamsContext) error
 }
 
@@ -791,8 +791,8 @@ func MountStreamsController(service *goa.Service, ctrl StreamsController) {
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/data", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/logs", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/streams/:streamId/json", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/streams", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/devices/:deviceId/streams", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/devices/:deviceId/streams/data", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/devices/:deviceId/streams/logs", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/streams/devices", ctrl.MuxHandler("preflight", handleStreamsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -865,15 +865,15 @@ func MountStreamsController(service *goa.Service, ctrl StreamsController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewListAllStreamsContext(ctx, req, service)
+		rctx, err := NewListDeviceDataStreamsStreamsContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.ListAll(rctx)
+		return ctrl.ListDeviceDataStreams(rctx)
 	}
 	h = handleStreamsOrigin(h)
-	service.Mux.Handle("GET", "/streams", ctrl.MuxHandler("list all", h, nil))
-	service.LogInfo("mount", "ctrl", "Streams", "action", "ListAll", "route", "GET /streams")
+	service.Mux.Handle("GET", "/devices/:deviceId/streams/data", ctrl.MuxHandler("list device data streams", h, nil))
+	service.LogInfo("mount", "ctrl", "Streams", "action", "ListDeviceDataStreams", "route", "GET /devices/:deviceId/streams/data")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -881,15 +881,15 @@ func MountStreamsController(service *goa.Service, ctrl StreamsController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewListDeviceStreamsContext(ctx, req, service)
+		rctx, err := NewListDeviceLogStreamsStreamsContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.ListDevice(rctx)
+		return ctrl.ListDeviceLogStreams(rctx)
 	}
 	h = handleStreamsOrigin(h)
-	service.Mux.Handle("GET", "/devices/:deviceId/streams", ctrl.MuxHandler("list device", h, nil))
-	service.LogInfo("mount", "ctrl", "Streams", "action", "ListDevice", "route", "GET /devices/:deviceId/streams")
+	service.Mux.Handle("GET", "/devices/:deviceId/streams/logs", ctrl.MuxHandler("list device log streams", h, nil))
+	service.LogInfo("mount", "ctrl", "Streams", "action", "ListDeviceLogStreams", "route", "GET /devices/:deviceId/streams/logs")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

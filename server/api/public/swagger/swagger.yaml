@@ -2292,18 +2292,14 @@ paths:
       summary: device logs Streams
       tags:
       - Streams
-  /devices/{deviceId}/streams:
+  /devices/{deviceId}/streams/data:
     get:
       description: List device streams
-      operationId: Streams#list device
+      operationId: Streams#list device data streams
       parameters:
       - in: path
         name: deviceId
         required: true
-        type: string
-      - in: query
-        name: file_id
-        required: false
         type: string
       - in: query
         name: page
@@ -2318,7 +2314,32 @@ paths:
             $ref: '#/definitions/DeviceStreams'
       schemes:
       - https
-      summary: list device Streams
+      summary: list device data streams Streams
+      tags:
+      - Streams
+  /devices/{deviceId}/streams/logs:
+    get:
+      description: List device streams
+      operationId: Streams#list device log streams
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      - in: query
+        name: page
+        required: false
+        type: integer
+      produces:
+      - application/vnd.app.device.streams+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DeviceStreams'
+      schemes:
+      - https
+      summary: list device log streams Streams
       tags:
       - Streams
   /devices/firmware:
@@ -4042,31 +4063,6 @@ paths:
       summary: get id twitter
       tags:
       - twitter
-  /streams:
-    get:
-      description: List streams
-      operationId: Streams#list all
-      parameters:
-      - in: query
-        name: file_id
-        required: false
-        type: string
-      - in: query
-        name: page
-        required: false
-        type: integer
-      produces:
-      - application/vnd.app.device.streams+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/DeviceStreams'
-      schemes:
-      - https
-      summary: list all Streams
-      tags:
-      - Streams
   /streams/{streamId}/csv:
     get:
       description: Export stream

@@ -115,17 +115,16 @@ type (
 		PrettyPrint bool
 	}
 
-	// ListAllStreamsCommand is the command line data structure for the list all action of Streams
-	ListAllStreamsCommand struct {
-		FileID      string
+	// ListDeviceDataStreamsStreamsCommand is the command line data structure for the list device data streams action of Streams
+	ListDeviceDataStreamsStreamsCommand struct {
+		DeviceID    string
 		Page        int
 		PrettyPrint bool
 	}
 
-	// ListDeviceStreamsCommand is the command line data structure for the list device action of Streams
-	ListDeviceStreamsCommand struct {
+	// ListDeviceLogStreamsStreamsCommand is the command line data structure for the list device log streams action of Streams
+	ListDeviceLogStreamsStreamsCommand struct {
 		DeviceID    string
-		FileID      string
 		Page        int
 		PrettyPrint bool
 	}
@@ -1240,12 +1239,12 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-all",
-		Short: `List streams`,
+		Use:   "list-byid",
+		Short: `List a feature's GeoJSON by id.`,
 	}
-	tmp107 := new(ListAllStreamsCommand)
+	tmp107 := new(ListByIDGeojsonCommand)
 	sub = &cobra.Command{
-		Use:   `streams ["/streams"]`,
+		Use:   `geojson ["/features/FEATUREID/geojson"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp107.Run(c, args) },
 	}
@@ -1254,44 +1253,44 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-byid",
-		Short: `List a feature's GeoJSON by id.`,
+		Use:   "list-by-source",
+		Short: `listBySource action`,
 	}
-	tmp108 := new(ListByIDGeojsonCommand)
+	tmp108 := new(ListBySourceExportCommand)
 	sub = &cobra.Command{
-		Use:   `geojson ["/features/FEATUREID/geojson"]`,
+		Use:   `export ["/sources/SOURCEID/csv"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp108.Run(c, args) },
 	}
 	tmp108.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp108.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list-by-source",
-		Short: `listBySource action`,
-	}
-	tmp109 := new(ListBySourceExportCommand)
+	tmp109 := new(ListBySourceGeojsonCommand)
 	sub = &cobra.Command{
-		Use:   `export ["/sources/SOURCEID/csv"]`,
+		Use:   `geojson ["/sources/SOURCEID/geojson"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp109.Run(c, args) },
 	}
 	tmp109.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp109.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp110 := new(ListBySourceGeojsonCommand)
+	tmp110 := new(ListBySourceQueryCommand)
 	sub = &cobra.Command{
-		Use:   `geojson ["/sources/SOURCEID/geojson"]`,
+		Use:   `query ["/sources/SOURCEID/query"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp110.Run(c, args) },
 	}
 	tmp110.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp110.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp111 := new(ListBySourceQueryCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "list-current",
+		Short: `List the authenticated user's projects`,
+	}
+	tmp111 := new(ListCurrentProjectCommand)
 	sub = &cobra.Command{
-		Use:   `query ["/sources/SOURCEID/query"]`,
+		Use:   `project ["/user/projects"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp111.Run(c, args) },
 	}
@@ -1300,12 +1299,12 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-current",
-		Short: `List the authenticated user's projects`,
+		Use:   "list-device",
+		Short: `List device firmware`,
 	}
-	tmp112 := new(ListCurrentProjectCommand)
+	tmp112 := new(ListDeviceFirmwareCommand)
 	sub = &cobra.Command{
-		Use:   `project ["/user/projects"]`,
+		Use:   `firmware ["/devices/DEVICEID/firmware"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp112.Run(c, args) },
 	}
@@ -1314,21 +1313,26 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list-device",
-		Short: `listDevice action`,
+		Use:   "list-device-data-streams",
+		Short: `List device streams`,
 	}
-	tmp113 := new(ListDeviceFirmwareCommand)
+	tmp113 := new(ListDeviceDataStreamsStreamsCommand)
 	sub = &cobra.Command{
-		Use:   `firmware ["/devices/DEVICEID/firmware"]`,
+		Use:   `streams ["/devices/DEVICEID/streams/data"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp113.Run(c, args) },
 	}
 	tmp113.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp113.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp114 := new(ListDeviceStreamsCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "list-device-log-streams",
+		Short: `List device streams`,
+	}
+	tmp114 := new(ListDeviceLogStreamsStreamsCommand)
 	sub = &cobra.Command{
-		Use:   `streams ["/devices/DEVICEID/streams"]`,
+		Use:   `streams ["/devices/DEVICEID/streams/logs"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp114.Run(c, args) },
 	}
@@ -2371,17 +2375,17 @@ func (cmd *JSONStreamsCommand) RegisterFlags(cc *cobra.Command, c *client.Client
 	cc.Flags().StringVar(&cmd.StreamID, "streamId", streamID, ``)
 }
 
-// Run makes the HTTP request corresponding to the ListAllStreamsCommand command.
-func (cmd *ListAllStreamsCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the ListDeviceDataStreamsStreamsCommand command.
+func (cmd *ListDeviceDataStreamsStreamsCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/streams"
+		path = fmt.Sprintf("/devices/%v/streams/data", url.QueryEscape(cmd.DeviceID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListAllStreams(ctx, path, stringFlagVal("file_id", cmd.FileID), intFlagVal("page", cmd.Page))
+	resp, err := c.ListDeviceDataStreamsStreams(ctx, path, intFlagVal("page", cmd.Page))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2392,24 +2396,24 @@ func (cmd *ListAllStreamsCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *ListAllStreamsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "file_id", fileID, ``)
+func (cmd *ListDeviceDataStreamsStreamsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
 	var page int
 	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
 }
 
-// Run makes the HTTP request corresponding to the ListDeviceStreamsCommand command.
-func (cmd *ListDeviceStreamsCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the ListDeviceLogStreamsStreamsCommand command.
+func (cmd *ListDeviceLogStreamsStreamsCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/devices/%v/streams", url.QueryEscape(cmd.DeviceID))
+		path = fmt.Sprintf("/devices/%v/streams/logs", url.QueryEscape(cmd.DeviceID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListDeviceStreams(ctx, path, stringFlagVal("file_id", cmd.FileID), intFlagVal("page", cmd.Page))
+	resp, err := c.ListDeviceLogStreamsStreams(ctx, path, intFlagVal("page", cmd.Page))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2420,11 +2424,9 @@ func (cmd *ListDeviceStreamsCommand) Run(c *client.Client, args []string) error 
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *ListDeviceStreamsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *ListDeviceLogStreamsStreamsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var deviceID string
 	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "file_id", fileID, ``)
 	var page int
 	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
 }
