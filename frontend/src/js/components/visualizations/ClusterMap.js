@@ -87,7 +87,7 @@ class DataColors {
             'rgb(128, 110, 183)',
             'rgb(249, 217, 249)',
             'rgb(186, 67, 169)',
-        ]
+        ];
         this.index = 0;
     }
 
@@ -128,7 +128,7 @@ export default class ClusterMap extends Component {
             .sortBy(s => s.source.id)
             .map(s => {
                 return _(s.summary.temporal)
-                    .filter(c => s.geometries[c.id])
+                    .filter(c => s.geometries && s.geometries[c.id])
                     .sortBy(c => c.id)
                     .map(c => {
                         return {
