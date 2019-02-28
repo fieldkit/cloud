@@ -457,6 +457,8 @@ func (streamer *Streamer) Next(ctx context.Context) (cs *CurrentStream, err erro
 		return nil, fmt.Errorf("Error signing stream URL: %v (%v)", stream.URL, err)
 	}
 
+	log.Infow("Stream", "stream_id", stream.StreamID, "signed_url", signed)
+
 	response, err := http.Get(signed)
 	if err != nil {
 		return nil, fmt.Errorf("Error opening stream URL: %v (%v)", stream.URL, err)
