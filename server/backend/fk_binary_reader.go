@@ -11,10 +11,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/robinpowered/go-proto/message"
-	"github.com/robinpowered/go-proto/stream"
 
-	pbtools "github.com/conservify/protobuf-tools/tools"
+	_ /* pbtools */ "github.com/conservify/protobuf-tools/tools"
 
 	pb "github.com/fieldkit/data-protocol"
 
@@ -58,7 +56,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 
 	changes := make(map[int64][]*ingestion.RecordChange)
 
-	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
+	unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var record pb.DataRecord
 		err := proto.Unmarshal(b, &record)
 		if err != nil {
@@ -86,19 +84,9 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		return &record, nil
 	})
 
-	if false {
-		_, junk, err := pbtools.ReadLengthPrefixedCollectionIgnoringIncompleteBeginning(body, 4096, unmarshalFunc)
-		if err != nil {
-			return err
-		}
-		if junk > 0 {
-			log.Warnw("Malformed stream, ignored junk", "junk", junk)
-		}
-	} else {
-		_, err := stream.ReadLengthPrefixedCollection(body, unmarshalFunc)
-		if err != nil {
-			return err
-		}
+	_, bytesRead, err := ReadLengthPrefixedCollection(body, unmarshalFunc)
+	if err != nil {
+		return err
 	}
 
 	if br.ReadingsSeen > 0 {
@@ -109,7 +97,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		log.Infow("Source changes", "device_id", br.DeviceId, "source_id", sourceId, "records_added", len(c))
 	}
 
-	log.Infow("Processed", "device_id", br.DeviceId, "records_processed", br.RecordsProcessed)
+	log.Infow("Processed", "device_id", br.DeviceId, "records_processed", br.RecordsProcessed, "bytes_read", bytesRead)
 
 	return nil
 }

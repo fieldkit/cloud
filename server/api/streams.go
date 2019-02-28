@@ -204,6 +204,9 @@ func ExportAllStreams(ctx context.Context, streamer *Streamer, exporter Exporter
 
 	for {
 		cs, err := streamer.Next(ctx)
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return err
 		}
@@ -218,10 +221,8 @@ func ExportAllStreams(ctx context.Context, streamer *Streamer, exporter Exporter
 
 		err = binaryReader.Read(ctx, cs.Response.Body)
 		if err != nil {
-			log.Infow("Error reading stream", "error", err)
+			log.Infow("Error reading stream", "error", err, "stream_id", cs.Stream.StreamID)
 		}
-
-		log.Infow("Stream sent", "size", cs.Stream.Size)
 	}
 
 	return nil
@@ -420,19 +421,22 @@ func (streamer *Streamer) Next(ctx context.Context) (cs *CurrentStream, err erro
 	log := Logger(ctx).Sugar()
 
 	if streamer.Streams != nil && streamer.Index >= len(streamer.Streams) {
-		log.Infow("Completed batch")
 		streamer.Streams = nil
+
+		// Easy way to handle the single stream per batch.
+		if streamer.Limit == 0 {
+			log.Infow("No more batches")
+			return nil, io.EOF
+		}
 	}
 
 	if streamer.Streams == nil {
-		log.Infow("Querying new stream batch")
-
 		err = streamer.Query(streamer)
 		if err != nil {
 			return nil, err
 		}
 
-		log.Infow("Queried", "batch", len(streamer.Streams))
+		log.Infow("Queried", "batch_size", len(streamer.Streams))
 
 		if len(streamer.Streams) == 0 {
 			log.Infow("No more batches")
@@ -444,7 +448,7 @@ func (streamer *Streamer) Next(ctx context.Context) (cs *CurrentStream, err erro
 
 	stream := streamer.Streams[streamer.Index]
 
-	log.Infow("Stream", "index", streamer.Index, "size", stream.Size, "url", stream.URL)
+	log.Infow("Stream", "stream_id", stream.StreamID, "index", streamer.Index, "size", stream.Size, "url", stream.URL)
 
 	streamer.Index += 1
 
