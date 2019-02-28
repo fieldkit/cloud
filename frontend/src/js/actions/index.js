@@ -86,7 +86,7 @@ export function loadMapFeatures(criteria) {
         const desired = new GeoRect(criteria);
         const loaded = new GeoRectSet(map.loaded);
         if (loaded.contains(desired)) {
-            return;
+            return { };
         }
 
         const loading = desired.enlarge(2);
@@ -107,6 +107,26 @@ export function loadMapFeatures(criteria) {
                     return api.getSourceSummary(id);
                 });
             }));
+        });
+    };
+}
+
+export function loadDevices() {
+    return (dispatch, getState) => {
+        const api = new FkApi(dispatch);
+        return api.queryDevices().then(data => {
+            return data;
+        });
+    };
+}
+
+export function loadDeviceFiles(deviceId) {
+    return (dispatch, getState) => {
+        const api = new FkApi(dispatch);
+        return api.queryDeviceFilesData(deviceId).then(data => {
+            return api.queryDeviceFilesLogs(deviceId).then(logs => {
+                return { data, logs };
+            });
         });
     };
 }

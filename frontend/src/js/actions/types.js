@@ -20,6 +20,10 @@ export const API_SOURCE_GEOJSON_GET = expandApiTypes("API_SOURCE_GEOJSON_GET");
 export const API_SOURCE_QUERY_GET = expandApiTypes("API_SOURCE_QUERY_GET");
 export const API_MAP_FEATURES_GET = expandApiTypes("API_MAP_FEATURES_GET");
 
+export const API_LOAD_DEVICES = expandApiTypes("API_LOAD_DEVICES");
+export const API_LOAD_DEVICE_LOGS_FILES = expandApiTypes("API_LOAD_DEVICE_LOGS_FILES");
+export const API_LOAD_DEVICE_DATA_FILES = expandApiTypes("API_LOAD_DEVICE_DATA_FILES");
+
 export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
 
 export const FOCUS_SOURCE = 'FOCUS_SOURCE';

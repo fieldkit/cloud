@@ -126,17 +126,17 @@ function objectToQueryString(obj) {
                 result += _.reduce(value, function (result1, value1) {
                     if (!_.isNull(value1) && !_.isUndefined(value1)) {
                         result1 += key + '=' + value1 + '&';
-                        return result1
+                        return result1;
                     } else {
                         return result1;
                     }
-                }, '')
+                }, '');
             } else {
                 result += key + '=' + value + '&';
             }
             return result;
         } else {
-            return result
+            return result;
         }
     }, '').slice(0, -1);
 };
@@ -165,5 +165,40 @@ export function queryMapFeatures(criteria) {
         method: 'GET',
         unwrap: (r) => r,
         criteria: criteria
+    };
+}
+
+export function queryDevices() {
+    return {
+        types: ActionTypes.API_LOAD_DEVICES,
+        path: '/files/devices',
+        method: 'GET',
+        unwrap: (r) => r
+    };
+}
+
+export function queryDeviceFilesLogs(deviceId) {
+    return {
+        types: ActionTypes.API_LOAD_DEVICE_LOGS_FILES,
+        path: '/devices/' + deviceId + '/files/logs',
+        method: 'GET',
+        unwrap: (r) => r,
+        criteria: {
+            deviceId,
+            page: 0,
+        }
+    };
+}
+
+export function queryDeviceFilesData(deviceId) {
+    return {
+        types: ActionTypes.API_LOAD_DEVICE_DATA_FILES,
+        path: '/devices/' + deviceId + '/files/data',
+        method: 'GET',
+        unwrap: (r) => r,
+        criteria: {
+            deviceId,
+            page: 0,
+        }
     };
 }

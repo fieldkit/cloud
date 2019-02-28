@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 import type { ActiveExpedition, GeoJSON, GeoJSONFeature } from '../types';
 
@@ -77,7 +77,7 @@ class Map extends Component {
         this.context.router.history.push({
             pathname: '/',
             search: '?center=' + newCenter.join(","),
-        })
+        });
     }
 
     render() {

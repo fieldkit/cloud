@@ -1,0 +1,10 @@
+.files.page {
+    background: #ffffff;
+    color: #000000;
+
+    .device {
+        float: left;
+        margin: 10px;
+        border: 1px solid black;
+    }
+}

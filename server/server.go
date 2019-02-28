@@ -255,7 +255,7 @@ func main() {
 			}
 
 			if strings.HasSuffix(req.Host, suffix) {
-				frontendServer.ServeHTTP(w, req)
+				frontEndServer.ServeHTTP(w, req)
 				return
 			}
 

@@ -222,6 +222,55 @@ function sources(state = initialSourcesState, action) {
     }
 }
 
+function files(state = { devices: [], filesByDevice: { } }, action) {
+    switch (action.type) {
+    case ActionTypes.API_LOAD_DEVICES.SUCCESS: {
+        return { ...state, ...action.response };
+    }
+    case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.START: {
+        const { deviceId } = action.criteria;
+        if (_.isObject(state.filesByDevice[deviceId])) {
+            const nextState = _.cloneDeep(state);
+            nextState.filesByDevice[deviceId].logs = [];
+            return nextState;
+        }
+        return state;
+    }
+    case ActionTypes.API_LOAD_DEVICE_DATA_FILES.START: {
+        if (action.criteria.page == 0) {
+            const { deviceId } = action.criteria;
+            if (_.isObject(state.filesByDevice[deviceId])) {
+                const nextState = _.cloneDeep(state);
+                nextState.filesByDevice[deviceId].data = [];
+                return nextState;
+            }
+            return state;
+        }
+        return state;
+    }
+    case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.SUCCESS: {
+        const nextState = _.cloneDeep(state);
+        const { deviceId } = action.criteria;
+        if (!_.isObject(nextState.filesByDevice[deviceId])) {
+            nextState.filesByDevice[deviceId] = { logs: [], data: [] };
+        }
+        nextState.filesByDevice[deviceId].logs = [ ...nextState.filesByDevice[deviceId].logs, ...action.response.files ];
+        return nextState;
+    }
+    case ActionTypes.API_LOAD_DEVICE_DATA_FILES.SUCCESS: {
+        const nextState = _.cloneDeep(state);
+        const { deviceId } = action.criteria;
+        if (!_.isObject(nextState.filesByDevice[deviceId])) {
+            nextState.filesByDevice[deviceId] = { logs: [], data: [] };
+        }
+        nextState.filesByDevice[deviceId].data = [ ...nextState.filesByDevice[deviceId].data, ...action.response.files ];
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     activeExpedition,
     visibleFeatures,
@@ -229,4 +278,5 @@ export default combineReducers({
     chartData,
     map,
     sources,
+    files,
 });

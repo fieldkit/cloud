@@ -98,6 +98,6 @@ class FKApiClient {
         const res = await this.post(path, data);
         return res.text();
     }
-}
+};
 
 export default new FKApiClient(API_HOST);

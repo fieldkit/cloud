@@ -14,12 +14,12 @@ export type ActiveExpedition = {
         name: string,
         slug: string
     }
-}
+};
 
 export type Focus = {
     feature: ?GeoJSONFeature,
     time: number
-}
+};
 
 export type StyleSheet = {
-}
+};

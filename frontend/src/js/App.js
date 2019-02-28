@@ -22,7 +22,7 @@ class App extends Component {
             <div className="App">
                 <Provider store={store}>
                     <Router>
-                        <Route path="/" component={ Main } />
+                        <Route path="/" component={Main} />
                     </Router>
                 </Provider>
             </div>
