@@ -197,6 +197,7 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 
 	ctx.ResponseData.Header().Set("Content-Type", backend.FkDataBinaryContentType)
 	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
+
 	ctx.ResponseData.WriteHeader(http.StatusOK)
 
 	_, err = io.Copy(ctx.ResponseData, cs.Response.Body)
@@ -392,9 +393,11 @@ func (ce *SimpleCsvExporter) Finish(ctx context.Context) error {
 }
 
 type FileIterator struct {
+	Session   *session.Session
 	S3Service *s3.S3
 	Offset    int
 	Limit     int
+	SignUrls  bool
 	Query     func(s *FileIterator) error
 	Files     []*data.DeviceFile
 	Index     int
@@ -415,6 +418,8 @@ func (c *FilesController) LookupFile(ctx context.Context, streamID string) (iter
 		Offset:    0,
 		Limit:     0,
 		Index:     0,
+		SignUrls:  c.options.Session.Config.Credentials != nil,
+		Session:   c.options.Session,
 		S3Service: s3.New(c.options.Session),
 		Query: func(s *FileIterator) error {
 			s.Files = []*data.DeviceFile{}
@@ -437,6 +442,8 @@ func (c *FilesController) LookupDeviceFiles(ctx context.Context, deviceID string
 		Offset:    0,
 		Limit:     10,
 		Index:     0,
+		SignUrls:  c.options.Session.Config.Credentials != nil,
+		Session:   c.options.Session,
 		S3Service: s3.New(c.options.Session),
 		Query: func(s *FileIterator) error {
 			s.Files = []*data.DeviceFile{}
@@ -487,12 +494,15 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *CurrentFile, err er
 
 	iterator.Index += 1
 
-	signed, err := SignS3URL(iterator.S3Service, stream.URL)
-	if err != nil {
-		return nil, fmt.Errorf("Error signing stream URL: %v (%v)", stream.URL, err)
-	}
+	signed := stream.URL
 
-	log.Infow("File", "file_type_id", stream.FileID, "signed_url", signed)
+	if iterator.SignUrls {
+		signed, err = SignS3URL(iterator.S3Service, stream.URL)
+		if err != nil {
+			return nil, fmt.Errorf("Error signing stream URL: %v (%v)", stream.URL, err)
+		}
+		log.Infow("File", "file_type_id", stream.FileID, "signed_url", signed)
+	}
 
 	response, err := http.Get(signed)
 	if err != nil {
@@ -500,7 +510,7 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *CurrentFile, err er
 	}
 
 	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("Error retrieving stream: %v (status = %v)", stream.URL, response.StatusCode)
+		return nil, fmt.Errorf("Error retrieving stream: %v (status = %v)", signed, response.StatusCode)
 	}
 
 	cs = &CurrentFile{
