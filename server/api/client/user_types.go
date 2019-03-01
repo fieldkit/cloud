@@ -618,6 +618,63 @@ func (ut *AddUserPayload) Validate() (err error) {
 	return
 }
 
+// deviceFileUrls user type.
+type deviceFileUrls struct {
+	Csv  *string `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
+	JSON *string `form:"json,omitempty" json:"json,omitempty" xml:"json,omitempty"`
+	Raw  *string `form:"raw,omitempty" json:"raw,omitempty" xml:"raw,omitempty"`
+}
+
+// Validate validates the deviceFileUrls type instance.
+func (ut *deviceFileUrls) Validate() (err error) {
+	if ut.Csv == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "csv"))
+	}
+	if ut.Raw == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "raw"))
+	}
+	if ut.JSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "json"))
+	}
+	return
+}
+
+// Publicize creates DeviceFileUrls from deviceFileUrls
+func (ut *deviceFileUrls) Publicize() *DeviceFileUrls {
+	var pub DeviceFileUrls
+	if ut.Csv != nil {
+		pub.Csv = *ut.Csv
+	}
+	if ut.JSON != nil {
+		pub.JSON = *ut.JSON
+	}
+	if ut.Raw != nil {
+		pub.Raw = *ut.Raw
+	}
+	return &pub
+}
+
+// DeviceFileUrls user type.
+type DeviceFileUrls struct {
+	Csv  string `form:"csv" json:"csv" xml:"csv"`
+	JSON string `form:"json" json:"json" xml:"json"`
+	Raw  string `form:"raw" json:"raw" xml:"raw"`
+}
+
+// Validate validates the DeviceFileUrls type instance.
+func (ut *DeviceFileUrls) Validate() (err error) {
+	if ut.Csv == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "csv"))
+	}
+	if ut.Raw == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "raw"))
+	}
+	if ut.JSON == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "json"))
+	}
+	return
+}
+
 // loginPayload user type.
 type loginPayload struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`

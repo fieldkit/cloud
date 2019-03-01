@@ -228,16 +228,18 @@ function files(state = { devices: [], filesByDevice: { } }, action) {
         return { ...state, ...action.response };
     }
     case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.START: {
-        const { deviceId } = action.criteria;
-        if (_.isObject(state.filesByDevice[deviceId])) {
-            const nextState = _.cloneDeep(state);
-            nextState.filesByDevice[deviceId].logs = [];
-            return nextState;
+        if (action.criteria.page === 0) {
+            const { deviceId } = action.criteria;
+            if (_.isObject(state.filesByDevice[deviceId])) {
+                const nextState = _.cloneDeep(state);
+                nextState.filesByDevice[deviceId].logs = [];
+                return nextState;
+            }
         }
         return state;
     }
     case ActionTypes.API_LOAD_DEVICE_DATA_FILES.START: {
-        if (action.criteria.page == 0) {
+        if (action.criteria.page === 0) {
             const { deviceId } = action.criteria;
             if (_.isObject(state.filesByDevice[deviceId])) {
                 const nextState = _.cloneDeep(state);

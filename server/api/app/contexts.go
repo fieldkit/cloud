@@ -253,6 +253,45 @@ func (ctx *ListDevicesFilesContext) NotFound() error {
 	return nil
 }
 
+// RawFilesContext provides the Files raw action context.
+type RawFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	FileID string
+}
+
+// NewRawFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Files controller raw action.
+func NewRawFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*RawFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := RawFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramFileID := req.Params["fileId"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		rctx.FileID = rawFileID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *RawFilesContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *RawFilesContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddFirmwareContext provides the Firmware add action context.
 type AddFirmwareContext struct {
 	context.Context

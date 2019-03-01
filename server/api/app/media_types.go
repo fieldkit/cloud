@@ -120,15 +120,16 @@ func (mt *Device) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device.file+json; view=default
 type DeviceFile struct {
-	DeviceID   string    `form:"device_id" json:"device_id" xml:"device_id"`
-	FileID     string    `form:"file_id" json:"file_id" xml:"file_id"`
-	FileTypeID string    `form:"file_type_id" json:"file_type_id" xml:"file_type_id"`
-	Firmware   string    `form:"firmware" json:"firmware" xml:"firmware"`
-	ID         int       `form:"id" json:"id" xml:"id"`
-	Meta       string    `form:"meta" json:"meta" xml:"meta"`
-	Size       int       `form:"size" json:"size" xml:"size"`
-	Time       time.Time `form:"time" json:"time" xml:"time"`
-	URL        string    `form:"url" json:"url" xml:"url"`
+	DeviceID   string          `form:"device_id" json:"device_id" xml:"device_id"`
+	FileID     string          `form:"file_id" json:"file_id" xml:"file_id"`
+	FileTypeID string          `form:"file_type_id" json:"file_type_id" xml:"file_type_id"`
+	Firmware   string          `form:"firmware" json:"firmware" xml:"firmware"`
+	ID         int             `form:"id" json:"id" xml:"id"`
+	Meta       string          `form:"meta" json:"meta" xml:"meta"`
+	Size       int             `form:"size" json:"size" xml:"size"`
+	Time       time.Time       `form:"time" json:"time" xml:"time"`
+	URL        string          `form:"url" json:"url" xml:"url"`
+	Urls       *DeviceFileUrls `form:"urls" json:"urls" xml:"urls"`
 }
 
 // Validate validates the DeviceFile media type instance.
@@ -152,6 +153,14 @@ func (mt *DeviceFile) Validate() (err error) {
 
 	if mt.URL == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	if mt.Urls == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Urls != nil {
+		if err2 := mt.Urls.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

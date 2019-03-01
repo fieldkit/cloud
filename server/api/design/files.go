@@ -5,6 +5,13 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var DeviceFileUrls = Type("DeviceFileUrls", func() {
+	Attribute("csv", String)
+	Attribute("raw", String)
+	Attribute("json", String)
+	Required("csv", "raw", "json")
+})
+
 var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func() {
 	TypeName("DeviceFile")
 	Attributes(func() {
@@ -17,6 +24,7 @@ var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func()
 		Attribute("file_type_id", String)
 		Attribute("size", Integer)
 		Attribute("url", String)
+		Attribute("urls", DeviceFileUrls)
 		Required("id")
 		Required("time")
 		Required("file_id")
@@ -26,6 +34,7 @@ var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func()
 		Required("file_type_id")
 		Required("size")
 		Required("url")
+		Required("urls")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -37,6 +46,7 @@ var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func()
 		Attribute("file_type_id")
 		Attribute("size")
 		Attribute("url")
+		Attribute("urls")
 	})
 })
 
@@ -133,6 +143,15 @@ var _ = Resource("Files", func() {
 			})
 		})
 	*/
+
+	Action("raw", func() {
+		Routing(GET("files/:fileId/raw"))
+		Description("Export file")
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+		})
+	})
 
 	Action("csv", func() {
 		Routing(GET("files/:fileId/csv"))

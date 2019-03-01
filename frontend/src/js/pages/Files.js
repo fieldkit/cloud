@@ -8,7 +8,10 @@ import { Link } from 'react-router-dom';
 
 import { loadDevices, loadDeviceFiles } from '../actions';
 
+import { API_HOST } from '../secrets';
+
 import '../../css/files.css';
+import '../../css/bootstrap.min.css';
 
 class Files extends Component {
     props: {
@@ -45,12 +48,12 @@ class Files extends Component {
             }
 
             return (
-                <div className="files page">
+                <div className="files page container-fluid">
                     <div className="header">
                         <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
                     </div>
                     <div className="main-container">
-                    <table>
+                    <table className="table table-striped">
                         <thead>
                             <tr>
                                 <th>File</th>
@@ -65,8 +68,8 @@ class Files extends Component {
                                         <td>{file.file_id}</td>
                                         <td>{file.size}</td>
                                         <td>{file.time}</td>
-                                        <td>Raw</td>
-                                        <td>CSV</td>
+                                        <td><a href={API_HOST + file.urls.csv}>CSV</a></td>
+                                        <td><a href={API_HOST + file.urls.raw}>Raw</a></td>
                                     </tr>
                                 );
                             })}
@@ -78,13 +81,13 @@ class Files extends Component {
         }
 
         return (
-            <div className="files page">
+            <div className="files page container-fluid">
                 <div className="header">
                     <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
                 </div>
                 <div className="main-container">
 
-                <table>
+                <table className="table table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>

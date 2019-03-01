@@ -183,6 +183,7 @@ type FilesController interface {
 	ListDeviceDataFiles(*ListDeviceDataFilesFilesContext) error
 	ListDeviceLogFiles(*ListDeviceLogFilesFilesContext) error
 	ListDevices(*ListDevicesFilesContext) error
+	Raw(*RawFilesContext) error
 }
 
 // MountFilesController "mounts" a Files resource controller on the given service.
@@ -194,6 +195,7 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/data", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/logs", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/devices", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/files/:fileId/raw", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -274,6 +276,22 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/devices", ctrl.MuxHandler("list devices", h, nil))
 	service.LogInfo("mount", "ctrl", "Files", "action", "ListDevices", "route", "GET /files/devices")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewRawFilesContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Raw(rctx)
+	}
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("GET", "/files/:fileId/raw", ctrl.MuxHandler("raw", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "Raw", "route", "GET /files/:fileId/raw")
 }
 
 // handleFilesOrigin applies the CORS response headers corresponding to the origin.

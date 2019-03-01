@@ -62,6 +62,11 @@ func DeviceFileSummaryType(s *data.DeviceFile) *app.DeviceFile {
 		FileTypeID: s.FileID,
 		Time:       s.Time,
 		URL:        s.URL,
+		Urls: &app.DeviceFileUrls{
+			Csv:  fmt.Sprintf("/files/%v/csv", s.ID),
+			Raw:  fmt.Sprintf("/files/%v/raw", s.ID),
+			JSON: fmt.Sprintf("/files/%v/json", s.ID),
+		},
 	}
 }
 
@@ -163,7 +168,7 @@ func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
 
 	exporter := NewSimpleCsvExporter(ctx.ResponseData)
 
-	return ExportAllFiles(ctx, iterator, exporter)
+	return ExportAllFiles(ctx, ctx.ResponseData, iterator, exporter)
 }
 
 func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
@@ -174,7 +179,32 @@ func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
 
 	exporter := NewSimpleJsonExporter(ctx.ResponseData)
 
-	return ExportAllFiles(ctx, iterator, exporter)
+	return ExportAllFiles(ctx, ctx.ResponseData, iterator, exporter)
+}
+
+func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
+	iterator, err := c.LookupFile(ctx, ctx.FileID)
+	if err != nil {
+		return err
+	}
+
+	cs, err := iterator.Next(ctx)
+	if err != nil {
+		return err
+	}
+
+	fileName := fmt.Sprintf("%s.csv", cs.File.StreamID)
+
+	ctx.ResponseData.Header().Set("Content-Type", backend.FkDataBinaryContentType)
+	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
+	ctx.ResponseData.WriteHeader(http.StatusOK)
+
+	_, err = io.Copy(ctx.ResponseData, cs.Response.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /*
@@ -201,8 +231,10 @@ func (c *FilesController) DeviceLogs(ctx *app.DeviceLogsFilesContext) error {
 }
 */
 
-func ExportAllFiles(ctx context.Context, iterator *FileIterator, exporter Exporter) error {
+func ExportAllFiles(ctx context.Context, response *goa.ResponseData, iterator *FileIterator, exporter Exporter) error {
 	log := Logger(ctx).Sugar()
+
+	header := false
 
 	for {
 		cs, err := iterator.Next(ctx)
@@ -215,6 +247,13 @@ func ExportAllFiles(ctx context.Context, iterator *FileIterator, exporter Export
 
 		if cs == nil {
 			break
+		}
+
+		if !header {
+			fileName := exporter.FileName(cs.File)
+			response.Header().Set("Content-Type", exporter.MimeType())
+			response.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
+			header = true
 		}
 
 		defer cs.Response.Body.Close()
@@ -232,6 +271,8 @@ func ExportAllFiles(ctx context.Context, iterator *FileIterator, exporter Export
 
 type Exporter interface {
 	ForFile(stream *data.DeviceFile) backend.FormattedMessageReceiver
+	FileName(file *data.DeviceFile) string
+	MimeType() string
 }
 
 type SimpleJsonExporter struct {
@@ -244,8 +285,16 @@ func NewSimpleJsonExporter(writer io.Writer) Exporter {
 	return &SimpleJsonExporter{Writer: writer}
 }
 
-func (ce *SimpleJsonExporter) ForFile(stream *data.DeviceFile) backend.FormattedMessageReceiver {
-	ce.File = stream
+func (ce *SimpleJsonExporter) MimeType() string {
+	return "application/json"
+}
+
+func (ce *SimpleJsonExporter) FileName(file *data.DeviceFile) string {
+	return fmt.Sprintf("%s.json", file.StreamID)
+}
+
+func (ce *SimpleJsonExporter) ForFile(file *data.DeviceFile) backend.FormattedMessageReceiver {
+	ce.File = file
 	return ce
 }
 
@@ -289,8 +338,16 @@ func NewSimpleCsvExporter(writer io.Writer) Exporter {
 	return &SimpleCsvExporter{Writer: writer}
 }
 
-func (ce *SimpleCsvExporter) ForFile(stream *data.DeviceFile) backend.FormattedMessageReceiver {
-	ce.File = stream
+func (ce *SimpleCsvExporter) MimeType() string {
+	return "text/csv"
+}
+
+func (ce *SimpleCsvExporter) FileName(file *data.DeviceFile) string {
+	return fmt.Sprintf("%s.csv", file.StreamID)
+}
+
+func (ce *SimpleCsvExporter) ForFile(file *data.DeviceFile) backend.FormattedMessageReceiver {
+	ce.File = file
 	return ce
 }
 

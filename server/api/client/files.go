@@ -100,8 +100,8 @@ func (c *Client) NewListDeviceDataFilesFilesRequest(ctx context.Context, path st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp142 := strconv.Itoa(*page)
-		values.Set("page", tmp142)
+		tmp143 := strconv.Itoa(*page)
+		values.Set("page", tmp143)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -136,8 +136,8 @@ func (c *Client) NewListDeviceLogFilesFilesRequest(ctx context.Context, path str
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp143 := strconv.Itoa(*page)
-		values.Set("page", tmp143)
+		tmp144 := strconv.Itoa(*page)
+		values.Set("page", tmp144)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -164,6 +164,36 @@ func (c *Client) ListDevicesFiles(ctx context.Context, path string) (*http.Respo
 
 // NewListDevicesFilesRequest create the request corresponding to the list devices action endpoint of the Files resource.
 func (c *Client) NewListDevicesFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// RawFilesPath computes a request path to the raw action of Files.
+func RawFilesPath(fileID string) string {
+	param0 := fileID
+
+	return fmt.Sprintf("/files/%s/raw", param0)
+}
+
+// Export file
+func (c *Client) RawFiles(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRawFilesRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRawFilesRequest create the request corresponding to the raw action endpoint of the Files resource.
+func (c *Client) NewRawFilesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
