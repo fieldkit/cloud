@@ -124,26 +124,6 @@ var _ = Resource("Files", func() {
 		})
 	})
 
-	/*
-		Action("device data", func() {
-			Routing(GET("devices/:deviceId/data"))
-			Description("Export device data")
-			Response(NotFound)
-			Response(OK, func() {
-				Status(200)
-			})
-		})
-
-		Action("device logs", func() {
-			Routing(GET("devices/:deviceId/logs"))
-			Description("Export device logs")
-			Response(NotFound)
-			Response(OK, func() {
-				Status(200)
-			})
-		})
-	*/
-
 	Action("raw", func() {
 		Routing(GET("files/:fileId/raw"))
 		Description("Export file")

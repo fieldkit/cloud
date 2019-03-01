@@ -207,30 +207,6 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 	return nil
 }
 
-/*
-func (c *FilesController) DeviceData(ctx *app.DeviceDataFilesContext) error {
-	iterator, err := c.LookupDeviceFiles(ctx, ctx.DeviceID, DataFileTypeID)
-	if err != nil {
-		return err
-	}
-
-	exporter := NewSimpleCsvExporter(ctx.ResponseData)
-
-	return ExportAllFiles(ctx, iterator, exporter)
-}
-
-func (c *FilesController) DeviceLogs(ctx *app.DeviceLogsFilesContext) error {
-	iterator, err := c.LookupDeviceFiles(ctx, ctx.DeviceID, LogFileTypeID)
-	if err != nil {
-		return err
-	}
-
-	exporter := NewSimpleCsvExporter(ctx.ResponseData)
-
-	return ExportAllFiles(ctx, iterator, exporter)
-}
-*/
-
 func ExportAllFiles(ctx context.Context, response *goa.ResponseData, iterator *FileIterator, exporter Exporter) error {
 	log := Logger(ctx).Sugar()
 
