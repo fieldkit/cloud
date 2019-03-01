@@ -380,7 +380,7 @@ func (ce *SimpleCsvExporter) HandleFormattedMessage(ctx context.Context, fm *ing
 	sort.Strings(keys)
 
 	if !ce.HeaderWritten {
-		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v,", "Device", "File", "File", "Message", "Time", "Longitude", "Latitude", "Fixed")
+		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v", "Device", "File", "File", "Message", "Time", "Longitude", "Latitude", "Fixed")
 
 		for _, key := range keys {
 			fmt.Fprintf(ce.Writer, ",%v", key)
