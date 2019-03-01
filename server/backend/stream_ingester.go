@@ -252,7 +252,7 @@ func (h *IncomingHeaders) ToLoggingFields() []interface{} {
 func (h *IncomingHeaders) ToPartHeaders(contentType string, contentLength int32) *IncomingHeaders {
 	mediaType, mediaTypeParams, _ := mime.ParseMediaType(contentType)
 
-	return &IncomingHeaders{
+	headers := &IncomingHeaders{
 		ContentType:     contentType,
 		ContentLength:   contentLength,
 		MediaType:       mediaType,
@@ -268,6 +268,8 @@ func (h *IncomingHeaders) ToPartHeaders(contentType string, contentLength int32)
 		FkCompiled:      h.FkCompiled,
 		FkUploadName:    h.FkUploadName,
 	}
+
+	return headers
 }
 
 func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
@@ -303,6 +305,10 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		FkFileVersion:   req.Header.Get(FkFileVersionHeaderName),
 		FkCompiled:      req.Header.Get(FkCompiledHeaderName),
 		FkUploadName:    req.Header.Get(FkUploadNameHeaderName),
+	}
+
+	if headers.FkDeviceId == "" {
+		return nil, fmt.Errorf("Invalid %s ('%s')", FkDeviceIdHeaderName, headers.FkDeviceId)
 	}
 
 	return headers, nil
