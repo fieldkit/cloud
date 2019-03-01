@@ -23,8 +23,8 @@ func CsvFilesPath(fileID string) string {
 }
 
 // Export file
-func (c *Client) CsvFiles(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewCsvFilesRequest(ctx, path)
+func (c *Client) CsvFiles(ctx context.Context, path string, dl *bool) (*http.Response, error) {
+	req, err := c.NewCsvFilesRequest(ctx, path, dl)
 	if err != nil {
 		return nil, err
 	}
@@ -32,12 +32,18 @@ func (c *Client) CsvFiles(ctx context.Context, path string) (*http.Response, err
 }
 
 // NewCsvFilesRequest create the request corresponding to the csv action endpoint of the Files resource.
-func (c *Client) NewCsvFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewCsvFilesRequest(ctx context.Context, path string, dl *bool) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if dl != nil {
+		tmp149 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp149)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -53,8 +59,8 @@ func JSONFilesPath(fileID string) string {
 }
 
 // Export file
-func (c *Client) JSONFiles(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewJSONFilesRequest(ctx, path)
+func (c *Client) JSONFiles(ctx context.Context, path string, dl *bool) (*http.Response, error) {
+	req, err := c.NewJSONFilesRequest(ctx, path, dl)
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +68,18 @@ func (c *Client) JSONFiles(ctx context.Context, path string) (*http.Response, er
 }
 
 // NewJSONFilesRequest create the request corresponding to the json action endpoint of the Files resource.
-func (c *Client) NewJSONFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewJSONFilesRequest(ctx context.Context, path string, dl *bool) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if dl != nil {
+		tmp150 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp150)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -100,8 +112,8 @@ func (c *Client) NewListDeviceDataFilesFilesRequest(ctx context.Context, path st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp143 := strconv.Itoa(*page)
-		values.Set("page", tmp143)
+		tmp151 := strconv.Itoa(*page)
+		values.Set("page", tmp151)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -136,8 +148,8 @@ func (c *Client) NewListDeviceLogFilesFilesRequest(ctx context.Context, path str
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp144 := strconv.Itoa(*page)
-		values.Set("page", tmp144)
+		tmp152 := strconv.Itoa(*page)
+		values.Set("page", tmp152)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -184,8 +196,8 @@ func RawFilesPath(fileID string) string {
 }
 
 // Export file
-func (c *Client) RawFiles(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewRawFilesRequest(ctx, path)
+func (c *Client) RawFiles(ctx context.Context, path string, dl *bool) (*http.Response, error) {
+	req, err := c.NewRawFilesRequest(ctx, path, dl)
 	if err != nil {
 		return nil, err
 	}
@@ -193,12 +205,18 @@ func (c *Client) RawFiles(ctx context.Context, path string) (*http.Response, err
 }
 
 // NewRawFilesRequest create the request corresponding to the raw action endpoint of the Files resource.
-func (c *Client) NewRawFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewRawFilesRequest(ctx context.Context, path string, dl *bool) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if dl != nil {
+		tmp153 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp153)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

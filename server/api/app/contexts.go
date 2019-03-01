@@ -63,6 +63,7 @@ type CsvFilesContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
+	Dl     bool
 	FileID string
 }
 
@@ -75,6 +76,17 @@ func NewCsvFilesContext(ctx context.Context, r *http.Request, service *goa.Servi
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := CsvFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDl := req.Params["dl"]
+	if len(paramDl) == 0 {
+		rctx.Dl = true
+	} else {
+		rawDl := paramDl[0]
+		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
+			rctx.Dl = dl
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
+		}
+	}
 	paramFileID := req.Params["fileId"]
 	if len(paramFileID) > 0 {
 		rawFileID := paramFileID[0]
@@ -102,6 +114,7 @@ type JSONFilesContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
+	Dl     bool
 	FileID string
 }
 
@@ -114,6 +127,17 @@ func NewJSONFilesContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := JSONFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDl := req.Params["dl"]
+	if len(paramDl) == 0 {
+		rctx.Dl = true
+	} else {
+		rawDl := paramDl[0]
+		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
+			rctx.Dl = dl
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
+		}
+	}
 	paramFileID := req.Params["fileId"]
 	if len(paramFileID) > 0 {
 		rawFileID := paramFileID[0]
@@ -163,9 +187,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp3 := page
-			tmp2 := &tmp3
-			rctx.Page = tmp2
+			tmp5 := page
+			tmp4 := &tmp5
+			rctx.Page = tmp4
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -206,9 +230,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp5 := page
-			tmp4 := &tmp5
-			rctx.Page = tmp4
+			tmp7 := page
+			tmp6 := &tmp7
+			rctx.Page = tmp6
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -258,6 +282,7 @@ type RawFilesContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
+	Dl     bool
 	FileID string
 }
 
@@ -270,6 +295,17 @@ func NewRawFilesContext(ctx context.Context, r *http.Request, service *goa.Servi
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := RawFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDl := req.Params["dl"]
+	if len(paramDl) == 0 {
+		rctx.Dl = true
+	} else {
+		rawDl := paramDl[0]
+		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
+			rctx.Dl = dl
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
+		}
+	}
 	paramFileID := req.Params["fileId"]
 	if len(paramFileID) > 0 {
 		rawFileID := paramFileID[0]
@@ -593,8 +629,8 @@ func NewListBySourceGeoJSONContext(ctx context.Context, r *http.Request, service
 	if len(paramDescending) > 0 {
 		rawDescending := paramDescending[0]
 		if descending, err2 := strconv.ParseBool(rawDescending); err2 == nil {
-			tmp7 := &descending
-			rctx.Descending = tmp7
+			tmp10 := &descending
+			rctx.Descending = tmp10
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("descending", rawDescending, "boolean"))
 		}

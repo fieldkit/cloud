@@ -130,6 +130,11 @@ var _ = Resource("Files", func() {
 	Action("raw", func() {
 		Routing(GET("files/:fileId/raw"))
 		Description("Export file")
+		Params(func() {
+			Param("dl", Boolean, func() {
+				Default(true)
+			})
+		})
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
@@ -139,6 +144,11 @@ var _ = Resource("Files", func() {
 	Action("csv", func() {
 		Routing(GET("files/:fileId/csv"))
 		Description("Export file")
+		Params(func() {
+			Param("dl", Boolean, func() {
+				Default(true)
+			})
+		})
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
@@ -148,6 +158,11 @@ var _ = Resource("Files", func() {
 	Action("json", func() {
 		Routing(GET("files/:fileId/json"))
 		Description("Export file")
+		Params(func() {
+			Param("dl", Boolean, func() {
+				Default(true)
+			})
+		})
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)

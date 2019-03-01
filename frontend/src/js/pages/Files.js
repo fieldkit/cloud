@@ -60,6 +60,7 @@ class Files extends Component {
                                 <th>Type</th>
                                 <th>Size</th>
                                 <th>Uploaded</th>
+                                <th>Links</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,9 +71,9 @@ class Files extends Component {
                                         <td>{file.file_type_name}</td>
                                         <td>{file.size}</td>
                                         <td>{file.time}</td>
-                                        <td><a href={API_HOST + file.urls.csv}>CSV</a></td>
-                                        <td><a href={API_HOST + file.urls.json}>JSON</a></td>
-                                        <td><a href={API_HOST + file.urls.raw}>Raw</a></td>
+                                        <td>
+                                            <a target="_blank" href={API_HOST + file.urls.csv + "?dl=0"}>CSV</a> (<a href={API_HOST + file.urls.csv}>Download</a>) | <a target="_blank" href={API_HOST + file.urls.json + "?dl=0"}>JSON</a> (<a href={API_HOST + file.urls.json}>Download</a>) | <a href={API_HOST + file.urls.raw}>Raw</a>
+                                        </td>
                                     </tr>
                                 );
                             })}

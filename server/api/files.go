@@ -174,7 +174,7 @@ func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
 
 	exporter := NewSimpleCsvExporter(ctx.ResponseData)
 
-	return ExportAllFiles(ctx, ctx.ResponseData, iterator, exporter)
+	return ExportAllFiles(ctx, ctx.ResponseData, ctx.Dl, iterator, exporter)
 }
 
 func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
@@ -185,7 +185,7 @@ func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
 
 	exporter := NewSimpleJsonExporter(ctx.ResponseData)
 
-	return ExportAllFiles(ctx, ctx.ResponseData, iterator, exporter)
+	return ExportAllFiles(ctx, ctx.ResponseData, ctx.Dl, iterator, exporter)
 }
 
 func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
@@ -214,7 +214,7 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 	return nil
 }
 
-func ExportAllFiles(ctx context.Context, response *goa.ResponseData, iterator *FileIterator, exporter Exporter) error {
+func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bool, iterator *FileIterator, exporter Exporter) error {
 	log := Logger(ctx).Sugar()
 
 	header := false
@@ -233,9 +233,14 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, iterator *F
 		}
 
 		if !header {
-			fileName := exporter.FileName(cs.File)
-			response.Header().Set("Content-Type", exporter.MimeType())
-			response.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
+			if download {
+				fileName := exporter.FileName(cs.File)
+				response.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+				response.Header().Set("Content-Type", exporter.DownloadMimeType())
+			} else {
+				response.Header().Set("Content-Disposition", fmt.Sprintf("inline"))
+				response.Header().Set("Content-Type", exporter.MimeType())
+			}
 			header = true
 		}
 
@@ -255,6 +260,7 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, iterator *F
 type Exporter interface {
 	ForFile(stream *data.DeviceFile) backend.FormattedMessageReceiver
 	FileName(file *data.DeviceFile) string
+	DownloadMimeType() string
 	MimeType() string
 }
 
@@ -268,8 +274,12 @@ func NewSimpleJsonExporter(writer io.Writer) Exporter {
 	return &SimpleJsonExporter{Writer: writer}
 }
 
+func (ce *SimpleJsonExporter) DownloadMimeType() string {
+	return "application/json; charset=utf-8"
+}
+
 func (ce *SimpleJsonExporter) MimeType() string {
-	return "application/json"
+	return "text/plain; charset=utf-8"
 }
 
 func (ce *SimpleJsonExporter) FileName(file *data.DeviceFile) string {
@@ -321,8 +331,12 @@ func NewSimpleCsvExporter(writer io.Writer) Exporter {
 	return &SimpleCsvExporter{Writer: writer}
 }
 
+func (ce *SimpleCsvExporter) DownloadMimeType() string {
+	return "text/csv; charset=utf-8"
+}
+
 func (ce *SimpleCsvExporter) MimeType() string {
-	return "text/csv"
+	return "text/plain; charset=utf-8"
 }
 
 func (ce *SimpleCsvExporter) FileName(file *data.DeviceFile) string {
