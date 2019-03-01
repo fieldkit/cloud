@@ -254,11 +254,14 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 		}
 	}
 
+	exporter.Finish(ctx)
+
 	return nil
 }
 
 type Exporter interface {
 	ForFile(stream *data.DeviceFile) backend.FormattedMessageReceiver
+	Finish(ctx context.Context) error
 	FileName(file *data.DeviceFile) string
 	DownloadMimeType() string
 	MimeType() string
@@ -318,6 +321,7 @@ func (ce *SimpleJsonExporter) HandleFormattedMessage(ctx context.Context, fm *in
 }
 
 func (ce *SimpleJsonExporter) Finish(ctx context.Context) error {
+	fmt.Fprintf(ce.Writer, "\n]\n")
 	return nil
 }
 
