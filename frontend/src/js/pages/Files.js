@@ -1,5 +1,6 @@
 // @flow weak
 import _ from 'lodash';
+import moment from 'moment';
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -37,6 +38,62 @@ class Files extends Component {
         }
     }
 
+    renderFiles(deviceFiles) {
+        return (
+            <div className="files page container-fluid">
+                <div className="header">
+                    <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
+                </div>
+                <div className="main-container">
+                <table className="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Uploaded</th>
+                            <th>Links</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {deviceFiles.all.map(file => this.renderFile(file))}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        );
+    }
+
+    renderFile(file) {
+        const time = moment(file.time).format('MMM Do YYYY, h:mm:ss a');;
+
+        return (
+            <tr key={file.file_id}>
+                <td>{file.file_id}</td>
+                <td>{file.file_type_name}</td>
+                <td>{file.size}</td>
+                <td>{time}</td>
+                <td>
+                    <a target="_blank" href={API_HOST + file.urls.csv + "?dl=0"}>CSV</a> (<a href={API_HOST + file.urls.csv}>Download</a>) <span> | </span>
+                    <a target="_blank" href={API_HOST + file.urls.json + "?dl=0"}>JSON</a> (<a href={API_HOST + file.urls.json}>Download</a>) <span> | </span>
+                    <a href={API_HOST + file.urls.raw}>Raw</a>
+                </td>
+            </tr>
+        );
+    }
+
+    renderDevice(device) {
+        const time = moment(device.last_file_time).format('MMM Do YYYY, h:mm:ss a');;
+
+        return (
+            <tr className="device" key={device.device_id}>
+                <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
+                <td>{device.number_of_files}</td>
+                <td>{time}</td>
+            </tr>
+        );
+    }
+
     render() {
         const { files, deviceId } = this.props;
 
@@ -47,41 +104,7 @@ class Files extends Component {
                 return (<div></div>);
             }
 
-            return (
-                <div className="files page container-fluid">
-                    <div className="header">
-                        <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
-                    </div>
-                    <div className="main-container">
-                    <table className="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>Type</th>
-                                <th>Size</th>
-                                <th>Uploaded</th>
-                                <th>Links</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {deviceFiles.all.map(file => {
-                                return (
-                                    <tr key={file.file_id}>
-                                        <td>{file.file_id}</td>
-                                        <td>{file.file_type_name}</td>
-                                        <td>{file.size}</td>
-                                        <td>{file.time}</td>
-                                        <td>
-                                            <a target="_blank" href={API_HOST + file.urls.csv + "?dl=0"}>CSV</a> (<a href={API_HOST + file.urls.csv}>Download</a>) | <a target="_blank" href={API_HOST + file.urls.json + "?dl=0"}>JSON</a> (<a href={API_HOST + file.urls.json}>Download</a>) | <a href={API_HOST + file.urls.raw}>Raw</a>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            );
+            return this.renderFiles(deviceFiles);
         }
 
         return (
@@ -100,15 +123,7 @@ class Files extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                {files.devices.map(device => {
-                    return (
-                        <tr className="device" key={device.device_id}>
-                            <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
-                            <td>{device.number_of_files}</td>
-                            <td>{device.last_file_time}</td>
-                        </tr>
-                    );
-                })}
+                    {files.devices.map(device => this.renderDevice(device))}
                 </tbody>
                 </table>
 
