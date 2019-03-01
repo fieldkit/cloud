@@ -69,9 +69,9 @@ func DeviceFileSummaryType(s *data.DeviceFile) *app.DeviceFile {
 		Time:         s.Time,
 		URL:          s.URL,
 		Urls: &app.DeviceFileUrls{
-			Csv:  fmt.Sprintf("/files/%v/csv", s.ID),
-			Raw:  fmt.Sprintf("/files/%v/raw", s.ID),
-			JSON: fmt.Sprintf("/files/%v/json", s.ID),
+			Csv:  fmt.Sprintf("/files/%v/data.csv", s.ID),
+			JSON: fmt.Sprintf("/files/%v/data.json", s.ID),
+			Raw:  fmt.Sprintf("/files/%v/data.fkpb", s.ID),
 		},
 	}
 }
@@ -282,7 +282,7 @@ func (ce *SimpleJsonExporter) DownloadMimeType() string {
 }
 
 func (ce *SimpleJsonExporter) MimeType() string {
-	return "text/plain; charset=utf-8"
+	return ce.DownloadMimeType()
 }
 
 func (ce *SimpleJsonExporter) FileName(file *data.DeviceFile) string {

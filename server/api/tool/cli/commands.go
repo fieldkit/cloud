@@ -848,7 +848,7 @@ Payload example:
 	}
 	tmp73 := new(CsvFilesCommand)
 	sub = &cobra.Command{
-		Use:   `files ["/files/FILEID/csv"]`,
+		Use:   `files ["/files/FILEID/data.csv"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp73.Run(c, args) },
 	}
@@ -1095,7 +1095,7 @@ Payload example:
 	}
 	tmp96 := new(JSONFilesCommand)
 	sub = &cobra.Command{
-		Use:   `files ["/files/FILEID/json"]`,
+		Use:   `files ["/files/FILEID/data.json"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp96.Run(c, args) },
 	}
@@ -1461,7 +1461,7 @@ Payload example:
 	}
 	tmp128 := new(RawFilesCommand)
 	sub = &cobra.Command{
-		Use:   `files ["/files/FILEID/raw"]`,
+		Use:   `files ["/files/FILEID/data.fkpb"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp128.Run(c, args) },
 	}
@@ -1997,7 +1997,7 @@ func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/files/%v/csv", url.QueryEscape(cmd.FileID))
+		path = fmt.Sprintf("/files/%v/data.csv", url.QueryEscape(cmd.FileID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -2024,7 +2024,7 @@ func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
 func (cmd *CsvFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var fileID string
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", "true", ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
 }
 
 // Run makes the HTTP request corresponding to the JSONFilesCommand command.
@@ -2033,7 +2033,7 @@ func (cmd *JSONFilesCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/files/%v/json", url.QueryEscape(cmd.FileID))
+		path = fmt.Sprintf("/files/%v/data.json", url.QueryEscape(cmd.FileID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -2060,7 +2060,7 @@ func (cmd *JSONFilesCommand) Run(c *client.Client, args []string) error {
 func (cmd *JSONFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var fileID string
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", "true", ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
 }
 
 // Run makes the HTTP request corresponding to the ListDeviceDataFilesFilesCommand command.
@@ -2149,7 +2149,7 @@ func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/files/%v/raw", url.QueryEscape(cmd.FileID))
+		path = fmt.Sprintf("/files/%v/data.fkpb", url.QueryEscape(cmd.FileID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -2176,7 +2176,7 @@ func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
 func (cmd *RawFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var fileID string
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", "true", ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddFirmwareCommand command.

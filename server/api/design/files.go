@@ -128,7 +128,7 @@ var _ = Resource("Files", func() {
 	})
 
 	Action("raw", func() {
-		Routing(GET("files/:fileId/raw"))
+		Routing(GET("files/:fileId/data.fkpb"))
 		Description("Export file")
 		Params(func() {
 			Param("dl", Boolean, func() {
@@ -142,7 +142,7 @@ var _ = Resource("Files", func() {
 	})
 
 	Action("csv", func() {
-		Routing(GET("files/:fileId/csv"))
+		Routing(GET("files/:fileId/data.csv"))
 		Description("Export file")
 		Params(func() {
 			Param("dl", Boolean, func() {
@@ -156,7 +156,7 @@ var _ = Resource("Files", func() {
 	})
 
 	Action("json", func() {
-		Routing(GET("files/:fileId/json"))
+		Routing(GET("files/:fileId/data.json"))
 		Description("Export file")
 		Params(func() {
 			Param("dl", Boolean, func() {

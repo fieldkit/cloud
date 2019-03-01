@@ -19,7 +19,7 @@ import (
 func CsvFilesPath(fileID string) string {
 	param0 := fileID
 
-	return fmt.Sprintf("/files/%s/csv", param0)
+	return fmt.Sprintf("/files/%s/data.csv", param0)
 }
 
 // Export file
@@ -55,7 +55,7 @@ func (c *Client) NewCsvFilesRequest(ctx context.Context, path string, dl *bool) 
 func JSONFilesPath(fileID string) string {
 	param0 := fileID
 
-	return fmt.Sprintf("/files/%s/json", param0)
+	return fmt.Sprintf("/files/%s/data.json", param0)
 }
 
 // Export file
@@ -192,7 +192,7 @@ func (c *Client) NewListDevicesFilesRequest(ctx context.Context, path string) (*
 func RawFilesPath(fileID string) string {
 	param0 := fileID
 
-	return fmt.Sprintf("/files/%s/raw", param0)
+	return fmt.Sprintf("/files/%s/data.fkpb", param0)
 }
 
 // Export file

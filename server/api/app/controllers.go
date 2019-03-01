@@ -190,12 +190,12 @@ type FilesController interface {
 func MountFilesController(service *goa.Service, ctrl FilesController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/files/:fileId/csv", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/files/:fileId/json", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/files/:fileId/data.csv", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/files/:fileId/data.json", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/data", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/logs", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/devices", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/files/:fileId/raw", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/files/:fileId/data.fkpb", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -210,8 +210,8 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 		return ctrl.Csv(rctx)
 	}
 	h = handleFilesOrigin(h)
-	service.Mux.Handle("GET", "/files/:fileId/csv", ctrl.MuxHandler("csv", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "action", "Csv", "route", "GET /files/:fileId/csv")
+	service.Mux.Handle("GET", "/files/:fileId/data.csv", ctrl.MuxHandler("csv", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "Csv", "route", "GET /files/:fileId/data.csv")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -226,8 +226,8 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 		return ctrl.JSON(rctx)
 	}
 	h = handleFilesOrigin(h)
-	service.Mux.Handle("GET", "/files/:fileId/json", ctrl.MuxHandler("json", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "action", "JSON", "route", "GET /files/:fileId/json")
+	service.Mux.Handle("GET", "/files/:fileId/data.json", ctrl.MuxHandler("json", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "JSON", "route", "GET /files/:fileId/data.json")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -290,8 +290,8 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 		return ctrl.Raw(rctx)
 	}
 	h = handleFilesOrigin(h)
-	service.Mux.Handle("GET", "/files/:fileId/raw", ctrl.MuxHandler("raw", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "action", "Raw", "route", "GET /files/:fileId/raw")
+	service.Mux.Handle("GET", "/files/:fileId/data.fkpb", ctrl.MuxHandler("raw", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "Raw", "route", "GET /files/:fileId/data.fkpb")
 }
 
 // handleFilesOrigin applies the CORS response headers corresponding to the origin.

@@ -251,6 +251,18 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -331,17 +343,6 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
-    - centroid:
-      - 0.19389316
-      - 0.19389316
-      endTime: 1982-11-27T22:23:46Z
-      envelope:
-      - - 0.39624313
-      id: 6.130069e+18
-      numberOfFeatures: 8.5731494e+18
-      radius: 0.4070355
-      sourceId: 8.62877e+18
-      startTime: 1988-04-25T05:20:05Z
     - centroid:
       - 0.19389316
       - 0.19389316
@@ -962,21 +963,21 @@ definitions:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
         type: Beatae itaque ipsa soluta minus consequatur.
       type: Sed magni consequatur et.
     properties:
@@ -998,7 +999,7 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
       type: Beatae itaque ipsa soluta minus consequatur.
     properties:
       geometry:
@@ -1006,7 +1007,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
         type: object
       type:
         example: Beatae itaque ipsa soluta minus consequatur.
@@ -1026,21 +1027,14 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
       type: Beatae itaque ipsa soluta minus consequatur.
     - geometry:
         coordinates:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
-      type: Beatae itaque ipsa soluta minus consequatur.
-    - geometry:
-        coordinates:
-        - 0.1554735
-        type: Repudiandae dignissimos.
-      properties:
-        Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
       type: Beatae itaque ipsa soluta minus consequatur.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1114,21 +1108,21 @@ definitions:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
             type: Beatae itaque ipsa soluta minus consequatur.
           type: Sed magni consequatur et.
         hasMore: true
@@ -1219,21 +1213,21 @@ definitions:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b6041b54-5da9-47fc-9e74-4b4a9e006733
+            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
           type: Beatae itaque ipsa soluta minus consequatur.
         type: Sed magni consequatur et.
       hasMore: true
@@ -2670,7 +2664,7 @@ paths:
       summary: list by id GeoJSON
       tags:
       - GeoJSON
-  /files/{fileId}/csv:
+  /files/{fileId}/data.csv:
     get:
       description: Export file
       operationId: Files#csv
@@ -2696,33 +2690,7 @@ paths:
       summary: csv Files
       tags:
       - Files
-  /files/{fileId}/json:
-    get:
-      description: Export file
-      operationId: Files#json
-      parameters:
-      - default: true
-        in: query
-        name: dl
-        required: false
-        type: boolean
-      - in: path
-        name: fileId
-        required: true
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: json Files
-      tags:
-      - Files
-  /files/{fileId}/raw:
+  /files/{fileId}/data.fkpb:
     get:
       description: Export file
       operationId: Files#raw
@@ -2746,6 +2714,32 @@ paths:
       schemes:
       - https
       summary: raw Files
+      tags:
+      - Files
+  /files/{fileId}/data.json:
+    get:
+      description: Export file
+      operationId: Files#json
+      parameters:
+      - default: true
+        in: query
+        name: dl
+        required: false
+        type: boolean
+      - in: path
+        name: fileId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: json Files
       tags:
       - Files
   /files/devices:
