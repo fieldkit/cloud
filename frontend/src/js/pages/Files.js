@@ -32,7 +32,7 @@ class Files extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { loadDeviceFiles, deviceId } = this.props;
 
-        if (deviceId !== prevProps.deviceId) {
+        if (deviceId && deviceId !== prevProps.deviceId) {
             loadDeviceFiles(deviceId);
         }
     }
@@ -53,12 +53,12 @@ class Files extends Component {
                         <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
                     </div>
                     <div className="main-container">
-                    <table className="table table-striped">
+                    <table className="table table-striped table-sm">
                         <thead>
                             <tr>
                                 <th>File</th>
                                 <th>Size</th>
-                                <th>Time</th>
+                                <th>Uploaded</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,6 +69,7 @@ class Files extends Component {
                                         <td>{file.size}</td>
                                         <td>{file.time}</td>
                                         <td><a href={API_HOST + file.urls.csv}>CSV</a></td>
+                                        <td><a href={API_HOST + file.urls.json}>JSON</a></td>
                                         <td><a href={API_HOST + file.urls.raw}>Raw</a></td>
                                     </tr>
                                 );
@@ -87,7 +88,7 @@ class Files extends Component {
                 </div>
                 <div className="main-container">
 
-                <table className="table table-striped">
+                <table className="table table-striped table-sm">
                 <thead>
                     <tr>
                         <th>ID</th>
