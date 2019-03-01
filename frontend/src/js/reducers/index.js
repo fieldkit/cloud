@@ -253,19 +253,29 @@ function files(state = { devices: [], filesByDevice: { } }, action) {
     case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.SUCCESS: {
         const nextState = _.cloneDeep(state);
         const { deviceId } = action.criteria;
-        if (!_.isObject(nextState.filesByDevice[deviceId])) {
-            nextState.filesByDevice[deviceId] = { logs: [], data: [] };
+
+        let files = nextState.filesByDevice[deviceId];
+        if (!_.isObject(files)) {
+            nextState.filesByDevice[deviceId] = files = { logs: [], data: [], all: [] };
         }
-        nextState.filesByDevice[deviceId].logs = [ ...nextState.filesByDevice[deviceId].logs, ...action.response.files ];
+
+        files.logs = [ ...files.logs, ...action.response.files ];
+        files.all = _([ ...files.data, ...files.logs ]).sortBy(i => i.time).reverse().value();
+
         return nextState;
     }
     case ActionTypes.API_LOAD_DEVICE_DATA_FILES.SUCCESS: {
         const nextState = _.cloneDeep(state);
         const { deviceId } = action.criteria;
-        if (!_.isObject(nextState.filesByDevice[deviceId])) {
-            nextState.filesByDevice[deviceId] = { logs: [], data: [] };
+
+        let files = nextState.filesByDevice[deviceId];
+        if (!_.isObject(files)) {
+            nextState.filesByDevice[deviceId] = files = { logs: [], data: [], all: [] };
         }
-        nextState.filesByDevice[deviceId].data = [ ...nextState.filesByDevice[deviceId].data, ...action.response.files ];
+
+        files.data = [ ...files.data, ...action.response.files ];
+        files.all = _([ ...files.data, ...files.logs ]).sortBy(i => i.time).reverse().value();
+
         return nextState;
     }
     default:

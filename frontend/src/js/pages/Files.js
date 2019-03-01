@@ -57,15 +57,17 @@ class Files extends Component {
                         <thead>
                             <tr>
                                 <th>File</th>
+                                <th>Type</th>
                                 <th>Size</th>
                                 <th>Uploaded</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {deviceFiles.data.map(file => {
+                            {deviceFiles.all.map(file => {
                                 return (
                                     <tr key={file.file_id}>
                                         <td>{file.file_id}</td>
+                                        <td>{file.file_type_name}</td>
                                         <td>{file.size}</td>
                                         <td>{file.time}</td>
                                         <td><a href={API_HOST + file.urls.csv}>CSV</a></td>

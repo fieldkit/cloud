@@ -42,6 +42,11 @@ type FilesController struct {
 var (
 	DataFileTypeIDs = []string{"4"}
 	LogFileTypeIDs  = []string{"2", "3"}
+	FileTypeNames   = map[string]string{
+		"2": "Logs",
+		"3": "Logs",
+		"4": "Data",
+	}
 )
 
 func NewFilesController(service *goa.Service, options FilesControllerOptions) *FilesController {
@@ -53,15 +58,16 @@ func NewFilesController(service *goa.Service, options FilesControllerOptions) *F
 
 func DeviceFileSummaryType(s *data.DeviceFile) *app.DeviceFile {
 	return &app.DeviceFile{
-		DeviceID:   s.DeviceID,
-		FileID:     s.StreamID,
-		Firmware:   s.Firmware,
-		ID:         int(s.ID),
-		Meta:       s.Meta.String(),
-		Size:       int(s.Size),
-		FileTypeID: s.FileID,
-		Time:       s.Time,
-		URL:        s.URL,
+		DeviceID:     s.DeviceID,
+		FileID:       s.StreamID,
+		Firmware:     s.Firmware,
+		ID:           int(s.ID),
+		Meta:         s.Meta.String(),
+		Size:         int(s.Size),
+		FileTypeID:   s.FileID,
+		FileTypeName: FileTypeNames[s.FileID],
+		Time:         s.Time,
+		URL:          s.URL,
 		Urls: &app.DeviceFileUrls{
 			Csv:  fmt.Sprintf("/files/%v/csv", s.ID),
 			Raw:  fmt.Sprintf("/files/%v/raw", s.ID),
