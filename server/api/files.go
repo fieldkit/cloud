@@ -158,6 +158,7 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 		    MAX(s.time) AS last_stream_time,
 		    COUNT(s.*) AS number_of_files
 		 FROM fieldkit.device_stream AS s
+                 WHERE s.device_id != ''
                  GROUP BY s.device_id
                  ORDER BY last_stream_time DESC`); err != nil {
 		return err
