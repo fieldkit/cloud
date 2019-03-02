@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	_ "encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
-	"strings"
+	_ "strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -27,7 +27,7 @@ import (
 
 	pbtools "github.com/conservify/protobuf-tools/tools"
 
-	"github.com/fieldkit/cloud/server/data"
+	_ "github.com/fieldkit/cloud/server/data"
 	pb "github.com/fieldkit/data-protocol"
 )
 
@@ -37,7 +37,7 @@ type options struct {
 func createAwsSession() (s *session.Session, err error) {
 	configs := []aws.Config{
 		aws.Config{
-			Region: aws.String("us-east-1"),
+			Region:                        aws.String("us-east-1"),
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 		aws.Config{
@@ -92,39 +92,43 @@ func fixMeta(m map[string]*string) map[string]*string {
 
 func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
 	for job := range jobs {
-		hoi := &s3.HeadObjectInput{
-			Bucket: aws.String(job.Bucket),
-			Key:    aws.String(job.Key),
-		}
-
-		obj, err := svc.HeadObject(hoi)
-		if err != nil {
-			log.Printf("%v", err)
-		}
-
-		meta := fixMeta(obj.Metadata)
-
-		deviceId := meta["Fk-DeviceId"]
-		firmware := meta["Fk-Version"]
-		build := meta["Fk-Build"]
-		fileId := meta["Fk-FileId"]
-
-		if deviceId == nil || firmware == nil || build == nil || fileId == nil {
-			log.Printf("Incomplete metadata: %v", obj)
-		} else {
-			details <- ObjectDetails{
-				Bucket:       job.Bucket,
-				Key:          job.Key,
-				LastModified: obj.LastModified,
-				Size:         *obj.ContentLength,
-				Firmware:     *firmware,
-				Build:        *build,
-				DeviceId:     *deviceId,
-				FileId:       *fileId,
-				URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", job.Bucket, job.Key),
-				Meta:         meta,
+		log.Printf("%v", job)
+		/*
+			hoi := &s3.HeadObjectInput{
+				Bucket: aws.String(job.Bucket),
+				Key:    aws.String(job.Key),
 			}
-		}
+
+			obj, err := svc.HeadObject(hoi)
+			if err != nil {
+				log.Printf("%v", err)
+				continue
+			}
+
+			meta := fixMeta(obj.Metadata)
+
+			deviceId := meta["Fk-DeviceId"]
+			firmware := meta["Fk-Version"]
+			build := meta["Fk-Build"]
+			fileId := meta["Fk-FileId"]
+
+			if deviceId == nil || firmware == nil || build == nil || fileId == nil {
+				log.Printf("Incomplete metadata: %v", obj)
+			} else {
+				details <- ObjectDetails{
+					Bucket:       job.Bucket,
+					Key:          job.Key,
+					LastModified: obj.LastModified,
+					Size:         *obj.ContentLength,
+					Firmware:     *firmware,
+					Build:        *build,
+					DeviceId:     *deviceId,
+					FileId:       *fileId,
+					URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", job.Bucket, job.Key),
+					Meta:         meta,
+				}
+			}
+		*/
 	}
 }
 
@@ -171,17 +175,13 @@ func process(job ObjectJob, svc *s3.S3) error {
 	return nil
 }
 
+/*
 func writeFile(details <-chan ObjectDetails) {
 	csv, err := os.OpenFile("objects.csv", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	defer csv.Close()
-
-	db, err := sqlxcache.Open("postgres", os.Getenv("FIELDKIT_POSTGRES_URL"))
-	if err != nil {
-		panic(err)
-	}
 
 	_ = db
 
@@ -229,8 +229,9 @@ func writeFile(details <-chan ObjectDetails) {
 		csv.WriteString(strings.Join(fields, ",") + "\n")
 	}
 }
+*/
 
-func listStreams(ctx context.Context) error {
+func listStreams(ctx context.Context, db *sqlxcache.DB) error {
 	log.Printf("Creating session...")
 
 	session, err := createAwsSession()
@@ -248,47 +249,74 @@ func listStreams(ctx context.Context) error {
 	jobs := make(chan ObjectJob, 100)
 	details := make(chan ObjectDetails, 100)
 
-	go writeFile(details)
+	log.Printf("Listing...")
 
-	if true {
-		log.Printf("Listing...")
+	for w := 0; w < 10; w++ {
+		go worker(w, svc, jobs, details)
+	}
 
-		for w := 0; w < 10; w++ {
-			go worker(w, svc, jobs, details)
-		}
+	total := 0
 
-		total := 0
+	err = svc.ListObjectsPages(loi, func(page *s3.ListObjectsOutput, lastPage bool) bool {
+		log.Printf("%v objects", len(page.Contents))
 
-		err = svc.ListObjectsPages(loi, func(page *s3.ListObjectsOutput, lastPage bool) bool {
-			log.Printf("%v objects", len(page.Contents))
-
-			// fmt.Println(page.Contents)
-
-			for _, summary := range page.Contents {
-				job := ObjectJob{
-					Bucket: *loi.Bucket,
-					Key:    *summary.Key,
-				}
-
-				// process(job, svc)
-
-				jobs <- job
+		for _, summary := range page.Contents {
+			job := ObjectJob{
+				Bucket: *loi.Bucket,
+				Key:    *summary.Key,
 			}
 
-			total += len(page.Contents)
-
-			return true
-		})
-		if err != nil {
-			return err
+			jobs <- job
 		}
 
-		log.Printf("%v total objects", total)
+		total += len(page.Contents)
+
+		return true
+	})
+	if err != nil {
+		return err
 	}
+
+	log.Printf("%v total objects", total)
 
 	close(jobs)
 
 	return nil
+}
+
+func grayLogMessage() {
+	hn, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+
+	g, err := graylog.NewGraylog(graylog.Endpoint{
+		Transport: graylog.TCP,
+		Address:   "172.31.58.48",
+		Port:      12201,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	defer g.Close()
+
+	err = g.Send(graylog.Message{
+		Version:      "1.1",
+		Host:         hn,
+		ShortMessage: "test",
+		FullMessage:  "test",
+		Timestamp:    time.Now().Unix(),
+		Level:        1,
+		Extra: map[string]string{
+			"tag":       "fkdev/devices",
+			"stream":    "",
+			"device_id": "",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -296,44 +324,13 @@ func main() {
 
 	flag.Parse()
 
-	hn, err := os.Hostname()
+	db, err := sqlxcache.Open("postgres", os.Getenv("FIELDKIT_POSTGRES_URL"))
 	if err != nil {
 		panic(err)
 	}
 
-	if true {
-		err := listStreams(ctx)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		g, err := graylog.NewGraylog(graylog.Endpoint{
-			Transport: graylog.TCP,
-			Address:   "172.31.58.48",
-			Port:      12201,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		defer g.Close()
-
-		err = g.Send(graylog.Message{
-			Version:      "1.1",
-			Host:         hn,
-			ShortMessage: "test",
-			FullMessage:  "test",
-			Timestamp:    time.Now().Unix(),
-			Level:        1,
-			Extra: map[string]string{
-				"tag":       "fkdev/devices",
-				"stream":    "",
-				"device_id": "",
-			},
-		})
-		if err != nil {
-			panic(err)
-		}
+	err = listStreams(ctx, db)
+	if err != nil {
+		panic(err)
 	}
-
 }
