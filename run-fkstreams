@@ -21,7 +21,7 @@ if [ -d ~/conservify/dev-ops ]; then
    ssh-add ~/.ssh/cfy.pem
 
    rsync -zvua --progress fkstreams core@$APP_SERVER_ADDRESS:
-   ssh core@$APP_SERVER_ADDRESS "FIELDKIT_POSTGRES_URL=$ENV_DB_URL ./fkstreams --host 127.0.0.1 --sync"
+   ssh core@$APP_SERVER_ADDRESS "FIELDKIT_POSTGRES_URL=$ENV_DB_URL ./fkstreams --host 127.0.0.1 $@"
 else
    echo "No dev-ops directory found"
 fi

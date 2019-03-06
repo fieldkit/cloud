@@ -2406,6 +2406,10 @@ h5 {
   .grid .wrapper:after, .grid .row:after {
     clear: both; }
 
+html, body {
+  overflow-x: hidden;
+  background-color: #161719; }
+
 .source.page .main-container {
   display: flex;
   overflow: hidden;
