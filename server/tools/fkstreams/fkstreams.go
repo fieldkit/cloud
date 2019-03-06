@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
-	_ "encoding/json"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
-	_ "strings"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
+
+	"github.com/kelseyhightower/envconfig"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -27,12 +30,12 @@ import (
 
 	pbtools "github.com/conservify/protobuf-tools/tools"
 
-	_ "github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/data"
 	pb "github.com/fieldkit/data-protocol"
-)
 
-type options struct {
-}
+	fk "github.com/fieldkit/cloud/server/api/client"
+	fktesting "github.com/fieldkit/cloud/server/tools"
+)
 
 func createAwsSession() (s *session.Session, err error) {
 	configs := []aws.Config{
@@ -90,10 +93,14 @@ func fixMeta(m map[string]*string) map[string]*string {
 	return newM
 }
 
-func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
+func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
 	for job := range jobs {
-		log.Printf("%v", job)
-		/*
+		files := []*data.DeviceStream{}
+		if err := db.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE (s.stream_id = $1)`, job.Key); err != nil {
+			panic(fmt.Errorf("Error querying for DeviceFile: %v", err))
+		}
+
+		if len(files) != 1 {
 			hoi := &s3.HeadObjectInput{
 				Bucket: aws.String(job.Bucket),
 				Key:    aws.String(job.Key),
@@ -101,21 +108,20 @@ func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDeta
 
 			obj, err := svc.HeadObject(hoi)
 			if err != nil {
-				log.Printf("%v", err)
+				log.Printf("Error getting object Head: %v", err)
 				continue
 			}
 
 			meta := fixMeta(obj.Metadata)
-
 			deviceId := meta["Fk-DeviceId"]
 			firmware := meta["Fk-Version"]
 			build := meta["Fk-Build"]
 			fileId := meta["Fk-FileId"]
 
 			if deviceId == nil || firmware == nil || build == nil || fileId == nil {
-				log.Printf("Incomplete metadata: %v", obj)
+				log.Printf("Incomplete Metadata: %v", obj)
 			} else {
-				details <- ObjectDetails{
+				od := ObjectDetails{
 					Bucket:       job.Bucket,
 					Key:          job.Key,
 					LastModified: obj.LastModified,
@@ -127,8 +133,33 @@ func worker(id int, svc *s3.S3, jobs <-chan ObjectJob, details chan<- ObjectDeta
 					URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", job.Bucket, job.Key),
 					Meta:         meta,
 				}
+
+				jsonMeta, err := json.Marshal(od.Meta)
+				if err != nil {
+					panic(err)
+				}
+
+				stream := data.DeviceStream{
+					Time:     *od.LastModified,
+					StreamID: od.Key,
+					Firmware: od.Firmware,
+					DeviceID: od.DeviceId,
+					Size:     int64(od.Size),
+					FileID:   od.FileId,
+					URL:      od.URL,
+					Meta:     jsonMeta,
+				}
+
+				log.Printf("Missing database entry: %v %v %v", job, od.LastModified, od.Size)
+
+				if _, err := db.NamedExecContext(ctx, `
+					  INSERT INTO fieldkit.device_stream (time, stream_id, firmware, device_id, size, file_id, url, meta)
+					  VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
+					`, stream); err != nil {
+					panic(err)
+				}
 			}
-		*/
+		}
 	}
 }
 
@@ -140,8 +171,9 @@ func process(job ObjectJob, svc *s3.S3) error {
 
 	obj, err := svc.GetObject(goi)
 	if err != nil {
-		log.Printf("%v", err)
+		return err
 	}
+
 	fmt.Println(obj)
 
 	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
@@ -175,70 +207,7 @@ func process(job ObjectJob, svc *s3.S3) error {
 	return nil
 }
 
-/*
-func writeFile(details <-chan ObjectDetails) {
-	csv, err := os.OpenFile("objects.csv", os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		panic(err)
-	}
-	defer csv.Close()
-
-	_ = db
-
-	for od := range details {
-		fields := []string{
-			od.Bucket,
-			od.Key,
-			od.LastModified.String(),
-			fmt.Sprintf("%v", od.Size),
-			od.Firmware,
-			od.Build,
-			od.DeviceId,
-			od.FileId,
-		}
-
-		metaData, err := json.Marshal(od.Meta)
-		if err != nil {
-			panic(err)
-		}
-
-		stream := data.DeviceStream{
-			Time:     *od.LastModified,
-			StreamID: od.Key,
-			Firmware: od.Firmware,
-			DeviceID: od.DeviceId,
-			Size:     int64(od.Size),
-			FileID:   od.FileId,
-			URL:      od.URL,
-			Meta:     metaData,
-		}
-
-		log.Printf("%v\n", stream)
-
-		_ = stream
-
-		if false {
-			if _, err := db.NamedExecContext(context.TODO(), `
-				   INSERT INTO fieldkit.device_stream (time, stream_id, firmware, device_id, size, file_id, url, meta)
-				   VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
-				   `, stream); err != nil {
-				log.Printf("%v", err)
-			}
-		}
-
-		csv.WriteString(strings.Join(fields, ",") + "\n")
-	}
-}
-*/
-
-func listStreams(ctx context.Context, db *sqlxcache.DB) error {
-	log.Printf("Creating session...")
-
-	session, err := createAwsSession()
-	if err != nil {
-		return err
-	}
-
+func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB) error {
 	svc := s3.New(session)
 
 	loi := &s3.ListObjectsInput{
@@ -252,13 +221,13 @@ func listStreams(ctx context.Context, db *sqlxcache.DB) error {
 	log.Printf("Listing...")
 
 	for w := 0; w < 10; w++ {
-		go worker(w, svc, jobs, details)
+		go worker(ctx, w, svc, db, jobs, details)
 	}
 
 	total := 0
 
-	err = svc.ListObjectsPages(loi, func(page *s3.ListObjectsOutput, lastPage bool) bool {
-		log.Printf("%v objects", len(page.Contents))
+	err := svc.ListObjectsPages(loi, func(page *s3.ListObjectsOutput, lastPage bool) bool {
+		log.Printf("%v objects (%v)", len(page.Contents), total)
 
 		for _, summary := range page.Contents {
 			job := ObjectJob{
@@ -274,7 +243,7 @@ func listStreams(ctx context.Context, db *sqlxcache.DB) error {
 		return true
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to list S3 bucket: %v", err)
 	}
 
 	log.Printf("%v total objects", total)
@@ -319,18 +288,132 @@ func grayLogMessage() {
 	}
 }
 
+type options struct {
+	Scheme   string
+	Host     string
+	Username string
+	Password string
+
+	DeviceID string
+
+	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
+	Sync        bool
+}
+
 func main() {
 	ctx := context.TODO()
 
+	o := options{}
+
+	flag.StringVar(&o.Scheme, "scheme", "http", "fk instance scheme")
+	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "fk instance hostname")
+	flag.StringVar(&o.Username, "username", "demo-user", "username")
+	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password")
+
+	flag.StringVar(&o.DeviceID, "device-id", "", "device id")
+
+	flag.BoolVar(&o.Sync, "sync", false, "sync")
+
 	flag.Parse()
 
-	db, err := sqlxcache.Open("postgres", os.Getenv("FIELDKIT_POSTGRES_URL"))
+	if err := envconfig.Process("fieldkit", &o); err != nil {
+		panic(err)
+	}
+
+	log.Printf("%v", o.PostgresURL)
+
+	fkc, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
 	if err != nil {
 		panic(err)
 	}
 
-	err = listStreams(ctx, db)
-	if err != nil {
-		panic(err)
+	log.Printf("Authenticated as %s (%s)", o.Username, o.Host)
+
+	if o.Sync {
+		db, err := sqlxcache.Open("postgres", o.PostgresURL)
+		if err != nil {
+			panic(err)
+		}
+
+		session, err := createAwsSession()
+		if err != nil {
+			panic(err)
+		}
+
+		err = listStreams(ctx, session, db)
+		if err != nil {
+			panic(err)
+		}
+
+		return
 	}
+
+	if o.DeviceID != "" {
+		page := 0
+		total := 0
+
+		for {
+			res, err := fkc.ListDeviceLogFilesFiles(ctx, fk.ListDeviceDataFilesFilesPath(o.DeviceID), &page)
+			if err != nil {
+				panic(err)
+			}
+
+			files, err := fkc.DecodeDeviceFiles(res)
+			if err != nil {
+				panic(err)
+			}
+
+			if len(files.Files) == 0 {
+				break
+			}
+
+			total += len(files.Files)
+
+			for _, file := range files.Files {
+				bucket, key, err := getBucketAndKey(file.URL)
+				if err != nil {
+					panic(err)
+				}
+
+				log.Printf("%v %v %v", o.DeviceID, bucket, key)
+			}
+
+			page += 1
+		}
+
+		log.Printf("Total Files: %v", total)
+
+		return
+	}
+
+	if o.DeviceID == "" {
+		res, err := fkc.ListDevicesFiles(ctx, fk.ListDevicesFilesPath())
+		if err != nil {
+			panic(err)
+		}
+
+		devices, err := fkc.DecodeDevices(res)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, device := range devices.Devices {
+			log.Printf("%v %v", device.DeviceID, device.LastFileTime)
+		}
+
+		log.Printf("Total Devices: %v", len(devices.Devices))
+
+		return
+	}
+}
+
+func getBucketAndKey(s3Url string) (bucket, key string, err error) {
+	u, err := url.Parse(s3Url)
+	if err != nil {
+		return "", "", err
+	}
+
+	parts := strings.Split(u.Host, ".")
+
+	return parts[0], u.Path[1:], nil
 }
