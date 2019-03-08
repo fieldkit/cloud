@@ -22,8 +22,9 @@ if [ -d ~/conservify/dev-ops ]; then
 
    rsync -zvua --progress fkstreams core@$APP_SERVER_ADDRESS:
    ssh core@$APP_SERVER_ADDRESS "FIELDKIT_POSTGRES_URL=$ENV_DB_URL ./fkstreams --host 127.0.0.1 $@"
+   rsync -zvua --progress "core@$APP_SERVER_ADDRESS:*.fkpb" ../../../
 else
    echo "No dev-ops directory found"
 fi
 
-popd 
+popd
