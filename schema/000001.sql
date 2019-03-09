@@ -181,7 +181,8 @@ CREATE TABLE fieldkit.device_stream (
   size integer NOT NULL,
   file_id varchar(32) NOT NULL,
   url varchar NOT NULL,
-  meta json NOT NULL
+  meta json NOT NULL,
+  children integer[]
 );
 
 CREATE UNIQUE INDEX ON fieldkit.device_stream (stream_id);

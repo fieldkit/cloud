@@ -257,12 +257,6 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -343,6 +337,28 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.19389316
+      - 0.19389316
+      endTime: 1982-11-27T22:23:46Z
+      envelope:
+      - - 0.39624313
+      id: 6.130069e+18
+      numberOfFeatures: 8.5731494e+18
+      radius: 0.4070355
+      sourceId: 8.62877e+18
+      startTime: 1988-04-25T05:20:05Z
+    - centroid:
+      - 0.19389316
+      - 0.19389316
+      endTime: 1982-11-27T22:23:46Z
+      envelope:
+      - - 0.39624313
+      id: 6.130069e+18
+      numberOfFeatures: 8.5731494e+18
+      radius: 0.4070355
+      sourceId: 8.62877e+18
+      startTime: 1988-04-25T05:20:05Z
     - centroid:
       - 0.19389316
       - 0.19389316
@@ -963,21 +979,21 @@ definitions:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
         type: Beatae itaque ipsa soluta minus consequatur.
       type: Sed magni consequatur et.
     properties:
@@ -999,7 +1015,7 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+        Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
       type: Beatae itaque ipsa soluta minus consequatur.
     properties:
       geometry:
@@ -1007,7 +1023,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
         type: object
       type:
         example: Beatae itaque ipsa soluta minus consequatur.
@@ -1027,14 +1043,7 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
-      type: Beatae itaque ipsa soluta minus consequatur.
-    - geometry:
-        coordinates:
-        - 0.1554735
-        type: Repudiandae dignissimos.
-      properties:
-        Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+        Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
       type: Beatae itaque ipsa soluta minus consequatur.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1108,21 +1117,21 @@ definitions:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
             type: Beatae itaque ipsa soluta minus consequatur.
           type: Sed magni consequatur et.
         hasMore: true
@@ -1213,21 +1222,21 @@ definitions:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: bf986e73-6703-4704-af26-802e56c8d143
+            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
           type: Beatae itaque ipsa soluta minus consequatur.
         type: Sed magni consequatur et.
       hasMore: true
@@ -2189,6 +2198,33 @@ paths:
       summary: check Firmware
       tags:
       - Firmware
+  /devices/{deviceId}/data:
+    get:
+      description: Get all device data
+      operationId: DeviceData#all
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "302":
+          description: Found
+          headers:
+            Location:
+              type: string
+        "404":
+          description: Not Found
+        "503": {}
+      schemes:
+      - https
+      summary: all DeviceData
+      tags:
+      - DeviceData
   /devices/{deviceId}/files/data:
     get:
       description: List device files
@@ -2260,6 +2296,33 @@ paths:
       summary: list device Firmware
       tags:
       - Firmware
+  /devices/{deviceId}/logs:
+    get:
+      description: Get all device logs
+      operationId: DeviceLogs#all
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "302":
+          description: Found
+          headers:
+            Location:
+              type: string
+        "404":
+          description: Not Found
+        "503": {}
+      schemes:
+      - https
+      summary: all DeviceLogs
+      tags:
+      - DeviceLogs
   /devices/firmware:
     patch:
       description: Update an Device firmware
@@ -2664,6 +2727,29 @@ paths:
       summary: list by id GeoJSON
       tags:
       - GeoJSON
+  /files/{fileId}:
+    get:
+      description: File info
+      operationId: Files#file
+      parameters:
+      - in: path
+        name: fileId
+        required: true
+        type: string
+      produces:
+      - application/vnd.app.device.file+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DeviceFile'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: file Files
+      tags:
+      - Files
   /files/{fileId}/data.csv:
     get:
       description: Export file

@@ -156,7 +156,7 @@ func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHead
 }
 
 func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeaders, saved *SavedStream) error {
-	metaData, err := json.Marshal(headers)
+	metadata, err := json.Marshal(headers)
 	if err != nil {
 		return fmt.Errorf("JSON error: %v", err)
 	}
@@ -169,7 +169,7 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 		Size:     int64(headers.ContentLength),
 		FileID:   headers.FkFileId,
 		URL:      saved.URL,
-		Meta:     metaData,
+		Meta:     metadata,
 	}
 
 	if _, err := si.db.NamedExecContext(ctx, `

@@ -9,26 +9,15 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func getBucketAndKey(s3Url string) (bucket, key string, err error) {
-	u, err := url.Parse(s3Url)
-	if err != nil {
-		return "", "", err
-	}
-
-	parts := strings.Split(u.Host, ".")
-
-	return parts[0], u.Path[1:], nil
-}
-
 func SignS3URL(svc *s3.S3, url string) (signed string, err error) {
-	bucket, key, err := getBucketAndKey(url)
+	bak, err := GetBucketAndKey(url)
 	if err != nil {
 		return "", err
 	}
 
 	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
+		Bucket: aws.String(bak.Bucket),
+		Key:    aws.String(bak.Key),
 	})
 
 	signed, err = req.Presign(1 * time.Hour)
@@ -37,4 +26,23 @@ func SignS3URL(svc *s3.S3, url string) (signed string, err error) {
 	}
 
 	return
+}
+
+type BucketAndKey struct {
+	Bucket string
+	Key    string
+}
+
+func GetBucketAndKey(s3Url string) (*BucketAndKey, error) {
+	u, err := url.Parse(s3Url)
+	if err != nil {
+		return nil, err
+	}
+
+	parts := strings.Split(u.Host, ".")
+
+	return &BucketAndKey{
+		Bucket: parts[0],
+		Key:    u.Path[1:],
+	}, nil
 }

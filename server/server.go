@@ -486,12 +486,14 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.MountFirmwareController(service, c17)
 
 	// Mount "device_streams" controller
-	c18 := api.NewFilesController(service, api.FilesControllerOptions{
+	fco := api.FilesControllerOptions{
 		Session:  awsSession,
 		Database: database,
 		Backend:  be,
-	})
-	app.MountFilesController(service, c18)
+	}
+	app.MountFilesController(service, api.NewFilesController(service, fco))
+	app.MountDeviceLogsController(service, api.NewDeviceLogsController(service, fco))
+	app.MountDeviceDataController(service, api.NewDeviceDataController(service, fco))
 
 	setupErrorHandling()
 

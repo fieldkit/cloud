@@ -15,6 +15,108 @@ import (
 	"unicode/utf8"
 )
 
+// AllDeviceDataContext provides the DeviceData all action context.
+type AllDeviceDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+}
+
+// NewAllDeviceDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the DeviceData controller all action.
+func NewAllDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*AllDeviceDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AllDeviceDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AllDeviceDataContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// Found sends a HTTP response with status code 302.
+func (ctx *AllDeviceDataContext) Found() error {
+	ctx.ResponseData.WriteHeader(302)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *AllDeviceDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// Busy sends a HTTP response with status code 503.
+func (ctx *AllDeviceDataContext) Busy() error {
+	ctx.ResponseData.WriteHeader(503)
+	return nil
+}
+
+// AllDeviceLogsContext provides the DeviceLogs all action context.
+type AllDeviceLogsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+}
+
+// NewAllDeviceLogsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the DeviceLogs controller all action.
+func NewAllDeviceLogsContext(ctx context.Context, r *http.Request, service *goa.Service) (*AllDeviceLogsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AllDeviceLogsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AllDeviceLogsContext) OK(resp []byte) error {
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// Found sends a HTTP response with status code 302.
+func (ctx *AllDeviceLogsContext) Found() error {
+	ctx.ResponseData.WriteHeader(302)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *AllDeviceLogsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// Busy sends a HTTP response with status code 503.
+func (ctx *AllDeviceLogsContext) Busy() error {
+	ctx.ResponseData.WriteHeader(503)
+	return nil
+}
+
 // ListBySourceExportContext provides the Export list by source action context.
 type ListBySourceExportContext struct {
 	context.Context
@@ -105,6 +207,43 @@ func (ctx *CsvFilesContext) OK(resp []byte) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *CsvFilesContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// FileFilesContext provides the Files file action context.
+type FileFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	FileID string
+}
+
+// NewFileFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Files controller file action.
+func NewFileFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*FileFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := FileFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramFileID := req.Params["fileId"]
+	if len(paramFileID) > 0 {
+		rawFileID := paramFileID[0]
+		rctx.FileID = rawFileID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *FileFilesContext) OK(r *DeviceFile) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.file+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *FileFilesContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }

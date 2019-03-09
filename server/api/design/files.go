@@ -95,6 +95,44 @@ var Devices = MediaType("application/vnd.app.devices+json", func() {
 	})
 })
 
+var _ = Resource("DeviceLogs", func() {
+	Action("all", func() {
+		Routing(GET("devices/:deviceId/logs"))
+		Description("Get all device logs")
+		Response(NotFound)
+		Response("Busy", func() {
+			Status(503)
+		})
+		Response(Found, func() {
+			Headers(func() {
+				Header("Location", String)
+			})
+		})
+		Response(OK, func() {
+			Status(200)
+		})
+	})
+})
+
+var _ = Resource("DeviceData", func() {
+	Action("all", func() {
+		Routing(GET("devices/:deviceId/data"))
+		Description("Get all device data")
+		Response(NotFound)
+		Response("Busy", func() {
+			Status(503)
+		})
+		Response(Found, func() {
+			Headers(func() {
+				Header("Location", String)
+			})
+		})
+		Response(OK, func() {
+			Status(200)
+		})
+	})
+})
+
 var _ = Resource("Files", func() {
 	Action("list devices", func() {
 		Routing(GET("files/devices"))
@@ -138,6 +176,15 @@ var _ = Resource("Files", func() {
 		Response(NotFound)
 		Response(OK, func() {
 			Status(200)
+		})
+	})
+
+	Action("file", func() {
+		Routing(GET("files/:fileId"))
+		Description("File info")
+		Response(NotFound)
+		Response(OK, func() {
+			Media(DeviceFileSummary)
 		})
 	})
 
