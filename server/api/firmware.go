@@ -223,7 +223,7 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	svc := s3.New(c.options.Session)
 
 	for _, f := range firmwares {
-		signed, err := SignS3URL(svc, f.URL)
+		signed, err := backend.SignS3URL(svc, f.URL)
 		if err != nil {
 			return err
 		}

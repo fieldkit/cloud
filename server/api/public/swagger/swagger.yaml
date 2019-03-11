@@ -257,6 +257,12 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
+    - geometry:
+      - - 0.96824837
+      - - 0.96824837
+      - - 0.96824837
+      id: 5.41219e+18
+      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -337,28 +343,6 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
-    - centroid:
-      - 0.19389316
-      - 0.19389316
-      endTime: 1982-11-27T22:23:46Z
-      envelope:
-      - - 0.39624313
-      id: 6.130069e+18
-      numberOfFeatures: 8.5731494e+18
-      radius: 0.4070355
-      sourceId: 8.62877e+18
-      startTime: 1988-04-25T05:20:05Z
-    - centroid:
-      - 0.19389316
-      - 0.19389316
-      endTime: 1982-11-27T22:23:46Z
-      envelope:
-      - - 0.39624313
-      id: 6.130069e+18
-      numberOfFeatures: 8.5731494e+18
-      radius: 0.4070355
-      sourceId: 8.62877e+18
-      startTime: 1988-04-25T05:20:05Z
     - centroid:
       - 0.19389316
       - 0.19389316
@@ -979,21 +963,21 @@ definitions:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
         type: Beatae itaque ipsa soluta minus consequatur.
       type: Sed magni consequatur et.
     properties:
@@ -1015,7 +999,7 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
       type: Beatae itaque ipsa soluta minus consequatur.
     properties:
       geometry:
@@ -1023,7 +1007,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
         type: object
       type:
         example: Beatae itaque ipsa soluta minus consequatur.
@@ -1043,7 +1027,14 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+      type: Beatae itaque ipsa soluta minus consequatur.
+    - geometry:
+        coordinates:
+        - 0.1554735
+        type: Repudiandae dignissimos.
+      properties:
+        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
       type: Beatae itaque ipsa soluta minus consequatur.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1117,21 +1108,21 @@ definitions:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
             type: Beatae itaque ipsa soluta minus consequatur.
           type: Sed magni consequatur et.
         hasMore: true
@@ -1222,21 +1213,21 @@ definitions:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: e57edede-c8d2-4abe-ac6a-7fc52b12ea0d
+            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
           type: Beatae itaque ipsa soluta minus consequatur.
         type: Sed magni consequatur et.
       hasMore: true
