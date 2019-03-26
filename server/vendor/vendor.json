@@ -19,28 +19,6 @@
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "eC+oLOZpuCWbyukQ4Ed2q7dimNc=",
-			"path": "github.com/conservify/gonaturalist",
-			"revision": "89ee57d290732ee54861a77b4422723518390202",
-			"revisionTime": "2018-04-23T23:40:38Z"
-		},
-		{
-			"path": "github.com/conservify/gonaturalist.git",
-			"revision": ""
-		},
-		{
-			"checksumSHA1": "CTs0C05F+XVHqvwNvCJ/x0M/c4g=",
-			"path": "github.com/conservify/protobuf-tools/tools",
-			"revision": "43b897198d1489bd3b7832567a74fbb0a080833b",
-			"revisionTime": "2018-07-15T16:45:06Z"
-		},
-		{
-			"checksumSHA1": "xxnBZZLJJw4bhN8JRnVJbEkVdSw=",
-			"path": "github.com/conservify/sqlxcache",
-			"revision": "f531a9ef96c0ddd2cfa72873326ccdde91433345",
-			"revisionTime": "2018-04-20T16:34:12Z"
-		},
-		{
 			"checksumSHA1": "sMXTaE5P3q//jluejx9c0GqZPs0=",
 			"path": "github.com/O-C-R/singlepage",
 			"revision": "bbbe2159ecec95ee029557c8646d7904ec5aeec3",
@@ -242,6 +220,28 @@
 			"path": "github.com/cenkalti/backoff",
 			"revision": "3db60c813733fce657c114634171689bbf1f8dee",
 			"revisionTime": "2017-02-01T15:12:07Z"
+		},
+		{
+			"checksumSHA1": "eC+oLOZpuCWbyukQ4Ed2q7dimNc=",
+			"path": "github.com/conservify/gonaturalist",
+			"revision": "89ee57d290732ee54861a77b4422723518390202",
+			"revisionTime": "2018-04-23T23:40:38Z"
+		},
+		{
+			"path": "github.com/conservify/gonaturalist.git",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "CTs0C05F+XVHqvwNvCJ/x0M/c4g=",
+			"path": "github.com/conservify/protobuf-tools/tools",
+			"revision": "43b897198d1489bd3b7832567a74fbb0a080833b",
+			"revisionTime": "2018-07-15T16:45:06Z"
+		},
+		{
+			"checksumSHA1": "xxnBZZLJJw4bhN8JRnVJbEkVdSw=",
+			"path": "github.com/conservify/sqlxcache",
+			"revision": "f531a9ef96c0ddd2cfa72873326ccdde91433345",
+			"revisionTime": "2018-04-20T16:34:12Z"
 		},
 		{
 			"checksumSHA1": "Afg5kSBCFDP49VONNSX2j9Wxioo=",
@@ -501,10 +501,10 @@
 			"revisionTime": "2017-01-11T10:11:55Z"
 		},
 		{
-			"checksumSHA1": "uFNLkTxk8BkHTk0Jcub2lj2BX4M=",
+			"checksumSHA1": "Kh/EnzmngEgl6DxIndgpflFLm00=",
 			"path": "github.com/google/uuid",
-			"revision": "dec09d789f3dba190787f8b4454c7d3c936fed9e",
-			"revisionTime": "2017-11-29T19:10:14Z"
+			"revision": "0cd6bf5da1e1c83f8b45653022c74f71af0538a4",
+			"revisionTime": "2019-02-27T21:05:49Z"
 		},
 		{
 			"checksumSHA1": "y+AeKVZoX0gB+DZW4Arzkb3tTVc=",
