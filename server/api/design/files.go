@@ -64,6 +64,12 @@ var DeviceFiles = MediaType("application/vnd.app.device.files+json", func() {
 	})
 })
 
+var DeviceSummaryUrls = Type("DeviceSummaryUrls", func() {
+	Attribute("logs", String)
+	Attribute("data", String)
+	Required("logs", "data")
+})
+
 var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 	TypeName("Device")
 	Attributes(func() {
@@ -71,16 +77,19 @@ var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 		Attribute("number_of_files", Integer)
 		Attribute("last_file_time", DateTime)
 		Attribute("last_file_id", String)
+		Attribute("urls", DeviceSummaryUrls)
 		Required("device_id")
 		Required("number_of_files")
 		Required("last_file_time")
 		Required("last_file_id")
+		Required("urls")
 	})
 	View("default", func() {
 		Attribute("device_id")
 		Attribute("number_of_files")
 		Attribute("last_file_time")
 		Attribute("last_file_id")
+		Attribute("urls")
 	})
 })
 
@@ -95,7 +104,7 @@ var Devices = MediaType("application/vnd.app.devices+json", func() {
 	})
 })
 
-var _ = Resource("DeviceLogs", func() {
+var _ = Resource("device_logs", func() {
 	Action("all", func() {
 		Routing(GET("devices/:deviceId/logs"))
 		Description("Get all device logs")
@@ -114,7 +123,7 @@ var _ = Resource("DeviceLogs", func() {
 	})
 })
 
-var _ = Resource("DeviceData", func() {
+var _ = Resource("device_data", func() {
 	Action("all", func() {
 		Routing(GET("devices/:deviceId/data"))
 		Description("Get all device data")
@@ -133,7 +142,7 @@ var _ = Resource("DeviceData", func() {
 	})
 })
 
-var _ = Resource("Files", func() {
+var _ = Resource("files", func() {
 	Action("list devices", func() {
 		Routing(GET("files/devices"))
 		Description("List devices")

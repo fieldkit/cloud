@@ -251,18 +251,6 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -354,6 +342,28 @@ definitions:
       radius: 0.4070355
       sourceId: 8.62877e+18
       startTime: 1988-04-25T05:20:05Z
+    - centroid:
+      - 0.19389316
+      - 0.19389316
+      endTime: 1982-11-27T22:23:46Z
+      envelope:
+      - - 0.39624313
+      id: 6.130069e+18
+      numberOfFeatures: 8.5731494e+18
+      radius: 0.4070355
+      sourceId: 8.62877e+18
+      startTime: 1988-04-25T05:20:05Z
+    - centroid:
+      - 0.19389316
+      - 0.19389316
+      endTime: 1982-11-27T22:23:46Z
+      envelope:
+      - - 0.39624313
+      id: 6.130069e+18
+      numberOfFeatures: 8.5731494e+18
+      radius: 0.4070355
+      sourceId: 8.62877e+18
+      startTime: 1988-04-25T05:20:05Z
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -366,6 +376,9 @@ definitions:
       last_file_id: Rem vel est qui ratione sequi et.
       last_file_time: 1980-07-23T03:28:45Z
       number_of_files: 8.8054075e+18
+      urls:
+        data: Cumque nihil.
+        logs: Labore dolorem vel laboriosam aut voluptatum.
     properties:
       device_id:
         example: Saepe facilis quis blanditiis recusandae est.
@@ -381,11 +394,14 @@ definitions:
         example: 8.8054075e+18
         format: int64
         type: integer
+      urls:
+        $ref: '#/definitions/DeviceSummaryUrls'
     required:
     - device_id
     - number_of_files
     - last_file_time
     - last_file_id
+    - urls
     title: 'Mediatype identifier: application/vnd.app.device+json; view=default'
     type: object
   DeviceCollection:
@@ -396,10 +412,16 @@ definitions:
       last_file_id: Rem vel est qui ratione sequi et.
       last_file_time: 1980-07-23T03:28:45Z
       number_of_files: 8.8054075e+18
+      urls:
+        data: Cumque nihil.
+        logs: Labore dolorem vel laboriosam aut voluptatum.
     - device_id: Saepe facilis quis blanditiis recusandae est.
       last_file_id: Rem vel est qui ratione sequi et.
       last_file_time: 1980-07-23T03:28:45Z
       number_of_files: 8.8054075e+18
+      urls:
+        data: Cumque nihil.
+        logs: Labore dolorem vel laboriosam aut voluptatum.
     items:
       $ref: '#/definitions/Device'
     title: 'Mediatype identifier: application/vnd.app.device+json; type=collection;
@@ -408,53 +430,53 @@ definitions:
   DeviceFile:
     description: DeviceFile media type (default view)
     example:
-      device_id: Cumque nihil.
-      file_id: Labore dolorem vel laboriosam aut voluptatum.
-      file_type_id: Error dignissimos.
-      file_type_name: Incidunt consequuntur fugit non ut.
-      firmware: Ducimus perspiciatis quasi error voluptatem et.
-      id: 6.684198e+18
-      meta: Quia explicabo unde recusandae provident.
-      size: 6.104504e+18
-      time: 2015-08-11T10:20:08Z
-      url: Sapiente assumenda excepturi dolores dolores et molestias.
+      device_id: Error dignissimos.
+      file_id: Incidunt consequuntur fugit non ut.
+      file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+      file_type_name: Ducimus quia explicabo unde.
+      firmware: Provident earum sit enim sapiente assumenda.
+      id: 5.955074e+18
+      meta: Dolores et molestias sit velit.
+      size: 7.5139965e+18
+      time: 1990-06-12T22:38:29Z
+      url: Consequatur debitis sit ratione aut.
       urls:
-        csv: Velit quo eveniet in consequatur debitis.
-        json: Ratione aut et.
-        raw: Amet reiciendis odit.
+        csv: Amet amet reiciendis odit sapiente.
+        json: Expedita qui eum.
+        raw: Deleniti sint velit qui.
     properties:
       device_id:
-        example: Cumque nihil.
-        type: string
-      file_id:
-        example: Labore dolorem vel laboriosam aut voluptatum.
-        type: string
-      file_type_id:
         example: Error dignissimos.
         type: string
-      file_type_name:
+      file_id:
         example: Incidunt consequuntur fugit non ut.
         type: string
-      firmware:
+      file_type_id:
         example: Ducimus perspiciatis quasi error voluptatem et.
         type: string
+      file_type_name:
+        example: Ducimus quia explicabo unde.
+        type: string
+      firmware:
+        example: Provident earum sit enim sapiente assumenda.
+        type: string
       id:
-        example: 6.684198e+18
+        example: 5.955074e+18
         format: int64
         type: integer
       meta:
-        example: Quia explicabo unde recusandae provident.
+        example: Dolores et molestias sit velit.
         type: string
       size:
-        example: 6.104504e+18
+        example: 7.5139965e+18
         format: int64
         type: integer
       time:
-        example: 2015-08-11T10:20:08Z
+        example: 1990-06-12T22:38:29Z
         format: date-time
         type: string
       url:
-        example: Sapiente assumenda excepturi dolores dolores et molestias.
+        example: Consequatur debitis sit ratione aut.
         type: string
       urls:
         $ref: '#/definitions/DeviceFileUrls'
@@ -476,48 +498,48 @@ definitions:
     description: DeviceFileCollection is the media type for an array of DeviceFile
       (default view)
     example:
-    - device_id: Cumque nihil.
-      file_id: Labore dolorem vel laboriosam aut voluptatum.
-      file_type_id: Error dignissimos.
-      file_type_name: Incidunt consequuntur fugit non ut.
-      firmware: Ducimus perspiciatis quasi error voluptatem et.
-      id: 6.684198e+18
-      meta: Quia explicabo unde recusandae provident.
-      size: 6.104504e+18
-      time: 2015-08-11T10:20:08Z
-      url: Sapiente assumenda excepturi dolores dolores et molestias.
+    - device_id: Error dignissimos.
+      file_id: Incidunt consequuntur fugit non ut.
+      file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+      file_type_name: Ducimus quia explicabo unde.
+      firmware: Provident earum sit enim sapiente assumenda.
+      id: 5.955074e+18
+      meta: Dolores et molestias sit velit.
+      size: 7.5139965e+18
+      time: 1990-06-12T22:38:29Z
+      url: Consequatur debitis sit ratione aut.
       urls:
-        csv: Velit quo eveniet in consequatur debitis.
-        json: Ratione aut et.
-        raw: Amet reiciendis odit.
-    - device_id: Cumque nihil.
-      file_id: Labore dolorem vel laboriosam aut voluptatum.
-      file_type_id: Error dignissimos.
-      file_type_name: Incidunt consequuntur fugit non ut.
-      firmware: Ducimus perspiciatis quasi error voluptatem et.
-      id: 6.684198e+18
-      meta: Quia explicabo unde recusandae provident.
-      size: 6.104504e+18
-      time: 2015-08-11T10:20:08Z
-      url: Sapiente assumenda excepturi dolores dolores et molestias.
+        csv: Amet amet reiciendis odit sapiente.
+        json: Expedita qui eum.
+        raw: Deleniti sint velit qui.
+    - device_id: Error dignissimos.
+      file_id: Incidunt consequuntur fugit non ut.
+      file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+      file_type_name: Ducimus quia explicabo unde.
+      firmware: Provident earum sit enim sapiente assumenda.
+      id: 5.955074e+18
+      meta: Dolores et molestias sit velit.
+      size: 7.5139965e+18
+      time: 1990-06-12T22:38:29Z
+      url: Consequatur debitis sit ratione aut.
       urls:
-        csv: Velit quo eveniet in consequatur debitis.
-        json: Ratione aut et.
-        raw: Amet reiciendis odit.
-    - device_id: Cumque nihil.
-      file_id: Labore dolorem vel laboriosam aut voluptatum.
-      file_type_id: Error dignissimos.
-      file_type_name: Incidunt consequuntur fugit non ut.
-      firmware: Ducimus perspiciatis quasi error voluptatem et.
-      id: 6.684198e+18
-      meta: Quia explicabo unde recusandae provident.
-      size: 6.104504e+18
-      time: 2015-08-11T10:20:08Z
-      url: Sapiente assumenda excepturi dolores dolores et molestias.
+        csv: Amet amet reiciendis odit sapiente.
+        json: Expedita qui eum.
+        raw: Deleniti sint velit qui.
+    - device_id: Error dignissimos.
+      file_id: Incidunt consequuntur fugit non ut.
+      file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+      file_type_name: Ducimus quia explicabo unde.
+      firmware: Provident earum sit enim sapiente assumenda.
+      id: 5.955074e+18
+      meta: Dolores et molestias sit velit.
+      size: 7.5139965e+18
+      time: 1990-06-12T22:38:29Z
+      url: Consequatur debitis sit ratione aut.
       urls:
-        csv: Velit quo eveniet in consequatur debitis.
-        json: Ratione aut et.
-        raw: Amet reiciendis odit.
+        csv: Amet amet reiciendis odit sapiente.
+        json: Expedita qui eum.
+        raw: Deleniti sint velit qui.
     items:
       $ref: '#/definitions/DeviceFile'
     title: 'Mediatype identifier: application/vnd.app.device.file+json; type=collection;
@@ -525,18 +547,18 @@ definitions:
     type: array
   DeviceFileUrls:
     example:
-      csv: Velit quo eveniet in consequatur debitis.
-      json: Ratione aut et.
-      raw: Amet reiciendis odit.
+      csv: Amet amet reiciendis odit sapiente.
+      json: Expedita qui eum.
+      raw: Deleniti sint velit qui.
     properties:
       csv:
-        example: Velit quo eveniet in consequatur debitis.
+        example: Amet amet reiciendis odit sapiente.
         type: string
       json:
-        example: Ratione aut et.
+        example: Expedita qui eum.
         type: string
       raw:
-        example: Amet reiciendis odit.
+        example: Deleniti sint velit qui.
         type: string
     required:
     - csv
@@ -548,48 +570,48 @@ definitions:
     description: DeviceFiles media type (default view)
     example:
       files:
-      - device_id: Cumque nihil.
-        file_id: Labore dolorem vel laboriosam aut voluptatum.
-        file_type_id: Error dignissimos.
-        file_type_name: Incidunt consequuntur fugit non ut.
-        firmware: Ducimus perspiciatis quasi error voluptatem et.
-        id: 6.684198e+18
-        meta: Quia explicabo unde recusandae provident.
-        size: 6.104504e+18
-        time: 2015-08-11T10:20:08Z
-        url: Sapiente assumenda excepturi dolores dolores et molestias.
+      - device_id: Error dignissimos.
+        file_id: Incidunt consequuntur fugit non ut.
+        file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+        file_type_name: Ducimus quia explicabo unde.
+        firmware: Provident earum sit enim sapiente assumenda.
+        id: 5.955074e+18
+        meta: Dolores et molestias sit velit.
+        size: 7.5139965e+18
+        time: 1990-06-12T22:38:29Z
+        url: Consequatur debitis sit ratione aut.
         urls:
-          csv: Velit quo eveniet in consequatur debitis.
-          json: Ratione aut et.
-          raw: Amet reiciendis odit.
-      - device_id: Cumque nihil.
-        file_id: Labore dolorem vel laboriosam aut voluptatum.
-        file_type_id: Error dignissimos.
-        file_type_name: Incidunt consequuntur fugit non ut.
-        firmware: Ducimus perspiciatis quasi error voluptatem et.
-        id: 6.684198e+18
-        meta: Quia explicabo unde recusandae provident.
-        size: 6.104504e+18
-        time: 2015-08-11T10:20:08Z
-        url: Sapiente assumenda excepturi dolores dolores et molestias.
+          csv: Amet amet reiciendis odit sapiente.
+          json: Expedita qui eum.
+          raw: Deleniti sint velit qui.
+      - device_id: Error dignissimos.
+        file_id: Incidunt consequuntur fugit non ut.
+        file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+        file_type_name: Ducimus quia explicabo unde.
+        firmware: Provident earum sit enim sapiente assumenda.
+        id: 5.955074e+18
+        meta: Dolores et molestias sit velit.
+        size: 7.5139965e+18
+        time: 1990-06-12T22:38:29Z
+        url: Consequatur debitis sit ratione aut.
         urls:
-          csv: Velit quo eveniet in consequatur debitis.
-          json: Ratione aut et.
-          raw: Amet reiciendis odit.
-      - device_id: Cumque nihil.
-        file_id: Labore dolorem vel laboriosam aut voluptatum.
-        file_type_id: Error dignissimos.
-        file_type_name: Incidunt consequuntur fugit non ut.
-        firmware: Ducimus perspiciatis quasi error voluptatem et.
-        id: 6.684198e+18
-        meta: Quia explicabo unde recusandae provident.
-        size: 6.104504e+18
-        time: 2015-08-11T10:20:08Z
-        url: Sapiente assumenda excepturi dolores dolores et molestias.
+          csv: Amet amet reiciendis odit sapiente.
+          json: Expedita qui eum.
+          raw: Deleniti sint velit qui.
+      - device_id: Error dignissimos.
+        file_id: Incidunt consequuntur fugit non ut.
+        file_type_id: Ducimus perspiciatis quasi error voluptatem et.
+        file_type_name: Ducimus quia explicabo unde.
+        firmware: Provident earum sit enim sapiente assumenda.
+        id: 5.955074e+18
+        meta: Dolores et molestias sit velit.
+        size: 7.5139965e+18
+        time: 1990-06-12T22:38:29Z
+        url: Consequatur debitis sit ratione aut.
         urls:
-          csv: Velit quo eveniet in consequatur debitis.
-          json: Ratione aut et.
-          raw: Amet reiciendis odit.
+          csv: Amet amet reiciendis odit sapiente.
+          json: Expedita qui eum.
+          raw: Deleniti sint velit qui.
     properties:
       files:
         $ref: '#/definitions/DeviceFileCollection'
@@ -600,32 +622,32 @@ definitions:
   DeviceSchema:
     description: DeviceSchema media type (default view)
     example:
-      active: false
-      deviceId: 6.676849e+18
-      jsonSchema: Deleniti sint velit qui.
-      key: Et quidem quis fugit.
-      projectId: 3.0480972e+18
-      schemaId: 4.3492727e+18
+      active: true
+      deviceId: 1.6250877e+18
+      jsonSchema: Ut qui.
+      key: Aperiam amet.
+      projectId: 5.536231e+18
+      schemaId: 3.995137e+18
     properties:
       active:
-        example: false
+        example: true
         type: boolean
       deviceId:
-        example: 6.676849e+18
+        example: 1.6250877e+18
         format: int64
         type: integer
       jsonSchema:
-        example: Deleniti sint velit qui.
+        example: Ut qui.
         type: string
       key:
-        example: Et quidem quis fugit.
+        example: Aperiam amet.
         type: string
       projectId:
-        example: 3.0480972e+18
+        example: 5.536231e+18
         format: int64
         type: integer
       schemaId:
-        example: 4.3492727e+18
+        example: 3.995137e+18
         format: int64
         type: integer
     required:
@@ -641,24 +663,12 @@ definitions:
     description: DeviceSchemaCollection is the media type for an array of DeviceSchema
       (default view)
     example:
-    - active: false
-      deviceId: 6.676849e+18
-      jsonSchema: Deleniti sint velit qui.
-      key: Et quidem quis fugit.
-      projectId: 3.0480972e+18
-      schemaId: 4.3492727e+18
-    - active: false
-      deviceId: 6.676849e+18
-      jsonSchema: Deleniti sint velit qui.
-      key: Et quidem quis fugit.
-      projectId: 3.0480972e+18
-      schemaId: 4.3492727e+18
-    - active: false
-      deviceId: 6.676849e+18
-      jsonSchema: Deleniti sint velit qui.
-      key: Et quidem quis fugit.
-      projectId: 3.0480972e+18
-      schemaId: 4.3492727e+18
+    - active: true
+      deviceId: 1.6250877e+18
+      jsonSchema: Ut qui.
+      key: Aperiam amet.
+      projectId: 5.536231e+18
+      schemaId: 3.995137e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -668,24 +678,12 @@ definitions:
     description: DeviceSchemas media type (default view)
     example:
       schemas:
-      - active: false
-        deviceId: 6.676849e+18
-        jsonSchema: Deleniti sint velit qui.
-        key: Et quidem quis fugit.
-        projectId: 3.0480972e+18
-        schemaId: 4.3492727e+18
-      - active: false
-        deviceId: 6.676849e+18
-        jsonSchema: Deleniti sint velit qui.
-        key: Et quidem quis fugit.
-        projectId: 3.0480972e+18
-        schemaId: 4.3492727e+18
-      - active: false
-        deviceId: 6.676849e+18
-        jsonSchema: Deleniti sint velit qui.
-        key: Et quidem quis fugit.
-        projectId: 3.0480972e+18
-        schemaId: 4.3492727e+18
+      - active: true
+        deviceId: 1.6250877e+18
+        jsonSchema: Ut qui.
+        key: Aperiam amet.
+        projectId: 5.536231e+18
+        schemaId: 3.995137e+18
     properties:
       schemas:
         $ref: '#/definitions/DeviceSchemaCollection'
@@ -696,31 +694,31 @@ definitions:
   DeviceSource:
     description: DeviceSource media type (default view)
     example:
-      active: false
-      expeditionId: 5.508071e+18
-      id: 3.7761713e+18
-      key: Est amet ipsam reprehenderit totam dolorem impedit.
-      name: Quidem repellendus cupiditate nemo doloribus recusandae.
+      active: true
+      expeditionId: 5.3703655e+18
+      id: 8.4556045e+18
+      key: Impedit hic dolore quidem.
+      name: Nemo doloribus recusandae.
       teamId: 9.080818e+18
       token: Doloribus sequi placeat amet illo reprehenderit.
       userId: 3.6259348e+18
     properties:
       active:
-        example: false
+        example: true
         type: boolean
       expeditionId:
-        example: 5.508071e+18
+        example: 5.3703655e+18
         format: int64
         type: integer
       id:
-        example: 3.7761713e+18
+        example: 8.4556045e+18
         format: int64
         type: integer
       key:
-        example: Est amet ipsam reprehenderit totam dolorem impedit.
+        example: Impedit hic dolore quidem.
         type: string
       name:
-        example: Quidem repellendus cupiditate nemo doloribus recusandae.
+        example: Nemo doloribus recusandae.
         type: string
       teamId:
         example: 9.080818e+18
@@ -746,19 +744,27 @@ definitions:
     description: DeviceSourceCollection is the media type for an array of DeviceSource
       (default view)
     example:
-    - active: false
-      expeditionId: 5.508071e+18
-      id: 3.7761713e+18
-      key: Est amet ipsam reprehenderit totam dolorem impedit.
-      name: Quidem repellendus cupiditate nemo doloribus recusandae.
+    - active: true
+      expeditionId: 5.3703655e+18
+      id: 8.4556045e+18
+      key: Impedit hic dolore quidem.
+      name: Nemo doloribus recusandae.
       teamId: 9.080818e+18
       token: Doloribus sequi placeat amet illo reprehenderit.
       userId: 3.6259348e+18
-    - active: false
-      expeditionId: 5.508071e+18
-      id: 3.7761713e+18
-      key: Est amet ipsam reprehenderit totam dolorem impedit.
-      name: Quidem repellendus cupiditate nemo doloribus recusandae.
+    - active: true
+      expeditionId: 5.3703655e+18
+      id: 8.4556045e+18
+      key: Impedit hic dolore quidem.
+      name: Nemo doloribus recusandae.
+      teamId: 9.080818e+18
+      token: Doloribus sequi placeat amet illo reprehenderit.
+      userId: 3.6259348e+18
+    - active: true
+      expeditionId: 5.3703655e+18
+      id: 8.4556045e+18
+      key: Impedit hic dolore quidem.
+      name: Nemo doloribus recusandae.
       teamId: 9.080818e+18
       token: Doloribus sequi placeat amet illo reprehenderit.
       userId: 3.6259348e+18
@@ -771,11 +777,11 @@ definitions:
     description: DeviceSources media type (default view)
     example:
       deviceSources:
-      - active: false
-        expeditionId: 5.508071e+18
-        id: 3.7761713e+18
-        key: Est amet ipsam reprehenderit totam dolorem impedit.
-        name: Quidem repellendus cupiditate nemo doloribus recusandae.
+      - active: true
+        expeditionId: 5.3703655e+18
+        id: 8.4556045e+18
+        key: Impedit hic dolore quidem.
+        name: Nemo doloribus recusandae.
         teamId: 9.080818e+18
         token: Doloribus sequi placeat amet illo reprehenderit.
         userId: 3.6259348e+18
@@ -786,6 +792,22 @@ definitions:
     - deviceSources
     title: 'Mediatype identifier: application/vnd.app.device_sources+json; view=default'
     type: object
+  DeviceSummaryUrls:
+    example:
+      data: Cumque nihil.
+      logs: Labore dolorem vel laboriosam aut voluptatum.
+    properties:
+      data:
+        example: Cumque nihil.
+        type: string
+      logs:
+        example: Labore dolorem vel laboriosam aut voluptatum.
+        type: string
+    required:
+    - logs
+    - data
+    title: DeviceSummaryUrls
+    type: object
   Devices:
     description: Devices media type (default view)
     example:
@@ -794,14 +816,9 @@ definitions:
         last_file_id: Rem vel est qui ratione sequi et.
         last_file_time: 1980-07-23T03:28:45Z
         number_of_files: 8.8054075e+18
-      - device_id: Saepe facilis quis blanditiis recusandae est.
-        last_file_id: Rem vel est qui ratione sequi et.
-        last_file_time: 1980-07-23T03:28:45Z
-        number_of_files: 8.8054075e+18
-      - device_id: Saepe facilis quis blanditiis recusandae est.
-        last_file_id: Rem vel est qui ratione sequi et.
-        last_file_time: 1980-07-23T03:28:45Z
-        number_of_files: 8.8054075e+18
+        urls:
+          data: Cumque nihil.
+          logs: Labore dolorem vel laboriosam aut voluptatum.
     properties:
       devices:
         $ref: '#/definitions/DeviceCollection'
@@ -920,6 +937,18 @@ definitions:
       profile: A voluptas.
       time: 1976-07-08T15:56:09Z
       url: Itaque qui sequi.
+    - etag: Ut repellendus ratione voluptatum.
+      id: 9.878814e+17
+      module: Praesentium ratione et.
+      profile: A voluptas.
+      time: 1976-07-08T15:56:09Z
+      url: Itaque qui sequi.
+    - etag: Ut repellendus ratione voluptatum.
+      id: 9.878814e+17
+      module: Praesentium ratione et.
+      profile: A voluptas.
+      time: 1976-07-08T15:56:09Z
+      url: Itaque qui sequi.
     items:
       $ref: '#/definitions/FirmwareSummary'
     title: 'Mediatype identifier: application/vnd.app.firmware+json; type=collection;
@@ -963,21 +992,21 @@ definitions:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+          Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+          Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
         type: Beatae itaque ipsa soluta minus consequatur.
       - geometry:
           coordinates:
           - 0.1554735
           type: Repudiandae dignissimos.
         properties:
-          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+          Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
         type: Beatae itaque ipsa soluta minus consequatur.
       type: Sed magni consequatur et.
     properties:
@@ -999,7 +1028,7 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+        Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
       type: Beatae itaque ipsa soluta minus consequatur.
     properties:
       geometry:
@@ -1007,7 +1036,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+          Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
         type: object
       type:
         example: Beatae itaque ipsa soluta minus consequatur.
@@ -1027,14 +1056,14 @@ definitions:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+        Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
       type: Beatae itaque ipsa soluta minus consequatur.
     - geometry:
         coordinates:
         - 0.1554735
         type: Repudiandae dignissimos.
       properties:
-        Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+        Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
       type: Beatae itaque ipsa soluta minus consequatur.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1108,27 +1137,33 @@ definitions:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+              Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+              Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
             type: Beatae itaque ipsa soluta minus consequatur.
           - geometry:
               coordinates:
               - 0.1554735
               type: Repudiandae dignissimos.
             properties:
-              Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+              Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
             type: Beatae itaque ipsa soluta minus consequatur.
           type: Sed magni consequatur et.
         hasMore: true
         nextUrl: Velit ad.
         previousUrl: Voluptatem explicabo.
       geometries:
+      - geometry:
+        - - 0.96824837
+        - - 0.96824837
+        - - 0.96824837
+        id: 5.41219e+18
+        sourceId: 1.6901081e+18
       - geometry:
         - - 0.96824837
         - - 0.96824837
@@ -1213,21 +1248,21 @@ definitions:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+            Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+            Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
           type: Beatae itaque ipsa soluta minus consequatur.
         - geometry:
             coordinates:
             - 0.1554735
             type: Repudiandae dignissimos.
           properties:
-            Nihil et.: b99ed35d-2848-469c-b209-c23c1b1912ba
+            Nihil et.: 1dc9b796-e67a-4fc1-a6d0-bb6fb56ab2f1
           type: Beatae itaque ipsa soluta minus consequatur.
         type: Sed magni consequatur et.
       hasMore: true
@@ -1317,6 +1352,10 @@ definitions:
       administrators:
       - projectId: 1.2833427e+18
         userId: 6.2970576e+18
+      - projectId: 1.2833427e+18
+        userId: 6.2970576e+18
+      - projectId: 1.2833427e+18
+        userId: 6.2970576e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -1364,6 +1403,9 @@ definitions:
     description: QueryData media type (default view)
     example:
       series:
+      - name: Officiis dignissimos consectetur.
+        rows:
+        - 0.06883001
       - name: Officiis dignissimos consectetur.
         rows:
         - 0.06883001
@@ -1433,9 +1475,6 @@ definitions:
     description: SeriesDataCollection is the media type for an array of SeriesData
       (default view)
     example:
-    - name: Officiis dignissimos consectetur.
-      rows:
-      - 0.06883001
     - name: Officiis dignissimos consectetur.
       rows:
       - 0.06883001
@@ -1611,27 +1650,27 @@ definitions:
     description: Sources media type (default view)
     example:
       deviceSources:
-      - active: false
-        expeditionId: 5.508071e+18
-        id: 3.7761713e+18
-        key: Est amet ipsam reprehenderit totam dolorem impedit.
-        name: Quidem repellendus cupiditate nemo doloribus recusandae.
+      - active: true
+        expeditionId: 5.3703655e+18
+        id: 8.4556045e+18
+        key: Impedit hic dolore quidem.
+        name: Nemo doloribus recusandae.
         teamId: 9.080818e+18
         token: Doloribus sequi placeat amet illo reprehenderit.
         userId: 3.6259348e+18
-      - active: false
-        expeditionId: 5.508071e+18
-        id: 3.7761713e+18
-        key: Est amet ipsam reprehenderit totam dolorem impedit.
-        name: Quidem repellendus cupiditate nemo doloribus recusandae.
+      - active: true
+        expeditionId: 5.3703655e+18
+        id: 8.4556045e+18
+        key: Impedit hic dolore quidem.
+        name: Nemo doloribus recusandae.
         teamId: 9.080818e+18
         token: Doloribus sequi placeat amet illo reprehenderit.
         userId: 3.6259348e+18
-      - active: false
-        expeditionId: 5.508071e+18
-        id: 3.7761713e+18
-        key: Est amet ipsam reprehenderit totam dolorem impedit.
-        name: Quidem repellendus cupiditate nemo doloribus recusandae.
+      - active: true
+        expeditionId: 5.3703655e+18
+        id: 8.4556045e+18
+        key: Impedit hic dolore quidem.
+        name: Nemo doloribus recusandae.
         teamId: 9.080818e+18
         token: Doloribus sequi placeat amet illo reprehenderit.
         userId: 3.6259348e+18
@@ -2192,7 +2231,7 @@ paths:
   /devices/{deviceId}/data:
     get:
       description: Get all device data
-      operationId: DeviceData#all
+      operationId: device_data#all
       parameters:
       - in: path
         name: deviceId
@@ -2213,13 +2252,13 @@ paths:
         "503": {}
       schemes:
       - https
-      summary: all DeviceData
+      summary: all device_data
       tags:
-      - DeviceData
+      - device_data
   /devices/{deviceId}/files/data:
     get:
       description: List device files
-      operationId: Files#list device data files
+      operationId: files#list device data files
       parameters:
       - in: path
         name: deviceId
@@ -2238,13 +2277,13 @@ paths:
             $ref: '#/definitions/DeviceFiles'
       schemes:
       - https
-      summary: list device data files Files
+      summary: list device data files files
       tags:
-      - Files
+      - files
   /devices/{deviceId}/files/logs:
     get:
       description: List device files
-      operationId: Files#list device log files
+      operationId: files#list device log files
       parameters:
       - in: path
         name: deviceId
@@ -2263,9 +2302,9 @@ paths:
             $ref: '#/definitions/DeviceFiles'
       schemes:
       - https
-      summary: list device log files Files
+      summary: list device log files files
       tags:
-      - Files
+      - files
   /devices/{deviceId}/firmware:
     get:
       description: List device firmware
@@ -2290,7 +2329,7 @@ paths:
   /devices/{deviceId}/logs:
     get:
       description: Get all device logs
-      operationId: DeviceLogs#all
+      operationId: device_logs#all
       parameters:
       - in: path
         name: deviceId
@@ -2311,9 +2350,9 @@ paths:
         "503": {}
       schemes:
       - https
-      summary: all DeviceLogs
+      summary: all device_logs
       tags:
-      - DeviceLogs
+      - device_logs
   /devices/firmware:
     patch:
       description: Update an Device firmware
@@ -2721,7 +2760,7 @@ paths:
   /files/{fileId}:
     get:
       description: File info
-      operationId: Files#file
+      operationId: files#file
       parameters:
       - in: path
         name: fileId
@@ -2738,13 +2777,13 @@ paths:
           description: Not Found
       schemes:
       - https
-      summary: file Files
+      summary: file files
       tags:
-      - Files
+      - files
   /files/{fileId}/data.csv:
     get:
       description: Export file
-      operationId: Files#csv
+      operationId: files#csv
       parameters:
       - default: true
         in: query
@@ -2764,13 +2803,13 @@ paths:
           description: Not Found
       schemes:
       - https
-      summary: csv Files
+      summary: csv files
       tags:
-      - Files
+      - files
   /files/{fileId}/data.fkpb:
     get:
       description: Export file
-      operationId: Files#raw
+      operationId: files#raw
       parameters:
       - default: true
         in: query
@@ -2790,13 +2829,13 @@ paths:
           description: Not Found
       schemes:
       - https
-      summary: raw Files
+      summary: raw files
       tags:
-      - Files
+      - files
   /files/{fileId}/data.json:
     get:
       description: Export file
-      operationId: Files#json
+      operationId: files#json
       parameters:
       - default: true
         in: query
@@ -2816,13 +2855,13 @@ paths:
           description: Not Found
       schemes:
       - https
-      summary: json Files
+      summary: json files
       tags:
-      - Files
+      - files
   /files/devices:
     get:
       description: List devices
-      operationId: Files#list devices
+      operationId: files#list devices
       produces:
       - application/vnd.app.devices+json
       responses:
@@ -2834,9 +2873,9 @@ paths:
           description: Not Found
       schemes:
       - https
-      summary: list devices Files
+      summary: list devices files
       tags:
-      - Files
+      - files
   /firmware:
     get:
       description: List firmware

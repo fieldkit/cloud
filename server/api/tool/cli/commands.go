@@ -25,67 +25,9 @@ import (
 )
 
 type (
-	// AllDeviceDataCommand is the command line data structure for the all action of DeviceData
-	AllDeviceDataCommand struct {
-		DeviceID    string
-		PrettyPrint bool
-	}
-
-	// AllDeviceLogsCommand is the command line data structure for the all action of DeviceLogs
-	AllDeviceLogsCommand struct {
-		DeviceID    string
-		PrettyPrint bool
-	}
-
 	// ListBySourceExportCommand is the command line data structure for the list by source action of Export
 	ListBySourceExportCommand struct {
 		SourceID    int
-		PrettyPrint bool
-	}
-
-	// CsvFilesCommand is the command line data structure for the csv action of Files
-	CsvFilesCommand struct {
-		FileID      string
-		Dl          string
-		PrettyPrint bool
-	}
-
-	// FileFilesCommand is the command line data structure for the file action of Files
-	FileFilesCommand struct {
-		FileID      string
-		PrettyPrint bool
-	}
-
-	// JSONFilesCommand is the command line data structure for the json action of Files
-	JSONFilesCommand struct {
-		FileID      string
-		Dl          string
-		PrettyPrint bool
-	}
-
-	// ListDeviceDataFilesFilesCommand is the command line data structure for the list device data files action of Files
-	ListDeviceDataFilesFilesCommand struct {
-		DeviceID    string
-		Page        int
-		PrettyPrint bool
-	}
-
-	// ListDeviceLogFilesFilesCommand is the command line data structure for the list device log files action of Files
-	ListDeviceLogFilesFilesCommand struct {
-		DeviceID    string
-		Page        int
-		PrettyPrint bool
-	}
-
-	// ListDevicesFilesCommand is the command line data structure for the list devices action of Files
-	ListDevicesFilesCommand struct {
-		PrettyPrint bool
-	}
-
-	// RawFilesCommand is the command line data structure for the raw action of Files
-	RawFilesCommand struct {
-		FileID      string
-		Dl          string
 		PrettyPrint bool
 	}
 
@@ -256,6 +198,18 @@ type (
 		PrettyPrint bool
 	}
 
+	// AllDeviceDataCommand is the command line data structure for the all action of device_data
+	AllDeviceDataCommand struct {
+		DeviceID    string
+		PrettyPrint bool
+	}
+
+	// AllDeviceLogsCommand is the command line data structure for the all action of device_logs
+	AllDeviceLogsCommand struct {
+		DeviceID    string
+		PrettyPrint bool
+	}
+
 	// AddExpeditionCommand is the command line data structure for the add action of expedition
 	AddExpeditionCommand struct {
 		Payload     string
@@ -298,6 +252,52 @@ type (
 		ContentType  string
 		ExpeditionID int
 		PrettyPrint  bool
+	}
+
+	// CsvFilesCommand is the command line data structure for the csv action of files
+	CsvFilesCommand struct {
+		FileID      string
+		Dl          string
+		PrettyPrint bool
+	}
+
+	// FileFilesCommand is the command line data structure for the file action of files
+	FileFilesCommand struct {
+		FileID      string
+		PrettyPrint bool
+	}
+
+	// JSONFilesCommand is the command line data structure for the json action of files
+	JSONFilesCommand struct {
+		FileID      string
+		Dl          string
+		PrettyPrint bool
+	}
+
+	// ListDeviceDataFilesFilesCommand is the command line data structure for the list device data files action of files
+	ListDeviceDataFilesFilesCommand struct {
+		DeviceID    string
+		Page        int
+		PrettyPrint bool
+	}
+
+	// ListDeviceLogFilesFilesCommand is the command line data structure for the list device log files action of files
+	ListDeviceLogFilesFilesCommand struct {
+		DeviceID    string
+		Page        int
+		PrettyPrint bool
+	}
+
+	// ListDevicesFilesCommand is the command line data structure for the list devices action of files
+	ListDevicesFilesCommand struct {
+		PrettyPrint bool
+	}
+
+	// RawFilesCommand is the command line data structure for the raw action of files
+	RawFilesCommand struct {
+		FileID      string
+		Dl          string
+		PrettyPrint bool
 	}
 
 	// AddMemberCommand is the command line data structure for the add action of member
@@ -2020,58 +2020,6 @@ found:
 	return nil
 }
 
-// Run makes the HTTP request corresponding to the AllDeviceDataCommand command.
-func (cmd *AllDeviceDataCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/devices/%v/data", url.QueryEscape(cmd.DeviceID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AllDeviceData(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *AllDeviceDataCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var deviceID string
-	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
-}
-
-// Run makes the HTTP request corresponding to the AllDeviceLogsCommand command.
-func (cmd *AllDeviceLogsCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/devices/%v/logs", url.QueryEscape(cmd.DeviceID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AllDeviceLogs(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *AllDeviceLogsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var deviceID string
-	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
-}
-
 // Run makes the HTTP request corresponding to the ListBySourceExportCommand command.
 func (cmd *ListBySourceExportCommand) Run(c *client.Client, args []string) error {
 	var path string
@@ -2096,220 +2044,6 @@ func (cmd *ListBySourceExportCommand) Run(c *client.Client, args []string) error
 func (cmd *ListBySourceExportCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var sourceID int
 	cc.Flags().IntVar(&cmd.SourceID, "sourceId", sourceID, ``)
-}
-
-// Run makes the HTTP request corresponding to the CsvFilesCommand command.
-func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/files/%v/data.csv", url.QueryEscape(cmd.FileID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp148 *bool
-	if cmd.Dl != "" {
-		var err error
-		tmp148, err = boolVal(cmd.Dl)
-		if err != nil {
-			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
-			return err
-		}
-	}
-	resp, err := c.CsvFiles(ctx, path, tmp148)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *CsvFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
-}
-
-// Run makes the HTTP request corresponding to the FileFilesCommand command.
-func (cmd *FileFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/files/%v", url.QueryEscape(cmd.FileID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.FileFiles(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *FileFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-}
-
-// Run makes the HTTP request corresponding to the JSONFilesCommand command.
-func (cmd *JSONFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/files/%v/data.json", url.QueryEscape(cmd.FileID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp149 *bool
-	if cmd.Dl != "" {
-		var err error
-		tmp149, err = boolVal(cmd.Dl)
-		if err != nil {
-			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
-			return err
-		}
-	}
-	resp, err := c.JSONFiles(ctx, path, tmp149)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *JSONFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
-}
-
-// Run makes the HTTP request corresponding to the ListDeviceDataFilesFilesCommand command.
-func (cmd *ListDeviceDataFilesFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/devices/%v/files/data", url.QueryEscape(cmd.DeviceID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListDeviceDataFilesFiles(ctx, path, intFlagVal("page", cmd.Page))
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ListDeviceDataFilesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var deviceID string
-	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
-	var page int
-	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
-}
-
-// Run makes the HTTP request corresponding to the ListDeviceLogFilesFilesCommand command.
-func (cmd *ListDeviceLogFilesFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/devices/%v/files/logs", url.QueryEscape(cmd.DeviceID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListDeviceLogFilesFiles(ctx, path, intFlagVal("page", cmd.Page))
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ListDeviceLogFilesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var deviceID string
-	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
-	var page int
-	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
-}
-
-// Run makes the HTTP request corresponding to the ListDevicesFilesCommand command.
-func (cmd *ListDevicesFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/files/devices"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListDevicesFiles(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ListDevicesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the RawFilesCommand command.
-func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/files/%v/data.fkpb", url.QueryEscape(cmd.FileID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp150 *bool
-	if cmd.Dl != "" {
-		var err error
-		tmp150, err = boolVal(cmd.Dl)
-		if err != nil {
-			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
-			return err
-		}
-	}
-	resp, err := c.RawFiles(ctx, path, tmp150)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *RawFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var fileID string
-	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddFirmwareCommand command.
@@ -2522,16 +2256,16 @@ func (cmd *ListBySourceGeojsonCommand) Run(c *client.Client, args []string) erro
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp151 *bool
+	var tmp148 *bool
 	if cmd.Descending != "" {
 		var err error
-		tmp151, err = boolVal(cmd.Descending)
+		tmp148, err = boolVal(cmd.Descending)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--descending", "err", err)
 			return err
 		}
 	}
-	resp, err := c.ListBySourceGeoJSON(ctx, path, tmp151)
+	resp, err := c.ListBySourceGeoJSON(ctx, path, tmp148)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -3014,6 +2748,58 @@ func (cmd *UpdateSchemaDeviceCommand) RegisterFlags(cc *cobra.Command, c *client
 	cc.Flags().IntVar(&cmd.ID, "id", id, ``)
 }
 
+// Run makes the HTTP request corresponding to the AllDeviceDataCommand command.
+func (cmd *AllDeviceDataCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v/data", url.QueryEscape(cmd.DeviceID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.AllDeviceData(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *AllDeviceDataCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+}
+
+// Run makes the HTTP request corresponding to the AllDeviceLogsCommand command.
+func (cmd *AllDeviceLogsCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v/logs", url.QueryEscape(cmd.DeviceID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.AllDeviceLogs(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *AllDeviceLogsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+}
+
 // Run makes the HTTP request corresponding to the AddExpeditionCommand command.
 func (cmd *AddExpeditionCommand) Run(c *client.Client, args []string) error {
 	var path string
@@ -3188,6 +2974,220 @@ func (cmd *UpdateExpeditionCommand) RegisterFlags(cc *cobra.Command, c *client.C
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var expeditionID int
 	cc.Flags().IntVar(&cmd.ExpeditionID, "expeditionId", expeditionID, ``)
+}
+
+// Run makes the HTTP request corresponding to the CsvFilesCommand command.
+func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/files/%v/data.csv", url.QueryEscape(cmd.FileID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	var tmp149 *bool
+	if cmd.Dl != "" {
+		var err error
+		tmp149, err = boolVal(cmd.Dl)
+		if err != nil {
+			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
+			return err
+		}
+	}
+	resp, err := c.CsvFiles(ctx, path, tmp149)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *CsvFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var fileID string
+	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
+}
+
+// Run makes the HTTP request corresponding to the FileFilesCommand command.
+func (cmd *FileFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/files/%v", url.QueryEscape(cmd.FileID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.FileFiles(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *FileFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var fileID string
+	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
+}
+
+// Run makes the HTTP request corresponding to the JSONFilesCommand command.
+func (cmd *JSONFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/files/%v/data.json", url.QueryEscape(cmd.FileID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	var tmp150 *bool
+	if cmd.Dl != "" {
+		var err error
+		tmp150, err = boolVal(cmd.Dl)
+		if err != nil {
+			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
+			return err
+		}
+	}
+	resp, err := c.JSONFiles(ctx, path, tmp150)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *JSONFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var fileID string
+	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
+}
+
+// Run makes the HTTP request corresponding to the ListDeviceDataFilesFilesCommand command.
+func (cmd *ListDeviceDataFilesFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v/files/data", url.QueryEscape(cmd.DeviceID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ListDeviceDataFilesFiles(ctx, path, intFlagVal("page", cmd.Page))
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ListDeviceDataFilesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
+}
+
+// Run makes the HTTP request corresponding to the ListDeviceLogFilesFilesCommand command.
+func (cmd *ListDeviceLogFilesFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v/files/logs", url.QueryEscape(cmd.DeviceID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ListDeviceLogFilesFiles(ctx, path, intFlagVal("page", cmd.Page))
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ListDeviceLogFilesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
+}
+
+// Run makes the HTTP request corresponding to the ListDevicesFilesCommand command.
+func (cmd *ListDevicesFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/files/devices"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ListDevicesFiles(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ListDevicesFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+}
+
+// Run makes the HTTP request corresponding to the RawFilesCommand command.
+func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/files/%v/data.fkpb", url.QueryEscape(cmd.FileID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	var tmp151 *bool
+	if cmd.Dl != "" {
+		var err error
+		tmp151, err = boolVal(cmd.Dl)
+		if err != nil {
+			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
+			return err
+		}
+	}
+	resp, err := c.RawFiles(ctx, path, tmp151)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *RawFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var fileID string
+	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddMemberCommand command.

@@ -134,10 +134,11 @@ func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (Cl
 //
 // Identifier: application/vnd.app.device+json; view=default
 type Device struct {
-	DeviceID      string    `form:"device_id" json:"device_id" xml:"device_id"`
-	LastFileID    string    `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
-	LastFileTime  time.Time `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
-	NumberOfFiles int       `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
+	DeviceID      string             `form:"device_id" json:"device_id" xml:"device_id"`
+	LastFileID    string             `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
+	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
+	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
+	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }
 
 // Validate validates the Device media type instance.
@@ -148,6 +149,14 @@ func (mt *Device) Validate() (err error) {
 
 	if mt.LastFileID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "last_file_id"))
+	}
+	if mt.Urls == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Urls != nil {
+		if err2 := mt.Urls.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

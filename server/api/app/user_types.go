@@ -675,6 +675,52 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 	return
 }
 
+// deviceSummaryUrls user type.
+type deviceSummaryUrls struct {
+	Data *string `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+	Logs *string `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
+}
+
+// Validate validates the deviceSummaryUrls type instance.
+func (ut *deviceSummaryUrls) Validate() (err error) {
+	if ut.Logs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "logs"))
+	}
+	if ut.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "data"))
+	}
+	return
+}
+
+// Publicize creates DeviceSummaryUrls from deviceSummaryUrls
+func (ut *deviceSummaryUrls) Publicize() *DeviceSummaryUrls {
+	var pub DeviceSummaryUrls
+	if ut.Data != nil {
+		pub.Data = *ut.Data
+	}
+	if ut.Logs != nil {
+		pub.Logs = *ut.Logs
+	}
+	return &pub
+}
+
+// DeviceSummaryUrls user type.
+type DeviceSummaryUrls struct {
+	Data string `form:"data" json:"data" xml:"data"`
+	Logs string `form:"logs" json:"logs" xml:"logs"`
+}
+
+// Validate validates the DeviceSummaryUrls type instance.
+func (ut *DeviceSummaryUrls) Validate() (err error) {
+	if ut.Logs == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "logs"))
+	}
+	if ut.Data == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "data"))
+	}
+	return
+}
+
 // loginPayload user type.
 type loginPayload struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`

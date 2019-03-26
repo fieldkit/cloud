@@ -301,6 +301,10 @@ func DeviceSummaryType(s *DeviceSummary) *app.Device {
 		LastFileID:    s.LastFileID,
 		LastFileTime:  s.LastFileTime,
 		NumberOfFiles: s.NumberOfFiles,
+		Urls: &app.DeviceSummaryUrls{
+			Data: fmt.Sprintf("/devices/%v/data", s.DeviceID),
+			Logs: fmt.Sprintf("/devices/%v/logs", s.DeviceID),
+		},
 	}
 }
 
