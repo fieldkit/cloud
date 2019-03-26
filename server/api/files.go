@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -22,20 +21,26 @@ import (
 )
 
 type FilesControllerOptions struct {
+	Config   *ApiConfiguration
 	Session  *session.Session
 	Database *sqlxcache.DB
 	Backend  *backend.Backend
 }
 
-type FilesController struct {
-	*goa.Controller
+type BaseFilesController struct {
 	options FilesControllerOptions
 }
 
+type FilesController struct {
+	BaseFilesController
+	*goa.Controller
+}
+
 var (
-	DataFileTypeIDs = []string{"4"}
-	LogFileTypeIDs  = []string{"2", "3"}
-	FileTypeNames   = map[string]string{
+	ConcatenatedFilesSpace = uuid.MustParse("5554c632-d586-53f2-b2a7-88a63663a3f5")
+	DataFileTypeIDs        = []string{"4"}
+	LogFileTypeIDs         = []string{"2", "3"}
+	FileTypeNames          = map[string]string{
 		"2": "Logs",
 		"3": "Logs",
 		"4": "Data",
@@ -44,12 +49,14 @@ var (
 
 func NewFilesController(service *goa.Service, options FilesControllerOptions) *FilesController {
 	return &FilesController{
+		BaseFilesController: BaseFilesController{
+			options: options,
+		},
 		Controller: service.NewController("FilesController"),
-		options:    options,
 	}
 }
 
-func DeviceFileSummaryType(s *data.DeviceFile) *app.DeviceFile {
+func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.DeviceFile {
 	return &app.DeviceFile{
 		DeviceID:     s.DeviceID,
 		FileID:       s.StreamID,
@@ -69,10 +76,10 @@ func DeviceFileSummaryType(s *data.DeviceFile) *app.DeviceFile {
 	}
 }
 
-func DeviceFilesType(files []*data.DeviceFile) *app.DeviceFiles {
+func DeviceFilesType(ac *ApiConfiguration, files []*data.DeviceFile) *app.DeviceFiles {
 	summaries := make([]*app.DeviceFile, len(files))
 	for i, summary := range files {
-		summaries[i] = DeviceFileSummaryType(summary)
+		summaries[i] = DeviceFileSummaryType(ac, summary)
 	}
 	return &app.DeviceFiles{
 		Files: summaries,
@@ -96,7 +103,7 @@ func (c *FilesController) listDeviceFiles(ctx context.Context, fileTypeIDs []str
 		return nil, err
 	}
 
-	return DeviceFilesType(files), nil
+	return DeviceFilesType(c.options.Config, files), nil
 }
 
 func (c *FilesController) ListDeviceDataFiles(ctx *app.ListDeviceDataFilesFilesContext) error {
@@ -118,7 +125,7 @@ func (c *FilesController) ListDeviceLogFiles(ctx *app.ListDeviceLogFilesFilesCon
 }
 
 func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
-	devices := []*DeviceSummary{}
+	devices := []*data.DeviceSummary{}
 	if err := c.options.Database.SelectContext(ctx, &devices,
 		`SELECT s.device_id,
 		    (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
@@ -145,7 +152,7 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 		return ctx.NotFound()
 	}
 
-	return ctx.OK(DeviceFileSummaryType(files[0]))
+	return ctx.OK(DeviceFileSummaryType(c.options.Config, files[0]))
 }
 
 func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
@@ -196,106 +203,81 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 	return nil
 }
 
+func (c *BaseFilesController) concatenatedDeviceFile(ctx context.Context, responseData *goa.ResponseData, deviceID string, fileTypeIDs []string) (redirection string, err error) {
+	deviceStreamID := uuid.NewSHA1(ConcatenatedFilesSpace, []byte(deviceID))
+	fileTypeID := fileTypeIDs[0]
+
+	fc := &backend.FileConcatenator{
+		Session:    c.options.Session,
+		Database:   c.options.Database,
+		FileID:     deviceStreamID.String(),
+		FileTypeID: fileTypeID,
+		DeviceID:   deviceID,
+		TypeIDs:    fileTypeIDs,
+	}
+
+	go fc.Concatenate(ctx)
+
+	return c.options.Config.MakeApiUrl("/files/%s", deviceStreamID), nil
+}
+
 type DeviceLogsController struct {
+	BaseFilesController
 	*goa.Controller
-	options FilesControllerOptions
 }
 
 func NewDeviceLogsController(service *goa.Service, options FilesControllerOptions) *DeviceLogsController {
 	return &DeviceLogsController{
+		BaseFilesController: BaseFilesController{
+			options: options,
+		},
 		Controller: service.NewController("DeviceLogsController"),
-		options:    options,
 	}
 }
 
 func (c *DeviceLogsController) All(ctx *app.AllDeviceLogsContext) error {
-	files := []*data.DeviceFile{}
-	if err := c.options.Database.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.device_id = $1 AND s.children IS NOT NULL`, ctx.DeviceID); err != nil {
+	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, LogFileTypeIDs)
+	if err != nil {
 		return err
 	}
 
-	if len(files) == 0 {
-		newFileID, err := uuid.NewRandom()
-		if err != nil {
-			return err
-		}
-
-		fc := &backend.FileConcatenator{
-			Session:    c.options.Session,
-			Database:   c.options.Database,
-			FileID:     newFileID.String(),
-			FileTypeID: DataFileTypeIDs[0],
-			DeviceID:   ctx.DeviceID,
-			TypeIDs:    DataFileTypeIDs,
-		}
-
-		go fc.Concatenate(ctx)
-
-		if true {
-			ctx.ResponseData.Header().Set("Location", fmt.Sprintf("https://api.fieldkit.org/files/%s", newFileID))
-			return ctx.Busy()
-		}
-
-		return ctx.Busy()
+	if url != "" {
+		ctx.ResponseData.Header().Set("Location", url)
+		return ctx.Found()
 	}
 
-	return ctx.OK([]byte{})
+	return ctx.NotFound()
 }
 
 type DeviceDataController struct {
+	BaseFilesController
 	*goa.Controller
-	options FilesControllerOptions
 }
 
 func NewDeviceDataController(service *goa.Service, options FilesControllerOptions) *DeviceDataController {
 	return &DeviceDataController{
+		BaseFilesController: BaseFilesController{
+			options: options,
+		},
 		Controller: service.NewController("DeviceDataController"),
-		options:    options,
 	}
 }
 
 func (c *DeviceDataController) All(ctx *app.AllDeviceDataContext) error {
-	files := []*data.DeviceFile{}
-	if err := c.options.Database.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.device_id = $1 AND s.children IS NOT NULL`, ctx.DeviceID); err != nil {
+	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, DataFileTypeIDs)
+	if err != nil {
 		return err
 	}
 
-	if len(files) == 0 {
-		newFileID, err := uuid.NewRandom()
-		if err != nil {
-			return err
-		}
-
-		fc := &backend.FileConcatenator{
-			Session:    c.options.Session,
-			Database:   c.options.Database,
-			FileID:     newFileID.String(),
-			FileTypeID: DataFileTypeIDs[0],
-			DeviceID:   ctx.DeviceID,
-			TypeIDs:    DataFileTypeIDs,
-		}
-
-		go fc.Concatenate(ctx)
-
-		if true {
-			ctx.ResponseData.Header().Set("Location", fmt.Sprintf("https://api.fieldkit.org/files/%s", newFileID))
-			return ctx.Busy()
-		}
-
+	if url != "" {
+		ctx.ResponseData.Header().Set("Location", url)
 		return ctx.Found()
 	}
 
-	return ctx.OK([]byte{})
+	return ctx.NotFound()
 }
 
-type DeviceSummary struct {
-	DeviceID      string    `db:"device_id"`
-	LastFileID    string    `db:"last_stream_id"`
-	LastFileTime  time.Time `db:"last_stream_time"`
-	NumberOfFiles int       `db:"number_of_files"`
-}
-
-func DeviceSummaryType(s *DeviceSummary) *app.Device {
+func DeviceSummaryType(s *data.DeviceSummary) *app.Device {
 	return &app.Device{
 		DeviceID:      s.DeviceID,
 		LastFileID:    s.LastFileID,
@@ -308,7 +290,7 @@ func DeviceSummaryType(s *DeviceSummary) *app.Device {
 	}
 }
 
-func DevicesType(devices []*DeviceSummary) *app.Devices {
+func DevicesType(devices []*data.DeviceSummary) *app.Devices {
 	summaries := make([]*app.Device, len(devices))
 	for i, summary := range devices {
 		summaries[i] = DeviceSummaryType(summary)

@@ -243,7 +243,7 @@ func (fc *FileConcatenator) Close() {
 func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB) error {
 	svc := s3.New(session)
 
-	loi := &s3.ListObjectsInput{
+	loi := &s3.ListObjectsV2Input{
 		Bucket:  aws.String("fk-streams"),
 		MaxKeys: aws.Int64(100),
 	}
@@ -259,7 +259,7 @@ func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB
 
 	total := 0
 
-	err := svc.ListObjectsPages(loi, func(page *s3.ListObjectsOutput, lastPage bool) bool {
+	err := svc.ListObjectsV2Pages(loi, func(page *s3.ListObjectsV2Output, lastPage bool) bool {
 		log.Printf("%v objects (%v)", len(page.Contents), total)
 
 		for _, summary := range page.Contents {

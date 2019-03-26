@@ -81,3 +81,10 @@ type DeviceStream struct {
 	Meta     types.JSONText `db:"meta"`
 	Children *[]int64       `db:"children"`
 }
+
+type DeviceSummary struct {
+	DeviceID      string    `db:"device_id"`
+	LastFileID    string    `db:"last_stream_id"`
+	LastFileTime  time.Time `db:"last_stream_time"`
+	NumberOfFiles int       `db:"number_of_files"`
+}

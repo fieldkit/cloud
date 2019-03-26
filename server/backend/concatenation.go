@@ -2,11 +2,9 @@ package backend
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"time"
 
 	"github.com/lib/pq"
 
@@ -35,6 +33,16 @@ type FileConcatenator struct {
 	FileTypeID string
 	DeviceID   string
 	TypeIDs    []string
+}
+
+func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend) (fc *FileConcatenator, err error) {
+	fc = &FileConcatenator{
+		Session:  s,
+		Database: db,
+		Backend:  backend,
+	}
+
+	return
 }
 
 func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
@@ -73,7 +81,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 
 		obj, err := svc.GetObject(goi)
 		if err != nil {
-			return "", fmt.Errorf("Error reading object: %v", err)
+			return "", fmt.Errorf("Error reading object %v: %v", object.Key, err)
 		}
 
 		unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
@@ -97,7 +105,11 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 
 		_, err = stream.ReadLengthPrefixedCollection(obj.Body, unmarshalFunc)
 		if err != nil {
-			return "", fmt.Errorf("Error reading collection: %v", err)
+			newErr := fmt.Errorf("Error reading collection: %v", err)
+			log.Errorw("Error", "error", newErr)
+			if false {
+				return "", newErr
+			}
 		}
 	}
 
@@ -112,14 +124,7 @@ func (fc *FileConcatenator) Upload(ctx context.Context, path string) (string, er
 
 	defer reading.Close()
 
-	fi, err := reading.Stat()
-	if err != nil {
-		return "", fmt.Errorf("Error getting FileInfo: %v", err)
-	}
-
 	uploader := s3manager.NewUploader(fc.Session)
-
-	headers := IncomingHeaders{}
 
 	metadata := make(map[string]*string)
 	metadata[FkDeviceIdHeaderName] = aws.String(fc.DeviceID)
@@ -135,29 +140,6 @@ func (fc *FileConcatenator) Upload(ctx context.Context, path string) (string, er
 		Tagging:     nil,
 	})
 	if err != nil {
-		return "", err
-	}
-
-	jsonMetadata, err := json.Marshal(headers)
-	if err != nil {
-		return "", fmt.Errorf("JSON error: %v", err)
-	}
-
-	stream := data.DeviceStream{
-		Time:     time.Now(),
-		StreamID: fc.FileID,
-		Firmware: "",
-		DeviceID: fc.DeviceID,
-		Size:     fi.Size(),
-		FileID:   fc.FileTypeID,
-		URL:      res.Location,
-		Meta:     jsonMetadata,
-	}
-
-	if _, err := fc.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.device_stream (time, stream_id, firmware, device_id, size, file_id, url, meta)
-		   VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
-		   `, stream); err != nil {
 		return "", err
 	}
 

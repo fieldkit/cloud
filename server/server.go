@@ -60,6 +60,8 @@ type Config struct {
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
+	ApiDomain             string `split_words:"true" default:"api.fieldkit.org" required:"true"`
+	ApiHost               string `split_words:"true" default:"https://api.fieldkit.org" required:"true"`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 	ProductionLogging     bool   `envconfig:"production_logging"`
 	AwsId                 string `split_words:"true" default:""`
@@ -229,7 +231,6 @@ func main() {
 		}
 	}
 
-	apiDomain := "api." + config.Domain
 	suffix := "." + config.Domain
 	server := &http.Server{
 		Addr: config.Addr,
@@ -239,7 +240,7 @@ func main() {
 				return
 			}
 
-			if req.Host == apiDomain {
+			if req.Host == config.ApiDomain {
 				serveApi(w, req)
 				return
 			}
@@ -349,6 +350,15 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	service = goa.New("fieldkit")
 
 	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
+
+	apiConfig := &api.ApiConfiguration{
+		ApiHost:   config.ApiHost,
+		ApiDomain: config.ApiDomain,
+	}
+
+	log := logging.Logger(ctx).Sugar()
+
+	log.Infow("Config", "config", apiConfig)
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
@@ -487,6 +497,7 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "device_streams" controller
 	fco := api.FilesControllerOptions{
+		Config:   apiConfig,
 		Session:  awsSession,
 		Database: database,
 		Backend:  be,

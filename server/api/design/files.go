@@ -112,6 +112,7 @@ var _ = Resource("device_logs", func() {
 		Response("Busy", func() {
 			Status(503)
 		})
+		Response(NotFound)
 		Response(Found, func() {
 			Headers(func() {
 				Header("Location", String)
@@ -131,6 +132,7 @@ var _ = Resource("device_data", func() {
 		Response("Busy", func() {
 			Status(503)
 		})
+		Response(NotFound)
 		Response(Found, func() {
 			Headers(func() {
 				Header("Location", String)
