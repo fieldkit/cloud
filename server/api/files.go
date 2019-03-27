@@ -70,9 +70,9 @@ func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.Device
 		Time:         s.Time,
 		URL:          s.URL,
 		Urls: &app.DeviceFileUrls{
-			Csv:  fmt.Sprintf("/files/%v/data.csv", s.ID),
-			JSON: fmt.Sprintf("/files/%v/data.json", s.ID),
-			Raw:  fmt.Sprintf("/files/%v/data.fkpb", s.ID),
+			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
+			JSON: ac.MakeApiUrl("/files/%v/data.json", s.ID),
+			Raw:  ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
 		},
 	}
 }
@@ -139,7 +139,7 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 		return err
 	}
 
-	return ctx.OK(DevicesType(devices))
+	return ctx.OK(DevicesType(c.options.Config, devices))
 }
 
 func (c *FilesController) File(ctx *app.FileFilesContext) error {
@@ -152,6 +152,8 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 	}
 
 	if len(files) != 1 {
+		ac := c.options.Config
+
 		fr, err := backend.NewFileRepository(c.options.Session, "fk-streams")
 		if err != nil {
 			return err
@@ -179,9 +181,9 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 			URL:    fi.URL,
 			Meta:   string(jsonMeta),
 			Urls: &app.DeviceFileUrls{
-				Csv:  fmt.Sprintf("/files/%v/data.csv", fi.Key),
-				JSON: fmt.Sprintf("/files/%v/data.json", fi.Key),
-				Raw:  fmt.Sprintf("/files/%v/data.fkpb", fi.Key),
+				Csv:  ac.MakeApiUrl("/files/%v/data.csv", fi.Key),
+				JSON: ac.MakeApiUrl("/files/%v/data.json", fi.Key),
+				Raw:  ac.MakeApiUrl("/files/%v/data.fkpb", fi.Key),
 			},
 		})
 	}
@@ -310,23 +312,23 @@ func (c *DeviceDataController) All(ctx *app.AllDeviceDataContext) error {
 	return ctx.NotFound()
 }
 
-func DeviceSummaryType(s *data.DeviceSummary) *app.Device {
+func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary) *app.Device {
 	return &app.Device{
 		DeviceID:      s.DeviceID,
 		LastFileID:    s.LastFileID,
 		LastFileTime:  s.LastFileTime,
 		NumberOfFiles: s.NumberOfFiles,
 		Urls: &app.DeviceSummaryUrls{
-			Data: fmt.Sprintf("/devices/%v/data", s.DeviceID),
-			Logs: fmt.Sprintf("/devices/%v/logs", s.DeviceID),
+			Data: ac.MakeApiUrl("/devices/%v/data", s.DeviceID),
+			Logs: ac.MakeApiUrl("/devices/%v/logs", s.DeviceID),
 		},
 	}
 }
 
-func DevicesType(devices []*data.DeviceSummary) *app.Devices {
+func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary) *app.Devices {
 	summaries := make([]*app.Device, len(devices))
 	for i, summary := range devices {
-		summaries[i] = DeviceSummaryType(summary)
+		summaries[i] = DeviceSummaryType(ac, summary)
 	}
 	return &app.Devices{
 		Devices: summaries,
