@@ -30,6 +30,7 @@ type FilesControllerOptions struct {
 
 type BaseFilesController struct {
 	options FilesControllerOptions
+	cw      *ConcatenationWorkers
 }
 
 type FilesController struct {
@@ -48,7 +49,7 @@ var (
 	}
 )
 
-func NewFilesController(service *goa.Service, options FilesControllerOptions) *FilesController {
+func NewFilesController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *FilesController {
 	return &FilesController{
 		BaseFilesController: BaseFilesController{
 			options: options,
@@ -240,18 +241,11 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 
 func (c *BaseFilesController) concatenatedDeviceFile(ctx context.Context, responseData *goa.ResponseData, deviceID string, fileTypeIDs []string) (redirection string, err error) {
 	deviceStreamID := uuid.NewSHA1(ConcatenatedFilesSpace, []byte(deviceID))
-	fileTypeID := fileTypeIDs[0]
 
-	fc := &backend.FileConcatenator{
-		Session:    c.options.Session,
-		Database:   c.options.Database,
-		FileID:     deviceStreamID.String(),
-		FileTypeID: fileTypeID,
-		DeviceID:   deviceID,
-		TypeIDs:    fileTypeIDs,
+	c.cw.channel <- ConcatenationJob{
+		DeviceID:    deviceID,
+		FileTypeIDs: fileTypeIDs,
 	}
-
-	go fc.Concatenate(ctx)
 
 	return c.options.Config.MakeApiUrl("/files/%s", deviceStreamID), nil
 }
@@ -261,10 +255,16 @@ type DeviceLogsController struct {
 	*goa.Controller
 }
 
-func NewDeviceLogsController(service *goa.Service, options FilesControllerOptions) *DeviceLogsController {
+func NewDeviceLogsController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceLogsController {
+	cw, err := NewConcatenationWorkers(ctx, options)
+	if err != nil {
+		panic(err)
+	}
+
 	return &DeviceLogsController{
 		BaseFilesController: BaseFilesController{
 			options: options,
+			cw:      cw,
 		},
 		Controller: service.NewController("DeviceLogsController"),
 	}
@@ -289,10 +289,16 @@ type DeviceDataController struct {
 	*goa.Controller
 }
 
-func NewDeviceDataController(service *goa.Service, options FilesControllerOptions) *DeviceDataController {
+func NewDeviceDataController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceDataController {
+	cw, err := NewConcatenationWorkers(ctx, options)
+	if err != nil {
+		panic(err)
+	}
+
 	return &DeviceDataController{
 		BaseFilesController: BaseFilesController{
 			options: options,
+			cw:      cw,
 		},
 		Controller: service.NewController("DeviceDataController"),
 	}
@@ -333,4 +339,53 @@ func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary) *app.Devic
 	return &app.Devices{
 		Devices: summaries,
 	}
+}
+
+type ConcatenationJob struct {
+	DeviceID    string
+	FileTypeIDs []string
+}
+
+type ConcatenationWorkers struct {
+	options FilesControllerOptions
+	channel chan ConcatenationJob
+}
+
+func NewConcatenationWorkers(ctx context.Context, options FilesControllerOptions) (cw *ConcatenationWorkers, err error) {
+	cw = &ConcatenationWorkers{
+		channel: make(chan ConcatenationJob, 100),
+		options: options,
+	}
+
+	for w := 0; w < 1; w++ {
+		go cw.worker(ctx)
+	}
+
+	return
+}
+
+func (cw *ConcatenationWorkers) worker(ctx context.Context) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Worker starting")
+
+	for job := range cw.channel {
+		log.Infow("Worker", "job", job)
+
+		deviceStreamID := uuid.NewSHA1(ConcatenatedFilesSpace, []byte(job.DeviceID))
+		fileTypeID := job.FileTypeIDs[0]
+
+		fc := &backend.FileConcatenator{
+			Session:    cw.options.Session,
+			Database:   cw.options.Database,
+			FileID:     deviceStreamID.String(),
+			FileTypeID: fileTypeID,
+			DeviceID:   job.DeviceID,
+			TypeIDs:    job.FileTypeIDs,
+		}
+
+		fc.Concatenate(ctx)
+	}
+
+	log.Infow("Worker exiting")
 }

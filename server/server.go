@@ -502,9 +502,9 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Database: database,
 		Backend:  be,
 	}
-	app.MountFilesController(service, api.NewFilesController(service, fco))
-	app.MountDeviceLogsController(service, api.NewDeviceLogsController(service, fco))
-	app.MountDeviceDataController(service, api.NewDeviceDataController(service, fco))
+	app.MountFilesController(service, api.NewFilesController(ctx, service, fco))
+	app.MountDeviceLogsController(service, api.NewDeviceLogsController(ctx, service, fco))
+	app.MountDeviceDataController(service, api.NewDeviceDataController(ctx, service, fco))
 
 	setupErrorHandling()
 
