@@ -39,10 +39,15 @@ type FilesController struct {
 }
 
 var (
-	ConcatenatedFilesSpace = uuid.MustParse("5554c632-d586-53f2-b2a7-88a63663a3f5")
-	DataFileTypeIDs        = []string{"4"}
-	LogFileTypeIDs         = []string{"2", "3"}
-	FileTypeNames          = map[string]string{
+	ConcatenatedDataSpace  = uuid.MustParse("5554c632-d586-53f2-b2a7-88a63663a3f5")
+	ConcatenatedLogsSpace  = uuid.MustParse("1e563c95-7984-4868-abd1-411c4dfc5467")
+	ConcatenatedFileSpaces = map[string]uuid.UUID{
+		"2": ConcatenatedLogsSpace,
+		"4": ConcatenatedDataSpace,
+	}
+	DataFileTypeIDs = []string{"4"}
+	LogFileTypeIDs  = []string{"2", "3"}
+	FileTypeNames   = map[string]string{
 		"2": "Logs",
 		"3": "Logs",
 		"4": "Data",
@@ -73,7 +78,7 @@ func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.Device
 		Urls: &app.DeviceFileUrls{
 			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
 			JSON: ac.MakeApiUrl("/files/%v/data.json", s.ID),
-			Raw:  ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
+			Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
 		},
 	}
 }
@@ -184,7 +189,7 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 			Urls: &app.DeviceFileUrls{
 				Csv:  ac.MakeApiUrl("/files/%v/data.csv", fi.Key),
 				JSON: ac.MakeApiUrl("/files/%v/data.json", fi.Key),
-				Raw:  ac.MakeApiUrl("/files/%v/data.fkpb", fi.Key),
+				Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", fi.Key),
 			},
 		})
 	}
@@ -240,7 +245,8 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 }
 
 func (c *BaseFilesController) concatenatedDeviceFile(ctx context.Context, responseData *goa.ResponseData, deviceID string, fileTypeIDs []string) (redirection string, err error) {
-	deviceStreamID := uuid.NewSHA1(ConcatenatedFilesSpace, []byte(deviceID))
+	space := ConcatenatedFileSpaces[fileTypeIDs[0]]
+	deviceStreamID := uuid.NewSHA1(space, []byte(deviceID))
 
 	c.cw.channel <- ConcatenationJob{
 		DeviceID:    deviceID,
@@ -319,14 +325,27 @@ func (c *DeviceDataController) All(ctx *app.AllDeviceDataContext) error {
 }
 
 func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary) *app.Device {
+	concatenatedDataID := uuid.NewSHA1(ConcatenatedDataSpace, []byte(s.DeviceID))
+	concatenatedLogsID := uuid.NewSHA1(ConcatenatedLogsSpace, []byte(s.DeviceID))
+
 	return &app.Device{
 		DeviceID:      s.DeviceID,
 		LastFileID:    s.LastFileID,
 		LastFileTime:  s.LastFileTime,
 		NumberOfFiles: s.NumberOfFiles,
 		Urls: &app.DeviceSummaryUrls{
-			Data: ac.MakeApiUrl("/devices/%v/data", s.DeviceID),
-			Logs: ac.MakeApiUrl("/devices/%v/logs", s.DeviceID),
+			Data: &app.DeviceFileTypeUrls{
+				Generate: ac.MakeApiUrl("/devices/%v/data", s.DeviceID),
+				Info:     ac.MakeApiUrl("/files/%v", concatenatedDataID),
+				Csv:      ac.MakeApiUrl("/files/%v/data.csv", concatenatedDataID),
+				Fkpb:     ac.MakeApiUrl("/files/%v/data.fkpb", concatenatedDataID),
+			},
+			Logs: &app.DeviceFileTypeUrls{
+				Generate: ac.MakeApiUrl("/devices/%v/logs", s.DeviceID),
+				Info:     ac.MakeApiUrl("/files/%v", concatenatedLogsID),
+				Csv:      ac.MakeApiUrl("/files/%v/data.csv", concatenatedLogsID),
+				Fkpb:     ac.MakeApiUrl("/files/%v/data.fkpb", concatenatedLogsID),
+			},
 		},
 	}
 }
@@ -372,8 +391,9 @@ func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 	for job := range cw.channel {
 		log.Infow("Worker", "job", job)
 
-		deviceStreamID := uuid.NewSHA1(ConcatenatedFilesSpace, []byte(job.DeviceID))
 		fileTypeID := job.FileTypeIDs[0]
+		space := ConcatenatedFileSpaces[fileTypeID]
+		deviceStreamID := uuid.NewSHA1(space, []byte(job.DeviceID))
 
 		fc := &backend.FileConcatenator{
 			Session:    cw.options.Session,

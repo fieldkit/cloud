@@ -618,11 +618,79 @@ func (ut *AddUserPayload) Validate() (err error) {
 	return
 }
 
+// deviceFileTypeUrls user type.
+type deviceFileTypeUrls struct {
+	Csv      *string `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
+	Fkpb     *string `form:"fkpb,omitempty" json:"fkpb,omitempty" xml:"fkpb,omitempty"`
+	Generate *string `form:"generate,omitempty" json:"generate,omitempty" xml:"generate,omitempty"`
+	Info     *string `form:"info,omitempty" json:"info,omitempty" xml:"info,omitempty"`
+}
+
+// Validate validates the deviceFileTypeUrls type instance.
+func (ut *deviceFileTypeUrls) Validate() (err error) {
+	if ut.Generate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "generate"))
+	}
+	if ut.Info == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "info"))
+	}
+	if ut.Csv == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "csv"))
+	}
+	if ut.Fkpb == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "fkpb"))
+	}
+	return
+}
+
+// Publicize creates DeviceFileTypeUrls from deviceFileTypeUrls
+func (ut *deviceFileTypeUrls) Publicize() *DeviceFileTypeUrls {
+	var pub DeviceFileTypeUrls
+	if ut.Csv != nil {
+		pub.Csv = *ut.Csv
+	}
+	if ut.Fkpb != nil {
+		pub.Fkpb = *ut.Fkpb
+	}
+	if ut.Generate != nil {
+		pub.Generate = *ut.Generate
+	}
+	if ut.Info != nil {
+		pub.Info = *ut.Info
+	}
+	return &pub
+}
+
+// DeviceFileTypeUrls user type.
+type DeviceFileTypeUrls struct {
+	Csv      string `form:"csv" json:"csv" xml:"csv"`
+	Fkpb     string `form:"fkpb" json:"fkpb" xml:"fkpb"`
+	Generate string `form:"generate" json:"generate" xml:"generate"`
+	Info     string `form:"info" json:"info" xml:"info"`
+}
+
+// Validate validates the DeviceFileTypeUrls type instance.
+func (ut *DeviceFileTypeUrls) Validate() (err error) {
+	if ut.Generate == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "generate"))
+	}
+	if ut.Info == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "info"))
+	}
+	if ut.Csv == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "csv"))
+	}
+	if ut.Fkpb == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "fkpb"))
+	}
+	return
+}
+
 // deviceFileUrls user type.
 type deviceFileUrls struct {
 	Csv  *string `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
+	Fkpb *string `form:"fkpb,omitempty" json:"fkpb,omitempty" xml:"fkpb,omitempty"`
 	JSON *string `form:"json,omitempty" json:"json,omitempty" xml:"json,omitempty"`
-	Raw  *string `form:"raw,omitempty" json:"raw,omitempty" xml:"raw,omitempty"`
 }
 
 // Validate validates the deviceFileUrls type instance.
@@ -630,8 +698,8 @@ func (ut *deviceFileUrls) Validate() (err error) {
 	if ut.Csv == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "csv"))
 	}
-	if ut.Raw == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "raw"))
+	if ut.Fkpb == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "fkpb"))
 	}
 	if ut.JSON == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "json"))
@@ -645,11 +713,11 @@ func (ut *deviceFileUrls) Publicize() *DeviceFileUrls {
 	if ut.Csv != nil {
 		pub.Csv = *ut.Csv
 	}
+	if ut.Fkpb != nil {
+		pub.Fkpb = *ut.Fkpb
+	}
 	if ut.JSON != nil {
 		pub.JSON = *ut.JSON
-	}
-	if ut.Raw != nil {
-		pub.Raw = *ut.Raw
 	}
 	return &pub
 }
@@ -657,8 +725,8 @@ func (ut *deviceFileUrls) Publicize() *DeviceFileUrls {
 // DeviceFileUrls user type.
 type DeviceFileUrls struct {
 	Csv  string `form:"csv" json:"csv" xml:"csv"`
+	Fkpb string `form:"fkpb" json:"fkpb" xml:"fkpb"`
 	JSON string `form:"json" json:"json" xml:"json"`
-	Raw  string `form:"raw" json:"raw" xml:"raw"`
 }
 
 // Validate validates the DeviceFileUrls type instance.
@@ -666,8 +734,8 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 	if ut.Csv == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "csv"))
 	}
-	if ut.Raw == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "raw"))
+	if ut.Fkpb == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "fkpb"))
 	}
 	if ut.JSON == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "json"))
@@ -677,8 +745,8 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 
 // deviceSummaryUrls user type.
 type deviceSummaryUrls struct {
-	Data *string `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
-	Logs *string `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
+	Data *deviceFileTypeUrls `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+	Logs *deviceFileTypeUrls `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
 }
 
 // Validate validates the deviceSummaryUrls type instance.
@@ -689,6 +757,16 @@ func (ut *deviceSummaryUrls) Validate() (err error) {
 	if ut.Data == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "data"))
 	}
+	if ut.Data != nil {
+		if err2 := ut.Data.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.Logs != nil {
+		if err2 := ut.Logs.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
@@ -696,27 +774,37 @@ func (ut *deviceSummaryUrls) Validate() (err error) {
 func (ut *deviceSummaryUrls) Publicize() *DeviceSummaryUrls {
 	var pub DeviceSummaryUrls
 	if ut.Data != nil {
-		pub.Data = *ut.Data
+		pub.Data = ut.Data.Publicize()
 	}
 	if ut.Logs != nil {
-		pub.Logs = *ut.Logs
+		pub.Logs = ut.Logs.Publicize()
 	}
 	return &pub
 }
 
 // DeviceSummaryUrls user type.
 type DeviceSummaryUrls struct {
-	Data string `form:"data" json:"data" xml:"data"`
-	Logs string `form:"logs" json:"logs" xml:"logs"`
+	Data *DeviceFileTypeUrls `form:"data" json:"data" xml:"data"`
+	Logs *DeviceFileTypeUrls `form:"logs" json:"logs" xml:"logs"`
 }
 
 // Validate validates the DeviceSummaryUrls type instance.
 func (ut *DeviceSummaryUrls) Validate() (err error) {
-	if ut.Logs == "" {
+	if ut.Logs == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "logs"))
 	}
-	if ut.Data == "" {
+	if ut.Data == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "data"))
+	}
+	if ut.Data != nil {
+		if err2 := ut.Data.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.Logs != nil {
+		if err2 := ut.Logs.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

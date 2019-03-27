@@ -7,9 +7,9 @@ import (
 
 var DeviceFileUrls = Type("DeviceFileUrls", func() {
 	Attribute("csv", String)
-	Attribute("raw", String)
+	Attribute("fkpb", String)
 	Attribute("json", String)
-	Required("csv", "raw", "json")
+	Required("csv", "fkpb", "json")
 })
 
 var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func() {
@@ -64,9 +64,17 @@ var DeviceFiles = MediaType("application/vnd.app.device.files+json", func() {
 	})
 })
 
+var DeviceFileTypeUrls = Type("DeviceFileTypeUrls", func() {
+	Attribute("generate", String)
+	Attribute("info", String)
+	Attribute("csv", String)
+	Attribute("fkpb", String)
+	Required("generate", "info", "csv", "fkpb")
+})
+
 var DeviceSummaryUrls = Type("DeviceSummaryUrls", func() {
-	Attribute("logs", String)
-	Attribute("data", String)
+	Attribute("logs", DeviceFileTypeUrls)
+	Attribute("data", DeviceFileTypeUrls)
 	Required("logs", "data")
 })
 
@@ -112,7 +120,6 @@ var _ = Resource("device_logs", func() {
 		Response("Busy", func() {
 			Status(503)
 		})
-		Response(NotFound)
 		Response(Found, func() {
 			Headers(func() {
 				Header("Location", String)
@@ -132,7 +139,6 @@ var _ = Resource("device_data", func() {
 		Response("Busy", func() {
 			Status(503)
 		})
-		Response(NotFound)
 		Response(Found, func() {
 			Headers(func() {
 				Header("Location", String)
