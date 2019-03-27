@@ -60,8 +60,8 @@ type Config struct {
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
-	ApiDomain             string `split_words:"true" default:"api.fieldkit.org" required:"true"`
-	ApiHost               string `split_words:"true" default:"https://api.fieldkit.org" required:"true"`
+	ApiDomain             string `split_words:"true" default:""`
+	ApiHost               string `split_words:"true" default:""`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 	ProductionLogging     bool   `envconfig:"production_logging"`
 	AwsId                 string `split_words:"true" default:""`
@@ -117,6 +117,14 @@ func main() {
 
 	if err := envconfig.Process("fieldkit", &config); err != nil {
 		panic(err)
+	}
+
+	if config.ApiDomain == "" {
+		config.ApiDomain = "api." + config.Domain
+	}
+
+	if config.ApiHost == "" {
+		config.ApiHost = "https://" + config.ApiDomain
 	}
 
 	logging.Configure(config.ProductionLogging)
