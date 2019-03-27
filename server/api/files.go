@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -142,6 +143,8 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 }
 
 func (c *FilesController) File(ctx *app.FileFilesContext) error {
+	log := Logger(ctx).Sugar()
+
 	files := []*data.DeviceFile{}
 	if err := c.options.Database.SelectContext(ctx, &files,
 		`SELECT s.* FROM fieldkit.device_stream AS s WHERE (s.stream_id = $1)`, ctx.FileID); err != nil {
@@ -149,14 +152,45 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 	}
 
 	if len(files) != 1 {
-		return ctx.NotFound()
+		fr, err := backend.NewFileRepository(c.options.Session, "fk-streams")
+		if err != nil {
+			return err
+		}
+
+		fi, err := fr.Info(ctx, ctx.FileID)
+		if err != nil {
+			return err
+		}
+		if fi == nil {
+			return ctx.NotFound()
+		}
+
+		jsonMeta, err := json.Marshal(fi.Meta)
+		if err != nil {
+			panic(err)
+		}
+
+		log.Infow("File", "info", fi)
+
+		return ctx.OK(&app.DeviceFile{
+			FileID: fi.Key,
+			Time:   fi.LastModified,
+			Size:   int(fi.Size),
+			URL:    fi.URL,
+			Meta:   string(jsonMeta),
+			Urls: &app.DeviceFileUrls{
+				Csv:  fmt.Sprintf("/files/%v/data.csv", fi.Key),
+				JSON: fmt.Sprintf("/files/%v/data.json", fi.Key),
+				Raw:  fmt.Sprintf("/files/%v/data.fkpb", fi.Key),
+			},
+		})
 	}
 
 	return ctx.OK(DeviceFileSummaryType(c.options.Config, files[0]))
 }
 
 func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
-	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}
@@ -167,7 +201,7 @@ func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
 }
 
 func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
-	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}
@@ -178,24 +212,23 @@ func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
 }
 
 func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
-	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}
 
-	cs, err := iterator.Next(ctx)
+	opened, err := iterator.Next(ctx)
 	if err != nil {
 		return err
 	}
 
-	fileName := fmt.Sprintf("%s.csv", cs.File.StreamID)
+	fileName := fmt.Sprintf("%s.csv", opened.FileID)
 
 	ctx.ResponseData.Header().Set("Content-Type", backend.FkDataBinaryContentType)
 	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
-
 	ctx.ResponseData.WriteHeader(http.StatusOK)
 
-	_, err = io.Copy(ctx.ResponseData, cs.Response.Body)
+	_, err = io.Copy(ctx.ResponseData, opened.Response.Body)
 	if err != nil {
 		return err
 	}

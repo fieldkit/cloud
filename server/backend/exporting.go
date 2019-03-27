@@ -43,7 +43,7 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 
 		if !header {
 			if download {
-				fileName := exporter.FileName(cs.File)
+				fileName := exporter.FileName(&cs.IteratorFile)
 				response.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
 				response.Header().Set("Content-Type", exporter.DownloadMimeType())
 			} else {
@@ -55,11 +55,11 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 
 		defer cs.Response.Body.Close()
 
-		binaryReader := NewFkBinaryReader(exporter.ForFile(cs.File))
+		binaryReader := NewFkBinaryReader(exporter.ForFile(&cs.IteratorFile))
 
 		err = binaryReader.Read(ctx, cs.Response.Body)
 		if err != nil {
-			log.Infow("Error reading stream", "error", err, "file_type_id", cs.File.FileID)
+			log.Infow("Error reading stream", "error", err, "file_type_id", cs.FileID)
 		}
 	}
 
@@ -69,15 +69,15 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 }
 
 type Exporter interface {
-	ForFile(stream *data.DeviceFile) FormattedMessageReceiver
+	ForFile(file *IteratorFile) FormattedMessageReceiver
 	Finish(ctx context.Context) error
-	FileName(file *data.DeviceFile) string
+	FileName(file *IteratorFile) string
 	DownloadMimeType() string
 	MimeType() string
 }
 
 type SimpleJsonExporter struct {
-	File    *data.DeviceFile
+	File    *IteratorFile
 	Writer  io.Writer
 	Records int
 }
@@ -94,11 +94,11 @@ func (ce *SimpleJsonExporter) MimeType() string {
 	return ce.DownloadMimeType()
 }
 
-func (ce *SimpleJsonExporter) FileName(file *data.DeviceFile) string {
-	return fmt.Sprintf("%s.json", file.StreamID)
+func (ce *SimpleJsonExporter) FileName(file *IteratorFile) string {
+	return fmt.Sprintf("%s.json", file.FileID)
 }
 
-func (ce *SimpleJsonExporter) ForFile(file *data.DeviceFile) FormattedMessageReceiver {
+func (ce *SimpleJsonExporter) ForFile(file *IteratorFile) FormattedMessageReceiver {
 	ce.File = file
 	return ce
 }
@@ -135,7 +135,7 @@ func (ce *SimpleJsonExporter) Finish(ctx context.Context) error {
 }
 
 type SimpleCsvExporter struct {
-	File          *data.DeviceFile
+	File          *IteratorFile
 	Writer        io.Writer
 	HeaderWritten bool
 }
@@ -152,11 +152,11 @@ func (ce *SimpleCsvExporter) MimeType() string {
 	return "text/plain; charset=utf-8"
 }
 
-func (ce *SimpleCsvExporter) FileName(file *data.DeviceFile) string {
-	return fmt.Sprintf("%s.csv", file.StreamID)
+func (ce *SimpleCsvExporter) FileName(file *IteratorFile) string {
+	return fmt.Sprintf("%s.csv", file.FileID)
 }
 
-func (ce *SimpleCsvExporter) ForFile(file *data.DeviceFile) FormattedMessageReceiver {
+func (ce *SimpleCsvExporter) ForFile(file *IteratorFile) FormattedMessageReceiver {
 	ce.File = file
 	return ce
 }
@@ -175,7 +175,7 @@ func (ce *SimpleCsvExporter) ExportLog(ctx context.Context, r *pb.DataRecord) er
 		ce.HeaderWritten = true
 	}
 
-	fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", ce.File.DeviceID, ce.File.FileID, ce.File.ID, r.Log.Uptime, r.Log.Time, r.Log.Level, r.Log.Facility, strings.TrimSpace(r.Log.Message))
+	fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", ce.File.DeviceID, ce.File.FileID, r.Log.Uptime, r.Log.Time, r.Log.Level, r.Log.Facility, strings.TrimSpace(r.Log.Message))
 
 	return nil
 }
@@ -200,7 +200,7 @@ func (ce *SimpleCsvExporter) HandleFormattedMessage(ctx context.Context, fm *ing
 		ce.HeaderWritten = true
 	}
 
-	fmt.Fprintf(ce.Writer, "%v,%v,%v,", ce.File.DeviceID, ce.File.FileID, ce.File.ID)
+	fmt.Fprintf(ce.Writer, "%v,%v,", ce.File.DeviceID, ce.File.FileID)
 
 	fmt.Fprintf(ce.Writer, "%v,%v,", fm.MessageId, fm.Time)
 
@@ -231,21 +231,41 @@ type FileIterator struct {
 	Offset    int
 	Limit     int
 	SignUrls  bool
-	Query     func(s *FileIterator) error
-	Files     []*data.DeviceFile
+	Query     func(ctx context.Context, s *FileIterator) error
+	Files     []*IteratorFile
 	Index     int
 }
 
-type CurrentFile struct {
-	File      *data.DeviceFile
+type IteratorFile struct {
+	FileID   string
+	DeviceID string
+	Size     int64
+	URL      string
+}
+
+type OpenedFile struct {
+	IteratorFile
 	SignedURL string
 	Response  *http.Response
 }
 
-func LookupFile(ctx context.Context, session *session.Session, db *sqlxcache.DB, streamID string) (iterator *FileIterator, err error) {
+func toIteratorFiles(dfs []*data.DeviceFile) []*IteratorFile {
+	ifs := make([]*IteratorFile, len(dfs))
+	for i, f := range dfs {
+		ifs[i] = &IteratorFile{
+			FileID:   f.FileID,
+			DeviceID: f.DeviceID,
+			Size:     f.Size,
+			URL:      f.URL,
+		}
+	}
+	return ifs
+}
+
+func LookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache.DB, fileID string) (iterator *FileIterator, err error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("File", "file_id", streamID)
+	log.Infow("File", "file_id", fileID)
 
 	iterator = &FileIterator{
 		Offset:    0,
@@ -254,11 +274,50 @@ func LookupFile(ctx context.Context, session *session.Session, db *sqlxcache.DB,
 		SignUrls:  session.Config.Credentials != nil,
 		Session:   session,
 		S3Service: s3.New(session),
-		Query: func(s *FileIterator) error {
-			s.Files = []*data.DeviceFile{}
-			if err := db.SelectContext(ctx, &s.Files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.id = $1`, streamID); err != nil {
+		Query: func(ctx context.Context, s *FileIterator) error {
+			fileRepository, err := NewFileRepository(session, "fk-streams")
+			if err != nil {
 				return err
 			}
+
+			fi, err := fileRepository.Info(ctx, fileID)
+			if err != nil {
+				return err
+			}
+
+			s.Files = make([]*IteratorFile, 1)
+			s.Files[0] = &IteratorFile{
+				FileID:   fi.Key,
+				DeviceID: "",
+				Size:     fi.Size,
+				URL:      fi.URL,
+			}
+
+			return nil
+		},
+	}
+
+	return
+}
+
+func LookupFile(ctx context.Context, session *session.Session, db *sqlxcache.DB, fileID string) (iterator *FileIterator, err error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("File", "file_id", fileID)
+
+	iterator = &FileIterator{
+		Offset:    0,
+		Limit:     0,
+		Index:     0,
+		SignUrls:  session.Config.Credentials != nil,
+		Session:   session,
+		S3Service: s3.New(session),
+		Query: func(ctx context.Context, s *FileIterator) error {
+			var files []*data.DeviceFile
+			if err := db.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.id = $1`, fileID); err != nil {
+				return err
+			}
+			s.Files = toIteratorFiles(files)
 			return nil
 		},
 	}
@@ -278,13 +337,14 @@ func LookupDeviceFiles(ctx context.Context, session *session.Session, db *sqlxca
 		SignUrls:  session.Config.Credentials != nil,
 		Session:   session,
 		S3Service: s3.New(session),
-		Query: func(s *FileIterator) error {
-			s.Files = []*data.DeviceFile{}
-			if err := db.SelectContext(ctx, &s.Files,
+		Query: func(ctx context.Context, s *FileIterator) error {
+			var files []*data.DeviceFile
+			if err := db.SelectContext(ctx, &files,
 				`SELECT s.* FROM fieldkit.device_stream AS s WHERE (s.file_id = ANY($1)) AND (s.device_id = $2) ORDER BY time DESC LIMIT $3 OFFSET $4`,
 				fileTypeIDs, deviceID, s.Limit, s.Offset); err != nil {
 				return err
 			}
+			s.Files = toIteratorFiles(files)
 			return nil
 		},
 	}
@@ -292,7 +352,7 @@ func LookupDeviceFiles(ctx context.Context, session *session.Session, db *sqlxca
 	return
 }
 
-func (iterator *FileIterator) Next(ctx context.Context) (cs *CurrentFile, err error) {
+func (iterator *FileIterator) Next(ctx context.Context) (cs *OpenedFile, err error) {
 	log := Logger(ctx).Sugar()
 
 	if iterator.Files != nil && iterator.Index >= len(iterator.Files) {
@@ -306,7 +366,7 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *CurrentFile, err er
 	}
 
 	if iterator.Files == nil {
-		err = iterator.Query(iterator)
+		err = iterator.Query(ctx, iterator)
 		if err != nil {
 			return nil, err
 		}
@@ -321,35 +381,35 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *CurrentFile, err er
 		iterator.Index = 0
 	}
 
-	stream := iterator.Files[iterator.Index]
+	iteratorFile := iterator.Files[iterator.Index]
 
-	log.Infow("File", "file_type_id", stream.FileID, "index", iterator.Index, "size", stream.Size, "url", stream.URL)
+	log.Infow("File", "file_type_id", iteratorFile.FileID, "index", iterator.Index, "size", iteratorFile.Size, "url", iteratorFile.URL)
 
 	iterator.Index += 1
 
-	signed := stream.URL
+	signed := iteratorFile.URL
 
 	if iterator.SignUrls {
-		signed, err = SignS3URL(iterator.S3Service, stream.URL)
+		signed, err = SignS3URL(iterator.S3Service, iteratorFile.URL)
 		if err != nil {
-			return nil, fmt.Errorf("Error signing stream URL: %v (%v)", stream.URL, err)
+			return nil, fmt.Errorf("Error signing stream URL: %v (%v)", iteratorFile.URL, err)
 		}
-		log.Infow("File", "file_type_id", stream.FileID, "signed_url", signed)
+		log.Infow("File", "file_type_id", iteratorFile.FileID, "signed_url", signed)
 	}
 
 	response, err := http.Get(signed)
 	if err != nil {
-		return nil, fmt.Errorf("Error opening stream URL: %v (%v)", stream.URL, err)
+		return nil, fmt.Errorf("Error opening stream URL: %v (%v)", iteratorFile.URL, err)
 	}
 
 	if response.StatusCode != 200 {
 		return nil, fmt.Errorf("Error retrieving stream: %v (status = %v)", signed, response.StatusCode)
 	}
 
-	cs = &CurrentFile{
-		File:      stream,
-		SignedURL: signed,
-		Response:  response,
+	cs = &OpenedFile{
+		IteratorFile: *iteratorFile,
+		SignedURL:    signed,
+		Response:     response,
 	}
 
 	return
