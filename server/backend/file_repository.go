@@ -56,7 +56,7 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 
 	meta := fixMeta(obj.Metadata)
 	deviceID := ""
-	if value, ok := meta["Fk-DeviceId"]; ok {
+	if value, ok := meta[FkDeviceIdHeaderName]; ok {
 		deviceID = *value
 	}
 
@@ -74,10 +74,10 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 
 func fixMeta(m map[string]*string) map[string]*string {
 	newM := make(map[string]*string)
-	newM["Fk-DeviceId"] = m["Fk-Deviceid"]
-	newM["Fk-FileId"] = m["Fk-Fileid"]
-	newM["Fk-Build"] = m["Fk-Build"]
-	newM["Fk-FileName"] = m["Fk-Filename"]
-	newM["Fk-Version"] = m["Fk-Version"]
+	newM[FkDeviceIdHeaderName] = m["Fk-Deviceid"]
+	newM[FkFileIdHeaderName] = m["Fk-Fileid"]
+	newM[FkBuildHeaderName] = m["Fk-Build"]
+	newM[FkFileNameHeaderName] = m["Fk-Filename"]
+	newM[FkVersionHeaderName] = m["Fk-Version"]
 	return newM
 }
