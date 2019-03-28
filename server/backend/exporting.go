@@ -171,11 +171,11 @@ func (ce *SimpleCsvExporter) HandleRecord(ctx context.Context, r *pb.DataRecord)
 
 func (ce *SimpleCsvExporter) ExportLog(ctx context.Context, r *pb.DataRecord) error {
 	if !ce.HeaderWritten {
-		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", "DeviceID", "FileID", "FileID", "Uptime", "Time", "Level", "Facility", "Message")
+		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v\n", "DeviceID", "FileID", "Uptime", "Time", "Level", "Facility", "Message")
 		ce.HeaderWritten = true
 	}
 
-	fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v\n", ce.File.DeviceID, ce.File.FileID, r.Log.Uptime, r.Log.Time, r.Log.Level, r.Log.Facility, strings.TrimSpace(r.Log.Message))
+	fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v\n", ce.File.DeviceID, ce.File.FileID, r.Log.Uptime, r.Log.Time, r.Log.Level, r.Log.Facility, strings.TrimSpace(r.Log.Message))
 
 	return nil
 }
@@ -189,7 +189,7 @@ func (ce *SimpleCsvExporter) HandleFormattedMessage(ctx context.Context, fm *ing
 	sort.Strings(keys)
 
 	if !ce.HeaderWritten {
-		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v,%v", "Device", "File", "File", "Message", "Time", "Longitude", "Latitude", "Fixed")
+		fmt.Fprintf(ce.Writer, "%v,%v,%v,%v,%v,%v,%v", "Device", "File", "Message", "Time", "Longitude", "Latitude", "Fixed")
 
 		for _, key := range keys {
 			fmt.Fprintf(ce.Writer, ",%v", key)
@@ -288,7 +288,7 @@ func LookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache
 			s.Files = make([]*IteratorFile, 1)
 			s.Files[0] = &IteratorFile{
 				FileID:   fi.Key,
-				DeviceID: "",
+				DeviceID: fi.DeviceID,
 				Size:     fi.Size,
 				URL:      fi.URL,
 			}

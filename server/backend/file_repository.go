@@ -22,6 +22,7 @@ type FileInfo struct {
 	LastModified time.Time
 	Size         int64
 	Meta         map[string]*string
+	DeviceID     string
 }
 
 func NewFileRepository(s *session.Session, bucket string) (fr *FileRepository, err error) {
@@ -53,12 +54,19 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 		return nil, fmt.Errorf("Error calling HeadObject(%v): %v", key, err)
 	}
 
+	meta := fixMeta(obj.Metadata)
+	deviceID := ""
+	if value, ok := meta["Fk-DeviceId"]; ok {
+		deviceID = *value
+	}
+
 	fi = &FileInfo{
 		Key:          key,
+		DeviceID:     deviceID,
 		URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", fr.Bucket, key),
 		LastModified: *obj.LastModified,
 		Size:         *obj.ContentLength,
-		Meta:         obj.Metadata,
+		Meta:         meta,
 	}
 
 	return
