@@ -57,7 +57,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	temporaryFile, err := ioutil.TempFile("", fmt.Sprintf("%s.fkpb", fc.DeviceID))
+	temporaryFile, err := ioutil.TempFile("", fmt.Sprintf("%s-*.fkpb", fc.DeviceID))
 	if err != nil {
 		return "", fmt.Errorf("Error opening temporary file: %v", err)
 	}
