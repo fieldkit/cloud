@@ -187,6 +187,8 @@ CREATE TABLE fieldkit.device_stream (
 
 CREATE UNIQUE INDEX ON fieldkit.device_stream (stream_id);
 
+CREATE INDEX ON fieldkit.device_stream (device_id, time);
+
 -- device_schema
 
 CREATE TABLE fieldkit.device_schema (
