@@ -39,6 +39,8 @@ docker build -t fieldkit-landing-build landing
 
 mkdir build
 
+mkdir build/tmp
+
 mkdir build/api
 docker rm -f fieldkit-server-build > /dev/null 2>&1 || true
 docker run --rm --name fieldkit-server-build -v `pwd`/build:/build fieldkit-server-build \
