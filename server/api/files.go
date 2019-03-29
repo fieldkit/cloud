@@ -181,11 +181,14 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 		log.Infow("File", "info", fi)
 
 		return ctx.OK(&app.DeviceFile{
-			FileID: fi.Key,
-			Time:   fi.LastModified,
-			Size:   int(fi.Size),
-			URL:    fi.URL,
-			Meta:   string(jsonMeta),
+			DeviceID:     fi.DeviceID,
+			FileID:       fi.Key,
+			FileTypeID:   fi.FileTypeID,
+			FileTypeName: FileTypeNames[fi.FileTypeID],
+			Time:         fi.LastModified,
+			Size:         int(fi.Size),
+			URL:          fi.URL,
+			Meta:         string(jsonMeta),
 			Urls: &app.DeviceFileUrls{
 				Csv:  ac.MakeApiUrl("/files/%v/data.csv", fi.Key),
 				JSON: ac.MakeApiUrl("/files/%v/data.json", fi.Key),

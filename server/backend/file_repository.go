@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -23,6 +24,7 @@ type FileInfo struct {
 	Size         int64
 	Meta         map[string]*string
 	DeviceID     string
+	FileTypeID   string
 }
 
 func NewFileRepository(s *session.Session, bucket string) (fr *FileRepository, err error) {
@@ -54,15 +56,20 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 		return nil, fmt.Errorf("Error calling HeadObject(%v): %v", key, err)
 	}
 
-	meta := fixMeta(obj.Metadata)
+	meta := sanitizeMeta(obj.Metadata)
 	deviceID := ""
 	if value, ok := meta[FkDeviceIdHeaderName]; ok {
 		deviceID = *value
+	}
+	fileTypeID := ""
+	if value, ok := meta[FkFileIdHeaderName]; ok {
+		fileTypeID = *value
 	}
 
 	fi = &FileInfo{
 		Key:          key,
 		DeviceID:     deviceID,
+		FileTypeID:   fileTypeID,
 		URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", fr.Bucket, key),
 		LastModified: *obj.LastModified,
 		Size:         *obj.ContentLength,
@@ -72,12 +79,16 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 	return
 }
 
-func fixMeta(m map[string]*string) map[string]*string {
+func sanitizeMeta(m map[string]*string) map[string]*string {
+	ci := make(map[string]*string)
+	for key, value := range m {
+		ci[strings.ToLower(key)] = value
+	}
 	newM := make(map[string]*string)
-	newM[FkDeviceIdHeaderName] = m["Fk-Deviceid"]
-	newM[FkFileIdHeaderName] = m["Fk-Fileid"]
-	newM[FkBuildHeaderName] = m["Fk-Build"]
-	newM[FkFileNameHeaderName] = m["Fk-Filename"]
-	newM[FkVersionHeaderName] = m["Fk-Version"]
+	for _, key := range []string{FkDeviceIdHeaderName, FkFileIdHeaderName, FkBuildHeaderName, FkFileNameHeaderName, FkVersionHeaderName} {
+		if value, ok := ci[strings.ToLower(key)]; ok {
+			newM[key] = value
+		}
+	}
 	return newM
 }
