@@ -27,5 +27,5 @@ export default store => dispatch => action => {
         }));
 
         return err;
-    })
+    });
 };

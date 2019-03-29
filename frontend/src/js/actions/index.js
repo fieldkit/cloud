@@ -130,3 +130,10 @@ export function loadDeviceFiles(deviceId) {
         });
     };
 }
+
+export function queryDeviceFilesDetails(deviceId) {
+    return (dispatch, getState) => {
+        const api = new FkApi(dispatch);
+        return api.queryDeviceFilesDetails(deviceId);
+    };
+}

@@ -63,36 +63,6 @@ func NewFilesController(ctx context.Context, service *goa.Service, options Files
 	}
 }
 
-func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.DeviceFile {
-	return &app.DeviceFile{
-		DeviceID:     s.DeviceID,
-		FileID:       s.StreamID,
-		Firmware:     s.Firmware,
-		ID:           int(s.ID),
-		Meta:         s.Meta.String(),
-		Size:         int(s.Size),
-		FileTypeID:   s.FileID,
-		FileTypeName: FileTypeNames[s.FileID],
-		Time:         s.Time,
-		URL:          s.URL,
-		Urls: &app.DeviceFileUrls{
-			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
-			JSON: ac.MakeApiUrl("/files/%v/data.json", s.ID),
-			Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
-		},
-	}
-}
-
-func DeviceFilesType(ac *ApiConfiguration, files []*data.DeviceFile) *app.DeviceFiles {
-	summaries := make([]*app.DeviceFile, len(files))
-	for i, summary := range files {
-		summaries[i] = DeviceFileSummaryType(ac, summary)
-	}
-	return &app.DeviceFiles{
-		Files: summaries,
-	}
-}
-
 func (c *FilesController) listDeviceFiles(ctx context.Context, fileTypeIDs []string, deviceID string, page *int) (*app.DeviceFiles, error) {
 	log := Logger(ctx).Sugar()
 
@@ -172,16 +142,8 @@ func (c *FilesController) DeviceInfo(ctx *app.DeviceInfoFilesContext) error {
 		DeviceID: ctx.DeviceID,
 		Urls:     urls,
 		Files: &app.ConcatenatedFilesInfo{
-			Data: &app.ConcatenatedFileInfo{
-				Time: data.LastModified,
-				Size: int(data.Size),
-				Csv:  urls.Data.Csv,
-			},
-			Logs: &app.ConcatenatedFileInfo{
-				Time: logs.LastModified,
-				Size: int(logs.Size),
-				Csv:  urls.Logs.Csv,
-			},
+			Data: ConcatenatedFileInfo(urls.Data, data),
+			Logs: ConcatenatedFileInfo(urls.Logs, logs),
 		},
 	})
 }
@@ -365,24 +327,24 @@ func (c *DeviceDataController) All(ctx *app.AllDeviceDataContext) error {
 	return ctx.NotFound()
 }
 
+func DeviceFileTypeUrls(ac *ApiConfiguration, kind, deviceID, fileID string) *app.DeviceFileTypeUrls {
+	return &app.DeviceFileTypeUrls{
+		ID:       fileID,
+		Generate: ac.MakeApiUrl("/devices/%v/%s", deviceID, kind),
+		Info:     ac.MakeApiUrl("/files/%v", fileID),
+		Csv:      ac.MakeApiUrl("/files/%v/data.csv", fileID),
+		Fkpb:     ac.MakeApiUrl("/files/%v/data.fkpb", fileID),
+	}
+}
+
 func DeviceSummaryUrls(ac *ApiConfiguration, deviceID string) *app.DeviceSummaryUrls {
 	concatenatedDataID := uuid.NewSHA1(ConcatenatedDataSpace, []byte(deviceID))
 	concatenatedLogsID := uuid.NewSHA1(ConcatenatedLogsSpace, []byte(deviceID))
 
 	return &app.DeviceSummaryUrls{
 		Details: ac.MakeApiUrl("/devices/%v/data", deviceID),
-		Data:    DeviceFileTypeUrls(ac, deviceID, concatenatedDataID.String()),
-		Logs:    DeviceFileTypeUrls(ac, deviceID, concatenatedLogsID.String()),
-	}
-}
-
-func DeviceFileTypeUrls(ac *ApiConfiguration, deviceID string, fileID string) *app.DeviceFileTypeUrls {
-	return &app.DeviceFileTypeUrls{
-		ID:       fileID,
-		Generate: ac.MakeApiUrl("/devices/%v/data", deviceID),
-		Info:     ac.MakeApiUrl("/files/%v", fileID),
-		Csv:      ac.MakeApiUrl("/files/%v/data.csv", fileID),
-		Fkpb:     ac.MakeApiUrl("/files/%v/data.fkpb", fileID),
+		Data:    DeviceFileTypeUrls(ac, "data", deviceID, concatenatedDataID.String()),
+		Logs:    DeviceFileTypeUrls(ac, "logs", deviceID, concatenatedLogsID.String()),
 	}
 }
 
@@ -403,6 +365,47 @@ func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary) *app.Devic
 	}
 	return &app.Devices{
 		Devices: summaries,
+	}
+}
+
+func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.DeviceFile {
+	return &app.DeviceFile{
+		DeviceID:     s.DeviceID,
+		FileID:       s.StreamID,
+		Firmware:     s.Firmware,
+		ID:           int(s.ID),
+		Meta:         s.Meta.String(),
+		Size:         int(s.Size),
+		FileTypeID:   s.FileID,
+		FileTypeName: FileTypeNames[s.FileID],
+		Time:         s.Time,
+		URL:          s.URL,
+		Urls: &app.DeviceFileUrls{
+			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
+			JSON: ac.MakeApiUrl("/files/%v/data.json", s.ID),
+			Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
+		},
+	}
+}
+
+func DeviceFilesType(ac *ApiConfiguration, files []*data.DeviceFile) *app.DeviceFiles {
+	summaries := make([]*app.DeviceFile, len(files))
+	for i, summary := range files {
+		summaries[i] = DeviceFileSummaryType(ac, summary)
+	}
+	return &app.DeviceFiles{
+		Files: summaries,
+	}
+}
+
+func ConcatenatedFileInfo(urls *app.DeviceFileTypeUrls, fi *backend.FileInfo) *app.ConcatenatedFileInfo {
+	if fi == nil {
+		return nil
+	}
+	return &app.ConcatenatedFileInfo{
+		Time: fi.LastModified,
+		Size: int(fi.Size),
+		Csv:  urls.Csv,
 	}
 }
 
