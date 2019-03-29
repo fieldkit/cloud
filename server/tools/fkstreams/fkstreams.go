@@ -65,13 +65,8 @@ func createAwsSession() (s *session.Session, err error) {
 	return nil, fmt.Errorf("Error creating AWS session: %v", err)
 }
 
-type BucketAndKey struct {
-	Bucket string
-	Key    string
-}
-
 type ObjectJob struct {
-	BucketAndKey
+	backend.BucketAndKey
 }
 
 type ObjectDetails struct {
@@ -85,17 +80,6 @@ type ObjectDetails struct {
 	FileId       string
 	URL          string
 	Meta         map[string]*string
-}
-
-func fixMeta(m map[string]*string) map[string]*string {
-	newM := make(map[string]*string)
-	newM["Fk-DeviceId"] = m["Fk-Deviceid"]
-	newM["Fk-FileId"] = m["Fk-Fileid"]
-	newM["Fk-Build"] = m["Fk-Build"]
-	newM["Fk-FileName"] = m["Fk-Filename"]
-	newM["Fk-Version"] = m["Fk-Version"]
-
-	return newM
 }
 
 func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
@@ -117,11 +101,11 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 				continue
 			}
 
-			meta := fixMeta(obj.Metadata)
-			deviceId := meta["Fk-DeviceId"]
-			firmware := meta["Fk-Version"]
-			build := meta["Fk-Build"]
-			fileId := meta["Fk-FileId"]
+			meta := backend.SanitizeMeta(obj.Metadata)
+			deviceId := meta[backend.FkDeviceIdHeaderName]
+			firmware := meta[backend.FkVersionHeaderName]
+			build := meta[backend.FkBuildHeaderName]
+			fileId := meta[backend.FkFileIdHeaderName]
 
 			if deviceId == nil || firmware == nil || build == nil || fileId == nil {
 				log.Printf("Incomplete Metadata: %v", obj)
@@ -187,7 +171,7 @@ func NewFileConcatenator(file *os.File) (fc *FileConcatenator, err error) {
 }
 
 func (fc *FileConcatenator) AppendURL(session *session.Session, url string) error {
-	ids, err := getBucketAndKey(url)
+	ids, err := backend.GetBucketAndKey(url)
 	if err != nil {
 		return err
 	}
@@ -196,7 +180,7 @@ func (fc *FileConcatenator) AppendURL(session *session.Session, url string) erro
 
 }
 
-func (fc *FileConcatenator) AppendS3Object(session *session.Session, object *BucketAndKey) error {
+func (fc *FileConcatenator) AppendS3Object(session *session.Session, object *backend.BucketAndKey) error {
 	svc := s3.New(session)
 
 	goi := &s3.GetObjectInput{
@@ -264,7 +248,7 @@ func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB
 
 		for _, summary := range page.Contents {
 			job := ObjectJob{
-				BucketAndKey: BucketAndKey{
+				BucketAndKey: backend.BucketAndKey{
 					Bucket: *loi.Bucket,
 					Key:    *summary.Key,
 				},
@@ -478,18 +462,4 @@ func main() {
 
 		return
 	}
-}
-
-func getBucketAndKey(s3Url string) (*BucketAndKey, error) {
-	u, err := url.Parse(s3Url)
-	if err != nil {
-		return nil, err
-	}
-
-	parts := strings.Split(u.Host, ".")
-
-	return &BucketAndKey{
-		Bucket: parts[0],
-		Key:    u.Path[1:],
-	}, nil
 }

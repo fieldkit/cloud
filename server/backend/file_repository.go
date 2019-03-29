@@ -56,7 +56,7 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 		return nil, fmt.Errorf("Error calling HeadObject(%v): %v", key, err)
 	}
 
-	meta := sanitizeMeta(obj.Metadata)
+	meta := SanitizeMeta(obj.Metadata)
 	deviceID := ""
 	if value, ok := meta[FkDeviceIdHeaderName]; ok {
 		deviceID = *value
@@ -79,7 +79,7 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 	return
 }
 
-func sanitizeMeta(m map[string]*string) map[string]*string {
+func SanitizeMeta(m map[string]*string) map[string]*string {
 	ci := make(map[string]*string)
 	for key, value := range m {
 		ci[strings.ToLower(key)] = value
