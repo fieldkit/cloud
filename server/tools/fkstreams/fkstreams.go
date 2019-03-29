@@ -7,10 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/url"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -26,17 +24,27 @@ import (
 	"github.com/robinpowered/go-proto/message"
 	"github.com/robinpowered/go-proto/stream"
 
-	"github.com/Devatoria/go-graylog"
-
 	"github.com/conservify/sqlxcache"
 
 	fk "github.com/fieldkit/cloud/server/api/client"
-	"github.com/fieldkit/cloud/server/data"
+	backend "github.com/fieldkit/cloud/server/backend"
+	data "github.com/fieldkit/cloud/server/data"
 	fktesting "github.com/fieldkit/cloud/server/tools"
-
-	_ "github.com/conservify/protobuf-tools/tools"
 	pb "github.com/fieldkit/data-protocol"
 )
+
+type options struct {
+	Scheme   string
+	Host     string
+	Username string
+	Password string
+
+	DeviceID string
+
+	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
+	Sync        bool
+	Locate      bool
+}
 
 func createAwsSession() (s *session.Session, err error) {
 	configs := []aws.Config{
@@ -224,7 +232,7 @@ func (fc *FileConcatenator) Close() {
 	fc.File.Close()
 }
 
-func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB) error {
+func listStreams(ctx context.Context, o *options, session *session.Session, db *sqlxcache.DB) error {
 	svc := s3.New(session)
 
 	loi := &s3.ListObjectsV2Input{
@@ -270,62 +278,6 @@ func listStreams(ctx context.Context, session *session.Session, db *sqlxcache.DB
 	close(jobs)
 
 	return nil
-}
-
-func grayLogMessage() {
-	hn, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-
-	g, err := graylog.NewGraylog(graylog.Endpoint{
-		Transport: graylog.TCP,
-		Address:   "172.31.58.48",
-		Port:      12201,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	defer g.Close()
-
-	err = g.Send(graylog.Message{
-		Version:      "1.1",
-		Host:         hn,
-		ShortMessage: "test",
-		FullMessage:  "test",
-		Timestamp:    time.Now().Unix(),
-		Level:        1,
-		Extra: map[string]string{
-			"tag":       "fkdev/devices",
-			"stream":    "",
-			"device_id": "",
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-}
-
-type ConcatenatedFileUpdater struct {
-}
-
-func NewConcatenatedFileUpdater() (fu *ConcatenatedFileUpdater, err error) {
-	fu = &ConcatenatedFileUpdater{}
-
-	return
-}
-
-type options struct {
-	Scheme   string
-	Host     string
-	Username string
-	Password string
-
-	DeviceID string
-
-	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
-	Sync        bool
 }
 
 func handleDevice(ctx context.Context, o *options, fkc *fk.Client, session *session.Session) error {
@@ -401,6 +353,7 @@ func main() {
 	flag.StringVar(&o.DeviceID, "device-id", "", "device id")
 
 	flag.BoolVar(&o.Sync, "sync", false, "sync")
+	flag.BoolVar(&o.Locate, "locate", false, "locate")
 
 	flag.Parse()
 
@@ -428,7 +381,16 @@ func main() {
 			panic(err)
 		}
 
-		err = listStreams(ctx, session, db)
+		err = listStreams(ctx, &o, session, db)
+		if err != nil {
+			panic(err)
+		}
+
+		return
+	}
+
+	if o.Locate {
+		err := locateDevices(ctx, &o, fkc, session)
 		if err != nil {
 			panic(err)
 		}
