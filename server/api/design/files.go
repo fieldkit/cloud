@@ -65,21 +65,53 @@ var DeviceFiles = MediaType("application/vnd.app.device.files+json", func() {
 })
 
 var DeviceFileTypeUrls = Type("DeviceFileTypeUrls", func() {
+	Attribute("id", String)
 	Attribute("generate", String)
 	Attribute("info", String)
 	Attribute("csv", String)
 	Attribute("fkpb", String)
-	Required("generate", "info", "csv", "fkpb")
+	Required("id", "generate", "info", "csv", "fkpb")
 })
 
 var DeviceSummaryUrls = Type("DeviceSummaryUrls", func() {
+	Attribute("details", String)
 	Attribute("logs", DeviceFileTypeUrls)
 	Attribute("data", DeviceFileTypeUrls)
+	Required("details", "logs", "data")
+})
+
+var ConcatenatedFileInfo = Type("ConcatenatedFileInfo", func() {
+	Attribute("time", DateTime)
+	Attribute("size", Integer)
+	Attribute("csv", String)
+	Required("time", "size", "csv")
+})
+
+var ConcatenatedFilesInfo = Type("ConcatenatedFilesInfo", func() {
+	Attribute("logs", ConcatenatedFileInfo)
+	Attribute("data", ConcatenatedFileInfo)
 	Required("logs", "data")
 })
 
+var DeviceDetails = MediaType("application/vnd.app.device.details+json", func() {
+	TypeName("DeviceDetails")
+	Attributes(func() {
+		Attribute("device_id", String)
+		Attribute("files", ConcatenatedFilesInfo)
+		Attribute("urls", DeviceSummaryUrls)
+		Required("device_id")
+		Required("files")
+		Required("urls")
+	})
+	View("default", func() {
+		Attribute("device_id")
+		Attribute("files")
+		Attribute("urls")
+	})
+})
+
 var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
-	TypeName("Device")
+	TypeName("DeviceSummary")
 	Attributes(func() {
 		Attribute("device_id", String)
 		Attribute("number_of_files", Integer)
@@ -157,6 +189,15 @@ var _ = Resource("files", func() {
 		Response(NotFound)
 		Response(OK, func() {
 			Media(Devices)
+		})
+	})
+
+	Action("device info", func() {
+		Routing(GET("devices/:deviceId"))
+		Description("Device info")
+		Response(NotFound)
+		Response(OK, func() {
+			Media(DeviceDetails)
 		})
 	})
 

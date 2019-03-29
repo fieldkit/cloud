@@ -9,6 +9,7 @@ package client
 
 import (
 	"github.com/goadesign/goa"
+	"time"
 	"unicode/utf8"
 )
 
@@ -618,16 +619,138 @@ func (ut *AddUserPayload) Validate() (err error) {
 	return
 }
 
+// concatenatedFileInfo user type.
+type concatenatedFileInfo struct {
+	Csv  *string    `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
+	Size *int       `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
+	Time *time.Time `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+}
+
+// Validate validates the concatenatedFileInfo type instance.
+func (ut *concatenatedFileInfo) Validate() (err error) {
+	if ut.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "time"))
+	}
+	if ut.Size == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "size"))
+	}
+	if ut.Csv == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "csv"))
+	}
+	return
+}
+
+// Publicize creates ConcatenatedFileInfo from concatenatedFileInfo
+func (ut *concatenatedFileInfo) Publicize() *ConcatenatedFileInfo {
+	var pub ConcatenatedFileInfo
+	if ut.Csv != nil {
+		pub.Csv = *ut.Csv
+	}
+	if ut.Size != nil {
+		pub.Size = *ut.Size
+	}
+	if ut.Time != nil {
+		pub.Time = *ut.Time
+	}
+	return &pub
+}
+
+// ConcatenatedFileInfo user type.
+type ConcatenatedFileInfo struct {
+	Csv  string    `form:"csv" json:"csv" xml:"csv"`
+	Size int       `form:"size" json:"size" xml:"size"`
+	Time time.Time `form:"time" json:"time" xml:"time"`
+}
+
+// Validate validates the ConcatenatedFileInfo type instance.
+func (ut *ConcatenatedFileInfo) Validate() (err error) {
+
+	if ut.Csv == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "csv"))
+	}
+	return
+}
+
+// concatenatedFilesInfo user type.
+type concatenatedFilesInfo struct {
+	Data *concatenatedFileInfo `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+	Logs *concatenatedFileInfo `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
+}
+
+// Validate validates the concatenatedFilesInfo type instance.
+func (ut *concatenatedFilesInfo) Validate() (err error) {
+	if ut.Logs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "logs"))
+	}
+	if ut.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "data"))
+	}
+	if ut.Data != nil {
+		if err2 := ut.Data.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.Logs != nil {
+		if err2 := ut.Logs.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// Publicize creates ConcatenatedFilesInfo from concatenatedFilesInfo
+func (ut *concatenatedFilesInfo) Publicize() *ConcatenatedFilesInfo {
+	var pub ConcatenatedFilesInfo
+	if ut.Data != nil {
+		pub.Data = ut.Data.Publicize()
+	}
+	if ut.Logs != nil {
+		pub.Logs = ut.Logs.Publicize()
+	}
+	return &pub
+}
+
+// ConcatenatedFilesInfo user type.
+type ConcatenatedFilesInfo struct {
+	Data *ConcatenatedFileInfo `form:"data" json:"data" xml:"data"`
+	Logs *ConcatenatedFileInfo `form:"logs" json:"logs" xml:"logs"`
+}
+
+// Validate validates the ConcatenatedFilesInfo type instance.
+func (ut *ConcatenatedFilesInfo) Validate() (err error) {
+	if ut.Logs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "logs"))
+	}
+	if ut.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "data"))
+	}
+	if ut.Data != nil {
+		if err2 := ut.Data.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.Logs != nil {
+		if err2 := ut.Logs.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
 // deviceFileTypeUrls user type.
 type deviceFileTypeUrls struct {
 	Csv      *string `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
 	Fkpb     *string `form:"fkpb,omitempty" json:"fkpb,omitempty" xml:"fkpb,omitempty"`
 	Generate *string `form:"generate,omitempty" json:"generate,omitempty" xml:"generate,omitempty"`
+	ID       *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Info     *string `form:"info,omitempty" json:"info,omitempty" xml:"info,omitempty"`
 }
 
 // Validate validates the deviceFileTypeUrls type instance.
 func (ut *deviceFileTypeUrls) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
+	}
 	if ut.Generate == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "generate"))
 	}
@@ -655,6 +778,9 @@ func (ut *deviceFileTypeUrls) Publicize() *DeviceFileTypeUrls {
 	if ut.Generate != nil {
 		pub.Generate = *ut.Generate
 	}
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
 	if ut.Info != nil {
 		pub.Info = *ut.Info
 	}
@@ -666,11 +792,15 @@ type DeviceFileTypeUrls struct {
 	Csv      string `form:"csv" json:"csv" xml:"csv"`
 	Fkpb     string `form:"fkpb" json:"fkpb" xml:"fkpb"`
 	Generate string `form:"generate" json:"generate" xml:"generate"`
+	ID       string `form:"id" json:"id" xml:"id"`
 	Info     string `form:"info" json:"info" xml:"info"`
 }
 
 // Validate validates the DeviceFileTypeUrls type instance.
 func (ut *DeviceFileTypeUrls) Validate() (err error) {
+	if ut.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "id"))
+	}
 	if ut.Generate == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "generate"))
 	}
@@ -745,12 +875,16 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 
 // deviceSummaryUrls user type.
 type deviceSummaryUrls struct {
-	Data *deviceFileTypeUrls `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
-	Logs *deviceFileTypeUrls `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
+	Data    *deviceFileTypeUrls `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+	Details *string             `form:"details,omitempty" json:"details,omitempty" xml:"details,omitempty"`
+	Logs    *deviceFileTypeUrls `form:"logs,omitempty" json:"logs,omitempty" xml:"logs,omitempty"`
 }
 
 // Validate validates the deviceSummaryUrls type instance.
 func (ut *deviceSummaryUrls) Validate() (err error) {
+	if ut.Details == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "details"))
+	}
 	if ut.Logs == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "logs"))
 	}
@@ -776,6 +910,9 @@ func (ut *deviceSummaryUrls) Publicize() *DeviceSummaryUrls {
 	if ut.Data != nil {
 		pub.Data = ut.Data.Publicize()
 	}
+	if ut.Details != nil {
+		pub.Details = *ut.Details
+	}
 	if ut.Logs != nil {
 		pub.Logs = ut.Logs.Publicize()
 	}
@@ -784,12 +921,16 @@ func (ut *deviceSummaryUrls) Publicize() *DeviceSummaryUrls {
 
 // DeviceSummaryUrls user type.
 type DeviceSummaryUrls struct {
-	Data *DeviceFileTypeUrls `form:"data" json:"data" xml:"data"`
-	Logs *DeviceFileTypeUrls `form:"logs" json:"logs" xml:"logs"`
+	Data    *DeviceFileTypeUrls `form:"data" json:"data" xml:"data"`
+	Details string              `form:"details" json:"details" xml:"details"`
+	Logs    *DeviceFileTypeUrls `form:"logs" json:"logs" xml:"logs"`
 }
 
 // Validate validates the DeviceSummaryUrls type instance.
 func (ut *DeviceSummaryUrls) Validate() (err error) {
+	if ut.Details == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "details"))
+	}
 	if ut.Logs == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "logs"))
 	}

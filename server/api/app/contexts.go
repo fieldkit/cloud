@@ -1549,6 +1549,43 @@ func (ctx *CsvFilesContext) NotFound() error {
 	return nil
 }
 
+// DeviceInfoFilesContext provides the files device info action context.
+type DeviceInfoFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+}
+
+// NewDeviceInfoFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the files controller device info action.
+func NewDeviceInfoFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceInfoFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeviceInfoFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeviceInfoFilesContext) OK(r *DeviceDetails) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.details+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeviceInfoFilesContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // FileFilesContext provides the files file action context.
 type FileFilesContext struct {
 	context.Context

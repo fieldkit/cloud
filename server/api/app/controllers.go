@@ -2128,6 +2128,7 @@ func unmarshalUpdateExpeditionPayload(ctx context.Context, service *goa.Service,
 type FilesController interface {
 	goa.Muxer
 	Csv(*CsvFilesContext) error
+	DeviceInfo(*DeviceInfoFilesContext) error
 	File(*FileFilesContext) error
 	JSON(*JSONFilesContext) error
 	ListDeviceDataFiles(*ListDeviceDataFilesFilesContext) error
@@ -2141,6 +2142,7 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/files/:fileId/data.csv", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/devices/:deviceId", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/:fileId", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/:fileId/data.json", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/data", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
@@ -2163,6 +2165,22 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/:fileId/data.csv", ctrl.MuxHandler("csv", h, nil))
 	service.LogInfo("mount", "ctrl", "Files", "action", "Csv", "route", "GET /files/:fileId/data.csv")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeviceInfoFilesContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.DeviceInfo(rctx)
+	}
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("GET", "/devices/:deviceId", ctrl.MuxHandler("device info", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "DeviceInfo", "route", "GET /devices/:deviceId")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

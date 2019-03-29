@@ -130,10 +130,10 @@ func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (Cl
 	return decoded, err
 }
 
-// Device media type (default view)
+// DeviceSummary media type (default view)
 //
 // Identifier: application/vnd.app.device+json; view=default
-type Device struct {
+type DeviceSummary struct {
 	DeviceID      string             `form:"device_id" json:"device_id" xml:"device_id"`
 	LastFileID    string             `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
 	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
@@ -141,8 +141,8 @@ type Device struct {
 	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }
 
-// Validate validates the Device media type instance.
-func (mt *Device) Validate() (err error) {
+// Validate validates the DeviceSummary media type instance.
+func (mt *DeviceSummary) Validate() (err error) {
 	if mt.DeviceID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
 	}
@@ -161,9 +161,49 @@ func (mt *Device) Validate() (err error) {
 	return
 }
 
-// DecodeDevice decodes the Device instance encoded in resp body.
-func (c *Client) DecodeDevice(resp *http.Response) (*Device, error) {
-	var decoded Device
+// DecodeDeviceSummary decodes the DeviceSummary instance encoded in resp body.
+func (c *Client) DecodeDeviceSummary(resp *http.Response) (*DeviceSummary, error) {
+	var decoded DeviceSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceDetails media type (default view)
+//
+// Identifier: application/vnd.app.device.details+json; view=default
+type DeviceDetails struct {
+	DeviceID string                 `form:"device_id" json:"device_id" xml:"device_id"`
+	Files    *ConcatenatedFilesInfo `form:"files" json:"files" xml:"files"`
+	Urls     *DeviceSummaryUrls     `form:"urls" json:"urls" xml:"urls"`
+}
+
+// Validate validates the DeviceDetails media type instance.
+func (mt *DeviceDetails) Validate() (err error) {
+	if mt.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
+	}
+	if mt.Files == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
+	}
+	if mt.Urls == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Files != nil {
+		if err2 := mt.Files.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if mt.Urls != nil {
+		if err2 := mt.Urls.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeDeviceDetails decodes the DeviceDetails instance encoded in resp body.
+func (c *Client) DecodeDeviceDetails(resp *http.Response) (*DeviceDetails, error) {
+	var decoded DeviceDetails
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
@@ -277,13 +317,13 @@ func (c *Client) DecodeDeviceFiles(resp *http.Response) (*DeviceFiles, error) {
 	return &decoded, err
 }
 
-// DeviceCollection is the media type for an array of Device (default view)
+// DeviceSummaryCollection is the media type for an array of DeviceSummary (default view)
 //
 // Identifier: application/vnd.app.device+json; type=collection; view=default
-type DeviceCollection []*Device
+type DeviceSummaryCollection []*DeviceSummary
 
-// Validate validates the DeviceCollection media type instance.
-func (mt DeviceCollection) Validate() (err error) {
+// Validate validates the DeviceSummaryCollection media type instance.
+func (mt DeviceSummaryCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
@@ -294,9 +334,9 @@ func (mt DeviceCollection) Validate() (err error) {
 	return
 }
 
-// DecodeDeviceCollection decodes the DeviceCollection instance encoded in resp body.
-func (c *Client) DecodeDeviceCollection(resp *http.Response) (DeviceCollection, error) {
-	var decoded DeviceCollection
+// DecodeDeviceSummaryCollection decodes the DeviceSummaryCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceSummaryCollection(resp *http.Response) (DeviceSummaryCollection, error) {
+	var decoded DeviceSummaryCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }
@@ -529,7 +569,7 @@ func (c *Client) DecodeDeviceSources(resp *http.Response) (*DeviceSources, error
 //
 // Identifier: application/vnd.app.devices+json; view=default
 type Devices struct {
-	Devices DeviceCollection `form:"devices" json:"devices" xml:"devices"`
+	Devices DeviceSummaryCollection `form:"devices" json:"devices" xml:"devices"`
 }
 
 // Validate validates the Devices media type instance.

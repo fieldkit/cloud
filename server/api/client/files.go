@@ -40,10 +40,40 @@ func (c *Client) NewCsvFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp153 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp153)
+		tmp154 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp154)
 	}
 	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// DeviceInfoFilesPath computes a request path to the device info action of files.
+func DeviceInfoFilesPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/devices/%s", param0)
+}
+
+// Device info
+func (c *Client) DeviceInfoFiles(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeviceInfoFilesRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeviceInfoFilesRequest create the request corresponding to the device info action endpoint of the files resource.
+func (c *Client) NewDeviceInfoFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -106,8 +136,8 @@ func (c *Client) NewJSONFilesRequest(ctx context.Context, path string, dl *bool)
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp154 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp154)
+		tmp155 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp155)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -142,8 +172,8 @@ func (c *Client) NewListDeviceDataFilesFilesRequest(ctx context.Context, path st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp155 := strconv.Itoa(*page)
-		values.Set("page", tmp155)
+		tmp156 := strconv.Itoa(*page)
+		values.Set("page", tmp156)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -178,8 +208,8 @@ func (c *Client) NewListDeviceLogFilesFilesRequest(ctx context.Context, path str
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp156 := strconv.Itoa(*page)
-		values.Set("page", tmp156)
+		tmp157 := strconv.Itoa(*page)
+		values.Set("page", tmp157)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -243,8 +273,8 @@ func (c *Client) NewRawFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp157 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp157)
+		tmp158 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp158)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
