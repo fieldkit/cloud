@@ -3,6 +3,7 @@ import { put, call } from 'redux-saga/effects';
 import FKApiClient from './api';
 
 import * as Creators from './creators';
+
 import apiMiddleware, { CALL_WEB_API } from './middleware';
 
 export class FkApi {
@@ -26,7 +27,7 @@ export class FkApi {
 
 };
 
-function* api(callApi) {
+function* asyncApi(callApi) {
     yield put(Object.assign({}, callApi, {
         type: callApi.types.START,
     }));
@@ -50,14 +51,24 @@ function* api(callApi) {
     }
 }
 
-const Calls = {};
+const AsyncCalls = {};
+const PromisedCalls = {};
 
 for (let name of Object.keys(Creators)) {
     const fn = Creators[name];
-    Calls[name] = function() {
+    PromisedCalls[name] = function() {
         const args = Array.prototype.slice.call(arguments);
-        return call(api, fn.apply(null, args));
+        const callApi = fn.apply(null, args);
+        return FKApiClient.getJSON(callApi.path).then((data) => {
+            return callApi.unwrap != null ? callApi.unwrap(data) : data;
+        });
+    };
+    AsyncCalls[name] = function() {
+        const args = Array.prototype.slice.call(arguments);
+        return call(asyncApi, fn.apply(null, args));
     };
 }
 
-export default Calls;
+export const FkPromisedApi = PromisedCalls;
+
+export default AsyncCalls;
