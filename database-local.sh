@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker exec -it cloud_postgres_1 psql -U fieldkit fieldkit
+psql -h 127.0.0.1 -U fieldkit -U fieldkit

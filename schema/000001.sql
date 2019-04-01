@@ -257,6 +257,27 @@ WHERE
   (a.outlier IS NULL OR NOT a.outlier) AND
   (a.manually_excluded IS NULL OR NOT a.manually_excluded);
 
+-- data
+
+CREATE TABLE fieldkit.countries (
+  "gid" serial PRIMARY KEY,
+  "fips" varchar(2),
+  "iso2" varchar(2),
+  "iso3" varchar(3),
+  "un" int2,
+  "name" varchar(50),
+  "area" int4,
+  "pop2005" int8,
+  "region" int2,
+  "subregion" int2,
+  "lon" float8,
+  "lat" float8
+);
+
+SELECT AddGeometryColumn('fieldkit', 'countries', 'geom', '0', 'MULTIPOLYGON', 2);
+
+CREATE INDEX ON fieldkit.countries USING GIST (geom);
+
 -- user
 
 DO
