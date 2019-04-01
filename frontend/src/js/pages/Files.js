@@ -13,8 +13,6 @@ import { loadDevices, loadDeviceFiles } from '../actions';
 
 import { FkPromisedApi } from '../api/calls';
 
-import { API_HOST } from '../secrets';
-
 import '../../css/files.css';
 import '../../css/bootstrap.min.css';
 

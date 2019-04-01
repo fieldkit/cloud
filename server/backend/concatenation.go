@@ -51,7 +51,7 @@ func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend)
 func (fc *FileConcatenator) HandleLocation(ctx context.Context, file *data.DeviceFile, ts time.Time, coordinates []float64) error {
 	dsl := data.DeviceStreamLocation{
 		DeviceID:  file.DeviceID,
-		Timestamp: &ts,
+		Timestamp: ts,
 		Location:  data.NewLocation(coordinates),
 	}
 

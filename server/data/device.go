@@ -37,10 +37,10 @@ type DeviceLocation struct {
 }
 
 type DeviceStreamLocation struct {
-	ID        int64      `db:"id"`
-	DeviceID  string     `db:"device_id"`
-	Timestamp *time.Time `db:"timestamp"`
-	Location  *Location  `db:"location"`
+	ID        int64     `db:"id"`
+	DeviceID  string    `db:"device_id"`
+	Timestamp time.Time `db:"timestamp"`
+	Location  *Location `db:"location"`
 }
 
 type Firmware struct {

@@ -137,6 +137,7 @@ type DeviceSummary struct {
 	DeviceID      string             `form:"device_id" json:"device_id" xml:"device_id"`
 	LastFileID    string             `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
 	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
+	Locations     *LocationHistory   `form:"locations" json:"locations" xml:"locations"`
 	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
 	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }
@@ -152,6 +153,14 @@ func (mt *DeviceSummary) Validate() (err error) {
 	}
 	if mt.Urls == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Locations == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "locations"))
+	}
+	if mt.Locations != nil {
+		if err2 := mt.Locations.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if mt.Urls != nil {
 		if err2 := mt.Urls.Validate(); err2 != nil {
@@ -1021,6 +1030,79 @@ func (mt *Location) Validate() (err error) {
 // DecodeLocation decodes the Location instance encoded in resp body.
 func (c *Client) DecodeLocation(resp *http.Response) (*Location, error) {
 	var decoded Location
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// LocationEntry media type (default view)
+//
+// Identifier: application/vnd.app.location.entry+json; view=default
+type LocationEntry struct {
+	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Time        time.Time `form:"time" json:"time" xml:"time"`
+}
+
+// Validate validates the LocationEntry media type instance.
+func (mt *LocationEntry) Validate() (err error) {
+
+	if mt.Coordinates == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
+	}
+	return
+}
+
+// DecodeLocationEntry decodes the LocationEntry instance encoded in resp body.
+func (c *Client) DecodeLocationEntry(resp *http.Response) (*LocationEntry, error) {
+	var decoded LocationEntry
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// LocationEntryCollection is the media type for an array of LocationEntry (default view)
+//
+// Identifier: application/vnd.app.location.entry+json; type=collection; view=default
+type LocationEntryCollection []*LocationEntry
+
+// Validate validates the LocationEntryCollection media type instance.
+func (mt LocationEntryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeLocationEntryCollection decodes the LocationEntryCollection instance encoded in resp body.
+func (c *Client) DecodeLocationEntryCollection(resp *http.Response) (LocationEntryCollection, error) {
+	var decoded LocationEntryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// LocationHistory media type (default view)
+//
+// Identifier: application/vnd.app.location.history+json; view=default
+type LocationHistory struct {
+	Entries LocationEntryCollection `form:"entries" json:"entries" xml:"entries"`
+}
+
+// Validate validates the LocationHistory media type instance.
+func (mt *LocationHistory) Validate() (err error) {
+	if mt.Entries == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "entries"))
+	}
+	if err2 := mt.Entries.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeLocationHistory decodes the LocationHistory instance encoded in resp body.
+func (c *Client) DecodeLocationHistory(resp *http.Response) (*LocationHistory, error) {
+	var decoded LocationHistory
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

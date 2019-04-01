@@ -110,6 +110,31 @@ var DeviceDetails = MediaType("application/vnd.app.device.details+json", func() 
 	})
 })
 
+var LocationEntry = MediaType("application/vnd.app.location.entry+json", func() {
+	TypeName("LocationEntry")
+	Attributes(func() {
+		Attribute("time", DateTime)
+		Attribute("coordinates", ArrayOf(Number))
+		Required("time")
+		Required("coordinates")
+	})
+	View("default", func() {
+		Attribute("time")
+		Attribute("coordinates")
+	})
+})
+
+var LocationHistory = MediaType("application/vnd.app.location.history+json", func() {
+	TypeName("LocationHistory")
+	Attributes(func() {
+		Attribute("entries", CollectionOf(LocationEntry))
+		Required("entries")
+	})
+	View("default", func() {
+		Attribute("entries")
+	})
+})
+
 var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 	TypeName("DeviceSummary")
 	Attributes(func() {
@@ -118,11 +143,13 @@ var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 		Attribute("last_file_time", DateTime)
 		Attribute("last_file_id", String)
 		Attribute("urls", DeviceSummaryUrls)
+		Attribute("locations", LocationHistory)
 		Required("device_id")
 		Required("number_of_files")
 		Required("last_file_time")
 		Required("last_file_id")
 		Required("urls")
+		Required("locations")
 	})
 	View("default", func() {
 		Attribute("device_id")
@@ -130,6 +157,7 @@ var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 		Attribute("last_file_time")
 		Attribute("last_file_id")
 		Attribute("urls")
+		Attribute("locations")
 	})
 })
 

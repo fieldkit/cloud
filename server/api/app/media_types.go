@@ -101,6 +101,7 @@ type DeviceSummary struct {
 	DeviceID      string             `form:"device_id" json:"device_id" xml:"device_id"`
 	LastFileID    string             `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
 	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
+	Locations     *LocationHistory   `form:"locations" json:"locations" xml:"locations"`
 	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
 	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }
@@ -116,6 +117,14 @@ func (mt *DeviceSummary) Validate() (err error) {
 	}
 	if mt.Urls == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Locations == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "locations"))
+	}
+	if mt.Locations != nil {
+		if err2 := mt.Locations.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if mt.Urls != nil {
 		if err2 := mt.Urls.Validate(); err2 != nil {
@@ -775,6 +784,58 @@ func (mt *Location) Validate() (err error) {
 	}
 	if err2 := goa.ValidateFormat(goa.FormatURI, mt.Location); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.location`, mt.Location, goa.FormatURI, err2))
+	}
+	return
+}
+
+// LocationEntry media type (default view)
+//
+// Identifier: application/vnd.app.location.entry+json; view=default
+type LocationEntry struct {
+	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Time        time.Time `form:"time" json:"time" xml:"time"`
+}
+
+// Validate validates the LocationEntry media type instance.
+func (mt *LocationEntry) Validate() (err error) {
+
+	if mt.Coordinates == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
+	}
+	return
+}
+
+// LocationEntryCollection is the media type for an array of LocationEntry (default view)
+//
+// Identifier: application/vnd.app.location.entry+json; type=collection; view=default
+type LocationEntryCollection []*LocationEntry
+
+// Validate validates the LocationEntryCollection media type instance.
+func (mt LocationEntryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// LocationHistory media type (default view)
+//
+// Identifier: application/vnd.app.location.history+json; view=default
+type LocationHistory struct {
+	Entries LocationEntryCollection `form:"entries" json:"entries" xml:"entries"`
+}
+
+// Validate validates the LocationHistory media type instance.
+func (mt *LocationHistory) Validate() (err error) {
+	if mt.Entries == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "entries"))
+	}
+	if err2 := mt.Entries.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	return
 }

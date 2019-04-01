@@ -102,6 +102,14 @@ func (c *FilesController) ListDeviceLogFiles(ctx *app.ListDeviceLogFilesFilesCon
 }
 
 func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
+	locations := []*data.DeviceStreamLocation{}
+	if err := c.options.Database.SelectContext(ctx, &locations,
+		`SELECT s.id, s.device_id, s.timestamp, ST_AsBinary(s.location) AS location
+		 FROM fieldkit.device_stream_location AS s
+                 ORDER BY s.timestamp DESC`); err != nil {
+		return err
+	}
+
 	devices := []*data.DeviceSummary{}
 	if err := c.options.Database.SelectContext(ctx, &devices,
 		`SELECT s.device_id,
@@ -115,7 +123,7 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 		return err
 	}
 
-	return ctx.OK(DevicesType(c.options.Config, devices))
+	return ctx.OK(DevicesType(c.options.Config, devices, locations))
 }
 
 func (c *FilesController) DeviceInfo(ctx *app.DeviceInfoFilesContext) error {
@@ -348,20 +356,41 @@ func DeviceSummaryUrls(ac *ApiConfiguration, deviceID string) *app.DeviceSummary
 	}
 }
 
-func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary) *app.DeviceSummary {
+func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[string][]*app.LocationEntry, locations []*data.DeviceStreamLocation) *app.DeviceSummary {
+	lh := &app.LocationHistory{}
+
+	if deviceEntries, ok := entries[s.DeviceID]; ok {
+		lh.Entries = deviceEntries
+	}
+
 	return &app.DeviceSummary{
 		DeviceID:      s.DeviceID,
 		LastFileID:    s.LastFileID,
 		LastFileTime:  s.LastFileTime,
 		NumberOfFiles: s.NumberOfFiles,
 		Urls:          DeviceSummaryUrls(ac, s.DeviceID),
+		Locations:     lh,
 	}
 }
 
-func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary) *app.Devices {
+func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations []*data.DeviceStreamLocation) *app.Devices {
+	entries := make(map[string][]*app.LocationEntry)
+	for _, dsl := range locations {
+		if _, ok := entries[dsl.DeviceID]; !ok {
+			entries[dsl.DeviceID] = make([]*app.LocationEntry, 0)
+		}
+
+		le := &app.LocationEntry{
+			Coordinates: dsl.Location.Coordinates(),
+			Time:        dsl.Timestamp,
+		}
+
+		entries[dsl.DeviceID] = append(entries[dsl.DeviceID], le)
+	}
+
 	summaries := make([]*app.DeviceSummary, len(devices))
 	for i, summary := range devices {
-		summaries[i] = DeviceSummaryType(ac, summary)
+		summaries[i] = DeviceSummaryType(ac, summary, entries, locations)
 	}
 	return &app.Devices{
 		Devices: summaries,
