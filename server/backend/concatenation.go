@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/lib/pq"
 
@@ -43,6 +44,29 @@ func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend)
 	}
 
 	return
+}
+
+func (fc *FileConcatenator) HandleLocation(ctx context.Context, file *data.DeviceFile, r *pb.DataRecord) error {
+	location := r.LoggedReading.Location
+	coordinates := []float64{float64(location.Longitude), float64(location.Latitude), float64(location.Altitude)}
+	ts := time.Unix(int64(location.Time), 0)
+
+	dsl := data.DeviceStreamLocation{
+		DeviceID:  file.DeviceID,
+		Timestamp: &ts,
+		Location:  data.NewLocation(coordinates),
+	}
+
+	_, err := fc.Database.NamedExecContext(ctx, `
+		   INSERT INTO fieldkit.device_stream_location (device_id, timestamp, location)
+		   VALUES (:device_id, :timestamp, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		   ON CONFLICT DO NOTHING
+		   `, dsl)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
@@ -100,7 +124,14 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 				return nil, err
 			}
 
-			return &record, nil
+			if record.LoggedReading != nil && record.LoggedReading.Location != nil {
+				err := fc.HandleLocation(ctx, file, &record)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			return nil, nil
 		})
 
 		_, err = stream.ReadLengthPrefixedCollection(obj.Body, unmarshalFunc)

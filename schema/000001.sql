@@ -189,6 +189,17 @@ CREATE UNIQUE INDEX ON fieldkit.device_stream (stream_id);
 
 CREATE INDEX ON fieldkit.device_stream (device_id, time);
 
+CREATE TABLE fieldkit.device_stream_location (
+  id serial PRIMARY KEY,
+  device_id varchar(64) NOT NULL,
+	timestamp timestamp NOT NULL,
+	location geometry(POINT, 4326) NOT NULL
+);
+
+CREATE INDEX ON fieldkit.device_stream_location (device_id, timestamp);
+
+CREATE UNIQUE INDEX ON fieldkit.device_stream_location (device_id, timestamp, location);
+
 -- device_schema
 
 CREATE TABLE fieldkit.device_schema (
