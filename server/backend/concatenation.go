@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/lib/pq"
@@ -46,11 +48,7 @@ func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend)
 	return
 }
 
-func (fc *FileConcatenator) HandleLocation(ctx context.Context, file *data.DeviceFile, r *pb.DataRecord) error {
-	location := r.LoggedReading.Location
-	coordinates := []float64{float64(location.Longitude), float64(location.Latitude), float64(location.Altitude)}
-	ts := time.Unix(int64(location.Time), 0)
-
+func (fc *FileConcatenator) HandleLocation(ctx context.Context, file *data.DeviceFile, ts time.Time, coordinates []float64) error {
 	dsl := data.DeviceStreamLocation{
 		DeviceID:  file.DeviceID,
 		Timestamp: &ts,
@@ -64,6 +62,48 @@ func (fc *FileConcatenator) HandleLocation(ctx context.Context, file *data.Devic
 		   `, dsl)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+var LocationRegex = regexp.MustCompile("Loc\\((\\S+), (\\S+), (\\S+)\\)")
+
+func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.DeviceFile, record *pb.DataRecord) error {
+	log := Logger(ctx).Sugar()
+
+	if record.LoggedReading != nil && record.LoggedReading.Location != nil {
+		location := record.LoggedReading.Location
+		coordinates := []float64{float64(location.Longitude), float64(location.Latitude), float64(location.Altitude)}
+		ts := time.Unix(int64(location.Time), 0)
+
+		err := fc.HandleLocation(ctx, file, ts, coordinates)
+		if err != nil {
+			return err
+		}
+	}
+
+	if record.Log != nil {
+		m := LocationRegex.FindAllStringSubmatch(record.Log.Message, -1)
+		if len(m) > 0 {
+			coordinates := make([]float64, 3)
+			for i := 0; i < 3; i += 1 {
+				v, err := strconv.ParseFloat(m[0][i+1], 64)
+				if err != nil {
+					panic(err)
+				}
+				coordinates[i] = v
+			}
+
+			ts := time.Unix(int64(record.Log.Time), 0)
+
+			log.Infow("Location", "match", m, "time", ts)
+
+			err := fc.HandleLocation(ctx, file, ts, coordinates)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
@@ -124,12 +164,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 				return nil, err
 			}
 
-			if record.LoggedReading != nil && record.LoggedReading.Location != nil {
-				err := fc.HandleLocation(ctx, file, &record)
-				if err != nil {
-					return nil, err
-				}
-			}
+			fc.ProcessRecord(ctx, file, &record)
 
 			return nil, nil
 		})
