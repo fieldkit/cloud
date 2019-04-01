@@ -201,7 +201,7 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 }
 
 func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
-	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
 }
 
 func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
-	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
 }
 
 func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
-	iterator, err := backend.LookupFileOnS3(ctx, c.options.Session, c.options.Database, ctx.FileID)
+	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
 	if err != nil {
 		return err
 	}

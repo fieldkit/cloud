@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/goadesign/goa"
@@ -262,7 +263,7 @@ func toIteratorFiles(dfs []*data.DeviceFile) []*IteratorFile {
 	return ifs
 }
 
-func LookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache.DB, fileID string) (iterator *FileIterator, err error) {
+func lookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache.DB, fileID string) (iterator *FileIterator, err error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("File", "file_id", fileID)
@@ -301,9 +302,14 @@ func LookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache
 }
 
 func LookupFile(ctx context.Context, session *session.Session, db *sqlxcache.DB, fileID string) (iterator *FileIterator, err error) {
+	fileIDInteger, err := strconv.Atoi(fileID)
+	if err != nil {
+		return lookupFileOnS3(ctx, session, db, fileID)
+	}
+
 	log := Logger(ctx).Sugar()
 
-	log.Infow("File", "file_id", fileID)
+	log.Infow("File", "file_id", fileIDInteger)
 
 	iterator = &FileIterator{
 		Offset:    0,
@@ -314,7 +320,7 @@ func LookupFile(ctx context.Context, session *session.Session, db *sqlxcache.DB,
 		S3Service: s3.New(session),
 		Query: func(ctx context.Context, s *FileIterator) error {
 			var files []*data.DeviceFile
-			if err := db.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.id = $1`, fileID); err != nil {
+			if err := db.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE s.id = $1`, fileIDInteger); err != nil {
 				return err
 			}
 			s.Files = toIteratorFiles(files)

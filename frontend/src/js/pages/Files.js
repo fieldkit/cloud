@@ -83,7 +83,7 @@ class ConcatenatedFiles extends Component {
 
                 <div className="">
                     <div className="row">
-                        <div className="col-sm-5">
+                        <div className="col-sm-6">
                             <table className="table">
                                 <tbody>
                                   {this.renderData()}
@@ -91,7 +91,7 @@ class ConcatenatedFiles extends Component {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="col-sm-7">
+                        <div className="col-sm-6">
                         </div>
                     </div>
                 </div>
@@ -124,8 +124,8 @@ class ConcatenatedFiles extends Component {
               <td>{dataTime}</td>
               <td>{dataAgo}</td>
               <td>{details.files.data.size} bytes</td>
-              <td><a target="_blank" href={device.urls.data.csv}>CSV</a></td>
-              <td><a target="_blank" href={device.urls.data.csv}>FKPB</a></td>
+              <td><a target="_blank" href={device.urls.data.csv + "?dl=0"}>CSV</a> (<a href={device.urls.data.csv}>Download</a>)</td>
+              <td><a target="_blank" href={device.urls.data.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.data.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -155,8 +155,8 @@ class ConcatenatedFiles extends Component {
               <td>{logsTime}</td>
               <td>{logsAgo}</td>
               <td>{details.files.logs.size} bytes</td>
-              <td><a target="_blank" href={device.urls.logs.csv}>CSV</a></td>
-              <td><a target="_blank" href={device.urls.logs.csv}>FKPB</a></td>
+              <td><a target="_blank" href={device.urls.logs.csv + "?dl=0"}>CSV</a> (<a href={device.urls.logs.csv}>Download</a>)</td>
+              <td><a target="_blank" href={device.urls.logs.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.logs.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -228,9 +228,9 @@ class Files extends Component {
                 <td>{file.size}</td>
                 <td>{time}</td>
                 <td>
-                    <a target="_blank" href={API_HOST + file.urls.csv + "?dl=0"}>CSV</a> (<a href={API_HOST + file.urls.csv}>Download</a>) <span> | </span>
-                    <a target="_blank" href={API_HOST + file.urls.json + "?dl=0"}>JSON</a> (<a href={API_HOST + file.urls.json}>Download</a>) <span> | </span>
-                    <a href={API_HOST + file.urls.raw}>Raw</a>
+                    <a target="_blank" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) <span> | </span>
+                    <a target="_blank" href={file.urls.json + "?dl=0"}>JSON</a> (<a href={file.urls.json}>Download</a>) <span> | </span>
+                    <a href={file.urls.raw}>Raw</a>
                 </td>
             </tr>
         );
