@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -102,9 +103,11 @@ func (c *FilesController) ListDeviceLogFiles(ctx *app.ListDeviceLogFilesFilesCon
 }
 
 func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
-	locations := []*data.DeviceStreamLocation{}
+	locations := []*data.DeviceStreamLocationAndPlace{}
 	if err := c.options.Database.SelectContext(ctx, &locations,
-		`SELECT s.id, s.device_id, s.timestamp, ST_AsBinary(s.location) AS location
+		`SELECT
+		    s.id, s.device_id, s.timestamp, ST_AsBinary(s.location) AS location,
+		    ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
 		 FROM fieldkit.device_stream_location AS s
                  ORDER BY s.timestamp DESC`); err != nil {
 		return err
@@ -356,11 +359,13 @@ func DeviceSummaryUrls(ac *ApiConfiguration, deviceID string) *app.DeviceSummary
 	}
 }
 
-func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[string][]*app.LocationEntry, locations []*data.DeviceStreamLocation) *app.DeviceSummary {
+func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[string][]*app.LocationEntry, locations []*data.DeviceStreamLocationAndPlace) *app.DeviceSummary {
 	lh := &app.LocationHistory{}
 
 	if deviceEntries, ok := entries[s.DeviceID]; ok {
 		lh.Entries = deviceEntries
+	} else {
+		lh.Entries = make([]*app.LocationEntry, 0)
 	}
 
 	return &app.DeviceSummary{
@@ -373,7 +378,7 @@ func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[
 	}
 }
 
-func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations []*data.DeviceStreamLocation) *app.Devices {
+func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations []*data.DeviceStreamLocationAndPlace) *app.Devices {
 	entries := make(map[string][]*app.LocationEntry)
 	for _, dsl := range locations {
 		if _, ok := entries[dsl.DeviceID]; !ok {
@@ -383,6 +388,7 @@ func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations 
 		le := &app.LocationEntry{
 			Coordinates: dsl.Location.Coordinates(),
 			Time:        dsl.Timestamp,
+			Places:      strings.Join(dsl.Places, ", "),
 		}
 
 		entries[dsl.DeviceID] = append(entries[dsl.DeviceID], le)

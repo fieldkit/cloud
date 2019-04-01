@@ -793,12 +793,16 @@ func (mt *Location) Validate() (err error) {
 // Identifier: application/vnd.app.location.entry+json; view=default
 type LocationEntry struct {
 	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Places      string    `form:"places" json:"places" xml:"places"`
 	Time        time.Time `form:"time" json:"time" xml:"time"`
 }
 
 // Validate validates the LocationEntry media type instance.
 func (mt *LocationEntry) Validate() (err error) {
 
+	if mt.Places == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "places"))
+	}
 	if mt.Coordinates == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
 	}

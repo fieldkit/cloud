@@ -3,6 +3,8 @@ package data
 import (
 	"time"
 
+	"github.com/lib/pq"
+
 	"github.com/jmoiron/sqlx/types"
 )
 
@@ -41,6 +43,11 @@ type DeviceStreamLocation struct {
 	DeviceID  string    `db:"device_id"`
 	Timestamp time.Time `db:"timestamp"`
 	Location  *Location `db:"location"`
+}
+
+type DeviceStreamLocationAndPlace struct {
+	DeviceStreamLocation
+	Places pq.StringArray `db:"places"`
 }
 
 type Firmware struct {

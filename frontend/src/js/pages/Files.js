@@ -236,12 +236,14 @@ class Files extends Component {
 
     renderDevice(device) {
         const time = moment(device.last_file_time).format('MMM Do YYYY, h:mm:ss a');;
+        const places = _(device.locations.entries).map(le => le.places).uniq().value();
 
         return (
             <tr className="device" key={device.device_id}>
                 <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
                 <td>{device.number_of_files}</td>
                 <td>{time}</td>
+                <td>{places}</td>
             </tr>
         );
     }

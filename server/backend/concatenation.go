@@ -87,21 +87,28 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 		m := LocationRegex.FindAllStringSubmatch(record.Log.Message, -1)
 		if len(m) > 0 {
 			coordinates := make([]float64, 3)
+			valid := true
 			for i := 0; i < 3; i += 1 {
 				v, err := strconv.ParseFloat(m[0][i+1], 64)
 				if err != nil {
 					panic(err)
 				}
+
+				if v >= 200 {
+					valid = false
+				}
 				coordinates[i] = v
 			}
 
-			ts := time.Unix(int64(record.Log.Time), 0)
+			if valid {
+				ts := time.Unix(int64(record.Log.Time), 0)
 
-			log.Infow("Location", "match", m, "time", ts)
+				log.Infow("Location", "match", m, "time", ts)
 
-			err := fc.HandleLocation(ctx, file, ts, coordinates)
-			if err != nil {
-				return err
+				err := fc.HandleLocation(ctx, file, ts, coordinates)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
