@@ -43,7 +43,6 @@ type options struct {
 
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 	Sync        bool
-	Locate      bool
 }
 
 func createAwsSession() (s *session.Session, err error) {
@@ -353,7 +352,6 @@ func main() {
 	flag.StringVar(&o.DeviceID, "device-id", "", "device id")
 
 	flag.BoolVar(&o.Sync, "sync", false, "sync")
-	flag.BoolVar(&o.Locate, "locate", false, "locate")
 
 	flag.Parse()
 
@@ -382,15 +380,6 @@ func main() {
 		}
 
 		err = listStreams(ctx, &o, session, db)
-		if err != nil {
-			panic(err)
-		}
-
-		return
-	}
-
-	if o.Locate {
-		err := locateDevices(ctx, &o, fkc, session)
 		if err != nil {
 			panic(err)
 		}
