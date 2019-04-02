@@ -134,10 +134,12 @@ func (c *Client) DecodeClusterGeometrySummaryCollection(resp *http.Response) (Cl
 //
 // Identifier: application/vnd.app.device+json; view=default
 type DeviceSummary struct {
+	DataSize      int                `form:"data_size" json:"data_size" xml:"data_size"`
 	DeviceID      string             `form:"device_id" json:"device_id" xml:"device_id"`
 	LastFileID    string             `form:"last_file_id" json:"last_file_id" xml:"last_file_id"`
 	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
 	Locations     *LocationHistory   `form:"locations" json:"locations" xml:"locations"`
+	LogsSize      int                `form:"logs_size" json:"logs_size" xml:"logs_size"`
 	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
 	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }

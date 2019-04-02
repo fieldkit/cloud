@@ -112,7 +112,7 @@ class ConcatenatedFiles extends Component {
         }
 
         const dataMoment = moment(details.files.data.time);
-        const dataTime = dataMoment.format('MMM Do YYYY, h:mm:ss a');
+        const dataTime = dataMoment.format('MMM Do YYYY h:mm:ss a');
         const dataAgo = dataMoment.fromNow();
 
         return (
@@ -235,14 +235,18 @@ class Files extends Component {
     }
 
     renderDevice(device) {
-        const time = moment(device.last_file_time).format('MMM Do YYYY, h:mm:ss a');;
+        const fileMoment = moment(device.last_file_time);
+        const time = fileMoment.format('MMM Do YYYY h:mm:ss a');;
+        const fileAgo = fileMoment.fromNow();
         const places = _.join(_(device.locations.entries).map(le => le.places).uniq().filter(s => s !== null && s !== "").value(), ", ");
 
         return (
             <tr className="device" key={device.device_id}>
                 <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
                 <td>{device.number_of_files}</td>
-                <td>{time}</td>
+                <td>{device.logs_size}</td>
+                <td>{device.data_size}</td>
+                <td>{fileAgo} ({time})</td>
                 <td>{places}</td>
             </tr>
         );
@@ -274,6 +278,8 @@ class Files extends Component {
                     <tr>
                         <th>ID</th>
                         <th>Files</th>
+                        <th>Logs</th>
+                        <th>Data</th>
                         <th>Last File</th>
                         <th>Places</th>
                     </tr>

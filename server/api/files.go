@@ -118,7 +118,9 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 		`SELECT s.device_id,
 		    (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
 		    MAX(s.time) AS last_stream_time,
-		    COUNT(s.*) AS number_of_files
+		    COUNT(s.*) AS number_of_files,
+		    SUM(s.size) FILTER (WHERE s.file_id != '4') AS logs_size,
+		    SUM(s.size) FILTER (WHERE s.file_id  = '4') AS data_size
 		 FROM fieldkit.device_stream AS s
                  WHERE s.device_id != ''
                  GROUP BY s.device_id
@@ -373,6 +375,8 @@ func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[
 		LastFileID:    s.LastFileID,
 		LastFileTime:  s.LastFileTime,
 		NumberOfFiles: s.NumberOfFiles,
+		LogsSize:      s.LogsSize,
+		DataSize:      s.DataSize,
 		Urls:          DeviceSummaryUrls(ac, s.DeviceID),
 		Locations:     lh,
 	}

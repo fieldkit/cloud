@@ -101,4 +101,6 @@ type DeviceSummary struct {
 	LastFileID    string    `db:"last_stream_id"`
 	LastFileTime  time.Time `db:"last_stream_time"`
 	NumberOfFiles int       `db:"number_of_files"`
+	LogsSize      int       `db:"logs_size"`
+	DataSize      int       `db:"data_size"`
 }

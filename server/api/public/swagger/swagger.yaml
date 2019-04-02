@@ -251,12 +251,6 @@ definitions:
       - - 0.96824837
       id: 5.41219e+18
       sourceId: 1.6901081e+18
-    - geometry:
-      - - 0.96824837
-      - - 0.96824837
-      - - 0.96824837
-      id: 5.41219e+18
-      sourceId: 1.6901081e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -417,16 +411,16 @@ definitions:
           time: 2010-04-01T23:32:50Z
       urls:
         data:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
         details: Sit velit quo eveniet in.
         logs:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
     properties:
@@ -563,20 +557,20 @@ definitions:
     type: array
   DeviceFileTypeUrls:
     example:
-      csv: Dignissimos earum incidunt consequuntur fugit non ut.
-      fkpb: Ducimus perspiciatis quasi error voluptatem et.
-      generate: Ducimus quia explicabo unde.
+      csv: Earum incidunt consequuntur fugit.
+      fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+      generate: Et debitis ducimus quia explicabo unde.
       id: Provident earum sit enim sapiente assumenda.
       info: Dolores dolores et.
     properties:
       csv:
-        example: Dignissimos earum incidunt consequuntur fugit non ut.
+        example: Earum incidunt consequuntur fugit.
         type: string
       fkpb:
-        example: Ducimus perspiciatis quasi error voluptatem et.
+        example: Ut voluptatum ducimus perspiciatis quasi error.
         type: string
       generate:
-        example: Ducimus quia explicabo unde.
+        example: Et debitis ducimus quia explicabo unde.
         type: string
       id:
         example: Provident earum sit enim sapiente assumenda.
@@ -798,7 +792,8 @@ definitions:
   DeviceSummary:
     description: DeviceSummary media type (default view)
     example:
-      device_id: Saepe facilis quis blanditiis recusandae est.
+      data_size: 3.1889683e+18
+      device_id: Facilis quis blanditiis recusandae est.
       last_file_id: Rem vel est qui ratione sequi et.
       last_file_time: 1980-07-23T03:28:45Z
       locations:
@@ -813,24 +808,29 @@ definitions:
           - 0.92904395
           places: Sit labore dolorem vel laboriosam aut.
           time: 1997-06-27T12:34:14Z
-      number_of_files: 2.2726114e+18
+      logs_size: 2.2726114e+18
+      number_of_files: 1.966706e+18
       urls:
         data:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
         details: Sit velit quo eveniet in.
         logs:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
     properties:
+      data_size:
+        example: 3.1889683e+18
+        format: int64
+        type: integer
       device_id:
-        example: Saepe facilis quis blanditiis recusandae est.
+        example: Facilis quis blanditiis recusandae est.
         type: string
       last_file_id:
         example: Rem vel est qui ratione sequi et.
@@ -841,8 +841,12 @@ definitions:
         type: string
       locations:
         $ref: '#/definitions/LocationHistory'
-      number_of_files:
+      logs_size:
         example: 2.2726114e+18
+        format: int64
+        type: integer
+      number_of_files:
+        example: 1.966706e+18
         format: int64
         type: integer
       urls:
@@ -850,6 +854,8 @@ definitions:
     required:
     - device_id
     - number_of_files
+    - logs_size
+    - data_size
     - last_file_time
     - last_file_id
     - urls
@@ -860,7 +866,8 @@ definitions:
     description: DeviceSummaryCollection is the media type for an array of DeviceSummary
       (default view)
     example:
-    - device_id: Saepe facilis quis blanditiis recusandae est.
+    - data_size: 3.1889683e+18
+      device_id: Facilis quis blanditiis recusandae est.
       last_file_id: Rem vel est qui ratione sequi et.
       last_file_time: 1980-07-23T03:28:45Z
       locations:
@@ -875,19 +882,20 @@ definitions:
           - 0.92904395
           places: Sit labore dolorem vel laboriosam aut.
           time: 1997-06-27T12:34:14Z
-      number_of_files: 2.2726114e+18
+      logs_size: 2.2726114e+18
+      number_of_files: 1.966706e+18
       urls:
         data:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
         details: Sit velit quo eveniet in.
         logs:
-          csv: Dignissimos earum incidunt consequuntur fugit non ut.
-          fkpb: Ducimus perspiciatis quasi error voluptatem et.
-          generate: Ducimus quia explicabo unde.
+          csv: Earum incidunt consequuntur fugit.
+          fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+          generate: Et debitis ducimus quia explicabo unde.
           id: Provident earum sit enim sapiente assumenda.
           info: Dolores dolores et.
     items:
@@ -898,16 +906,16 @@ definitions:
   DeviceSummaryUrls:
     example:
       data:
-        csv: Dignissimos earum incidunt consequuntur fugit non ut.
-        fkpb: Ducimus perspiciatis quasi error voluptatem et.
-        generate: Ducimus quia explicabo unde.
+        csv: Earum incidunt consequuntur fugit.
+        fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+        generate: Et debitis ducimus quia explicabo unde.
         id: Provident earum sit enim sapiente assumenda.
         info: Dolores dolores et.
       details: Sit velit quo eveniet in.
       logs:
-        csv: Dignissimos earum incidunt consequuntur fugit non ut.
-        fkpb: Ducimus perspiciatis quasi error voluptatem et.
-        generate: Ducimus quia explicabo unde.
+        csv: Earum incidunt consequuntur fugit.
+        fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+        generate: Et debitis ducimus quia explicabo unde.
         id: Provident earum sit enim sapiente assumenda.
         info: Dolores dolores et.
     properties:
@@ -928,7 +936,8 @@ definitions:
     description: Devices media type (default view)
     example:
       devices:
-      - device_id: Saepe facilis quis blanditiis recusandae est.
+      - data_size: 3.1889683e+18
+        device_id: Facilis quis blanditiis recusandae est.
         last_file_id: Rem vel est qui ratione sequi et.
         last_file_time: 1980-07-23T03:28:45Z
         locations:
@@ -943,19 +952,20 @@ definitions:
             - 0.92904395
             places: Sit labore dolorem vel laboriosam aut.
             time: 1997-06-27T12:34:14Z
-        number_of_files: 2.2726114e+18
+        logs_size: 2.2726114e+18
+        number_of_files: 1.966706e+18
         urls:
           data:
-            csv: Dignissimos earum incidunt consequuntur fugit non ut.
-            fkpb: Ducimus perspiciatis quasi error voluptatem et.
-            generate: Ducimus quia explicabo unde.
+            csv: Earum incidunt consequuntur fugit.
+            fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+            generate: Et debitis ducimus quia explicabo unde.
             id: Provident earum sit enim sapiente assumenda.
             info: Dolores dolores et.
           details: Sit velit quo eveniet in.
           logs:
-            csv: Dignissimos earum incidunt consequuntur fugit non ut.
-            fkpb: Ducimus perspiciatis quasi error voluptatem et.
-            generate: Ducimus quia explicabo unde.
+            csv: Earum incidunt consequuntur fugit.
+            fkpb: Ut voluptatum ducimus perspiciatis quasi error.
+            generate: Et debitis ducimus quia explicabo unde.
             id: Provident earum sit enim sapiente assumenda.
             info: Dolores dolores et.
     properties:
@@ -1180,6 +1190,15 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
+    - geometry:
+        coordinates:
+        - 0.14940116
+        - 0.14940116
+        - 0.14940116
+        type: Fuga architecto nobis omnis.
+      properties:
+        Id exercitationem aliquam.: 1994-08-17T10:41:40Z
+      type: Qui quas voluptates ad consectetur occaecati.
     - geometry:
         coordinates:
         - 0.14940116
