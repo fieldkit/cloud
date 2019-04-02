@@ -104,12 +104,22 @@ func (c *FilesController) ListDeviceLogFiles(ctx *app.ListDeviceLogFilesFilesCon
 
 func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 	locations := []*data.DeviceStreamLocationAndPlace{}
-	if err := c.options.Database.SelectContext(ctx, &locations,
-		`SELECT
-		    s.id, s.device_id, s.timestamp, ST_AsBinary(s.location) AS location,
-		    ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
-		 FROM fieldkit.device_stream_location AS s
-                 ORDER BY s.timestamp DESC`); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &locations, `
+	    SELECT
+	      s.id, s.device_id, s.timestamp, ST_AsBinary(s.location) AS location,
+	      ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
+	    FROM
+	    (
+	      SELECT
+		DISTINCT ON (dsl.location)
+		dsl.*,
+		ROW_NUMBER() OVER (
+		  PARTITION BY device_id
+		  ORDER BY dsl.timestamp DESC
+		) AS c
+	      FROM fieldkit.device_stream_location AS dsl
+	    ) AS s
+	    WHERE s.c < 100`); err != nil {
 		return err
 	}
 

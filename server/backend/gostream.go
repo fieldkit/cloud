@@ -58,7 +58,7 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 		}
 
 		if messageLength > maximumMessageLength {
-			return pbs, position, fmt.Errorf("Refusing to allocate %d bytes (position = %d) (%v)", messageLength, position, err)
+			return pbs, position, fmt.Errorf("Refusing to allocate %d bytes (position = %d)", messageLength, position)
 		}
 
 		messageBuf := make([]byte, messageLength)
