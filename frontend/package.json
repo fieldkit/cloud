@@ -56,5 +56,11 @@
     "lint": "./node_modules/eslint/bin/eslint.js src",
     "pretty": "prettier --single-quote --trailing-comma es5 --jsx-bracket-same-line=true --parser flow --write \"src/**/*.js\"",
     "fix": "yarn pretty && yarn lint -- --fix"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
