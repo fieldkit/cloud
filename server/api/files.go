@@ -275,8 +275,9 @@ func (c *BaseFilesController) concatenatedDeviceFile(ctx context.Context, respon
 	deviceStreamID := uuid.NewSHA1(space, []byte(deviceID))
 
 	c.cw.channel <- ConcatenationJob{
-		DeviceID:    deviceID,
-		FileTypeIDs: fileTypeIDs,
+		ctx:         ctx,
+		deviceID:    deviceID,
+		fileTypeIDs: fileTypeIDs,
 	}
 
 	return c.options.Config.MakeApiUrl("/files/%s", deviceStreamID), nil
@@ -459,8 +460,9 @@ func ConcatenatedFileInfo(urls *app.DeviceFileTypeUrls, fi *backend.FileInfo) *a
 }
 
 type ConcatenationJob struct {
-	DeviceID    string
-	FileTypeIDs []string
+	ctx         context.Context
+	deviceID    string
+	fileTypeIDs []string
 }
 
 type ConcatenationWorkers struct {
@@ -487,22 +489,24 @@ func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 	log.Infow("Worker starting")
 
 	for job := range cw.channel {
-		log.Infow("Worker", "job", job)
+		jobLog := Logger(job.ctx).Sugar()
 
-		fileTypeID := job.FileTypeIDs[0]
+		jobLog.Infow("Worker", "job", job)
+
+		fileTypeID := job.fileTypeIDs[0]
 		space := ConcatenatedFileSpaces[fileTypeID]
-		deviceStreamID := uuid.NewSHA1(space, []byte(job.DeviceID))
+		deviceStreamID := uuid.NewSHA1(space, []byte(job.deviceID))
 
 		fc := &backend.FileConcatenator{
 			Session:    cw.options.Session,
 			Database:   cw.options.Database,
 			FileID:     deviceStreamID.String(),
 			FileTypeID: fileTypeID,
-			DeviceID:   job.DeviceID,
-			TypeIDs:    job.FileTypeIDs,
+			DeviceID:   job.deviceID,
+			TypeIDs:    job.fileTypeIDs,
 		}
 
-		fc.Concatenate(ctx)
+		fc.Concatenate(job.ctx)
 	}
 
 	log.Infow("Worker exiting")
