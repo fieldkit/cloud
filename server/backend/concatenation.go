@@ -184,6 +184,8 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 				return "", newErr
 			}
 		}
+
+		obj.Body.Close()
 	}
 
 	return temporaryFile.Name(), nil
