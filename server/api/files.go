@@ -189,7 +189,7 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 			panic(err)
 		}
 
-		log.Infow("File", "info", fi)
+		log.Infow("File", "file_key", fi.Key, "file_url", fi.URL, "size", fi.Size)
 
 		return ctx.OK(&app.DeviceFile{
 			DeviceID:     fi.DeviceID,

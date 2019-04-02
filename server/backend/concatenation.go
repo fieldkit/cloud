@@ -103,8 +103,6 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 			if valid {
 				ts := time.Unix(int64(record.Log.Time), 0)
 
-				log.Infow("Location", "match", m, "time", ts)
-
 				err := fc.HandleLocation(ctx, file, ts, coordinates)
 				if err != nil {
 					return err
@@ -112,6 +110,8 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 			}
 		}
 	}
+
+	_ = log
 
 	return nil
 }
