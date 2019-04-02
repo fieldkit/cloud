@@ -16,6 +16,9 @@ import { FkPromisedApi } from '../api/calls';
 
 import { Loading } from '../components/Loading';
 
+import { generatePointDecorator } from '../common/utilities';
+import MapContainer from '../components/MapContainer';
+
 import '../../css/files.css';
 import '../../css/bootstrap.min.css';
 
@@ -23,32 +26,6 @@ class ConcatenatedFiles extends Component {
     state = {
         details: null
     }
-
-    /*
-    constructor() {
-        super();
-        this.timerToken = null;
-        this.timer = this.timer.bind(this);
-    }
-
-    componentWillUnmount() {
-        if (this.timerToken) {
-            clearInterval(this.timerToken);
-        }
-    }
-
-    timer() {
-        const { deviceId } = this.props;
-
-        FkPromisedApi.queryDeviceFilesDetails(deviceId).then(newDetails => {
-            const { details: oldDetails } = this.state;
-
-            console.log(newDetails, oldDetails);
-
-            this.timerToken = setTimeout(this.timer, 1000);
-        });
-    }
-    */
 
     componentWillMount() {
         const { deviceId } = this.props;
@@ -62,12 +39,6 @@ class ConcatenatedFiles extends Component {
 
     generate(url) {
         fetch(url, {}).then((res) => {
-            /*
-            if (this.timerToken) {
-                clearInterval(this.timerToken);
-            }
-            this.timerToken = setTimeout(this.timer, 1000);
-            */
         });
     }
 
@@ -80,84 +51,48 @@ class ConcatenatedFiles extends Component {
 
         return (
             <div>
-                <h4>Concatenated Files</h4>
-
-                <div className="">
-                    <div className="row">
-                        <div className="col-sm-6">
-                            <table className="table">
-                                <tbody>
-                                  {this.renderData()}
-                                  {this.renderLogs()}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="col-sm-6">
-                        </div>
-                    </div>
-                </div>
+              <div className="">
+                <table className="table table-sm">
+                  <tbody>
+                    {this.renderFileType('Data', 'data')}
+                    {this.renderFileType('Logs', 'logs')}
+                  </tbody>
+                </table>
+              </div>
             </div>
         );
     }
 
-    renderData() {
+    renderFileType(name, key) {
         const { details } = this.state;
         const { device } = this.props;
 
-        if (!_.isObject(details.files.data)) {
+        const files = details.files[key];
+        const urls = device.urls[key];
+
+        if (!_.isObject(files)) {
             return (
                 <tr>
-                  <th>Data</th>
-                  <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.data.generate)}>Generate</button></td>
+                  <th>{name}</th>
+                  <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
                   <td colSpan="5">None</td>
                 </tr>
             );
         }
 
-        const dataMoment = moment(details.files.data.time);
-        const dataTime = dataMoment.format('MMM Do YYYY h:mm:ss a');
-        const dataAgo = dataMoment.fromNow();
+        const typeMoment = moment(files.time);
+        const typeTime = typeMoment.format('MMM Do YYYY, h:mm:ss a');
+        const typeAgo = typeMoment.fromNow();
 
         return (
             <tr>
-              <th>Data</th>
-              <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.data.generate)}>Generate</button></td>
-              <td>{dataTime}</td>
-              <td>{dataAgo}</td>
-              <td>{prettyBytes(details.files.data.size)} bytes</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.data.csv + "?dl=0"}>CSV</a> (<a href={device.urls.data.csv}>Download</a>)</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.data.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.data.fkpb}>Download</a>)</td>
-            </tr>
-        );
-    }
-
-    renderLogs() {
-        const { details } = this.state;
-        const { device } = this.props;
-
-        if (!_.isObject(details.files.logs)) {
-            return (
-                <tr>
-                  <th>Logs</th>
-                  <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.logs.generate)}>Generate</button></td>
-                  <td colSpan="5">None</td>
-                </tr>
-            );
-        }
-
-        const logsMoment = moment(details.files.logs.time);
-        const logsTime = logsMoment.format('MMM Do YYYY, h:mm:ss a');
-        const logsAgo = logsMoment.fromNow();
-
-        return (
-            <tr>
-              <th>Logs</th>
-              <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.logs.generate)}>Generate</button></td>
-              <td>{logsTime}</td>
-              <td>{logsAgo}</td>
-              <td>{prettyBytes(details.files.logs.size)} bytes</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.logs.csv + "?dl=0"}>CSV</a> (<a href={device.urls.logs.csv}>Download</a>)</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.logs.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.logs.fkpb}>Download</a>)</td>
+              <th>{name}</th>
+              <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
+              <td>{typeTime}</td>
+              <td>{typeAgo}</td>
+              <td>{prettyBytes(files.size)} bytes</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={urls.csv + "?dl=0"}>CSV</a> (<a href={urls.csv}>Download</a>)</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={urls.fkpb + "?dl=0"}>FKPB</a> (<a href={urls.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -193,32 +128,33 @@ class Files extends Component {
         }
 
         return (
-            <div className="files page container-fluid">
-                <div className="header">
-                    <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
-                </div>
-                <div className="main-container">
-                  <ConcatenatedFiles device={device} deviceId={deviceId} />
+            <div className="">
+              <h4>
+                <Link to={'/files'}>Back to Devices</Link>
+              </h4>
 
-                  <h4> Individual Uploads </h4>
+              <h5>Concatenated Files</h5>
 
-                  <div className="">
-                    <table className="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>Type</th>
-                                <th>Size</th>
-                                <th>Uploaded</th>
-                                <th>Links</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {deviceFiles.all.map(file => this.renderFile(file))}
-                        </tbody>
-                    </table>
-                  </div>
-                </div>
+              <ConcatenatedFiles device={device} deviceId={deviceId} />
+
+              <h5>Individual Uploads</h5>
+
+              <div className="">
+                <table className="table table-striped table-sm">
+                  <thead>
+                    <tr>
+                      <th>File</th>
+                      <th>Type</th>
+                      <th>Size</th>
+                      <th>Uploaded</th>
+                      <th>Links</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deviceFiles.all.map(file => this.renderFile(file))}
+                  </tbody>
+                </table>
+              </div>
             </div>
         );
     }
@@ -243,7 +179,7 @@ class Files extends Component {
 
     renderDevice(device) {
         const fileMoment = moment(device.last_file_time);
-        const time = fileMoment.format('MMM Do YYYY h:mm:ss a');;
+        const time = fileMoment.format('MMM Do YYYY HH:mm');;
         const fileAgo = fileMoment.fromNow();
         const places = _.join(_(device.locations.entries).map(le => le.places).uniq().filter(s => s !== null && s !== "").value(), ", ");
 
@@ -259,7 +195,7 @@ class Files extends Component {
         );
     }
 
-    render() {
+    renderMain() {
         const { files, deviceId } = this.props;
 
         if (deviceId) {
@@ -273,34 +209,64 @@ class Files extends Component {
             return this.renderFiles(device, deviceFiles, deviceId);
         }
 
+        return (
+            <table className="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Files</th>
+                  <th>Logs</th>
+                  <th>Data</th>
+                  <th>Last File</th>
+                  <th>Places</th>
+                </tr>
+              </thead>
+              <tbody>
+                {files.devices.map(device => this.renderDevice(device))}
+              </tbody>
+            </table>
+        );
+    }
+
+    render() {
+        const { files } = this.props;
+
         if (files.devices.length === 0) {
             return <Loading />;
         }
 
+        const narrowed = {
+            geojson: { type: '', features: [] },
+            sources: [],
+            focus: {
+                center: [-118.26928432026534, 34.03118429949713],
+                feature: null,
+                time: 0,
+            }
+        };
+
+        const pointDecorator = generatePointDecorator('constant', 'constant');
+
         return (
-            <div className="files page container-fluid">
-                <div className="header">
-                    <div className="project-name"><Link to='/'>FieldKit Project</Link> / <Link to='/files'>Files</Link></div>
-                </div>
-                <div className="main-container">
+            <div className="files page">
+              <div className="">
+                <div className="">
+                  <div className="map-container">
+                    <div className="map">
+                      <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100vh" }}
+                                    pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
+                                    playbackMode={ () => false } focusFeature={ () => false }
+                                    focusSource={ () => false } onUserActivity={ () => false }
+                                    loadMapFeatures={ () => false }
+                                    onChangePlaybackMode={ () => false } />
+                    </div>
+                  </div>
 
-                <table className="table table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Files</th>
-                        <th>Logs</th>
-                        <th>Data</th>
-                        <th>Last File</th>
-                        <th>Places</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {files.devices.map(device => this.renderDevice(device))}
-                </tbody>
-                </table>
-
+                  <div className="main-container">
+                    {this.renderMain()}
+                  </div>
                 </div>
+              </div>
             </div>
         );
     }

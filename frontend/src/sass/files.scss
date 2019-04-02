@@ -1,0 +1,35 @@
+@import 'App.scss';
+@import '../images/fa/scss/font-awesome.scss';
+
+$breakpoint-small: "only screen and (min-width: 20em)";
+$breakpoint-medium: "only screen and (min-width: 30em)";
+
+#files.page, html, body {
+    height: 98%;
+}
+
+.files.page {
+    .map-container {
+        width: 50%;
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+
+        .disclaimer-panel {
+            display: none;
+        }
+    }
+
+    .main-container {
+        width: 50%;
+        height: 100%;
+        margin-left: 50%;
+        overflow: auto;
+        padding: 5px;
+    }
+
+    h3, h4, h5 {
+        color: black;
+    }
+}
