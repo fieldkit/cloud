@@ -174,7 +174,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 			return nil, nil
 		})
 
-		_, _, err = ReadLengthPrefixedCollection(ctx, obj.Body, unmarshalFunc)
+		_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
 		if err != nil {
 			newErr := fmt.Errorf("Error reading collection: %v", err)
 			log.Errorw("Error", "error", newErr)

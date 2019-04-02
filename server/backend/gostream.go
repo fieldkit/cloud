@@ -15,15 +15,17 @@ type MessageCollection []proto.Message
 
 type UnmarshalFunc func([]byte) (proto.Message, error)
 
+const (
+	MaximumDataRecordLength = 1024 * 10
+)
+
 // ReadLengthPrefixedCollection reads a collection of protocol buffer messages from the supplied reader.
 // Each message is presumed prefixed by a 32 bit varint which represents the size of the ensuing message.
 // The UnmarshalFunc argument is a supplied callback used to convert the raw bytes read as a message to the desired message type.
 // The protocol buffer message collection is returned, along with any error arising.
 // For more detailed information on this approach, see the official protocol buffer documentation https://developers.google.com/protocol-buffers/docs/techniques#streaming.
-func ReadLengthPrefixedCollection(ctx context.Context, r io.Reader, f UnmarshalFunc) (pbs MessageCollection, totalBytesRead int, err error) {
+func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint64, r io.Reader, f UnmarshalFunc) (pbs MessageCollection, totalBytesRead int, err error) {
 	position := 0
-
-	log := Logger(ctx).Sugar()
 
 	for {
 		var prefixBuf [binary.MaxVarintLen32]byte
@@ -55,8 +57,8 @@ func ReadLengthPrefixedCollection(ctx context.Context, r io.Reader, f UnmarshalF
 			messageLength, varIntBytes = proto.DecodeVarint(prefixBuf[:bytesRead])
 		}
 
-		if messageLength > 1024 {
-			log.Infow("Alloc", "size", messageLength)
+		if messageLength > maximumMessageLength {
+			return pbs, position, fmt.Errorf("Refusing to allocate %d bytes (position = %d) (%v)", messageLength, position, err)
 		}
 
 		messageBuf := make([]byte, messageLength)
