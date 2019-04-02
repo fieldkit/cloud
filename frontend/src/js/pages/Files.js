@@ -125,8 +125,8 @@ class ConcatenatedFiles extends Component {
               <td>{dataTime}</td>
               <td>{dataAgo}</td>
               <td>{prettyBytes(details.files.data.size)} bytes</td>
-              <td><a target="_blank" href={device.urls.data.csv + "?dl=0"}>CSV</a> (<a href={device.urls.data.csv}>Download</a>)</td>
-              <td><a target="_blank" href={device.urls.data.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.data.fkpb}>Download</a>)</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.data.csv + "?dl=0"}>CSV</a> (<a href={device.urls.data.csv}>Download</a>)</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.data.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.data.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -156,8 +156,8 @@ class ConcatenatedFiles extends Component {
               <td>{logsTime}</td>
               <td>{logsAgo}</td>
               <td>{prettyBytes(details.files.logs.size)} bytes</td>
-              <td><a target="_blank" href={device.urls.logs.csv + "?dl=0"}>CSV</a> (<a href={device.urls.logs.csv}>Download</a>)</td>
-              <td><a target="_blank" href={device.urls.logs.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.logs.fkpb}>Download</a>)</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.logs.csv + "?dl=0"}>CSV</a> (<a href={device.urls.logs.csv}>Download</a>)</td>
+              <td><a target="_blank" rel="noopener noreferrer" href={device.urls.logs.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.logs.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -233,8 +233,8 @@ class Files extends Component {
                 <td>{prettyBytes(file.size)}</td>
                 <td>{time}</td>
                 <td>
-                    <a target="_blank" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) <span> | </span>
-                    <a target="_blank" href={file.urls.json + "?dl=0"}>JSON</a> (<a href={file.urls.json}>Download</a>) <span> | </span>
+                    <a target="_blank" rel="noopener noreferrer" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) <span> | </span>
+                    <a target="_blank" rel="noopener noreferrer" href={file.urls.json + "?dl=0"}>JSON</a> (<a href={file.urls.json}>Download</a>) <span> | </span>
                     <a href={file.urls.raw}>Raw</a>
                 </td>
             </tr>

@@ -90,7 +90,7 @@ class SourcePanel extends Component {
 
         return (
             <div>
-                <a href={featuresUrl} target="_blank">GeoJSON</a> | <a href={csvUrl} target="_blank">CSV</a>
+                <a href={featuresUrl} target="_blank" rel="noopener noreferrer">GeoJSON</a> | <a href={csvUrl} target="_blank" rel="noopener noreferrer">CSV</a>
             </div>
         );
     }
