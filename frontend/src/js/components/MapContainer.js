@@ -242,15 +242,15 @@ export default class MapContainer extends Component {
 
                     <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } onClick={ this.onMarkerClick.bind(this) } />
 
-                    { controls && <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />}
+                    {controls && <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />}
 
-                    { controls && false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
+                    {controls && false && <ZoomControl className="zoom-control" position={ 'topLeft' } />}
 
-                    { controls && <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />}
+                    {controls && <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />}
 
-                    { controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log(arguments) } />}
+                    {controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log(arguments) } />}
 
-                    {this.renderRadialMenu()}
+                    {controls && this.renderRadialMenu()}
                 </Map>
                 <div className="disclaimer-panel">
                     <div className="fieldkit-logo">
