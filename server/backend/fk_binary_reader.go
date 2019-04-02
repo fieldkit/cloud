@@ -181,12 +181,17 @@ func (br *FkBinaryReader) getLocationArray() []float64 {
 func (br *FkBinaryReader) getFormattedMessage() (fm *ingestion.FormattedMessage, err error) {
 	values := make(map[string]interface{})
 	for key, value := range br.Readings {
+		name := fmt.Sprintf("sensor_%d", key)
+		if sensor, ok := br.Sensors[key]; ok {
+			name = sensor.Name
+		}
+
 		if math.IsNaN(float64(value)) {
-			values[br.Sensors[key].Name] = "NaN"
+			values[name] = "NaN"
 		} else if math.IsInf(float64(value), 0) {
-			values[br.Sensors[key].Name] = "NaN"
+			values[name] = "NaN"
 		} else {
-			values[br.Sensors[key].Name] = value
+			values[name] = value
 		}
 	}
 
