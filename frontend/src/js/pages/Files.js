@@ -3,6 +3,7 @@ import 'whatwg-fetch';
 
 import _ from 'lodash';
 import moment from 'moment';
+import prettyBytes from 'pretty-bytes';
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -121,7 +122,7 @@ class ConcatenatedFiles extends Component {
               <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.data.generate)}>Generate</button></td>
               <td>{dataTime}</td>
               <td>{dataAgo}</td>
-              <td>{details.files.data.size} bytes</td>
+              <td>{prettyBytes(details.files.data.size)} bytes</td>
               <td><a target="_blank" href={device.urls.data.csv + "?dl=0"}>CSV</a> (<a href={device.urls.data.csv}>Download</a>)</td>
               <td><a target="_blank" href={device.urls.data.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.data.fkpb}>Download</a>)</td>
             </tr>
@@ -152,7 +153,7 @@ class ConcatenatedFiles extends Component {
               <td><button className="btn btn-sm btn-success" onClick={() => this.generate(device.urls.logs.generate)}>Generate</button></td>
               <td>{logsTime}</td>
               <td>{logsAgo}</td>
-              <td>{details.files.logs.size} bytes</td>
+              <td>{prettyBytes(details.files.logs.size)} bytes</td>
               <td><a target="_blank" href={device.urls.logs.csv + "?dl=0"}>CSV</a> (<a href={device.urls.logs.csv}>Download</a>)</td>
               <td><a target="_blank" href={device.urls.logs.fkpb + "?dl=0"}>FKPB</a> (<a href={device.urls.logs.fkpb}>Download</a>)</td>
             </tr>
@@ -223,7 +224,7 @@ class Files extends Component {
             <tr key={file.file_id}>
                 <td>{file.file_id}</td>
                 <td>{file.file_type_name}</td>
-                <td>{file.size}</td>
+                <td>{prettyBytes(file.size)}</td>
                 <td>{time}</td>
                 <td>
                     <a target="_blank" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) <span> | </span>
@@ -244,8 +245,8 @@ class Files extends Component {
             <tr className="device" key={device.device_id}>
                 <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
                 <td>{device.number_of_files}</td>
-                <td>{device.logs_size}</td>
-                <td>{device.data_size}</td>
+                <td>{prettyBytes(device.logs_size)}</td>
+                <td>{prettyBytes(device.data_size)}</td>
                 <td>{fileAgo} ({time})</td>
                 <td>{places}</td>
             </tr>
