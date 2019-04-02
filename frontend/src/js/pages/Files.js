@@ -275,6 +275,7 @@ class Files extends Component {
                         <th>ID</th>
                         <th>Files</th>
                         <th>Last File</th>
+                        <th>Places</th>
                     </tr>
                 </thead>
                 <tbody>

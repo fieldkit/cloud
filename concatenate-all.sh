@@ -6,13 +6,13 @@ DEVICES_JSON=/tmp/devices.json
 
 curl -s $ROOT/files/devices > $DEVICES_JSON
 
-for url in `cat $DEVICES_JSON | jq -r ".devices[].urls.data.generate" | head -n 20`; do
+for url in `cat $DEVICES_JSON | jq -r ".devices[].urls.data.generate" | head -n 2000`; do
     echo $url
     curl -v $url
 done
 
 
-for url in `cat $DEVICES_JSON | jq -r ".devices[].urls.logs.generate" | head -n 20`; do
+for url in `cat $DEVICES_JSON | jq -r ".devices[].urls.logs.generate" | head -n 2000`; do
     echo $url
     curl -v $url
 done
