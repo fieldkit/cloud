@@ -19,8 +19,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/robinpowered/go-proto/message"
-	"github.com/robinpowered/go-proto/stream"
 
 	pb "github.com/fieldkit/data-protocol"
 
@@ -155,7 +153,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 			return "", fmt.Errorf("Error reading object %v: %v", object.Key, err)
 		}
 
-		unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
+		unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
 			var record pb.DataRecord
 
 			err := proto.Unmarshal(b, &record)
@@ -176,7 +174,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 			return nil, nil
 		})
 
-		_, err = stream.ReadLengthPrefixedCollection(obj.Body, unmarshalFunc)
+		_, _, err = ReadLengthPrefixedCollection(ctx, obj.Body, unmarshalFunc)
 		if err != nil {
 			newErr := fmt.Errorf("Error reading collection: %v", err)
 			log.Errorw("Error", "error", newErr)

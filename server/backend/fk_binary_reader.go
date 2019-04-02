@@ -84,7 +84,7 @@ func (br *FkBinaryReader) Read(ctx context.Context, body io.Reader) error {
 		return &record, nil
 	})
 
-	_, bytesRead, err := ReadLengthPrefixedCollection(body, unmarshalFunc)
+	_, bytesRead, err := ReadLengthPrefixedCollection(ctx, body, unmarshalFunc)
 	if err != nil {
 		return err
 	}
