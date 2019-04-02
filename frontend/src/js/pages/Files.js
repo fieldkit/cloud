@@ -236,7 +236,7 @@ class Files extends Component {
 
     renderDevice(device) {
         const time = moment(device.last_file_time).format('MMM Do YYYY, h:mm:ss a');;
-        const places = _.join(_(device.locations.entries).map(le => le.places).uniq().value(), ", ");
+        const places = _.join(_(device.locations.entries).map(le => le.places).uniq().filter(s => s !== null && s !== "").value(), ", ");
 
         return (
             <tr className="device" key={device.device_id}>
