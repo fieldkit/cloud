@@ -1,4 +1,4 @@
-FROM golang:1.10.1
+FROM golang:1.12.1
 ENV CGO_ENABLED=0
 COPY . $GOPATH/src/github.com/fieldkit/cloud/server
 WORKDIR $GOPATH/src/github.com/fieldkit/cloud/server

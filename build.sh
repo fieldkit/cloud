@@ -2,6 +2,14 @@
 
 USER_ID=`id -u $USER`
 
+banner() {
+    echo "+------------------------------------------+"
+    printf "| %-40s |\n" "`date`"
+    echo "|                                          |"
+    printf "|`tput bold` %-40s `tput sgr0`|\n" "$@"
+    echo "+------------------------------------------+"
+}
+
 function show_help {
     echo "build.sh [-h] [-p]"
     echo " -h this text"
@@ -27,39 +35,53 @@ shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
 
-set -ex
+set -e
 cd `dirname $0`
 
 rm -rf build
 
-docker build -t fieldkit-server-build server
-docker build -t fieldkit-admin-build admin
-docker build -t fieldkit-frontend-build frontend
-docker build -t fieldkit-landing-build landing
+banner "NODE-BASE"
+docker build -t fk-server-node-base node-base
+
+banner "SERVER"
+docker build -t fk-server-build server
+
+banner "ADMIN"
+docker build -t fk-admin-build admin
+
+banner "FRONTEND"
+docker build -t fk-frontend-build frontend
+
+banner "LANDING"
+docker build -t fk-landing-build landing
+
+banner "BUILDING"
 
 mkdir build
 
 mkdir build/tmp
 
 mkdir build/api
-docker rm -f fieldkit-server-build > /dev/null 2>&1 || true
-docker run --rm --name fieldkit-server-build -v `pwd`/build:/build fieldkit-server-build \
+docker rm -f fk-server-build > /dev/null 2>&1 || true
+docker run --rm --name fk-server-build -v `pwd`/build:/build fk-server-build \
        sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
 
 mkdir build/admin
-docker rm -f fieldkit-admin-build > /dev/null 2>&1 || true
-docker run --rm --name fieldkit-admin-build -v `pwd`/build/admin:/build fieldkit-admin-build \
+docker rm -f fk-admin-build > /dev/null 2>&1 || true
+docker run --rm --name fk-admin-build -v `pwd`/build/admin:/build fk-admin-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/frontend
-docker rm -f fieldkit-frontend-build > /dev/null 2>&1 || true
-docker run --rm --name fieldkit-frontend-build -v `pwd`/build/frontend:/build fieldkit-frontend-build \
+docker rm -f fk-frontend-build > /dev/null 2>&1 || true
+docker run --rm --name fk-frontend-build -v `pwd`/build/frontend:/build fk-frontend-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/landing
-docker rm -f fieldkit-landing-build > /dev/null 2>&1 || true
-docker run --rm --name fieldkit-landing-build -v `pwd`/build/landing:/build fieldkit-landing-build \
+docker rm -f fk-landing-build > /dev/null 2>&1 || true
+docker run --rm --name fk-landing-build -v `pwd`/build/landing:/build fk-landing-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+
+banner "Final Container"
 
 for e in css csv html js json map svg txt; do
     find build -iname '*.$e' -exec gzip -k9 {} \;
@@ -91,5 +113,6 @@ fi
 docker build -t conservify/fk-cloud:$DOCKER_TAG build
 
 if [ "$push" == "1" ]; then
+    banner "Pushing!"
     docker push conservify/fk-cloud:$DOCKER_TAG
 fi
