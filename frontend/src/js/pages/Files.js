@@ -14,6 +14,8 @@ import { loadDevices, loadDeviceFiles } from '../actions';
 
 import { FkPromisedApi } from '../api/calls';
 
+import { Loading } from '../components/Loading';
+
 import '../../css/files.css';
 import '../../css/bootstrap.min.css';
 
@@ -73,7 +75,7 @@ class ConcatenatedFiles extends Component {
         const { details } = this.state;
 
         if (!_.isObject(details)) {
-            return (<div>Loading</div>);
+            return <Loading />;
         }
 
         return (
@@ -186,6 +188,10 @@ class Files extends Component {
     }
 
     renderFiles(device, deviceFiles, deviceId) {
+        if (deviceFiles.all.length === 0) {
+            return <Loading />;
+        }
+
         return (
             <div className="files page container-fluid">
                 <div className="header">
@@ -261,10 +267,14 @@ class Files extends Component {
             const device = _(files.devices).filter(d => d.device_id === deviceId).first();
 
             if (!_.isObject(device) || !_.isObject(deviceFiles)) {
-                return (<div></div>);
+                return <Loading />;
             }
 
             return this.renderFiles(device, deviceFiles, deviceId);
+        }
+
+        if (files.devices.length === 0) {
+            return <Loading />;
         }
 
         return (
