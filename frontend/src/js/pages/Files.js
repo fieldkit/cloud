@@ -178,7 +178,6 @@ class Files extends Component {
                 <td>{time}</td>
                 <td>
                     <a target="_blank" rel="noopener noreferrer" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) <span> | </span>
-                    <a target="_blank" rel="noopener noreferrer" href={file.urls.json + "?dl=0"}>JSON</a> (<a href={file.urls.json}>Download</a>) <span> | </span>
                     <a href={file.urls.raw}>Raw</a>
                 </td>
             </tr>
