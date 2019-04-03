@@ -6,13 +6,6 @@ import { Layer, Feature } from 'react-mapbox-gl';
 
 import type { GeoJSON } from '../../types';
 
-function onToggleHover(cursor) {
-    const body = document.body;
-    if (body) {
-        body.style.cursor = cursor;
-    }
-}
-
 export default class BubbleMap extends Component {
     props: {
         pointDecorator: PointDecorator,
@@ -46,6 +39,7 @@ export default class BubbleMap extends Component {
         const { pointDecorator, data } = this.props;
         const { color } = pointDecorator.points;
         let circleColor = {};
+
         if (color.type === 'constant') {
             circleColor = color.colors[0].color;
         } else {
@@ -95,21 +89,37 @@ export default class BubbleMap extends Component {
         return circleRadius;
     }
 
+    onToggleHover(cursor: string, { map }: { map: any }) {
+        map.getCanvas().style.cursor = cursor;
+    }
+
     render() {
         const { data, onClick } = this.props;
-        const { circleColor, circleRadius } = this.state;
+        // const { circleColor, circleRadius } = this.state;
 
         if (!data || data.features.length === 0) {
             return <div></div>;
         }
+
+        const circleColor ={
+            type: 'identity',
+            property: 'color'
+        };
+
+        const circleRadius = {
+            type: 'identity',
+            property: "size"
+        };
+
 
         return (
             <div>
                 <Layer type="circle" id="circle-markers" paint={ { 'circle-color': circleColor, 'circle-radius': circleRadius } }>
                 { data.features.map((f, i) => (
                     <Feature key={i} onClick={ onClick.bind(this, f) }
-                            onMouseEnter={ onToggleHover.bind(this, 'pointer') }
-                            onMouseLeave={ onToggleHover.bind(this, '') }
+                            onMouseEnter={ this.onToggleHover.bind(this, 'pointer') }
+                            onMouseLeave={ this.onToggleHover.bind(this, '') }
+                            properties={ f.properties }
                             coordinates={ f.geometry.coordinates } />
                       )) }
                 </Layer>

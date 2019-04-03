@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 
 import * as ActionTypes from '../actions/types';
 
+import { DataColors } from '../common/colors';
 import { FkGeoJSON } from '../common/geojson';
 
 function activeExpedition(state = { project: null, expedition: null }, action) {
@@ -225,7 +226,13 @@ function sources(state = initialSourcesState, action) {
 function files(state = { devices: [], filesByDevice: { } }, action) {
     switch (action.type) {
     case ActionTypes.API_LOAD_DEVICES.SUCCESS: {
-        return { ...state, ...action.response };
+        const colors = new DataColors();
+        const files = action.response;
+        for (let i = 0; i < files.devices.length; ++i) {
+            files.devices[i].color = colors.get();
+        }
+        console.log(files);
+        return { ...state, ...files };
     }
     case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.START: {
         if (action.criteria.page === 0) {

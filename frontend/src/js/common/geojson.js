@@ -103,8 +103,8 @@ export class FkGeoJSON {
         const beforeTime = pair[0].time().getTime();
         const afterTime = pair[1].time().getTime();
 
-        const latitude = map(time.getTime(), beforeTime, afterTime, beforeCoordinates[1], afterCoordinates[1])
-        const longitude = map(time.getTime(), beforeTime, afterTime, beforeCoordinates[0], afterCoordinates[0])
+        const latitude = map(time.getTime(), beforeTime, afterTime, beforeCoordinates[1], afterCoordinates[1]);
+        const longitude = map(time.getTime(), beforeTime, afterTime, beforeCoordinates[0], afterCoordinates[0]);
 
         return [ longitude, latitude ];
     }

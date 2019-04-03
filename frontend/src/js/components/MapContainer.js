@@ -30,6 +30,7 @@ type Props = {
     onChangePlaybackMode: () => mixed,
     onUserActivity: () => mixed,
     loadMapFeatures: () => mixed,
+    clickFeature: () => mixed,
     pointDecorator: PointDecorator,
     controls: ?bool,
     visibleFeatures: {
@@ -90,8 +91,11 @@ export default class MapContainer extends Component {
         }
     }
 
-    onMarkerClick(thing) {
-        console.log(thing);
+    onMarkerClick(feature) {
+        const { clickFeature } = this.props;
+        if (clickFeature) {
+            clickFeature(feature);
+        }
     }
 
     onFocusSource(source) {
@@ -128,7 +132,7 @@ export default class MapContainer extends Component {
         const selected = _.uniqBy(features, f => f.properties.name);
         const coordinates = ev.lngLat;
 
-        console.log(features);
+        // console.log("MapContainer::onClick", features);
 
         if (selected.length === 0) {
             this.setState({
@@ -160,7 +164,7 @@ export default class MapContainer extends Component {
         if (selected.length === 1) {
             return {
                 text: selected[0].properties.name,
-            }
+            };
         }
         return null;
     }
@@ -248,7 +252,7 @@ export default class MapContainer extends Component {
 
                     {controls && <PlaybackControl className="playback-control" playback={ playbackMode } onPlaybackChange={ onChangePlaybackMode.bind(this) } />}
 
-                    {controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log(arguments) } />}
+                    {controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log("SHOW", arguments) } />}
 
                     {controls && this.renderRadialMenu()}
                 </Map>

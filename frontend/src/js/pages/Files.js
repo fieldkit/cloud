@@ -185,7 +185,10 @@ class Files extends Component {
 
         return (
             <tr className="device" key={device.device_id}>
-                <td><Link to={'/files/' + device.device_id}>{device.device_id}</Link></td>
+              <td>
+                    <div style={{ marginRight: 10, float: 'left', width: 20, height: 20, borderRadius: 5, backgroundColor: device.color }}> </div>
+                    <Link to={'/files/' + device.device_id}>{device.device_id}</Link>
+                </td>
                 <td>{device.number_of_files}</td>
                 <td>{prettyBytes(device.logs_size)}</td>
                 <td>{prettyBytes(device.data_size)}</td>
@@ -235,8 +238,25 @@ class Files extends Component {
             return <Loading />;
         }
 
+        const features = _(files.devices)
+              .map((d) => d.locations.entries.map(l => {
+                  return {
+                      type: 'Feature',
+                      geometry: {
+                          type: "Point",
+                          coordinates: l.coordinates
+                      },
+                      properties: {
+                          size: 10,
+                          color: d.color
+                      }
+                  };
+              }))
+              .flatten()
+              .value();
+
         const narrowed = {
-            geojson: { type: '', features: [] },
+            geojson: { type: '', features: features },
             sources: [],
             focus: {
                 center: [-118.26928432026534, 34.03118429949713],
@@ -249,24 +269,21 @@ class Files extends Component {
 
         return (
             <div className="files page">
-              <div className="">
-                <div className="">
-                  <div className="map-container">
-                    <div className="map">
-                      <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100vh" }}
-                                    pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
-                                    playbackMode={ () => false } focusFeature={ () => false }
-                                    focusSource={ () => false } onUserActivity={ () => false }
-                                    loadMapFeatures={ () => false }
-                                    onChangePlaybackMode={ () => false } />
-                    </div>
-                  </div>
-
-                  <div className="main-container">
-                    {this.renderMain()}
-                  </div>
+                <div className="map-container">
+                <div className="map">
+                    <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100vh" }}
+                                pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
+                                playbackMode={ () => false } focusFeature={ (feature) => console.log("FOCUS", feature) }
+                                focusSource={ (source) => console.log("SOURCE", source) } onUserActivity={ () => false }
+                                clickFeature={ (feature) => console.log("FEATURE", feature) }
+                                loadMapFeatures={ () => false }
+                                onChangePlaybackMode={ () => false } />
                 </div>
-              </div>
+                </div>
+
+                <div className="main-container">
+                {this.renderMain()}
+                </div>
             </div>
         );
     }
