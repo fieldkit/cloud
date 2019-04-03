@@ -138,8 +138,12 @@ class Files extends Component {
             <div className="">
                 <h4>
                     <div style={{ marginRight: 10, float: 'left', width: 30, height: 30, borderRadius: 10, backgroundColor: device.color }}> </div>
-                    <Link to={'/files'}>Back to Devices</Link>
+                    {deviceId}
                 </h4>
+
+                <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+                    <Link to={'/files'}>Back to Devices</Link>
+                </div>
 
                 <h5>Concatenated Files</h5>
 
