@@ -55,7 +55,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
     case ActionTypes.API_SOURCE_GEOJSON_GET.SUCCESS: {
         return mergeFeatures(state, action);
     }
-    case ActionTypes.FOCUS_FEATURE:
+    case ActionTypes.FOCUS_FEATURE: {
         return Object.assign({ }, state, {
             focus: {
                 expeditionSecondsPerTick: 0,
@@ -66,6 +66,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
                 features: []
             }
         });
+    }
     case ActionTypes.API_MAP_FEATURES_GET.SUCCESS: {
         const nextState = Object.assign({ }, state);
         const geometries = action.response.geometries;
@@ -223,8 +224,18 @@ function sources(state = initialSourcesState, action) {
     }
 }
 
-function files(state = { devices: [], filesByDevice: { } }, action) {
+const LosAngelesCenter = [-118.26928432026534, 34.03118429949713];
+const initialFilesState = {
+    devices: [],
+    filesByDevice: { },
+    center: LosAngelesCenter
+};
+
+function files(state = initialFilesState, action) {
     switch (action.type) {
+    case ActionTypes.FOCUS_LOCATION: {
+        return { ...state, ...{ center: action.center } };
+    }
     case ActionTypes.API_LOAD_DEVICES.SUCCESS: {
         const colors = new DataColors();
         const files = action.response;

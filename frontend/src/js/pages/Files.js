@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 
-import { loadDevices, loadDeviceFiles } from '../actions';
+import { loadDevices, loadDeviceFiles, focusLocation } from '../actions';
 
 import { FkPromisedApi } from '../api/calls';
 
@@ -115,9 +115,16 @@ class Files extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { loadDeviceFiles, deviceId } = this.props;
+        const { loadDeviceFiles, deviceId, focusLocation } = this.props;
 
         if (deviceId && deviceId !== prevProps.deviceId) {
+            const device = this.getDevice();
+
+            if (device.locations.entries.length > 0) {
+                const center = [ ...device.locations.entries[0].coordinates, 8 ];
+                focusLocation(center);
+            }
+
             loadDeviceFiles(deviceId);
         }
     }
@@ -130,6 +137,7 @@ class Files extends Component {
         return (
             <div className="">
               <h4>
+                <div style={{ marginRight: 10, float: 'left', width: 30, height: 30, borderRadius: 10, backgroundColor: device.color }}> </div>
                 <Link to={'/files'}>Back to Devices</Link>
               </h4>
 
@@ -198,12 +206,17 @@ class Files extends Component {
         );
     }
 
+    getDevice() {
+        const { files, deviceId } = this.props;
+        return _(files.devices).filter(d => d.device_id === deviceId).first();
+    }
+
     renderMain() {
         const { files, deviceId } = this.props;
 
         if (deviceId) {
             const deviceFiles = files.filesByDevice[deviceId];
-            const device = _(files.devices).filter(d => d.device_id === deviceId).first();
+            const device = this.getDevice();
 
             if (!_.isObject(device) || !_.isObject(deviceFiles)) {
                 return <Loading />;
@@ -259,9 +272,7 @@ class Files extends Component {
             geojson: { type: '', features: features },
             sources: [],
             focus: {
-                center: [-118.26928432026534, 34.03118429949713],
-                feature: null,
-                time: 0,
+                center: files.center
             }
         };
 
@@ -307,7 +318,8 @@ function showWhenReady(WrappedComponent, isReady) {
 
 export default connect(mapStateToProps, {
     loadDevices,
-    loadDeviceFiles
+    loadDeviceFiles,
+    focusLocation
 })(showWhenReady(Files, props => {
     return true;
 }));
