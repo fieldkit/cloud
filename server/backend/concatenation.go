@@ -177,7 +177,13 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 		_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
 		if err != nil {
 			newErr := fmt.Errorf("Error reading collection: %v", err)
+
 			log.Errorw("Error", "error", newErr)
+
+			if _, err := fc.Database.ExecContext(ctx, `UPDATE fieldkit.device_stream SET flags = '{1}' WHERE id = $1`, file.ID); err != nil {
+				return "", err
+			}
+
 			if false {
 				return "", newErr
 			}

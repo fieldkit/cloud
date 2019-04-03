@@ -80,7 +80,7 @@ type DeviceFile struct {
 	FileID   string         `db:"file_id"`
 	URL      string         `db:"url"`
 	Meta     types.JSONText `db:"meta"`
-	Children *[]int64       `db:"children"`
+	Flags    pq.Int64Array  `db:"flags"`
 }
 
 type DeviceStream struct {
@@ -93,7 +93,7 @@ type DeviceStream struct {
 	FileID   string         `db:"file_id"`
 	URL      string         `db:"url"`
 	Meta     types.JSONText `db:"meta"`
-	Children *[]int64       `db:"children"`
+	Flags    pq.Int64Array  `db:"flags"`
 }
 
 type DeviceSummary struct {
