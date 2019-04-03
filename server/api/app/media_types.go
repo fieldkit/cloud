@@ -580,6 +580,13 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
+// FilesStatus media type (default view)
+//
+// Identifier: application/vnd.app.files.status+json; view=default
+type FilesStatus struct {
+	Queued int `form:"queued" json:"queued" xml:"queued"`
+}
+
 // FirmwareSummary media type (default view)
 //
 // Identifier: application/vnd.app.firmware+json; view=default

@@ -1623,57 +1623,6 @@ func (ctx *FileFilesContext) NotFound() error {
 	return nil
 }
 
-// JSONFilesContext provides the files json action context.
-type JSONFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Dl     bool
-	FileID string
-}
-
-// NewJSONFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller json action.
-func NewJSONFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*JSONFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := JSONFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDl := req.Params["dl"]
-	if len(paramDl) == 0 {
-		rctx.Dl = true
-	} else {
-		rawDl := paramDl[0]
-		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
-			rctx.Dl = dl
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
-		}
-	}
-	paramFileID := req.Params["fileId"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = rawFileID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *JSONFilesContext) OK(resp []byte) error {
-	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *JSONFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
 // ListDeviceDataFilesFilesContext provides the files list device data files action context.
 type ListDeviceDataFilesFilesContext struct {
 	context.Context
@@ -1701,9 +1650,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp24 := page
-			tmp23 := &tmp24
-			rctx.Page = tmp23
+			tmp23 := page
+			tmp22 := &tmp23
+			rctx.Page = tmp22
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1744,9 +1693,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp26 := page
-			tmp25 := &tmp26
-			rctx.Page = tmp25
+			tmp25 := page
+			tmp24 := &tmp25
+			rctx.Page = tmp24
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1840,6 +1789,31 @@ func (ctx *RawFilesContext) OK(resp []byte) error {
 func (ctx *RawFilesContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
+}
+
+// StatusFilesContext provides the files status action context.
+type StatusFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewStatusFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the files controller status action.
+func NewStatusFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*StatusFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := StatusFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *StatusFilesContext) OK(r *FilesStatus) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.files.status+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // AddMemberContext provides the member add action context.

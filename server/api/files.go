@@ -23,37 +23,21 @@ import (
 )
 
 type FilesControllerOptions struct {
-	Config   *ApiConfiguration
-	Session  *session.Session
-	Database *sqlxcache.DB
-	Backend  *backend.Backend
+	Config        *ApiConfiguration
+	Session       *session.Session
+	Database      *sqlxcache.DB
+	Backend       *backend.Backend
+	ConcatWorkers *backend.ConcatenationWorkers
 }
 
 type BaseFilesController struct {
 	options FilesControllerOptions
-	cw      *ConcatenationWorkers
 }
 
 type FilesController struct {
 	BaseFilesController
 	*goa.Controller
 }
-
-var (
-	ConcatenatedDataSpace  = uuid.MustParse("5554c632-d586-53f2-b2a7-88a63663a3f5")
-	ConcatenatedLogsSpace  = uuid.MustParse("1e563c95-7984-4868-abd1-411c4dfc5467")
-	ConcatenatedFileSpaces = map[string]uuid.UUID{
-		"2": ConcatenatedLogsSpace,
-		"4": ConcatenatedDataSpace,
-	}
-	DataFileTypeIDs = []string{"4"}
-	LogFileTypeIDs  = []string{"2", "3"}
-	FileTypeNames   = map[string]string{
-		"2": "Logs",
-		"3": "Logs",
-		"4": "Data",
-	}
-)
 
 func NewFilesController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *FilesController {
 	return &FilesController{
@@ -85,7 +69,7 @@ func (c *FilesController) listDeviceFiles(ctx context.Context, fileTypeIDs []str
 }
 
 func (c *FilesController) ListDeviceDataFiles(ctx *app.ListDeviceDataFilesFilesContext) error {
-	files, err := c.listDeviceFiles(ctx, DataFileTypeIDs, ctx.DeviceID, ctx.Page)
+	files, err := c.listDeviceFiles(ctx, backend.DataFileTypeIDs, ctx.DeviceID, ctx.Page)
 	if err != nil {
 		return err
 	}
@@ -94,7 +78,7 @@ func (c *FilesController) ListDeviceDataFiles(ctx *app.ListDeviceDataFilesFilesC
 }
 
 func (c *FilesController) ListDeviceLogFiles(ctx *app.ListDeviceLogFilesFilesContext) error {
-	files, err := c.listDeviceFiles(ctx, LogFileTypeIDs, ctx.DeviceID, ctx.Page)
+	files, err := c.listDeviceFiles(ctx, backend.LogFileTypeIDs, ctx.DeviceID, ctx.Page)
 	if err != nil {
 		return err
 	}
@@ -207,14 +191,13 @@ func (c *FilesController) File(ctx *app.FileFilesContext) error {
 			DeviceID:     fi.DeviceID,
 			FileID:       fi.Key,
 			FileTypeID:   fi.FileTypeID,
-			FileTypeName: FileTypeNames[fi.FileTypeID],
+			FileTypeName: backend.FileTypeNames[fi.FileTypeID],
 			Time:         fi.LastModified,
 			Size:         int(fi.Size),
 			URL:          fi.URL,
 			Meta:         string(jsonMeta),
 			Urls: &app.DeviceFileUrls{
 				Csv:  ac.MakeApiUrl("/files/%v/data.csv", fi.Key),
-				JSON: ac.MakeApiUrl("/files/%v/data.json", fi.Key),
 				Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", fi.Key),
 			},
 		})
@@ -230,17 +213,6 @@ func (c *FilesController) Csv(ctx *app.CsvFilesContext) error {
 	}
 
 	exporter := backend.NewSimpleCsvExporter(ctx.ResponseData)
-
-	return backend.ExportAllFiles(ctx, ctx.ResponseData, ctx.Dl, iterator, exporter)
-}
-
-func (c *FilesController) JSON(ctx *app.JSONFilesContext) error {
-	iterator, err := backend.LookupFile(ctx, c.options.Session, c.options.Database, ctx.FileID)
-	if err != nil {
-		return err
-	}
-
-	exporter := backend.NewSimpleJsonExporter(ctx.ResponseData)
 
 	return backend.ExportAllFiles(ctx, ctx.ResponseData, ctx.Dl, iterator, exporter)
 }
@@ -270,14 +242,18 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 	return nil
 }
 
+func (c *FilesController) Status(ctx *app.StatusFilesContext) error {
+	return ctx.OK(&app.FilesStatus{
+		Queued: c.options.ConcatWorkers.Length(),
+	})
+}
+
 func (c *BaseFilesController) concatenatedDeviceFile(ctx context.Context, responseData *goa.ResponseData, deviceID string, fileTypeIDs []string) (redirection string, err error) {
-	space := ConcatenatedFileSpaces[fileTypeIDs[0]]
+	space := backend.ConcatenatedFileSpaces[fileTypeIDs[0]]
 	deviceStreamID := uuid.NewSHA1(space, []byte(deviceID))
 
-	c.cw.channel <- ConcatenationJob{
-		ctx:         ctx,
-		deviceID:    deviceID,
-		fileTypeIDs: fileTypeIDs,
+	if err := c.options.ConcatWorkers.QueueJob(ctx, deviceID, fileTypeIDs); err != nil {
+		return "", err
 	}
 
 	return c.options.Config.MakeApiUrl("/files/%s", deviceStreamID), nil
@@ -289,22 +265,16 @@ type DeviceLogsController struct {
 }
 
 func NewDeviceLogsController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceLogsController {
-	cw, err := NewConcatenationWorkers(ctx, options)
-	if err != nil {
-		panic(err)
-	}
-
 	return &DeviceLogsController{
 		BaseFilesController: BaseFilesController{
 			options: options,
-			cw:      cw,
 		},
 		Controller: service.NewController("DeviceLogsController"),
 	}
 }
 
 func (c *DeviceLogsController) All(ctx *app.AllDeviceLogsContext) error {
-	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, LogFileTypeIDs)
+	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, backend.LogFileTypeIDs)
 	if err != nil {
 		return err
 	}
@@ -323,22 +293,16 @@ type DeviceDataController struct {
 }
 
 func NewDeviceDataController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceDataController {
-	cw, err := NewConcatenationWorkers(ctx, options)
-	if err != nil {
-		panic(err)
-	}
-
 	return &DeviceDataController{
 		BaseFilesController: BaseFilesController{
 			options: options,
-			cw:      cw,
 		},
 		Controller: service.NewController("DeviceDataController"),
 	}
 }
 
 func (c *DeviceDataController) All(ctx *app.AllDeviceDataContext) error {
-	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, DataFileTypeIDs)
+	url, err := c.concatenatedDeviceFile(ctx, ctx.ResponseData, ctx.DeviceID, backend.DataFileTypeIDs)
 	if err != nil {
 		return err
 	}
@@ -362,8 +326,8 @@ func DeviceFileTypeUrls(ac *ApiConfiguration, kind, deviceID, fileID string) *ap
 }
 
 func DeviceSummaryUrls(ac *ApiConfiguration, deviceID string) *app.DeviceSummaryUrls {
-	concatenatedDataID := uuid.NewSHA1(ConcatenatedDataSpace, []byte(deviceID))
-	concatenatedLogsID := uuid.NewSHA1(ConcatenatedLogsSpace, []byte(deviceID))
+	concatenatedDataID := uuid.NewSHA1(backend.ConcatenatedDataSpace, []byte(deviceID))
+	concatenatedLogsID := uuid.NewSHA1(backend.ConcatenatedLogsSpace, []byte(deviceID))
 
 	return &app.DeviceSummaryUrls{
 		Details: ac.MakeApiUrl("/devices/%v/data", deviceID),
@@ -427,12 +391,11 @@ func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.Device
 		Meta:         s.Meta.String(),
 		Size:         int(s.Size),
 		FileTypeID:   s.FileID,
-		FileTypeName: FileTypeNames[s.FileID],
+		FileTypeName: backend.FileTypeNames[s.FileID],
 		Time:         s.Time,
 		URL:          s.URL,
 		Urls: &app.DeviceFileUrls{
 			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
-			JSON: ac.MakeApiUrl("/files/%v/data.json", s.ID),
 			Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
 		},
 	}
@@ -457,57 +420,4 @@ func ConcatenatedFileInfo(urls *app.DeviceFileTypeUrls, fi *backend.FileInfo) *a
 		Size: int(fi.Size),
 		Csv:  urls.Csv,
 	}
-}
-
-type ConcatenationJob struct {
-	ctx         context.Context
-	deviceID    string
-	fileTypeIDs []string
-}
-
-type ConcatenationWorkers struct {
-	options FilesControllerOptions
-	channel chan ConcatenationJob
-}
-
-func NewConcatenationWorkers(ctx context.Context, options FilesControllerOptions) (cw *ConcatenationWorkers, err error) {
-	cw = &ConcatenationWorkers{
-		channel: make(chan ConcatenationJob, 100),
-		options: options,
-	}
-
-	for w := 0; w < 1; w++ {
-		go cw.worker(ctx)
-	}
-
-	return
-}
-
-func (cw *ConcatenationWorkers) worker(ctx context.Context) {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("Worker starting")
-
-	for job := range cw.channel {
-		jobLog := Logger(job.ctx).Sugar()
-
-		jobLog.Infow("Worker", "job", job)
-
-		fileTypeID := job.fileTypeIDs[0]
-		space := ConcatenatedFileSpaces[fileTypeID]
-		deviceStreamID := uuid.NewSHA1(space, []byte(job.deviceID))
-
-		fc := &backend.FileConcatenator{
-			Session:    cw.options.Session,
-			Database:   cw.options.Database,
-			FileID:     deviceStreamID.String(),
-			FileTypeID: fileTypeID,
-			DeviceID:   job.deviceID,
-			TypeIDs:    job.fileTypeIDs,
-		}
-
-		fc.Concatenate(job.ctx)
-	}
-
-	log.Infow("Worker exiting")
 }

@@ -8,8 +8,18 @@ import (
 var DeviceFileUrls = Type("DeviceFileUrls", func() {
 	Attribute("csv", String)
 	Attribute("fkpb", String)
-	Attribute("json", String)
-	Required("csv", "fkpb", "json")
+	Required("csv", "fkpb")
+})
+
+var FilesStatus = MediaType("application/vnd.app.files.status+json", func() {
+	TypeName("FilesStatus")
+	Attributes(func() {
+		Attribute("queued", Integer)
+		Required("queued")
+	})
+	View("default", func() {
+		Attribute("queued")
+	})
 })
 
 var DeviceFileSummary = MediaType("application/vnd.app.device.file+json", func() {
@@ -298,17 +308,11 @@ var _ = Resource("files", func() {
 		})
 	})
 
-	Action("json", func() {
-		Routing(GET("files/:fileId/data.json"))
-		Description("Export file")
-		Params(func() {
-			Param("dl", Boolean, func() {
-				Default(true)
-			})
-		})
-		Response(NotFound)
+	Action("status", func() {
+		Routing(GET("files/status"))
+		Description("File backend status")
 		Response(OK, func() {
-			Status(200)
+			Media(FilesStatus)
 		})
 	})
 })

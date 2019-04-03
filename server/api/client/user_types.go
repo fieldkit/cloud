@@ -820,7 +820,6 @@ func (ut *DeviceFileTypeUrls) Validate() (err error) {
 type deviceFileUrls struct {
 	Csv  *string `form:"csv,omitempty" json:"csv,omitempty" xml:"csv,omitempty"`
 	Fkpb *string `form:"fkpb,omitempty" json:"fkpb,omitempty" xml:"fkpb,omitempty"`
-	JSON *string `form:"json,omitempty" json:"json,omitempty" xml:"json,omitempty"`
 }
 
 // Validate validates the deviceFileUrls type instance.
@@ -830,9 +829,6 @@ func (ut *deviceFileUrls) Validate() (err error) {
 	}
 	if ut.Fkpb == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "fkpb"))
-	}
-	if ut.JSON == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "json"))
 	}
 	return
 }
@@ -846,9 +842,6 @@ func (ut *deviceFileUrls) Publicize() *DeviceFileUrls {
 	if ut.Fkpb != nil {
 		pub.Fkpb = *ut.Fkpb
 	}
-	if ut.JSON != nil {
-		pub.JSON = *ut.JSON
-	}
 	return &pub
 }
 
@@ -856,7 +849,6 @@ func (ut *deviceFileUrls) Publicize() *DeviceFileUrls {
 type DeviceFileUrls struct {
 	Csv  string `form:"csv" json:"csv" xml:"csv"`
 	Fkpb string `form:"fkpb" json:"fkpb" xml:"fkpb"`
-	JSON string `form:"json" json:"json" xml:"json"`
 }
 
 // Validate validates the DeviceFileUrls type instance.
@@ -866,9 +858,6 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 	}
 	if ut.Fkpb == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "fkpb"))
-	}
-	if ut.JSON == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "json"))
 	}
 	return
 }

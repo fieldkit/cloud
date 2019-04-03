@@ -756,6 +756,20 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// FilesStatus media type (default view)
+//
+// Identifier: application/vnd.app.files.status+json; view=default
+type FilesStatus struct {
+	Queued int `form:"queued" json:"queued" xml:"queued"`
+}
+
+// DecodeFilesStatus decodes the FilesStatus instance encoded in resp body.
+func (c *Client) DecodeFilesStatus(resp *http.Response) (*FilesStatus, error) {
+	var decoded FilesStatus
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // FirmwareSummary media type (default view)
 //
 // Identifier: application/vnd.app.firmware+json; view=default

@@ -503,12 +503,18 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountFirmwareController(service, c17)
 
-	// Mount "device_streams" controller
+	// Mount "files" controller
+	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database)
+	if err != nil {
+		panic(err)
+	}
+
 	fco := api.FilesControllerOptions{
-		Config:   apiConfig,
-		Session:  awsSession,
-		Database: database,
-		Backend:  be,
+		Config:        apiConfig,
+		Session:       awsSession,
+		Database:      database,
+		Backend:       be,
+		ConcatWorkers: cw,
 	}
 	app.MountFilesController(service, api.NewFilesController(ctx, service, fco))
 	app.MountDeviceLogsController(service, api.NewDeviceLogsController(ctx, service, fco))

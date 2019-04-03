@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 
 	"github.com/conservify/sqlxcache"
@@ -23,6 +24,22 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
+)
+
+var (
+	ConcatenatedDataSpace  = uuid.MustParse("5554c632-d586-53f2-b2a7-88a63663a3f5")
+	ConcatenatedLogsSpace  = uuid.MustParse("1e563c95-7984-4868-abd1-411c4dfc5467")
+	ConcatenatedFileSpaces = map[string]uuid.UUID{
+		"2": ConcatenatedLogsSpace,
+		"4": ConcatenatedDataSpace,
+	}
+	DataFileTypeIDs = []string{"4"}
+	LogFileTypeIDs  = []string{"2", "3"}
+	FileTypeNames   = map[string]string{
+		"2": "Logs",
+		"3": "Logs",
+		"4": "Data",
+	}
 )
 
 type FileConcatenator struct {
@@ -241,4 +258,73 @@ func (fc *FileConcatenator) Concatenate(ctx context.Context) {
 	}
 
 	log.Infow("Uploaded", "file_url", location)
+}
+
+type ConcatenationJob struct {
+	ctx         context.Context
+	deviceID    string
+	fileTypeIDs []string
+}
+
+type ConcatenationWorkers struct {
+	session  *session.Session
+	database *sqlxcache.DB
+	channel  chan ConcatenationJob
+}
+
+func NewConcatenationWorkers(ctx context.Context, session *session.Session, database *sqlxcache.DB) (cw *ConcatenationWorkers, err error) {
+	cw = &ConcatenationWorkers{
+		channel:  make(chan ConcatenationJob, 100),
+		session:  session,
+		database: database,
+	}
+
+	for w := 0; w < 1; w++ {
+		go cw.worker(ctx)
+	}
+
+	return
+}
+
+func (cw *ConcatenationWorkers) Length() int {
+	return len(cw.channel)
+}
+
+func (cw *ConcatenationWorkers) QueueJob(ctx context.Context, deviceID string, fileTypeIDs []string) error {
+	cw.channel <- ConcatenationJob{
+		ctx:         ctx,
+		deviceID:    deviceID,
+		fileTypeIDs: fileTypeIDs,
+	}
+
+	return nil
+}
+
+func (cw *ConcatenationWorkers) worker(ctx context.Context) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Worker starting")
+
+	for job := range cw.channel {
+		jobLog := Logger(job.ctx).Sugar()
+
+		jobLog.Infow("Worker", "job", job)
+
+		fileTypeID := job.fileTypeIDs[0]
+		space := ConcatenatedFileSpaces[fileTypeID]
+		deviceStreamID := uuid.NewSHA1(space, []byte(job.deviceID))
+
+		fc := &FileConcatenator{
+			Session:    cw.session,
+			Database:   cw.database,
+			FileID:     deviceStreamID.String(),
+			FileTypeID: fileTypeID,
+			DeviceID:   job.deviceID,
+			TypeIDs:    job.fileTypeIDs,
+		}
+
+		fc.Concatenate(job.ctx)
+	}
+
+	log.Infow("Worker exiting")
 }
