@@ -158,7 +158,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 			return "", fmt.Errorf("Error parsing URL: %v", err)
 		}
 
-		log.Infow("File", "file_url", file.URL, "file_stamp", file.Time, "stream_id", file.StreamID)
+		log.Infow("File", "file_url", file.URL, "file_stamp", file.Time, "stream_id", file.StreamID, "file_size", file.Size)
 
 		goi := &s3.GetObjectInput{
 			Bucket: aws.String(object.Bucket),
