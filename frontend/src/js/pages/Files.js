@@ -260,6 +260,7 @@ class Files extends Component {
                           coordinates: l.coordinates
                       },
                       properties: {
+                          device: d,
                           size: 10,
                           color: d.color
                       }
