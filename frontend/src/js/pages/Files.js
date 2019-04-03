@@ -51,14 +51,14 @@ class ConcatenatedFiles extends Component {
 
         return (
             <div>
-              <div className="">
-                <table className="table table-sm">
-                  <tbody>
-                    {this.renderFileType('Data', 'data')}
-                    {this.renderFileType('Logs', 'logs')}
-                  </tbody>
-                </table>
-              </div>
+                <div className="">
+                    <table className="table table-sm">
+                        <tbody>
+                            {this.renderFileType('Data', 'data')}
+                            {this.renderFileType('Logs', 'logs')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }
@@ -73,9 +73,9 @@ class ConcatenatedFiles extends Component {
         if (!_.isObject(files)) {
             return (
                 <tr>
-                  <th>{name}</th>
-                  <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
-                  <td colSpan="5">None</td>
+                    <th>{name}</th>
+                    <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
+                    <td colSpan="5">None</td>
                 </tr>
             );
         }
@@ -86,13 +86,13 @@ class ConcatenatedFiles extends Component {
 
         return (
             <tr>
-              <th>{name}</th>
-              <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
-              <td>{typeTime}</td>
-              <td>{typeAgo}</td>
-              <td>{prettyBytes(files.size)} bytes</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={urls.csv + "?dl=0"}>CSV</a> (<a href={urls.csv}>Download</a>)</td>
-              <td><a target="_blank" rel="noopener noreferrer" href={urls.fkpb + "?dl=0"}>FKPB</a> (<a href={urls.fkpb}>Download</a>)</td>
+                <th>{name}</th>
+                <td><button className="btn btn-sm btn-success" onClick={() => this.generate(urls.generate)}>Generate</button></td>
+                <td>{typeTime}</td>
+                <td>{typeAgo}</td>
+                <td>{prettyBytes(files.size)} bytes</td>
+                <td><a target="_blank" rel="noopener noreferrer" href={urls.csv + "?dl=0"}>CSV</a> (<a href={urls.csv}>Download</a>)</td>
+                <td><a target="_blank" rel="noopener noreferrer" href={urls.fkpb + "?dl=0"}>FKPB</a> (<a href={urls.fkpb}>Download</a>)</td>
             </tr>
         );
     }
@@ -136,33 +136,33 @@ class Files extends Component {
 
         return (
             <div className="">
-              <h4>
-                <div style={{ marginRight: 10, float: 'left', width: 30, height: 30, borderRadius: 10, backgroundColor: device.color }}> </div>
-                <Link to={'/files'}>Back to Devices</Link>
-              </h4>
+                <h4>
+                    <div style={{ marginRight: 10, float: 'left', width: 30, height: 30, borderRadius: 10, backgroundColor: device.color }}> </div>
+                    <Link to={'/files'}>Back to Devices</Link>
+                </h4>
 
-              <h5>Concatenated Files</h5>
+                <h5>Concatenated Files</h5>
 
-              <ConcatenatedFiles device={device} deviceId={deviceId} />
+                <ConcatenatedFiles device={device} deviceId={deviceId} />
 
-              <h5>Individual Uploads</h5>
+                <h5>Individual Uploads</h5>
 
-              <div className="">
-                <table className="table table-striped table-sm">
-                  <thead>
-                    <tr>
-                      <th>File</th>
-                      <th>Type</th>
-                      <th>Size</th>
-                      <th>Uploaded</th>
-                      <th>Links</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {deviceFiles.all.map(file => this.renderFile(file))}
-                  </tbody>
-                </table>
-              </div>
+                <div className="">
+                    <table className="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th>Links</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {deviceFiles.all.map(file => this.renderFile(file))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }
@@ -192,7 +192,7 @@ class Files extends Component {
 
         return (
             <tr className="device" key={device.device_id}>
-              <td>
+                <td>
                     <div style={{ marginRight: 10, float: 'left', width: 20, height: 20, borderRadius: 5, backgroundColor: device.color }}> </div>
                     <Link to={'/files/' + device.device_id}>{device.device_id}</Link>
                 </td>
@@ -226,19 +226,19 @@ class Files extends Component {
 
         return (
             <table className="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Files</th>
-                  <th>Logs</th>
-                  <th>Data</th>
-                  <th>Last File</th>
-                  <th>Places</th>
-                </tr>
-              </thead>
-              <tbody>
-                {files.devices.map(device => this.renderDevice(device))}
-              </tbody>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Files</th>
+                        <th>Logs</th>
+                        <th>Data</th>
+                        <th>Last File</th>
+                        <th>Places</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {files.devices.map(device => this.renderDevice(device))}
+                </tbody>
             </table>
         );
     }
@@ -281,19 +281,19 @@ class Files extends Component {
         return (
             <div className="files page">
                 <div className="map-container">
-                <div className="map">
-                    <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100vh" }}
-                                pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
-                                playbackMode={ () => false } focusFeature={ (feature) => console.log("FOCUS", feature) }
-                                focusSource={ (source) => console.log("SOURCE", source) } onUserActivity={ () => false }
-                                clickFeature={ (feature) => console.log("FEATURE", feature) }
-                                loadMapFeatures={ () => false }
-                                onChangePlaybackMode={ () => false } />
-                </div>
+                    <div className="map">
+                        <MapContainer style={{ height: "100%" }} containerStyle={{ width: "100%", height: "100vh" }}
+                                      pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
+                                      playbackMode={ () => false } focusFeature={ (feature) => console.log("FOCUS", feature) }
+                                      focusSource={ (source) => console.log("SOURCE", source) } onUserActivity={ () => false }
+                                      clickFeature={ (feature) => console.log("FEATURE", feature) }
+                                      loadMapFeatures={ () => false }
+                                      onChangePlaybackMode={ () => false } />
+                    </div>
                 </div>
 
                 <div className="main-container">
-                {this.renderMain()}
+                    {this.renderMain()}
                 </div>
             </div>
         );

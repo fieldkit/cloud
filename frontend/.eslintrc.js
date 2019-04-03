@@ -1,6 +1,6 @@
 module.exports = {
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["off"],
         "no-extra-parens": 0,
         "react/jsx-uses-vars": 1,
         "react/jsx-uses-react": 1,
