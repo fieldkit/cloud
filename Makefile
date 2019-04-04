@@ -89,6 +89,11 @@ restart-postgres:
 	docker-compose rm -f postgres
 	docker-compose up -d postgres
 
+run-postgres:
+	docker-compose stop postgres
+	docker-compose rm -f postgres
+	docker-compose up postgres
+
 veryclean:
 
 distribution:
