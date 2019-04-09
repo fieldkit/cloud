@@ -161,7 +161,7 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 		return fmt.Errorf("JSON error: %v", err)
 	}
 
-	stream := data.DeviceStream{
+	stream := data.DeviceFile{
 		Time:     time.Now(),
 		StreamID: saved.ID,
 		Firmware: headers.FkVersion,

@@ -83,19 +83,6 @@ type DeviceFile struct {
 	Flags    pq.Int64Array  `db:"flags"`
 }
 
-type DeviceStream struct {
-	ID       int64          `db:"id"`
-	Time     time.Time      `db:"time"`
-	StreamID string         `db:"stream_id"`
-	Firmware string         `db:"firmware"`
-	DeviceID string         `db:"device_id"`
-	Size     int64          `db:"size"`
-	FileID   string         `db:"file_id"`
-	URL      string         `db:"url"`
-	Meta     types.JSONText `db:"meta"`
-	Flags    pq.Int64Array  `db:"flags"`
-}
-
 type DeviceSummary struct {
 	DeviceID      string    `db:"device_id"`
 	LastFileID    string    `db:"last_stream_id"`
