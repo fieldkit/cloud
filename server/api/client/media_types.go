@@ -223,6 +223,7 @@ func (c *Client) DecodeDeviceDetails(resp *http.Response) (*DeviceDetails, error
 //
 // Identifier: application/vnd.app.device.file+json; view=default
 type DeviceFile struct {
+	Corrupted    bool            `form:"corrupted" json:"corrupted" xml:"corrupted"`
 	DeviceID     string          `form:"device_id" json:"device_id" xml:"device_id"`
 	FileID       string          `form:"file_id" json:"file_id" xml:"file_id"`
 	FileTypeID   string          `form:"file_type_id" json:"file_type_id" xml:"file_type_id"`
@@ -264,6 +265,7 @@ func (mt *DeviceFile) Validate() (err error) {
 	if mt.Urls == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
 	}
+
 	if mt.Urls != nil {
 		if err2 := mt.Urls.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)

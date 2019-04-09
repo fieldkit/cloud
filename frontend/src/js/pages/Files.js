@@ -161,6 +161,7 @@ class Files extends Component {
                                 <th>Uploaded</th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -181,6 +182,7 @@ class Files extends Component {
                 <td>{file.file_type_name}</td>
                 <td>{prettyBytes(file.size)}</td>
                 <td>{time}</td>
+                <td>{file.corrupted ? "Corrupt" : ""}</td>
                 <td> <a target="_blank" rel="noopener noreferrer" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) </td>
                 <td> <a href={file.urls.raw}>FKPB</a> </td>
             </tr>

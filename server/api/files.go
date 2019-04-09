@@ -394,6 +394,7 @@ func DeviceFileSummaryType(ac *ApiConfiguration, s *data.DeviceFile) *app.Device
 		FileTypeName: backend.FileTypeNames[s.FileID],
 		Time:         s.Time,
 		URL:          s.URL,
+		Corrupted:    len(s.Flags) > 0,
 		Urls: &app.DeviceFileUrls{
 			Csv:  ac.MakeApiUrl("/files/%v/data.csv", s.ID),
 			Fkpb: ac.MakeApiUrl("/files/%v/data.fkpb", s.ID),
