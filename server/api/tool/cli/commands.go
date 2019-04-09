@@ -3027,7 +3027,7 @@ func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
 func (cmd *CsvFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var fileID string
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", "true", ``)
 }
 
 // Run makes the HTTP request corresponding to the DeviceInfoFilesCommand command.
@@ -3195,7 +3195,7 @@ func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
 func (cmd *RawFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var fileID string
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
-	cc.Flags().StringVar(&cmd.Dl, "dl", true, ``)
+	cc.Flags().StringVar(&cmd.Dl, "dl", "true", ``)
 }
 
 // Run makes the HTTP request corresponding to the StatusFilesCommand command.
