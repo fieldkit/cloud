@@ -91,7 +91,7 @@ type ObjectDetails struct {
 
 func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-chan ObjectJob, details chan<- ObjectDetails) {
 	for job := range jobs {
-		files := []*data.DeviceStream{}
+		files := []*data.DeviceFile{}
 		if err := db.SelectContext(ctx, &files, `SELECT s.* FROM fieldkit.device_stream AS s WHERE (s.stream_id = $1)`, job.Key); err != nil {
 			panic(fmt.Errorf("Error querying for DeviceFile: %v", err))
 		}
@@ -135,7 +135,7 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 					panic(err)
 				}
 
-				stream := data.DeviceStream{
+				stream := data.DeviceFile{
 					Time:     *od.LastModified,
 					StreamID: od.Key,
 					Firmware: od.Firmware,
