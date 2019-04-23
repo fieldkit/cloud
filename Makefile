@@ -3,7 +3,7 @@ modules = server/sqs-worker server/sqs-sender server/tools/fktool
 GOARCH ?= amd64
 GOOS ?= linux
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
-BUILD ?= build
+BUILD ?= $(abspath build)
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
@@ -45,10 +45,10 @@ server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
 
 install: all
-	cp build/fktool $(INSTALLDIR)
-	cp build/testing-random $(INSTALLDIR)
-	cp build/sqs-sender $(INSTALLDIR)
-	cp build/sqs-worker $(INSTALLDIR)
+	cp $(BUILD)/fktool $(INSTALLDIR)
+	cp $(BUILD)/testing-random $(INSTALLDIR)
+	cp $(BUILD)/sqs-sender $(INSTALLDIR)
+	cp $(BUILD)/sqs-worker $(INSTALLDIR)
 	@for d in $(modules); do                           \
 		(cd $$d && echo $$d && go install) || exit 1;  \
 	done
@@ -62,7 +62,7 @@ deps: server/inaturalist/secrets.go
 	cd server && go get ./...
 
 clean:
-	rm -rf build
+	rm -rf $(BUILD)
 
 clean-production:
 	rm -rf schema-production
@@ -98,7 +98,7 @@ veryclean:
 
 distribution:
 	rm -rf distribution
-	GOOS=darwin GOARCH=amd64 BUILD=build/distribution/darwin $(MAKE) build/distribution/darwin/fkflash
-	cp -ar ~/.fk/tools build/distribution/darwin
-	GOOS=windows GOARCH=amd64 BUILD=build/distribution/windows $(MAKE) build/distribution/windows/fkflash
-	cp -ar ~/.fk/tools build/distribution/windows
+	GOOS=darwin GOARCH=amd64 BUILD=$(BUILD)/distribution/darwin $(MAKE) $(BUILD)/distribution/darwin/fkflash
+	cp -ar ~/.fk/tools $(BUILD)/distribution/darwin
+	GOOS=windows GOARCH=amd64 BUILD=$(BUILD)/distribution/windows $(MAKE) $(BUILD)/distribution/windows/fkflash
+	cp -ar ~/.fk/tools $(BUILD)/distribution/windows
