@@ -72,7 +72,7 @@ class DeviceNotes extends Component {
             <div>
                 <table className="notes">
                     <tbody>
-                    {details.notes.map((note, idx) => {
+                    {(details.notes || []).map((note, idx) => {
                         return this.renderNote(device, idx, note);
                     })}
                     </tbody>
@@ -163,63 +163,20 @@ class ConcatenatedFiles extends Component {
     }
 }
 
-class Files extends Component {
-    props: {
-        loadDevices: any => void,
-    };
+class DeviceView extends Component {
+    render() {
+        const { files, device, deviceId } = this.props;
+        const deviceFiles = files.filesByDevice[deviceId];
 
-    state = {
-        details: null
-    };
-
-    static contextTypes = {
-        router: PropTypes.shape({
-            history: PropTypes.shape({
-                push: PropTypes.func.isRequired,
-                replace: PropTypes.func.isRequired,
-            }).isRequired
-        }).isRequired
-    };
-
-    refreshDevice(deviceId) {
-        const { loadDeviceFiles } = this.props;
-
-        loadDeviceFiles(deviceId);
-
-        FkPromisedApi.queryDeviceFilesDetails(deviceId).then(details => {
-            this.setState({
-                details
-            });
-        });
-    }
-
-    componentWillMount() {
-        const { loadDevices, deviceId } = this.props;
-
-        loadDevices();
-
-        if (deviceId) {
-            this.refreshDevice(deviceId);
+        if (!_.isObject(device) || !_.isObject(deviceFiles)) {
+            return <Loading />;
         }
-    }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        const { deviceId, focusLocation } = this.props;
-
-        if (deviceId && deviceId !== prevProps.deviceId) {
-            const device = this.getDevice();
-
-            if (device.locations.entries.length > 0) {
-                const center = [ ...device.locations.entries[0].coordinates, 8 ];
-                focusLocation(center);
-            }
-
-            this.refreshDevice(deviceId);
-        }
+        return this.renderFiles(device, deviceFiles, deviceId);
     }
 
     renderFiles(device, deviceFiles, deviceId) {
-        const { details } = this.state;
+        const { details } = this.props;
 
         if (deviceFiles.all.length === 0) {
             return <Loading />;
@@ -283,10 +240,11 @@ class Files extends Component {
             </tr>
         );
     }
+}
 
+class FilesView extends Component {
     renderDevice(device) {
         const fileMoment = moment(device.last_file_time);
-        // const time = fileMoment.format('MMM Do YYYY HH:mm');
         const fileAgo = fileMoment.fromNow();
         const places = _.join(_(device.locations.entries).map(le => le.places).uniq().filter(s => s !== null && s !== "").value(), ", ");
 
@@ -306,30 +264,8 @@ class Files extends Component {
         );
     }
 
-    getDevice() {
-        const { files, deviceId } = this.props;
-        return _(files.devices).filter(d => d.device_id === deviceId).first();
-    }
-
-    onChooseFeature(feature) {
-        this.context.router.history.push({
-            pathname: '/files/' + feature.properties.device.device_id,
-        });
-    }
-
-    renderMain() {
-        const { files, deviceId } = this.props;
-
-        if (deviceId) {
-            const deviceFiles = files.filesByDevice[deviceId];
-            const device = this.getDevice();
-
-            if (!_.isObject(device) || !_.isObject(deviceFiles)) {
-                return <Loading />;
-            }
-
-            return this.renderFiles(device, deviceFiles, deviceId);
-        }
+    render() {
+        const { files } = this.props;
 
         return (
             <table className="table table-striped table-sm">
@@ -349,10 +285,78 @@ class Files extends Component {
                 </tbody>
             </table>
         );
+    } 
+}
+
+class Files extends Component {
+    props: {
+        loadDevices: any => void,
+    };
+
+    state = {
+        details: null
+    };
+
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+            }).isRequired
+        }).isRequired
+    };
+
+    refreshDevice(deviceId) {
+        const { loadDeviceFiles } = this.props;
+
+        loadDeviceFiles(deviceId);
+
+        FkPromisedApi.queryDeviceFilesDetails(deviceId).then(details => {
+            this.setState({
+                details
+            });
+        });
+    }
+
+    componentWillMount() {
+        const { loadDevices, deviceId } = this.props;
+
+        loadDevices();
+
+        if (deviceId) {
+            this.refreshDevice(deviceId);
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const { deviceId, focusLocation } = this.props;
+
+        if (deviceId && deviceId !== prevProps.deviceId) {
+            const device = this.getDevice();
+
+            if (device.locations.entries.length > 0) {
+                const center = [ ...device.locations.entries[0].coordinates, 8 ];
+                focusLocation(center);
+            }
+
+            this.refreshDevice(deviceId);
+        }
+    }
+
+    getDevice() {
+        const { files, deviceId } = this.props;
+        return _(files.devices).filter(d => d.device_id === deviceId).first();
+    }
+
+    onChooseFeature(feature) {
+        this.context.router.history.push({
+            pathname: '/files/' + feature.properties.device.device_id,
+        });
     }
 
     render() {
-        const { files } = this.props;
+        const { files, deviceId } = this.props;
+        const { details } = this.state;
 
         if (files.devices.length === 0) {
             return <Loading />;
@@ -401,7 +405,7 @@ class Files extends Component {
                 </div>
 
                 <div className="main-container">
-                    {this.renderMain()}
+                    { deviceId ? <DeviceView files={files} deviceId={deviceId} device={this.getDevice()} details={details} /> : <FilesView files={files} /> }
                 </div>
             </div>
         );
