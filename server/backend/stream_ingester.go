@@ -81,7 +81,7 @@ func (si *StreamIngester) download(ctx context.Context, headers *IncomingHeaders
 
 	startedAt := time.Now()
 
-	log.Infow("started", headers.ToLoggingFields()...)
+	log.Infow("synchronous", headers.ToLoggingFields()...)
 
 	reader := &ReaderWrapper{
 		BytesRead: 0,
@@ -187,7 +187,7 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 
 	startedAt := time.Now()
 
-	log.Infow("started (async)", headers.ToLoggingFields()...)
+	log.Infow("asynchronous", headers.ToLoggingFields()...)
 
 	if saved, err := si.streamArchiver.Archive(ctx, headers, reader); err != nil {
 		log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
@@ -206,6 +206,55 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 		w.WriteHeader(http.StatusOK)
 	}
 
+	return nil
+}
+
+func (si *StreamIngester) form(ctx context.Context, headers *IncomingHeaders, w http.ResponseWriter, reader io.Reader) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("form", headers.ToLoggingFields()...)
+
+	mr := multipart.NewReader(reader, headers.MediaTypeParams["boundary"])
+	for {
+		var reader io.Reader
+
+		buffered := false
+		p, err := mr.NextPart()
+		if err == io.EOF {
+			return err
+		}
+		if err != nil {
+			log.Errorw("failed", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return err
+		}
+
+		contentDisposition := p.Header.Get("Content-Disposition")
+		contentType := p.Header.Get("Content-Type")
+		contentLengthString := p.Header.Get("Content-Length")
+
+		contentLength, err := strconv.Atoi(contentLengthString)
+		if err != nil || contentLength <= 0 {
+			buf := &bytes.Buffer{}
+			bytesCopied, err := io.Copy(buf, p)
+			if err != nil {
+				log.Errorw("failed", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return err
+			}
+			contentLength = int(bytesCopied)
+			reader = buf
+			buffered = true
+		} else {
+			reader = p
+		}
+
+		log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength, "buffered", buffered)
+
+		partHeaders := headers.ToPartHeaders(contentType, int32(contentLength))
+
+		si.asynchronous(ctx, partHeaders, w, reader)
+	}
 	return nil
 }
 
@@ -343,6 +392,10 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	nestedCtx := logging.WithDeviceId(ctx, headers.FkDeviceId)
 
+	log = Logger(nestedCtx).Sugar()
+
+	log.Infow("started", headers.ToLoggingFields()...)
+
 	if !acceptableMediaType(headers.MediaType) {
 		log.Infow("Unknown Content-Type", headers.ToLoggingFields()...)
 		w.WriteHeader(http.StatusBadRequest)
@@ -350,57 +403,8 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if headers.MediaType == MultiPartFormDataMediaType {
-		log.Infow("Reading form", headers.ToLoggingFields()...)
-
-		mr := multipart.NewReader(req.Body, headers.MediaTypeParams["boundary"])
-		for {
-			var reader io.Reader
-
-			buffered := false
-			p, err := mr.NextPart()
-			if err == io.EOF {
-				return
-			}
-			if err != nil {
-				log.Errorw("failed", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
-			contentDisposition := p.Header.Get("Content-Disposition")
-			contentType := p.Header.Get("Content-Type")
-			contentLengthString := p.Header.Get("Content-Length")
-
-			contentLength, err := strconv.Atoi(contentLengthString)
-			if err != nil || contentLength <= 0 {
-				buf := &bytes.Buffer{}
-				bytesCopied, err := io.Copy(buf, p)
-				if err != nil {
-					log.Errorw("failed", "error", err)
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				contentLength = int(bytesCopied)
-				reader = buf
-				buffered = true
-			} else {
-				reader = p
-			}
-
-			log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength, "buffered", buffered)
-
-			partHeaders := headers.ToPartHeaders(contentType, int32(contentLength))
-			if headers.FkProcessing == "sync" {
-				si.synchronous(nestedCtx, partHeaders, w, reader)
-			} else {
-				si.asynchronous(nestedCtx, partHeaders, w, reader)
-			}
-		}
+		si.form(nestedCtx, headers, w, req.Body)
 	} else {
-		if headers.FkProcessing == "sync" {
-			si.synchronous(nestedCtx, headers, w, req.Body)
-		} else {
-			si.asynchronous(nestedCtx, headers, w, req.Body)
-		}
+		si.asynchronous(nestedCtx, headers, w, req.Body)
 	}
 }
