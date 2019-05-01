@@ -6,6 +6,7 @@ import moment from 'moment';
 import prettyBytes from 'pretty-bytes';
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Link } from 'react-router-dom';
@@ -171,6 +172,15 @@ class Files extends Component {
         details: null
     };
 
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+            }).isRequired
+        }).isRequired
+    };
+
     refreshDevice(deviceId) {
         const { loadDeviceFiles } = this.props;
 
@@ -301,6 +311,12 @@ class Files extends Component {
         return _(files.devices).filter(d => d.device_id === deviceId).first();
     }
 
+    onChooseFeature(feature) {
+        this.context.router.history.push({
+            pathname: '/files/' + feature.properties.device.device_id,
+        });
+    }
+
     renderMain() {
         const { files, deviceId } = this.props;
 
@@ -378,7 +394,7 @@ class Files extends Component {
                                       pointDecorator={ pointDecorator } visibleFeatures={ narrowed } controls={false}
                                       playbackMode={ () => false } focusFeature={ (feature) => console.log("FOCUS", feature) }
                                       focusSource={ (source) => console.log("SOURCE", source) } onUserActivity={ () => false }
-                                      clickFeature={ (feature) => console.log("FEATURE", feature) }
+                                      clickFeature={ (feature) => this.onChooseFeature(feature) }
                                       loadMapFeatures={ () => false }
                                       onChangePlaybackMode={ () => false } />
                     </div>
