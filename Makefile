@@ -17,6 +17,8 @@ all: binaries
 tests:
 	cd frontend && yarn run flow
 
+server: $(BUILD)/server
+
 $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 	$(GO) build -o $@ server/server.go
 

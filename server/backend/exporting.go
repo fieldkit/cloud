@@ -60,7 +60,7 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 
 		err = binaryReader.Read(ctx, cs.Response.Body)
 		if err != nil {
-			log.Infow("Error reading stream", "error", err, "file_type_id", cs.FileID)
+			log.Errorw("Error reading stream", "error", err, "file_type_id", cs.FileID)
 		}
 	}
 

@@ -170,8 +170,6 @@ func (c *FilesController) getDeviceDetails(ctx context.Context, deviceID string)
 
 	notesType := DeviceNotesType(ctx, notes)
 
-	fmt.Printf("%v\n", notes)
-
 	return &app.DeviceDetails{
 		DeviceID: deviceID,
 		Urls:     urls,
@@ -199,16 +197,12 @@ func (c *FilesController) UpdateDeviceInfo(ctx *app.UpdateDeviceInfoFilesContext
 		Notes:    ctx.Payload.Notes,
 	}
 
-	fmt.Printf("%v\n", newNote)
-
 	err := c.options.Database.NamedGetContext(ctx, &newNote, `
                INSERT INTO fieldkit.device_notes (device_id, time, name, notes)
 	       VALUES (:device_id, :time, :name, :notes) RETURNING *`, newNote)
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("%v\n", err)
 
 	dd, err := c.getDeviceDetails(ctx, ctx.DeviceID)
 	if err != nil {
