@@ -34,6 +34,10 @@ class DeviceNotes extends Component {
             notes: (ev.target.notes.value !== "") ? ev.target.notes.value : null,
         };
 
+        if (update.name == null && update.notes == null) {
+            return;
+        }
+
         fetch(device.urls.details, {
             method: 'POST',
             body: JSON.stringify(update)
@@ -44,19 +48,50 @@ class DeviceNotes extends Component {
         });
     }
 
-    render() {
+    renderNote(device, index, note) {
+        const noteMoment = moment(note.time);
+        const noteAgo = noteMoment.fromNow();
+
         return (
-            <div className="">
+            <tr key={index}>
+                <th> {noteAgo} </th>
+                <td> {note.name && "Name changed to " + note.name} {note.notes && "Notes: " + note.notes} </td>
+            </tr>
+        );
+    }
+
+    render() {
+        const { device, details } = this.props;
+
+        if (!_.isObject(details)) {
+            return <Loading />;
+        }
+
+        return (
+            <div>
+                <table className="notes">
+                    <tbody>
+                    {details.notes.map((note, idx) => {
+                        return this.renderNote(device, idx, note);
+                    })}
+                    </tbody>
+                </table>
                 <form className="" onSubmit={(ev) => this.save(ev)}>
-                    <div className="form-group">
-                        <label htmlFor="name">Name</label>
-                        <input type="text" name="name" className="form-control" />
+                    <div className="form-row">
+                        <div className="form-group col-md-6">
+                            <label htmlFor="name">Name</label>
+                            <input type="text" name="name" className="form-control" placeholder="Name" />
+                        </div>
+                        <div className="form-group col-md-6">
+                            <label htmlFor="notes">Notes</label>
+                            <input type="text" name="notes" className="form-control" placeholder="Notes" />
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="notes">Notes</label>
-                        <input type="text" name="notes" className="form-control" />
+                    <div className="form-row">
+                        <div className="col-md-6">
+                        <button type="submit" className="btn btn-primary">Save</button>
+                        </div>
                     </div>
-                    <button type="submit" className="btn btn-primary">Save</button>
                 </form>
             </div>
         );
@@ -64,20 +99,6 @@ class DeviceNotes extends Component {
 }
 
 class ConcatenatedFiles extends Component {
-    state = {
-        details: null
-    }
-
-    componentWillMount() {
-        const { deviceId } = this.props;
-
-        FkPromisedApi.queryDeviceFilesDetails(deviceId).then(details => {
-            this.setState({
-                details
-            });
-        });
-    }
-
     generate(url) {
         fetch(url, {}).then((res) => {
             return res.json();
@@ -87,7 +108,7 @@ class ConcatenatedFiles extends Component {
     }
 
     render() {
-        const { details } = this.state;
+        const { details } = this.props;
 
         if (!_.isObject(details)) {
             return <Loading />;
@@ -108,8 +129,7 @@ class ConcatenatedFiles extends Component {
     }
 
     renderFileType(name, key) {
-        const { details } = this.state;
-        const { device } = this.props;
+        const { device, details } = this.props;
 
         const files = details.files[key];
         const urls = device.urls[key];
@@ -147,19 +167,34 @@ class Files extends Component {
         loadDevices: any => void,
     };
 
+    state = {
+        details: null
+    };
+
+    refreshDevice(deviceId) {
+        const { loadDeviceFiles } = this.props;
+
+        loadDeviceFiles(deviceId);
+
+        FkPromisedApi.queryDeviceFilesDetails(deviceId).then(details => {
+            this.setState({
+                details
+            });
+        });
+    }
+
     componentWillMount() {
-        const { loadDevices } = this.props;
-        const { loadDeviceFiles, deviceId } = this.props;
+        const { loadDevices, deviceId } = this.props;
 
         loadDevices();
 
         if (deviceId) {
-            loadDeviceFiles(deviceId);
+            this.refreshDevice(deviceId);
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { loadDeviceFiles, deviceId, focusLocation } = this.props;
+        const { deviceId, focusLocation } = this.props;
 
         if (deviceId && deviceId !== prevProps.deviceId) {
             const device = this.getDevice();
@@ -169,11 +204,13 @@ class Files extends Component {
                 focusLocation(center);
             }
 
-            loadDeviceFiles(deviceId);
+            this.refreshDevice(deviceId);
         }
     }
 
     renderFiles(device, deviceFiles, deviceId) {
+        const { details } = this.state;
+
         if (deviceFiles.all.length === 0) {
             return <Loading />;
         }
@@ -189,11 +226,13 @@ class Files extends Component {
                     <Link to={'/files'}>Back to Devices</Link>
                 </div>
 
-                <DeviceNotes device={device} />
+                <h5>Notes</h5>
+
+                <DeviceNotes device={device} details={details} />
 
                 <h5>Concatenated Files</h5>
 
-                <ConcatenatedFiles device={device} deviceId={deviceId} />
+                <ConcatenatedFiles device={device} deviceId={deviceId} details={details} />
 
                 <h5>Individual Files</h5>
 
