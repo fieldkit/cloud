@@ -22,6 +22,47 @@ import MapContainer from '../components/MapContainer';
 import '../../css/files.css';
 import '../../css/bootstrap.min.css';
 
+class DeviceNotes extends Component {
+    save(ev) {
+        const { device } = this.props;
+
+        ev.preventDefault();
+
+        const update = {
+            deviceId: device.device_id,
+            name: (ev.target.name.value !== "") ? ev.target.name.value : null,
+            notes: (ev.target.notes.value !== "") ? ev.target.notes.value : null,
+        };
+
+        fetch(device.urls.details, {
+            method: 'POST',
+            body: JSON.stringify(update)
+        }).then((res) => {
+            return res.json();
+        }).then(data =>{
+            console.log(data);
+        });
+    }
+
+    render() {
+        return (
+            <div className="">
+                <form className="" onSubmit={(ev) => this.save(ev)}>
+                    <div className="form-group">
+                        <label htmlFor="name">Name</label>
+                        <input type="text" name="name" className="form-control" />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="notes">Notes</label>
+                        <input type="text" name="notes" className="form-control" />
+                    </div>
+                    <button type="submit" className="btn btn-primary">Save</button>
+                </form>
+            </div>
+        );
+    }
+}
+
 class ConcatenatedFiles extends Component {
     state = {
         details: null
@@ -39,6 +80,9 @@ class ConcatenatedFiles extends Component {
 
     generate(url) {
         fetch(url, {}).then((res) => {
+            return res.json();
+        }).then(data =>{
+            console.log(data);
         });
     }
 
@@ -138,12 +182,14 @@ class Files extends Component {
             <div className="">
                 <h4>
                     <div style={{ marginRight: 10, float: 'left', width: 30, height: 30, borderRadius: 10, backgroundColor: device.color }}> </div>
-                    {deviceId}
+                    {deviceId} {device.name}
                 </h4>
 
                 <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
                     <Link to={'/files'}>Back to Devices</Link>
                 </div>
+
+                <DeviceNotes device={device} />
 
                 <h5>Concatenated Files</h5>
 
@@ -191,7 +237,7 @@ class Files extends Component {
 
     renderDevice(device) {
         const fileMoment = moment(device.last_file_time);
-        const time = fileMoment.format('MMM Do YYYY HH:mm');;
+        // const time = fileMoment.format('MMM Do YYYY HH:mm');
         const fileAgo = fileMoment.fromNow();
         const places = _.join(_(device.locations.entries).map(le => le.places).uniq().filter(s => s !== null && s !== "").value(), ", ");
 
@@ -201,10 +247,11 @@ class Files extends Component {
                     <div style={{ marginRight: 10, float: 'left', width: 20, height: 20, borderRadius: 5, backgroundColor: device.color }}> </div>
                     <Link to={'/files/' + device.device_id}>{device.device_id}</Link>
                 </td>
+                <td>{device.name}</td>
                 <td>{device.number_of_files}</td>
                 <td>{prettyBytes(device.logs_size)}</td>
                 <td>{prettyBytes(device.data_size)}</td>
-                <td>{fileAgo} ({time})</td>
+                <td>{fileAgo}</td>
                 <td>{places}</td>
             </tr>
         );
@@ -234,6 +281,7 @@ class Files extends Component {
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Name</th>
                         <th>Files</th>
                         <th>Logs</th>
                         <th>Data</th>

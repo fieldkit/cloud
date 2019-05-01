@@ -1052,6 +1052,51 @@ func (ut *UpdateDeviceFirmwarePayload) Validate() (err error) {
 	return
 }
 
+// updateDeviceInfoPayload user type.
+type updateDeviceInfoPayload struct {
+	DeviceID *string `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Notes    *string `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+}
+
+// Validate validates the updateDeviceInfoPayload type instance.
+func (ut *updateDeviceInfoPayload) Validate() (err error) {
+	if ut.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "deviceId"))
+	}
+	return
+}
+
+// Publicize creates UpdateDeviceInfoPayload from updateDeviceInfoPayload
+func (ut *updateDeviceInfoPayload) Publicize() *UpdateDeviceInfoPayload {
+	var pub UpdateDeviceInfoPayload
+	if ut.DeviceID != nil {
+		pub.DeviceID = *ut.DeviceID
+	}
+	if ut.Name != nil {
+		pub.Name = ut.Name
+	}
+	if ut.Notes != nil {
+		pub.Notes = ut.Notes
+	}
+	return &pub
+}
+
+// UpdateDeviceInfoPayload user type.
+type UpdateDeviceInfoPayload struct {
+	DeviceID string  `form:"deviceId" json:"deviceId" xml:"deviceId"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Notes    *string `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+}
+
+// Validate validates the UpdateDeviceInfoPayload type instance.
+func (ut *UpdateDeviceInfoPayload) Validate() (err error) {
+	if ut.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "deviceId"))
+	}
+	return
+}
+
 // updateDeviceSourceLocationPayload user type.
 type updateDeviceSourceLocationPayload struct {
 	Key       *string  `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`

@@ -304,6 +304,14 @@ type (
 		PrettyPrint bool
 	}
 
+	// UpdateDeviceInfoFilesCommand is the command line data structure for the update device info action of files
+	UpdateDeviceInfoFilesCommand struct {
+		Payload     string
+		ContentType string
+		DeviceID    string
+		PrettyPrint bool
+	}
+
 	// AddMemberCommand is the command line data structure for the add action of member
 	AddMemberCommand struct {
 		Payload     string
@@ -665,11 +673,11 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 Payload example:
 
 {
-   "etag": "Placeat repellendus dolores praesentium.",
-   "meta": "Impedit aliquam illum aut.",
-   "module": "Eius ipsam magnam molestiae.",
-   "profile": "Sed quis rerum.",
-   "url": "Quia mollitia."
+   "etag": "Voluptas doloremque ea pariatur.",
+   "meta": "Tempore aut deleniti dolorem sunt nesciunt.",
+   "module": "Doloremque eum quia et occaecati ut sint.",
+   "profile": "Reiciendis doloremque autem necessitatibus doloribus et labore.",
+   "url": "Rerum numquam voluptatem."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp59.Run(c, args) },
 	}
@@ -685,7 +693,7 @@ Payload example:
 Payload example:
 
 {
-   "userId": 5845747075414789895
+   "userId": 163439533785277515
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp60.Run(c, args) },
 	}
@@ -701,8 +709,8 @@ Payload example:
 Payload example:
 
 {
-   "key": "Doloremque ea pariatur ut tempore.",
-   "name": "Deleniti dolorem sunt nesciunt dolor doloremque."
+   "key": "Consequatur quibusdam nisi.",
+   "name": "Doloremque consequuntur ut."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp61.Run(c, args) },
 	}
@@ -718,9 +726,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Quaerat et.",
-   "name": "Ea voluptas sit.",
-   "slug": "ixws2whiba"
+   "description": "Minima deserunt rerum cumque et aut sunt.",
+   "name": "Qui asperiores amet aliquid et.",
+   "slug": "mp6g6qg0z6"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp62.Run(c, args) },
 	}
@@ -736,8 +744,8 @@ Payload example:
 Payload example:
 
 {
-   "role": "Quam maxime sunt exercitationem.",
-   "userId": 5868433439943793991
+   "role": "Ducimus assumenda quod nesciunt.",
+   "userId": 3017786066181507426
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp63.Run(c, args) },
 	}
@@ -753,9 +761,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Rerum cumque et aut sunt.",
-   "name": "Qui asperiores amet aliquid et.",
-   "slug": "mp6g6qg0z6"
+   "description": "Voluptatem sed unde vel soluta aut consequuntur.",
+   "name": "Tempore facere tempora ut eveniet alias fuga.",
+   "slug": "xodano2mb4"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp64.Run(c, args) },
 	}
@@ -780,9 +788,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Beatae officia dolores.",
-   "name": "j91bm6qh9f",
-   "slug": "iq9cd69as0"
+   "description": "Non nobis nostrum id.",
+   "name": "q90susr7y4",
+   "slug": "bnqpv56hnk"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp66.Run(c, args) },
 	}
@@ -798,7 +806,7 @@ Payload example:
 Payload example:
 
 {
-   "name": "Tempore neque itaque tempora."
+   "name": "Labore est."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp67.Run(c, args) },
 	}
@@ -814,12 +822,12 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Sed unde vel soluta aut consequuntur.",
-   "email": "dasia_toy@bechtelarhoppe.info",
-   "invite_token": "Quaerat dolor magnam.",
-   "name": "v56hnkyddw",
-   "password": "vj36wa2lzz",
-   "username": "51w67zb615"
+   "bio": "Vel ut quod ad quisquam nihil.",
+   "email": "daniela@nolanrowe.biz",
+   "invite_token": "Et corporis consequatur itaque et.",
+   "name": "yin840862o",
+   "password": "em7iud7z2v",
+   "username": "s5htqwowfr"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp68.Run(c, args) },
 	}
@@ -1477,8 +1485,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "d9i8qvlvy4",
-   "username": "tjblkmzepz"
+   "password": "ncxwe120m0",
+   "username": "0o2o0pniix"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp127.Run(c, args) },
 	}
@@ -1541,7 +1549,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Nisi excepturi ab modi tenetur et corporis."
+   "refresh_token": "Rerum rerum."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp131.Run(c, args) },
 	}
@@ -1618,8 +1626,8 @@ Payload example:
 Payload example:
 
 {
-   "deviceId": 3803341964789081395,
-   "firmwareId": 8072982623113136546
+   "deviceId": 8383815340155777850,
+   "firmwareId": 5093924094306830147
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp136.Run(c, args) },
 	}
@@ -1635,8 +1643,8 @@ Payload example:
 Payload example:
 
 {
-   "key": "Quia et occaecati ut sint aut reiciendis.",
-   "name": "Autem necessitatibus doloribus."
+   "key": "Quaerat et.",
+   "name": "Ea voluptas sit."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp137.Run(c, args) },
 	}
@@ -1652,9 +1660,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Quaerat et.",
-   "name": "Ea voluptas sit.",
-   "slug": "ixws2whiba"
+   "description": "Minima deserunt rerum cumque et aut sunt.",
+   "name": "Qui asperiores amet aliquid et.",
+   "slug": "mp6g6qg0z6"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp138.Run(c, args) },
 	}
@@ -1670,7 +1678,7 @@ Payload example:
 Payload example:
 
 {
-   "role": "Non minima."
+   "role": "Ut et esse sapiente tempore neque itaque."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp139.Run(c, args) },
 	}
@@ -1686,9 +1694,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Rerum cumque et aut sunt.",
-   "name": "Qui asperiores amet aliquid et.",
-   "slug": "mp6g6qg0z6"
+   "description": "Voluptatem sed unde vel soluta aut consequuntur.",
+   "name": "Tempore facere tempora ut eveniet alias fuga.",
+   "slug": "xodano2mb4"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp140.Run(c, args) },
 	}
@@ -1705,9 +1713,9 @@ Payload example:
 
 {
    "active": true,
-   "name": "Voluptatibus omnis recusandae.",
-   "teamId": 3682049678587796623,
-   "userId": 926617965293018256
+   "name": "Dignissimos suscipit voluptatem quae.",
+   "teamId": 1164589535367422425,
+   "userId": 7361913865704234174
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp141.Run(c, args) },
 	}
@@ -1723,9 +1731,9 @@ Payload example:
 Payload example:
 
 {
-   "description": "Beatae officia dolores.",
-   "name": "j91bm6qh9f",
-   "slug": "iq9cd69as0"
+   "description": "Non nobis nostrum id.",
+   "name": "q90susr7y4",
+   "slug": "bnqpv56hnk"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp142.Run(c, args) },
 	}
@@ -1741,10 +1749,10 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Itaque et id fugiat est aperiam.",
-   "email": "lera@hauck.net",
-   "name": "o0pniixhu1",
-   "username": "mgwcc1rzvg"
+   "bio": "Quia in veritatis illo.",
+   "email": "darrion@gleichner.com",
+   "name": "ur3gib044g",
+   "username": "b1xfgeh0tj"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp143.Run(c, args) },
 	}
@@ -1753,21 +1761,21 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "update-location",
-		Short: `Update an Device source location`,
+		Use:   "update-device-info",
+		Short: `Device info`,
 	}
-	tmp144 := new(UpdateLocationDeviceCommand)
+	tmp144 := new(UpdateDeviceInfoFilesCommand)
 	sub = &cobra.Command{
-		Use:   `device ["/sources/devices/ID/location"]`,
+		Use:   `files ["/devices/DEVICEID"]`,
 		Short: ``,
 		Long: `
 
 Payload example:
 
 {
-   "key": "Labore voluptatem rerum numquam voluptatem.",
-   "latitude": 0.9089750805514193,
-   "longitude": 0.5522843569523721
+   "deviceId": "Odio voluptatibus omnis recusandae omnis perferendis illo.",
+   "name": "Officia dolores facere veritatis quod voluptas.",
+   "notes": "Sit id officia ipsa quam consectetur rerum."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp144.Run(c, args) },
 	}
@@ -1776,21 +1784,21 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "update-schema",
-		Short: `Update an Device source schema`,
+		Use:   "update-location",
+		Short: `Update an Device source location`,
 	}
-	tmp145 := new(UpdateSchemaDeviceCommand)
+	tmp145 := new(UpdateLocationDeviceCommand)
 	sub = &cobra.Command{
-		Use:   `device ["/sources/devices/ID/schemas"]`,
+		Use:   `device ["/sources/devices/ID/location"]`,
 		Short: ``,
 		Long: `
 
 Payload example:
 
 {
-   "active": false,
-   "jsonSchema": "Consequatur quibusdam nisi.",
-   "key": "Doloremque consequuntur ut."
+   "key": "Autem ex veritatis.",
+   "latitude": 0.49604993206521375,
+   "longitude": 0.2441469207466748
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp145.Run(c, args) },
 	}
@@ -1799,31 +1807,54 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "user-getid",
-		Short: `Get a user's picture`,
+		Use:   "update-schema",
+		Short: `Update an Device source schema`,
 	}
-	tmp146 := new(UserGetIDPictureCommand)
+	tmp146 := new(UpdateSchemaDeviceCommand)
 	sub = &cobra.Command{
-		Use:   `picture ["/users/USERID/picture"]`,
+		Use:   `device ["/sources/devices/ID/schemas"]`,
 		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp146.Run(c, args) },
+		Long: `
+
+Payload example:
+
+{
+   "active": true,
+   "jsonSchema": "Et maiores et nobis quam.",
+   "key": "Sunt exercitationem a dolores."
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp146.Run(c, args) },
 	}
 	tmp146.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp146.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "validate",
-		Short: `Validate a user's email address.`,
+		Use:   "user-getid",
+		Short: `Get a user's picture`,
 	}
-	tmp147 := new(ValidateUserCommand)
+	tmp147 := new(UserGetIDPictureCommand)
 	sub = &cobra.Command{
-		Use:   `user ["/validate"]`,
+		Use:   `picture ["/users/USERID/picture"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp147.Run(c, args) },
 	}
 	tmp147.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp147.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "validate",
+		Short: `Validate a user's email address.`,
+	}
+	tmp148 := new(ValidateUserCommand)
+	sub = &cobra.Command{
+		Use:   `user ["/validate"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp148.Run(c, args) },
+	}
+	tmp148.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp148.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -2274,16 +2305,16 @@ func (cmd *ListBySourceGeojsonCommand) Run(c *client.Client, args []string) erro
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp148 *bool
+	var tmp149 *bool
 	if cmd.Descending != "" {
 		var err error
-		tmp148, err = boolVal(cmd.Descending)
+		tmp149, err = boolVal(cmd.Descending)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--descending", "err", err)
 			return err
 		}
 	}
-	resp, err := c.ListBySourceGeoJSON(ctx, path, tmp148)
+	resp, err := c.ListBySourceGeoJSON(ctx, path, tmp149)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -3004,16 +3035,16 @@ func (cmd *CsvFilesCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp149 *bool
+	var tmp150 *bool
 	if cmd.Dl != "" {
 		var err error
-		tmp149, err = boolVal(cmd.Dl)
+		tmp150, err = boolVal(cmd.Dl)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
 			return err
 		}
 	}
-	resp, err := c.CsvFiles(ctx, path, tmp149)
+	resp, err := c.CsvFiles(ctx, path, tmp150)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -3172,16 +3203,16 @@ func (cmd *RawFilesCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp150 *bool
+	var tmp151 *bool
 	if cmd.Dl != "" {
 		var err error
-		tmp150, err = boolVal(cmd.Dl)
+		tmp151, err = boolVal(cmd.Dl)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *bool value", "flag", "--dl", "err", err)
 			return err
 		}
 	}
-	resp, err := c.RawFiles(ctx, path, tmp150)
+	resp, err := c.RawFiles(ctx, path, tmp151)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -3220,6 +3251,41 @@ func (cmd *StatusFilesCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *StatusFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+}
+
+// Run makes the HTTP request corresponding to the UpdateDeviceInfoFilesCommand command.
+func (cmd *UpdateDeviceInfoFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v", url.QueryEscape(cmd.DeviceID))
+	}
+	var payload client.UpdateDeviceInfoPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.UpdateDeviceInfoFiles(ctx, path, &payload)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *UpdateDeviceInfoFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddMemberCommand command.

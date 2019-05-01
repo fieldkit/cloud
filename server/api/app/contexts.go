@@ -1816,6 +1816,50 @@ func (ctx *StatusFilesContext) OK(r *FilesStatus) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// UpdateDeviceInfoFilesContext provides the files update device info action context.
+type UpdateDeviceInfoFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+	Payload  *UpdateDeviceInfoPayload
+}
+
+// NewUpdateDeviceInfoFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the files controller update device info action.
+func NewUpdateDeviceInfoFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateDeviceInfoFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateDeviceInfoFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateDeviceInfoFilesContext) OK(r *DeviceDetails) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.details+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateDeviceInfoFilesContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *UpdateDeviceInfoFilesContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddMemberContext provides the member add action context.
 type AddMemberContext struct {
 	context.Context

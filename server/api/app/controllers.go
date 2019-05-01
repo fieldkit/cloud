@@ -2135,6 +2135,7 @@ type FilesController interface {
 	ListDevices(*ListDevicesFilesContext) error
 	Raw(*RawFilesContext) error
 	Status(*StatusFilesContext) error
+	UpdateDeviceInfo(*UpdateDeviceInfoFilesContext) error
 }
 
 // MountFilesController "mounts" a Files resource controller on the given service.
@@ -2277,6 +2278,28 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/status", ctrl.MuxHandler("status", h, nil))
 	service.LogInfo("mount", "ctrl", "Files", "action", "Status", "route", "GET /files/status")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateDeviceInfoFilesContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UpdateDeviceInfoPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.UpdateDeviceInfo(rctx)
+	}
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("POST", "/devices/:deviceId", ctrl.MuxHandler("update device info", h, unmarshalUpdateDeviceInfoFilesPayload))
+	service.LogInfo("mount", "ctrl", "Files", "action", "UpdateDeviceInfo", "route", "POST /devices/:deviceId")
 }
 
 // handleFilesOrigin applies the CORS response headers corresponding to the origin.
@@ -2397,6 +2420,21 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalUpdateDeviceInfoFilesPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateDeviceInfoFilesPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateDeviceInfoPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // MemberController is the controller interface for the Member actions.

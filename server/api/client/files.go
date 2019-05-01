@@ -8,6 +8,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -40,8 +41,8 @@ func (c *Client) NewCsvFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp152 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp152)
+		tmp153 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp153)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -136,8 +137,8 @@ func (c *Client) NewListDeviceDataFilesFilesRequest(ctx context.Context, path st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp153 := strconv.Itoa(*page)
-		values.Set("page", tmp153)
+		tmp154 := strconv.Itoa(*page)
+		values.Set("page", tmp154)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -172,8 +173,8 @@ func (c *Client) NewListDeviceLogFilesFilesRequest(ctx context.Context, path str
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp154 := strconv.Itoa(*page)
-		values.Set("page", tmp154)
+		tmp155 := strconv.Itoa(*page)
+		values.Set("page", tmp155)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -237,8 +238,8 @@ func (c *Client) NewRawFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp155 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp155)
+		tmp156 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp156)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -274,5 +275,42 @@ func (c *Client) NewStatusFilesRequest(ctx context.Context, path string) (*http.
 	if err != nil {
 		return nil, err
 	}
+	return req, nil
+}
+
+// UpdateDeviceInfoFilesPath computes a request path to the update device info action of files.
+func UpdateDeviceInfoFilesPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/devices/%s", param0)
+}
+
+// Device info
+func (c *Client) UpdateDeviceInfoFiles(ctx context.Context, path string, payload *UpdateDeviceInfoPayload) (*http.Response, error) {
+	req, err := c.NewUpdateDeviceInfoFilesRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUpdateDeviceInfoFilesRequest create the request corresponding to the update device info action endpoint of the files resource.
+func (c *Client) NewUpdateDeviceInfoFilesRequest(ctx context.Context, path string, payload *UpdateDeviceInfoPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
 	return req, nil
 }

@@ -104,6 +104,7 @@ type DeviceSummary struct {
 	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" xml:"last_file_time"`
 	Locations     *LocationHistory   `form:"locations" json:"locations" xml:"locations"`
 	LogsSize      int                `form:"logs_size" json:"logs_size" xml:"logs_size"`
+	Name          *string            `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" xml:"number_of_files"`
 	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" xml:"urls"`
 }
@@ -140,9 +141,10 @@ func (mt *DeviceSummary) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device.details+json; view=default
 type DeviceDetails struct {
-	DeviceID string                 `form:"device_id" json:"device_id" xml:"device_id"`
-	Files    *ConcatenatedFilesInfo `form:"files" json:"files" xml:"files"`
-	Urls     *DeviceSummaryUrls     `form:"urls" json:"urls" xml:"urls"`
+	DeviceID string                     `form:"device_id" json:"device_id" xml:"device_id"`
+	Files    *ConcatenatedFilesInfo     `form:"files" json:"files" xml:"files"`
+	Notes    DeviceNotesEntryCollection `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Urls     *DeviceSummaryUrls         `form:"urls" json:"urls" xml:"urls"`
 }
 
 // Validate validates the DeviceDetails media type instance.
@@ -258,6 +260,20 @@ func (mt *DeviceFiles) Validate() (err error) {
 	}
 	return
 }
+
+// DeviceNotesEntry media type (default view)
+//
+// Identifier: application/vnd.app.device.notes+json; view=default
+type DeviceNotesEntry struct {
+	Name  *string   `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Notes *string   `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Time  time.Time `form:"time" json:"time" xml:"time"`
+}
+
+// DeviceNotesEntryCollection is the media type for an array of DeviceNotesEntry (default view)
+//
+// Identifier: application/vnd.app.device.notes+json; type=collection; view=default
+type DeviceNotesEntryCollection []*DeviceNotesEntry
 
 // DeviceSummaryCollection is the media type for an array of DeviceSummary (default view)
 //

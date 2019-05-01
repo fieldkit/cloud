@@ -106,12 +106,35 @@ var ConcatenatedFilesInfo = Type("ConcatenatedFilesInfo", func() {
 	Required("logs", "data")
 })
 
+var UpdateDeviceInfoPayload = Type("UpdateDeviceInfoPayload ", func() {
+	Attribute("deviceId")
+	Required("deviceId")
+	Attribute("name")
+	Attribute("notes")
+})
+
+var DeviceNotesEntry = MediaType("application/vnd.app.device.notes+json", func() {
+	TypeName("DeviceNotesEntry")
+	Attributes(func() {
+		Attribute("time", DateTime)
+		Required("time")
+		Attribute("name")
+		Attribute("notes")
+	})
+	View("default", func() {
+		Attribute("time")
+		Attribute("name")
+		Attribute("notes")
+	})
+})
+
 var DeviceDetails = MediaType("application/vnd.app.device.details+json", func() {
 	TypeName("DeviceDetails")
 	Attributes(func() {
 		Attribute("device_id", String)
 		Attribute("files", ConcatenatedFilesInfo)
 		Attribute("urls", DeviceSummaryUrls)
+		Attribute("notes", CollectionOf(DeviceNotesEntry))
 		Required("device_id")
 		Required("files")
 		Required("urls")
@@ -120,6 +143,7 @@ var DeviceDetails = MediaType("application/vnd.app.device.details+json", func() 
 		Attribute("device_id")
 		Attribute("files")
 		Attribute("urls")
+		Attribute("notes")
 	})
 })
 
@@ -163,6 +187,7 @@ var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 		Attribute("last_file_id", String)
 		Attribute("urls", DeviceSummaryUrls)
 		Attribute("locations", LocationHistory)
+		Attribute("name", String)
 		Required("device_id")
 		Required("number_of_files")
 		Required("logs_size")
@@ -181,6 +206,7 @@ var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 		Attribute("last_file_id")
 		Attribute("urls")
 		Attribute("locations")
+		Attribute("name")
 	})
 })
 
@@ -247,6 +273,21 @@ var _ = Resource("files", func() {
 		Routing(GET("devices/:deviceId"))
 		Description("Device info")
 		Response(NotFound)
+		Response(OK, func() {
+			Media(DeviceDetails)
+		})
+	})
+
+	Action("update device info", func() {
+		Routing(POST("devices/:deviceId"))
+		Description("Device info")
+		Params(func() {
+			Param("deviceId", String)
+			Required("deviceId")
+		})
+		Payload(UpdateDeviceInfoPayload)
+		Response(NotFound)
+		Response(BadRequest)
 		Response(OK, func() {
 			Media(DeviceDetails)
 		})

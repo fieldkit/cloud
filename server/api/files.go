@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -111,6 +112,7 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 	if err := c.options.Database.SelectContext(ctx, &devices,
 		`SELECT s.device_id,
 		    (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
+		    (SELECT n.name FROM fieldkit.device_notes AS n WHERE (n.device_id = s.device_id) AND (n.name IS NOT NULL) ORDER BY n.time DESC LIMIT 1) AS name,
 		    MAX(s.time) AS last_stream_time,
 		    COUNT(s.*) AS number_of_files,
 		    COALESCE(SUM(s.size) FILTER (WHERE s.file_id != '4'), 0) AS logs_size,
@@ -125,34 +127,94 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 	return ctx.OK(DevicesType(c.options.Config, devices, locations))
 }
 
-func (c *FilesController) DeviceInfo(ctx *app.DeviceInfoFilesContext) error {
+func DeviceNotesType(ctx context.Context, notes []*data.DeviceNotes) []*app.DeviceNotesEntry {
+	entries := make([]*app.DeviceNotesEntry, len(notes))
+	for i, note := range notes {
+		entries[i] = &app.DeviceNotesEntry{
+			Time:  note.Time,
+			Name:  note.Name,
+			Notes: note.Notes,
+		}
+	}
+	return entries
+}
+
+func (c *FilesController) getDeviceDetails(ctx context.Context, deviceID string) (dd *app.DeviceDetails, err error) {
 	ac := c.options.Config
+
+	var notes []*data.DeviceNotes
+	if err := c.options.Database.SelectContext(ctx, &notes,
+		`SELECT n.time, n.name, n.notes
+		 FROM fieldkit.device_notes AS n
+                 WHERE n.device_id = $1
+                 ORDER BY time DESC`, deviceID); err != nil {
+		return nil, err
+	}
 
 	fr, err := backend.NewFileRepository(c.options.Session, "fk-streams")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	urls := DeviceSummaryUrls(ac, ctx.DeviceID)
+	urls := DeviceSummaryUrls(ac, deviceID)
 
 	data, err := fr.Info(ctx, urls.Data.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	logs, err := fr.Info(ctx, urls.Logs.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return ctx.OK(&app.DeviceDetails{
-		DeviceID: ctx.DeviceID,
+	notesType := DeviceNotesType(ctx, notes)
+
+	fmt.Printf("%v\n", notes)
+
+	return &app.DeviceDetails{
+		DeviceID: deviceID,
 		Urls:     urls,
+		Notes:    notesType,
 		Files: &app.ConcatenatedFilesInfo{
 			Data: ConcatenatedFileInfo(urls.Data, data),
 			Logs: ConcatenatedFileInfo(urls.Logs, logs),
 		},
-	})
+	}, nil
+}
+
+func (c *FilesController) DeviceInfo(ctx *app.DeviceInfoFilesContext) error {
+	dd, err := c.getDeviceDetails(ctx, ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(dd)
+}
+
+func (c *FilesController) UpdateDeviceInfo(ctx *app.UpdateDeviceInfoFilesContext) error {
+	newNote := data.DeviceNotes{
+		DeviceID: ctx.Payload.DeviceID,
+		Time:     time.Now(),
+		Name:     ctx.Payload.Name,
+		Notes:    ctx.Payload.Notes,
+	}
+
+	fmt.Printf("%v\n", newNote)
+
+	err := c.options.Database.NamedGetContext(ctx, &newNote, `
+               INSERT INTO fieldkit.device_notes (device_id, time, name, notes)
+	       VALUES (:device_id, :time, :name, :notes) RETURNING *`, newNote)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%v\n", err)
+
+	dd, err := c.getDeviceDetails(ctx, ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(dd)
 }
 
 func (c *FilesController) File(ctx *app.FileFilesContext) error {
@@ -330,7 +392,7 @@ func DeviceSummaryUrls(ac *ApiConfiguration, deviceID string) *app.DeviceSummary
 	concatenatedLogsID := uuid.NewSHA1(backend.ConcatenatedLogsSpace, []byte(deviceID))
 
 	return &app.DeviceSummaryUrls{
-		Details: ac.MakeApiUrl("/devices/%v/data", deviceID),
+		Details: ac.MakeApiUrl("/devices/%v", deviceID),
 		Data:    DeviceFileTypeUrls(ac, "data", deviceID, concatenatedDataID.String()),
 		Logs:    DeviceFileTypeUrls(ac, "logs", deviceID, concatenatedLogsID.String()),
 	}
@@ -352,6 +414,7 @@ func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[
 		NumberOfFiles: s.NumberOfFiles,
 		LogsSize:      s.LogsSize,
 		DataSize:      s.DataSize,
+		Name:          s.Name,
 		Urls:          DeviceSummaryUrls(ac, s.DeviceID),
 		Locations:     lh,
 	}

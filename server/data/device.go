@@ -83,6 +83,14 @@ type DeviceFile struct {
 	Flags    pq.Int64Array  `db:"flags"`
 }
 
+type DeviceNotes struct {
+	ID       int64     `db:"id"`
+	Time     time.Time `db:"time"`
+	DeviceID string    `db:"device_id"`
+	Name     *string   `db:"name"`
+	Notes    *string   `db:"notes"`
+}
+
 type DeviceSummary struct {
 	DeviceID      string    `db:"device_id"`
 	LastFileID    string    `db:"last_stream_id"`
@@ -90,4 +98,5 @@ type DeviceSummary struct {
 	NumberOfFiles int       `db:"number_of_files"`
 	LogsSize      int       `db:"logs_size"`
 	DataSize      int       `db:"data_size"`
+	Name          *string   `db:"name"`
 }

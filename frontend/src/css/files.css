@@ -2420,4 +2420,7 @@ h5 {
 .files.page h3, .files.page h4, .files.page h5 {
   color: black; }
 
+.files.page label {
+  color: black; }
+
 /*# sourceMappingURL=files.css.map */
