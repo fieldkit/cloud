@@ -12,9 +12,21 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
+type CountingReader struct {
+	target    io.Reader
+	BytesRead int
+}
+
+func NewCountingReader(target io.Reader) *CountingReader {
+	return &CountingReader{
+		target: target,
+	}
+}
+
 type SavedStream struct {
-	ID  string
-	URL string
+	ID        string
+	URL       string
+	BytesRead int
 }
 
 type StreamArchiver interface {
@@ -36,6 +48,8 @@ type FileStreamArchiver struct {
 func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders, reader io.Reader) (*SavedStream, error) {
 	log := Logger(ctx).Sugar()
 
+	countingReader := NewCountingReader(reader)
+
 	if headers.FkUploadName == "" {
 		log.Infof("No file name, streaming %s to /dev/null", headers.ContentType)
 		id, err := uuid.NewRandom()
@@ -43,8 +57,9 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 			return nil, err
 		}
 		ss := &SavedStream{
-			ID:  id.String(),
-			URL: "https://foo/" + id.String(),
+			ID:        id.String(),
+			URL:       "https://foo/" + id.String(),
+			BytesRead: 0,
 		}
 
 		return ss, nil
@@ -52,7 +67,7 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 
 	fn := headers.FkUploadName
 
-	log.Infof("Streaming %s to %s", headers.ContentType, fn)
+	log.Infow("Streaming", "content_type", headers.ContentType, "file_name", fn)
 
 	file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
@@ -61,15 +76,22 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 
 	defer file.Close()
 
-	io.Copy(file, reader)
+	io.Copy(file, countingReader)
 
 	ss := &SavedStream{
-		ID:  fn,
-		URL: fn,
+		ID:        fn,
+		URL:       fn,
+		BytesRead: countingReader.BytesRead,
 	}
 
 	return ss, nil
 
+}
+
+func (r *CountingReader) Read(p []byte) (n int, err error) {
+	n, err = r.target.Read(p)
+	r.BytesRead += n
+	return n, err
 }
 
 type S3StreamArchiver struct {
@@ -90,6 +112,8 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 		return nil, err
 	}
 
+	log := Logger(ctx).Sugar()
+
 	uploader := s3manager.NewUploader(a.session)
 
 	metadata := make(map[string]*string)
@@ -101,12 +125,14 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 	metadata[FkFileIdHeaderName] = aws.String(headers.FkFileId)
 	metadata[FkFileNameHeaderName] = aws.String(headers.FkFileName)
 
+	countingReader := NewCountingReader(reader)
+
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
 		ContentType: aws.String(headers.ContentType),
 		Bucket:      aws.String(a.bucketName),
 		Key:         aws.String(id.String()),
-		Body:        reader,
+		Body:        countingReader,
 		Metadata:    metadata,
 		Tagging:     nil,
 	})
@@ -114,11 +140,12 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 		return nil, err
 	}
 
-	Logger(ctx).Sugar().Infof("Done: %s", r.Location)
+	log.Infow("saved", "url", r.Location, "bytes_read", countingReader.BytesRead)
 
 	ss := &SavedStream{
-		ID:  id.String(),
-		URL: r.Location,
+		ID:        id.String(),
+		URL:       r.Location,
+		BytesRead: countingReader.BytesRead,
 	}
 
 	return ss, err
