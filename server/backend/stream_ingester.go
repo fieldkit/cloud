@@ -32,6 +32,7 @@ const (
 	MultiPartFormDataMediaType = "multipart/form-data"
 	ContentTypeHeaderName      = "Content-Type"
 	ContentLengthHeaderName    = "Content-Length"
+	XForwardedForHeaderName    = "X-Forwarded-For"
 	FkProcessingHeaderName     = "Fk-Processing"
 	FkVersionHeaderName        = "Fk-Version"
 	FkBuildHeaderName          = "Fk-Build"
@@ -249,7 +250,7 @@ func (si *StreamIngester) form(ctx context.Context, headers *IncomingHeaders, w 
 			reader = p
 		}
 
-		log.Infow("Part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength, "buffered", buffered)
+		log.Infow("part", "content_disposition", contentDisposition, "content_type", contentType, "content_length", contentLength, "buffered", buffered)
 
 		partHeaders := headers.ToPartHeaders(contentType, int32(contentLength))
 
@@ -267,6 +268,7 @@ type IncomingHeaders struct {
 	ContentLength   int32
 	MediaType       string
 	MediaTypeParams map[string]string
+	XForwardedFor   string
 	FkProcessing    string
 	FkVersion       string
 	FkBuild         string
@@ -282,6 +284,7 @@ type IncomingHeaders struct {
 func (h *IncomingHeaders) ToLoggingFields() []interface{} {
 	keysAndValues := make([]interface{}, 0)
 
+	keysAndValues = append(keysAndValues, "forwarded_for", h.XForwardedFor)
 	keysAndValues = append(keysAndValues, "content_type", h.ContentType)
 	keysAndValues = append(keysAndValues, "content_length", h.ContentLength)
 	keysAndValues = append(keysAndValues, "media_type", h.MediaType)
@@ -306,6 +309,7 @@ func (h *IncomingHeaders) ToPartHeaders(contentType string, contentLength int32)
 		ContentLength:   contentLength,
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
+		XForwardedFor:   h.XForwardedFor,
 		FkProcessing:    h.FkProcessing,
 		FkVersion:       h.FkVersion,
 		FkBuild:         h.FkBuild,
@@ -344,6 +348,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		ContentLength:   int32(contentLength),
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
+		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
 		FkProcessing:    req.Header.Get(FkProcessingHeaderName),
 		FkVersion:       req.Header.Get(FkVersionHeaderName),
 		FkBuild:         req.Header.Get(FkBuildHeaderName),
