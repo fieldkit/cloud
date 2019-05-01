@@ -195,6 +195,10 @@ func (si *StreamIngester) asynchronous(ctx context.Context, headers *IncomingHea
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		if saved != nil {
+			if saved.BytesRead != int(headers.ContentLength) {
+				log.Warnw("unexpected archive size", "expected", headers.ContentLength, "actual", saved.BytesRead)
+			}
+
 			err = si.saveStream(ctx, headers, saved)
 			if err != nil {
 				log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
@@ -254,7 +258,10 @@ func (si *StreamIngester) form(ctx context.Context, headers *IncomingHeaders, w 
 
 		partHeaders := headers.ToPartHeaders(contentType, int32(contentLength))
 
-		si.asynchronous(ctx, partHeaders, w, reader)
+		err = si.asynchronous(ctx, partHeaders, w, reader)
+		if err != nil {
+			log.Errorw("Error", "error", err)
+		}
 	}
 	return nil
 }
