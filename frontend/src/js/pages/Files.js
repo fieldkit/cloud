@@ -236,7 +236,7 @@ class DeviceView extends Component {
                 <td>{time}</td>
                 <td>{file.corrupted ? "Corrupt" : ""}</td>
                 <td> <a target="_blank" rel="noopener noreferrer" href={file.urls.csv + "?dl=0"}>CSV</a> (<a href={file.urls.csv}>Download</a>) </td>
-                <td> <a href={file.urls.raw}>FKPB</a> </td>
+                <td> <a href={file.urls.fkpb}>FKPB</a> </td>
             </tr>
         );
     }
