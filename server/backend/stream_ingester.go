@@ -369,7 +369,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	}
 
 	if headers.FkDeviceId == "" {
-		return nil, fmt.Errorf("Invalid %s ('%s')", FkDeviceIdHeaderName, headers.FkDeviceId)
+		return nil, fmt.Errorf("Invalid Header: '%s' = '%s'", FkDeviceIdHeaderName, headers.FkDeviceId)
 	}
 
 	return headers, nil
@@ -398,7 +398,7 @@ func (si *StreamIngester) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	headers, err := NewIncomingHeaders(req)
 	if err != nil {
 		log.Errorw("failed", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
