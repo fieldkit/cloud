@@ -238,10 +238,12 @@ type FileIterator struct {
 }
 
 type IteratorFile struct {
-	FileID   string
-	DeviceID string
-	Size     int64
-	URL      string
+	FileID     string
+	FileTypeID string
+	StreamID   string
+	DeviceID   string
+	Size       int64
+	URL        string
 }
 
 type OpenedFile struct {
@@ -254,10 +256,12 @@ func toIteratorFiles(dfs []*data.DeviceFile) []*IteratorFile {
 	ifs := make([]*IteratorFile, len(dfs))
 	for i, f := range dfs {
 		ifs[i] = &IteratorFile{
-			FileID:   f.FileID,
-			DeviceID: f.DeviceID,
-			Size:     f.Size,
-			URL:      f.URL,
+			FileID:     f.StreamID,
+			StreamID:   f.StreamID,
+			FileTypeID: f.FileID,
+			DeviceID:   f.DeviceID,
+			Size:       f.Size,
+			URL:        f.URL,
 		}
 	}
 	return ifs
@@ -288,10 +292,12 @@ func lookupFileOnS3(ctx context.Context, session *session.Session, db *sqlxcache
 
 			s.Files = make([]*IteratorFile, 1)
 			s.Files[0] = &IteratorFile{
-				FileID:   fi.Key,
-				DeviceID: fi.DeviceID,
-				Size:     fi.Size,
-				URL:      fi.URL,
+				FileID:     fi.Key,
+				FileTypeID: fi.FileTypeID,
+				StreamID:   fi.Key,
+				DeviceID:   fi.DeviceID,
+				Size:       fi.Size,
+				URL:        fi.URL,
 			}
 
 			return nil

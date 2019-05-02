@@ -23,6 +23,12 @@ func NewCountingReader(target io.Reader) *CountingReader {
 	}
 }
 
+func (r *CountingReader) Read(p []byte) (n int, err error) {
+	n, err = r.target.Read(p)
+	r.BytesRead += n
+	return n, err
+}
+
 type SavedStream struct {
 	ID        string
 	URL       string
@@ -86,12 +92,6 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 
 	return ss, nil
 
-}
-
-func (r *CountingReader) Read(p []byte) (n int, err error) {
-	n, err = r.target.Read(p)
-	r.BytesRead += n
-	return n, err
 }
 
 type S3StreamArchiver struct {

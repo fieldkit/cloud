@@ -284,7 +284,9 @@ func (c *FilesController) Raw(ctx *app.RawFilesContext) error {
 		return err
 	}
 
-	fileName := fmt.Sprintf("%s.csv", opened.FileID)
+	fileType := backend.FileTypeNames[opened.FileTypeID]
+
+	fileName := fmt.Sprintf("%s-%s-%s.fkpb", opened.StreamID, opened.FileTypeID, fileType)
 
 	ctx.ResponseData.Header().Set("Content-Type", backend.FkDataBinaryContentType)
 	ctx.ResponseData.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", fileName))
