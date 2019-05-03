@@ -406,7 +406,6 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *OpenedFile, err err
 		if err != nil {
 			return nil, fmt.Errorf("Error signing stream URL: %v (%v)", iteratorFile.URL, err)
 		}
-		log.Infow("File", "file_type_id", iteratorFile.FileID, "signed_url", signed)
 	}
 
 	response, err := http.Get(signed)
