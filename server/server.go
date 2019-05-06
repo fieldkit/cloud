@@ -59,13 +59,14 @@ type Config struct {
 	AdminRoot             string `split_words:"true"`
 	FrontendRoot          string `split_words:"true"`
 	LandingRoot           string `split_words:"true"`
+	LandingURL            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	ApiDomain             string `split_words:"true" default:""`
 	ApiHost               string `split_words:"true" default:""`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
-	ProductionLogging     bool   `envconfig:"production_logging"`
 	AwsId                 string `split_words:"true" default:""`
 	AwsSecret             string `split_words:"true" default:""`
+	ProductionLogging     bool   `envconfig:"production_logging"`
 
 	DisableMemoryLogging  bool `envconfig:"disable_memory_logging" default:"false"`
 	DisableStartupRefresh bool `envconfig:"disable_startup_refresh" default:"false"`
@@ -259,7 +260,11 @@ func main() {
 					return
 				}
 
-				landingServer.ServeHTTP(w, req)
+				if config.LandingURL == "" {
+					landingServer.ServeHTTP(w, req)
+				} else {
+					http.Redirect(w, req, config.LandingURL, http.StatusSeeOther)
+				}
 				return
 			}
 
