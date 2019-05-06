@@ -109,7 +109,7 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 					panic(err)
 				}
 
-				if i > 2 && v >= 200 {
+				if i < 2 && v >= 200 {
 					valid = false
 				}
 				coordinates[i] = v
