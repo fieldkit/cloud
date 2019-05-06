@@ -18,7 +18,7 @@ var cors = func() {
 var _ = API("fieldkit", func() {
 	Title("Fieldkit API")
 	Description("A one-click open platform for field researchers and explorers.")
-	Host("api.fieldkit.org:8080")
+	Host("api.fieldkit.org")
 	Scheme("https")
 	Origin("https://fieldkit.org:8080", cors)
 	Origin("https://*.fieldkit.org:8080", cors)
