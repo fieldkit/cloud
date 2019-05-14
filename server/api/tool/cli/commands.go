@@ -1485,8 +1485,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "ncxwe120m0",
-   "username": "0o2o0pniix"
+   "email": "alivia@bergstrom.info",
+   "password": "0nn1f09iai"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp127.Run(c, args) },
 	}
@@ -1549,7 +1549,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Rerum rerum."
+   "refresh_token": "Expedita ut sequi enim officiis."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp131.Run(c, args) },
 	}
@@ -1749,10 +1749,10 @@ Payload example:
 Payload example:
 
 {
-   "bio": "Quia in veritatis illo.",
-   "email": "darrion@gleichner.com",
-   "name": "ur3gib044g",
-   "username": "b1xfgeh0tj"
+   "bio": "Exercitationem enim.",
+   "email": "hollis@waltermclaughlin.biz",
+   "name": "3iin72yaco",
+   "username": "dg4n3junef"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp143.Run(c, args) },
 	}

@@ -172,9 +172,9 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	now := time.Now()
 
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE username = $1", ctx.Payload.Username)
+	err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE email = $1", ctx.Payload.Email)
 	if err == sql.ErrNoRows {
-		return ctx.Unauthorized(goa.ErrUnauthorized("invalid username or password"))
+		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
 
 	if err != nil {
@@ -187,7 +187,7 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 
 	err = user.CheckPassword(ctx.Payload.Password)
 	if err == data.IncorrectPasswordError {
-		return ctx.Unauthorized(goa.ErrUnauthorized("invalid username or password"))
+		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
 
 	if err != nil {
@@ -200,7 +200,7 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	}
 
 	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", refreshToken); err != nil {
-		return ctx.Unauthorized(fmt.Errorf("invalid username or password"))
+		return ctx.Unauthorized(fmt.Errorf("invalid email or password"))
 	}
 
 	token := NewToken(now, user, refreshToken)

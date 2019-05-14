@@ -203,14 +203,14 @@ func NewClient(ctx context.Context, host, scheme string) (*fk.Client, error) {
 	return c, nil
 }
 
-func CreateAndAuthenticate(ctx context.Context, host, scheme, username, password string) (*fk.Client, error) {
+func CreateAndAuthenticate(ctx context.Context, host, scheme, email, password string) (*fk.Client, error) {
 	c, err := NewClient(ctx, host, scheme)
 	if err != nil {
 		return nil, err
 	}
 
 	loginPayload := fk.LoginPayload{}
-	loginPayload.Username = username
+	loginPayload.Email = email
 	loginPayload.Password = password
 	res, err := c.LoginUser(ctx, fk.LoginUserPath(), &loginPayload)
 	if err != nil {

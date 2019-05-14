@@ -33,9 +33,9 @@ var UpdateUserPayload = Type("UpdateUserPayload", func() {
 
 var LoginPayload = Type("LoginPayload", func() {
 	Reference(AddUserPayload)
-	Attribute("username")
+	Attribute("email")
 	Attribute("password")
-	Required("username", "password")
+	Required("email", "password")
 })
 
 var User = MediaType("application/vnd.app.user+json", func() {
