@@ -486,8 +486,6 @@ type addUserPayload struct {
 	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Password    *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
-	// Username
-	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
 // Validate validates the addUserPayload type instance.
@@ -497,9 +495,6 @@ func (ut *addUserPayload) Validate() (err error) {
 	}
 	if ut.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
-	}
-	if ut.Username == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "username"))
 	}
 	if ut.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
@@ -530,16 +525,6 @@ func (ut *addUserPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 10, true))
 		}
 	}
-	if ut.Username != nil {
-		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, *ut.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`request.username`, *ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-		}
-	}
-	if ut.Username != nil {
-		if utf8.RuneCountInString(*ut.Username) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.username`, *ut.Username, utf8.RuneCountInString(*ut.Username), 40, false))
-		}
-	}
 	return
 }
 
@@ -561,9 +546,6 @@ func (ut *addUserPayload) Publicize() *AddUserPayload {
 	if ut.Password != nil {
 		pub.Password = *ut.Password
 	}
-	if ut.Username != nil {
-		pub.Username = *ut.Username
-	}
 	return &pub
 }
 
@@ -574,8 +556,6 @@ type AddUserPayload struct {
 	InviteToken string `form:"invite_token" json:"invite_token" xml:"invite_token"`
 	Name        string `form:"name" json:"name" xml:"name"`
 	Password    string `form:"password" json:"password" xml:"password"`
-	// Username
-	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the AddUserPayload type instance.
@@ -585,9 +565,6 @@ func (ut *AddUserPayload) Validate() (err error) {
 	}
 	if ut.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
-	}
-	if ut.Username == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "username"))
 	}
 	if ut.Password == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
@@ -609,12 +586,6 @@ func (ut *AddUserPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Password) < 10 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
-	}
-	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, ut.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`type.username`, ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-	}
-	if utf8.RuneCountInString(ut.Username) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
 	}
 	return
 }
@@ -1359,8 +1330,6 @@ type updateUserPayload struct {
 	Bio   *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// Username
-	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
 // Validate validates the updateUserPayload type instance.
@@ -1370,9 +1339,6 @@ func (ut *updateUserPayload) Validate() (err error) {
 	}
 	if ut.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
-	}
-	if ut.Username == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "username"))
 	}
 	if ut.Bio == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "bio"))
@@ -1392,16 +1358,6 @@ func (ut *updateUserPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 256, false))
 		}
 	}
-	if ut.Username != nil {
-		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, *ut.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`request.username`, *ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-		}
-	}
-	if ut.Username != nil {
-		if utf8.RuneCountInString(*ut.Username) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.username`, *ut.Username, utf8.RuneCountInString(*ut.Username), 40, false))
-		}
-	}
 	return
 }
 
@@ -1417,9 +1373,6 @@ func (ut *updateUserPayload) Publicize() *UpdateUserPayload {
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
-	if ut.Username != nil {
-		pub.Username = *ut.Username
-	}
 	return &pub
 }
 
@@ -1428,8 +1381,6 @@ type UpdateUserPayload struct {
 	Bio   string `form:"bio" json:"bio" xml:"bio"`
 	Email string `form:"email" json:"email" xml:"email"`
 	Name  string `form:"name" json:"name" xml:"name"`
-	// Username
-	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the UpdateUserPayload type instance.
@@ -1439,9 +1390,6 @@ func (ut *UpdateUserPayload) Validate() (err error) {
 	}
 	if ut.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
-	}
-	if ut.Username == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "username"))
 	}
 	if ut.Bio == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "bio"))
@@ -1454,12 +1402,6 @@ func (ut *UpdateUserPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 256, false))
-	}
-	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, ut.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`type.username`, ut.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-	}
-	if utf8.RuneCountInString(ut.Username) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.username`, ut.Username, utf8.RuneCountInString(ut.Username), 40, false))
 	}
 	return
 }

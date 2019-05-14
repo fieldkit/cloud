@@ -52,41 +52,6 @@ func (c *Client) NewAddUserRequest(ctx context.Context, path string, payload *Ad
 	return req, nil
 }
 
-// GetUserPath computes a request path to the get action of user.
-func GetUserPath(username string) string {
-	param0 := username
-
-	return fmt.Sprintf("/users/@/%s", param0)
-}
-
-// Get a user
-func (c *Client) GetUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetUserRequest create the request corresponding to the get action endpoint of the user resource.
-func (c *Client) NewGetUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
-	return req, nil
-}
-
 // GetCurrentUserPath computes a request path to the get current action of user.
 func GetCurrentUserPath() string {
 

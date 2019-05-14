@@ -1877,8 +1877,6 @@ type User struct {
 	Email string `form:"email" json:"email" xml:"email"`
 	ID    int    `form:"id" json:"id" xml:"id"`
 	Name  string `form:"name" json:"name" xml:"name"`
-	// Username
-	Username string `form:"username" json:"username" xml:"username"`
 }
 
 // Validate validates the User media type instance.
@@ -1886,9 +1884,6 @@ func (mt *User) Validate() (err error) {
 
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	if mt.Username == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
 	}
 	if mt.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
@@ -1904,12 +1899,6 @@ func (mt *User) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(mt.Name) > 256 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 256, false))
-	}
-	if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, mt.Username); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.username`, mt.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-	}
-	if utf8.RuneCountInString(mt.Username) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.username`, mt.Username, utf8.RuneCountInString(mt.Username), 40, false))
 	}
 	return
 }

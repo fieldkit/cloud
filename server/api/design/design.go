@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	UsernamePattern = `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`
-	SlugPattern     = `^[\da-z]+(?:-[\da-z]+)*$`
+	SlugPattern = `^[\da-z]+(?:-[\da-z]+)*$`
 )
 
 var cors = func() {
@@ -52,11 +51,6 @@ var Location = MediaType("application/vnd.app.location+json", func() {
 })
 
 var (
-	Username = func() {
-		Pattern(UsernamePattern)
-		Description("Username")
-		MaxLength(40)
-	}
 	ProjectSlug = func() {
 		Pattern(SlugPattern)
 		Description("Project slug")

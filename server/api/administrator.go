@@ -68,7 +68,7 @@ func (c *AdministratorController) Delete(ctx *app.DeleteAdministratorContext) er
 
 func (c *AdministratorController) Get(ctx *app.GetAdministratorContext) error {
 	administrator := &data.Administrator{}
-	if err := c.options.Database.GetContext(ctx, administrator, "SELECT pu.* FROM fieldkit.project_user AS pu JOIN fieldkit.project AS p ON p.id = pu.project_id JOIN fieldkit.user AS u ON u.id = pu.user_id WHERE p.slug = $1 AND u.username = $2", ctx.Project, ctx.Username); err != nil {
+	if err := c.options.Database.GetContext(ctx, administrator, "SELECT pu.* FROM fieldkit.project_user AS pu JOIN fieldkit.project AS p ON p.id = pu.project_id JOIN fieldkit.user AS u ON u.id = pu.user_id WHERE p.slug = $1 AND u.email = $2", ctx.Project, ctx.Email); err != nil {
 		return err
 	}
 

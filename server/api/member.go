@@ -84,7 +84,7 @@ func (c *MemberController) Delete(ctx *app.DeleteMemberContext) error {
 
 func (c *MemberController) Get(ctx *app.GetMemberContext) error {
 	member := &data.Member{}
-	if err := c.options.Database.GetContext(ctx, member, "SELECT tu.* FROM fieldkit.team_user AS tu JOIN fieldkit.team AS t ON t.id = tu.team_id JOIN fieldkit.user AS u ON u.id = tu.user_id JOIN fieldkit.expedition AS e ON e.id = t.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2 AND t.slug = $3 AND u.username = $4", ctx.Project, ctx.Expedition, ctx.Team, ctx.Username); err != nil {
+	if err := c.options.Database.GetContext(ctx, member, "SELECT tu.* FROM fieldkit.team_user AS tu JOIN fieldkit.team AS t ON t.id = tu.team_id JOIN fieldkit.user AS u ON u.id = tu.user_id JOIN fieldkit.expedition AS e ON e.id = t.expedition_id JOIN fieldkit.project AS p ON p.id = e.project_id WHERE p.slug = $1 AND e.slug = $2 AND t.slug = $3 AND u.email = $4", ctx.Project, ctx.Expedition, ctx.Team, ctx.Email); err != nil {
 		return err
 	}
 

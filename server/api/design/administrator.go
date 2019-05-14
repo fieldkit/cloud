@@ -67,10 +67,10 @@ var _ = Resource("administrator", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/@/:project/administrators/@/:username"))
+		Routing(GET("projects/@/:project/administrators/@/:email"))
 		Params(func() {
 			Param("project", String, ProjectSlug)
-			Param("username", String, Username)
+			Param("email", String)
 		})
 		Description("Get an administrator")
 		Response(OK, func() {

@@ -639,8 +639,8 @@ type GetAdministratorContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Project  string
-	Username string
+	Email   string
+	Project string
 }
 
 // NewGetAdministratorContext parses the incoming request URL and body, performs validations and creates the
@@ -652,6 +652,11 @@ func NewGetAdministratorContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetAdministratorContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEmail := req.Params["email"]
+	if len(paramEmail) > 0 {
+		rawEmail := paramEmail[0]
+		rctx.Email = rawEmail
+	}
 	paramProject := req.Params["project"]
 	if len(paramProject) > 0 {
 		rawProject := paramProject[0]
@@ -661,17 +666,6 @@ func NewGetAdministratorContext(ctx context.Context, r *http.Request, service *g
 		}
 		if utf8.RuneCountInString(rctx.Project) > 40 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
-		}
-	}
-	paramUsername := req.Params["username"]
-	if len(paramUsername) > 0 {
-		rawUsername := paramUsername[0]
-		rctx.Username = rawUsername
-		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, rctx.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Username) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
 		}
 	}
 	return &rctx, err
@@ -1958,10 +1952,10 @@ type GetMemberContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
+	Email      string
 	Expedition string
 	Project    string
 	Team       string
-	Username   string
 }
 
 // NewGetMemberContext parses the incoming request URL and body, performs validations and creates the
@@ -1973,6 +1967,11 @@ func NewGetMemberContext(ctx context.Context, r *http.Request, service *goa.Serv
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetMemberContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEmail := req.Params["email"]
+	if len(paramEmail) > 0 {
+		rawEmail := paramEmail[0]
+		rctx.Email = rawEmail
+	}
 	paramExpedition := req.Params["expedition"]
 	if len(paramExpedition) > 0 {
 		rawExpedition := paramExpedition[0]
@@ -2004,17 +2003,6 @@ func NewGetMemberContext(ctx context.Context, r *http.Request, service *goa.Serv
 		}
 		if utf8.RuneCountInString(rctx.Team) > 40 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`team`, rctx.Team, utf8.RuneCountInString(rctx.Team), 40, false))
-		}
-	}
-	paramUsername := req.Params["username"]
-	if len(paramUsername) > 0 {
-		rawUsername := paramUsername[0]
-		rctx.Username = rawUsername
-		if ok := goa.ValidatePattern(`^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`, rctx.Username); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`username`, rctx.Username, `^[\dA-Za-z]+(?:-[\dA-Za-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Username) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`username`, rctx.Username, utf8.RuneCountInString(rctx.Username), 40, false))
 		}
 	}
 	return &rctx, err
@@ -3618,37 +3606,6 @@ func (ctx *AddUserContext) BadRequest() error {
 func (ctx *AddUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
 	return nil
-}
-
-// GetUserContext provides the user get action context.
-type GetUserContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Username string
-}
-
-// NewGetUserContext parses the incoming request URL and body, performs validations and creates the
-// context used by the user controller get action.
-func NewGetUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetUserContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUsername := req.Params["username"]
-	if len(paramUsername) > 0 {
-		rawUsername := paramUsername[0]
-		rctx.Username = rawUsername
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetUserContext) OK(r *User) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // GetCurrentUserContext provides the user get current action context.

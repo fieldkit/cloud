@@ -95,11 +95,11 @@ func (c *Client) NewDeleteMemberRequest(ctx context.Context, path string) (*http
 }
 
 // GetMemberPath computes a request path to the get action of member.
-func GetMemberPath(project string, expedition string, team string, username string) string {
+func GetMemberPath(project string, expedition string, team string, email string) string {
 	param0 := project
 	param1 := expedition
 	param2 := team
-	param3 := username
+	param3 := email
 
 	return fmt.Sprintf("/projects/@/%s/expeditions/@/%s/teams/@/%s/members/@/%s", param0, param1, param2, param3)
 }

@@ -13,22 +13,20 @@ var AddUserPayload = Type("AddUserPayload", func() {
 	Attribute("email", String, func() {
 		Format("email")
 	})
-	Attribute("username", String, Username)
 	Attribute("password", String, func() {
 		MinLength(10)
 	})
 	Attribute("bio", String)
 	Attribute("invite_token", String)
-	Required("name", "email", "username", "password", "bio", "invite_token")
+	Required("name", "email", "password", "bio", "invite_token")
 })
 
 var UpdateUserPayload = Type("UpdateUserPayload", func() {
 	Reference(AddUserPayload)
 	Attribute("name")
 	Attribute("email")
-	Attribute("username")
 	Attribute("bio")
-	Required("name", "email", "username", "bio")
+	Required("name", "email", "bio")
 })
 
 var LoginPayload = Type("LoginPayload", func() {
@@ -44,15 +42,13 @@ var User = MediaType("application/vnd.app.user+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("name")
-		Attribute("username")
 		Attribute("email")
 		Attribute("bio")
-		Required("id", "name", "username", "email", "bio")
+		Required("id", "name", "email", "bio")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
-		Attribute("username")
 		Attribute("email")
 		Attribute("bio")
 	})
@@ -155,14 +151,6 @@ var _ = Resource("user", func() {
 	Action("get current", func() {
 		Routing(GET("user"))
 		Description("Get the authenticated user")
-		Response(OK, func() {
-			Media(User)
-		})
-	})
-
-	Action("get", func() {
-		Routing(GET("users/@/:username"))
-		Description("Get a user")
 		Response(OK, func() {
 			Media(User)
 		})

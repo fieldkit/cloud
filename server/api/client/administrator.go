@@ -95,9 +95,9 @@ func (c *Client) NewDeleteAdministratorRequest(ctx context.Context, path string)
 }
 
 // GetAdministratorPath computes a request path to the get action of administrator.
-func GetAdministratorPath(project string, username string) string {
+func GetAdministratorPath(project string, email string) string {
 	param0 := project
-	param1 := username
+	param1 := email
 
 	return fmt.Sprintf("/projects/@/%s/administrators/@/%s", param0, param1)
 }

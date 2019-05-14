@@ -19,11 +19,10 @@ import (
 
 func UserType(user *data.User) *app.User {
 	return &app.User{
-		ID:       int(user.ID),
-		Name:     user.Name,
-		Username: user.Username,
-		Email:    user.Email,
-		Bio:      user.Bio,
+		ID:    int(user.ID),
+		Name:  user.Name,
+		Email: user.Email,
+		Bio:   user.Bio,
 	}
 }
 
@@ -44,7 +43,7 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 		"iat":           now.Unix(),
 		"exp":           now.Add(time.Hour).Unix(),
 		"sub":           user.ID,
-		"username":      user.Username,
+		"email":         user.Email,
 		"refresh_token": refreshToken.Token.String(),
 		"scopes":        "api:access",
 	}
@@ -90,8 +89,8 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 
 	user := &data.User{
 		Name:     data.Name(ctx.Payload.Name),
-		Username: ctx.Payload.Username,
 		Email:    ctx.Payload.Email,
+		Username: ctx.Payload.Email,
 		Bio:      ctx.Payload.Bio,
 	}
 
@@ -99,7 +98,7 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :username, :email, :password, :bio) RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, "INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :email, :email, :password, :bio) RETURNING *", user); err != nil {
 		return err
 	}
 
@@ -125,14 +124,13 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 
 func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	user := &data.User{
-		ID:       int32(ctx.UserID),
-		Name:     data.Name(ctx.Payload.Name),
-		Username: ctx.Payload.Username,
-		Email:    ctx.Payload.Email,
-		Bio:      ctx.Payload.Bio,
+		ID:    int32(ctx.UserID),
+		Name:  data.Name(ctx.Payload.Name),
+		Email: ctx.Payload.Email,
+		Bio:   ctx.Payload.Bio,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET name = :name, username = :username, email = :email, bio = :bio WHERE id = :id RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET name = :name, username = :email, email = :email, bio = :bio WHERE id = :id RETURNING *", user); err != nil {
 		return err
 	}
 
@@ -176,14 +174,9 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
-
 	if err != nil {
 		return err
 	}
-
-	// if !user.Valid {
-	// 	return ctx.Unauthorized()
-	// }
 
 	err = user.CheckPassword(ctx.Payload.Password)
 	if err == data.IncorrectPasswordError {
@@ -293,15 +286,6 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 
 	user := &data.User{}
 	if err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", claims["sub"]); err != nil {
-		return err
-	}
-
-	return ctx.OK(UserType(user))
-}
-
-func (c *UserController) Get(ctx *app.GetUserContext) error {
-	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE username = $1 LIMIT 1", ctx.Username); err != nil {
 		return err
 	}
 

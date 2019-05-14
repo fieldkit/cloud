@@ -89,12 +89,12 @@ var _ = Resource("member", func() {
 	})
 
 	Action("get", func() {
-		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:username"))
+		Routing(GET("projects/@/:project/expeditions/@/:expedition/teams/@/:team/members/@/:email"))
 		Params(func() {
 			Param("project", String, ProjectSlug)
 			Param("expedition", String, ExpeditionSlug)
 			Param("team", String, TeamSlug)
-			Param("username", String, Username)
+			Param("email", String)
 		})
 		Description("Get a member")
 		Response(OK, func() {
