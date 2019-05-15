@@ -84,7 +84,8 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	}
 
 	if !valid {
-		return ctx.Unauthorized()
+		log := Logger(ctx).Sugar()
+		log.Infow("Invalid invite token", "token", token)
 	}
 
 	user := &data.User{
