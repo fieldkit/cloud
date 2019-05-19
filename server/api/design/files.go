@@ -154,7 +154,6 @@ var LocationEntry = MediaType("application/vnd.app.location.entry+json", func() 
 		Attribute("places", String)
 		Attribute("coordinates", ArrayOf(Number))
 		Required("time")
-		Required("places")
 		Required("coordinates")
 	})
 	View("default", func() {

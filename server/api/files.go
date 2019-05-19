@@ -438,6 +438,14 @@ func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[
 	}
 }
 
+func getPlaces(dsl *data.DeviceStreamLocationAndPlace) *string {
+	if len(dsl.Places) > 0 {
+		places := strings.Join(dsl.Places, ", ")
+		return &places
+	}
+	return nil
+}
+
 func LocationEntries(locations []*data.DeviceStreamLocationAndPlace) map[string][]*app.LocationEntry {
 	entries := make(map[string][]*app.LocationEntry)
 	for _, dsl := range locations {
@@ -448,7 +456,7 @@ func LocationEntries(locations []*data.DeviceStreamLocationAndPlace) map[string]
 		le := &app.LocationEntry{
 			Coordinates: dsl.Location.Coordinates(),
 			Time:        dsl.Timestamp,
-			Places:      strings.Join(dsl.Places, ", "),
+			Places:      getPlaces(dsl),
 		}
 
 		entries[dsl.DeviceID] = append(entries[dsl.DeviceID], le)

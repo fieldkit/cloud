@@ -214,3 +214,16 @@ export function queryDeviceFilesDetails(deviceId) {
         }
     };
 }
+
+export function queryDeviceFilesLocations(deviceId, page) {
+    return {
+        types: ActionTypes.API_LOAD_DEVICE_FILES_DETAILS,
+        path: '/devices/' + deviceId + '/locations?page=' + (page || 0),
+        method: 'GET',
+        unwrap: (r) => r,
+        criteria: {
+            deviceId,
+            page
+        }
+    };
+}

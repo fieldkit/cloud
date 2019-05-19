@@ -316,6 +316,23 @@ class Files extends Component {
                 details
             });
         });
+
+        function getPage(page) {
+            return FkPromisedApi.queryDeviceFilesLocations(deviceId, page).then(locations => {
+                if (locations.entries != null && locations.entries.length > 0) {
+                    return getPage(page + 1).then((more) => {
+                        return [ ...locations.entries, ...more ];
+                    });
+                }
+                return [];
+            });
+        }
+
+        getPage(0).then(locations => {
+            this.setState({
+                locations
+            });
+        });
     }
 
     componentWillMount() {
@@ -335,8 +352,11 @@ class Files extends Component {
             const device = this.getDevice();
 
             if (device.locations.entries.length > 0) {
-                const center = [ ...device.locations.entries[0].coordinates, 8 ];
-                focusLocation(center);
+                console.log("Focusing", device.locations.entries[0]);
+                if (false) {
+                    const center = [ ...device.locations.entries[0].coordinates, 8 ];
+                    focusLocation(center);
+                }
             }
 
             this.refreshDevice(deviceId);
@@ -354,15 +374,35 @@ class Files extends Component {
         });
     }
 
-    render() {
+    getVisibleFeatures() {
         const { files, deviceId } = this.props;
-        const { details } = this.state;
 
-        if (files.devices.length === 0) {
-            return <Loading />;
+        if (deviceId && false) {
+            const { locations } = this.state;
+            if (!locations) {
+                return [];
+            }
+
+            return _(locations)
+                  .map(l => {
+                      return {
+                          type: 'Feature',
+                          geometry: {
+                              type: "Point",
+                              coordinates: l.coordinates
+                          },
+                          properties: {
+                              size: 10,
+                              color: "#aaaaff",
+                          }
+                      };
+                  })
+                .take(10000)
+                  .flatten()
+                  .value();
         }
 
-        const features = _(files.devices)
+        return _(files.devices)
               .map((d) => d.locations.entries.map(l => {
                   return {
                       type: 'Feature',
@@ -379,6 +419,17 @@ class Files extends Component {
               }))
               .flatten()
               .value();
+    }
+
+    render() {
+        const { files, deviceId } = this.props;
+        const { details } = this.state;
+
+        if (files.devices.length === 0) {
+            return <Loading />;
+        }
+
+        const features = this.getVisibleFeatures();
 
         const narrowed = {
             geojson: { type: '', features: features },
@@ -387,6 +438,8 @@ class Files extends Component {
                 center: files.center
             }
         };
+
+        console.log('Center', files.center);
 
         const pointDecorator = generatePointDecorator('constant', 'constant');
 

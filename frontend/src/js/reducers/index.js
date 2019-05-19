@@ -242,7 +242,6 @@ function files(state = initialFilesState, action) {
         for (let i = 0; i < files.devices.length; ++i) {
             files.devices[i].color = colors.get();
         }
-        console.log(files);
         return { ...state, ...files };
     }
     case ActionTypes.API_LOAD_DEVICE_LOGS_FILES.START: {
@@ -295,6 +294,9 @@ function files(state = initialFilesState, action) {
         files.all = _([ ...files.data, ...files.logs ]).sortBy(i => i.time).reverse().value();
 
         return nextState;
+    }
+    case ActionTypes.API_LOAD_DEVICE_FILES_DETAILS.SUCCESS: {
+        return state;
     }
     default:
         return state;
