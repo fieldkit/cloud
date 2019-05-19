@@ -2270,6 +2270,7 @@ type FilesController interface {
 	Csv(*CsvFilesContext) error
 	DeviceInfo(*DeviceInfoFilesContext) error
 	File(*FileFilesContext) error
+	GetDeviceLocationHistory(*GetDeviceLocationHistoryFilesContext) error
 	ListDeviceDataFiles(*ListDeviceDataFilesFilesContext) error
 	ListDeviceLogFiles(*ListDeviceLogFilesFilesContext) error
 	ListDevices(*ListDevicesFilesContext) error
@@ -2285,6 +2286,7 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	service.Mux.Handle("OPTIONS", "/files/:fileId/data.csv", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/:fileId", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/devices/:deviceId/locations", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/data", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/files/logs", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/files/devices", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
@@ -2338,6 +2340,22 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/:fileId", ctrl.MuxHandler("file", h, nil))
 	service.LogInfo("mount", "ctrl", "Files", "action", "File", "route", "GET /files/:fileId")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetDeviceLocationHistoryFilesContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetDeviceLocationHistory(rctx)
+	}
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("GET", "/devices/:deviceId/locations", ctrl.MuxHandler("get device location history", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "GetDeviceLocationHistory", "route", "GET /devices/:deviceId/locations")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

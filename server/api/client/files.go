@@ -112,6 +112,42 @@ func (c *Client) NewFileFilesRequest(ctx context.Context, path string) (*http.Re
 	return req, nil
 }
 
+// GetDeviceLocationHistoryFilesPath computes a request path to the get device location history action of files.
+func GetDeviceLocationHistoryFilesPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/devices/%s/locations", param0)
+}
+
+// device location history
+func (c *Client) GetDeviceLocationHistoryFiles(ctx context.Context, path string, page *int) (*http.Response, error) {
+	req, err := c.NewGetDeviceLocationHistoryFilesRequest(ctx, path, page)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetDeviceLocationHistoryFilesRequest create the request corresponding to the get device location history action endpoint of the files resource.
+func (c *Client) NewGetDeviceLocationHistoryFilesRequest(ctx context.Context, path string, page *int) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if page != nil {
+		tmp156 := strconv.Itoa(*page)
+		values.Set("page", tmp156)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListDeviceDataFilesFilesPath computes a request path to the list device data files action of files.
 func ListDeviceDataFilesFilesPath(deviceID string) string {
 	param0 := deviceID

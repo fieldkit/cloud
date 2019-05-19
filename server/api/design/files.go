@@ -175,6 +175,8 @@ var LocationHistory = MediaType("application/vnd.app.location.history+json", fun
 	})
 })
 
+var DeviceLocationHistory = LocationHistory
+
 var DeviceSummary = MediaType("application/vnd.app.device+json", func() {
 	TypeName("DeviceSummary")
 	Attributes(func() {
@@ -290,6 +292,17 @@ var _ = Resource("files", func() {
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(DeviceDetails)
+		})
+	})
+
+	Action("get device location history", func() {
+		Routing(GET("devices/:deviceId/locations"))
+		Description("device location history")
+		Params(func() {
+			Param("page", Integer)
+		})
+		Response(OK, func() {
+			Media(DeviceLocationHistory)
 		})
 	})
 

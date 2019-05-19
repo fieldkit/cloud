@@ -1617,6 +1617,51 @@ func (ctx *FileFilesContext) NotFound() error {
 	return nil
 }
 
+// GetDeviceLocationHistoryFilesContext provides the files get device location history action context.
+type GetDeviceLocationHistoryFilesContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+	Page     *int
+}
+
+// NewGetDeviceLocationHistoryFilesContext parses the incoming request URL and body, performs validations and creates the
+// context used by the files controller get device location history action.
+func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetDeviceLocationHistoryFilesContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetDeviceLocationHistoryFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp23 := page
+			tmp22 := &tmp23
+			rctx.Page = tmp22
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetDeviceLocationHistoryFilesContext) OK(r *LocationHistory) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location.history+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // ListDeviceDataFilesFilesContext provides the files list device data files action context.
 type ListDeviceDataFilesFilesContext struct {
 	context.Context

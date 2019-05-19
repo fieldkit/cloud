@@ -189,6 +189,28 @@ func (c *FilesController) DeviceInfo(ctx *app.DeviceInfoFilesContext) error {
 	return ctx.OK(dd)
 }
 
+func (c *FilesController) GetDeviceLocationHistory(ctx *app.GetDeviceLocationHistoryFilesContext) error {
+	pageSize := 10000
+	offset := 0
+	if ctx.Page != nil {
+		offset = *ctx.Page * pageSize
+	}
+	locations := []*data.DeviceStreamLocationAndPlace{}
+	if err := c.options.Database.SelectContext(ctx, &locations, `
+	    SELECT dsl.id, dsl.device_id, dsl.timestamp, ST_AsBinary(dsl.location) AS location FROM fieldkit.device_stream_location AS dsl WHERE dsl.device_id = $1 ORDER BY dsl.timestamp DESC LIMIT $2 OFFSET $3
+	  `, ctx.DeviceID, pageSize, offset); err != nil {
+		return err
+	}
+
+	entries := LocationEntries(locations)
+
+	lh := &app.LocationHistory{
+		Entries: entries[ctx.DeviceID],
+	}
+
+	return ctx.OK(lh)
+}
+
 func (c *FilesController) UpdateDeviceInfo(ctx *app.UpdateDeviceInfoFilesContext) error {
 	newNote := data.DeviceNotes{
 		DeviceID: ctx.Payload.DeviceID,
@@ -416,7 +438,7 @@ func DeviceSummaryType(ac *ApiConfiguration, s *data.DeviceSummary, entries map[
 	}
 }
 
-func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations []*data.DeviceStreamLocationAndPlace) *app.Devices {
+func LocationEntries(locations []*data.DeviceStreamLocationAndPlace) map[string][]*app.LocationEntry {
 	entries := make(map[string][]*app.LocationEntry)
 	for _, dsl := range locations {
 		if _, ok := entries[dsl.DeviceID]; !ok {
@@ -431,7 +453,11 @@ func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations 
 
 		entries[dsl.DeviceID] = append(entries[dsl.DeviceID], le)
 	}
+	return entries
+}
 
+func DevicesType(ac *ApiConfiguration, devices []*data.DeviceSummary, locations []*data.DeviceStreamLocationAndPlace) *app.Devices {
+	entries := LocationEntries(locations)
 	summaries := make([]*app.DeviceSummary, len(devices))
 	for i, summary := range devices {
 		summaries[i] = DeviceSummaryType(ac, summary, entries, locations)

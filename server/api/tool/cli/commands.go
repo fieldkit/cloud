@@ -3094,6 +3094,34 @@ func (cmd *FileFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) 
 	cc.Flags().StringVar(&cmd.FileID, "fileId", fileID, ``)
 }
 
+// Run makes the HTTP request corresponding to the GetDeviceLocationHistoryFilesCommand command.
+func (cmd *GetDeviceLocationHistoryFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/devices/%v/locations", url.QueryEscape(cmd.DeviceID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.GetDeviceLocationHistoryFiles(ctx, path, intFlagVal("page", cmd.Page))
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *GetDeviceLocationHistoryFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
+}
+
 // Run makes the HTTP request corresponding to the ListDeviceDataFilesFilesCommand command.
 func (cmd *ListDeviceDataFilesFilesCommand) Run(c *client.Client, args []string) error {
 	var path string
