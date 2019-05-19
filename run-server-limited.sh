@@ -15,4 +15,9 @@ fi
 
 make server
 
-build/server "$@"
+sudo cgdelete -g memory:fkgroup
+sudo cgcreate -g memory:fkgroup -t jlewallen -a jlewallen
+cgset -r memory.memsw.limit_in_bytes=5m fkgroup
+cgset -r memory.limit_in_bytes=5m fkgroup
+cgget -g memory:/fkgroup|grep limit|grep bytes
+cgexec -g memory:fkgroup build/server "$@"
