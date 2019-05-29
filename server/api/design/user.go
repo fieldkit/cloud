@@ -16,9 +16,8 @@ var AddUserPayload = Type("AddUserPayload", func() {
 	Attribute("password", String, func() {
 		MinLength(10)
 	})
-	Attribute("bio", String)
 	Attribute("invite_token", String)
-	Required("name", "email", "password", "bio", "invite_token")
+	Required("name", "email", "password")
 })
 
 var UpdateUserPayload = Type("UpdateUserPayload", func() {

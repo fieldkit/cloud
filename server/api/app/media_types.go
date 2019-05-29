@@ -819,9 +819,9 @@ func (mt *Location) Validate() (err error) {
 //
 // Identifier: application/vnd.app.location.entry+json; view=default
 type LocationEntry struct {
-	Coordinates []float64 `form:"coordinates" json:"coordinates" yaml:"coordinates" xml:"coordinates"`
-	Places      *string   `form:"places,omitempty" json:"places,omitempty" yaml:"places,omitempty" xml:"places,omitempty"`
-	Time        time.Time `form:"time" json:"time" yaml:"time" xml:"time"`
+	Coordinates []float64 `form:"coordinates" json:"coordinates" xml:"coordinates"`
+	Places      *string   `form:"places,omitempty" json:"places,omitempty" xml:"places,omitempty"`
+	Time        time.Time `form:"time" json:"time" xml:"time"`
 }
 
 // Validate validates the LocationEntry media type instance.

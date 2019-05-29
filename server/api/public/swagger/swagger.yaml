@@ -161,37 +161,31 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      bio: Quaerat dolor magnam.
-      email: providenci_rath@wilderman.name
-      invite_token: Ratione quis repellendus incidunt reprehenderit dolore.
-      name: epzc2lt4s3
-      password: t0ofyin840
+      email: jarvis_anderson@ferry.biz
+      invite_token: Distinctio commodi repellendus tempora.
+      name: tjblkmzepz
+      password: 2lt4s3kt0o
     properties:
-      bio:
-        example: Quaerat dolor magnam.
-        type: string
       email:
-        example: providenci_rath@wilderman.name
+        example: jarvis_anderson@ferry.biz
         format: email
         type: string
       invite_token:
-        example: Ratione quis repellendus incidunt reprehenderit dolore.
+        example: Distinctio commodi repellendus tempora.
         type: string
       name:
-        example: epzc2lt4s3
+        example: tjblkmzepz
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: t0ofyin840
+        example: 2lt4s3kt0o
         minLength: 10
         type: string
     required:
     - name
     - email
     - password
-    - bio
-    - invite_token
     title: AddUserPayload
     type: object
   ClusterGeometrySummary:
@@ -1269,7 +1263,7 @@ definitions:
           - 0.60669327
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+          Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1277,7 +1271,7 @@ definitions:
           - 0.60669327
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+          Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1285,7 +1279,7 @@ definitions:
           - 0.60669327
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+          Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
         type: Magnam sunt debitis rerum rerum et quia.
       type: Incidunt consequatur magni et.
     properties:
@@ -1308,7 +1302,7 @@ definitions:
         - 0.60669327
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+        Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
       type: Magnam sunt debitis rerum rerum et quia.
     properties:
       geometry:
@@ -1316,7 +1310,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+          Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
         type: object
       type:
         example: Magnam sunt debitis rerum rerum et quia.
@@ -1337,7 +1331,7 @@ definitions:
         - 0.60669327
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+        Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
       type: Magnam sunt debitis rerum rerum et quia.
     - geometry:
         coordinates:
@@ -1345,7 +1339,7 @@ definitions:
         - 0.60669327
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+        Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
       type: Magnam sunt debitis rerum rerum et quia.
     - geometry:
         coordinates:
@@ -1353,7 +1347,7 @@ definitions:
         - 0.60669327
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+        Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
       type: Magnam sunt debitis rerum rerum et quia.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1425,7 +1419,6 @@ definitions:
         type: string
     required:
     - time
-    - places
     - coordinates
     title: 'Mediatype identifier: application/vnd.app.location.entry+json; view=default'
     type: object
@@ -1466,15 +1459,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      email: jody.hauck@beattygreenfelder.biz
-      password: pniixhu10m
+      email: mabel.muller@muller.com
+      password: 40o2o0pnii
     properties:
       email:
-        example: jody.hauck@beattygreenfelder.biz
+        example: mabel.muller@muller.com
         format: email
         type: string
       password:
-        example: pniixhu10m
+        example: 40o2o0pnii
         minLength: 10
         type: string
     required:
@@ -1494,7 +1487,7 @@ definitions:
               - 0.60669327
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+              Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1502,7 +1495,7 @@ definitions:
               - 0.60669327
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+              Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1510,7 +1503,7 @@ definitions:
               - 0.60669327
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+              Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
             type: Magnam sunt debitis rerum rerum et quia.
           type: Incidunt consequatur magni et.
         hasMore: true
@@ -1608,7 +1601,7 @@ definitions:
             - 0.60669327
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+            Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1616,7 +1609,7 @@ definitions:
             - 0.60669327
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+            Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1624,7 +1617,7 @@ definitions:
             - 0.60669327
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: a8426dac-f312-4ef8-a872-2a399c670fc3
+            Deleniti rem sint velit ad laboriosam.: cfab49fa-a2a8-467e-b59d-92d4d0a82789
           type: Magnam sunt debitis rerum rerum et quia.
         type: Incidunt consequatur magni et.
       hasMore: true
@@ -1801,10 +1794,10 @@ definitions:
     type: array
   RefreshUserPayload:
     example:
-      refresh_token: Veritatis illo.
+      refresh_token: Non rerum rerum magni quia in.
     properties:
       refresh_token:
-        example: Veritatis illo.
+        example: Non rerum rerum magni quia in.
         type: string
     required:
     - refresh_token
@@ -2404,12 +2397,12 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Molestias nulla consequatur.
+      bio: Illo non molestias nulla consequatur.
       email: gavin_weber@skiles.org
       name: 3gib044grb
     properties:
       bio:
-        example: Molestias nulla consequatur.
+        example: Illo non molestias nulla consequatur.
         type: string
       email:
         example: gavin_weber@skiles.org
@@ -2727,6 +2720,31 @@ paths:
       summary: list device Firmware
       tags:
       - Firmware
+  /devices/{deviceId}/locations:
+    get:
+      description: device location history
+      operationId: files#get device location history
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      - in: query
+        name: page
+        required: false
+        type: integer
+      produces:
+      - application/vnd.app.location.history+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LocationHistory'
+      schemes:
+      - https
+      summary: get device location history files
+      tags:
+      - files
   /devices/{deviceId}/logs:
     get:
       description: Get all device logs

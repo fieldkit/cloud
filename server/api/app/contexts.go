@@ -1656,9 +1656,7 @@ func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Reques
 
 // OK sends a HTTP response with status code 200.
 func (ctx *GetDeviceLocationHistoryFilesContext) OK(r *LocationHistory) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location.history+json")
-	}
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location.history+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
@@ -1689,9 +1687,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp23 := page
-			tmp22 := &tmp23
-			rctx.Page = tmp22
+			tmp25 := page
+			tmp24 := &tmp25
+			rctx.Page = tmp24
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1732,9 +1730,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp25 := page
-			tmp24 := &tmp25
-			rctx.Page = tmp24
+			tmp27 := page
+			tmp26 := &tmp27
+			rctx.Page = tmp26
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}

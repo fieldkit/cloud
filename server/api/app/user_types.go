@@ -481,7 +481,6 @@ func (ut *AddTwitterAccountSourcePayload) Validate() (err error) {
 
 // addUserPayload user type.
 type addUserPayload struct {
-	Bio         *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Email       *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
@@ -498,12 +497,6 @@ func (ut *addUserPayload) Validate() (err error) {
 	}
 	if ut.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
-	}
-	if ut.Bio == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "bio"))
-	}
-	if ut.InviteToken == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "invite_token"))
 	}
 	if ut.Email != nil {
 		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
@@ -531,14 +524,11 @@ func (ut *addUserPayload) Validate() (err error) {
 // Publicize creates AddUserPayload from addUserPayload
 func (ut *addUserPayload) Publicize() *AddUserPayload {
 	var pub AddUserPayload
-	if ut.Bio != nil {
-		pub.Bio = *ut.Bio
-	}
 	if ut.Email != nil {
 		pub.Email = *ut.Email
 	}
 	if ut.InviteToken != nil {
-		pub.InviteToken = *ut.InviteToken
+		pub.InviteToken = ut.InviteToken
 	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
@@ -551,11 +541,10 @@ func (ut *addUserPayload) Publicize() *AddUserPayload {
 
 // AddUserPayload user type.
 type AddUserPayload struct {
-	Bio         string `form:"bio" json:"bio" xml:"bio"`
-	Email       string `form:"email" json:"email" xml:"email"`
-	InviteToken string `form:"invite_token" json:"invite_token" xml:"invite_token"`
-	Name        string `form:"name" json:"name" xml:"name"`
-	Password    string `form:"password" json:"password" xml:"password"`
+	Email       string  `form:"email" json:"email" xml:"email"`
+	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
+	Name        string  `form:"name" json:"name" xml:"name"`
+	Password    string  `form:"password" json:"password" xml:"password"`
 }
 
 // Validate validates the AddUserPayload type instance.
@@ -568,12 +557,6 @@ func (ut *AddUserPayload) Validate() (err error) {
 	}
 	if ut.Password == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
-	}
-	if ut.Bio == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "bio"))
-	}
-	if ut.InviteToken == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "invite_token"))
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))

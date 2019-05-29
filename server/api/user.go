@@ -73,26 +73,11 @@ func NewUserController(service *goa.Service, options UserControllerOptions) (*Us
 }
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {
-	token := data.Token{}
-	if err := token.UnmarshalText([]byte(ctx.Payload.InviteToken)); err != nil {
-		return err
-	}
-
-	valid, err := c.options.Backend.CheckInviteToken(ctx, token)
-	if err != nil {
-		return err
-	}
-
-	if !valid {
-		log := Logger(ctx).Sugar()
-		log.Infow("Invalid invite token", "token", token)
-	}
-
 	user := &data.User{
 		Name:     data.Name(ctx.Payload.Name),
 		Email:    ctx.Payload.Email,
 		Username: ctx.Payload.Email,
-		Bio:      ctx.Payload.Bio,
+		Bio:      "",
 	}
 
 	if err := user.SetPassword(ctx.Payload.Password); err != nil {
@@ -113,10 +98,6 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	}
 
 	if err := c.options.Emailer.SendValidationToken(user, validationToken); err != nil {
-		return err
-	}
-
-	if err := c.options.Backend.DeleteInviteToken(ctx, token); err != nil {
 		return err
 	}
 
