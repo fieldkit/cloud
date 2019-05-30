@@ -20,7 +20,7 @@ tests:
 server: $(BUILD)/server
 
 $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
-	$(GO) build -o $@ server/server.go
+	cd server && $(GO) build -o $@ server.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	$(GO) build -o $@ server/tools/fktool/*.go
@@ -29,7 +29,7 @@ $(BUILD)/fkflash: server/tools/fkflash/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	$(GO) build -o $@ server/tools/fkflash/*.go
 
 $(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
-	$(GO) build -o $@ server/tools/inaturalist/*.go
+	cd server/tools/inaturalist && $(GO) build -o $@ *.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
 	$(GO) build -o $@ server/sqs-worker/*.go
