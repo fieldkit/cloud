@@ -19,6 +19,8 @@ tests:
 
 server: $(BUILD)/server
 
+fktool: $(BUILD)/fktool
+
 $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 	cd server && $(GO) build -o $@ server.go
 
