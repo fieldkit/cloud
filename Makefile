@@ -23,25 +23,25 @@ $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 	cd server && $(GO) build -o $@ server.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	$(GO) build -o $@ server/tools/fktool/*.go
+	cd server/tools/fktool && $(GO) build -o $@ *.go
 
 $(BUILD)/fkflash: server/tools/fkflash/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	$(GO) build -o $@ server/tools/fkflash/*.go
+	cd server/tools/fkflash && $(GO) build -o $@ *.go
 
 $(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
 	cd server/tools/inaturalist && $(GO) build -o $@ *.go
 
 $(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
-	$(GO) build -o $@ server/sqs-worker/*.go
+	cd server/sqs-worker && $(GO) build -o $@ *.go
 
 $(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
-	$(GO) build -o $@ server/sqs-sender/*.go
+	cd server/sqs-sender && $(GO) build -o $@ *.go
 
 $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	$(GO) build -o $@ testing/random/*.go
+	cd testing/random && $(GO) build -o $@ *.go
 
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	$(GO) build -o $@ testing/weather-proxy/*.go
+	cd testing/weather-proxy && $(GO) build -o $@ *.go
 
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
