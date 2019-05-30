@@ -14,6 +14,8 @@ require (
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
 	github.com/conservify/sqlxcache v0.0.0-20180420163412-f531a9ef96c0
+	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188 // indirect
+	github.com/creack/goselect v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dghubble/go-twitter v0.0.0-20170219215544-fc93bb35701b
 	github.com/dghubble/oauth1 v0.0.0-20170219195226-3c7784d12fed
@@ -62,6 +64,7 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c
 	github.com/xeipuuv/gojsonschema v0.0.0-20170324002221-702b404897d4
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
+	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v0.0.0-20180122172545-ddea229ff1df
 	go.uber.org/zap v1.8.0
