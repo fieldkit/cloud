@@ -60,7 +60,7 @@ func ExportAllFiles(ctx context.Context, response *goa.ResponseData, download bo
 
 		err = binaryReader.Read(ctx, cs.Response.Body)
 		if err != nil {
-			log.Errorw("Error reading stream", "error", err, "file_type_id", cs.FileID)
+			log.Errorw("Error reading stream", "error", err, "file_id", cs.FileID)
 		}
 	}
 
@@ -395,7 +395,7 @@ func (iterator *FileIterator) Next(ctx context.Context) (cs *OpenedFile, err err
 
 	iteratorFile := iterator.Files[iterator.Index]
 
-	log.Infow("File", "file_type_id", iteratorFile.FileID, "index", iterator.Index, "size", iteratorFile.Size, "url", iteratorFile.URL)
+	log.Infow("File", "file_id", iteratorFile.FileID, "index", iterator.Index, "size", iteratorFile.Size, "url", iteratorFile.URL)
 
 	iterator.Index += 1
 
