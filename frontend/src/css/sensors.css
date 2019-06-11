@@ -2,6 +2,10 @@
   font-family: "Avenir";
   src: url("/fonts/AvenirLTPro-Light.otf"); }
 
+@font-face {
+  font-family: "Avenir Medium";
+  src: url("/fonts/AvenirLTPro-Medium.otf"); }
+
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

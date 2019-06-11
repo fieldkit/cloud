@@ -26,16 +26,27 @@ div.loading {
     }
 
     button {
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button.download {
         width: 300px;
         height: 45px;
         background-color: #CE596B;
         color: #FFF;
         font-size: 16px;
-        font-weight: bold;
-        border: none;
-        border-radius: 4px;
         margin: 20px auto;
-        cursor: pointer;
+    }
+
+    button.logout {
+        background-color: $fk-gray-light;
+        color: #000;
+        font-size: 14px;
+        padding: 8px;
+        float: right;
     }
 }
 

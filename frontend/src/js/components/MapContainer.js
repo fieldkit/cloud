@@ -228,8 +228,6 @@ export default class MapContainer extends Component {
         const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode, containerStyle, style, controls, children } = this.props;
         const { center, zoom } = this.state;
 
-        console.log(children);
-
         if (!center) {
             return <div></div>;
         }

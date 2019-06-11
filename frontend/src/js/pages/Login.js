@@ -42,26 +42,27 @@ class Login extends Component {
 
         return (
             <div className="map page unauth">
+                <div className="logo"></div>
+
                 <div className="contents">
                     <div className="signin">
                         <header>
-                            <h1>Sign in</h1>
+                            <h1>Log In to Your Account</h1>
                         </header>
+
                         <form onSubmit={this.onSubmit.bind(this)}>
                             { this.state.errors && <p className="errors">
                                 Email/username or password invalid. Check your information and try again.
                             </p> }
-                            <div className="content">
-                                <div>
-                                    <label htmlFor="email">E-Mail</label>
-                                    <input ref="email" id="email" name="email" type="text" placeholder="" />
+                            <div className="form-section">
+                                <div className="control-group">
+                                    <input ref="email" id="email" name="email" type="text" placeholder="Email" />
                                 </div>
-                                <div>
-                                    <label htmlFor="password">Password</label>
-                                    <input ref="password" id="password" name="password" type="password" placeholder="" />
+                                <div className="control-group">
+                                    <input ref="password" id="password" name="password" type="password" placeholder="Password" />
                                 </div>
                             </div>
-                            <input type="submit" value="Submit" />
+                            <input type="submit" value="Log In" />
                         </form>
                     </div>
                 </div>

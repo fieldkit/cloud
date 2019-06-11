@@ -2,6 +2,10 @@
   font-family: "Avenir";
   src: url("/fonts/AvenirLTPro-Light.otf"); }
 
+@font-face {
+  font-family: "Avenir Medium";
+  src: url("/fonts/AvenirLTPro-Medium.otf"); }
+
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -91,16 +95,23 @@ div.loading {
     font-size: 18px;
     font-weight: normal; }
   .download-data-panel button {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold; }
+  .download-data-panel button.download {
     width: 300px;
     height: 45px;
     background-color: #CE596B;
     color: #FFF;
     font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    margin: 20px auto;
-    cursor: pointer; }
+    margin: 20px auto; }
+  .download-data-panel button.logout {
+    background-color: #CCCDCF;
+    color: #000;
+    font-size: 14px;
+    padding: 8px;
+    float: right; }
 
 .map.page .header {
   position: absolute;

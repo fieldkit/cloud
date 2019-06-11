@@ -39,11 +39,40 @@ $color-black: #333;
 $color-red: #CE596B;
 $color-gray: #2C3E50;
 
+$fk-primary-blue: #1B80C9; // sky blue
+$fk-primary-black: #2C3E50; // almost black
+$fk-primary-red: #CE596B; // mauve/red
+// Secondary
+$fk-secondary-blue: #52B5E4; // turquoise
+$fk-secondary-light-blue: #A0DBE1; // light turquoise
+$fk-secondary-salmon: #F48E84; // salmon
+$fk-secondary-peach: #FCDFCA; // light peach
+// Tertiary
+$fk-tertiary-red: #C42C44; // red
+$fk-tertiary-green: #3F8530; // green
+$fk-tertiary-blue: #3F0B9B; // blue
+$fk-tertiary-yellow: #3F0B9B; // yellow
+$fk-tertiary-gray: #EDE9E6; // light gray
+$fk-tertiary-black: #464C51; // almost black
+// Gray colors
+$fk-gray-dark: #6B6D6F; // dark gray
+$fk-gray-light: #CCCDCF; // light gray
+$fk-gray-lighter: #D8DCE0; // lighter gray
+$fk-gray-lightest: #F4F5F7; // lightest gray
+$fk-gray-white: #FCFCFC; // almost white
+$fk-gray-hint: #6A6D71; // for hint text
+$fk-gray-border: #D8DEC0; // under input fields
+
 //-------------------- TYPOGRAPHY --------------------//
 
 @font-face {
     font-family: "Avenir";
     src: url("/fonts/AvenirLTPro-Light.otf");
+}
+
+@font-face {
+    font-family: "Avenir Medium";
+    src: url("/fonts/AvenirLTPro-Medium.otf");
 }
 
 $font-family: "Avenir";
