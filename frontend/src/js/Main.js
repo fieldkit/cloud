@@ -10,7 +10,6 @@ import Login from './pages/Login';
 import SingleUserMap from './pages/SingleUserMap';
 import Source from './pages/Source';
 import Files from './pages/Files';
-import About from './pages/About';
 
 import type { ActiveExpedition  } from './types';
 
@@ -34,7 +33,6 @@ export class Main extends Component {
             <div className="main">
                 <Switch>
                     <Route exact path={'/sources/:sourceId'} component={Source} />
-                    <Route exact path={'/about'} component={About} />
                     <Route exact path={'/files'} component={Files} />
                     <Route exact path={'/files/:deviceId'} render={props => {
                         const { match } = props;
