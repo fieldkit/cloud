@@ -2,7 +2,9 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { Redirect } from 'react-router';
+
+import UserSession from '../api/session';
 
 import { generatePointDecorator } from '../common/utilities';
 
@@ -31,6 +33,8 @@ function getDefaultMapLocation() {
 
 class DownloadDataPanel extends React.Component {
     render() {
+        const { onDownload, onLogout } = this.props;
+
         return (
             <div className="download-data-panel">
                 <div className="download-data-body">
@@ -41,7 +45,9 @@ class DownloadDataPanel extends React.Component {
                         <li>Nunc hendrerit scelerisque semper. Donec pharetra nibh eu dui convallis, eget sagittis nunc pellentesque.</li>
                     </ol>
 
-                    <button onClick={ () => console.log("DOWNLOAD") }>Download Data</button>
+                    <button onClick={ onDownload } className="download">Download Data</button>
+
+                    <button onClick={ onLogout } className="logout">Logout</button>
                 </div>
             </div>
         );
@@ -94,7 +100,22 @@ class SingleUserMap extends Component {
     loadMapFeatures(criteria) {
     }
 
+    async onDownload() {
+        console.log("Download");
+    }
+
+    async onLogout() {
+        await new UserSession().logout();
+
+        this.setState({});
+    }
+
     render() {
+        const session = new UserSession();
+        if (!session.authenticated()) {
+            return <Redirect to={ "/" } />;
+        }
+
         const pointDecorator = generatePointDecorator('constant', 'constant');
         const visibleFeatures = {
             focus: this.state.focus,
@@ -117,7 +138,7 @@ class SingleUserMap extends Component {
                         onUserActivity={ this.onUserActivity.bind(this) }
                         loadMapFeatures={ this.loadMapFeatures.bind(this) }
                         onChangePlaybackMode={ () => { } }>
-                        <DownloadDataPanel />
+                        <DownloadDataPanel onDownload={ this.onDownload.bind(this )} onLogout={ this.onLogout.bind(this )} />
                     </MapContainer>
                 </div>
             </div>
@@ -125,8 +146,4 @@ class SingleUserMap extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-});
-
-export default connect(mapStateToProps, {
-})(SingleUserMap);
+export default SingleUserMap;

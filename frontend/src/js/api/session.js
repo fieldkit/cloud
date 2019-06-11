@@ -7,7 +7,7 @@ export default class UserSession {
         this.tokens = new TokenStorage();
     }
 
-    async authenticated() {
+    authenticated() {
         return this.tokens.authenticated();
     }
 
@@ -15,14 +15,13 @@ export default class UserSession {
         try {
             await FkPromisedApi.login(email, password);
 
-            const user = await FkPromisedApi.getAuthenticatedUser();
-
-            console.log(user);
+            return await FkPromisedApi.getAuthenticatedUser();
         }
-        finally {
-        }
+        catch (err) {
+            console.log(err);
 
-        return this.user;
+            return null;
+        }
     }
 
     async logout() {

@@ -1,7 +1,6 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 
 import log from 'loglevel';
@@ -10,16 +9,15 @@ import Login from './pages/Login';
 import SingleUserMap from './pages/SingleUserMap';
 import Files from './pages/Files';
 
-import type { ActiveExpedition  } from './types';
-
 import '../css/main.css';
 
 type Props = {
-    activeExpedition: ActiveExpedition
 };
 
 export class Main extends Component {
     props: Props
+    state = {
+    }
 
     constructor(props: Props) {
         super(props);
@@ -44,9 +42,4 @@ export class Main extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-    activeExpedition: state.activeExpedition
-});
-
-export default connect(mapStateToProps, {
-})(Main);
+export default Main;

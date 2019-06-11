@@ -18,5 +18,6 @@ export default class TokenStorage {
 
     clear() {
         this.token = null;
+        delete window.localStorage['fktoken'];
     }
 };

@@ -1,10 +1,7 @@
 // @flow weak
 
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
-
-import log from 'loglevel';
 
 import UserSession from '../api/session';
 
@@ -12,17 +9,11 @@ import '../../css/login.css';
 
 class Login extends Component {
     props: Props
-
     state = {
-        authenticated: null
     }
 
-    async componentDidMount() {
-        const authenticated = await new UserSession().authenticated();
-
-        this.setState({
-            authenticated
-        });
+    isAuthenticated() {
+        return new UserSession().authenticated();
     }
 
     async onSubmit(ev) {
@@ -30,13 +21,13 @@ class Login extends Component {
 
         const user = await new UserSession().login(this.refs.email.value, this.refs.password.value);
 
-        log.info(user);
+        if (user) {
+            this.setState({});
+        }
     }
 
     render() {
-        const { authenticated } = this.state;
-
-        if (authenticated) {
+        if (this.isAuthenticated()) {
             return <Redirect to={ "/map" } />;
         }
 
@@ -71,8 +62,4 @@ class Login extends Component {
     }
 };
 
-const mapStateToProps = state => ({
-});
-
-export default connect(mapStateToProps, {
-})(Login);
+export default Login;
