@@ -227,3 +227,25 @@ export function queryDeviceFilesLocations(deviceId, page) {
         }
     };
 }
+
+export function login(emailOrUsername, password) {
+    return {
+        types: ActionTypes.API_LOGIN,
+        path: '/login',
+        method: 'POST',
+        unwrap: (r) => r,
+        body: {
+            email: emailOrUsername,
+            password: password,
+        }
+    };
+}
+
+export function getAuthenticatedUser() {
+    return {
+        types: ActionTypes.API_GET_AUTHENTICATED_USER,
+        path: '/user',
+        method: 'GET',
+        unwrap: (r) => r,
+    };
+}

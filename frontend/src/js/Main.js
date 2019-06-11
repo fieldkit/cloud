@@ -6,7 +6,8 @@ import { Route, Switch } from 'react-router-dom';
 
 import log from 'loglevel';
 
-import Map from './pages/Map';
+import Login from './pages/Login';
+// import Map from './pages/Map';
 import Source from './pages/Source';
 import Files from './pages/Files';
 import About from './pages/About';
@@ -39,7 +40,7 @@ export class Main extends Component {
                         const { match } = props;
                         return ( <Files deviceId={match.params.deviceId} /> );
                     }} />
-                    <Route path={'/'} component={Map} />
+                    <Route path={'/'} component={Login} />
                 </Switch>
             </div>
         );

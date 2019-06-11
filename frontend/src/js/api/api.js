@@ -4,6 +4,8 @@ import 'whatwg-fetch';
 import { BaseError } from '../common/errors';
 import { API_HOST } from '../secrets';
 
+import TokenStorage from './tokens';
+
 class APIError extends BaseError {
 }
 
@@ -13,6 +15,20 @@ class AuthenticationError extends APIError {
 class FKApiClient {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
+        this.tokens = new TokenStorage();
+    }
+
+    getHeaders() {
+        if (!this.tokens.authenticated()) {
+            return {
+            };
+        }
+
+        const token = this.tokens.getToken();
+
+        return {
+            "Authorization": token,
+        };
     }
 
     async get(path, params) {
@@ -26,7 +42,8 @@ class FKApiClient {
             let res;
             try {
                 res = await fetch(url.toString(), {
-                    method: 'GET'
+                    method: 'GET',
+                    headers: this.getHeaders()
                 });
             } catch (e) {
                 console.log('Threw while GETing', url.toString(), e);
@@ -58,13 +75,14 @@ class FKApiClient {
         return res.json();
     }
 
-    async post(path, body) {
+    async post(path, body, contentType) {
         try {
             const url = new URL(path, this.baseUrl);
             let res;
             try {
                 res = await fetch(url.toString(), {
                     method: 'POST',
+                    headers: this.getHeaders(),
                     body
                 });
             } catch (e) {
@@ -88,6 +106,28 @@ class FKApiClient {
         }
     }
 
+    async postJSON(path: string, params?: Object): Promise<any> {
+        const res = await this.post(path, JSON.stringify(params), "application/json");
+
+        let body = {};
+
+        const contentLength = res.headers.get("Content-Length");
+        if (contentLength) {
+            body = res.json();
+        }
+
+        const token = res.headers.get("Authorization");
+        if (token) {
+            this.tokens.setToken(token);
+            return {
+                authorization: token,
+                body
+            };
+        }
+
+        return body;
+    }
+
     async postForm(path, body) {
         const data = new FormData();
         if (body) {
@@ -97,6 +137,10 @@ class FKApiClient {
         }
         const res = await this.post(path, data);
         return res.text();
+    }
+
+    onAuthError(error) {
+        console.log("Authentication Error", error);
     }
 };
 

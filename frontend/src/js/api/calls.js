@@ -24,7 +24,6 @@ export class FkApi {
         action[CALL_WEB_API] = callApi;
         return apiMiddleware(null)(this.dispatch.bind(this))(action);
     }
-
 };
 
 function* asyncApi(callApi) {
@@ -33,7 +32,13 @@ function* asyncApi(callApi) {
     }));
 
     try {
-        const data = yield FKApiClient.getJSON(callApi.path);
+        let data;
+        if (callApi.method === "GET") {
+            data = yield FKApiClient.getJSON(callApi.path);
+        }
+        else {
+            data = yield FKApiClient.postJSON(callApi.path, callApi.body);
+        }
         const unwrapped = callApi.unwrap != null ? callApi.unwrap(data) : data;
         yield put(Object.assign({}, callApi, {
             type: callApi.types.SUCCESS,
@@ -59,9 +64,16 @@ for (let name of Object.keys(Creators)) {
     PromisedCalls[name] = function() {
         const args = Array.prototype.slice.call(arguments);
         const callApi = fn.apply(null, args);
-        return FKApiClient.getJSON(callApi.path).then((data) => {
-            return callApi.unwrap != null ? callApi.unwrap(data) : data;
-        });
+        if (callApi.method === "GET") {
+            return FKApiClient.getJSON(callApi.path).then((data) => {
+                return callApi.unwrap != null ? callApi.unwrap(data) : data;
+            });
+        }
+        else {
+            return FKApiClient.postJSON(callApi.path, callApi.body).then((data) => {
+                return callApi.unwrap != null ? callApi.unwrap(data) : data;
+            });
+        }
     };
     AsyncCalls[name] = function() {
         const args = Array.prototype.slice.call(arguments);
