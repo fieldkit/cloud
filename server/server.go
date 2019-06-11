@@ -99,6 +99,21 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
+func insecureRedirection(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		proto := req.Header.Get("X-Forwarded-Proto")
+		if proto == "http" {
+			target := "https://" + req.Host + req.URL.Path
+			if len(req.URL.RawQuery) > 0 {
+				target += "?" + req.URL.RawQuery
+			}
+			http.Redirect(res, req, target, http.StatusTemporaryRedirect)
+			return
+		}
+
+		next.ServeHTTP(res, req)
+	})
+}
 func main() {
 	var config Config
 
@@ -243,7 +258,7 @@ func main() {
 	suffix := "." + config.Domain
 	server := &http.Server{
 		Addr: config.Addr,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		Handler: insecureRedirection(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/status" {
 				fmt.Fprint(w, "ok")
 				return
@@ -274,7 +289,7 @@ func main() {
 			}
 
 			serveApi(w, req)
-		}),
+		})),
 	}
 
 	go func() {
