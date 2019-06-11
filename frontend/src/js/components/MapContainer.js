@@ -225,8 +225,10 @@ export default class MapContainer extends Component {
     }
 
     render() {
-        const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode, containerStyle, style, controls } = this.props;
+        const { pointDecorator, visibleFeatures, onChangePlaybackMode, playbackMode, containerStyle, style, controls, children } = this.props;
         const { center, zoom } = this.state;
+
+        console.log(children);
 
         if (!center) {
             return <div></div>;
@@ -255,6 +257,8 @@ export default class MapContainer extends Component {
                     {controls && <FiltersPanel visibleFeatures={ visibleFeatures } onShowSource={ this.onFocusSource.bind(this) } onShowFeature={ () => console.log("SHOW", arguments) } />}
 
                     {controls && this.renderRadialMenu()}
+
+                    {children}
                 </Map>
                 <div className="disclaimer-panel">
                     <div className="fieldkit-logo">

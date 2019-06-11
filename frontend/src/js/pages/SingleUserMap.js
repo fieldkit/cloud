@@ -29,6 +29,25 @@ function getDefaultMapLocation() {
     return [-118.2688137, 34.0309388, 14];
 }
 
+class DownloadDataPanel extends React.Component {
+    render() {
+        return (
+            <div className="download-data-panel">
+                <div className="download-data-body">
+                    <h4>Instructions Header Placeholder</h4>
+
+                    <ol>
+                        <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                        <li>Nunc hendrerit scelerisque semper. Donec pharetra nibh eu dui convallis, eget sagittis nunc pellentesque.</li>
+                    </ol>
+
+                    <button onClick={ () => console.log("DOWNLOAD") }>Download Data</button>
+                </div>
+            </div>
+        );
+    }
+}
+
 class SingleUserMap extends Component {
     static contextTypes = {
         router: PropTypes.shape({
@@ -87,7 +106,7 @@ class SingleUserMap extends Component {
         return (
             <div className="map page">
                 <div className="header">
-                    <div className="project-name">FieldKit Project</div>
+                    <div className="project">Project</div>
                 </div>
                 <div>
                     <MapContainer style={{ }} containerStyle={{ width: "100vw", height: "100vh" }} controls={false}
@@ -97,8 +116,9 @@ class SingleUserMap extends Component {
                         focusSource={ () => { } }
                         onUserActivity={ this.onUserActivity.bind(this) }
                         loadMapFeatures={ this.loadMapFeatures.bind(this) }
-                        onChangePlaybackMode={ () => { } }
-                        />
+                        onChangePlaybackMode={ () => { } }>
+                        <DownloadDataPanel />
+                    </MapContainer>
                 </div>
             </div>
         );
