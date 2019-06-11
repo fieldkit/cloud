@@ -176,6 +176,6 @@ export function* loadActiveProject() {
 
 export function* rootSaga() {
     yield all([
-        loadActiveProject()
+        // loadActiveProject()
     ]);
 }
