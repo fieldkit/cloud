@@ -1,5 +1,4 @@
 @import 'App.scss';
-@import '../images/fa/scss/font-awesome.scss';
 
 $breakpoint-small: "only screen and (min-width: 20em)";
 $breakpoint-medium: "only screen and (min-width: 30em)";
@@ -9,6 +8,8 @@ $breakpoint-medium: "only screen and (min-width: 30em)";
 }
 
 .files.page {
+    height: 100vh;
+
     .map-container {
         width: 50%;
         height: 100%;
@@ -22,11 +23,13 @@ $breakpoint-medium: "only screen and (min-width: 30em)";
     }
 
     .main-container {
+        background-color: #fff;
         width: 50%;
         height: 100%;
         margin-left: 50%;
         overflow: auto;
         padding: 5px;
+        font-size: 14px;
     }
 
     h3, h4, h5 {

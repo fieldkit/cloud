@@ -20,8 +20,8 @@ import { Loading } from '../components/Loading';
 import { generatePointDecorator } from '../common/utilities';
 import MapContainer from '../components/MapContainer';
 
-import '../../css/files.css';
 import '../../css/bootstrap.min.css';
+import '../../css/files.css';
 
 class DeviceNotes extends Component {
     save(ev) {
