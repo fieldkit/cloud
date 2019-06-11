@@ -8,7 +8,6 @@ import log from 'loglevel';
 
 import Login from './pages/Login';
 import SingleUserMap from './pages/SingleUserMap';
-import Source from './pages/Source';
 import Files from './pages/Files';
 
 import type { ActiveExpedition  } from './types';
@@ -32,7 +31,6 @@ export class Main extends Component {
         return (
             <div className="main">
                 <Switch>
-                    <Route exact path={'/sources/:sourceId'} component={Source} />
                     <Route exact path={'/files'} component={Files} />
                     <Route exact path={'/files/:deviceId'} render={props => {
                         const { match } = props;
