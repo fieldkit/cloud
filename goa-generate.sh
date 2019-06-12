@@ -13,7 +13,10 @@ mkdir -p ${WORKSPACE}/src/github.com/fieldkit/cloud/server
 
 rsync -zvua --progress --exclude=vendor server/ ${WORKSPACE}/src/github.com/fieldkit/cloud/server/
 
-(cd ${WORKSPACE}/src/github.com/fieldkit/cloud/server && (GOPATH=${WORKSPACE} go generate))
+export GOPATH=${WORKSPACE}
+export GO111MODULE=on
+
+(cd ${WORKSPACE}/src/github.com/fieldkit/cloud/server && go generate)
 
 find ${WORKSPACE} -type d -exec chmod 755 {} \;
 
