@@ -40,6 +40,11 @@ func (c *Client) NewMyCsvDataSimpleRequest(ctx context.Context, path string) (*h
 	if err != nil {
 		return nil, err
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -68,6 +73,11 @@ func (c *Client) NewMyFeaturesSimpleRequest(ctx context.Context, path string) (*
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }

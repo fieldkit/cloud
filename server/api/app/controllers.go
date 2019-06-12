@@ -3454,9 +3454,10 @@ func MountSimpleController(service *goa.Service, ctrl SimpleController) {
 		}
 		return ctrl.MyCsvData(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleSimpleOrigin(h)
 	service.Mux.Handle("GET", "/my/simple/data/csv", ctrl.MuxHandler("my csv data", h, nil))
-	service.LogInfo("mount", "ctrl", "Simple", "action", "MyCsvData", "route", "GET /my/simple/data/csv")
+	service.LogInfo("mount", "ctrl", "Simple", "action", "MyCsvData", "route", "GET /my/simple/data/csv", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3470,9 +3471,10 @@ func MountSimpleController(service *goa.Service, ctrl SimpleController) {
 		}
 		return ctrl.MyFeatures(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleSimpleOrigin(h)
 	service.Mux.Handle("GET", "/my/simple/features", ctrl.MuxHandler("my features", h, nil))
-	service.LogInfo("mount", "ctrl", "Simple", "action", "MyFeatures", "route", "GET /my/simple/features")
+	service.LogInfo("mount", "ctrl", "Simple", "action", "MyFeatures", "route", "GET /my/simple/features", "security", "jwt")
 }
 
 // handleSimpleOrigin applies the CORS response headers corresponding to the origin.

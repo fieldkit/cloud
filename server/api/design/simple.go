@@ -6,6 +6,10 @@ import (
 )
 
 var _ = Resource("simple", func() {
+	Security(JWT, func() {
+		Scope("api:access")
+	})
+
 	Action("my features", func() {
 		Routing(GET("my/simple/features"))
 		Response(NotFound)
