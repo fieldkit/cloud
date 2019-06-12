@@ -16,7 +16,7 @@ rsync -zvua --progress --exclude=vendor server/ ${WORKSPACE}/src/github.com/fiel
 export GOPATH=${WORKSPACE}
 export GO111MODULE=on
 
-(cd ${WORKSPACE}/src/github.com/fieldkit/cloud/server && go generate)
+(cd ${WORKSPACE}/src/github.com/fieldkit/cloud/server && go run gen/main.go)
 
 find ${WORKSPACE} -type d -exec chmod 755 {} \;
 
