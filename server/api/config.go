@@ -5,8 +5,12 @@ import (
 )
 
 type ApiConfiguration struct {
-	ApiDomain string
-	ApiHost   string
+	BucketName string
+	ApiDomain  string
+	ApiHost    string
+	SessionKey string
+	Emailer    string
+	Domain     string
 }
 
 func (ac *ApiConfiguration) MakeApiUrl(f string, args ...interface{}) string {
