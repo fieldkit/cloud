@@ -58,9 +58,7 @@ install: all
 	done
 
 generate:
-	mv server/vendor server/vendor-temp # See https://github.com/goadesign/goa/issues/923
-	(cd $(GOPATH)/src/github.com/fieldkit/cloud/server && go generate) || true
-	mv server/vendor-temp server/vendor
+	goa-generate.sh
 
 deps: server/inaturalist/secrets.go
 	cd server && go get ./...
