@@ -8,6 +8,7 @@ import log from 'loglevel';
 import Login from './pages/Login';
 import SingleUserMap from './pages/SingleUserMap';
 import Files from './pages/Files';
+import Map from './pages/Map';
 
 import '../css/main.css';
 
@@ -35,6 +36,7 @@ export class Main extends Component {
                         return ( <Files deviceId={match.params.deviceId} /> );
                     }} />
                     <Route exact path={'/map'} component={SingleUserMap} />
+                    <Route exact path={'/old-map'} component={Map} />
                     <Route path={'/'} component={Login} />
                 </Switch>
             </div>

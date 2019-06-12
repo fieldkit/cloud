@@ -75,7 +75,7 @@ class Map extends Component {
         const mapCenter = map.getCenter();
         const newCenter = [ mapCenter.lng, mapCenter.lat, newZoom ];
         this.context.router.history.push({
-            pathname: '/',
+            pathname: '/old-map',
             search: '?center=' + newCenter.join(","),
         });
     }
