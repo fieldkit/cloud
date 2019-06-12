@@ -1,5 +1,3 @@
-//go:generate go run gen/main.go
-
 package main
 
 import (
@@ -539,6 +537,15 @@ func createApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.MountFilesController(service, api.NewFilesController(ctx, service, fco))
 	app.MountDeviceLogsController(service, api.NewDeviceLogsController(ctx, service, fco))
 	app.MountDeviceDataController(service, api.NewDeviceDataController(ctx, service, fco))
+
+	sco := api.SimpleControllerOptions{
+		Config:        apiConfig,
+		Session:       awsSession,
+		Database:      database,
+		Backend:       be,
+		ConcatWorkers: cw,
+	}
+	app.MountSimpleController(service, api.NewSimpleController(ctx, service, sco))
 
 	setupErrorHandling()
 
