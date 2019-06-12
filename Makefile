@@ -58,7 +58,7 @@ install: all
 	done
 
 generate:
-	goa-generate.sh
+	./goa-generate.sh
 
 deps: server/inaturalist/secrets.go
 	cd server && go get ./...
