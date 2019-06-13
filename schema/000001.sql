@@ -210,14 +210,6 @@ CREATE TABLE fieldkit.device_notes (
 
 CREATE INDEX ON fieldkit.device_notes (device_id, time);
 
-CREATE TABLE fieldkit.device_owners (
-  id serial PRIMARY KEY,
-  user_id INTEGER NOT NULL,
-  device_id varchar(64) NOT NULL
-);
-
-CREATE INDEX ON fieldkit.device_owners (device_id, user_id);
-
 -- device_schema
 
 CREATE TABLE fieldkit.device_schema (
