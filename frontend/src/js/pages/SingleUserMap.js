@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router';
 
+import { FkPromisedApi } from '../api/calls';
+
 import UserSession from '../api/session';
 
 import { generatePointDecorator } from '../common/utilities';
@@ -72,10 +74,24 @@ class SingleUserMap extends Component {
         };
     }
 
+    refreshFeatures(page) {
+        FkPromisedApi.getMyFeatures(page).then(geojson => {
+            console.log(geojson);
+            if (geojson.hasMore) {
+                this.refreshFeatures(page + 1);
+            }
+        }, () => {
+            // Nearly always an authentication error.
+            this.setState(this.state);
+        });
+    }
+
     // Not sure how I feel about this. I'm open to suggestions.
     componentWillMount() {
         // $FlowFixMe
         document.body.style.overflow = "hidden";
+
+        this.refreshFeatures(0);
     }
 
     componentWillUnmount() {

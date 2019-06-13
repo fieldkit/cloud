@@ -249,3 +249,21 @@ export function getAuthenticatedUser() {
         unwrap: (r) => r,
     };
 }
+
+export function getMyFeatures(page) {
+    return {
+        types: ActionTypes.API_GET_MY_FEATURES,
+        path: '/my/simple/features?page=' + (page || 0),
+        method: 'GET',
+        unwrap: (r) => r,
+    };
+}
+
+export function getMyCsvData() {
+    return {
+        types: ActionTypes.API_GET_MY_CSV_DATA,
+        path: '/my/simple/data/csv',
+        method: 'GET',
+        unwrap: (r) => r,
+    };
+}

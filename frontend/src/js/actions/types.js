@@ -27,6 +27,8 @@ export const API_LOAD_DEVICE_FILES_DETAILS = expandApiTypes("API_LOAD_DEVICE_FIL
 
 export const API_LOGIN = expandApiTypes("API_LOGIN");
 export const API_GET_AUTHENTICATED_USER = expandApiTypes("API_GET_AUTHENTICATED_USER");
+export const API_GET_MY_FEATURES = expandApiTypes("API_GET_MY_FEATURES");
+export const API_GET_MY_CSV_DATA = expandApiTypes("API_GET_MY_CSV_DATA");
 
 export const CHANGE_PLAYBACK_MODE = 'CHANGE_PLAYBACK_MODE';
 
