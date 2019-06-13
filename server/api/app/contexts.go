@@ -2781,7 +2781,6 @@ type MyFeaturesSimpleContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Page *int
 }
 
 // NewMyFeaturesSimpleContext parses the incoming request URL and body, performs validations and creates the
@@ -2793,24 +2792,13 @@ func NewMyFeaturesSimpleContext(ctx context.Context, r *http.Request, service *g
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := MyFeaturesSimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramPage := req.Params["page"]
-	if len(paramPage) > 0 {
-		rawPage := paramPage[0]
-		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp43 := page
-			tmp42 := &tmp43
-			rctx.Page = tmp42
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
-		}
-	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *MyFeaturesSimpleContext) OK(r *PagedGeoJSON) error {
+func (ctx *MyFeaturesSimpleContext) OK(r *MapFeatures) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.paged_geojson+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.map_features+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

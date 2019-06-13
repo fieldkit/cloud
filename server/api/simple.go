@@ -46,14 +46,7 @@ func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
 
 	log.Infow("my features", "user_id", id)
 
-	features := make([]*app.GeoJSONFeature, 0)
-	return ctx.OK(&app.PagedGeoJSON{
-		HasMore: len(features) > 0,
-		Geo: &app.GeoJSON{
-			Type:     "FeatureCollection",
-			Features: features,
-		},
-	})
+	return ctx.OK(&app.MapFeatures{})
 }
 
 func (sc *SimpleController) MyCsvData(ctx *app.MyCsvDataSimpleContext) error {

@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 // MyCsvDataSimplePath computes a request path to the my csv data action of simple.
@@ -56,8 +55,8 @@ func MyFeaturesSimplePath() string {
 }
 
 // MyFeaturesSimple makes a request to the my features action endpoint of the simple resource
-func (c *Client) MyFeaturesSimple(ctx context.Context, path string, page *int) (*http.Response, error) {
-	req, err := c.NewMyFeaturesSimpleRequest(ctx, path, page)
+func (c *Client) MyFeaturesSimple(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewMyFeaturesSimpleRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -65,18 +64,12 @@ func (c *Client) MyFeaturesSimple(ctx context.Context, path string, page *int) (
 }
 
 // NewMyFeaturesSimpleRequest create the request corresponding to the my features action endpoint of the simple resource.
-func (c *Client) NewMyFeaturesSimpleRequest(ctx context.Context, path string, page *int) (*http.Request, error) {
+func (c *Client) NewMyFeaturesSimpleRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	values := u.Query()
-	if page != nil {
-		tmp164 := strconv.Itoa(*page)
-		values.Set("page", tmp164)
-	}
-	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

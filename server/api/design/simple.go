@@ -13,11 +13,8 @@ var _ = Resource("simple", func() {
 	Action("my features", func() {
 		Routing(GET("my/simple/features"))
 		Response(NotFound)
-		Params(func() {
-			Param("page", Integer)
-		})
 		Response(OK, func() {
-			Media(PagedGeoJSON)
+			Media(MapFeatures)
 		})
 	})
 
