@@ -118,7 +118,8 @@ func (c *FilesController) ListDevices(ctx *app.ListDevicesFilesContext) error {
 		    COALESCE(SUM(s.size) FILTER (WHERE s.file_id != '4'), 0) AS logs_size,
 		    COALESCE(SUM(s.size) FILTER (WHERE s.file_id  = '4'), 0) AS data_size
 		 FROM fieldkit.device_stream AS s
-                 WHERE s.device_id != '' AND s.file_id != '5' AND s.file_id != '6' AND (s.device_id NOT IN (SELECT key FROM fieldkit.device))
+                 WHERE s.device_id != '' AND s.file_id != '5' AND s.file_id != '6' AND
+                     (s.device_id IN (SELECT key FROM fieldkit.device AS d JOIN fieldkit.source AS s ON (d.source_id = s.id) WHERE s.visible))
                  GROUP BY s.device_id
                  ORDER BY last_stream_time DESC`); err != nil {
 		return err

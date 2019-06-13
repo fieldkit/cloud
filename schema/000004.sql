@@ -22,9 +22,9 @@ WITH
   SELECT s.*
   FROM sanitized AS s;
 
-CREATE OR REPLACE FUNCTION fieldkit.fk_dsl_clustered_identical(desired_device_id BIGINT)
+CREATE OR REPLACE FUNCTION fieldkit.fk_dsl_clustered_identical(desired_source_id BIGINT)
 RETURNS TABLE (
-	"source_id" BIGINT,
+	"source_id" integer,
 	"location" geometry,
 	"size" BIGINT,
 	"min_timestamp" timestamp,
@@ -38,19 +38,19 @@ RETURN QUERY
 WITH
   with_identical_clustering AS (
     SELECT
-      d.device_id AS device_id,
+      d.source_id AS source_id,
       d.location,
       COUNT(*) AS actual_size,
       MIN(d.timestamp) AS min_timestamp,
       MAX(d.timestamp) AS max_timestamp,
       LEAST(CAST(11 AS BIGINT), COUNT(*)) AS capped_size
     FROM fieldkit.device_stream_location_sanitized d
-    WHERE d.device_id IN (desired_device_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
-    GROUP BY d.device_id, d.location
+    WHERE d.source_id IN (desired_source_id) AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0
+    GROUP BY d.source_id, d.location
   ),
   with_cluster_ids AS (
     SELECT
-      s.device_id,
+      s.source_id,
       s.location,
       s.actual_size,
       s.min_timestamp,
@@ -67,7 +67,7 @@ END
 
 CREATE OR REPLACE FUNCTION fieldkit.fk_dsl_tracks(desired_source_id BIGINT)
 RETURNS TABLE (
-	"source_id" BIGINT,
+	"source_id" integer,
 	"timestamp" timestamp,
 	"min_timestamp" timestamp,
 	"max_timestamp" timestamp,
@@ -121,7 +121,7 @@ with_assigned_temporal_clustering AS (
 	FROM with_temporal_clustering s
 )
 SELECT
-  desired_source_id AS source_id,
+  desired_source_id::integer AS source_id,
   s.timestamp,
   s.min_timestamp,
   s.max_timestamp,
@@ -201,13 +201,13 @@ RETURN QUERY
 SELECT
   desired_source_id::integer AS source_id,
   NOW()::timestamp AS updated_at,
-	(SELECT COUNT(d.id)::integer AS number_of_features FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT d.Id::integer AS last_feature_id FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
-	(SELECT MIN(d.timestamp) AS start_time FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT MAX(d.timestamp) AS end_time FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT ST_Envelope(ST_Collect(d.location)) AS envelope FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(POINT, 4326) AS centroid FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
-	(SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location))::geography))::numeric AS radius FROM fieldkit.device_stream_location AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0);
+	(SELECT COUNT(d.id)::integer AS number_of_features FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT d.Id::integer AS last_feature_id FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0 ORDER BY d.timestamp DESC LIMIT 1),
+	(SELECT MIN(d.timestamp) AS start_time FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT MAX(d.timestamp) AS end_time FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT ST_Envelope(ST_Collect(d.location)) AS envelope FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT ST_Centroid(ST_Collect(d.location))::geometry(POINT, 4326) AS centroid FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0),
+	(SELECT Sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(d.location))::geography))::numeric AS radius FROM fieldkit.device_stream_location_sanitized AS d WHERE d.source_id = desired_source_id AND ST_X(d.location) != 0 AND ST_Y(d.location) != 0);
 END
 ' LANGUAGE plpgsql;
 

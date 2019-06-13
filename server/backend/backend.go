@@ -699,6 +699,7 @@ func (b *Backend) CreateMissingDevices(ctx context.Context) (err error) {
 		source := &data.Source{
 			ExpeditionID: expedition,
 			Name:         device.DeviceID,
+			Visible:      true,
 		}
 		if err := b.AddSource(ctx, source); err != nil {
 			return err
