@@ -1,19 +1,19 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-SELECT * FROM
-(
-SELECT
-  DISTINCT ON (dsl.location)
-  dsl.*,
-  ROW_NUMBER() OVER (
-    PARTITION BY device_id
-    ORDER BY dsl.timestamp
-  ) AS c
-FROM
-  fieldkit.device_stream_location AS dsl
-) AS q
-WHERE q.c < 20
-LIMIT 500
+  SELECT * FROM
+               (
+                 SELECT
+                   DISTINCT ON (dsl.location)
+                     dsl.*,
+                   ROW_NUMBER() OVER (
+                     PARTITION BY device_id
+                     ORDER BY dsl.timestamp
+                   ) AS c
+                   FROM
+                       fieldkit.device_stream_location AS dsl
+               ) AS q
+   WHERE q.c < 20
+   LIMIT 500
 
 #+END_SRC
 
@@ -94,11 +94,13 @@ LIMIT 500
 |     1 | 0004a30b0022ee27                 | 2019-02-26 11:59:24 | 0101000020E61000006DFDF49F35B552C077DB85E63A0525C0 |  1 |
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-SELECT
-  s.id, s.device_id, s.timestamp, ST_AsText(s.location) AS location,
-	ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
-FROM fieldkit.device_stream_location AS s
-ORDER BY s.timestamp DESC
+
+  SELECT
+    s.id, s.device_id, s.timestamp, ST_AsText(s.location) AS location,
+    ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
+    FROM fieldkit.device_stream_location AS s
+   ORDER BY s.timestamp DESC
+
 #+END_SRC
 
 #+RESULTS:
@@ -127,7 +129,9 @@ ORDER BY s.timestamp DESC
 
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-SELECT * FROM fieldkit.device_stream LIMIT 10
+
+  SELECT * FROM fieldkit.device_stream LIMIT 10
+
 #+END_SRC
 
 #+RESULTS:
@@ -145,17 +149,18 @@ SELECT * FROM fieldkit.device_stream LIMIT 10
 | 10 | 2018-08-25 20:00:10.054802 | 504e32b6-dcd4-4d74-8ff0-3b14cb18b0e8 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |  6543 |       2 | https://fk-streams.s3.amazonaws.com/504e32b6-dcd4-4d74-8ff0-3b14cb18b0e8 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":6543,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}  |          |
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-		SELECT s.device_id,
-		    (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
-		    (SELECT n.name FROM fieldkit.device_notes AS n WHERE (n.device_id = s.device_id) AND (n.name IS NOT NULL) ORDER BY n.time DESC LIMIT 1) AS name,
-		    MAX(s.time) AS last_stream_time,
-		    COUNT(s.*) AS number_of_files,
-		    COALESCE(SUM(s.size) FILTER (WHERE s.file_id != '4'), 0) AS logs_size,
-		    COALESCE(SUM(s.size) FILTER (WHERE s.file_id  = '4'), 0) AS data_size
-		 FROM fieldkit.device_stream AS s
-                 WHERE s.device_id != ''
-                 GROUP BY s.device_id
-                 ORDER BY last_stream_time DESC
+
+  SELECT s.device_id,
+         (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
+         (SELECT n.name FROM fieldkit.device_notes AS n WHERE (n.device_id = s.device_id) AND (n.name IS NOT NULL) ORDER BY n.time DESC LIMIT 1) AS name,
+         MAX(s.time) AS last_stream_time,
+         COUNT(s.*) AS number_of_files,
+         COALESCE(SUM(s.size) FILTER (WHERE s.file_id != '4'), 0) AS logs_size,
+         COALESCE(SUM(s.size) FILTER (WHERE s.file_id  = '4'), 0) AS data_size
+    FROM fieldkit.device_stream AS s
+   WHERE s.device_id != ''
+   GROUP BY s.device_id
+   ORDER BY last_stream_time DESC
 
 #+END_SRC
 
@@ -247,3 +252,138 @@ SELECT * FROM fieldkit.device_stream LIMIT 10
 | 0004a30b001ca95f                 | 367f1c32-d16a-4c1e-962c-c731f4a67611 |               | 2018-07-19 22:52:03        |              11 |    174841 |     32227 |
 
 
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+  SELECT 
+    DISTINCT ON (dsl.location)
+    dsl.device_id,
+    dsl.timestamp,
+    dsl.location
+  FROM
+  fieldkit.device_stream_location AS dsl JOIN fieldkit.device_owners AS dvo ON (dvo.device_id = dsl.device_id) LIMIT 10
+
+#+END_SRC
+
+#+RESULTS:
+| device_id        | timestamp           | location                                           |
+|------------------+---------------------+----------------------------------------------------|
+| 0004a30b00232b9b | 2001-12-31 01:36:03 | 0101000020E6100000000000E0BA7C4640000000E0BA7C4640 |
+| 0004a30b00232b9b | 2019-01-22 20:54:54 | 0101000020E610000000000060CD925D40000000004B084140 |
+| 0004a30b00232b9b | 2019-06-01 12:04:18 | 0101000020E610000000000060689620C0000000C049084140 |
+| 0004a30b00232b9b | 2019-06-02 17:24:08 | 0101000020E610000000000040FE4B57C00000004071714640 |
+| 0004a30b00232b9b | 2019-06-02 17:24:22 | 0101000020E610000000000060E84B57C000000020C8714640 |
+| 0004a30b00232b9b | 2019-06-02 17:23:22 | 0101000020E610000000000040564C57C0000000E064704640 |
+| 0004a30b00232b9b | 2019-06-02 17:23:00 | 0101000020E6100000000000209B4C57C0000000606E704640 |
+| 0004a30b00232b9b | 2019-06-02 17:22:58 | 0101000020E610000000000000A14C57C00000008072704640 |
+| 0004a30b00232b9b | 2019-06-02 17:23:39 | 0101000020E6100000000000E0394C57C000000060BF704640 |
+| 0004a30b00232b9b | 2019-06-02 17:22:48 | 0101000020E610000000000020BE4C57C0000000C088704640 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+SELECT updated_at FROM fieldkit.fk_update_dsl_summary('0004a30b00232b9b');
+SELECT updated_at FROM fieldkit.fk_update_dsl_temporal_geometries('0004a30b00232b9b');
+SELECT updated_at FROM fieldkit.fk_update_dsl_temporal_clusters('0004a30b00232b9b');
+SELECT updated_at FROM fieldkit.fk_update_dsl_spatial_clusters('0004a30b00232b9b');
+
+#+END_SRC
+
+#+RESULTS:
+| updated_at                 |
+|----------------------------|
+| 2019-06-13 21:33:09.390667 |
+| updated_at                 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| 2019-06-13 21:33:09.478208 |
+| updated_at                 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| 2019-06-13 21:33:13.984813 |
+| updated_at                 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
+| 2019-06-13 21:33:18.495307 |
