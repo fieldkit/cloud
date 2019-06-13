@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
+	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/conservify/sqlxcache"
 
@@ -33,10 +36,42 @@ func NewSimpleController(ctx context.Context, service *goa.Service, options Simp
 	}
 }
 
+func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
+	log := Logger(ctx).Sugar()
+
+	id, err := getCurrentUserId(ctx)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("my features", "user_id", id)
+
+	features := make([]*app.GeoJSONFeature, 0)
+	return ctx.OK(&app.PagedGeoJSON{
+		HasMore: len(features) > 0,
+		Geo: &app.GeoJSON{
+			Type:     "FeatureCollection",
+			Features: features,
+		},
+	})
+}
+
 func (sc *SimpleController) MyCsvData(ctx *app.MyCsvDataSimpleContext) error {
 	return nil
 }
 
-func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
-	return nil
+func getCurrentUserId(ctx context.Context) (id int64, err error) {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return 0, fmt.Errorf("JWT token is missing from context")
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("JWT claims error")
+	}
+
+	id = int64(claims["sub"].(float64))
+
+	return
 }
