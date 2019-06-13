@@ -13,7 +13,7 @@ require (
 	github.com/cenkalti/backoff v0.0.0-20170309153948-3db60c813733
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
-	github.com/conservify/sqlxcache v0.0.0-20180420163412-f531a9ef96c0
+	github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e
 	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188 // indirect
 	github.com/creack/goselect v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1

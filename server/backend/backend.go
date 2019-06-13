@@ -8,6 +8,8 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/paulmach/go.geo"
 
+	"github.com/segmentio/ksuid"
+
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -622,6 +624,99 @@ func (b *Backend) TemporalGeometriesBySourceID(ctx context.Context, sourceId int
 		return nil, err
 	}
 	return summaries, nil
+}
+
+func (b *Backend) GetOrCreateDefaultProject(ctx context.Context) (id int32, err error) {
+	projects := []*data.Project{}
+	if err := b.db.SelectContext(ctx, &projects, `SELECT * FROM fieldkit.project WHERE name = $1`, "Default Project"); err != nil {
+		return 0, fmt.Errorf("Error querying for project: %v", err)
+	}
+
+	if len(projects) == 1 {
+		return projects[0].ID, nil
+	}
+
+	project := &data.Project{
+		Name: "Default Project",
+		Slug: "default-project",
+	}
+
+	if err := b.db.NamedGetContext(ctx, project, `INSERT INTO fieldkit.project (name, slug) VALUES (:name, :slug) RETURNING *`, project); err != nil {
+		return 0, fmt.Errorf("Error inserting project: %v", err)
+	}
+
+	return project.ID, nil
+}
+
+func (b *Backend) GetOrCreateDefaultExpedition(ctx context.Context) (id int32, err error) {
+	expeditions := []*data.Expedition{}
+	if err := b.db.SelectContext(ctx, &expeditions, `SELECT * FROM fieldkit.expedition WHERE name = $1`, "Default Expedition"); err != nil {
+		return 0, fmt.Errorf("Error querying for expedition: %v", err)
+	}
+
+	if len(expeditions) == 1 {
+		return expeditions[0].ID, nil
+	}
+
+	projectID, err := b.GetOrCreateDefaultProject(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("Error getting default project: %v", err)
+	}
+
+	expedition := &data.Expedition{
+		Name:      "Default Expedition",
+		Slug:      "default-expedition",
+		ProjectID: projectID,
+	}
+
+	if err := b.db.NamedGetContext(ctx, expedition, `INSERT INTO fieldkit.expedition (project_id, name, slug) VALUES (:project_id, :name, :slug) RETURNING *`, expedition); err != nil {
+		return 0, fmt.Errorf("Error inserting expedition: %v", err)
+	}
+
+	return expedition.ID, nil
+}
+
+func (b *Backend) CreateMissingDevices(ctx context.Context) (err error) {
+	type MissingDevice struct {
+		DeviceID string `db:"device_id"`
+	}
+
+	devices := []*MissingDevice{}
+	if err := b.db.SelectContext(ctx, &devices, `SELECT DISTINCT dsl.device_id FROM fieldkit.device_stream_location AS dsl WHERE dsl.device_id NOT IN (SELECT key FROM fieldkit.device)`); err != nil {
+		return fmt.Errorf("Error getting devices: %v", err)
+	}
+
+	expedition, err := b.GetOrCreateDefaultExpedition(ctx)
+	if err != nil {
+		return fmt.Errorf("Error getting default expedition: %v", err)
+	}
+
+	log := Logger(ctx).Sugar()
+
+	for _, device := range devices {
+		log.Infow("Creating missing device", "device_id", device.DeviceID)
+
+		source := &data.Source{
+			ExpeditionID: expedition,
+			Name:         device.DeviceID,
+		}
+		if err := b.AddSource(ctx, source); err != nil {
+			return err
+		}
+
+		token := ksuid.New().String()
+		device := &data.Device{
+			SourceID: int64(source.ID),
+			Key:      device.DeviceID,
+			Token:    token,
+		}
+
+		if err := b.AddDevice(ctx, device); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 type BoundingBox struct {

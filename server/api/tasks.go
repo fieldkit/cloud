@@ -40,7 +40,13 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 }
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
-	go c.options.INaturalistService.RefreshObservations(ctx)
+	if err := c.options.Backend.CreateMissingDevices(ctx); err != nil {
+		return err
+	}
+
+	if false {
+		go c.options.INaturalistService.RefreshObservations(ctx)
+	}
 
 	return ctx.OK([]byte("Ok"))
 }
