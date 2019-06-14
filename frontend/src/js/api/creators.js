@@ -250,7 +250,7 @@ export function getAuthenticatedUser() {
     };
 }
 
-export function getMyFeatures(criteria) {
+export function getMySimpleFeatures(criteria) {
     const queryString = objectToQueryString({
         ne: criteria.ne.join(","),
         sw: criteria.sw.join(","),
@@ -265,10 +265,10 @@ export function getMyFeatures(criteria) {
     };
 }
 
-export function getMyCsvData() {
+export function getMySimpleSummary() {
     return {
-        types: ActionTypes.API_GET_MY_CSV_DATA,
-        path: '/my/simple/data/csv',
+        types: ActionTypes.API_GET_MY_SIMPLE_SUMMARY,
+        path: '/my/simple',
         method: 'GET',
         unwrap: (r) => r,
     };

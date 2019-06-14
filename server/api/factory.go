@@ -205,6 +205,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Database:      database,
 		Backend:       be,
 		ConcatWorkers: cw,
+		JWTHMACKey:    jwtHMACKey,
 	}
 	app.MountSimpleController(service, NewSimpleController(ctx, service, sco))
 

@@ -22,6 +22,7 @@ type SimpleControllerOptions struct {
 	Database      *sqlxcache.DB
 	Backend       *backend.Backend
 	ConcatWorkers *backend.ConcatenationWorkers
+	JWTHMACKey    []byte
 }
 
 type SimpleController struct {
@@ -39,7 +40,7 @@ func NewSimpleController(ctx context.Context, service *goa.Service, options Simp
 func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
 	log := Logger(ctx).Sugar()
 
-	userID, err := getCurrentUserId(ctx)
+	userID, err := getCurrentUserIdFromContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -72,11 +73,111 @@ func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
 	})
 }
 
-func (sc *SimpleController) MyCsvData(ctx *app.MyCsvDataSimpleContext) error {
-	return nil
+func (sc *SimpleController) MySimpleSummary(ctx *app.MySimpleSummarySimpleContext) error {
+	/*
+		log := Logger(ctx).Sugar()
+
+		userID, err := getCurrentUserIdFromContext(ctx)
+		if err != nil {
+			return err
+		}
+
+		log.Infow("my data (csv)", "user_id", userID)
+
+		devices, err := sc.options.Backend.ListAllDeviceSourcesByUser(ctx, userID)
+		if err != nil {
+			return err
+		}
+
+		log.Infow("my data (csv)", "number_of_devices", len(devices))
+
+		if len(devices) != 1 {
+			return ctx.OK(&app.MyDataUrls{})
+		}
+	*/
+
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context")
+	}
+
+	return ctx.OK(&app.MyDataUrls{
+		Csv: sc.options.Config.MakeApiUrl("/my/simple/download?token=" + token.Raw),
+	})
 }
 
-func getCurrentUserId(ctx context.Context) (id int64, err error) {
+func (sc *SimpleController) Download(ctx *app.DownloadSimpleContext) error {
+	log := Logger(ctx).Sugar()
+
+	fr, err := backend.NewFileRepository(sc.options.Session, "fk-streams")
+	if err != nil {
+		return err
+	}
+
+	token, err := jwtgo.Parse(ctx.Token, func(token *jwtgo.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwtgo.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return sc.options.JWTHMACKey, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	userID, err := getCurrentUserIdFromToken(token)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("download", "user_id", userID)
+
+	devices, err := sc.options.Backend.ListAllDeviceSourcesByUser(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("download", "number_of_devices", len(devices))
+
+	if len(devices) != 1 {
+		return fmt.Errorf("Too many devices linked to user.")
+	}
+
+	device := devices[0]
+
+	urls := DeviceSummaryUrls(sc.options.Config, device.Key)
+
+	data, err := fr.Info(ctx, urls.Data.ID)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("download", "data", data)
+
+	log.Infow("download", "files", urls)
+
+	iterator, err := backend.LookupFile(ctx, sc.options.Session, sc.options.Database, urls.Data.ID)
+	if err != nil {
+		return err
+	}
+
+	exporter := backend.NewSimpleCsvExporter(ctx.ResponseData)
+
+	return backend.ExportAllFiles(ctx, ctx.ResponseData, true, iterator, exporter)
+}
+
+func getCurrentUserIdFromToken(token *jwtgo.Token) (id int64, err error) {
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("JWT claims error")
+	}
+
+	id = int64(claims["sub"].(float64))
+
+	return
+}
+
+func getCurrentUserIdFromContext(ctx context.Context) (id int64, err error) {
 	token := jwt.ContextJWT(ctx)
 	if token == nil {
 		return 0, fmt.Errorf("JWT token is missing from context")

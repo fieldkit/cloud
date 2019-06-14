@@ -216,6 +216,23 @@ func (b *Backend) TwitterAccountSource(ctx context.Context, sourceID int32) (*da
 	return twitterAccount, nil
 }
 
+func (b *Backend) ListAllDeviceSourcesByUser(ctx context.Context, userID int64) ([]*data.DeviceSource, error) {
+	devices := []*data.DeviceSource{}
+	if err := b.db.SelectContext(ctx, &devices, `
+		SELECT i.*, d.source_id, d.key, d.token
+			FROM fieldkit.device AS d
+				JOIN fieldkit.source AS i ON i.id = d.source_id
+				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
+				JOIN fieldkit.project AS p ON p.id = e.project_id
+                        WHERE i.user_id = $1
+                        ORDER BY i.name
+		`, userID); err != nil {
+		return nil, err
+	}
+
+	return devices, nil
+}
+
 func (b *Backend) ListAllDeviceSources(ctx context.Context) ([]*data.DeviceSource, error) {
 	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `

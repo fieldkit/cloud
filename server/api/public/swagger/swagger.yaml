@@ -340,6 +340,28 @@ definitions:
       radius: 0.6530857697814297
       sourceId: 1.999501909620784e+17
       startTime: "1997-04-01T20:52:44Z"
+    - centroid:
+      - 0.6447088396273654
+      - 0.6447088396273654
+      endTime: "2000-04-25T14:41:22Z"
+      envelope:
+      - - 0.5926219627974112
+      id: 2.072833317639838e+18
+      numberOfFeatures: 9.911149219263516e+17
+      radius: 0.6530857697814297
+      sourceId: 1.999501909620784e+17
+      startTime: "1997-04-01T20:52:44Z"
+    - centroid:
+      - 0.6447088396273654
+      - 0.6447088396273654
+      endTime: "2000-04-25T14:41:22Z"
+      envelope:
+      - - 0.5926219627974112
+      id: 2.072833317639838e+18
+      numberOfFeatures: 9.911149219263516e+17
+      radius: 0.6530857697814297
+      sourceId: 1.999501909620784e+17
+      startTime: "1997-04-01T20:52:44Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -1312,7 +1334,7 @@ definitions:
           - 0.6066932963872642
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+          Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1320,7 +1342,7 @@ definitions:
           - 0.6066932963872642
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+          Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1328,7 +1350,7 @@ definitions:
           - 0.6066932963872642
           type: Occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+          Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
         type: Magnam sunt debitis rerum rerum et quia.
       type: Incidunt consequatur magni et.
     properties:
@@ -1351,7 +1373,7 @@ definitions:
         - 0.6066932963872642
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+        Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
       type: Magnam sunt debitis rerum rerum et quia.
     properties:
       geometry:
@@ -1359,7 +1381,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+          Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
         type: object
       type:
         example: Magnam sunt debitis rerum rerum et quia.
@@ -1380,23 +1402,7 @@ definitions:
         - 0.6066932963872642
         type: Occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
-      type: Magnam sunt debitis rerum rerum et quia.
-    - geometry:
-        coordinates:
-        - 0.6066932963872642
-        - 0.6066932963872642
-        type: Occaecati occaecati omnis sint.
-      properties:
-        Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
-      type: Magnam sunt debitis rerum rerum et quia.
-    - geometry:
-        coordinates:
-        - 0.6066932963872642
-        - 0.6066932963872642
-        type: Occaecati occaecati omnis sint.
-      properties:
-        Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+        Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
       type: Magnam sunt debitis rerum rerum et quia.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1536,7 +1542,7 @@ definitions:
               - 0.6066932963872642
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+              Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1544,7 +1550,7 @@ definitions:
               - 0.6066932963872642
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+              Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1552,7 +1558,7 @@ definitions:
               - 0.6066932963872642
               type: Occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+              Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
             type: Magnam sunt debitis rerum rerum et quia.
           type: Incidunt consequatur magni et.
         hasMore: false
@@ -1667,7 +1673,7 @@ definitions:
             - 0.6066932963872642
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+            Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1675,7 +1681,7 @@ definitions:
             - 0.6066932963872642
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+            Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1683,7 +1689,7 @@ definitions:
             - 0.6066932963872642
             type: Occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 40eefa75-8b12-47ad-9dbd-d1033a94c26d
+            Deleniti rem sint velit ad laboriosam.: 3154a336-68eb-477c-93a3-556f7d8d4503
           type: Magnam sunt debitis rerum rerum et quia.
         type: Incidunt consequatur magni et.
       hasMore: false
@@ -1816,7 +1822,7 @@ definitions:
       series:
       - name: Autem velit magni.
         rows:
-        - abbac617-aff2-4b14-b03f-d5898a3a5f7e
+        - e9209663-da77-4736-83fe-b583a4154c97
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -1864,16 +1870,16 @@ definitions:
     example:
       name: Autem velit magni.
       rows:
-      - abbac617-aff2-4b14-b03f-d5898a3a5f7e
+      - e9209663-da77-4736-83fe-b583a4154c97
     properties:
       name:
         example: Autem velit magni.
         type: string
       rows:
         example:
-        - abbac617-aff2-4b14-b03f-d5898a3a5f7e
+        - e9209663-da77-4736-83fe-b583a4154c97
         items:
-          example: abbac617-aff2-4b14-b03f-d5898a3a5f7e
+          example: e9209663-da77-4736-83fe-b583a4154c97
         type: array
     required:
     - name
@@ -1886,10 +1892,10 @@ definitions:
     example:
     - name: Autem velit magni.
       rows:
-      - abbac617-aff2-4b14-b03f-d5898a3a5f7e
+      - e9209663-da77-4736-83fe-b583a4154c97
     - name: Autem velit magni.
       rows:
-      - abbac617-aff2-4b14-b03f-d5898a3a5f7e
+      - e9209663-da77-4736-83fe-b583a4154c97
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -3438,12 +3444,12 @@ paths:
       summary: logout user
       tags:
       - user
-  /my/simple/data/csv:
+  /my/simple:
     get:
       description: |-
         Required security scopes:
           * `api:access`
-      operationId: simple#my csv data
+      operationId: simple#my simple summary
       produces:
       - application/vnd.app.my_data_urls+json
       responses:
@@ -3458,7 +3464,27 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: my csv data simple
+      summary: my simple summary simple
+      tags:
+      - simple
+  /my/simple/download:
+    get:
+      operationId: simple#download
+      parameters:
+      - in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: download simple
       tags:
       - simple
   /my/simple/features:

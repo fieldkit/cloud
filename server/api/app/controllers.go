@@ -3431,16 +3431,18 @@ func unmarshalUpdateProjectPayload(ctx context.Context, service *goa.Service, re
 // SimpleController is the controller interface for the Simple actions.
 type SimpleController interface {
 	goa.Muxer
-	MyCsvData(*MyCsvDataSimpleContext) error
+	Download(*DownloadSimpleContext) error
 	MyFeatures(*MyFeaturesSimpleContext) error
+	MySimpleSummary(*MySimpleSummarySimpleContext) error
 }
 
 // MountSimpleController "mounts" a Simple resource controller on the given service.
 func MountSimpleController(service *goa.Service, ctrl SimpleController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/my/simple/data/csv", ctrl.MuxHandler("preflight", handleSimpleOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/my/simple/download", ctrl.MuxHandler("preflight", handleSimpleOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/my/simple/features", ctrl.MuxHandler("preflight", handleSimpleOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/my/simple", ctrl.MuxHandler("preflight", handleSimpleOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3448,16 +3450,15 @@ func MountSimpleController(service *goa.Service, ctrl SimpleController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewMyCsvDataSimpleContext(ctx, req, service)
+		rctx, err := NewDownloadSimpleContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.MyCsvData(rctx)
+		return ctrl.Download(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleSimpleOrigin(h)
-	service.Mux.Handle("GET", "/my/simple/data/csv", ctrl.MuxHandler("my csv data", h, nil))
-	service.LogInfo("mount", "ctrl", "Simple", "action", "MyCsvData", "route", "GET /my/simple/data/csv", "security", "jwt")
+	service.Mux.Handle("GET", "/my/simple/download", ctrl.MuxHandler("download", h, nil))
+	service.LogInfo("mount", "ctrl", "Simple", "action", "Download", "route", "GET /my/simple/download")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3475,6 +3476,23 @@ func MountSimpleController(service *goa.Service, ctrl SimpleController) {
 	h = handleSimpleOrigin(h)
 	service.Mux.Handle("GET", "/my/simple/features", ctrl.MuxHandler("my features", h, nil))
 	service.LogInfo("mount", "ctrl", "Simple", "action", "MyFeatures", "route", "GET /my/simple/features", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewMySimpleSummarySimpleContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.MySimpleSummary(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleSimpleOrigin(h)
+	service.Mux.Handle("GET", "/my/simple", ctrl.MuxHandler("my simple summary", h, nil))
+	service.LogInfo("mount", "ctrl", "Simple", "action", "MySimpleSummary", "route", "GET /my/simple", "security", "jwt")
 }
 
 // handleSimpleOrigin applies the CORS response headers corresponding to the origin.

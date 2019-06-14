@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { Redirect } from 'react-router';
 
 import { FkPromisedApi } from '../api/calls';
-
 import UserSession from '../api/session';
 
 import { GeoRectSet, GeoRect } from '../common/geo';
@@ -37,8 +36,6 @@ function getDefaultMapLocation() {
 
 class DownloadDataPanel extends React.Component {
     render() {
-        const { onDownload } = this.props;
-
         return (
             <div className="download-data-panel">
                 <div className="download-data-body">
@@ -49,10 +46,24 @@ class DownloadDataPanel extends React.Component {
                         <li>Nunc hendrerit scelerisque semper. Donec pharetra nibh eu dui convallis, eget sagittis nunc pellentesque.</li>
                     </ol>
 
-                    <button onClick={ onDownload } className="download">Download Data</button>
+                    {this.renderDownloadButton()}
                 </div>
             </div>
         );
+    }
+
+    renderDownloadButton() {
+        const { summary, onDownload } = this.props;
+
+        if (_.isObject(summary) && !_.isEmpty(summary.csv)) {
+            return (
+                <a target="_blank" rel="noopener noreferrer" href={summary.csv}>
+                    <button onClick={ onDownload } className="download">Download Data</button>
+                </a>
+            );
+        }
+
+        return <div />;
     }
 }
 
@@ -76,7 +87,7 @@ class MapFeatures {
         const loading = desired.enlarge(2);
         this.loaded.push(loading);
 
-        return FkPromisedApi.getMyFeatures({
+        return FkPromisedApi.getMySimpleFeatures({
             ne: loading.ne,
             sw: loading.sw,
         }).then(data => {
@@ -151,6 +162,14 @@ class SingleUserMap extends Component {
         };
     }
 
+    refreshSummary() {
+        FkPromisedApi.getMySimpleSummary().then(summary => {
+            this.setState({
+                summary
+            });
+        });
+    }
+
     loadMapFeatures(criteria) {
         return this.features.load(criteria).then(geometries => {
             if (geometries) {
@@ -168,6 +187,8 @@ class SingleUserMap extends Component {
 
     // Not sure how I feel about this. I'm open to suggestions.
     componentWillMount() {
+        this.refreshSummary();
+
         // $FlowFixMe
         document.body.style.overflow = "hidden";
     }
@@ -192,7 +213,6 @@ class SingleUserMap extends Component {
     }
 
     async onDownload() {
-        console.log("Download");
     }
 
     async onLogout() {
@@ -228,7 +248,7 @@ class SingleUserMap extends Component {
                         onUserActivity={ this.onUserActivity.bind(this) }
                         loadMapFeatures={ this.loadMapFeatures.bind(this) }
                         onChangePlaybackMode={ () => { } }>
-                        <DownloadDataPanel onDownload={ this.onDownload.bind(this )} />
+                        <DownloadDataPanel onDownload={ this.onDownload.bind(this )} summary={this.state.summary} />
                     </MapContainer>
                 </div>
             </div>

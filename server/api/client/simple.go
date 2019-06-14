@@ -14,36 +14,34 @@ import (
 	"net/url"
 )
 
-// MyCsvDataSimplePath computes a request path to the my csv data action of simple.
-func MyCsvDataSimplePath() string {
+// DownloadSimplePath computes a request path to the download action of simple.
+func DownloadSimplePath() string {
 
-	return fmt.Sprintf("/my/simple/data/csv")
+	return fmt.Sprintf("/my/simple/download")
 }
 
-// MyCsvDataSimple makes a request to the my csv data action endpoint of the simple resource
-func (c *Client) MyCsvDataSimple(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewMyCsvDataSimpleRequest(ctx, path)
+// DownloadSimple makes a request to the download action endpoint of the simple resource
+func (c *Client) DownloadSimple(ctx context.Context, path string, token string) (*http.Response, error) {
+	req, err := c.NewDownloadSimpleRequest(ctx, path, token)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewMyCsvDataSimpleRequest create the request corresponding to the my csv data action endpoint of the simple resource.
-func (c *Client) NewMyCsvDataSimpleRequest(ctx context.Context, path string) (*http.Request, error) {
+// NewDownloadSimpleRequest create the request corresponding to the download action endpoint of the simple resource.
+func (c *Client) NewDownloadSimpleRequest(ctx context.Context, path string, token string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	values.Set("token", token)
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }
@@ -65,6 +63,40 @@ func (c *Client) MyFeaturesSimple(ctx context.Context, path string) (*http.Respo
 
 // NewMyFeaturesSimpleRequest create the request corresponding to the my features action endpoint of the simple resource.
 func (c *Client) NewMyFeaturesSimpleRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// MySimpleSummarySimplePath computes a request path to the my simple summary action of simple.
+func MySimpleSummarySimplePath() string {
+
+	return fmt.Sprintf("/my/simple")
+}
+
+// MySimpleSummarySimple makes a request to the my simple summary action endpoint of the simple resource
+func (c *Client) MySimpleSummarySimple(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewMySimpleSummarySimpleRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewMySimpleSummarySimpleRequest create the request corresponding to the my simple summary action endpoint of the simple resource.
+func (c *Client) NewMySimpleSummarySimpleRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

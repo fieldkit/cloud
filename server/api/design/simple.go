@@ -23,6 +23,14 @@ var _ = Resource("simple", func() {
 		Scope("api:access")
 	})
 
+	Action("my simple summary", func() {
+		Routing(GET("my/simple"))
+		Response(NotFound)
+		Response(OK, func() {
+			Media(MyDataUrls)
+		})
+	})
+
 	Action("my features", func() {
 		Routing(GET("my/simple/features"))
 		Response(NotFound)
@@ -31,11 +39,14 @@ var _ = Resource("simple", func() {
 		})
 	})
 
-	Action("my csv data", func() {
-		Routing(GET("my/simple/data/csv"))
-		Response(NotFound)
-		Response(OK, func() {
-			Media(MyDataUrls)
+	Action("download", func() {
+		NoSecurity()
+		Routing(GET("my/simple/download"))
+		Params(func() {
+			Param("token", String)
+			Required("token")
 		})
+		Response(NotFound)
+		Response(OK)
 	})
 })

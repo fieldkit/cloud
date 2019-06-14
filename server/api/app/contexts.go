@@ -2741,35 +2741,45 @@ func (ctx *UpdateProjectContext) BadRequest() error {
 	return nil
 }
 
-// MyCsvDataSimpleContext provides the simple my csv data action context.
-type MyCsvDataSimpleContext struct {
+// DownloadSimpleContext provides the simple download action context.
+type DownloadSimpleContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
+	Token string
 }
 
-// NewMyCsvDataSimpleContext parses the incoming request URL and body, performs validations and creates the
-// context used by the simple controller my csv data action.
-func NewMyCsvDataSimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*MyCsvDataSimpleContext, error) {
+// NewDownloadSimpleContext parses the incoming request URL and body, performs validations and creates the
+// context used by the simple controller download action.
+func NewDownloadSimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*DownloadSimpleContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := MyCsvDataSimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := DownloadSimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramToken := req.Params["token"]
+	if len(paramToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("token"))
+	} else {
+		rawToken := paramToken[0]
+		rctx.Token = rawToken
+	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *MyCsvDataSimpleContext) OK(r *MyDataUrls) error {
+func (ctx *DownloadSimpleContext) OK(resp []byte) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.my_data_urls+json")
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *MyCsvDataSimpleContext) NotFound() error {
+func (ctx *DownloadSimpleContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
@@ -2803,6 +2813,39 @@ func (ctx *MyFeaturesSimpleContext) OK(r *MapFeatures) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *MyFeaturesSimpleContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// MySimpleSummarySimpleContext provides the simple my simple summary action context.
+type MySimpleSummarySimpleContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewMySimpleSummarySimpleContext parses the incoming request URL and body, performs validations and creates the
+// context used by the simple controller my simple summary action.
+func NewMySimpleSummarySimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*MySimpleSummarySimpleContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := MySimpleSummarySimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *MySimpleSummarySimpleContext) OK(r *MyDataUrls) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.my_data_urls+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *MySimpleSummarySimpleContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
