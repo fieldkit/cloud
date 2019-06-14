@@ -29,7 +29,7 @@ type SourceModifiedHandler struct {
 }
 
 func (h *SourceModifiedHandler) Handle(ctx context.Context, m *ingestion.SourceChange) error {
-	if m.File {
+	if m.DeviceID != "" {
 		if err := h.ConcatWorkers.QueueJob(ctx, m.DeviceID, m.FileTypeIDs); err != nil {
 			return err
 		}

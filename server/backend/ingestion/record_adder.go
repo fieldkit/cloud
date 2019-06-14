@@ -19,7 +19,6 @@ type SourceChange struct {
 	DeviceID    string
 	FileTypeIDs []string
 	QueuedAt    time.Time
-	File        bool
 }
 
 func NewSourceChange(sourceId int64, deviceID string, fileTypeIDs []string) SourceChange {

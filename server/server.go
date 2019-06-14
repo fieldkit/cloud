@@ -170,7 +170,7 @@ func main() {
 
 	publisher := backend.NewJobQueuePublisher(jq)
 
-	archiver, err := createArchiver(awsSession, config)
+	archiver, err := createArchiver(ctx, awsSession, config)
 	if err != nil {
 		panic(err)
 	}
@@ -322,7 +322,9 @@ func main() {
 	}
 }
 
-func createArchiver(awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
+func createArchiver(ctx context.Context, awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
+	log := logging.Logger(ctx).Sugar()
+
 	switch config.Archiver {
 	case "default":
 		archiver = &backend.FileStreamArchiver{}
@@ -331,6 +333,9 @@ func createArchiver(awsSession *session.Session, config Config) (archiver backen
 	default:
 		panic("Invalid archiver")
 	}
+
+	log.Infow("Selected", "archiver", config.Archiver)
+
 	return
 }
 

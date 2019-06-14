@@ -58,6 +58,16 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 
 	if headers.FkUploadName == "" {
 		log.Infof("No file name, streaming %s to /dev/null", headers.ContentType)
+
+		file, err := os.OpenFile("/dev/null", os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			return nil, err
+		}
+
+		defer file.Close()
+
+		io.Copy(file, countingReader)
+
 		id, err := uuid.NewRandom()
 		if err != nil {
 			return nil, err
@@ -65,7 +75,7 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 		ss := &SavedStream{
 			ID:        id.String(),
 			URL:       "https://foo/" + id.String(),
-			BytesRead: 0,
+			BytesRead: countingReader.BytesRead,
 		}
 
 		return ss, nil
