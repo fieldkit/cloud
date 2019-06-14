@@ -186,7 +186,8 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 	if err != nil {
 		log.Errorw("Error finding DeviceByKey: %v", err)
 	} else {
-		si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, []string{headers.FkFileId}))
+		fileTypeIDs := FileTypeIDsGroups[headers.FkFileId]
+		si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, fileTypeIDs))
 	}
 
 	return nil

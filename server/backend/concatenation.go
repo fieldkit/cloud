@@ -40,6 +40,10 @@ var (
 		"3": "Logs",
 		"4": "Data",
 	}
+	FileTypeIDsGroups = map[string][]string{
+		"4": []string{"4"},
+		"2": []string{"2", "3"},
+	}
 )
 
 type FileConcatenator struct {
@@ -134,7 +138,7 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Concatenating device files", "device_id", fc.DeviceID)
+	log.Infow("Concatenating device files", "device_id", fc.DeviceID, "file_type_ids", fc.TypeIDs)
 
 	files := []*data.DeviceFile{}
 	if err := fc.Database.SelectContext(ctx, &files,
