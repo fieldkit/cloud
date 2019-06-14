@@ -250,12 +250,18 @@ export function getAuthenticatedUser() {
     };
 }
 
-export function getMyFeatures(page) {
+export function getMyFeatures(criteria) {
+    const queryString = objectToQueryString({
+        ne: criteria.ne.join(","),
+        sw: criteria.sw.join(","),
+    });
+
     return {
-        types: ActionTypes.API_GET_MY_FEATURES,
-        path: '/my/simple/features?page=' + (page || 0),
+        types: ActionTypes.API_MAP_FEATURES_GET,
+        path: '/my/simple/features?' + queryString,
         method: 'GET',
         unwrap: (r) => r,
+        criteria: criteria
     };
 }
 

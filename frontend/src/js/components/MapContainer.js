@@ -244,7 +244,7 @@ export default class MapContainer extends Component {
 
                     <ClusterMap data={ visibleFeatures.sources } onClick={ this.onMarkerClick.bind(this) } />
 
-                    <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } onClick={ this.onMarkerClick.bind(this) } />
+                    {false && <BubbleMap pointDecorator={ pointDecorator } data={ visibleFeatures.geojson } onClick={ this.onMarkerClick.bind(this) } />}
 
                     {controls && <ScaleControl style={ { backgroundColor: 'rgba(0, 0, 0, 0)', left: '12px', bottom: '6px', } } />}
 

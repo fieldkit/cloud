@@ -1,5 +1,6 @@
 // @flow weak
 
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router';
@@ -8,6 +9,7 @@ import { FkPromisedApi } from '../api/calls';
 
 import UserSession from '../api/session';
 
+import { GeoRectSet, GeoRect } from '../common/geo';
 import { generatePointDecorator } from '../common/utilities';
 
 import MapContainer from '../components/MapContainer';
@@ -56,6 +58,81 @@ class DownloadDataPanel extends React.Component {
     }
 }
 
+class MapFeatures {
+    constructor() {
+        this.queue = Promise.resolve([]);
+        this.loaded = [];
+        this.sources = {};
+        this.geometries = {};
+        this.geometriesBySource = {};
+        this.query_ = _.throttle(this.query_, 500);
+    }
+
+    query_(criteria) {
+        const desired = new GeoRect(criteria);
+        const loaded = new GeoRectSet(this.loaded);
+        if (loaded.contains(desired)) {
+            return Promise.resolve(false);
+        }
+
+        const loading = desired.enlarge(2);
+        this.loaded.push(loading);
+
+        return FkPromisedApi.getMyFeatures({
+            ne: loading.ne,
+            sw: loading.sw,
+        }).then(data => {
+            const incomingGeometries = _(data.geometries).map(g => {
+                return [ g.id, g ];
+            }).fromPairs().value();
+
+            this.geometries = { ...this.geometries, ...incomingGeometries };
+
+            const sourceIds = _.union(_(data.spatial).map(s => s.sourceId).value(), _(data.temporal).map(s => s.sourceId).value());
+            return Promise.all(sourceIds.map(id => {
+                if (this.sources[id]) {
+                    return this.sources[id];
+                }
+                return this.sources[id] = FkPromisedApi.getSource(id).then(source => {
+                    return FkPromisedApi.getSourceSummary(id).then(summary => {
+                        return { source, summary };
+                    });
+                });
+            }));
+        }).then(() => {
+            return this.geometries;
+        });
+    }
+
+    getSources() {
+        return Promise.all(
+            _(this.sources)
+                .map((value, key) => {
+                    return value.then(ss => {
+                        const geometries = _(this.geometries)
+                              .map((value, key) => {
+                                  return value;
+                              })
+                              .filter(g => g.sourceId === ss.source.id)
+                              .value();
+                        return {
+                            source: ss.source,
+                            summary: ss.summary,
+                            geometries: geometries,
+                        };
+                    });
+                })
+                .value()).then((data) => {
+                    return data;
+                }
+        );
+    }
+
+    load(criteria) {
+        return this.query_(criteria);
+    }
+};
+
 class SingleUserMap extends Component {
     static contextTypes = {
         router: PropTypes.shape({
@@ -69,20 +146,23 @@ class SingleUserMap extends Component {
     constructor() {
         super();
 
+        this.features = new MapFeatures();
+
         this.state = {
             focus: { center: getDefaultMapLocation() }
         };
     }
 
-    refreshFeatures(page) {
-        FkPromisedApi.getMyFeatures(page).then(geojson => {
-            console.log(geojson);
-            if (geojson.hasMore) {
-                this.refreshFeatures(page + 1);
+    loadMapFeatures(criteria) {
+        return this.features.load(criteria).then(geometries => {
+            if (geometries) {
+                return this.features.getSources().then(sources => {
+                    this.setState({
+                        geometries: geometries,
+                        sources: sources
+                    });
+                });
             }
-        }, () => {
-            // Nearly always an authentication error.
-            this.setState(this.state);
         });
     }
 
@@ -90,8 +170,6 @@ class SingleUserMap extends Component {
     componentWillMount() {
         // $FlowFixMe
         document.body.style.overflow = "hidden";
-
-        this.refreshFeatures(0);
     }
 
     componentWillUnmount() {
@@ -113,9 +191,6 @@ class SingleUserMap extends Component {
         });
     }
 
-    loadMapFeatures(criteria) {
-    }
-
     async onDownload() {
         console.log("Download");
     }
@@ -134,10 +209,8 @@ class SingleUserMap extends Component {
 
         const pointDecorator = generatePointDecorator('constant', 'constant');
         const visibleFeatures = {
-            focus: this.state.focus,
-            geojson: {
-                features: []
-            }
+            sources: this.state.sources,
+            focus: this.state.focus
         };
 
         return (

@@ -39,14 +39,37 @@ func NewSimpleController(ctx context.Context, service *goa.Service, options Simp
 func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
 	log := Logger(ctx).Sugar()
 
-	id, err := getCurrentUserId(ctx)
+	userID, err := getCurrentUserId(ctx)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("my features", "user_id", id)
+	log.Infow("my features", "user_id", userID)
 
-	return ctx.OK(&app.MapFeatures{})
+	bb, err := ExtractBoundingBoxFromQueryString(ctx.RequestData)
+	if err != nil {
+		return fmt.Errorf("Error parsing bounding box: %v", err)
+	}
+	log.Infow("my features", "bb", bb)
+
+	mapFeatures, err := sc.options.Backend.QueryMapFeatures(ctx, bb, userID)
+	if err != nil {
+		return err
+	}
+
+	features := make([]*app.GeoJSONFeature, 0)
+	geoJson := &app.GeoJSON{
+		Type:     "FeatureCollection",
+		Features: features,
+	}
+	return ctx.OK(&app.MapFeatures{
+		Geometries: ClusterGeometriesType(mapFeatures.TemporalGeometries),
+		Spatial:    ClusterSummariesType(mapFeatures.SpatialClusters),
+		Temporal:   ClusterSummariesType(mapFeatures.TemporalClusters),
+		GeoJSON: &app.PagedGeoJSON{
+			Geo: geoJson,
+		},
+	})
 }
 
 func (sc *SimpleController) MyCsvData(ctx *app.MyCsvDataSimpleContext) error {

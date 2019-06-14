@@ -731,7 +731,7 @@ type MapFeatures struct {
 	TemporalGeometries []*TemporalGeometry
 }
 
-func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *MapFeatures, err error) {
+func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox, userID int64) (mf *MapFeatures, err error) {
 	ne := bb.NorthEast.Coordinates()
 	sw := bb.SouthWest.Coordinates()
 
@@ -747,7 +747,8 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
 		    fieldkit.sources_spatial_clusters c
                   WHERE
                     c.centroid && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
-		`, ne[0], ne[1], sw[0], sw[1]); err != nil {
+                    AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
+		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err
 	}
 
@@ -759,7 +760,8 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
                   WHERE
                     g.geometry && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
-		`, ne[0], ne[1], sw[0], sw[1]); err != nil {
+                    AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
+		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err
 	}
 
@@ -771,7 +773,8 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox) (mf *Ma
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
                   WHERE
                     g.geometry && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
-		`, ne[0], ne[1], sw[0], sw[1]); err != nil {
+                    AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
+		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err
 	}
 

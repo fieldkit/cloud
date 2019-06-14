@@ -118,8 +118,8 @@ func (c *GeoJSONController) ListByID(ctx *app.ListByIDGeoJSONContext) error {
 	})
 }
 
-func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSONContext) (l *data.Location, err error) {
-	strs := strings.Split(ctx.RequestData.Params.Get(key), ",")
+func ExtractLocationFromQueryString(key string, requestData *goa.RequestData) (l *data.Location, err error) {
+	strs := strings.Split(requestData.Params.Get(key), ",")
 	if len(strs) != 2 {
 		return nil, fmt.Errorf("Expected two values for data.Location")
 	}
@@ -136,13 +136,13 @@ func ExtractLocationFromQueryString(key string, ctx *app.GeographicalQueryGeoJSO
 	return data.NewLocation([]float64{lng, lat}), nil
 }
 
-func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext) (bb *backend.BoundingBox, err error) {
-	ne, err := ExtractLocationFromQueryString("ne", ctx)
+func ExtractBoundingBoxFromQueryString(requestData *goa.RequestData) (bb *backend.BoundingBox, err error) {
+	ne, err := ExtractLocationFromQueryString("ne", requestData)
 	if err != nil {
 		return nil, err
 	}
 
-	sw, err := ExtractLocationFromQueryString("sw", ctx)
+	sw, err := ExtractLocationFromQueryString("sw", requestData)
 	if err != nil {
 		return nil, err
 	}
@@ -155,13 +155,13 @@ func ExtractBoundingBoxFromQueryString(ctx *app.GeographicalQueryGeoJSONContext)
 }
 
 func (c *GeoJSONController) GeographicalQuery(ctx *app.GeographicalQueryGeoJSONContext) error {
-	bb, err := ExtractBoundingBoxFromQueryString(ctx)
+	bb, err := ExtractBoundingBoxFromQueryString(ctx.RequestData)
 	if err != nil {
 		return fmt.Errorf("Error parsing bounding box: %v", err)
 	}
 	log.Printf("Querying over %+v", bb)
 
-	mapFeatures, err := c.options.Backend.QueryMapFeatures(ctx, bb)
+	mapFeatures, err := c.options.Backend.QueryMapFeatures(ctx, bb, 0)
 	if err != nil {
 		return err
 	}
