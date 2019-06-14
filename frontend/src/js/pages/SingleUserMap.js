@@ -37,7 +37,7 @@ function getDefaultMapLocation() {
 
 class DownloadDataPanel extends React.Component {
     render() {
-        const { onDownload, onLogout } = this.props;
+        const { onDownload } = this.props;
 
         return (
             <div className="download-data-panel">
@@ -50,8 +50,6 @@ class DownloadDataPanel extends React.Component {
                     </ol>
 
                     <button onClick={ onDownload } className="download">Download Data</button>
-
-                    <button onClick={ onLogout } className="logout">Logout</button>
                 </div>
             </div>
         );
@@ -163,6 +161,8 @@ class SingleUserMap extends Component {
                     });
                 });
             }
+        }, () => {
+            this.setState({});
         });
     }
 
@@ -217,6 +217,7 @@ class SingleUserMap extends Component {
             <div className="map page">
                 <div className="header">
                     <div className="project">Project</div>
+                    <button onClick={ this.onLogout.bind(this) } className="logout">Logout</button>
                 </div>
                 <div>
                     <MapContainer style={{ }} containerStyle={{ width: "100vw", height: "100vh" }} controls={false}
@@ -227,7 +228,7 @@ class SingleUserMap extends Component {
                         onUserActivity={ this.onUserActivity.bind(this) }
                         loadMapFeatures={ this.loadMapFeatures.bind(this) }
                         onChangePlaybackMode={ () => { } }>
-                        <DownloadDataPanel onDownload={ this.onDownload.bind(this )} onLogout={ this.onLogout.bind(this )} />
+                        <DownloadDataPanel onDownload={ this.onDownload.bind(this )} />
                     </MapContainer>
                 </div>
             </div>
