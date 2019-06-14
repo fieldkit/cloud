@@ -15,14 +15,19 @@ type RecordChange struct {
 }
 
 type SourceChange struct {
-	QueuedAt time.Time
-	SourceID int64
+	SourceID    int64
+	DeviceID    string
+	FileTypeIDs []string
+	QueuedAt    time.Time
+	File        bool
 }
 
-func NewSourceChange(sourceId int64) SourceChange {
+func NewSourceChange(sourceId int64, deviceID string, fileTypeIDs []string) SourceChange {
 	return SourceChange{
-		SourceID: sourceId,
-		QueuedAt: time.Now(),
+		SourceID:    sourceId,
+		DeviceID:    deviceID,
+		QueuedAt:    time.Now(),
+		FileTypeIDs: fileTypeIDs,
 	}
 }
 

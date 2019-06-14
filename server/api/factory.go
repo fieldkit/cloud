@@ -25,8 +25,9 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend,
-	awsSession *session.Session, ingester *backend.StreamIngester, config *ApiConfiguration) (service *goa.Service, err error) {
+func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, cw *backend.ConcatenationWorkers, config *ApiConfiguration) (service *goa.Service, err error) {
+	log := Logger(ctx).Sugar()
+
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		panic(err)
@@ -42,8 +43,6 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	service = goa.New("fieldkit")
 
 	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
-
-	log := logging.Logger(ctx).Sugar()
 
 	log.Infow("Config", "config", config)
 
@@ -183,11 +182,6 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.MountFirmwareController(service, c17)
 
 	// Mount "files" controller
-	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database)
-	if err != nil {
-		panic(err)
-	}
-
 	fco := FilesControllerOptions{
 		Config:        config,
 		Session:       awsSession,

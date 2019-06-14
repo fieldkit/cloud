@@ -157,6 +157,8 @@ func (si *StreamIngester) synchronous(ctx context.Context, headers *IncomingHead
 }
 
 func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeaders, saved *SavedStream) error {
+	log := Logger(ctx).Sugar()
+
 	metadata, err := json.Marshal(headers)
 	if err != nil {
 		return fmt.Errorf("JSON error: %v", err)
@@ -178,6 +180,13 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 		   VALUES (:time, :stream_id, :firmware, :device_id, :size, :file_id, :url, :meta)
 		   `, stream); err != nil {
 		return err
+	}
+
+	deviceSource, err := si.backend.GetDeviceSourceByKey(ctx, headers.FkDeviceId)
+	if err != nil {
+		log.Errorw("Error finding DeviceByKey: %v", err)
+	} else {
+		si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, []string{headers.FkFileId}))
 	}
 
 	return nil

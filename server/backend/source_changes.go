@@ -23,29 +23,22 @@ func (p *JobQueuePublisher) SourceChanged(ctx context.Context, sourceChange inge
 }
 
 type SourceModifiedHandler struct {
-	Backend   *Backend
-	Publisher jobs.MessagePublisher
+	Backend       *Backend
+	Publisher     jobs.MessagePublisher
+	ConcatWorkers *ConcatenationWorkers
 }
 
 func (h *SourceModifiedHandler) Handle(ctx context.Context, m *ingestion.SourceChange) error {
-	generator := NewPregenerator(h.Backend)
-	_, err := generator.Pregenerate(ctx, m.SourceID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (h *SourceModifiedHandler) QueueChangesForAllSources(publisher ingestion.SourceChangesPublisher) error {
-	ctx := context.Background()
-	devices, err := h.Backend.ListAllDeviceSources(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, device := range devices {
-		publisher.SourceChanged(ctx, ingestion.NewSourceChange(int64(device.ID)))
+	if m.File {
+		if err := h.ConcatWorkers.QueueJob(ctx, m.DeviceID, m.FileTypeIDs); err != nil {
+			return err
+		}
+	} else {
+		generator := NewPregenerator(h.Backend)
+		_, err := generator.Pregenerate(ctx, m.SourceID)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

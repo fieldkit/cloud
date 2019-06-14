@@ -151,13 +151,19 @@ func main() {
 		panic(err)
 	}
 
+	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database)
+	if err != nil {
+		panic(err)
+	}
+
 	jq, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
 	sourceModifiedHandler := &backend.SourceModifiedHandler{
-		Backend:   be,
-		Publisher: jq,
+		Backend:       be,
+		Publisher:     jq,
+		ConcatWorkers: cw,
 	}
 
 	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
@@ -199,7 +205,16 @@ func main() {
 		Domain:     config.Domain,
 	}
 
-	service, err := api.CreateApiService(ctx, database, be, awsSession, ingester, apiConfig)
+	err = jq.Listen(ctx, 1)
+	if err != nil {
+		panic(err)
+	}
+
+	if !config.DisableMemoryLogging {
+		setupMemoryLogging(log)
+	}
+
+	service, err := api.CreateApiService(ctx, database, be, awsSession, ingester, cw, apiConfig)
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -289,19 +304,6 @@ func main() {
 	go func() {
 		log.Infof("%v", http.ListenAndServe("0.0.0.0:6060", nil))
 	}()
-
-	err = jq.Listen(ctx, 1)
-	if err != nil {
-		panic(err)
-	}
-
-	if !config.DisableMemoryLogging {
-		setupMemoryLogging(log)
-	}
-
-	if !config.DisableStartupRefresh {
-		sourceModifiedHandler.QueueChangesForAllSources(publisher)
-	}
 
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
