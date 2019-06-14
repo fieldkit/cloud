@@ -73,6 +73,12 @@ body {
                 margin: 20px auto;
                 cursor: pointer;
             }
+
+            .errors {
+                color: #ff3232;
+                font-weight: bold;
+                padding: 5px;
+            }
         }
     }
 }

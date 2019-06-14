@@ -140,7 +140,6 @@ class FKApiClient {
     }
 
     onAuthError(error) {
-        console.log("Authentication Error", error);
         this.tokens.clear();
     }
 };

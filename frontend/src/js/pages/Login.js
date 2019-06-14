@@ -19,10 +19,26 @@ class Login extends Component {
     async onSubmit(ev) {
         ev.preventDefault();
 
-        const user = await new UserSession().login(this.refs.email.value, this.refs.password.value);
+        try {
+            const user = await new UserSession().login(this.refs.email.value, this.refs.password.value);
 
-        if (user) {
-            this.setState({});
+            if (user) {
+                this.setState({
+                    errors: false
+                });
+            }
+            else {
+                this.setState({
+                    errors: true
+                });
+            }
+        }
+        catch (error) {
+            console.log("error", error);
+
+            this.setState({
+                errors: true
+            });
         }
     }
 

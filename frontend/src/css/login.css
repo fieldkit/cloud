@@ -125,5 +125,9 @@ body {
       border-radius: 4px;
       margin: 20px auto;
       cursor: pointer; }
+    .unauth .contents form .errors {
+      color: #ff3232;
+      font-weight: bold;
+      padding: 5px; }
 
 /*# sourceMappingURL=login.css.map */
