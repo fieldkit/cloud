@@ -2761,13 +2761,11 @@ func NewMyCsvDataSimpleContext(ctx context.Context, r *http.Request, service *go
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *MyCsvDataSimpleContext) OK(resp []byte) error {
+func (ctx *MyCsvDataSimpleContext) OK(r *MyDataUrls) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.my_data_urls+json")
 	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // NotFound sends a HTTP response with status code 404.

@@ -5,6 +5,19 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var MyDataUrls = MediaType("application/vnd.app.my_data_urls+json", func() {
+	TypeName("MyDataUrls")
+	Attributes(func() {
+		Attribute("csv", String)
+		Attribute("fkpb", String)
+		Required("csv", "fkpb")
+	})
+	View("default", func() {
+		Attribute("csv")
+		Attribute("fkpb")
+	})
+})
+
 var _ = Resource("simple", func() {
 	Security(JWT, func() {
 		Scope("api:access")
@@ -22,7 +35,7 @@ var _ = Resource("simple", func() {
 		Routing(GET("my/simple/data/csv"))
 		Response(NotFound)
 		Response(OK, func() {
-			Status(200)
+			Media(MyDataUrls)
 		})
 	})
 })

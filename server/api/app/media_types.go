@@ -962,6 +962,25 @@ func (mt *TeamMembers) Validate() (err error) {
 	return
 }
 
+// MyDataUrls media type (default view)
+//
+// Identifier: application/vnd.app.my_data_urls+json; view=default
+type MyDataUrls struct {
+	Csv  string `form:"csv" json:"csv" yaml:"csv" xml:"csv"`
+	Fkpb string `form:"fkpb" json:"fkpb" yaml:"fkpb" xml:"fkpb"`
+}
+
+// Validate validates the MyDataUrls media type instance.
+func (mt *MyDataUrls) Validate() (err error) {
+	if mt.Csv == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "csv"))
+	}
+	if mt.Fkpb == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fkpb"))
+	}
+	return
+}
+
 // PagedGeoJSON media type (default view)
 //
 // Identifier: application/vnd.app.paged_geojson+json; view=default
