@@ -536,7 +536,6 @@ type FeatureSummary struct {
 	SourceID         int           `db:"source_id"`
 	UpdatedAt        time.Time     `db:"updated_at"`
 	NumberOfFeatures int           `db:"number_of_features"`
-	LastFeatureID    int           `db:"last_feature_id"`
 	StartTime        time.Time     `db:"start_time"`
 	EndTime          time.Time     `db:"end_time"`
 	Envelope         Envelope      `db:"envelope"`
@@ -554,7 +553,7 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 	summaries := []*FeatureSummary{}
 	if err := b.db.SelectContext(ctx, &summaries, `
 		  SELECT
-		    c.source_id, c.updated_at, c.number_of_features, c.last_feature_id, c.start_time, c.end_time, ST_AsBinary(c.envelope) AS envelope, ST_AsBinary(c.centroid) AS centroid, radius
+		    c.source_id, c.updated_at, c.number_of_features, c.start_time, c.end_time, ST_AsBinary(c.envelope) AS envelope, ST_AsBinary(c.centroid) AS centroid, radius
 		  FROM
 		    fieldkit.sources_summaries c
 		  WHERE c.source_id = $1

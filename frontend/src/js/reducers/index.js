@@ -80,11 +80,6 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
     case ActionTypes.API_FEATURE_GEOJSON_GET.SUCCESS: {
         const feature = action.response.geo.features[0];
         const nextState = Object.assign({}, state);
-        _.each(nextState.sources, (container, id) => {
-            if (container.source.lastFeatureId === feature.properties.id) {
-                container.lastFeature = feature;
-            }
-        });
         return nextState;
     }
     case ActionTypes.API_SOURCE_SUMMARY_GET.SUCCESS: {

@@ -21,7 +21,6 @@ func DeviceSourcePublicType(deviceSource *data.DeviceSource, summary *backend.Fe
 		Name:             deviceSource.Source.Name,
 		Active:           true,
 		NumberOfFeatures: &summary.NumberOfFeatures,
-		LastFeatureID:    &summary.LastFeatureID,
 		StartTime:        &summary.StartTime,
 		EndTime:          &summary.EndTime,
 		Envelope:         summary.Envelope.Coordinates(),

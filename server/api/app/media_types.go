@@ -390,7 +390,6 @@ type DeviceSourcePublic struct {
 	Envelope         [][]float64 `form:"envelope,omitempty" json:"envelope,omitempty" yaml:"envelope,omitempty" xml:"envelope,omitempty"`
 	ExpeditionID     int         `form:"expeditionId" json:"expeditionId" yaml:"expeditionId" xml:"expeditionId"`
 	ID               int         `form:"id" json:"id" yaml:"id" xml:"id"`
-	LastFeatureID    *int        `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" yaml:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
 	Name             string      `form:"name" json:"name" yaml:"name" xml:"name"`
 	NumberOfFeatures *int        `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" yaml:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
 	Radius           *float64    `form:"radius,omitempty" json:"radius,omitempty" yaml:"radius,omitempty" xml:"radius,omitempty"`
@@ -517,7 +516,6 @@ type ExpeditionDetailed struct {
 	Description      string     `form:"description" json:"description" yaml:"description" xml:"description"`
 	EndTime          *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
 	ID               int        `form:"id" json:"id" yaml:"id" xml:"id"`
-	LastFeatureID    *int       `form:"lastFeatureId,omitempty" json:"lastFeatureId,omitempty" yaml:"lastFeatureId,omitempty" xml:"lastFeatureId,omitempty"`
 	Name             string     `form:"name" json:"name" yaml:"name" xml:"name"`
 	NumberOfFeatures *int       `form:"numberOfFeatures,omitempty" json:"numberOfFeatures,omitempty" yaml:"numberOfFeatures,omitempty" xml:"numberOfFeatures,omitempty"`
 	Radius           *float64   `form:"radius,omitempty" json:"radius,omitempty" yaml:"radius,omitempty" xml:"radius,omitempty"`
