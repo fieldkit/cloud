@@ -61,7 +61,7 @@ type ConcatenationDoneHandler struct {
 func (h *ConcatenationDoneHandler) Handle(ctx context.Context, m *ConcatenationDone) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Concatenation done", "message", m)
+	log.Infow("Concatenation done", "device_id", m.DeviceID)
 
 	deviceSource, err := h.Backend.GetDeviceSourceByKey(ctx, m.DeviceID)
 	if err != nil {
@@ -74,6 +74,8 @@ func (h *ConcatenationDoneHandler) Handle(ctx context.Context, m *ConcatenationD
 	if err != nil {
 		return err
 	}
+
+	log.Infow("Pregeneration done", "device_id", m.DeviceID)
 
 	return nil
 }

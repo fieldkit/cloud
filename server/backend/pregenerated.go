@@ -69,7 +69,7 @@ func (p *Pregenerator) Summaries(ctx context.Context, sourceId int64) (summaries
 	summaries = []*FeatureSummary{}
 	err = p.db.SelectContext(ctx, &summaries, `
                SELECT
-                 source_id, updated_at, number_of_features, last_feature_id, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius
+                 source_id, updated_at, number_of_features, start_time, end_time, ST_AsBinary(envelope) AS envelope, ST_AsBinary(centroid) AS centroid, radius
                FROM fieldkit.fk_update_source_summary($1)`, sourceId)
 	if err != nil {
 		return nil, err
