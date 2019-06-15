@@ -24,11 +24,13 @@ var _ = Resource("Tasks", func() {
 		Response(OK)
 	})
 
-	Action("streams/process", func() {
-		Routing(GET("tasks/streams/:id/process"))
-		Description("Process an uploaded stream")
+	Action("refresh", func() {
+		Routing(GET("tasks/refresh/:deviceId/:fileTypeId"))
+		Description("Refresh a device by ID")
 		Params(func() {
-			Param("id", String)
+			Param("deviceId", String)
+			Param("fileTypeId", String)
+			Required("deviceId", "fileTypeId")
 		})
 		Response(BadRequest)
 		Response(NotFound)

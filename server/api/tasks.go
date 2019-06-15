@@ -7,6 +7,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/inaturalist"
 )
@@ -17,6 +18,7 @@ type TasksControllerOptions struct {
 	Emailer            email.Emailer
 	INaturalistService *inaturalist.INaturalistService
 	StreamProcessor    backend.StreamProcessor
+	SourceChanges      ingestion.SourceChangesPublisher
 }
 
 type TasksController struct {
@@ -51,12 +53,21 @@ func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
 	return ctx.OK([]byte("Ok"))
 }
 
-func (c *TasksController) StreamsProcess(ctx *app.StreamsProcessTasksContext) error {
-	err := c.options.StreamProcessor.Process(ctx, ctx.ID)
+func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Refresh", "device_id", ctx.DeviceID)
+
+	deviceSource, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.DeviceID)
 	if err != nil {
-		log := Logger(ctx).Sugar()
-		log.Infow("Error", "error", err)
-		return ctx.NotFound()
+		log.Errorw("Error finding DeviceByKey", "error", err)
+	} else {
+		if deviceSource == nil {
+			log.Errorw("No owned device", "device_id", ctx.DeviceID)
+		} else {
+			fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
+			c.options.SourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
+		}
 	}
 
 	return ctx.OK([]byte("Ok"))

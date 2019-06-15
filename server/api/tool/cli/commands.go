@@ -101,9 +101,10 @@ type (
 		PrettyPrint bool
 	}
 
-	// StreamsProcessTasksCommand is the command line data structure for the streams/process action of Tasks
-	StreamsProcessTasksCommand struct {
-		ID          string
+	// RefreshTasksCommand is the command line data structure for the refresh action of Tasks
+	RefreshTasksCommand struct {
+		DeviceID    string
+		FileTypeID  string
 		PrettyPrint bool
 	}
 
@@ -1598,9 +1599,18 @@ Payload example:
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "refresh",
-		Short: `Creates a valid JWT given a refresh token.`,
+		Short: `refresh action`,
 	}
-	tmp136 := new(RefreshUserCommand)
+	tmp136 := new(RefreshTasksCommand)
+	sub = &cobra.Command{
+		Use:   `tasks ["/tasks/refresh/DEVICEID/FILETYPEID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp136.Run(c, args) },
+	}
+	tmp136.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp136.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	tmp137 := new(RefreshUserCommand)
 	sub = &cobra.Command{
 		Use:   `user ["/refresh"]`,
 		Short: ``,
@@ -1611,33 +1621,19 @@ Payload example:
 {
    "refresh_token": "Rerum magni quia in veritatis illo."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp136.Run(c, args) },
-	}
-	tmp136.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp136.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "status",
-		Short: `File backend status`,
-	}
-	tmp137 := new(StatusFilesCommand)
-	sub = &cobra.Command{
-		Use:   `files ["/files/status"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp137.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp137.Run(c, args) },
 	}
 	tmp137.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp137.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "streams-process",
-		Short: `Process an uploaded stream`,
+		Use:   "status",
+		Short: `File backend status`,
 	}
-	tmp138 := new(StreamsProcessTasksCommand)
+	tmp138 := new(StatusFilesCommand)
 	sub = &cobra.Command{
-		Use:   `tasks ["/tasks/streams/ID/process"]`,
+		Use:   `files ["/files/status"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp138.Run(c, args) },
 	}
@@ -2465,17 +2461,17 @@ func (cmd *FiveTasksCommand) Run(c *client.Client, args []string) error {
 func (cmd *FiveTasksCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 }
 
-// Run makes the HTTP request corresponding to the StreamsProcessTasksCommand command.
-func (cmd *StreamsProcessTasksCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the RefreshTasksCommand command.
+func (cmd *RefreshTasksCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/tasks/streams/%v/process", url.QueryEscape(cmd.ID))
+		path = fmt.Sprintf("/tasks/refresh/%v/%v", url.QueryEscape(cmd.DeviceID), url.QueryEscape(cmd.FileTypeID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.StreamsProcessTasks(ctx, path)
+	resp, err := c.RefreshTasks(ctx, path)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -2486,9 +2482,11 @@ func (cmd *StreamsProcessTasksCommand) Run(c *client.Client, args []string) erro
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *StreamsProcessTasksCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var id string
-	cc.Flags().StringVar(&cmd.ID, "id", id, ``)
+func (cmd *RefreshTasksCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var deviceID string
+	cc.Flags().StringVar(&cmd.DeviceID, "deviceId", deviceID, ``)
+	var fileTypeID string
+	cc.Flags().StringVar(&cmd.FileTypeID, "fileTypeId", fileTypeID, ``)
 }
 
 // Run makes the HTTP request corresponding to the AddAdministratorCommand command.

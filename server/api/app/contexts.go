@@ -520,33 +520,39 @@ func (ctx *FiveTasksContext) BadRequest() error {
 	return nil
 }
 
-// StreamsProcessTasksContext provides the Tasks streams/process action context.
-type StreamsProcessTasksContext struct {
+// RefreshTasksContext provides the Tasks refresh action context.
+type RefreshTasksContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	ID string
+	DeviceID   string
+	FileTypeID string
 }
 
-// NewStreamsProcessTasksContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Tasks controller streams/process action.
-func NewStreamsProcessTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*StreamsProcessTasksContext, error) {
+// NewRefreshTasksContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Tasks controller refresh action.
+func NewRefreshTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*RefreshTasksContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := StreamsProcessTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramID := req.Params["id"]
-	if len(paramID) > 0 {
-		rawID := paramID[0]
-		rctx.ID = rawID
+	rctx := RefreshTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramFileTypeID := req.Params["fileTypeId"]
+	if len(paramFileTypeID) > 0 {
+		rawFileTypeID := paramFileTypeID[0]
+		rctx.FileTypeID = rawFileTypeID
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *StreamsProcessTasksContext) OK(resp []byte) error {
+func (ctx *RefreshTasksContext) OK(resp []byte) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	}
@@ -556,13 +562,13 @@ func (ctx *StreamsProcessTasksContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *StreamsProcessTasksContext) BadRequest() error {
+func (ctx *RefreshTasksContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *StreamsProcessTasksContext) NotFound() error {
+func (ctx *RefreshTasksContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }

@@ -72,24 +72,25 @@ func (c *Client) NewFiveTasksRequest(ctx context.Context, path string) (*http.Re
 	return req, nil
 }
 
-// StreamsProcessTasksPath computes a request path to the streams/process action of Tasks.
-func StreamsProcessTasksPath(id string) string {
-	param0 := id
+// RefreshTasksPath computes a request path to the refresh action of Tasks.
+func RefreshTasksPath(deviceID string, fileTypeID string) string {
+	param0 := deviceID
+	param1 := fileTypeID
 
-	return fmt.Sprintf("/tasks/streams/%s/process", param0)
+	return fmt.Sprintf("/tasks/refresh/%s/%s", param0, param1)
 }
 
-// Process an uploaded stream
-func (c *Client) StreamsProcessTasks(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewStreamsProcessTasksRequest(ctx, path)
+// Refresh a device by ID
+func (c *Client) RefreshTasks(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRefreshTasksRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewStreamsProcessTasksRequest create the request corresponding to the streams/process action endpoint of the Tasks resource.
-func (c *Client) NewStreamsProcessTasksRequest(ctx context.Context, path string) (*http.Request, error) {
+// NewRefreshTasksRequest create the request corresponding to the refresh action endpoint of the Tasks resource.
+func (c *Client) NewRefreshTasksRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
