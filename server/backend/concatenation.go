@@ -47,9 +47,10 @@ var (
 )
 
 type FileConcatenator struct {
-	Session  *session.Session
-	Database *sqlxcache.DB
-	Backend  *Backend
+	Session   *session.Session
+	Database  *sqlxcache.DB
+	Backend   *Backend
+	Publisher *JobQueuePublisher
 
 	FileID     string
 	FileTypeID string
@@ -57,11 +58,12 @@ type FileConcatenator struct {
 	TypeIDs    []string
 }
 
-func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend) (fc *FileConcatenator, err error) {
+func NewFileConcatenator(s *session.Session, db *sqlxcache.DB, backend *Backend, publisher *JobQueuePublisher) (fc *FileConcatenator, err error) {
 	fc = &FileConcatenator{
-		Session:  s,
-		Database: db,
-		Backend:  backend,
+		Session:   s,
+		Database:  db,
+		Backend:   backend,
+		Publisher: publisher,
 	}
 
 	return
@@ -262,6 +264,12 @@ func (fc *FileConcatenator) Concatenate(ctx context.Context) {
 	}
 
 	log.Infow("Uploaded", "file_url", location)
+
+	fc.Publisher.ConcatenationDone(ctx, ConcatenationDone{
+		DeviceID:    fc.DeviceID,
+		FileTypeIDs: fc.TypeIDs,
+		Location:    location,
+	})
 }
 
 type ConcatenationJob struct {
@@ -271,16 +279,18 @@ type ConcatenationJob struct {
 }
 
 type ConcatenationWorkers struct {
-	session  *session.Session
-	database *sqlxcache.DB
-	channel  chan ConcatenationJob
+	session   *session.Session
+	database  *sqlxcache.DB
+	publisher *JobQueuePublisher
+	channel   chan ConcatenationJob
 }
 
-func NewConcatenationWorkers(ctx context.Context, session *session.Session, database *sqlxcache.DB) (cw *ConcatenationWorkers, err error) {
+func NewConcatenationWorkers(ctx context.Context, session *session.Session, database *sqlxcache.DB, publisher *JobQueuePublisher) (cw *ConcatenationWorkers, err error) {
 	cw = &ConcatenationWorkers{
-		channel:  make(chan ConcatenationJob, 100),
-		session:  session,
-		database: database,
+		channel:   make(chan ConcatenationJob, 100),
+		session:   session,
+		database:  database,
+		publisher: publisher,
 	}
 
 	for w := 0; w < 1; w++ {
@@ -321,6 +331,7 @@ func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 		fc := &FileConcatenator{
 			Session:    cw.session,
 			Database:   cw.database,
+			Publisher:  cw.publisher,
 			FileID:     deviceStreamID.String(),
 			FileTypeID: fileTypeID,
 			DeviceID:   job.deviceID,

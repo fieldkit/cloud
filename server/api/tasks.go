@@ -61,13 +61,14 @@ func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
 	deviceSource, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.DeviceID)
 	if err != nil {
 		log.Errorw("Error finding DeviceByKey", "error", err)
+		return err
+	}
+
+	if deviceSource != nil {
+		fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
+		c.options.SourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
 	} else {
-		if deviceSource == nil {
-			log.Errorw("No owned device", "device_id", ctx.DeviceID)
-		} else {
-			fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
-			c.options.SourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
-		}
+		log.Errorw("No owned device", "device_id", ctx.DeviceID)
 	}
 
 	return ctx.OK([]byte("Ok"))

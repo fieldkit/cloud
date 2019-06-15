@@ -8,6 +8,12 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 )
 
+type ConcatenationDone struct {
+	DeviceID    string
+	FileTypeIDs []string
+	Location    string
+}
+
 type JobQueuePublisher struct {
 	JobQueue *jobs.PgJobQueue
 }
@@ -20,6 +26,10 @@ func NewJobQueuePublisher(jobQueue *jobs.PgJobQueue) *JobQueuePublisher {
 
 func (p *JobQueuePublisher) SourceChanged(ctx context.Context, sourceChange ingestion.SourceChange) {
 	p.JobQueue.Publish(ctx, sourceChange)
+}
+
+func (p *JobQueuePublisher) ConcatenationDone(ctx context.Context, concatenationDone ConcatenationDone) {
+	p.JobQueue.Publish(ctx, concatenationDone)
 }
 
 type SourceModifiedHandler struct {
@@ -39,6 +49,30 @@ func (h *SourceModifiedHandler) Handle(ctx context.Context, m *ingestion.SourceC
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+type ConcatenationDoneHandler struct {
+	Backend *Backend
+}
+
+func (h *ConcatenationDoneHandler) Handle(ctx context.Context, m *ConcatenationDone) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("Concatenation done", "message", m)
+
+	deviceSource, err := h.Backend.GetDeviceSourceByKey(ctx, m.DeviceID)
+	if err != nil {
+		log.Errorw("Error finding DeviceByKey: %v", err)
+		return err
+	}
+
+	generator := NewPregenerator(h.Backend)
+	_, err = generator.Pregenerate(ctx, int64(deviceSource.ID))
+	if err != nil {
+		return err
 	}
 
 	return nil

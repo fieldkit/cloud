@@ -151,24 +151,30 @@ func main() {
 		panic(err)
 	}
 
-	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database)
-	if err != nil {
-		panic(err)
-	}
-
 	jq, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
+
+	publisher := backend.NewJobQueuePublisher(jq)
+
+	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database, publisher)
+	if err != nil {
+		panic(err)
+	}
+
 	sourceModifiedHandler := &backend.SourceModifiedHandler{
 		Backend:       be,
 		Publisher:     jq,
 		ConcatWorkers: cw,
 	}
 
-	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
+	concatenationDoneHandler := &backend.ConcatenationDoneHandler{
+		Backend: be,
+	}
 
-	publisher := backend.NewJobQueuePublisher(jq)
+	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
+	jq.Register(backend.ConcatenationDone{}, concatenationDoneHandler)
 
 	archiver, err := createArchiver(ctx, awsSession, config)
 	if err != nil {
