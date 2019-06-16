@@ -75,7 +75,7 @@ func (h *ConcatenationDoneHandler) Handle(ctx context.Context, m *ConcatenationD
 		return err
 	}
 
-	log.Infow("Pregeneration done", "device_id", m.DeviceID)
+	log.Infow("Concatenation done handled", "device_id", m.DeviceID)
 
 	return nil
 }
