@@ -184,10 +184,14 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 
 	deviceSource, err := si.backend.GetDeviceSourceByKey(ctx, headers.FkDeviceId)
 	if err != nil {
-		log.Errorw("Error finding DeviceByKey: %v", err)
+		log.Errorw("Error looking up DeviceByKey", "error", err)
 	} else {
-		fileTypeIDs := FileTypeIDsGroups[headers.FkFileId]
-		si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, fileTypeIDs))
+		if deviceSource != nil {
+			fileTypeIDs := FileTypeIDsGroups[headers.FkFileId]
+			si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, fileTypeIDs))
+		} else {
+			log.Warnw("orphaned device", "device_id", headers.FkDeviceId)
+		}
 	}
 
 	return nil
