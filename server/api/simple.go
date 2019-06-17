@@ -74,35 +74,33 @@ func (sc *SimpleController) MyFeatures(ctx *app.MyFeaturesSimpleContext) error {
 }
 
 func (sc *SimpleController) MySimpleSummary(ctx *app.MySimpleSummarySimpleContext) error {
-	/*
-		log := Logger(ctx).Sugar()
-
-		userID, err := getCurrentUserIdFromContext(ctx)
-		if err != nil {
-			return err
-		}
-
-		log.Infow("my data (csv)", "user_id", userID)
-
-		devices, err := sc.options.Backend.ListAllDeviceSourcesByUser(ctx, userID)
-		if err != nil {
-			return err
-		}
-
-		log.Infow("my data (csv)", "number_of_devices", len(devices))
-
-		if len(devices) != 1 {
-			return ctx.OK(&app.MyDataUrls{})
-		}
-	*/
+	log := Logger(ctx).Sugar()
 
 	token := jwt.ContextJWT(ctx)
 	if token == nil {
 		return fmt.Errorf("JWT token is missing from context")
 	}
 
-	return ctx.OK(&app.MyDataUrls{
-		Csv: sc.options.Config.MakeApiUrl("/my/simple/download?token=" + token.Raw),
+	userID, err := getCurrentUserIdFromToken(token)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("my simple summary", "user_id", userID)
+
+	center, err := sc.options.Backend.GetUserLatestCenterOfActivity(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	csv := sc.options.Config.MakeApiUrl("/my/simple/download?token=" + token.Raw)
+
+	return ctx.OK(&app.MySimpleSummary{
+		Urls: &app.MyDataUrls{
+			Csv:  csv,
+			Fkpb: "",
+		},
+		Center: center,
 	})
 }
 

@@ -78,9 +78,7 @@ function visibleFeatures(state = visibleFeaturesInitialState, action) {
         return nextState;
     }
     case ActionTypes.API_FEATURE_GEOJSON_GET.SUCCESS: {
-        const feature = action.response.geo.features[0];
-        const nextState = Object.assign({}, state);
-        return nextState;
+        return state;
     }
     case ActionTypes.API_SOURCE_SUMMARY_GET.SUCCESS: {
         const summary = createSummary(action.response);

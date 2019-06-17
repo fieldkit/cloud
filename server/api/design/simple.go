@@ -5,16 +5,22 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var MyDataUrls = MediaType("application/vnd.app.my_data_urls+json", func() {
-	TypeName("MyDataUrls")
+var MyDataUrls = Type("MyDataUrls", func() {
+	Attribute("csv", String)
+	Attribute("fkpb", String)
+	Required("csv", "fkpb")
+})
+
+var MySimpleSummary = MediaType("application/vnd.app.simple_summary+json", func() {
+	TypeName("MySimpleSummary")
 	Attributes(func() {
-		Attribute("csv", String)
-		Attribute("fkpb", String)
-		Required("csv", "fkpb")
+		Attribute("urls", MyDataUrls)
+		Attribute("center", ArrayOf(Number))
+		Required("urls", "center")
 	})
 	View("default", func() {
-		Attribute("csv")
-		Attribute("fkpb")
+		Attribute("urls")
+		Attribute("center")
 	})
 })
 
@@ -27,7 +33,7 @@ var _ = Resource("simple", func() {
 		Routing(GET("my/simple"))
 		Response(NotFound)
 		Response(OK, func() {
-			Media(MyDataUrls)
+			Media(MySimpleSummary)
 		})
 	})
 

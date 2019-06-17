@@ -1276,32 +1276,6 @@ func (c *Client) DecodeTeamMembers(resp *http.Response) (*TeamMembers, error) {
 	return &decoded, err
 }
 
-// MyDataUrls media type (default view)
-//
-// Identifier: application/vnd.app.my_data_urls+json; view=default
-type MyDataUrls struct {
-	Csv  string `form:"csv" json:"csv" yaml:"csv" xml:"csv"`
-	Fkpb string `form:"fkpb" json:"fkpb" yaml:"fkpb" xml:"fkpb"`
-}
-
-// Validate validates the MyDataUrls media type instance.
-func (mt *MyDataUrls) Validate() (err error) {
-	if mt.Csv == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "csv"))
-	}
-	if mt.Fkpb == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "fkpb"))
-	}
-	return
-}
-
-// DecodeMyDataUrls decodes the MyDataUrls instance encoded in resp body.
-func (c *Client) DecodeMyDataUrls(resp *http.Response) (*MyDataUrls, error) {
-	var decoded MyDataUrls
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
 // PagedGeoJSON media type (default view)
 //
 // Identifier: application/vnd.app.paged_geojson+json; view=default
@@ -1542,6 +1516,37 @@ func (c *Client) DecodeSeriesDataCollection(resp *http.Response) (SeriesDataColl
 	var decoded SeriesDataCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
+}
+
+// MySimpleSummary media type (default view)
+//
+// Identifier: application/vnd.app.simple_summary+json; view=default
+type MySimpleSummary struct {
+	Center []float64   `form:"center" json:"center" yaml:"center" xml:"center"`
+	Urls   *MyDataUrls `form:"urls" json:"urls" yaml:"urls" xml:"urls"`
+}
+
+// Validate validates the MySimpleSummary media type instance.
+func (mt *MySimpleSummary) Validate() (err error) {
+	if mt.Urls == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
+	}
+	if mt.Center == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "center"))
+	}
+	if mt.Urls != nil {
+		if err2 := mt.Urls.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeMySimpleSummary decodes the MySimpleSummary instance encoded in resp body.
+func (c *Client) DecodeMySimpleSummary(resp *http.Response) (*MySimpleSummary, error) {
+	var decoded MySimpleSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
 }
 
 // Source media type (default view)

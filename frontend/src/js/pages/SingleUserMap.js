@@ -55,9 +55,9 @@ class DownloadDataPanel extends React.Component {
     renderDownloadButton() {
         const { summary, onDownload } = this.props;
 
-        if (_.isObject(summary) && !_.isEmpty(summary.csv)) {
+        if (_.isObject(summary) && !_.isEmpty(summary.urls.csv)) {
             return (
-                <a target="_blank" rel="noopener noreferrer" href={summary.csv}>
+                <a target="_blank" rel="noopener noreferrer" href={summary.urls.csv}>
                     <button onClick={ onDownload } className="download">Download Data</button>
                 </a>
             );
@@ -69,23 +69,24 @@ class DownloadDataPanel extends React.Component {
 
 class MapFeatures {
     constructor() {
-        this.queue = Promise.resolve([]);
         this.loaded = [];
         this.sources = {};
         this.geometries = {};
         this.geometriesBySource = {};
-        this.query_ = _.throttle(this.query_, 500);
     }
 
     query_(criteria) {
         const desired = new GeoRect(criteria);
         const loaded = new GeoRectSet(this.loaded);
         if (loaded.contains(desired)) {
+            console.log("query: ignoring");
             return Promise.resolve(false);
         }
 
         const loading = desired.enlarge(2);
         this.loaded.push(loading);
+
+        console.log("query: querying");
 
         return FkPromisedApi.getMySimpleFeatures({
             ne: loading.ne,
@@ -97,8 +98,9 @@ class MapFeatures {
 
             this.geometries = { ...this.geometries, ...incomingGeometries };
 
-            const sourceIds = _.union(_(data.spatial).map(s => s.sourceId).value(), _(data.temporal).map(s => s.sourceId).value());
+            const sourceIds = _.union(_(data.spatial).map(s => s.sourceId).value(), _(data.temporal).map(s => s.sourceId).uniq().value());
             return Promise.all(sourceIds.map(id => {
+                console.log("promise source info", id);
                 if (this.sources[id]) {
                     return this.sources[id];
                 }
@@ -114,9 +116,11 @@ class MapFeatures {
     }
 
     getSources() {
+        console.log("getSources");
         return Promise.all(
             _(this.sources)
                 .map((value, key) => {
+                    console.log("source", key);
                     return value.then(ss => {
                         const geometries = _(this.geometries)
                               .map((value, key) => {
@@ -132,12 +136,14 @@ class MapFeatures {
                     });
                 })
                 .value()).then((data) => {
+                    console.log("sources data", data);
                     return data;
                 }
         );
     }
 
     load(criteria) {
+        console.log("load");
         return this.query_(criteria);
     }
 };
@@ -157,6 +163,8 @@ class SingleUserMap extends Component {
 
         this.features = new MapFeatures();
 
+        this.loadMapFeaturesThrottled = _.throttle(this.loadMapFeatures.bind(this), 500, { leading: true });
+
         this.state = {
             focus: { center: getDefaultMapLocation() }
         };
@@ -165,7 +173,10 @@ class SingleUserMap extends Component {
     refreshSummary() {
         FkPromisedApi.getMySimpleSummary().then(summary => {
             this.setState({
-                summary
+                summary,
+                focus: {
+                    center: summary.center,
+                },
             });
         });
     }
@@ -176,7 +187,7 @@ class SingleUserMap extends Component {
                 return this.features.getSources().then(sources => {
                     this.setState({
                         geometries: geometries,
-                        sources: sources
+                        sources: sources,
                     });
                 });
             }
@@ -246,7 +257,7 @@ class SingleUserMap extends Component {
                         focusFeature={ () => { } }
                         focusSource={ () => { } }
                         onUserActivity={ this.onUserActivity.bind(this) }
-                        loadMapFeatures={ this.loadMapFeatures.bind(this) }
+                        loadMapFeatures={ this.loadMapFeaturesThrottled }
                         onChangePlaybackMode={ () => { } }>
                         <DownloadDataPanel onDownload={ this.onDownload.bind(this )} summary={this.state.summary} />
                     </MapContainer>

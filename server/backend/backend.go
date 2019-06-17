@@ -249,6 +249,33 @@ func (b *Backend) ListAllDeviceSources(ctx context.Context) ([]*data.DeviceSourc
 	return devices, nil
 }
 
+func (b *Backend) GetUserLatestCenterOfActivity(ctx context.Context, userID int64) ([]float64, error) {
+	type Activity struct {
+		SourceID int64          `db:"source_id"`
+		Time     time.Time      `db:"time"`
+		Centroid *data.Location `db:"centroid"`
+	}
+	activities := []*Activity{}
+	if err := b.db.SelectContext(ctx, &activities, `
+	      SELECT * FROM (
+		  SELECT source_id, end_time AS time, ST_AsBinary(centroid) AS centroid FROM fieldkit.sources_temporal_clusters UNION
+		  SELECT source_id, end_time AS time, ST_AsBinary(centroid) AS centroid FROM fieldkit.sources_spatial_clusters 
+	      ) AS q WHERE
+	      q.source_id IN (
+		  SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = $1
+	      )
+	      ORDER BY time DESC
+	      LIMIT 1`, userID); err != nil {
+		return nil, err
+	}
+
+	if len(activities) != 1 {
+		return []float64{}, nil
+	}
+
+	return activities[0].Centroid.Coordinates(), nil
+}
+
 func (b *Backend) ListDeviceSources(ctx context.Context, project, expedition string) ([]*data.DeviceSource, error) {
 	devices := []*data.DeviceSource{}
 	if err := b.db.SelectContext(ctx, &devices, `

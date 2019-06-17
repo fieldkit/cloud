@@ -955,6 +955,52 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// myDataUrls user type.
+type myDataUrls struct {
+	Csv  *string `form:"csv,omitempty" json:"csv,omitempty" yaml:"csv,omitempty" xml:"csv,omitempty"`
+	Fkpb *string `form:"fkpb,omitempty" json:"fkpb,omitempty" yaml:"fkpb,omitempty" xml:"fkpb,omitempty"`
+}
+
+// Validate validates the myDataUrls type instance.
+func (ut *myDataUrls) Validate() (err error) {
+	if ut.Csv == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "csv"))
+	}
+	if ut.Fkpb == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "fkpb"))
+	}
+	return
+}
+
+// Publicize creates MyDataUrls from myDataUrls
+func (ut *myDataUrls) Publicize() *MyDataUrls {
+	var pub MyDataUrls
+	if ut.Csv != nil {
+		pub.Csv = *ut.Csv
+	}
+	if ut.Fkpb != nil {
+		pub.Fkpb = *ut.Fkpb
+	}
+	return &pub
+}
+
+// MyDataUrls user type.
+type MyDataUrls struct {
+	Csv  string `form:"csv" json:"csv" yaml:"csv" xml:"csv"`
+	Fkpb string `form:"fkpb" json:"fkpb" yaml:"fkpb" xml:"fkpb"`
+}
+
+// Validate validates the MyDataUrls type instance.
+func (ut *MyDataUrls) Validate() (err error) {
+	if ut.Csv == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "csv"))
+	}
+	if ut.Fkpb == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "fkpb"))
+	}
+	return
+}
+
 // updateDeviceFirmwarePayload user type.
 type updateDeviceFirmwarePayload struct {
 	DeviceID   *int `form:"deviceId,omitempty" json:"deviceId,omitempty" yaml:"deviceId,omitempty" xml:"deviceId,omitempty"`

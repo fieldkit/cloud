@@ -2843,9 +2843,9 @@ func NewMySimpleSummarySimpleContext(ctx context.Context, r *http.Request, servi
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *MySimpleSummarySimpleContext) OK(r *MyDataUrls) error {
+func (ctx *MySimpleSummarySimpleContext) OK(r *MySimpleSummary) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.my_data_urls+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.simple_summary+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
