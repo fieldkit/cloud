@@ -34,13 +34,14 @@ export default class ClusterMap extends Component {
         const temporalWidth = 8;
 
         const temporal = _(data)
-            .filter(s => s.summary != null && s.summary.spatial != null)
+            .filter(s => s.summary != null && s.summary.temporal != null)
             .sortBy(s => s.source.id)
             .map(s => {
                 return _(s.summary.temporal)
                     .filter(c => s.geometries && s.geometries[c.id])
                     .sortBy(c => c.id)
                     .map(c => {
+                        console.log(s.geometries[c.id]);
                         return {
                             geometry: {
                                 coordinates: s.geometries[c.id].geometry,
@@ -51,7 +52,7 @@ export default class ClusterMap extends Component {
                                 cluster: c.id,
                                 type: 'temporal',
                                 color: colors.get(),
-                                numberOfFeatures: c.numberOfFeatures
+                                numberOfFeatures: c.numberOfFeatures,
                             }
                         };
                     })
@@ -87,7 +88,8 @@ export default class ClusterMap extends Component {
                         cluster: c.id,
                         type: 'spatial',
                         color: colors.get(),
-                        numberOfFeatures: c.numberOfFeatures
+                        numberOfFeatures: c.numberOfFeatures,
+                        originalCluster: c,
                     }
                 };
             }).value();

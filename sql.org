@@ -485,6 +485,18 @@ SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = 0 OR 0 == 0
 | 80 |             3 | 0004a30b0022d630                 |         |         | f      | t       |        80 | 0004a30b0022d630                 | \x314d627a446d5867694a3954685a4571476e475755455a33486d43 |
 | 81 |             3 | 0004a30b00232b9b                 |         |         | f      | t       |        81 | 0004a30b00232b9b                 | \x314d63305a4c786142716b5a46676847304a74574e4754664a3353 |
 
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+SELECT ST_Buffer(ST_GeomFromText('POINT(1 1)'), 10) ~ ST_MakeBox2D(ST_MakePoint(0,0), ST_MakePoint(2,2)) AS contains;
+
+#+END_SRC
+
+#+RESULTS:
+| contains |
+|----------|
+| t        |
+
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
 SELECT * FROM (
@@ -557,3 +569,131 @@ ORDER BY end_time DESC
 |        25 | 2019-06-01 00:12:14 | 0101000020E6100000188661782D915DC0188661F87B044140 |
 |        25 | 2019-01-23 04:54:54 | 0101000020E610000000000060CD925D40000000004B084140 |
 |        25 | 2001-12-31 09:36:03 | 0101000020E6100000000000E0BA7C4640000000E0BA7C4640 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+DELETE FROM fieldkit.sources_temporal_geometries g WHERE ST_NumPoints(g.geometry) < 2;
+#+END_SRC
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+SELECT ST_NumPoints(g.geometry) FROM fieldkit.sources_temporal_geometries g;
+#+END_SRC
+
+#+RESULTS:
+| st_numpoints |
+|--------------|
+|           42 |
+|            7 |
+|           15 |
+|            6 |
+|           38 |
+|            3 |
+|           22 |
+|           26 |
+|           43 |
+|            4 |
+|           12 |
+|           19 |
+|            6 |
+|            7 |
+|           12 |
+|           20 |
+|            9 |
+|           68 |
+|            2 |
+|            2 |
+|            2 |
+|           42 |
+|          263 |
+|           38 |
+|           81 |
+|           49 |
+|           14 |
+|           23 |
+|           26 |
+|            2 |
+|            2 |
+|            2 |
+|           28 |
+|            9 |
+|           50 |
+|            6 |
+|          346 |
+|           26 |
+|           67 |
+|            9 |
+|           71 |
+|          189 |
+|            9 |
+|           50 |
+|           72 |
+|           54 |
+|          202 |
+|           30 |
+|            2 |
+|          402 |
+|           48 |
+|           71 |
+|            9 |
+|           57 |
+|           13 |
+|           23 |
+|          429 |
+|           46 |
+|           96 |
+|           57 |
+|            3 |
+|           12 |
+|            8 |
+|            2 |
+|           28 |
+|          224 |
+|           10 |
+|           27 |
+|           24 |
+|           38 |
+|          111 |
+|           48 |
+|            4 |
+|           45 |
+|           32 |
+|            1 |
+|           19 |
+|           21 |
+|           19 |
+|          441 |
+|           18 |
+|            2 |
+|            3 |
+|            4 |
+|           22 |
+|           16 |
+|           11 |
+|            2 |
+|           53 |
+|            3 |
+|            8 |
+|            1 |
+|            4 |
+|            7 |
+|            8 |
+|           22 |
+|           59 |
+|           93 |
+|            4 |
+|            2 |
+|            1 |
+|            9 |
+|           93 |
+|            1 |
+|            1 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+UPDATE fieldkit.sources_temporal_geometries SET geometry = PostGIS_DropBBox(geometry) WHERE NOT (Box2D(ST_AsBinary(geometry)) = Box2D(geometry));
+
+UPDATE fieldkit.sources_temporal_geometries SET geometry = PostGIS_AddBBox(geometry) WHERE NOT PostGIS_HasBBOX(geometry);
+
+#+END_SRC
+
+#+RESULTS:
+|   |

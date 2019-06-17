@@ -789,7 +789,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox, userID 
 		  FROM
 		    fieldkit.sources_spatial_clusters c
                   WHERE
-                    c.centroid && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
+                    c.centroid && ST_SetSRID(ST_MakeBox2D(ST_MakePoint($1, $2), ST_MakePoint($3, $4)), 4326)
                     AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
 		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err
@@ -802,7 +802,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox, userID 
 		    fieldkit.sources_temporal_clusters c JOIN
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
                   WHERE
-                    g.geometry && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
+		    ST_Intersects(g.geometry, ST_SetSRID(ST_MakeBox2D(ST_MakePoint($1, $2), ST_MakePoint($3, $4)), 4326))
                     AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
 		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err
@@ -815,7 +815,7 @@ func (b *Backend) QueryMapFeatures(ctx context.Context, bb *BoundingBox, userID 
 		    fieldkit.sources_temporal_clusters c JOIN
                     fieldkit.sources_temporal_geometries g ON (c.source_id = g.source_id AND c.cluster_id = g.cluster_id)
                   WHERE
-                    g.geometry && ST_SetSRID(ST_MakeEnvelope($1, $2, $3, $4), 4326)
+		    ST_Intersects(g.geometry, ST_SetSRID(ST_MakeBox2D(ST_MakePoint($1, $2), ST_MakePoint($3, $4)), 4326)::geometry)
                     AND c.source_id IN (SELECT s.id FROM fieldkit.source AS s WHERE (s.user_id = $5) OR ($5 = 0))
 		`, ne[0], ne[1], sw[0], sw[1], userID); err != nil {
 		return nil, err

@@ -254,8 +254,8 @@ class SingleUserMap extends Component {
                     <MapContainer style={{ }} containerStyle={{ width: "100vw", height: "100vh" }} controls={false}
                         visibleFeatures={ visibleFeatures }
                         pointDecorator={ pointDecorator }
-                        focusFeature={ () => { } }
-                        focusSource={ () => { } }
+                        focusFeature={ f => console.log(f) }
+                        focusSource={ f => console.log(f) }
                         onUserActivity={ this.onUserActivity.bind(this) }
                         loadMapFeatures={ this.loadMapFeaturesThrottled }
                         onChangePlaybackMode={ () => { } }>

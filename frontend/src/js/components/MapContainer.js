@@ -132,7 +132,7 @@ export default class MapContainer extends Component {
         const selected = _.uniqBy(features, f => f.properties.name);
         const coordinates = ev.lngLat;
 
-        // console.log("MapContainer::onClick", features);
+        console.log("MapContainer::onClick", features);
 
         if (selected.length === 0) {
             this.setState({
