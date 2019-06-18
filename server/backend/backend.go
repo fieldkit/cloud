@@ -725,7 +725,7 @@ func (b *Backend) CreateMissingDevices(ctx context.Context) (err error) {
 	}
 
 	devices := []*MissingDevice{}
-	if err := b.db.SelectContext(ctx, &devices, `SELECT DISTINCT dsl.device_id FROM fieldkit.device_stream_location AS dsl WHERE dsl.device_id NOT IN (SELECT key FROM fieldkit.device)`); err != nil {
+	if err := b.db.SelectContext(ctx, &devices, `SELECT DISTINCT ds.device_id FROM fieldkit.device_stream AS ds WHERE char_length(ds.device_id) > 0 AND ds.device_id NOT IN (SELECT key FROM fieldkit.device)`); err != nil {
 		return fmt.Errorf("Error getting devices: %v", err)
 	}
 
