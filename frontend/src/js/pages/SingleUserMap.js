@@ -39,11 +39,12 @@ class DownloadDataPanel extends React.Component {
         return (
             <div className="download-data-panel">
                 <div className="download-data-body">
-                    <h4>Instructions Header Placeholder</h4>
-
+                    <h4>Instructions</h4>
                     <ol>
-                        <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                        <li>Nunc hendrerit scelerisque semper. Donec pharetra nibh eu dui convallis, eget sagittis nunc pellentesque.</li>
+                        <li>Make sure to connect your device to the FieldKit app and download the data off the sensor.</li>
+                        <li>After downloading, go to the upload tab and upload your files to this website.</li>
+                        <li>Click the Download Data button to get all your data in CSV format</li>
+                        <li>Visualization functionalities are coming soon, but in the meantime please use your favorite data tool to explore and understand your data!</li>
                     </ol>
 
                     {this.renderDownloadButton()}
