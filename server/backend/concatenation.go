@@ -322,23 +322,25 @@ func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 	for job := range cw.channel {
 		jobLog := Logger(job.ctx).Sugar()
 
-		jobLog.Infow("Worker", "job", job)
+		jobLog.Infow("Worker", "job", job, "file_type_ids", job.fileTypeIDs)
 
-		fileTypeID := job.fileTypeIDs[0]
-		space := ConcatenatedFileSpaces[fileTypeID]
-		deviceStreamID := uuid.NewSHA1(space, []byte(job.deviceID))
+		if len(job.fileTypeIDs) > 0 {
+			fileTypeID := job.fileTypeIDs[0]
+			space := ConcatenatedFileSpaces[fileTypeID]
+			deviceStreamID := uuid.NewSHA1(space, []byte(job.deviceID))
 
-		fc := &FileConcatenator{
-			Session:    cw.session,
-			Database:   cw.database,
-			Publisher:  cw.publisher,
-			FileID:     deviceStreamID.String(),
-			FileTypeID: fileTypeID,
-			DeviceID:   job.deviceID,
-			TypeIDs:    job.fileTypeIDs,
+			fc := &FileConcatenator{
+				Session:    cw.session,
+				Database:   cw.database,
+				Publisher:  cw.publisher,
+				FileID:     deviceStreamID.String(),
+				FileTypeID: fileTypeID,
+				DeviceID:   job.deviceID,
+				TypeIDs:    job.fileTypeIDs,
+			}
+
+			fc.Concatenate(job.ctx)
 		}
-
-		fc.Concatenate(job.ctx)
 	}
 
 	log.Infow("Worker exiting")
