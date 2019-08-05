@@ -71,12 +71,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -84,12 +84,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -97,12 +97,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -110,12 +110,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -123,12 +123,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -136,12 +136,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -149,12 +149,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -162,12 +162,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -175,12 +175,12 @@ func handleExportOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -317,12 +317,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -330,12 +330,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -343,12 +343,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -356,12 +356,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -369,12 +369,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -382,12 +382,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -395,12 +395,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -408,12 +408,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -421,12 +421,12 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -546,12 +546,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -559,12 +559,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -572,12 +572,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -585,12 +585,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -598,12 +598,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -611,12 +611,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -624,12 +624,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -637,12 +637,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -650,12 +650,12 @@ func handleGeoJSONOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -709,12 +709,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -722,12 +722,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -735,12 +735,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -748,12 +748,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -761,12 +761,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -774,12 +774,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -787,12 +787,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -800,12 +800,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -813,12 +813,12 @@ func handleQueryOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -908,12 +908,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -921,12 +921,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -934,12 +934,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -947,12 +947,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -960,12 +960,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -973,12 +973,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -986,12 +986,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -999,12 +999,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1012,12 +1012,12 @@ func handleTasksOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1171,12 +1171,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1184,12 +1184,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1197,12 +1197,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1210,12 +1210,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1223,12 +1223,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1236,12 +1236,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1249,12 +1249,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1262,12 +1262,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1275,12 +1275,12 @@ func handleAdministratorOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1468,12 +1468,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1481,12 +1481,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1494,12 +1494,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1507,12 +1507,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1520,12 +1520,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1533,12 +1533,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1546,12 +1546,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1559,12 +1559,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1572,12 +1572,12 @@ func handleDeviceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1691,12 +1691,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1704,12 +1704,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1717,12 +1717,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1730,12 +1730,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1743,12 +1743,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1756,12 +1756,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1769,12 +1769,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1782,12 +1782,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1795,12 +1795,12 @@ func handleDeviceDataOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1854,12 +1854,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1867,12 +1867,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1880,12 +1880,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1893,12 +1893,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1906,12 +1906,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1919,12 +1919,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1932,12 +1932,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1945,12 +1945,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -1958,12 +1958,12 @@ func handleDeviceLogsOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2121,12 +2121,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2134,12 +2134,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2147,12 +2147,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2160,12 +2160,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2173,12 +2173,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2186,12 +2186,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2199,12 +2199,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2212,12 +2212,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2225,12 +2225,12 @@ func handleExpeditionOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2481,12 +2481,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2494,12 +2494,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2507,12 +2507,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2520,12 +2520,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2533,12 +2533,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2546,12 +2546,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2559,12 +2559,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2572,12 +2572,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2585,12 +2585,12 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2783,12 +2783,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2796,12 +2796,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2809,12 +2809,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2822,12 +2822,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2835,12 +2835,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2848,12 +2848,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2861,12 +2861,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2874,12 +2874,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -2887,12 +2887,12 @@ func handleMemberOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3012,12 +3012,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3025,12 +3025,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3038,12 +3038,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3051,12 +3051,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3064,12 +3064,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3077,12 +3077,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3090,12 +3090,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3103,12 +3103,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3116,12 +3116,12 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3280,12 +3280,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3293,12 +3293,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3306,12 +3306,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3319,12 +3319,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3332,12 +3332,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3345,12 +3345,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3358,12 +3358,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3371,12 +3371,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3384,12 +3384,12 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3511,12 +3511,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3524,12 +3524,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3537,12 +3537,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3550,12 +3550,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3563,12 +3563,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3576,12 +3576,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3589,12 +3589,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3602,12 +3602,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3615,12 +3615,12 @@ func handleSimpleOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3771,12 +3771,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3784,12 +3784,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3797,12 +3797,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3810,12 +3810,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3823,12 +3823,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3836,12 +3836,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3849,12 +3849,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3862,12 +3862,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -3875,12 +3875,12 @@ func handleSourceOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4006,12 +4006,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4019,12 +4019,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4032,12 +4032,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4045,12 +4045,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4058,12 +4058,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4071,12 +4071,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4084,12 +4084,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4097,12 +4097,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4110,12 +4110,12 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4174,12 +4174,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4187,12 +4187,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4200,12 +4200,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4213,12 +4213,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4226,12 +4226,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4239,12 +4239,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4252,12 +4252,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4265,12 +4265,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4278,12 +4278,12 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4461,12 +4461,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4474,12 +4474,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4487,12 +4487,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4500,12 +4500,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4513,12 +4513,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4526,12 +4526,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4539,12 +4539,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4552,12 +4552,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4565,12 +4565,12 @@ func handleTeamOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4735,12 +4735,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4748,12 +4748,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4761,12 +4761,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4774,12 +4774,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4787,12 +4787,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4800,12 +4800,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4813,12 +4813,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4826,12 +4826,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -4839,12 +4839,12 @@ func handleTwitterOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5084,12 +5084,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5097,12 +5097,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5110,12 +5110,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5123,12 +5123,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5136,12 +5136,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5149,12 +5149,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5162,12 +5162,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5175,12 +5175,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}
@@ -5188,12 +5188,12 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
-			rw.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
 			rw.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
-				rw.Header().Set("Access-Control-Allow-Headers", "Authorization")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 			}
 			return h(ctx, rw, req)
 		}

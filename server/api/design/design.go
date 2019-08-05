@@ -9,8 +9,8 @@ const (
 )
 
 var cors = func() {
-	Headers("Authorization")
-	Expose("Authorization")
+	Headers("Authorization", "Content-Type")
+	Expose("Authorization", "Content-Type")
 	Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
 }
 
