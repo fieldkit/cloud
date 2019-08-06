@@ -36,16 +36,18 @@
      3) Ensure you have the latest golang (>1.12)
 
 *** Running Locally
-    1) Create development ~fieldkit.env~
+    1) Establish a default developer setup.
 
     #+BEGIN_SRC sh
-    echo FIELDKIT_ADDR=0.0.0.0:8080 > fieldkit.env
+    make
     #+END_SRC
+
+    This will create a default ~fieldkit.env~ for you as well as materialize the various ~secrets.js~ files.
        
     2) Run the database.
 
     #+BEGIN_SRC sh
-    make restart-progress
+    make restart-postgres
     #+END_SRC
 
     #+BEGIN_SRC sh

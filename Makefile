@@ -17,7 +17,15 @@ BUILD ?= $(abspath build)
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
 
-default: binaries
+default: setup binaries
+
+setup: fieldkit.env frontend/src/js/secrets.js
+
+fieldkit.env:
+	echo FIELDKIT_ADDR=0.0.0.0:8080 > $@
+
+frontend/src/js/secrets.js: frontend/src/js/secrets.js.template
+	cp $^ $@
 
 binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/fkflash $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
 
