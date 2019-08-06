@@ -1,7 +1,16 @@
 modules = server/sqs-worker server/sqs-sender server/tools/fktool
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
 GOARCH ?= amd64
 GOOS ?= linux
+endif
+
+ifeq ($(UNAME_S),Darwin)
+GOARCH ?= amd64
+GOOS ?= darwin
+endif
+
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
 BUILD ?= $(abspath build)
 

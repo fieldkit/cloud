@@ -10,39 +10,103 @@
 
   3) PostgreSQL schema and sample/seed data.
 
-* Developer Instructions 
+* Developers
 *** Machine Setup
 **** Linux
-     1. Install docker, nodejs, and yarn.
-        sudo apt-get install docker.io docker-compose 
-        npm install -g yarn
-     2. Configure docker
-        sudo gpasswd -a $USER docker
-        newgrp docker 
-        docker ps -a # testing
-     3. Ensure you have the latest golang (>1.12)
+     1) Install docker, nodejs, and yarn.
+
+     #+BEGIN_SRC sh
+     sudo apt-get install docker.io docker-compose nodejs
+     npm install -g yarn
+     #+END_SRC
+
+     2) Configure docker
+
+     #+BEGIN_SRC sh
+     sudo gpasswd -a $USER docker
+     newgrp docker 
+     docker ps -a # testing
+     #+END_SRC
+
+     3) Ensure you have the latest golang (>1.12)
 
 **** OSX
-     1. Install nodejs/npm (https://nodejs.org/en/download/)
-     2. Install docker (https://docs.docker.com/docker-for-mac/install/)
-     3. Ensure you have the latest golang (>1.12)
+     1) Install nodejs/npm (https://nodejs.org/en/download/)
+     2) Install docker (https://docs.docker.com/docker-for-mac/install/)
+     3) Ensure you have the latest golang (>1.12)
 
 *** Running Locally
-    1. Create development fieldkit.env
+    1) Create development ~fieldkit.env~
 
+    #+BEGIN_SRC sh
     echo FIELDKIT_ADDR=0.0.0.0:8080 > fieldkit.env
+    #+END_SRC
        
-    2. Run the database.
+    2) Run the database.
 
+    #+BEGIN_SRC sh
     make restart-progress
+    #+END_SRC
 
-    3. Run the fk server.
+    #+BEGIN_SRC sh
+    ➜  cloud git:(master) make restart-postgres
+    docker-compose stop postgres
+    docker-compose rm -f postgres
+    No stopped containers
+    docker-compose up -d postgres
+    Creating cloud_postgres_1 ... done
+    #+END_SRC
 
+    3) Run the server.
+
+    #+BEGIN_SRC sh
     ./run-server-containerless.sh
+    #+END_SRC
 
-    4. Run one of the web sites in development mode.
+    This builds and runs the server outside of a docker container. This means that PostgreSQL is usually the only docker container running.
 
+    #+BEGIN_SRC sh
+    ➜  cloud git:(master) ./run-server-containerless.sh
+    + export FIELDKIT_ADDR=:8080
+    + FIELDKIT_ADDR=:8080
+    + export 'FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable'
+    + FIELDKIT_POSTGRES_URL='postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable'
+    + export FIELDKIT_DISABLE_MEMORY_LOGGING=true
+    + FIELDKIT_DISABLE_MEMORY_LOGGING=true
+    + export FIELDKIT_DISABLE_STARTUP_REFRESH=true
+    + FIELDKIT_DISABLE_STARTUP_REFRESH=true
+    + export FIELDKIT_API_DOMAIN=127.0.0.1:8080
+    + FIELDKIT_API_DOMAIN=127.0.0.1:8080
+    + export FIELDKIT_API_HOST=http://127.0.0.1:8080
+    + FIELDKIT_API_HOST=http://127.0.0.1:8080
+    + '[' -f aws.env ']'
+    + make server
+    cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
+    cd server && env GOOS=linux GOARCH=amd64 go build -o /Users/jlewallen/fieldkit/cloud/build/server server.go
+    go: finding github.com/pkg/errors v0.0.0-20190227000051-27936f6d90f9
+    go: finding github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
+    go: finding github.com/dghubble/sling v0.0.0-20170219194632-91b015f8c5e2
+    go: finding github.com/aws/aws-sdk-go v0.0.0-20170317202926-5b99715ae294
+    go: finding github.com/dghubble/oauth1 v0.0.0-20170219195226-3c7784d12fed
+    go: finding github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
+    go: finding github.com/PyYoshi/goa-logging-zap v0.2.3
+    # Lots and lots more Golang packages.
+    + build/server
+    2019-08-06T10:57:31.864-0700    INFO    fieldkit        server/server.go:135    Starting
+    2019-08-06T10:57:31.864-0700    INFO    fieldkit        server/server.go:343    Selected        {"archiver": "aws"}
+    2019-08-06T10:57:31.864-0700    INFO    fieldkit.backend        backend/concatenation.go:320    Worker starting
+    2019-08-06T10:57:31.891-0700    INFO    fieldkit.jobs   jobs/postgres.go:101    Listening       {"queue": "messages"}
+    # More startup log messages...
+    #+END_SRC
+
+    4) Run one of the web sites in development mode.
+
+    #+BEGIN_SRC sh
     cd frontend
     yarn dev
+    #+END_SRC
+
+    #+BEGIN_SRC sh
+    #+END_SRC
 
 * EOF
