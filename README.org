@@ -105,10 +105,19 @@
 
     #+BEGIN_SRC sh
     cd frontend
-    yarn dev
+    yarn start
     #+END_SRC
 
     #+BEGIN_SRC sh
+    Compiled successfully!
+
+    You can now view frontend in the browser.
+
+      Local:            http://localhost:3000/
+      On Your Network:  http://192.168.0.100:3000/
+
+    Note that the development build is not optimized.
+    To create a production build, use yarn build.
     #+END_SRC
 
 * EOF
