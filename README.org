@@ -1,70 +1,48 @@
 #+TITLE:  README for cloud
 #+EMAIL:  jacob@conservify.org 
 
-* FieldKit 
+* Overview
+  This repository contains:
+
+  1) All backend server side code, mostly written in Golang.
+
+  2) All public facing web sites, specifically the administrative site and the non-authenticated frontend.
+
+  3) PostgreSQL schema and sample/seed data.
+
 * Developer Instructions 
 *** Machine Setup
-    1. Necessary packages
-       sudo apt-get install docker.io docker-compose 
-       npm install -g yarn
-    2. Docker Setup
-       sudo gpasswd -a $USER docker
-       newgrp docker 
-       docker ps -a # testing
-    3. Ensure you have the latest golang (>1.8)
+**** Linux
+     1. Install docker, nodejs, and yarn.
+        sudo apt-get install docker.io docker-compose 
+        npm install -g yarn
+     2. Configure docker
+        sudo gpasswd -a $USER docker
+        newgrp docker 
+        docker ps -a # testing
+     3. Ensure you have the latest golang (>1.12)
+
+**** OSX
+     1. Install nodejs/npm (https://nodejs.org/en/download/)
+     2. Install docker (https://docs.docker.com/docker-for-mac/install/)
+     3. Ensure you have the latest golang (>1.12)
 
 *** Running Locally
-    Run the database and the API docker containers:
+    1. Create development fieldkit.env
 
-    ./run-server.sh
+    echo FIELDKIT_ADDR=0.0.0.0:8080 > fieldkit.env
+       
+    2. Run the database.
 
-    Now the web facing pieces can be run via "yarn dev" in the appropriate directory, eg:
+    make restart-progress
+
+    3. Run the fk server.
+
+    ./run-server-containerless.sh
+
+    4. Run one of the web sites in development mode.
 
     cd frontend
     yarn dev
-
-*** Rebuilding Goa API
-**** Setup
-
-     go get -u github.com/goadesign/goa/...
-
-     You will need to have the source directory linked into your GOWORK path.
-
-**** Regenerating
-
-     cd server
-     make generate
-
-*** Build / Deploying
-    ./build.sh 
-
-*** Common Problems
-**** On 'Missing API definition, make sure design is properly initialized' when running go generate
-     Rename vendor directory and rename back. Be sure and use Makefile if your branch has one.
-     https://github.com/goadesign/goa/issues/923
-
-**** On 'context related error' when running go generate
-     Check Golang version.
-
-**** On 'cannot find package "github.com/O-C-R/fieldkit/server/api/design"' when running go generate
-     cd ~/go/src
-     mkdir -p github.com/O-C-R
-     ln -sf ~/conservify/fk-cloud fieldkit
-
-**** Unable to find module fieldkit-api-client
-     Build the client module first. It'll get copied to node_modules as is.
-     
-     rm -rf node_modules && (cd ../api-client/js && yarn build) && yarn install
-
-**** On 'Go source file "/home/jlewallen/conservify/fieldkit/server/api/app/contexts.go" not in Go workspace, adjust GOPATH'
-     Run 'go generate' from under your GOPATH
-
-*** Misc
-**** fieldkit.env 
-     FIELDKIT_ADMIN_ROOT=/admin
-     FIELDKIT_FRONTEND_ROOT=/frontend
-     FIELDKIT_LANDING_ROOT=/landing
-     FIELDKIT_DOMAIN=fieldkit.org:8080
-
 
 * EOF
