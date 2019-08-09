@@ -184,6 +184,12 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountFirmwareController(service, c17)
 
+	// Mount "station" controller
+	c18 := NewStationController(service, StationControllerOptions{
+		Database: database,
+	})
+	app.MountStationController(service, c18)
+
 	// Mount "files" controller
 	fco := FilesControllerOptions{
 		Config:        config,
