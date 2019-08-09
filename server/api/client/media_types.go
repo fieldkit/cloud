@@ -1720,6 +1720,79 @@ func (c *Client) DecodeSources(resp *http.Response) (*Sources, error) {
 	return &decoded, err
 }
 
+// Station media type (default view)
+//
+// Identifier: application/vnd.app.station+json; view=default
+type Station struct {
+	ID   int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the Station media type instance.
+func (mt *Station) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// DecodeStation decodes the Station instance encoded in resp body.
+func (c *Client) DecodeStation(resp *http.Response) (*Station, error) {
+	var decoded Station
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// StationCollection is the media type for an array of Station (default view)
+//
+// Identifier: application/vnd.app.station+json; type=collection; view=default
+type StationCollection []*Station
+
+// Validate validates the StationCollection media type instance.
+func (mt StationCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeStationCollection decodes the StationCollection instance encoded in resp body.
+func (c *Client) DecodeStationCollection(resp *http.Response) (StationCollection, error) {
+	var decoded StationCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// Stations media type (default view)
+//
+// Identifier: application/vnd.app.stations+json; view=default
+type Stations struct {
+	Stations StationCollection `form:"stations" json:"stations" yaml:"stations" xml:"stations"`
+}
+
+// Validate validates the Stations media type instance.
+func (mt *Stations) Validate() (err error) {
+	if mt.Stations == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "stations"))
+	}
+	if err2 := mt.Stations.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeStations decodes the Stations instance encoded in resp body.
+func (c *Client) DecodeStations(resp *http.Response) (*Stations, error) {
+	var decoded Stations
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default

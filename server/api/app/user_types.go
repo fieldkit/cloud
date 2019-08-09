@@ -355,6 +355,41 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addStationPayload user type.
+type addStationPayload struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+}
+
+// Validate validates the addStationPayload type instance.
+func (ut *addStationPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	return
+}
+
+// Publicize creates AddStationPayload from addStationPayload
+func (ut *addStationPayload) Publicize() *AddStationPayload {
+	var pub AddStationPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	return &pub
+}
+
+// AddStationPayload user type.
+type AddStationPayload struct {
+	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the AddStationPayload type instance.
+func (ut *AddStationPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	return
+}
+
 // addTeamPayload user type.
 type addTeamPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
