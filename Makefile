@@ -68,9 +68,6 @@ $(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES
 $(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	cd testing/weather-proxy && $(GO) build -o $@ *.go
 
-server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
-	cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
-
 install: all
 	cp $(BUILD)/fktool $(INSTALLDIR)
 	cp $(BUILD)/testing-random $(INSTALLDIR)

@@ -5,6 +5,10 @@
 
 set -xe
 
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 WORKSPACE=$(realpath temp-go)
 
 rm -rf ${WORKSPACE}/src/github.com/fieldkit/cloud/server
