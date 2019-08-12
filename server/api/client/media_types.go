@@ -1724,7 +1724,7 @@ func (c *Client) DecodeSources(resp *http.Response) (*Sources, error) {
 //
 // Identifier: application/vnd.app.station+json; view=default
 type Station struct {
-	ID   int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	ID   int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
 	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
 }
 
@@ -1766,6 +1766,84 @@ func (c *Client) DecodeStationCollection(resp *http.Response) (StationCollection
 	var decoded StationCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
+}
+
+// StationLog media type (default view)
+//
+// Identifier: application/vnd.app.stationlog+json; view=default
+type StationLog struct {
+	ID        int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
+	Body      string `form:"body" json:"body" yaml:"body" xml:"body"`
+	StationID int    `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	Timestamp string `form:"timestamp" json:"timestamp" yaml:"timestamp" xml:"timestamp"`
+}
+
+// Validate validates the StationLog media type instance.
+func (mt *StationLog) Validate() (err error) {
+
+	if mt.Body == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Timestamp == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "timestamp"))
+	}
+	return
+}
+
+// DecodeStationLog decodes the StationLog instance encoded in resp body.
+func (c *Client) DecodeStationLog(resp *http.Response) (*StationLog, error) {
+	var decoded StationLog
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// StationLogCollection is the media type for an array of StationLog (default view)
+//
+// Identifier: application/vnd.app.stationlog+json; type=collection; view=default
+type StationLogCollection []*StationLog
+
+// Validate validates the StationLogCollection media type instance.
+func (mt StationLogCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeStationLogCollection decodes the StationLogCollection instance encoded in resp body.
+func (c *Client) DecodeStationLogCollection(resp *http.Response) (StationLogCollection, error) {
+	var decoded StationLogCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// StationLogs media type (default view)
+//
+// Identifier: application/vnd.app.stationlogs+json; view=default
+type StationLogs struct {
+	StationLogs StationLogCollection `form:"station_logs" json:"station_logs" yaml:"station_logs" xml:"station_logs"`
+}
+
+// Validate validates the StationLogs media type instance.
+func (mt *StationLogs) Validate() (err error) {
+	if mt.StationLogs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "station_logs"))
+	}
+	if err2 := mt.StationLogs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeStationLogs decodes the StationLogs instance encoded in resp body.
+func (c *Client) DecodeStationLogs(resp *http.Response) (*StationLogs, error) {
+	var decoded StationLogs
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
 }
 
 // Stations media type (default view)
