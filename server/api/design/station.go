@@ -14,12 +14,12 @@ var Station = MediaType("application/vnd.app.station+json", func() {
   TypeName("Station")
   Reference(AddStationPayload)
   Attributes(func() {
-    Attribute("id", Integer)
+		Attribute("ID", Integer)
     Attribute("name")
-    Required("id", "name")
+    Required("ID", "name")
   })
   View("default", func(){
-    Attribute("id")
+		Attribute("ID")
     Attribute("name")
   })
 })

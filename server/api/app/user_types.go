@@ -355,6 +355,69 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addStationLogPayload user type.
+type addStationLogPayload struct {
+	ID        *int    `form:"ID,omitempty" json:"ID,omitempty" yaml:"ID,omitempty" xml:"ID,omitempty"`
+	Body      *string `form:"body,omitempty" json:"body,omitempty" yaml:"body,omitempty" xml:"body,omitempty"`
+	StationID *int    `form:"station_id,omitempty" json:"station_id,omitempty" yaml:"station_id,omitempty" xml:"station_id,omitempty"`
+	Timestamp *string `form:"timestamp,omitempty" json:"timestamp,omitempty" yaml:"timestamp,omitempty" xml:"timestamp,omitempty"`
+}
+
+// Validate validates the addStationLogPayload type instance.
+func (ut *addStationLogPayload) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "ID"))
+	}
+	if ut.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "station_id"))
+	}
+	if ut.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "body"))
+	}
+	if ut.Timestamp == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "timestamp"))
+	}
+	return
+}
+
+// Publicize creates AddStationLogPayload from addStationLogPayload
+func (ut *addStationLogPayload) Publicize() *AddStationLogPayload {
+	var pub AddStationLogPayload
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Body != nil {
+		pub.Body = *ut.Body
+	}
+	if ut.StationID != nil {
+		pub.StationID = *ut.StationID
+	}
+	if ut.Timestamp != nil {
+		pub.Timestamp = *ut.Timestamp
+	}
+	return &pub
+}
+
+// AddStationLogPayload user type.
+type AddStationLogPayload struct {
+	ID        int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
+	Body      string `form:"body" json:"body" yaml:"body" xml:"body"`
+	StationID int    `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	Timestamp string `form:"timestamp" json:"timestamp" yaml:"timestamp" xml:"timestamp"`
+}
+
+// Validate validates the AddStationLogPayload type instance.
+func (ut *AddStationLogPayload) Validate() (err error) {
+
+	if ut.Body == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "body"))
+	}
+	if ut.Timestamp == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "timestamp"))
+	}
+	return
+}
+
 // addStationPayload user type.
 type addStationPayload struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`

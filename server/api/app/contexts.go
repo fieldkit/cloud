@@ -3448,6 +3448,123 @@ func (ctx *UpdateStationContext) BadRequest() error {
 	return nil
 }
 
+// AddStationLogContext provides the stationLog add action context.
+type AddStationLogContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *AddStationLogPayload
+}
+
+// NewAddStationLogContext parses the incoming request URL and body, performs validations and creates the
+// context used by the stationLog controller add action.
+func NewAddStationLogContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddStationLogContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddStationLogContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddStationLogContext) OK(r *StationLog) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.stationlog+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddStationLogContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// GetStationLogContext provides the stationLog get action context.
+type GetStationLogContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StationLog string
+}
+
+// NewGetStationLogContext parses the incoming request URL and body, performs validations and creates the
+// context used by the stationLog controller get action.
+func NewGetStationLogContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetStationLogContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetStationLogContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStationLog := req.Params["stationLog"]
+	if len(paramStationLog) > 0 {
+		rawStationLog := paramStationLog[0]
+		rctx.StationLog = rawStationLog
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetStationLogContext) OK(r *StationLog) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.stationlog+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetStationLogContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// UpdateStationLogContext provides the stationLog update action context.
+type UpdateStationLogContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StationLogID int
+	Payload      *AddStationLogPayload
+}
+
+// NewUpdateStationLogContext parses the incoming request URL and body, performs validations and creates the
+// context used by the stationLog controller update action.
+func NewUpdateStationLogContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateStationLogContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateStationLogContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStationLogID := req.Params["stationLogId"]
+	if len(paramStationLogID) > 0 {
+		rawStationLogID := paramStationLogID[0]
+		if stationLogID, err2 := strconv.Atoi(rawStationLogID); err2 == nil {
+			rctx.StationLogID = stationLogID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationLogId", rawStationLogID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateStationLogContext) OK(r *StationLog) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.stationlog+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateStationLogContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddTeamContext provides the team add action context.
 type AddTeamContext struct {
 	context.Context
