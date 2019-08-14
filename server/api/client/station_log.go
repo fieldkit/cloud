@@ -19,7 +19,7 @@ import (
 // AddStationLogPath computes a request path to the add action of stationLog.
 func AddStationLogPath() string {
 
-	return fmt.Sprintf("/station_logs")
+	return fmt.Sprintf("/stationLog")
 }
 
 // Add a station log
@@ -33,6 +33,47 @@ func (c *Client) AddStationLog(ctx context.Context, path string, payload *AddSta
 
 // NewAddStationLogRequest create the request corresponding to the add action endpoint of the stationLog resource.
 func (c *Client) NewAddStationLogRequest(ctx context.Context, path string, payload *AddStationLogPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// AddMultipleStationLogPath computes a request path to the addMultiple action of stationLog.
+func AddMultipleStationLogPath() string {
+
+	return fmt.Sprintf("/stationLogs")
+}
+
+// Add multiple station logs
+func (c *Client) AddMultipleStationLog(ctx context.Context, path string, payload *AddStationLogsPayload) (*http.Response, error) {
+	req, err := c.NewAddMultipleStationLogRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewAddMultipleStationLogRequest create the request corresponding to the addMultiple action endpoint of the stationLog resource.
+func (c *Client) NewAddMultipleStationLogRequest(ctx context.Context, path string, payload *AddStationLogsPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {

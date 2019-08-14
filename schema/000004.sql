@@ -1,6 +1,6 @@
 CREATE TABLE fieldkit.station (
   id integer NOT NULL,
-  name integer NOT NULL
+  name text NOT NULL
 );
 
 CREATE TABLE fieldkit.station_log (

@@ -79,6 +79,30 @@ func (c *StationLogController) Add(ctx *app.AddStationLogContext) error{
   return ctx.OK(StationLogType(stationLog))
 }
 
+func (c *StationLogController) AddMultiple(ctx *app.AddMultipleStationLogContext) error {
+
+  for _, add_log := range ctx.Payload.StationLogs {
+    stationLog := &data.StationLog{
+      StationId:  int32(add_log.StationID),
+      Body:       add_log.Body,
+      Timestamp:  add_log.Timestamp,
+    }
+
+    if err := c.options.Database.NamedGetContext(ctx, stationLog, "INSERT INTO fieldkit.stationLog (ID, stationId, Body, Timestamp) VALUES (:ID, :stationId, :Body, :Timestamp) RETURNING *", stationLog); err != nil {
+      return err
+    }
+
+  }
+
+  //return ctx.OK(StationLogsType(stationlogs))
+  /*
+  if _, err := options.Database.ExecContext(ctx, "INSERT INTO fieldkit.stationlog_user ") {
+    return err
+  }
+  */
+  return nil
+}
+
 func (c * StationLogController) Update(ctx *app.UpdateStationLogContext) error {
   stationlog := &data.StationLog{
     ID:   int32(ctx.StationLogID),

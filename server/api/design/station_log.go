@@ -31,6 +31,11 @@ var StationLog = MediaType("application/vnd.app.stationlog+json", func() {
   })
 })
 
+var AddStationLogsPayload = Type("AddStationLogsPayload", func() {
+  Attribute("station_logs", ArrayOf(AddStationLogPayload))
+  Required("station_logs")
+})
+
 var StationLogs = MediaType("application/vnd.app.stationlogs+json", func() {
   TypeName("StationLogs")
   Attributes(func() {
@@ -48,12 +53,21 @@ var _ = Resource("stationLog", func(){
   })
 
   Action("add", func(){
-    Routing(POST("station_logs"))
+    Routing(POST("stationLog"))
     Description("Add a station log")
     Payload(AddStationLogPayload)
     Response(BadRequest)
     Response(OK, func(){
       Media(StationLog)
+    })
+  })
+
+  Action("addMultiple", func() {
+    Routing(POST("stationLogs"))
+    Description("Add multiple station logs")
+    Payload(AddStationLogsPayload)
+    Response(BadRequest)
+    Response(OK, func(){
     })
   })
 

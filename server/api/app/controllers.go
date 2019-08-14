@@ -4371,6 +4371,7 @@ func unmarshalUpdateStationPayload(ctx context.Context, service *goa.Service, re
 type StationLogController interface {
 	goa.Muxer
 	Add(*AddStationLogContext) error
+	AddMultiple(*AddMultipleStationLogContext) error
 	Get(*GetStationLogContext) error
 	Update(*UpdateStationLogContext) error
 }
@@ -4379,7 +4380,8 @@ type StationLogController interface {
 func MountStationLogController(service *goa.Service, ctrl StationLogController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/station_logs", ctrl.MuxHandler("preflight", handleStationLogOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stationLog", ctrl.MuxHandler("preflight", handleStationLogOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stationLogs", ctrl.MuxHandler("preflight", handleStationLogOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stationlogs/@/:stationLog", ctrl.MuxHandler("preflight", handleStationLogOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stationlogs/:stationLogId", ctrl.MuxHandler("preflight", handleStationLogOrigin(cors.HandlePreflight()), nil))
 
@@ -4403,8 +4405,31 @@ func MountStationLogController(service *goa.Service, ctrl StationLogController) 
 	}
 	h = handleSecurity("jwt", h, "api: access")
 	h = handleStationLogOrigin(h)
-	service.Mux.Handle("POST", "/station_logs", ctrl.MuxHandler("add", h, unmarshalAddStationLogPayload))
-	service.LogInfo("mount", "ctrl", "StationLog", "action", "Add", "route", "POST /station_logs", "security", "jwt")
+	service.Mux.Handle("POST", "/stationLog", ctrl.MuxHandler("add", h, unmarshalAddStationLogPayload))
+	service.LogInfo("mount", "ctrl", "StationLog", "action", "Add", "route", "POST /stationLog", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddMultipleStationLogContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddStationLogsPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.AddMultiple(rctx)
+	}
+	h = handleSecurity("jwt", h, "api: access")
+	h = handleStationLogOrigin(h)
+	service.Mux.Handle("POST", "/stationLogs", ctrl.MuxHandler("addMultiple", h, unmarshalAddMultipleStationLogPayload))
+	service.LogInfo("mount", "ctrl", "StationLog", "action", "AddMultiple", "route", "POST /stationLogs", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -4583,6 +4608,21 @@ func handleStationLogOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddStationLogPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddStationLogPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addStationLogPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalAddMultipleStationLogPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddMultipleStationLogPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addStationLogsPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
