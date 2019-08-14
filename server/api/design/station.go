@@ -7,7 +7,8 @@ import (
 
 var AddStationPayload = Type("AddStationPayload", func(){
   Attribute("name", String)
-	Required("name")
+	Attribute("user_id", Integer)
+	Required("name", "user_id")
 })
 
 var Station = MediaType("application/vnd.app.station+json", func() {
@@ -16,11 +17,13 @@ var Station = MediaType("application/vnd.app.station+json", func() {
   Attributes(func() {
 		Attribute("ID", Integer)
     Attribute("name")
-    Required("ID", "name")
+		Attribute("user_id", Integer)
+    Required("ID", "name", "user_id")
   })
   View("default", func(){
 		Attribute("ID")
     Attribute("name")
+		Attribute("user_id")
   })
 })
 

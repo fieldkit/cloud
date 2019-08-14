@@ -472,13 +472,17 @@ func (ut *AddStationLogsPayload) Validate() (err error) {
 
 // addStationPayload user type.
 type addStationPayload struct {
-	Name *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Name   *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" yaml:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // Validate validates the addStationPayload type instance.
 func (ut *addStationPayload) Validate() (err error) {
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
 	}
 	return
 }
@@ -489,12 +493,16 @@ func (ut *addStationPayload) Publicize() *AddStationPayload {
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
 	return &pub
 }
 
 // AddStationPayload user type.
 type AddStationPayload struct {
-	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+	Name   string `form:"name" json:"name" yaml:"name" xml:"name"`
+	UserID int    `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
 }
 
 // Validate validates the AddStationPayload type instance.
@@ -502,6 +510,7 @@ func (ut *AddStationPayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
+
 	return
 }
 
