@@ -3482,6 +3482,42 @@ func (ctx *AddStationLogContext) BadRequest() error {
 	return nil
 }
 
+// AddMultipleStationLogContext provides the stationLog addMultiple action context.
+type AddMultipleStationLogContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *AddStationLogsPayload
+}
+
+// NewAddMultipleStationLogContext parses the incoming request URL and body, performs validations and creates the
+// context used by the stationLog controller addMultiple action.
+func NewAddMultipleStationLogContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddMultipleStationLogContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddMultipleStationLogContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *AddMultipleStationLogContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddMultipleStationLogContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // GetStationLogContext provides the stationLog get action context.
 type GetStationLogContext struct {
 	context.Context
