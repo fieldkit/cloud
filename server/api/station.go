@@ -21,6 +21,7 @@ func StationType(station *data.Station) *app.Station {
   return &app.Station{
     ID:         int(station.ID),
     Name:       station.Name,
+    UserID:     int(station.UserID),
   }
 }
 
@@ -60,10 +61,11 @@ func (c *StationController) Add(ctx *app.AddStationContext) error{
   }
 
   station := &data.Station{
-    Name:  ctx.Payload.Name,
+    Name:    ctx.Payload.Name,
+    UserID:  int32(ctx.Payload.UserID),
   }
 
-  if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name) VALUES (:name) RETURNING *", station); err != nil {
+  if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, user_id) VALUES (:name, :user_id) RETURNING *", station); err != nil {
     return err
   }
 
@@ -90,7 +92,7 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 //what does $1 mean?
 func (c *StationController) Get(ctx *app.GetStationContext) error {
   station := &data.Station{}
-  if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.project WHERE name = $1", ctx.Station); err != nil {
+  if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE name = $1", ctx.Station); err != nil {
     return err
   }
 
