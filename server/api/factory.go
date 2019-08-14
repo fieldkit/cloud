@@ -190,6 +190,12 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountStationController(service, c18)
 
+	// Mount "station log" controller
+	c19 := NewStationLogController(service, StationLogControllerOptions{
+		Database: database,
+	})
+	app.MountStationLogController(service, c19)
+
 	// Mount "files" controller
 	fco := FilesControllerOptions{
 		Config:        config,

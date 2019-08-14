@@ -98,3 +98,12 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 
   return ctx.OK(StationType(station))
 }
+
+func (c *StationController) List(ctx *app.ListStationContext) error {
+  stations := []*data.Station{}
+  if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station"); err != nil {
+    return err
+  }
+
+  return ctx.OK(StationsType(stations))
+}
