@@ -79,4 +79,13 @@ var _ = Resource("station", func(){
       Media(Station)
     })
   })
+
+	Action("list", func() {
+		Routing(GET("stations"))
+		Description("List stations")
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Stations)
+		})
+	})
 })

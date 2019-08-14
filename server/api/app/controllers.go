@@ -4129,6 +4129,7 @@ type StationController interface {
 	goa.Muxer
 	Add(*AddStationContext) error
 	Get(*GetStationContext) error
+	List(*ListStationContext) error
 	Update(*UpdateStationContext) error
 }
 
@@ -4178,6 +4179,23 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/stations/@/:station", ctrl.MuxHandler("get", h, nil))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:station")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListStationContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleSecurity("jwt", h, "api: access")
+	h = handleStationOrigin(h)
+	service.Mux.Handle("GET", "/stations", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "Station", "action", "List", "route", "GET /stations", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
