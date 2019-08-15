@@ -40,7 +40,7 @@ var Stations = MediaType("application/vnd.app.stations+json", func() {
 
 var _ = Resource("station", func(){
   Security(JWT, func(){
-    Scope("api: access")
+    Scope("api:access")
   })
 
   Action("add", func(){
