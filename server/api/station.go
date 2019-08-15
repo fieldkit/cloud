@@ -100,8 +100,18 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 }
 
 func (c *StationController) List(ctx *app.ListStationContext) error {
+  token := jwt.ContextJWT(ctx)
+  if token == nil {
+    return fmt.Errorf("JWT token is missing from context")
+  }
+
+  claims, ok := token.Claims.(jwtgo.MapClaims)
+  if !ok {
+    return fmt.Errorf("JWT claims error")
+  }
+
   stations := []*data.Station{}
-  if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station"); err != nil {
+  if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE user_id = $1", claims["sub"]); err != nil {
     return err
   }
 

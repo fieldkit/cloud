@@ -4159,7 +4159,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		}
 		return ctrl.Add(rctx)
 	}
-	h = handleSecurity("jwt", h, "api: access")
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleStationOrigin(h)
 	service.Mux.Handle("POST", "/stations", ctrl.MuxHandler("add", h, unmarshalAddStationPayload))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Add", "route", "POST /stations", "security", "jwt")
@@ -4192,7 +4192,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api: access")
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/stations", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Station", "action", "List", "route", "GET /stations", "security", "jwt")
@@ -4215,7 +4215,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		}
 		return ctrl.Update(rctx)
 	}
-	h = handleSecurity("jwt", h, "api: access")
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleStationOrigin(h)
 	service.Mux.Handle("PATCH", "/stations/:stationId", ctrl.MuxHandler("update", h, unmarshalUpdateStationPayload))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Update", "route", "PATCH /stations/:stationId", "security", "jwt")

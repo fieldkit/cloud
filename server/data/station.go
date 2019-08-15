@@ -3,7 +3,7 @@ package data
 type Station struct {
 	ID          int32  `db:"id,omitempty"`
 	Name        string `db:"name"`
-	UserID 			int32  `db:"stationid,omitempty"`
+	UserID 			int32  `db:"user_id,omitempty"`
 }
 
 type StationLog struct {
