@@ -82,7 +82,7 @@ export class Signin extends Component {
             <Unauth>
                 <div className="signin">
                     <header>
-                        <h1>Sign in</h1>
+                        <h1>Sign In</h1>
                     </header>
                     <form onSubmit={ this.onSubmit }>
                         { this.state.errors &&
