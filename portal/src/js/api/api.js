@@ -154,9 +154,9 @@ export class FKApiClient extends JWTAPIClient {
         return this.postWithErrors('/users', u);
     }
 
-    async signIn(username, password): Promise<FKAPIResponse<void>> {
+    async signIn(email, password): Promise<FKAPIResponse<void>> {
         const response = await this.postWithErrors('/login', {
-            username,
+            email,
             password
         });
         if (response.type === 'ok') {

@@ -35,7 +35,7 @@ export class Signin extends Component {
 
     async onSubmit(event) {
         event.preventDefault()
-        const response = await FKApiClient.get().signIn(this.refs.username.value, this.refs.password.value);
+        const response = await FKApiClient.get().signIn(this.refs.email.value, this.refs.password.value);
         log.info(response);
         if (response.type === 'err') {
             if (response.errors) {
@@ -87,12 +87,12 @@ export class Signin extends Component {
                     <form onSubmit={ this.onSubmit }>
                         { this.state.errors &&
                           <p className="errors">
-                              Username or password invalid. Check your information and try again.
+                              Email or password invalid. Check your information and try again.
                           </p> }
                         <div className="content">
-                            <div className={ `group ${errorClass(errors, 'username')}` }>
-                                <label htmlFor="username">Username</label>
-                                <input ref="username" id="username" name="username" type="text" placeholder="" />
+                            <div className={ `group ${errorClass(errors, 'email')}` }>
+                                <label htmlFor="email">E-Mail</label>
+                                <input ref="email" id="email" name="email" type="text" placeholder="" />
                             </div>
                             <div className={ `group ${errorClass(errors, 'password')}` }>
                                 <label htmlFor="password">Password</label>
