@@ -37,7 +37,7 @@ export class App extends Component {
 
     render() {
         return (
-            <Router basename="/admin">
+            <Router basename="/portal">
                 <Switch>
                     <Route exact path="/signin" component={ Signin } />
                     <Route exact path="/signup" component={ Signup } />

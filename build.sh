@@ -87,7 +87,7 @@ Dockerfile' > build/.dockerignore
 echo 'FROM scratch
 ENV FIELDKIT_ADDR=:80
 ENV FIELDKIT_ADMIN_ROOT=/portal
-ENV FIELDKIT_FRONTEND_ROOT=/legacy
+ENV FIELDKIT_LEGACY_ROOT=/legacy
 COPY . /
 ADD ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
