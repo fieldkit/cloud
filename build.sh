@@ -3,11 +3,13 @@
 USER_ID=`id -u $USER`
 
 banner() {
+    set +x
     echo "+------------------------------------------+"
     printf "| %-40s |\n" "`date`"
     echo "|                                          |"
     printf "| %-40s |\n" "$@"
     echo "+------------------------------------------+"
+    set -x
 }
 
 function show_help {
@@ -35,7 +37,7 @@ shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
 
-set -e
+set -xe
 cd `dirname $0`
 
 rm -rf build
