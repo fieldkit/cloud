@@ -1292,6 +1292,117 @@ func (mt *Sources) Validate() (err error) {
 	return
 }
 
+// Station media type (default view)
+//
+// Identifier: application/vnd.app.station+json; view=default
+type Station struct {
+	ID     int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
+	Name   string `form:"name" json:"name" yaml:"name" xml:"name"`
+	UserID int    `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+}
+
+// Validate validates the Station media type instance.
+func (mt *Station) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+
+	return
+}
+
+// StationCollection is the media type for an array of Station (default view)
+//
+// Identifier: application/vnd.app.station+json; type=collection; view=default
+type StationCollection []*Station
+
+// Validate validates the StationCollection media type instance.
+func (mt StationCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// StationLog media type (default view)
+//
+// Identifier: application/vnd.app.stationlog+json; view=default
+type StationLog struct {
+	ID        int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
+	Body      string `form:"body" json:"body" yaml:"body" xml:"body"`
+	StationID int    `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	Timestamp string `form:"timestamp" json:"timestamp" yaml:"timestamp" xml:"timestamp"`
+}
+
+// Validate validates the StationLog media type instance.
+func (mt *StationLog) Validate() (err error) {
+
+	if mt.Body == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Timestamp == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "timestamp"))
+	}
+	return
+}
+
+// StationLogCollection is the media type for an array of StationLog (default view)
+//
+// Identifier: application/vnd.app.stationlog+json; type=collection; view=default
+type StationLogCollection []*StationLog
+
+// Validate validates the StationLogCollection media type instance.
+func (mt StationLogCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// StationLogs media type (default view)
+//
+// Identifier: application/vnd.app.stationlogs+json; view=default
+type StationLogs struct {
+	StationLogs StationLogCollection `form:"station_logs" json:"station_logs" yaml:"station_logs" xml:"station_logs"`
+}
+
+// Validate validates the StationLogs media type instance.
+func (mt *StationLogs) Validate() (err error) {
+	if mt.StationLogs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "station_logs"))
+	}
+	if err2 := mt.StationLogs.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// Stations media type (default view)
+//
+// Identifier: application/vnd.app.stations+json; view=default
+type Stations struct {
+	Stations StationCollection `form:"stations" json:"stations" yaml:"stations" xml:"stations"`
+}
+
+// Validate validates the Stations media type instance.
+func (mt *Stations) Validate() (err error) {
+	if mt.Stations == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "stations"))
+	}
+	if err2 := mt.Stations.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // Team media type (default view)
 //
 // Identifier: application/vnd.app.team+json; view=default

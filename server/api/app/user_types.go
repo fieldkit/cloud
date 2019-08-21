@@ -355,6 +355,165 @@ func (ut *AddProjectPayload) Validate() (err error) {
 	return
 }
 
+// addStationLogPayload user type.
+type addStationLogPayload struct {
+	ID        *int    `form:"ID,omitempty" json:"ID,omitempty" yaml:"ID,omitempty" xml:"ID,omitempty"`
+	Body      *string `form:"body,omitempty" json:"body,omitempty" yaml:"body,omitempty" xml:"body,omitempty"`
+	StationID *int    `form:"station_id,omitempty" json:"station_id,omitempty" yaml:"station_id,omitempty" xml:"station_id,omitempty"`
+	Timestamp *string `form:"timestamp,omitempty" json:"timestamp,omitempty" yaml:"timestamp,omitempty" xml:"timestamp,omitempty"`
+}
+
+// Validate validates the addStationLogPayload type instance.
+func (ut *addStationLogPayload) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "ID"))
+	}
+	if ut.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "station_id"))
+	}
+	if ut.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "body"))
+	}
+	if ut.Timestamp == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "timestamp"))
+	}
+	return
+}
+
+// Publicize creates AddStationLogPayload from addStationLogPayload
+func (ut *addStationLogPayload) Publicize() *AddStationLogPayload {
+	var pub AddStationLogPayload
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Body != nil {
+		pub.Body = *ut.Body
+	}
+	if ut.StationID != nil {
+		pub.StationID = *ut.StationID
+	}
+	if ut.Timestamp != nil {
+		pub.Timestamp = *ut.Timestamp
+	}
+	return &pub
+}
+
+// AddStationLogPayload user type.
+type AddStationLogPayload struct {
+	ID        int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
+	Body      string `form:"body" json:"body" yaml:"body" xml:"body"`
+	StationID int    `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	Timestamp string `form:"timestamp" json:"timestamp" yaml:"timestamp" xml:"timestamp"`
+}
+
+// Validate validates the AddStationLogPayload type instance.
+func (ut *AddStationLogPayload) Validate() (err error) {
+
+	if ut.Body == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "body"))
+	}
+	if ut.Timestamp == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "timestamp"))
+	}
+	return
+}
+
+// addStationLogsPayload user type.
+type addStationLogsPayload struct {
+	StationLogs []*addStationLogPayload `form:"station_logs,omitempty" json:"station_logs,omitempty" yaml:"station_logs,omitempty" xml:"station_logs,omitempty"`
+}
+
+// Validate validates the addStationLogsPayload type instance.
+func (ut *addStationLogsPayload) Validate() (err error) {
+	if ut.StationLogs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "station_logs"))
+	}
+	for _, e := range ut.StationLogs {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Publicize creates AddStationLogsPayload from addStationLogsPayload
+func (ut *addStationLogsPayload) Publicize() *AddStationLogsPayload {
+	var pub AddStationLogsPayload
+	if ut.StationLogs != nil {
+		pub.StationLogs = make([]*AddStationLogPayload, len(ut.StationLogs))
+		for i2, elem2 := range ut.StationLogs {
+			pub.StationLogs[i2] = elem2.Publicize()
+		}
+	}
+	return &pub
+}
+
+// AddStationLogsPayload user type.
+type AddStationLogsPayload struct {
+	StationLogs []*AddStationLogPayload `form:"station_logs" json:"station_logs" yaml:"station_logs" xml:"station_logs"`
+}
+
+// Validate validates the AddStationLogsPayload type instance.
+func (ut *AddStationLogsPayload) Validate() (err error) {
+	if ut.StationLogs == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "station_logs"))
+	}
+	for _, e := range ut.StationLogs {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// addStationPayload user type.
+type addStationPayload struct {
+	Name   *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" yaml:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the addStationPayload type instance.
+func (ut *addStationPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
+	}
+	return
+}
+
+// Publicize creates AddStationPayload from addStationPayload
+func (ut *addStationPayload) Publicize() *AddStationPayload {
+	var pub AddStationPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
+	return &pub
+}
+
+// AddStationPayload user type.
+type AddStationPayload struct {
+	Name   string `form:"name" json:"name" yaml:"name" xml:"name"`
+	UserID int    `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+}
+
+// Validate validates the AddStationPayload type instance.
+func (ut *AddStationPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+
+	return
+}
+
 // addTeamPayload user type.
 type addTeamPayload struct {
 	Description *string `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
