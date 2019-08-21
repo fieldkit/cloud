@@ -1,7 +1,7 @@
 CREATE TABLE fieldkit.station (
   id integer NOT NULL,
   name text NOT NULL,
-  user_id integer REFERENCES fieldkit.user (id) NOT NULL,
+  user_id integer REFERENCES fieldkit.user (id) NOT NULL
 );
 
 CREATE TABLE fieldkit.station_log (

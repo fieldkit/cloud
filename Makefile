@@ -93,12 +93,12 @@ refresh-production: clean-production clone-production
 
 schema-production:
 	mkdir schema-production
-	@if [ -d ~/conservify/dev-ops ]; then                                           \
+	@if [ -d ~/conservify/dev-ops ]; then                                     \
 		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
 		cp ~/conservify/dev-ops/schema.sql schema-production/000001.sql;        \
 		cp ~/conservify/dev-ops/data.sql schema-production/000100.sql;          \
 		cp schema/00000?.sql schema-production/;                                \
-	else                                                                            \
+	else                                                                      \
 		echo "No dev-ops directory found";                                      \
 	fi
 
@@ -106,7 +106,14 @@ clone-production: schema-production
 	rm -f active-schema
 	ln -sf schema-production active-schema
 
-restart-postgres:
+clean-postgres:
+	docker-compose stop postgres
+	rm -f active-schema
+
+active-schema:
+	ln -sf schema active-schema
+
+restart-postgres: active-schema
 	docker-compose stop postgres
 	docker-compose rm -f postgres
 	docker-compose up -d postgres
