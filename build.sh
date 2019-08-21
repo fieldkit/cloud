@@ -1,6 +1,7 @@
 #!/bin/bash
 
 USER_ID=`id -u $USER`
+WORKING_DIRECTORY=`pwd`
 
 banner() {
     set +x
@@ -13,20 +14,24 @@ banner() {
 }
 
 function show_help {
-    echo "build.sh [-h] [-p]"
+    echo "build.sh [-h] [-p] [-w WORKING_DIRECTORY]"
     echo " -h this text"
     echo " -p push image"
+    echo " -w absolute path from HOST to this working copy"
 }
 
 # A POSIX variable
 OPTIND=1
 push=0
 
-while getopts "h?p" opt; do
+while getopts "h?pw:" opt; do
     case "$opt" in
         h|\?)
             show_help
             exit 0
+            ;;
+        w)
+            WORKING_DIRECTORY=$OPTARG
             ;;
         p)  push=1
             ;;
@@ -62,17 +67,17 @@ mkdir build/tmp
 
 mkdir build/api
 docker rm -f fk-server-build > /dev/null 2>&1 || true
-docker run --rm --name fk-server-build -v `pwd`/build:/build fk-server-build \
+docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-server-build \
        sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
 
 mkdir build/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
-docker run --rm --name fk-portal-build -v `pwd`/build/portal:/build fk-portal-build \
+docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/legacy
 docker rm -f fk-legacy-build > /dev/null 2>&1 || true
-docker run --rm --name fk-legacy-build -v `pwd`/build/legacy:/build fk-legacy-build \
+docker run --rm --name fk-legacy-build -v $WORKING_DIRECTORY/build/legacy:/build fk-legacy-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 banner "Final Container"
