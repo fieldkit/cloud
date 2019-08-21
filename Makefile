@@ -19,15 +19,15 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: setup binaries
 
-setup: fieldkit.env frontend/src/js/secrets.js admin/src/js/secrets.js server/inaturalist/secrets.go
+setup: fieldkit.env legacy/src/js/secrets.js portal/src/js/secrets.js server/inaturalist/secrets.go
 
 fieldkit.env:
 	echo FIELDKIT_ADDR=0.0.0.0:8080 > $@
 
-frontend/src/js/secrets.js: frontend/src/js/secrets.js.template
+legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 	cp $^ $@
 
-admin/src/js/secrets.js: admin/src/js/secrets.js.template
+portal/src/js/secrets.js: portal/src/js/secrets.js.template
 	cp $^ $@
 
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
@@ -38,7 +38,7 @@ binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktoo
 all: binaries
 
 tests:
-	cd frontend && yarn run flow
+	cd legacy && yarn run flow
 
 server: $(BUILD)/server
 

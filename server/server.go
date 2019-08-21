@@ -44,10 +44,8 @@ type Config struct {
 	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
 	Emailer               string `split_words:"true" default:"default" required:"true"`
 	Archiver              string `split_words:"true" default:"default" required:"true"`
-	AdminRoot             string `split_words:"true"`
-	FrontendRoot          string `split_words:"true"`
-	LandingRoot           string `split_words:"true"`
-	LandingURL            string `split_words:"true"`
+	PortalRoot            string `split_words:"true"`
+	LegacyRoot            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	ApiDomain             string `split_words:"true" default:""`
 	ApiHost               string `split_words:"true" default:""`
@@ -224,40 +222,28 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 
-	adminServer := notFoundHandler
-	if config.AdminRoot != "" {
+	portalServer := notFoundHandler
+	if config.PortalRoot != "" {
 		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.AdminRoot,
+			Root: config.PortalRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		adminServer = http.StripPrefix("/admin", singlePageApplication)
+		portalServer = http.StripPrefix("/portal", singlePageApplication)
 	}
 
-	frontEndServer := notFoundHandler
-	if config.FrontendRoot != "" {
+	legacyServer := notFoundHandler
+	if config.LegacyRoot != "" {
 		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.FrontendRoot,
+			Root: config.LegacyRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		frontEndServer = singlePageApplication
-	}
-
-	landingServer := notFoundHandler
-	if config.LandingRoot != "" {
-		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.LandingRoot,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		landingServer = singlePageApplication
+		portalServer = http.StripPrefix("/legacy", singlePageApplication)
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
@@ -285,21 +271,15 @@ func main() {
 			}
 
 			if req.Host == config.Domain {
-				if req.URL.Path == "/admin" || strings.HasPrefix(req.URL.Path, "/admin/") {
-					adminServer.ServeHTTP(w, req)
+				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
+					portalServer.ServeHTTP(w, req)
 					return
-				}
-
-				if config.LandingURL == "" {
-					landingServer.ServeHTTP(w, req)
-				} else {
-					http.Redirect(w, req, config.LandingURL, http.StatusSeeOther)
 				}
 				return
 			}
 
 			if strings.HasSuffix(req.Host, suffix) {
-				frontEndServer.ServeHTTP(w, req)
+				legacyServer.ServeHTTP(w, req)
 				return
 			}
 

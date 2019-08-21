@@ -46,14 +46,11 @@ docker build -t fk-server-node-base node-base
 banner "SERVER"
 docker build -t fk-server-build server
 
-banner "ADMIN"
-docker build -t fk-admin-build admin
+banner "PORTAL"
+docker build -t fk-portal-build portal
 
-banner "FRONTEND"
-docker build -t fk-frontend-build frontend
-
-banner "LANDING"
-docker build -t fk-landing-build landing
+banner "LEGACY"
+docker build -t fk-legacy-build legacy
 
 banner "BUILDING"
 
@@ -66,19 +63,14 @@ docker rm -f fk-server-build > /dev/null 2>&1 || true
 docker run --rm --name fk-server-build -v `pwd`/build:/build fk-server-build \
        sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
 
-mkdir build/admin
-docker rm -f fk-admin-build > /dev/null 2>&1 || true
-docker run --rm --name fk-admin-build -v `pwd`/build/admin:/build fk-admin-build \
+mkdir build/portal
+docker rm -f fk-portal-build > /dev/null 2>&1 || true
+docker run --rm --name fk-portal-build -v `pwd`/build/portal:/build fk-portal-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
-mkdir build/frontend
-docker rm -f fk-frontend-build > /dev/null 2>&1 || true
-docker run --rm --name fk-frontend-build -v `pwd`/build/frontend:/build fk-frontend-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
-
-mkdir build/landing
-docker rm -f fk-landing-build > /dev/null 2>&1 || true
-docker run --rm --name fk-landing-build -v `pwd`/build/landing:/build fk-landing-build \
+mkdir build/legacy
+docker rm -f fk-legacy-build > /dev/null 2>&1 || true
+docker run --rm --name fk-legacy-build -v `pwd`/build/legacy:/build fk-legacy-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 banner "Final Container"
@@ -94,9 +86,8 @@ Dockerfile' > build/.dockerignore
 
 echo 'FROM scratch
 ENV FIELDKIT_ADDR=:80
-ENV FIELDKIT_ADMIN_ROOT=/admin
-ENV FIELDKIT_FRONTEND_ROOT=/frontend
-ENV FIELDKIT_LANDING_ROOT=/landing
+ENV FIELDKIT_ADMIN_ROOT=/portal
+ENV FIELDKIT_FRONTEND_ROOT=/legacy
 COPY . /
 ADD ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
