@@ -243,7 +243,7 @@ func main() {
 			panic(err)
 		}
 
-		portalServer = http.StripPrefix("/legacy", singlePageApplication)
+		legacyServer = singlePageApplication
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
@@ -286,10 +286,6 @@ func main() {
 			serveApi(w, req)
 		})),
 	}
-
-	go func() {
-		log.Infof("%v", http.ListenAndServe("0.0.0.0:6060", nil))
-	}()
 
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
