@@ -1,0 +1,44 @@
+@Library('conservify') _
+
+timestamps {
+    node () {
+        try {
+            slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting... (<${env.BUILD_URL}|Open>)"
+
+            stage ('build') {
+                withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
+                    withCredentials([file(credentialsId: 'portal-secrets-js', variable: 'PORTAL_SECRETS_JS')]) {
+                        git url: 'https://github.com/fieldkit/cloud.git'
+                        sh "cp $PORTAL_SECRETS_JS portal/src/js"
+                        sh "cp $PORTAL_SECRETS_JS legacy/src/js"
+
+                        sh "docker rmi conservify/fk-cloud:master || /bin/true"
+
+                        // TODO Find a way to get this dynamically?
+                        sh "./build.sh -w /svr0/jenkins/workspace/fk/portal-deploy-fkdev"
+                    }
+                }
+            }
+
+            slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Archiving..."
+
+            stage ('archive') {
+                sh "docker save conservify/fk-cloud | bzip2 > fkdev-portal-docker-image.tar.bz2"
+                archiveArtifacts "fkdev-portal-docker-image.tar.bz2"
+            }
+
+            stage ('deploy') {
+                sshagent (credentials: ['ssh-fkdev-deploy']) {
+                    sh "scp *.bz2 core@fk-server-a.aws.fkdev.org:"
+                    sh 'ssh -o StrictHostKeyChecking=no core@fk-server-a.aws.fkdev.org ./deploy-fkdev.sh'
+                }
+
+                notifySuccess()
+            }
+        }
+        catch (Exception e) {
+            notifyFailure()
+            throw e
+        }
+    }
+}
