@@ -15,7 +15,7 @@ timestamps {
                         sh "docker rmi conservify/fk-cloud:master || /bin/true"
 
                         // TODO Find a way to get this dynamically?
-                        sh "./build.sh -w /svr0/jenkins/workspace/fk/portal-deploy-fkdev"
+                        sh "./build.sh -w /svr0/jenkins/workspace/fk/deploy-fkdev-portal"
                     }
                 }
             }
