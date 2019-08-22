@@ -3,7 +3,9 @@ package ingester
 import (
 	"context"
 	"fmt"
+	"mime"
 	"net/http"
+	"strconv"
 	"time"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -15,8 +17,20 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	_ "github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/logging"
+)
+
+const (
+	FkDataBinaryContentType    = "application/vnd.fk.data+binary"
+	FkDataBase64ContentType    = "application/vnd.fk.data+base64"
+	MultiPartFormDataMediaType = "multipart/form-data"
+	ContentTypeHeaderName      = "Content-Type"
+	ContentLengthHeaderName    = "Content-Length"
+	XForwardedForHeaderName    = "X-Forwarded-For"
+)
+
+var (
+	ids = logging.NewIdGenerator()
 )
 
 type IngesterOptions struct {
@@ -25,7 +39,7 @@ type IngesterOptions struct {
 	AuthenticationMiddleware goa.Middleware
 }
 
-func authenticate(middleware goa.Middleware, next goa.Handler) goa.Handler {
+func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
 	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
 		ctx = goa.WithRequiredScopes(ctx, []string{"api:access"})
 		return middleware(next)(ctx, res, req)
@@ -33,7 +47,7 @@ func authenticate(middleware goa.Middleware, next goa.Handler) goa.Handler {
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
-	handler := authenticate(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	handler := authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		log := logging.Logger(ctx).Sugar()
 
 		token := jwt.ContextJWT(ctx)
@@ -46,7 +60,14 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			return fmt.Errorf("JWT claims error")
 		}
 
-		log.Infow("begin", "claims", claims)
+		headers, err := NewIncomingHeaders(req)
+		if err != nil {
+			return err
+		}
+
+		_ = claims
+		_ = headers
+		_ = log
 
 		return nil
 	})
@@ -54,8 +75,11 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		startedAt := time.Now()
 
-		ctx := context.Background()
+		ctx := logging.WithNewTaskId(req.Context(), ids)
+
 		log := logging.Logger(ctx).Sugar()
+
+		log.Infow("begin")
 
 		err := handler(ctx, w, req)
 		if err != nil {
@@ -63,5 +87,43 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		log.Infow("completed", "time", time.Since(startedAt).String())
 	})
+}
+
+type IncomingHeaders struct {
+	ContentType     string
+	ContentLength   int32
+	MediaType       string
+	MediaTypeParams map[string]string
+	XForwardedFor   string
+}
+
+func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
+	contentType := req.Header.Get(ContentTypeHeaderName)
+	mediaType, mediaTypeParams, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid %s (%s)", ContentTypeHeaderName, contentType)
+	}
+
+	contentLengthString := req.Header.Get(ContentLengthHeaderName)
+	contentLength, err := strconv.Atoi(contentLengthString)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid %s (%s)", ContentLengthHeaderName, contentLengthString)
+	}
+
+	if contentLength <= 0 {
+		return nil, fmt.Errorf("Invalid %s (%v)", ContentLengthHeaderName, contentLength)
+	}
+
+	headers := &IncomingHeaders{
+		ContentType:     contentType,
+		ContentLength:   int32(contentLength),
+		MediaType:       mediaType,
+		MediaTypeParams: mediaTypeParams,
+		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
+	}
+
+	return headers, nil
 }
