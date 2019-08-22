@@ -10,3 +10,5 @@ aws.env
 fkstreams
 .tern-port
 temp-go
+node_modules
+secrets.js
