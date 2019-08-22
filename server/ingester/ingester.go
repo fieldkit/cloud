@@ -2,10 +2,14 @@ package ingester
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
+
 	"github.com/goadesign/goa"
+	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
@@ -32,7 +36,17 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	handler := authenticate(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		log := logging.Logger(ctx).Sugar()
 
-		log.Infow("begin")
+		token := jwt.ContextJWT(ctx)
+		if token == nil {
+			return fmt.Errorf("JWT token is missing from context")
+		}
+
+		claims, ok := token.Claims.(jwtgo.MapClaims)
+		if !ok {
+			return fmt.Errorf("JWT claims error")
+		}
+
+		log.Infow("begin", "claims", claims)
 
 		return nil
 	})
