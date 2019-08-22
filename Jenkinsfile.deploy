@@ -9,6 +9,7 @@ timestamps {
                 withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
                     withCredentials([file(credentialsId: 'portal-secrets-js', variable: 'PORTAL_SECRETS_JS')]) {
                         git url: 'https://github.com/fieldkit/cloud.git'
+                        sh "rm -f portal/src/js/secrets.js legacy/src/js/secrets.js"
                         sh "cp $PORTAL_SECRETS_JS portal/src/js"
                         sh "cp $PORTAL_SECRETS_JS legacy/src/js"
 
