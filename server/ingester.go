@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/logging"
@@ -31,6 +33,7 @@ type Config struct {
 	AwsSecret         string `split_words:"true" default:""`
 	Archiver          string `split_words:"true" default:"default" required:"true"`
 	BucketName        string `split_words:"true" default:"fk-streams" required:"true"`
+	SessionKey        string `split_words:"true"`
 	Help              bool
 }
 
@@ -55,10 +58,21 @@ func main() {
 		panic(err)
 	}
 
+	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
+	if err != nil {
+		panic(err)
+	}
+
+	jwtMiddleware, err := api.NewJWTMiddleware(jwtHMACKey)
+	if err != nil {
+		panic(err)
+	}
+
 	notFoundHandler := http.NotFoundHandler()
 	ingestion := ingester.Ingester(ctx, &ingester.IngesterOptions{
-		Database:   database,
-		AwsSession: awsSession,
+		Database:                 database,
+		AwsSession:               awsSession,
+		AuthenticationMiddleware: jwtMiddleware,
 	})
 
 	server := &http.Server{
