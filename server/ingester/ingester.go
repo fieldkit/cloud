@@ -2,10 +2,12 @@ package ingester
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"mime"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -27,6 +29,9 @@ const (
 	ContentTypeHeaderName      = "Content-Type"
 	ContentLengthHeaderName    = "Content-Length"
 	XForwardedForHeaderName    = "X-Forwarded-For"
+	FkDeviceIdHeaderName       = "Fk-DeviceId"
+	FkBlocksIdHeaderName       = "Fk-Blocks"
+	FkFlagsIdHeaderName        = "Fk-Flags"
 )
 
 var (
@@ -65,6 +70,8 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			return err
 		}
 
+		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks)
+
 		_ = claims
 		_ = headers
 		_ = log
@@ -98,6 +105,9 @@ type IncomingHeaders struct {
 	MediaType       string
 	MediaTypeParams map[string]string
 	XForwardedFor   string
+	FkDeviceId      []byte
+	FkBlocks        []int32
+	FkFlags         []int32
 }
 
 func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
@@ -117,13 +127,49 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("Invalid %s (%v)", ContentLengthHeaderName, contentLength)
 	}
 
+	deviceIdRaw := req.Header.Get(FkDeviceIdHeaderName)
+	if len(deviceIdRaw) == 0 {
+		return nil, fmt.Errorf("Invalid %s (No header)", FkDeviceIdHeaderName)
+	}
+
+	deviceId, err := base64.StdEncoding.DecodeString(deviceIdRaw)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid %s (%v)", FkDeviceIdHeaderName, err)
+	}
+
+	blocks, err := parseBlocks(req.Header.Get(FkBlocksIdHeaderName))
+	if err != nil {
+		return nil, fmt.Errorf("Invalid %s (%v)", FkBlocksIdHeaderName, err)
+	}
+
 	headers := &IncomingHeaders{
 		ContentType:     contentType,
 		ContentLength:   int32(contentLength),
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
 		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
+		FkDeviceId:      deviceId,
+		FkBlocks:        blocks,
 	}
 
 	return headers, nil
+}
+
+func parseBlocks(s string) ([]int32, error) {
+	parts := strings.Split(s, ",")
+
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("Malformed block range")
+	}
+
+	blocks := make([]int32, 2)
+	for i, p := range parts {
+		b, err := strconv.Atoi(strings.TrimSpace(p))
+		if err != nil {
+			return nil, err
+		}
+		blocks[i] = int32(b)
+	}
+
+	return blocks, nil
 }
