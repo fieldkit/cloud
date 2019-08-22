@@ -33,7 +33,7 @@ portal/src/js/secrets.js: portal/src/js/secrets.js.template
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/fkflash $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/fkflash $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
 
 all: binaries
 
@@ -42,10 +42,15 @@ tests:
 
 server: $(BUILD)/server
 
+ingester: $(BUILD)/ingester
+
 fktool: $(BUILD)/fktool
 
 $(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
 	cd server && $(GO) build -o $@ server.go
+
+$(BUILD)/ingester: $(SERVER_SOURCES) server/inaturalist/secrets.go
+	cd server && $(GO) build -o $@ ingester.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	cd server/tools/fktool && $(GO) build -o $@ *.go

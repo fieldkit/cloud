@@ -97,6 +97,7 @@ func insecureRedirection(next http.Handler) http.Handler {
 		next.ServeHTTP(res, req)
 	})
 }
+
 func main() {
 	var config Config
 
@@ -313,10 +314,10 @@ func createArchiver(ctx context.Context, awsSession *session.Session, config Con
 	case "aws":
 		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
-		panic("Invalid archiver")
+		panic("Unknown archiver: " + config.Archiver)
 	}
 
-	log.Infow("Selected", "archiver", config.Archiver)
+	log.Infow("Configuration", "archiver", config.Archiver)
 
 	return
 }
