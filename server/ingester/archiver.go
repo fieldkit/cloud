@@ -2,6 +2,7 @@ package ingester
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -106,13 +107,9 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, headers *IncomingHeaders
 	uploader := s3manager.NewUploader(a.session)
 
 	metadata := make(map[string]*string)
-
-	// metadata[FkProcessingHeaderName] = aws.String(headers.FkProcessing)
-	// metadata[FkVersionHeaderName] = aws.String(headers.FkVersion)
-	// metadata[FkBuildHeaderName] = aws.String(headers.FkBuild)
-	// metadata[FkDeviceIdHeaderName] = aws.String(headers.FkDeviceId)
-	// metadata[FkFileIdHeaderName] = aws.String(headers.FkFileId)
-	// metadata[FkFileNameHeaderName] = aws.String(headers.FkFileName)
+	metadata[FkDeviceIdHeaderName] = aws.String(hex.EncodeToString(headers.FkDeviceId))
+	metadata[FkBlocksIdHeaderName] = aws.String(fmt.Sprintf("%v", headers.FkBlocks))
+	metadata[FkFlagsIdHeaderName] = aws.String(fmt.Sprintf("%v", headers.FkFlags))
 
 	countingReader := NewCountingReader(reader)
 
