@@ -1,3 +1,3 @@
 #!/bin/bash
 
-(cd portal && yarn start)
+(cd portal && npm run serve)
