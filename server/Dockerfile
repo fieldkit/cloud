@@ -1,5 +1,9 @@
-FROM golang:1.12.1
+FROM golang:1.12.9
 ENV CGO_ENABLED=0
-COPY . $GOPATH/src/github.com/fieldkit/cloud/server
-WORKDIR $GOPATH/src/github.com/fieldkit/cloud/server
-RUN go get ./... && go install -ldflags '-extldflags "-static"' .
+
+COPY . /app
+WORKDIR /app
+
+RUN mkdir /app/build && \
+    go build -o /app/build/server -ldflags '-extldflags "-static"' server.go && \
+    go build -o /app/build/ingester -ldflags '-extldflags "-static"' ingester.go

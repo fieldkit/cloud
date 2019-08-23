@@ -19,7 +19,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: setup binaries
 
-setup: fieldkit.env legacy/src/js/secrets.js portal/src/js/secrets.js server/inaturalist/secrets.go
+setup: fieldkit.env legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js server/inaturalist/secrets.go
 
 fieldkit.env:
 	echo FIELDKIT_ADDR=0.0.0.0:8080 > $@
@@ -27,7 +27,10 @@ fieldkit.env:
 legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 	cp $^ $@
 
-portal/src/js/secrets.js: portal/src/js/secrets.js.template
+ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
+	cp $^ $@
+
+portal/src/secrets.js: portal/src/secrets.js.template
 	cp $^ $@
 
 server/inaturalist/secrets.go: server/inaturalist/secrets.go.template

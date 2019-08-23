@@ -68,12 +68,12 @@ mkdir build/tmp
 mkdir build/api
 docker rm -f fk-server-build > /dev/null 2>&1 || true
 docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-server-build \
-       sh -c "cp -r \$GOPATH/bin/server /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
+       sh -c "cp -r /app/build/* /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
 
 mkdir build/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+       sh -c "cp -r /usr/app/dist/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/legacy
 docker rm -f fk-legacy-build > /dev/null 2>&1 || true
