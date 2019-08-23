@@ -2,7 +2,7 @@
     <div>
         <div id="white-header" class="header">
             <div class="user-name">{{ this.user.name }}</div>
-            <div class="log-out" v-on:click="logout">Log out</div>
+            <div class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</div>
         </div>
 
         <div id="sidebar-nav">
@@ -10,30 +10,57 @@
                 <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_White.png" />
             </div>
             <div id="inner-nav">
-                <div class="nav-label">
-                    <div class="selected"></div>
+                <div class="nav-label" v-on:click="showProjects">
                     <img alt="Projects" src="../assets/projects.png" />
-                    <span>Projects</span>
+                    <span>
+                        Projects
+                        <div class="selected" v-if="viewingProjects || addingProject"></div>
+                    </span>
                     <span class="small-nav-text">Default FieldKit Project</span>
                 </div>
-                <div class="nav-label">
+                <div class="nav-label" v-on:click="showStations">
                     <img alt="Stations" src="../assets/stations.png" />
-                    Stations
+                    <span>
+                        Stations
+                        <div class="selected" v-if="viewingStations"></div>
+                    </span>
                 </div>
-                <div class="nav-label">
+                <div class="nav-label" v-on:click="showData">
                     <img alt="Data" src="../assets/data.png" />
-                    Data
+                    <span>
+                        Data
+                        <div class="selected" v-if="viewingData"></div>
+                    </span>
                 </div>
             </div>
         </div>
 
         <div class="dashboard">
-            <div class="section">
-                <h1>My Projects</h1>
-                <img alt="Default Fieldkit Project" src="../assets/default.png" />
+            <div id="projects-section" v-if="viewingProjects">
+                <div class="section">
+                    <div id="add-project" v-on:click="addProject">
+                        <img alt="Add project" src="../assets/add.png" />
+                        Add Project
+                    </div>
+                    <h1>My Projects</h1>
+                    <img alt="Default Fieldkit Project" src="../assets/default.png" />
+                </div>
+                <div class="section">
+                    <h1>Community</h1>
+                </div>
             </div>
-            <div class="section">
-                <h1>Community</h1>
+            <div v-if="addingProject">
+                <ProjectForm @closeProjectForm="closeAddProject" />
+            </div>
+            <div id="stations-section" v-if="viewingStations">
+                <div class="section">
+                    <h1>Stations</h1>
+                </div>
+            </div>
+            <div id="data-section" v-if="viewingData">
+                <div class="section">
+                    <h1>Data</h1>
+                </div>
             </div>
         </div>
     </div>
@@ -41,17 +68,30 @@
 
 <script>
 import FKApi from "../api/api";
+import ProjectForm from "../components/ProjectForm";
 
 export default {
     name: "dashboard",
+    components: {
+        ProjectForm
+    },
     data: () => {
-        return { user: {}, stations: {} };
+        return {
+            user: {},
+            stations: {},
+            isAuthenticated: false,
+            viewingProjects: true,
+            viewingStations: false,
+            viewingData: false,
+            addingProject: false
+        };
     },
     async beforeCreate() {
         const api = new FKApi();
         if (api.authenticated()) {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
+            this.isAuthenticated = true;
             // console.log("this is the user info", this.user);
             // console.log("this is the station info", this.stations);
         }
@@ -61,6 +101,32 @@ export default {
             const api = new FKApi();
             api.logout();
             this.$router.push({ name: "login" });
+        },
+        addProject() {
+            this.resetVisible();
+            this.addingProject = true;
+        },
+        closeAddProject() {
+            this.resetVisible();
+            this.viewingProjects = true;
+        },
+        showProjects() {
+            this.resetVisible();
+            this.viewingProjects = true;
+        },
+        showStations() {
+            this.resetVisible();
+            this.viewingStations = true;
+        },
+        showData() {
+            this.resetVisible();
+            this.viewingData = true;
+        },
+        resetVisible() {
+            this.addingProject = false;
+            this.viewingProjects = false;
+            this.viewingStations = false;
+            this.viewingData = false;
         }
     }
 };
@@ -109,6 +175,7 @@ export default {
     font-weight: bold;
     font-size: 16px;
     margin: 12px 0;
+    cursor: pointer;
 }
 .nav-label img {
     vertical-align: bottom;
@@ -143,5 +210,14 @@ export default {
     width: 800px;
     padding-bottom: 40px;
     border-bottom: 2px solid rgb(235, 235, 235);
+}
+
+#add-project {
+    float: right;
+    padding: 12px;
+    cursor: pointer;
+}
+#add-project img {
+    vertical-align: bottom;
 }
 </style>

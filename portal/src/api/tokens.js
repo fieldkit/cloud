@@ -8,7 +8,6 @@ export default class TokenStorage {
     }
 
     authenticated() {
-        console.log("authenticated token", this.token);
         return this.token != null;
     }
 
