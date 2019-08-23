@@ -58,8 +58,8 @@ func (c *Client) NewAddStationRequest(ctx context.Context, path string, payload 
 }
 
 // GetStationPath computes a request path to the get action of station.
-func GetStationPath(station string) string {
-	param0 := station
+func GetStationPath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
 
 	return fmt.Sprintf("/stations/@/%s", param0)
 }

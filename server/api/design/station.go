@@ -80,10 +80,10 @@ var _ = Resource("station", func() {
 
 	Action("get", func() {
 		NoSecurity()
-		Routing(GET("stations/@/:station"))
+		Routing(GET("stations/@/:stationId"))
 		Description("Get a station")
 		Params(func() {
-			Param("station", String)
+			Param("stationId", Integer)
 		})
 		Response(BadRequest)
 		Response(OK, func() {

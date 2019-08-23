@@ -4138,7 +4138,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/stations/@/:station", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -4177,8 +4177,8 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		return ctrl.Get(rctx)
 	}
 	h = handleStationOrigin(h)
-	service.Mux.Handle("GET", "/stations/@/:station", ctrl.MuxHandler("get", h, nil))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:station")
+	service.Mux.Handle("GET", "/stations/@/:stationId", ctrl.MuxHandler("get", h, nil))
+	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:stationId")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

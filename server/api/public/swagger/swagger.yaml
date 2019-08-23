@@ -1386,7 +1386,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+          Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1395,7 +1395,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+          Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1404,7 +1404,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+          Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
         type: Magnam sunt debitis rerum rerum et quia.
       type: Incidunt consequatur magni et.
     properties:
@@ -1428,7 +1428,7 @@ definitions:
         - 0.3663572725572787
         type: Ad consectetur occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+        Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
       type: Magnam sunt debitis rerum rerum et quia.
     properties:
       geometry:
@@ -1436,7 +1436,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+          Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
         type: object
       type:
         example: Magnam sunt debitis rerum rerum et quia.
@@ -1458,7 +1458,7 @@ definitions:
         - 0.3663572725572787
         type: Ad consectetur occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+        Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
       type: Magnam sunt debitis rerum rerum et quia.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1606,7 +1606,7 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+              Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1615,7 +1615,7 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+              Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1624,7 +1624,7 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+              Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
             type: Magnam sunt debitis rerum rerum et quia.
           type: Incidunt consequatur magni et.
         hasMore: false
@@ -1745,7 +1745,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+            Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1754,7 +1754,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+            Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1763,7 +1763,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 482d6e6b-54a9-43fb-99a0-e5da075d179b
+            Deleniti rem sint velit ad laboriosam.: 1002c0f6-e45c-4090-864d-302f7444cddc
           type: Magnam sunt debitis rerum rerum et quia.
         type: Incidunt consequatur magni et.
       hasMore: false
@@ -2675,7 +2675,7 @@ definitions:
     example:
       name: Distinctio omnis.
       status_json:
-        Ex alias sunt repellendus.: 5369a3ba-d40e-4e63-b4e7-a810de19927c
+        Ex alias sunt repellendus.: fed393e0-c3e9-49d9-b733-b6ed862eeff1
     properties:
       name:
         example: Distinctio omnis.
@@ -2683,7 +2683,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Ex alias sunt repellendus.: 5369a3ba-d40e-4e63-b4e7-a810de19927c
+          Ex alias sunt repellendus.: fed393e0-c3e9-49d9-b733-b6ed862eeff1
         type: object
     required:
     - name
@@ -5130,15 +5130,15 @@ paths:
       summary: add station
       tags:
       - station
-  /stations/@/{station}:
+  /stations/@/{stationId}:
     get:
       description: Get a station
       operationId: station#get
       parameters:
       - in: path
-        name: station
+        name: stationId
         required: true
-        type: string
+        type: integer
       produces:
       - application/vnd.app.station+json
       responses:

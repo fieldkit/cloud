@@ -63,14 +63,9 @@ func NewStationController(service *goa.Service, options StationControllerOptions
 }
 
 func (c *StationController) Add(ctx *app.AddStationContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context")
-	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return fmt.Errorf("JWT claims error")
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
 	}
 
 	deviceId, err := hex.DecodeString(ctx.Payload.DeviceID)
@@ -79,7 +74,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1 AND device_id = $2", claims["sub"], deviceId); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1 AND device_id = $2", p.UserID, deviceId); err != nil {
 		return err
 	}
 
@@ -93,7 +88,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 
 	station := &data.Station{
 		Name:     ctx.Payload.Name,
-		OwnerID:  int32(claims["sub"].(float64)),
+		OwnerID:  p.UserID,
 		DeviceID: deviceId,
 	}
 
@@ -111,6 +106,16 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 }
 
 func (c *StationController) Update(ctx *app.UpdateStationContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStation(int32(ctx.StationID))
+	if err != nil {
+		return err
+	}
+
 	station := &data.Station{
 		ID:   int32(ctx.StationID),
 		Name: ctx.Payload.Name,
@@ -130,8 +135,18 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 }
 
 func (c *StationController) Get(ctx *app.GetStationContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanViewStation(int32(ctx.StationID))
+	if err != nil {
+		return err
+	}
+
 	station := &data.Station{}
-	if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE name = $1", ctx.Station); err != nil {
+	if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE name = $1", ctx.StationID); err != nil {
 		return err
 	}
 

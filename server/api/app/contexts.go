@@ -3370,7 +3370,7 @@ type GetStationContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Station string
+	StationID int
 }
 
 // NewGetStationContext parses the incoming request URL and body, performs validations and creates the
@@ -3382,10 +3382,14 @@ func NewGetStationContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetStationContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramStation := req.Params["station"]
-	if len(paramStation) > 0 {
-		rawStation := paramStation[0]
-		rctx.Station = rawStation
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
 	}
 	return &rctx, err
 }
