@@ -20,9 +20,10 @@ type StationControllerOptions struct {
 
 func StationType(station *data.Station) *app.Station {
 	return &app.Station{
-		ID:     int(station.ID),
-		Name:   station.Name,
-		UserID: int(station.UserID),
+		ID:       int(station.ID),
+		OwnerID:  int(station.OwnerID),
+		DeviceID: int(station.DeviceID),
+		Name:     station.Name,
 	}
 }
 
@@ -66,7 +67,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		UserID: claims["sub"].(int32), // NOTE Untested.
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, user_id) VALUES (:name, :user_id) RETURNING *", station); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id, name) VALUES (:name, :device_id, :owner_id, :name) RETURNING *", station); err != nil {
 		return err
 	}
 
