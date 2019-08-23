@@ -317,7 +317,7 @@ func createArchiver(ctx context.Context, awsSession *session.Session, config Con
 		panic("Unknown archiver: " + config.Archiver)
 	}
 
-	log.Infow("Configuration", "archiver", config.Archiver)
+	log.Infow("configuration", "archiver", config.Archiver)
 
 	return
 }

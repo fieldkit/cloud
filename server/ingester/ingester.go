@@ -10,6 +10,9 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/jmoiron/sqlx/types"
+	"github.com/lib/pq"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 
 	"github.com/goadesign/goa"
@@ -42,17 +45,15 @@ type IngesterOptions struct {
 	Database                 *sqlxcache.DB
 	AwsSession               *session.Session
 	AuthenticationMiddleware goa.Middleware
+	Archiver                 StreamArchiver
 }
 
-func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
-	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
-		ctx = goa.WithRequiredScopes(ctx, []string{"api:access"})
-		return middleware(next)(ctx, res, req)
-	}
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	handler := authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+		startedAt := time.Now()
+
 		log := logging.Logger(ctx).Sugar()
 
 		token := jwt.ContextJWT(ctx)
@@ -71,6 +72,23 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 
 		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks)
+
+		if saved, err := o.Archiver.Archive(ctx, headers, req.Body); err != nil {
+			return err
+		} else {
+			if saved != nil {
+				if saved.BytesRead != int(headers.ContentLength) {
+					log.Warnw("size mismatch", "expected", headers.ContentLength, "actual", saved.BytesRead)
+				}
+
+				log.Infow("saved", "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
+			} else {
+				log.Infow("unsaved", "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
+			}
+
+			// TODO Give information.
+			w.WriteHeader(http.StatusOK)
+		}
 
 		_ = claims
 		_ = headers
@@ -172,4 +190,11 @@ func parseBlocks(s string) ([]int32, error) {
 	}
 
 	return blocks, nil
+}
+
+func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
+	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
+		ctx = goa.WithRequiredScopes(ctx, []string{"api:access"})
+		return middleware(next)(ctx, res, req)
+	}
 }

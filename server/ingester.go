@@ -19,7 +19,6 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/logging"
 )
@@ -58,6 +57,11 @@ func main() {
 		panic(err)
 	}
 
+	archiver, err := createArchiver(ctx, config, awsSession)
+	if err != nil {
+		panic(err)
+	}
+
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
 		panic(err)
@@ -73,6 +77,7 @@ func main() {
 		Database:                 database,
 		AwsSession:               awsSession,
 		AuthenticationMiddleware: jwtMiddleware,
+		Archiver:                 archiver,
 	})
 
 	server := &http.Server{
@@ -140,19 +145,19 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
-func createArchiver(ctx context.Context, awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
+func createArchiver(ctx context.Context, config *Config, awsSession *session.Session) (archiver ingester.StreamArchiver, err error) {
 	log := logging.Logger(ctx).Sugar()
 
 	switch config.Archiver {
 	case "default":
-		archiver = &backend.FileStreamArchiver{}
+		archiver = ingester.NewFileStreamArchiver()
 	case "aws":
-		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
+		archiver = ingester.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
 		panic("Unknown archiver: " + config.Archiver)
 	}
 
-	log.Infow("Configuration", "archiver", config.Archiver)
+	log.Infow("configuration", "archiver", config.Archiver)
 
 	return
 }
