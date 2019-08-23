@@ -4209,7 +4209,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*AddStationPayload)
+			rctx.Payload = rawPayload.(*UpdateStationPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
@@ -4372,7 +4372,7 @@ func unmarshalAddStationPayload(ctx context.Context, service *goa.Service, req *
 
 // unmarshalUpdateStationPayload unmarshals the request body into the context request data Payload field.
 func unmarshalUpdateStationPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &addStationPayload{}
+	payload := &updateStationPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

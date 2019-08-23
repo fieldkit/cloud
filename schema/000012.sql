@@ -3,7 +3,8 @@ CREATE TABLE fieldkit.station (
   owner_id integer REFERENCES fieldkit.user (id) NOT NULL,
   device_id bytea NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),
-  name text NOT NULL
+  name text NOT NULL,
+  status_json json NOT NULL
 );
 
 CREATE UNIQUE INDEX ON fieldkit.station (device_id);

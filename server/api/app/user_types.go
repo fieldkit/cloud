@@ -472,8 +472,9 @@ func (ut *AddStationLogsPayload) Validate() (err error) {
 
 // addStationPayload user type.
 type addStationPayload struct {
-	DeviceID *string `form:"device_id,omitempty" json:"device_id,omitempty" yaml:"device_id,omitempty" xml:"device_id,omitempty"`
-	Name     *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	DeviceID   *string                `form:"device_id,omitempty" json:"device_id,omitempty" yaml:"device_id,omitempty" xml:"device_id,omitempty"`
+	Name       *string                `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" yaml:"status_json,omitempty" xml:"status_json,omitempty"`
 }
 
 // Validate validates the addStationPayload type instance.
@@ -483,6 +484,9 @@ func (ut *addStationPayload) Validate() (err error) {
 	}
 	if ut.DeviceID == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "device_id"))
+	}
+	if ut.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "status_json"))
 	}
 	return
 }
@@ -496,13 +500,17 @@ func (ut *addStationPayload) Publicize() *AddStationPayload {
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
+	if ut.StatusJSON != nil {
+		pub.StatusJSON = ut.StatusJSON
+	}
 	return &pub
 }
 
 // AddStationPayload user type.
 type AddStationPayload struct {
-	DeviceID string `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
-	Name     string `form:"name" json:"name" yaml:"name" xml:"name"`
+	DeviceID   string                 `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
+	Name       string                 `form:"name" json:"name" yaml:"name" xml:"name"`
+	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
 }
 
 // Validate validates the AddStationPayload type instance.
@@ -512,6 +520,9 @@ func (ut *AddStationPayload) Validate() (err error) {
 	}
 	if ut.DeviceID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "device_id"))
+	}
+	if ut.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "status_json"))
 	}
 	return
 }
@@ -1482,6 +1493,52 @@ type UpdateSourcePayload struct {
 func (ut *UpdateSourcePayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	return
+}
+
+// updateStationPayload user type.
+type updateStationPayload struct {
+	Name       *string                `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" yaml:"status_json,omitempty" xml:"status_json,omitempty"`
+}
+
+// Validate validates the updateStationPayload type instance.
+func (ut *updateStationPayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "status_json"))
+	}
+	return
+}
+
+// Publicize creates UpdateStationPayload from updateStationPayload
+func (ut *updateStationPayload) Publicize() *UpdateStationPayload {
+	var pub UpdateStationPayload
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.StatusJSON != nil {
+		pub.StatusJSON = ut.StatusJSON
+	}
+	return &pub
+}
+
+// UpdateStationPayload user type.
+type UpdateStationPayload struct {
+	Name       string                 `form:"name" json:"name" yaml:"name" xml:"name"`
+	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
+}
+
+// Validate validates the UpdateStationPayload type instance.
+func (ut *UpdateStationPayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "status_json"))
 	}
 	return
 }

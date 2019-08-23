@@ -8,7 +8,14 @@ import (
 var AddStationPayload = Type("AddStationPayload", func() {
 	Attribute("name", String)
 	Attribute("device_id", String)
-	Required("name", "device_id")
+	Attribute("status_json", HashOf(String, Any))
+	Required("name", "device_id", "status_json")
+})
+
+var UpdateStationPayload = Type("UpdateStationPayload", func() {
+	Attribute("name", String)
+	Attribute("status_json", HashOf(String, Any))
+	Required("name", "status_json")
 })
 
 var Station = MediaType("application/vnd.app.station+json", func() {
@@ -19,13 +26,15 @@ var Station = MediaType("application/vnd.app.station+json", func() {
 		Attribute("name")
 		Attribute("owner_id", Integer)
 		Attribute("device_id", String)
-		Required("id", "name", "owner_id", "device_id")
+		Attribute("status_json", HashOf(String, Any))
+		Required("id", "name", "owner_id", "device_id", "status_json")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("owner_id")
 		Attribute("device_id")
+		Attribute("status_json")
 	})
 })
 
@@ -62,7 +71,7 @@ var _ = Resource("station", func() {
 			Param("stationId", Integer)
 			Required("stationId")
 		})
-		Payload(AddStationPayload)
+		Payload(UpdateStationPayload)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Station)

@@ -19,25 +19,35 @@ type StationControllerOptions struct {
 	Database *sqlxcache.DB
 }
 
-func StationType(station *data.Station) *app.Station {
-	return &app.Station{
-		ID:       int(station.ID),
-		OwnerID:  int(station.OwnerID),
-		DeviceID: hex.EncodeToString(station.DeviceID),
-		Name:     station.Name,
+func StationType(station *data.Station) (*app.Station, error) {
+	status, err := station.GetStatus()
+	if err != nil {
+		return nil, err
 	}
+
+	return &app.Station{
+		ID:         int(station.ID),
+		OwnerID:    int(station.OwnerID),
+		DeviceID:   hex.EncodeToString(station.DeviceID),
+		Name:       station.Name,
+		StatusJSON: status,
+	}, nil
 }
 
-func StationsType(stations []*data.Station) *app.Stations {
+func StationsType(stations []*data.Station) (*app.Stations, error) {
 	stationsCollection := make([]*app.Station, len(stations))
 
 	for i, station := range stations {
-		stationsCollection[i] = StationType(station)
+		appStation, err := StationType(station)
+		if err != nil {
+			return nil, err
+		}
+		stationsCollection[i] = appStation
 	}
 
 	return &app.Stations{
 		Stations: stationsCollection,
-	}
+	}, nil
 }
 
 type StationController struct {
@@ -74,7 +84,11 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 	}
 
 	if len(stations) > 0 {
-		return ctx.OK(StationType(stations[0]))
+		svm, err := StationType(stations[0])
+		if err != nil {
+			return err
+		}
+		return ctx.OK(svm)
 	}
 
 	station := &data.Station{
@@ -83,11 +97,17 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		DeviceID: deviceId,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id) VALUES (:name, :device_id, :owner_id) RETURNING *", station); err != nil {
+	station.SetStatus(ctx.Payload.StatusJSON)
+
+	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id, status_json) VALUES (:name, :device_id, :owner_id, :status_json) RETURNING *", station); err != nil {
 		return err
 	}
 
-	return ctx.OK(StationType(station))
+	svm, err := StationType(station)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(svm)
 }
 
 func (c *StationController) Update(ctx *app.UpdateStationContext) error {
@@ -96,11 +116,17 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		Name: ctx.Payload.Name,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, station, "UPDATE fieldkit.station SET name = :name, WHERE id = :id RETURNING *", station); err != nil {
+	station.SetStatus(ctx.Payload.StatusJSON)
+
+	if err := c.options.Database.NamedGetContext(ctx, station, "UPDATE fieldkit.station SET name = :name, status_json = :status_json WHERE id = :id RETURNING *", station); err != nil {
 		return err
 	}
 
-	return ctx.OK(StationType(station))
+	svm, err := StationType(station)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(svm)
 }
 
 func (c *StationController) Get(ctx *app.GetStationContext) error {
@@ -109,7 +135,11 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	return ctx.OK(StationType(station))
+	svm, err := StationType(station)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(svm)
 }
 
 func (c *StationController) List(ctx *app.ListStationContext) error {
@@ -128,5 +158,9 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 		return err
 	}
 
-	return ctx.OK(StationsType(stations))
+	stationsWm, err := StationsType(stations)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(stationsWm)
 }

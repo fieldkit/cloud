@@ -3443,7 +3443,7 @@ type UpdateStationContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	StationID int
-	Payload   *AddStationPayload
+	Payload   *UpdateStationPayload
 }
 
 // NewUpdateStationContext parses the incoming request URL and body, performs validations and creates the

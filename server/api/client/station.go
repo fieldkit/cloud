@@ -129,7 +129,7 @@ func UpdateStationPath(stationID int) string {
 }
 
 // Update a station
-func (c *Client) UpdateStation(ctx context.Context, path string, payload *AddStationPayload) (*http.Response, error) {
+func (c *Client) UpdateStation(ctx context.Context, path string, payload *UpdateStationPayload) (*http.Response, error) {
 	req, err := c.NewUpdateStationRequest(ctx, path, payload)
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func (c *Client) UpdateStation(ctx context.Context, path string, payload *AddSta
 }
 
 // NewUpdateStationRequest create the request corresponding to the update action endpoint of the station resource.
-func (c *Client) NewUpdateStationRequest(ctx context.Context, path string, payload *AddStationPayload) (*http.Request, error) {
+func (c *Client) NewUpdateStationRequest(ctx context.Context, path string, payload *UpdateStationPayload) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
 	if err != nil {
