@@ -1,10 +1,15 @@
 package data
 
+import (
+	"time"
+)
+
 type Station struct {
-	ID       int32  `db:"id,omitempty"`
-	Name     string `db:"name"`
-	DeviceID []byte `db:device_id`
-	OwnerID  int32  `db:"owner,omitempty"`
+	ID        int32     `db:"id,omitempty"`
+	Name      string    `db:"name"`
+	DeviceID  []byte    `db:"device_id"`
+	OwnerID   int32     `db:"owner_id,omitempty"`
+	CreatedAt time.Time `db:"created_at,omitempty"`
 }
 
 type StationLog struct {

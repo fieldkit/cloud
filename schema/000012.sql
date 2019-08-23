@@ -1,5 +1,5 @@
 CREATE TABLE fieldkit.station (
-  id integer NOT NULL,
+  id serial PRIMARY KEY,
   owner_id integer REFERENCES fieldkit.user (id) NOT NULL,
   device_id bytea NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),
@@ -9,8 +9,8 @@ CREATE TABLE fieldkit.station (
 CREATE UNIQUE INDEX ON fieldkit.station (device_id);
 
 CREATE TABLE fieldkit.station_log (
-  id integer NOT NULL,
-  station_id integer NOT NULL,
-  body text,
-  timestamp TIMESTAMP NOT NULL
+  id serial PRIMARY KEY,
+  station_id integer NOT NULL REFERENCES fieldkit.station (id) NOT NULL,
+  timestamp TIMESTAMP NOT NULL,
+  body text
 );

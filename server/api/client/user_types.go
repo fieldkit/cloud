@@ -472,8 +472,8 @@ func (ut *AddStationLogsPayload) Validate() (err error) {
 
 // addStationPayload user type.
 type addStationPayload struct {
-	Name   *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	UserID *int    `form:"user_id,omitempty" json:"user_id,omitempty" yaml:"user_id,omitempty" xml:"user_id,omitempty"`
+	DeviceID *string `form:"device_id,omitempty" json:"device_id,omitempty" yaml:"device_id,omitempty" xml:"device_id,omitempty"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
 }
 
 // Validate validates the addStationPayload type instance.
@@ -481,8 +481,8 @@ func (ut *addStationPayload) Validate() (err error) {
 	if ut.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
 	}
-	if ut.UserID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
+	if ut.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "device_id"))
 	}
 	return
 }
@@ -490,19 +490,19 @@ func (ut *addStationPayload) Validate() (err error) {
 // Publicize creates AddStationPayload from addStationPayload
 func (ut *addStationPayload) Publicize() *AddStationPayload {
 	var pub AddStationPayload
+	if ut.DeviceID != nil {
+		pub.DeviceID = *ut.DeviceID
+	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
-	}
-	if ut.UserID != nil {
-		pub.UserID = *ut.UserID
 	}
 	return &pub
 }
 
 // AddStationPayload user type.
 type AddStationPayload struct {
-	Name   string `form:"name" json:"name" yaml:"name" xml:"name"`
-	UserID int    `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+	DeviceID string `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
+	Name     string `form:"name" json:"name" yaml:"name" xml:"name"`
 }
 
 // Validate validates the AddStationPayload type instance.
@@ -510,7 +510,9 @@ func (ut *AddStationPayload) Validate() (err error) {
 	if ut.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
 	}
-
+	if ut.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "device_id"))
+	}
 	return
 }
 

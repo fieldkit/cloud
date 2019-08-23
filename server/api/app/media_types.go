@@ -1296,9 +1296,10 @@ func (mt *Sources) Validate() (err error) {
 //
 // Identifier: application/vnd.app.station+json; view=default
 type Station struct {
-	ID     int    `form:"ID" json:"ID" yaml:"ID" xml:"ID"`
-	Name   string `form:"name" json:"name" yaml:"name" xml:"name"`
-	UserID int    `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+	DeviceID string `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
+	ID       int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name     string `form:"name" json:"name" yaml:"name" xml:"name"`
+	OwnerID  int    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
 }
 
 // Validate validates the Station media type instance.
@@ -1308,6 +1309,9 @@ func (mt *Station) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
 
+	if mt.DeviceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
+	}
 	return
 }
 

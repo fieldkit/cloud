@@ -7,23 +7,25 @@ import (
 
 var AddStationPayload = Type("AddStationPayload", func() {
 	Attribute("name", String)
-	Attribute("user_id", Integer)
-	Required("name", "user_id")
+	Attribute("device_id", String)
+	Required("name", "device_id")
 })
 
 var Station = MediaType("application/vnd.app.station+json", func() {
 	TypeName("Station")
 	Reference(AddStationPayload)
 	Attributes(func() {
-		Attribute("ID", Integer)
+		Attribute("id", Integer)
 		Attribute("name")
-		Attribute("user_id", Integer)
-		Required("ID", "name", "user_id")
+		Attribute("owner_id", Integer)
+		Attribute("device_id", String)
+		Required("id", "name", "owner_id", "device_id")
 	})
 	View("default", func() {
-		Attribute("ID")
+		Attribute("id")
 		Attribute("name")
-		Attribute("user_id")
+		Attribute("owner_id")
+		Attribute("device_id")
 	})
 })
 

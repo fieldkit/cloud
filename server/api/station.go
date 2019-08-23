@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -22,7 +23,7 @@ func StationType(station *data.Station) *app.Station {
 	return &app.Station{
 		ID:       int(station.ID),
 		OwnerID:  int(station.OwnerID),
-		DeviceID: int(station.DeviceID),
+		DeviceID: hex.EncodeToString(station.DeviceID),
 		Name:     station.Name,
 	}
 }
@@ -62,12 +63,27 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		return fmt.Errorf("JWT claims error")
 	}
 
-	station := &data.Station{
-		Name:   ctx.Payload.Name,
-		UserID: claims["sub"].(int32), // NOTE Untested.
+	deviceId, err := hex.DecodeString(ctx.Payload.DeviceID)
+	if err != nil {
+		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id, name) VALUES (:name, :device_id, :owner_id, :name) RETURNING *", station); err != nil {
+	stations := []*data.Station{}
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1 AND device_id = $2", claims["sub"], deviceId); err != nil {
+		return err
+	}
+
+	if len(stations) > 0 {
+		return ctx.OK(StationType(stations[0]))
+	}
+
+	station := &data.Station{
+		Name:     ctx.Payload.Name,
+		OwnerID:  int32(claims["sub"].(float64)),
+		DeviceID: deviceId,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id) VALUES (:name, :device_id, :owner_id) RETURNING *", station); err != nil {
 		return err
 	}
 
@@ -108,7 +124,7 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE user_id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1", claims["sub"]); err != nil {
 		return err
 	}
 

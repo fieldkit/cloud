@@ -125,24 +125,24 @@ definitions:
     type: object
   AddStationLogPayload:
     example:
-      ID: 2.321374821909795e+18
-      body: Aspernatur labore est.
-      station_id: 3.3029034505576556e+18
-      timestamp: Ut quod ad.
+      ID: 1.1710638132431186e+18
+      body: Ut vel ut quod ad.
+      station_id: 1.6002943095161423e+18
+      timestamp: Doloremque quo vitae deleniti consequatur ipsa.
     properties:
       ID:
-        example: 2.321374821909795e+18
+        example: 1.1710638132431186e+18
         format: int64
         type: integer
       body:
-        example: Aspernatur labore est.
+        example: Ut vel ut quod ad.
         type: string
       station_id:
-        example: 3.3029034505576556e+18
+        example: 1.6002943095161423e+18
         format: int64
         type: integer
       timestamp:
-        example: Ut quod ad.
+        example: Doloremque quo vitae deleniti consequatur ipsa.
         type: string
     required:
     - ID
@@ -154,17 +154,33 @@ definitions:
   AddStationLogsPayload:
     example:
       station_logs:
-      - ID: 2.321374821909795e+18
-        body: Aspernatur labore est.
-        station_id: 3.3029034505576556e+18
-        timestamp: Ut quod ad.
+      - ID: 1.1710638132431186e+18
+        body: Ut vel ut quod ad.
+        station_id: 1.6002943095161423e+18
+        timestamp: Doloremque quo vitae deleniti consequatur ipsa.
+      - ID: 1.1710638132431186e+18
+        body: Ut vel ut quod ad.
+        station_id: 1.6002943095161423e+18
+        timestamp: Doloremque quo vitae deleniti consequatur ipsa.
+      - ID: 1.1710638132431186e+18
+        body: Ut vel ut quod ad.
+        station_id: 1.6002943095161423e+18
+        timestamp: Doloremque quo vitae deleniti consequatur ipsa.
     properties:
       station_logs:
         example:
-        - ID: 2.321374821909795e+18
-          body: Aspernatur labore est.
-          station_id: 3.3029034505576556e+18
-          timestamp: Ut quod ad.
+        - ID: 1.1710638132431186e+18
+          body: Ut vel ut quod ad.
+          station_id: 1.6002943095161423e+18
+          timestamp: Doloremque quo vitae deleniti consequatur ipsa.
+        - ID: 1.1710638132431186e+18
+          body: Ut vel ut quod ad.
+          station_id: 1.6002943095161423e+18
+          timestamp: Doloremque quo vitae deleniti consequatur ipsa.
+        - ID: 1.1710638132431186e+18
+          body: Ut vel ut quod ad.
+          station_id: 1.6002943095161423e+18
+          timestamp: Doloremque quo vitae deleniti consequatur ipsa.
         items:
           $ref: '#/definitions/AddStationLogPayload'
         type: array
@@ -174,37 +190,36 @@ definitions:
     type: object
   AddStationPayload:
     example:
-      name: Dolor magnam praesentium et necessitatibus harum.
-      user_id: 8.941848396208571e+18
+      device_id: Dolor magnam praesentium et necessitatibus harum.
+      name: Ullam asperiores aspernatur.
     properties:
-      name:
+      device_id:
         example: Dolor magnam praesentium et necessitatibus harum.
         type: string
-      user_id:
-        example: 8.941848396208571e+18
-        format: int64
-        type: integer
+      name:
+        example: Ullam asperiores aspernatur.
+        type: string
     required:
     - name
-    - user_id
+    - device_id
     title: AddStationPayload
     type: object
   AddTeamPayload:
     example:
-      description: Doloremque quo vitae deleniti consequatur ipsa.
-      name: 1w67zb615h
-      slug: 9i8qvlvy4h
+      description: Ea non.
+      name: zb615hd9i8
+      slug: vlvy4htjbl
     properties:
       description:
-        example: Doloremque quo vitae deleniti consequatur ipsa.
+        example: Ea non.
         type: string
       name:
-        example: 1w67zb615h
+        example: zb615hd9i8
         maxLength: 256
         pattern: \S
         type: string
       slug:
-        example: 9i8qvlvy4h
+        example: vlvy4htjbl
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -216,10 +231,10 @@ definitions:
     type: object
   AddTwitterAccountSourcePayload:
     example:
-      name: Quis repellendus incidunt reprehenderit dolore.
+      name: Dolore fuga molestias.
     properties:
       name:
-        example: Quis repellendus incidunt reprehenderit dolore.
+        example: Dolore fuga molestias.
         type: string
     required:
     - name
@@ -227,25 +242,25 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: candelario.veum@hermistonlittel.net
-      invite_token: Consequuntur sint quidem odio dolor.
-      name: cxwe120m04
-      password: o2o0pniixh
+      email: zula_tillman@cormier.biz
+      invite_token: Quidem odio dolor recusandae suscipit.
+      name: we120m040o
+      password: o0pniixhu1
     properties:
       email:
-        example: candelario.veum@hermistonlittel.net
+        example: zula_tillman@cormier.biz
         format: email
         type: string
       invite_token:
-        example: Consequuntur sint quidem odio dolor.
+        example: Quidem odio dolor recusandae suscipit.
         type: string
       name:
-        example: cxwe120m04
+        example: we120m040o
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: o2o0pniixh
+        example: o0pniixhu1
         minLength: 10
         type: string
     required:
@@ -493,9 +508,6 @@ definitions:
       - name: Quis fugit commodi ut.
         notes: Et aperiam amet nulla dolore.
         time: "1974-01-27T11:24:08Z"
-      - name: Quis fugit commodi ut.
-        notes: Et aperiam amet nulla dolore.
-        time: "1974-01-27T11:24:08Z"
       urls:
         data:
           csv: Perspiciatis quasi error voluptatem et.
@@ -615,6 +627,20 @@ definitions:
       urls:
         csv: Et autem aliquid voluptate.
         fkpb: Dolores quo suscipit.
+    - corrupted: true
+      device_id: Molestias enim.
+      file_id: Est amet ipsam reprehenderit totam dolorem impedit.
+      file_type_id: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+      file_type_name: Ea nobis in harum doloribus sequi placeat.
+      firmware: Illo reprehenderit quod.
+      id: 1.5355433818472102e+18
+      meta: Provident eligendi ut voluptatem et ratione.
+      size: 1.566789604843801e+18
+      time: "1986-04-22T23:58:19Z"
+      url: Ea quibusdam optio.
+      urls:
+        csv: Et autem aliquid voluptate.
+        fkpb: Dolores quo suscipit.
     items:
       $ref: '#/definitions/DeviceFile'
     title: 'Mediatype identifier: application/vnd.app.device.file+json; type=collection;
@@ -671,6 +697,20 @@ definitions:
     description: DeviceFiles media type (default view)
     example:
       files:
+      - corrupted: true
+        device_id: Molestias enim.
+        file_id: Est amet ipsam reprehenderit totam dolorem impedit.
+        file_type_id: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+        file_type_name: Ea nobis in harum doloribus sequi placeat.
+        firmware: Illo reprehenderit quod.
+        id: 1.5355433818472102e+18
+        meta: Provident eligendi ut voluptatem et ratione.
+        size: 1.566789604843801e+18
+        time: "1986-04-22T23:58:19Z"
+        url: Ea quibusdam optio.
+        urls:
+          csv: Et autem aliquid voluptate.
+          fkpb: Dolores quo suscipit.
       - corrupted: true
         device_id: Molestias enim.
         file_id: Est amet ipsam reprehenderit totam dolorem impedit.
@@ -778,6 +818,18 @@ definitions:
       key: Praesentium ratione et.
       projectId: 1.9709746601682004e+18
       schemaId: 1.8372572529667597e+18
+    - active: false
+      deviceId: 8.010664715160795e+18
+      jsonSchema: Voluptatum dolores.
+      key: Praesentium ratione et.
+      projectId: 1.9709746601682004e+18
+      schemaId: 1.8372572529667597e+18
+    - active: false
+      deviceId: 8.010664715160795e+18
+      jsonSchema: Voluptatum dolores.
+      key: Praesentium ratione et.
+      projectId: 1.9709746601682004e+18
+      schemaId: 1.8372572529667597e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -787,12 +839,6 @@ definitions:
     description: DeviceSchemas media type (default view)
     example:
       schemas:
-      - active: false
-        deviceId: 8.010664715160795e+18
-        jsonSchema: Voluptatum dolores.
-        key: Praesentium ratione et.
-        projectId: 1.9709746601682004e+18
-        schemaId: 1.8372572529667597e+18
       - active: false
         deviceId: 8.010664715160795e+18
         jsonSchema: Voluptatum dolores.
@@ -875,14 +921,6 @@ definitions:
       teamId: 6.118231057633733e+17
       token: Minus consequatur ullam.
       userId: 6.331965125704071e+18
-    - active: false
-      expeditionId: 3.2416451380914903e+18
-      id: 1.4339898754461952e+18
-      key: Repudiandae dignissimos.
-      name: Consequatur nihil et corrupti.
-      teamId: 6.118231057633733e+17
-      token: Minus consequatur ullam.
-      userId: 6.331965125704071e+18
     items:
       $ref: '#/definitions/DeviceSource'
     title: 'Mediatype identifier: application/vnd.app.device_source+json; type=collection;
@@ -892,6 +930,22 @@ definitions:
     description: DeviceSources media type (default view)
     example:
       deviceSources:
+      - active: false
+        expeditionId: 3.2416451380914903e+18
+        id: 1.4339898754461952e+18
+        key: Repudiandae dignissimos.
+        name: Consequatur nihil et corrupti.
+        teamId: 6.118231057633733e+17
+        token: Minus consequatur ullam.
+        userId: 6.331965125704071e+18
+      - active: false
+        expeditionId: 3.2416451380914903e+18
+        id: 1.4339898754461952e+18
+        key: Repudiandae dignissimos.
+        name: Consequatur nihil et corrupti.
+        teamId: 6.118231057633733e+17
+        token: Minus consequatur ullam.
+        userId: 6.331965125704071e+18
       - active: false
         expeditionId: 3.2416451380914903e+18
         id: 1.4339898754461952e+18
@@ -1137,10 +1191,6 @@ definitions:
       id: 3.907042247734213e+18
       name: Et hic sunt.
       slug: msmhgbrltf
-    - description: Iure ea dolorem et magnam alias.
-      id: 3.907042247734213e+18
-      name: Et hic sunt.
-      slug: msmhgbrltf
     items:
       $ref: '#/definitions/Expedition'
     title: 'Mediatype identifier: application/vnd.app.expedition+json; type=collection;
@@ -1150,6 +1200,10 @@ definitions:
     description: Expeditions media type (default view)
     example:
       expeditions:
+      - description: Iure ea dolorem et magnam alias.
+        id: 3.907042247734213e+18
+        name: Et hic sunt.
+        slug: msmhgbrltf
       - description: Iure ea dolorem et magnam alias.
         id: 3.907042247734213e+18
         name: Et hic sunt.
@@ -1250,18 +1304,6 @@ definitions:
         profile: Nobis omnis.
         time: "1993-10-17T05:51:54Z"
         url: Id exercitationem aliquam.
-      - etag: Laboriosam est praesentium.
-        id: 7.769315757880298e+18
-        module: Iusto iusto quia officia fuga.
-        profile: Nobis omnis.
-        time: "1993-10-17T05:51:54Z"
-        url: Id exercitationem aliquam.
-      - etag: Laboriosam est praesentium.
-        id: 7.769315757880298e+18
-        module: Iusto iusto quia officia fuga.
-        profile: Nobis omnis.
-        time: "1993-10-17T05:51:54Z"
-        url: Id exercitationem aliquam.
     properties:
       firmwares:
         $ref: '#/definitions/FirmwareSummaryCollection'
@@ -1280,7 +1322,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+          Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1289,7 +1331,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+          Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
         type: Magnam sunt debitis rerum rerum et quia.
       - geometry:
           coordinates:
@@ -1298,7 +1340,7 @@ definitions:
           - 0.3663572725572787
           type: Ad consectetur occaecati occaecati omnis sint.
         properties:
-          Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+          Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
         type: Magnam sunt debitis rerum rerum et quia.
       type: Incidunt consequatur magni et.
     properties:
@@ -1322,7 +1364,7 @@ definitions:
         - 0.3663572725572787
         type: Ad consectetur occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+        Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
       type: Magnam sunt debitis rerum rerum et quia.
     properties:
       geometry:
@@ -1330,7 +1372,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+          Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
         type: object
       type:
         example: Magnam sunt debitis rerum rerum et quia.
@@ -1352,7 +1394,7 @@ definitions:
         - 0.3663572725572787
         type: Ad consectetur occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+        Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
       type: Magnam sunt debitis rerum rerum et quia.
     - geometry:
         coordinates:
@@ -1361,7 +1403,7 @@ definitions:
         - 0.3663572725572787
         type: Ad consectetur occaecati occaecati omnis sint.
       properties:
-        Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+        Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
       type: Magnam sunt debitis rerum rerum et quia.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -1480,15 +1522,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      email: janick@reilly.name
-      password: npwptriur3
+      email: faustino.pagac@harveyhuel.biz
+      password: pwptriur3g
     properties:
       email:
-        example: janick@reilly.name
+        example: faustino.pagac@harveyhuel.biz
         format: email
         type: string
       password:
-        example: npwptriur3
+        example: pwptriur3g
         minLength: 10
         type: string
     required:
@@ -1509,7 +1551,7 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+              Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1518,7 +1560,7 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+              Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
             type: Magnam sunt debitis rerum rerum et quia.
           - geometry:
               coordinates:
@@ -1527,13 +1569,25 @@ definitions:
               - 0.3663572725572787
               type: Ad consectetur occaecati occaecati omnis sint.
             properties:
-              Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+              Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
             type: Magnam sunt debitis rerum rerum et quia.
           type: Incidunt consequatur magni et.
         hasMore: false
         nextUrl: Maxime consequatur ut.
         previousUrl: Aperiam perferendis veritatis dolore eius iusto.
       geometries:
+      - geometry:
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        id: 5.41219004578842e+18
+        sourceId: 1.6901081034442964e+18
+      - geometry:
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        id: 5.41219004578842e+18
+        sourceId: 1.6901081034442964e+18
       - geometry:
         - - 0.9682483955411658
         - - 0.9682483955411658
@@ -1563,7 +1617,6 @@ definitions:
         radius: 0.6530857697814297
         sourceId: 1.999501909620784e+17
         startTime: "1997-04-01T20:52:44Z"
-      temporal:
       - centroid:
         - 0.6447088396273654
         - 0.6447088396273654
@@ -1575,6 +1628,7 @@ definitions:
         radius: 0.6530857697814297
         sourceId: 1.999501909620784e+17
         startTime: "1997-04-01T20:52:44Z"
+      temporal:
       - centroid:
         - 0.6447088396273654
         - 0.6447088396273654
@@ -1658,7 +1712,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+            Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1667,7 +1721,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+            Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
           type: Magnam sunt debitis rerum rerum et quia.
         - geometry:
             coordinates:
@@ -1676,7 +1730,7 @@ definitions:
             - 0.3663572725572787
             type: Ad consectetur occaecati occaecati omnis sint.
           properties:
-            Deleniti rem sint velit ad laboriosam.: 9808b276-33dd-40b5-9f0b-73e0f1bf4c0f
+            Deleniti rem sint velit ad laboriosam.: 2d156196-e616-426a-a1b0-0cb010ee1e73
           type: Magnam sunt debitis rerum rerum et quia.
         type: Incidunt consequatur magni et.
       hasMore: false
@@ -1770,8 +1824,6 @@ definitions:
         userId: 6.297057674710826e+18
       - projectId: 1.2833427085391667e+18
         userId: 6.297057674710826e+18
-      - projectId: 1.2833427085391667e+18
-        userId: 6.297057674710826e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -1791,6 +1843,10 @@ definitions:
       id: 1.6102949998262432e+17
       name: Voluptatem molestias et.
       slug: rrbwtu6d71
+    - description: Ut est tempora.
+      id: 1.6102949998262432e+17
+      name: Voluptatem molestias et.
+      slug: rrbwtu6d71
     items:
       $ref: '#/definitions/Project'
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
@@ -1800,10 +1856,6 @@ definitions:
     description: Projects media type (default view)
     example:
       projects:
-      - description: Ut est tempora.
-        id: 1.6102949998262432e+17
-        name: Voluptatem molestias et.
-        slug: rrbwtu6d71
       - description: Ut est tempora.
         id: 1.6102949998262432e+17
         name: Voluptatem molestias et.
@@ -1857,8 +1909,6 @@ definitions:
       (default view)
     example:
     - name: Dolorum aut.
-    - name: Dolorum aut.
-    - name: Dolorum aut.
     items:
       $ref: '#/definitions/ReadingSummary'
     title: 'Mediatype identifier: application/vnd.app.reading_summary+json; type=collection;
@@ -1866,10 +1916,10 @@ definitions:
     type: array
   RefreshUserPayload:
     example:
-      refresh_token: Nulla quae.
+      refresh_token: Quae quisquam.
     properties:
       refresh_token:
-        example: Nulla quae.
+        example: Quae quisquam.
         type: string
     required:
     - refresh_token
@@ -2011,6 +2061,17 @@ definitions:
         radius: 0.6530857697814297
         sourceId: 1.999501909620784e+17
         startTime: "1997-04-01T20:52:44Z"
+      - centroid:
+        - 0.6447088396273654
+        - 0.6447088396273654
+        endTime: "2000-04-25T14:41:22Z"
+        envelope:
+        - - 0.5926219627974112
+        id: 2.072833317639838e+18
+        numberOfFeatures: 9.911149219263516e+17
+        radius: 0.6530857697814297
+        sourceId: 1.999501909620784e+17
+        startTime: "1997-04-01T20:52:44Z"
     properties:
       id:
         example: 3.198012612563036e+18
@@ -2100,14 +2161,23 @@ definitions:
         teamId: 6.118231057633733e+17
         token: Minus consequatur ullam.
         userId: 6.331965125704071e+18
+      - active: false
+        expeditionId: 3.2416451380914903e+18
+        id: 1.4339898754461952e+18
+        key: Repudiandae dignissimos.
+        name: Consequatur nihil et corrupti.
+        teamId: 6.118231057633733e+17
+        token: Minus consequatur ullam.
+        userId: 6.331965125704071e+18
+      - active: false
+        expeditionId: 3.2416451380914903e+18
+        id: 1.4339898754461952e+18
+        key: Repudiandae dignissimos.
+        name: Consequatur nihil et corrupti.
+        teamId: 6.118231057633733e+17
+        token: Minus consequatur ullam.
+        userId: 6.331965125704071e+18
       twitterAccountSources:
-      - expeditionId: 4.3914001203700316e+18
-        id: 4.843979992660156e+18
-        name: Omnis velit quod accusamus.
-        screenName: A quia aut.
-        teamId: 6.936376325543937e+18
-        twitterAccountId: 8.282634339368904e+18
-        userId: 8.252764702077084e+18
       - expeditionId: 4.3914001203700316e+18
         id: 4.843979992660156e+18
         name: Omnis velit quod accusamus.
@@ -2125,40 +2195,48 @@ definitions:
   Station:
     description: Station media type (default view)
     example:
-      ID: 6.72521805514288e+18
-      name: Qui velit aut hic quibusdam est rem.
-      user_id: 8.031066481591563e+18
+      device_id: Debitis qui.
+      id: 7.917913327215073e+18
+      name: Hic quibusdam est rem.
+      owner_id: 8.031066481591563e+18
     properties:
-      ID:
-        example: 6.72521805514288e+18
+      device_id:
+        example: Debitis qui.
+        type: string
+      id:
+        example: 7.917913327215073e+18
         format: int64
         type: integer
       name:
-        example: Qui velit aut hic quibusdam est rem.
+        example: Hic quibusdam est rem.
         type: string
-      user_id:
+      owner_id:
         example: 8.031066481591563e+18
         format: int64
         type: integer
     required:
-    - ID
+    - id
     - name
-    - user_id
+    - owner_id
+    - device_id
     title: 'Mediatype identifier: application/vnd.app.station+json; view=default'
     type: object
   StationCollection:
     description: StationCollection is the media type for an array of Station (default
       view)
     example:
-    - ID: 6.72521805514288e+18
-      name: Qui velit aut hic quibusdam est rem.
-      user_id: 8.031066481591563e+18
-    - ID: 6.72521805514288e+18
-      name: Qui velit aut hic quibusdam est rem.
-      user_id: 8.031066481591563e+18
-    - ID: 6.72521805514288e+18
-      name: Qui velit aut hic quibusdam est rem.
-      user_id: 8.031066481591563e+18
+    - device_id: Debitis qui.
+      id: 7.917913327215073e+18
+      name: Hic quibusdam est rem.
+      owner_id: 8.031066481591563e+18
+    - device_id: Debitis qui.
+      id: 7.917913327215073e+18
+      name: Hic quibusdam est rem.
+      owner_id: 8.031066481591563e+18
+    - device_id: Debitis qui.
+      id: 7.917913327215073e+18
+      name: Hic quibusdam est rem.
+      owner_id: 8.031066481591563e+18
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -2197,15 +2275,10 @@ definitions:
     description: Stations media type (default view)
     example:
       stations:
-      - ID: 6.72521805514288e+18
-        name: Qui velit aut hic quibusdam est rem.
-        user_id: 8.031066481591563e+18
-      - ID: 6.72521805514288e+18
-        name: Qui velit aut hic quibusdam est rem.
-        user_id: 8.031066481591563e+18
-      - ID: 6.72521805514288e+18
-        name: Qui velit aut hic quibusdam est rem.
-        user_id: 8.031066481591563e+18
+      - device_id: Debitis qui.
+        id: 7.917913327215073e+18
+        name: Hic quibusdam est rem.
+        owner_id: 8.031066481591563e+18
     properties:
       stations:
         $ref: '#/definitions/StationCollection'
@@ -2296,12 +2369,6 @@ definitions:
     - role: Et et perspiciatis et est.
       teamId: 4.948905625916945e+18
       userId: 4.0902780165990646e+18
-    - role: Et et perspiciatis et est.
-      teamId: 4.948905625916945e+18
-      userId: 4.0902780165990646e+18
-    - role: Et et perspiciatis et est.
-      teamId: 4.948905625916945e+18
-      userId: 4.0902780165990646e+18
     items:
       $ref: '#/definitions/TeamMember'
     title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
@@ -2311,9 +2378,6 @@ definitions:
     description: TeamMembers media type (default view)
     example:
       members:
-      - role: Et et perspiciatis et est.
-        teamId: 4.948905625916945e+18
-        userId: 4.0902780165990646e+18
       - role: Et et perspiciatis et est.
         teamId: 4.948905625916945e+18
         userId: 4.0902780165990646e+18
@@ -2397,6 +2461,13 @@ definitions:
     description: TwitterAccountSourceCollection is the media type for an array of
       TwitterAccountSource (default view)
     example:
+    - expeditionId: 4.3914001203700316e+18
+      id: 4.843979992660156e+18
+      name: Omnis velit quod accusamus.
+      screenName: A quia aut.
+      teamId: 6.936376325543937e+18
+      twitterAccountId: 8.282634339368904e+18
+      userId: 8.252764702077084e+18
     - expeditionId: 4.3914001203700316e+18
       id: 4.843979992660156e+18
       name: Omnis velit quod accusamus.
@@ -2577,19 +2648,19 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Eaque distinctio ipsam unde.
-      email: price_kautzer@skiles.net
-      name: twbfxuinqc
+      bio: Distinctio ipsam.
+      email: albert_quigley@daugherty.com
+      name: wgtwbfxuin
     properties:
       bio:
-        example: Eaque distinctio ipsam unde.
+        example: Distinctio ipsam.
         type: string
       email:
-        example: price_kautzer@skiles.net
+        example: albert_quigley@daugherty.com
         format: email
         type: string
       name:
-        example: twbfxuinqc
+        example: wgtwbfxuin
         maxLength: 256
         pattern: \S
         type: string
@@ -2633,6 +2704,10 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
+    - bio: Eos asperiores non nam.
+      email: gisselle_gibson@gutkowski.name
+      id: 9.197850662670274e+18
+      name: gdvcbmmrte
     - bio: Eos asperiores non nam.
       email: gisselle_gibson@gutkowski.name
       id: 9.197850662670274e+18
