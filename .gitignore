@@ -12,3 +12,4 @@ fkstreams
 temp-go
 node_modules
 secrets.js
+*.fkpb

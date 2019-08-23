@@ -3,6 +3,7 @@
 CREATE TABLE fieldkit.ingestion (
   id serial PRIMARY KEY,
   time timestamp NOT NULL,
+  upload_id varchar(64) NOT NULL,
   user_id integer NOT NULL,
   device_id bytea NOT NULL,
   size integer NOT NULL,

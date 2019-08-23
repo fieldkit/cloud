@@ -62,6 +62,7 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 	countingReader := NewCountingReader(reader)
 
 	id := uuid.Must(uuid.NewRandom())
+
 	fn := fmt.Sprintf("%v.fkpb", id)
 
 	log.Infow("archiving", "content_type", headers.ContentType, "file_name", fn)
@@ -76,7 +77,7 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 	io.Copy(file, countingReader)
 
 	ss := &SavedStream{
-		ID:        fn,
+		ID:        id.String(),
 		URL:       fn,
 		BytesRead: countingReader.BytesRead,
 	}
