@@ -13,4 +13,6 @@ RUN apk --no-cache --virtual build-dependencies add \
     && apk del build-dependencies
 
 COPY . /usr/app/
+
+ENV PUBLIC_PATH /portal
 RUN yarn build

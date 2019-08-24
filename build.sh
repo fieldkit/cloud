@@ -73,7 +73,7 @@ docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-ser
 mkdir build/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
-       sh -c "cp -r /usr/app/dist/* /build/ && chown -R $USER_ID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/legacy
 docker rm -f fk-legacy-build > /dev/null 2>&1 || true
