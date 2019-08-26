@@ -89,7 +89,6 @@ generate:
 	./tools/goa-generate.sh
 
 deps: server/inaturalist/secrets.go
-	cd server && go get ./...
 
 clean:
 	rm -rf $(BUILD)

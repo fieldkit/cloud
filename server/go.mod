@@ -14,7 +14,7 @@ require (
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
 	github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e
-	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188 // indirect
+	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188
 	github.com/creack/goselect v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dghubble/go-twitter v0.0.0-20170219215544-fc93bb35701b
@@ -23,6 +23,7 @@ require (
 	github.com/dgrijalva/jwt-go v0.0.0-20170201225849-2268707a8f08
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
+	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
 	github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.0.0-20190326234956-40f35b54ddf5
@@ -36,6 +37,8 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
 	github.com/hashicorp/golang-lru v0.0.0-20180201235237-0fb14efe8c47
+	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect
+	github.com/hongshibao/go-kdtree v0.0.0-20180503061502-0de4e8305acf
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
 	github.com/jmespath/go-jmespath v0.0.0-20160803190731-bd40a432e4c7
