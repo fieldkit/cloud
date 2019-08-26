@@ -92,8 +92,8 @@ export default {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
             this.isAuthenticated = true;
-            // console.log("this is the user info", this.user);
-            // console.log("this is the station info", this.stations);
+            console.log("this is the user info", this.user);
+            console.log("this is the station info", this.stations);
         }
     },
     methods: {
