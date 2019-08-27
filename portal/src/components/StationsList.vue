@@ -51,6 +51,7 @@ export default {
                     battery.toString().split("%")[0]
                 );
             }
+            station.status_json.battery_level = battery;
             let img = "";
             if(battery == 0) {
                 img = "0.png";
