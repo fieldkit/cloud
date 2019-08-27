@@ -55,6 +55,7 @@
             <div id="stations-section" v-if="viewingStations">
                 <div class="section">
                     <h1>Stations</h1>
+                    <StationsList :stations="stations" />
                 </div>
             </div>
             <div id="data-section" v-if="viewingData">
@@ -69,11 +70,13 @@
 <script>
 import FKApi from "../api/api";
 import ProjectForm from "../components/ProjectForm";
+import StationsList from "../components/StationsList";
 
 export default {
     name: "dashboard",
     components: {
-        ProjectForm
+        ProjectForm,
+        StationsList
     },
     data: () => {
         return {
@@ -91,6 +94,9 @@ export default {
         if (api.authenticated()) {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
+            if(this.stations) {
+                this.stations = this.stations.stations;
+            }
             this.isAuthenticated = true;
             console.log("this is the user info", this.user);
             console.log("this is the station info", this.stations);

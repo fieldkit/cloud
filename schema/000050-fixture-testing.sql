@@ -81,3 +81,28 @@ INSERT INTO fieldkit.project_user (user_id, project_id)
     (SELECT id FROM fieldkit.user WHERE username = 'jacob'),
     (SELECT id FROM fieldkit.project WHERE slug = 'demo-project')
   );
+
+-- libbey
+
+INSERT INTO fieldkit.user (name, username, email, password, valid, bio)
+  VALUES (
+    'Libbey White',
+    'libbey',
+    'libbey@conservify.org',
+    -- asdfasdfasdf
+    E'\\x24326124313024747278745357794d54737a5133796b6d3241434b464f48527572616f7969555870644e6d4c577a4275784946346e3739386d4e6247',
+    TRUE,
+    'A Libbey user.'
+  );
+
+INSERT INTO fieldkit.project_user (user_id, project_id)
+  VALUES (
+    (SELECT id FROM fieldkit.user WHERE username = 'libbey'),
+    (SELECT id FROM fieldkit.project WHERE slug = 'www')
+  );
+
+INSERT INTO fieldkit.project_user (user_id, project_id)
+  VALUES (
+    (SELECT id FROM fieldkit.user WHERE username = 'libbey'),
+    (SELECT id FROM fieldkit.project WHERE slug = 'demo-project')
+  );
