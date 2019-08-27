@@ -1,13 +1,42 @@
 <template>
     <div id="LoginForm">
         <h1>Log In to Your Account</h1>
-        <p v-if="error">Your email or password is invalid</p>
-        <input name="email" v-model="email" placeholder="Email" />
+        <input id="email-field"
+            placeholder="Email"
+            keyboardType="email"
+            autocorrect="false"
+            autocapitalizationType="none"
+            v-model="email"
+            @keyup.enter="$refs.password.focus"
+            @blur="checkEmail" />
+        <span
+            class="validation-error"
+            id="no-email"
+            v-if="noEmail">Email is a required field.</span>
+        <span
+            class="validation-error"
+            id="email-not-valid"
+            v-if="emailNotValid">Must be a valid email address.</span>
         <br />
         <br />
-        <input name="password" type="password" placeholder="Password" v-model="password" />
+        <input name="password"
+            placeholder="Password"
+            secure="true"
+            ref="password"
+            type="password"
+            v-model="password"
+            @keyup.enter="login"
+            @blur="checkPassword" />
+        <span
+            class="validation-error"
+            id="no-password"
+            v-if="noPassword">Password is a required field.</span>
+        <span
+            class="validation-error"
+            id="password-too-short"
+            v-if="passwordTooShort">Password must be at least 10 characters.</span>
         <br />
-        <button v-on:click="login">Log In</button>
+        <button v-on:click="login" ref="submit">Log In</button>
     </div>
 </template>
 
@@ -16,32 +45,56 @@ import FKApi from "../../api/api";
 
 export default {
     name: "LoginForm",
-    props: {
-        msg: String
-    },
     data: () => {
-        return { email: "", password: "", user: {}, error: false };
+        return {
+            email: "",
+            password: "",
+            user: {},
+            emailNotValid: false,
+            noEmail: false,
+            noPassword: false,
+            passwordTooShort: false,
+        };
     },
     methods: {
         async login(event) {
             event.preventDefault();
             try {
-                if (this.email == "" || this.password == "") {
-                    this.error = true;
-                }
                 const api = new FKApi();
                 const auth = await api.login(this.email, this.password);
                 const isAuthenticated = await api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
-                    this.error = false;
                     this.$router.push({ name: "dashboard" });
                 } else {
-                    this.error = true;
+                    alert("Unfortunately we were unable to log you in. Please check your credentials and try again.")
                 }
             } catch (error) {
-                this.error = false;
+                alert("Unfortunately we were unable to log you in. Please check your credentials and try again.")
             }
+        },
+
+        checkEmail(event) {
+            // reset these first
+            this.noEmail = false;
+            this.emailNotValid = false;
+            // then check
+            this.noEmail = !this.email || this.email.length == 0;
+            if (this.noEmail) {
+                return;
+            }
+            let emailPattern = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            this.emailNotValid = !emailPattern.test(this.email);
+        },
+
+        checkPassword(event) {
+            this.noPassword = false;
+            this.passwordTooShort = false;
+            this.noPassword = !this.password || this.password.length == 0;
+            if (this.noPassword) {
+                return;
+            }
+            this.passwordTooShort = this.password.length < 10;
         }
     }
 };
@@ -51,9 +104,6 @@ export default {
 <style scoped>
 h1 {
     font-weight: lighter;
-}
-p {
-    color: red;
 }
 button {
     margin-top: 50px;
@@ -88,5 +138,9 @@ div {
     text-align: center;
     padding-bottom: 60px;
     padding-top: 20px;
+}
+.validation-error {
+    color: #C42C44;
+    display: block;
 }
 </style>
