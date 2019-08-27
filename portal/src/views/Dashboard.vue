@@ -217,7 +217,12 @@ export default {
     padding-bottom: 40px;
     border-bottom: 2px solid rgb(235, 235, 235);
 }
-
+#stations-section .section {
+    padding: 0;
+}
+#stations-section {
+    margin-bottom: 60px;
+}
 #add-project {
     float: right;
     padding: 12px;
