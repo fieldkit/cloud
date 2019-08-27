@@ -45,6 +45,12 @@ export default {
         getBatteryImg(station) {
             let images = require.context('../assets/battery/', false, /\.png$/);
             let battery = station.status_json.battery_level;
+            // check to see if it already has a percent sign
+            if (battery.toString().indexOf("%") > -1) {
+                battery = parseInt(
+                    battery.toString().split("%")[0]
+                );
+            }
             let img = "";
             if(battery == 0) {
                 img = "0.png";
