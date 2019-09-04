@@ -95,7 +95,7 @@ export default {
         if (api.authenticated()) {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
-            if(this.stations) {
+            if (this.stations) {
                 this.stations = this.stations.stations;
             }
             this.isAuthenticated = true;

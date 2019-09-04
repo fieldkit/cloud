@@ -1,40 +1,36 @@
 <template>
     <div id="LoginForm">
         <h1>Log In to Your Account</h1>
-        <input id="email-field"
+        <input
+            id="email-field"
             placeholder="Email"
             keyboardType="email"
             autocorrect="false"
             autocapitalizationType="none"
             v-model="email"
             @keyup.enter="$refs.password.focus"
-            @blur="checkEmail" />
-        <span
-            class="validation-error"
-            id="no-email"
-            v-if="noEmail">Email is a required field.</span>
-        <span
-            class="validation-error"
-            id="email-not-valid"
-            v-if="emailNotValid">Must be a valid email address.</span>
+            @blur="checkEmail"
+        />
+        <span class="validation-error" id="no-email" v-if="noEmail">Email is a required field.</span>
+        <span class="validation-error" id="email-not-valid" v-if="emailNotValid"
+            >Must be a valid email address.</span
+        >
         <br />
         <br />
-        <input name="password"
+        <input
+            name="password"
             placeholder="Password"
             secure="true"
             ref="password"
             type="password"
             v-model="password"
             @keyup.enter="login"
-            @blur="checkPassword" />
-        <span
-            class="validation-error"
-            id="no-password"
-            v-if="noPassword">Password is a required field.</span>
-        <span
-            class="validation-error"
-            id="password-too-short"
-            v-if="passwordTooShort">Password must be at least 10 characters.</span>
+            @blur="checkPassword"
+        />
+        <span class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</span>
+        <span class="validation-error" id="password-too-short" v-if="passwordTooShort"
+            >Password must be at least 10 characters.</span
+        >
         <br />
         <button v-on:click="login" ref="submit">Log In</button>
     </div>
@@ -53,7 +49,7 @@ export default {
             emailNotValid: false,
             noEmail: false,
             noPassword: false,
-            passwordTooShort: false,
+            passwordTooShort: false
         };
     },
     methods: {
@@ -67,14 +63,18 @@ export default {
                     this.userToken = auth;
                     this.$router.push({ name: "dashboard" });
                 } else {
-                    alert("Unfortunately we were unable to log you in. Please check your credentials and try again.")
+                    alert(
+                        "Unfortunately we were unable to log you in. Please check your credentials and try again."
+                    );
                 }
             } catch (error) {
-                alert("Unfortunately we were unable to log you in. Please check your credentials and try again.")
+                alert(
+                    "Unfortunately we were unable to log you in. Please check your credentials and try again."
+                );
             }
         },
 
-        checkEmail(event) {
+        checkEmail() {
             // reset these first
             this.noEmail = false;
             this.emailNotValid = false;
@@ -83,11 +83,12 @@ export default {
             if (this.noEmail) {
                 return;
             }
+            // eslint-disable-next-line
             let emailPattern = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
             this.emailNotValid = !emailPattern.test(this.email);
         },
 
-        checkPassword(event) {
+        checkPassword() {
             this.noPassword = false;
             this.passwordTooShort = false;
             this.noPassword = !this.password || this.password.length == 0;
@@ -140,7 +141,7 @@ div {
     padding-top: 20px;
 }
 .validation-error {
-    color: #C42C44;
+    color: #c42c44;
     display: block;
 }
 </style>
