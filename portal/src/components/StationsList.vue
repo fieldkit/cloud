@@ -1,5 +1,8 @@
 <template>
     <div id="stations-list-container">
+        <div v-if="foundStations.length == 0" class="no-stations-message">
+            <p>No stations found.</p>
+        </div>
         <div v-for="station in stations" :key="station.id" class="station-container">
             <div class="left">
                 <img alt="Station image"
@@ -29,13 +32,18 @@ export default {
     name: "StationsList",
     data: () => {
         return {
+            foundStations: []
         };
     },
     props: ['stations'],
     mounted(args) {
-        this.stations.forEach((s) => {
-            this.$set(s, 'synced', this.formatDate(s.status_json.updated));
-        });
+        if(this.stations && this.stations.length > 0) {
+            this.foundStations = this.stations;
+            this.stations.forEach((s) => {
+                // console.log(s.name, s.device_id)
+                this.$set(s, 'synced', this.formatDate(s.status_json.updated));
+            });
+        }
     },
     methods: {
         formatDate(date) {
@@ -92,6 +100,9 @@ export default {
 #stations-list-container {
     width: 700px;
     margin: 60px 0;
+}
+.no-stations-message {
+    font-size: 20px;
 }
 .station-container {
     width: 400px;

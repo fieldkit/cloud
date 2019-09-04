@@ -38,11 +38,11 @@
         <div class="dashboard">
             <div id="projects-section" v-if="viewingProjects">
                 <div class="section">
-                    <div id="add-project" v-on:click="addProject">
+                    <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                         <img alt="Add project" src="../assets/add.png" />
                         Add Project
                     </div>
-                    <h1>My Projects</h1>
+                    <h1>{{ projectsTitle }}</h1>
                     <img alt="Default Fieldkit Project" src="../assets/default.png" />
                 </div>
                 <div class="section">
@@ -82,6 +82,7 @@ export default {
         return {
             user: {},
             stations: {},
+            projectsTitle: "Projects",
             isAuthenticated: false,
             viewingProjects: true,
             viewingStations: false,
@@ -98,6 +99,7 @@ export default {
                 this.stations = this.stations.stations;
             }
             this.isAuthenticated = true;
+            this.projectsTitle = "My Projects";
             console.log("this is the user info", this.user);
             console.log("this is the station info", this.stations);
         }
