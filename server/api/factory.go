@@ -53,7 +53,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		panic(err)
 	}
 
-	jwtMiddleware, err := NewJWTMiddleware(jwtHMACKey)
+	jwtMiddleware, err := config.NewJWTMiddleware()
 	if err != nil {
 		panic(err)
 	}

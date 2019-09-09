@@ -33,6 +33,8 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
+
+	"github.com/fieldkit/cloud/server/ingester"
 )
 
 type Config struct {
@@ -180,10 +182,13 @@ func main() {
 		panic(err)
 	}
 
-	ingester, err := backend.NewStreamIngester(be, archiver, publisher)
+	oldIngester, err := backend.NewStreamIngester(be, archiver, publisher)
 	if err != nil {
 		panic(err)
 	}
+
+	newIngesterConfig := getIngesterConfig()
+	newIngester := ingester.NewIngester(ctx, newIngesterConfig)
 
 	if flag.Arg(0) == "twitter" {
 		twitterListCredentialer := be.TwitterListCredentialer()
@@ -219,7 +224,7 @@ func main() {
 		setupMemoryLogging(log)
 	}
 
-	service, err := api.CreateApiService(ctx, database, be, awsSession, ingester, publisher, cw, apiConfig)
+	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher, cw, apiConfig)
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -249,9 +254,11 @@ func main() {
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/messages/ingestion" {
-			ingester.ServeHTTP(w, req)
+			oldIngester.ServeHTTP(w, req)
 		} else if req.URL.Path == "/messages/ingestion/stream" {
-			ingester.ServeHTTP(w, req)
+			oldIngester.ServeHTTP(w, req)
+		} else if req.URL.Path == "/ingestion" {
+			newIngester.ServeHTTP(w, req)
 		} else {
 			service.Mux.ServeHTTP(w, req)
 		}
@@ -364,4 +371,15 @@ func setupMemoryLogging(log *zap.SugaredLogger) {
 		}
 	}()
 
+}
+
+func getIngesterConfig() *ingester.Config {
+	var config ingester.Config
+
+	err := envconfig.Process("fieldkit", &config)
+	if err != nil {
+		panic(err)
+	}
+
+	return &config
 }
