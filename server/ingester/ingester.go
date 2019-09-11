@@ -250,7 +250,7 @@ func (a *Int64Range) parseString(s string) error {
 		return fmt.Errorf("Unexpected range boundaries. I was lazy.")
 	}
 
-	values := s[1 : len(s)-2]
+	values := s[1 : len(s)-1]
 	b, err := parseBlocks(values)
 	if err != nil {
 		return err
