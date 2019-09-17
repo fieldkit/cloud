@@ -850,6 +850,41 @@ func (ctx *ListIDAdministratorContext) BadRequest() error {
 	return nil
 }
 
+// ProcessDataContext provides the data process action context.
+type ProcessDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewProcessDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the data controller process action.
+func NewProcessDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProcessDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ProcessDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ProcessDataContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// Busy sends a HTTP response with status code 503.
+func (ctx *ProcessDataContext) Busy() error {
+	ctx.ResponseData.WriteHeader(503)
+	return nil
+}
+
 // AddDeviceContext provides the device add action context.
 type AddDeviceContext struct {
 	context.Context

@@ -196,6 +196,14 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountStationLogController(service, c19)
 
+	// Mount "data" controller
+	dco := DataControllerOptions{
+		Config:   config,
+		Session:  awsSession,
+		Database: database,
+	}
+	app.MountDataController(service, NewDataController(ctx, service, dco))
+
 	// Mount "files" controller
 	fco := FilesControllerOptions{
 		Config:        config,

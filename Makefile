@@ -104,7 +104,7 @@ schema-production:
 		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
 		cp ~/conservify/dev-ops/schema.sql schema-production/000001.sql;        \
 		cp ~/conservify/dev-ops/data.sql schema-production/000100.sql;          \
-		cp schema/00000?.sql schema-production/;                                \
+		cp schema/0000??.sql schema-production/;                                \
 	else                                                                      \
 		echo "No dev-ops directory found";                                      \
 	fi
@@ -123,7 +123,7 @@ active-schema:
 restart-postgres: active-schema
 	docker-compose stop postgres
 	docker-compose rm -f postgres
-	docker-compose up -d postgres
+	docker-compose up postgres
 
 restart-postgres-foreground: active-schema
 	docker-compose stop postgres

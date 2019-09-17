@@ -114,7 +114,7 @@ func (br *FkBinaryReader) Push(ctx context.Context, record *pb.DataRecord) (*ing
 		if record.Metadata.Sensors != nil {
 			if br.NumberOfSensors == 0 {
 				for _, sensor := range record.Metadata.Sensors {
-					br.Sensors[sensor.Sensor] = sensor
+					br.Sensors[sensor.Number] = sensor
 					br.NumberOfSensors += 1
 				}
 				br.ReadingsSeen = 0

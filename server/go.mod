@@ -24,15 +24,15 @@ require (
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
-	github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e
+	github.com/fieldkit/data-protocol v0.0.0-20190903230951-dd4bd77f8fec
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.0.0-20190326234956-40f35b54ddf5
 	github.com/go-logfmt/logfmt v0.4.0
 	github.com/go-stack/stack v1.8.0
 	github.com/goadesign/goa v1.4.0
-	github.com/gogo/protobuf v0.0.0-20190324160722-382325bbbb4d
+	github.com/gogo/protobuf v1.3.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.2.0
+	github.com/golang/protobuf v1.3.2
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
@@ -73,12 +73,14 @@ require (
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v0.0.0-20180122172545-ddea229ff1df
 	go.uber.org/zap v1.8.0
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
-	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
+	golang.org/x/net v0.0.0-20190916140828-c8589233b77d
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65
-	golang.org/x/tools v0.0.0-20190401163957-4fc9f0bfa59a
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
+	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
+	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/tools v0.0.0-20190916201440-b31ee645dd40
 	google.golang.org/appengine v1.4.0
 	gopkg.in/yaml.v2 v2.2.2
 )

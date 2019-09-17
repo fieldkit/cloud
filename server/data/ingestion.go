@@ -20,6 +20,7 @@ type Ingestion struct {
 	URL      string        `db:"url"`
 	Blocks   Int64Range    `db:"blocks"`
 	Flags    pq.Int64Array `db:"flags"`
+	Errors   *bool         `db:"errors"`
 }
 
 type Int64Range []int64
