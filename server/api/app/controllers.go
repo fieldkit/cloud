@@ -1307,6 +1307,8 @@ func unmarshalAddAdministratorPayload(ctx context.Context, service *goa.Service,
 // DataController is the controller interface for the Data actions.
 type DataController interface {
 	goa.Muxer
+	Delete(*DeleteDataContext) error
+	Device(*DeviceDataContext) error
 	Process(*ProcessDataContext) error
 }
 
@@ -1314,7 +1316,41 @@ type DataController interface {
 func MountDataController(service *goa.Service, ctrl DataController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/data/ingestions/:ingestionId", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteDataContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleDataOrigin(h)
+	service.Mux.Handle("DELETE", "/data/ingestions/:ingestionId", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "Delete", "route", "DELETE /data/ingestions/:ingestionId")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeviceDataContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Device(rctx)
+	}
+	h = handleDataOrigin(h)
+	service.Mux.Handle("GET", "/data/devices/:deviceId", ctrl.MuxHandler("device", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "Device", "route", "GET /data/devices/:deviceId")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

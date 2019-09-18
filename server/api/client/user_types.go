@@ -863,6 +863,30 @@ func (ut *ConcatenatedFilesInfo) Validate() (err error) {
 	return
 }
 
+// deviceDataStreamsSummary user type.
+type deviceDataStreamsSummary struct {
+	Data *deviceStreamSummary `form:"data,omitempty" json:"data,omitempty" yaml:"data,omitempty" xml:"data,omitempty"`
+	Meta *deviceStreamSummary `form:"meta,omitempty" json:"meta,omitempty" yaml:"meta,omitempty" xml:"meta,omitempty"`
+}
+
+// Publicize creates DeviceDataStreamsSummary from deviceDataStreamsSummary
+func (ut *deviceDataStreamsSummary) Publicize() *DeviceDataStreamsSummary {
+	var pub DeviceDataStreamsSummary
+	if ut.Data != nil {
+		pub.Data = ut.Data.Publicize()
+	}
+	if ut.Meta != nil {
+		pub.Meta = ut.Meta.Publicize()
+	}
+	return &pub
+}
+
+// DeviceDataStreamsSummary user type.
+type DeviceDataStreamsSummary struct {
+	Data *DeviceStreamSummary `form:"data,omitempty" json:"data,omitempty" yaml:"data,omitempty" xml:"data,omitempty"`
+	Meta *DeviceStreamSummary `form:"meta,omitempty" json:"meta,omitempty" yaml:"meta,omitempty" xml:"meta,omitempty"`
+}
+
 // deviceFileTypeUrls user type.
 type deviceFileTypeUrls struct {
 	Csv      *string `form:"csv,omitempty" json:"csv,omitempty" yaml:"csv,omitempty" xml:"csv,omitempty"`
@@ -986,6 +1010,30 @@ func (ut *DeviceFileUrls) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "fkpb"))
 	}
 	return
+}
+
+// deviceStreamSummary user type.
+type deviceStreamSummary struct {
+	Records *int `form:"records,omitempty" json:"records,omitempty" yaml:"records,omitempty" xml:"records,omitempty"`
+	Size    *int `form:"size,omitempty" json:"size,omitempty" yaml:"size,omitempty" xml:"size,omitempty"`
+}
+
+// Publicize creates DeviceStreamSummary from deviceStreamSummary
+func (ut *deviceStreamSummary) Publicize() *DeviceStreamSummary {
+	var pub DeviceStreamSummary
+	if ut.Records != nil {
+		pub.Records = ut.Records
+	}
+	if ut.Size != nil {
+		pub.Size = ut.Size
+	}
+	return &pub
+}
+
+// DeviceStreamSummary user type.
+type DeviceStreamSummary struct {
+	Records *int `form:"records,omitempty" json:"records,omitempty" yaml:"records,omitempty" xml:"records,omitempty"`
+	Size    *int `form:"size,omitempty" json:"size,omitempty" yaml:"size,omitempty" xml:"size,omitempty"`
 }
 
 // deviceSummaryUrls user type.

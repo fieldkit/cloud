@@ -137,6 +137,70 @@ func (mt *DeviceSummary) Validate() (err error) {
 	return
 }
 
+// DeviceDataRecordsResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.data+json; view=default
+type DeviceDataRecordsResponse struct {
+	Data    DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
+	Meta    DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Summary *DeviceDataStreamsSummary  `form:"summary" json:"summary" yaml:"summary" xml:"summary"`
+}
+
+// Validate validates the DeviceDataRecordsResponse media type instance.
+func (mt *DeviceDataRecordsResponse) Validate() (err error) {
+	if mt.Summary == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "summary"))
+	}
+	if mt.Meta == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	if err2 := mt.Data.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Meta.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DeviceDataRecord media type (default view)
+//
+// Identifier: application/vnd.app.device.data.record+json; view=default
+type DeviceDataRecord struct {
+	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
+	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+}
+
+// Validate validates the DeviceDataRecord media type instance.
+func (mt *DeviceDataRecord) Validate() (err error) {
+
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DeviceDataRecordCollection is the media type for an array of DeviceDataRecord (default view)
+//
+// Identifier: application/vnd.app.device.data.record+json; type=collection; view=default
+type DeviceDataRecordCollection []*DeviceDataRecord
+
+// Validate validates the DeviceDataRecordCollection media type instance.
+func (mt DeviceDataRecordCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // DeviceDetails media type (default view)
 //
 // Identifier: application/vnd.app.device.details+json; view=default
@@ -257,6 +321,41 @@ func (mt *DeviceFiles) Validate() (err error) {
 	}
 	if err2 := mt.Files.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DeviceMetaRecord media type (default view)
+//
+// Identifier: application/vnd.app.device.meta.record+json; view=default
+type DeviceMetaRecord struct {
+	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
+	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+}
+
+// Validate validates the DeviceMetaRecord media type instance.
+func (mt *DeviceMetaRecord) Validate() (err error) {
+
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord (default view)
+//
+// Identifier: application/vnd.app.device.meta.record+json; type=collection; view=default
+type DeviceMetaRecordCollection []*DeviceMetaRecord
+
+// Validate validates the DeviceMetaRecordCollection media type instance.
+func (mt DeviceMetaRecordCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }

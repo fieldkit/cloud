@@ -202,6 +202,7 @@ golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGm
 golang.org/x/tools v0.0.0-20181030221726-6c7e314b6563/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20190401163957-4fc9f0bfa59a h1:8uDq1cly8U9Rv4OKK7v3+67Eci6dUaa/tGZbJ/2KzpM=
 golang.org/x/tools v0.0.0-20190401163957-4fc9f0bfa59a/go.mod h1:LCzVGOaR6xXOjkQ3onu1FJEFr0SW1gC7cKk1uF8kGRs=
+golang.org/x/tools v0.0.0-20190916201440-b31ee645dd40 h1:KIkBPI7+t/KsMxe3hV4Is2Dufewmo8XXMB8SqnQqcy8=
 golang.org/x/tools v0.0.0-20190916201440-b31ee645dd40/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/appengine v0.0.0-20180405220334-0a24098c0ec6/go.mod h1:EbEs0AVv82hx2wNQdGPgUI5lhzA/G0D9YwlJXL52JkM=

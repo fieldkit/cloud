@@ -850,6 +850,126 @@ func (ctx *ListIDAdministratorContext) BadRequest() error {
 	return nil
 }
 
+// DeleteDataContext provides the data delete action context.
+type DeleteDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	IngestionID int
+}
+
+// NewDeleteDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the data controller delete action.
+func NewDeleteDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramIngestionID := req.Params["ingestionId"]
+	if len(paramIngestionID) > 0 {
+		rawIngestionID := paramIngestionID[0]
+		if ingestionID, err2 := strconv.Atoi(rawIngestionID); err2 == nil {
+			rctx.IngestionID = ingestionID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("ingestionId", rawIngestionID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteDataContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeleteDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// DeviceDataContext provides the data device action context.
+type DeviceDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID   string
+	FirstBlock *int
+	LastBlock  *int
+	Page       *int
+}
+
+// NewDeviceDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the data controller device action.
+func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeviceDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramFirstBlock := req.Params["first_block"]
+	if len(paramFirstBlock) > 0 {
+		rawFirstBlock := paramFirstBlock[0]
+		if firstBlock, err2 := strconv.Atoi(rawFirstBlock); err2 == nil {
+			tmp14 := firstBlock
+			tmp13 := &tmp14
+			rctx.FirstBlock = tmp13
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("first_block", rawFirstBlock, "integer"))
+		}
+	}
+	paramLastBlock := req.Params["last_block"]
+	if len(paramLastBlock) > 0 {
+		rawLastBlock := paramLastBlock[0]
+		if lastBlock, err2 := strconv.Atoi(rawLastBlock); err2 == nil {
+			tmp16 := lastBlock
+			tmp15 := &tmp16
+			rctx.LastBlock = tmp15
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("last_block", rawLastBlock, "integer"))
+		}
+	}
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp18 := page
+			tmp17 := &tmp18
+			rctx.Page = tmp17
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeviceDataContext) OK(r *DeviceDataRecordsResponse) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.data+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeviceDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // ProcessDataContext provides the data process action context.
 type ProcessDataContext struct {
 	context.Context
@@ -1775,9 +1895,9 @@ func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Reques
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp23 := page
-			tmp22 := &tmp23
-			rctx.Page = tmp22
+			tmp30 := page
+			tmp29 := &tmp30
+			rctx.Page = tmp29
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1820,9 +1940,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp25 := page
-			tmp24 := &tmp25
-			rctx.Page = tmp24
+			tmp32 := page
+			tmp31 := &tmp32
+			rctx.Page = tmp31
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1865,9 +1985,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp27 := page
-			tmp26 := &tmp27
-			rctx.Page = tmp26
+			tmp34 := page
+			tmp33 := &tmp34
+			rctx.Page = tmp33
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}

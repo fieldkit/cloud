@@ -34,6 +34,7 @@ const (
 	FkDeviceIdHeaderName       = "Fk-DeviceId"
 	FkBlocksIdHeaderName       = "Fk-Blocks"
 	FkFlagsIdHeaderName        = "Fk-Flags"
+	FkTypeHeaderName           = "Fk-Type"
 )
 
 var (
@@ -79,11 +80,12 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 				}
 
 				ingestion := &data.Ingestion{
+					URL:      saved.URL,
 					UploadID: saved.ID,
 					UserID:   int32(claims["sub"].(float64)),
 					DeviceID: headers.FkDeviceId,
+					Type:     &headers.FkType,
 					Size:     int64(saved.BytesRead),
-					URL:      saved.URL,
 					Blocks:   data.Int64Range(headers.FkBlocks),
 					Flags:    pq.Int64Array([]int64{}),
 				}
@@ -138,6 +140,7 @@ type IncomingHeaders struct {
 	MediaType       string
 	MediaTypeParams map[string]string
 	XForwardedFor   string
+	FkType          string
 	FkDeviceId      []byte
 	FkBlocks        []int64
 	FkFlags         []int64
@@ -162,7 +165,12 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 
 	deviceIdRaw := req.Header.Get(FkDeviceIdHeaderName)
 	if len(deviceIdRaw) == 0 {
-		return nil, fmt.Errorf("Invalid %s (No header)", FkDeviceIdHeaderName)
+		return nil, fmt.Errorf("Invalid %s (no header)", FkDeviceIdHeaderName)
+	}
+
+	typeRaw := req.Header.Get(FkTypeHeaderName)
+	if len(typeRaw) == 0 {
+		return nil, fmt.Errorf("Invalid %s (no header)", FkTypeHeaderName)
 	}
 
 	deviceId, err := base64.StdEncoding.DecodeString(deviceIdRaw)
@@ -181,6 +189,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
 		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
+		FkType:          typeRaw,
 		FkDeviceId:      deviceId,
 		FkBlocks:        blocks,
 	}

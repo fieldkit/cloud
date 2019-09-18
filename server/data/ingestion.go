@@ -2,25 +2,39 @@ package data
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx/types"
+
 	"github.com/lib/pq"
 )
 
 type Ingestion struct {
-	ID       int64         `db:"id"`
-	Time     time.Time     `db:"time"`
-	UploadID string        `db:"upload_id"`
-	UserID   int32         `db:"user_id"`
-	DeviceID []byte        `db:"device_id"`
-	Size     int64         `db:"size"`
-	URL      string        `db:"url"`
-	Blocks   Int64Range    `db:"blocks"`
-	Flags    pq.Int64Array `db:"flags"`
-	Errors   *bool         `db:"errors"`
+	ID        int64         `db:"id"`
+	Time      time.Time     `db:"time"`
+	UploadID  string        `db:"upload_id"`
+	UserID    int32         `db:"user_id"`
+	DeviceID  []byte        `db:"device_id"`
+	Size      int64         `db:"size"`
+	URL       string        `db:"url"`
+	Type      *string       `db:"type"`
+	Blocks    Int64Range    `db:"blocks"`
+	Flags     pq.Int64Array `db:"flags"`
+	Errors    *bool         `db:"errors"`
+	Completed *time.Time    `db:"processing_completed"`
+	Attempted *time.Time    `db:"processing_attempted"`
+}
+
+type Provision struct {
+	ID          int64     `db:"id"`
+	Time        time.Time `db:"time"`
+	DeviceID    []byte    `db:"device_id"`
+	Generation  []byte    `db:"generation"`
+	IngestionID int64     `db:"ingestion_id"`
 }
 
 type Int64Range []int64
@@ -99,4 +113,55 @@ func ParseBlocks(s string) ([]int64, error) {
 	}
 
 	return blocks, nil
+}
+
+type MetaRecord struct {
+	ID          int64          `db:"id"`
+	ProvisionID int64          `db:"provision_id"`
+	Time        time.Time      `db:"time"`
+	Number      int64          `db:"number"`
+	Data        types.JSONText `db:"raw"`
+}
+
+func (d *DataRecord) SetData(data interface{}) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	d.Data = jsonData
+	return nil
+}
+
+func (d *DataRecord) GetData() (fields map[string]interface{}, err error) {
+	err = json.Unmarshal(d.Data, &fields)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+type DataRecord struct {
+	ID          int64          `db:"id"`
+	ProvisionID int64          `db:"provision_id"`
+	Time        time.Time      `db:"time"`
+	Number      int64          `db:"number"`
+	Location    *Location      `db:"location"`
+	Data        types.JSONText `db:"raw"`
+}
+
+func (d *MetaRecord) SetData(data interface{}) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	d.Data = jsonData
+	return nil
+}
+
+func (d *MetaRecord) GetData() (fields map[string]interface{}, err error) {
+	err = json.Unmarshal(d.Data, &fields)
+	if err != nil {
+		return nil, err
+	}
+	return
 }

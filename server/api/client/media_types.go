@@ -180,6 +180,91 @@ func (c *Client) DecodeDeviceSummary(resp *http.Response) (*DeviceSummary, error
 	return &decoded, err
 }
 
+// DeviceDataRecordsResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.data+json; view=default
+type DeviceDataRecordsResponse struct {
+	Data    DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
+	Meta    DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Summary *DeviceDataStreamsSummary  `form:"summary" json:"summary" yaml:"summary" xml:"summary"`
+}
+
+// Validate validates the DeviceDataRecordsResponse media type instance.
+func (mt *DeviceDataRecordsResponse) Validate() (err error) {
+	if mt.Summary == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "summary"))
+	}
+	if mt.Meta == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	if err2 := mt.Data.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if err2 := mt.Meta.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeDeviceDataRecordsResponse decodes the DeviceDataRecordsResponse instance encoded in resp body.
+func (c *Client) DecodeDeviceDataRecordsResponse(resp *http.Response) (*DeviceDataRecordsResponse, error) {
+	var decoded DeviceDataRecordsResponse
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceDataRecord media type (default view)
+//
+// Identifier: application/vnd.app.device.data.record+json; view=default
+type DeviceDataRecord struct {
+	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
+	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+}
+
+// Validate validates the DeviceDataRecord media type instance.
+func (mt *DeviceDataRecord) Validate() (err error) {
+
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DecodeDeviceDataRecord decodes the DeviceDataRecord instance encoded in resp body.
+func (c *Client) DecodeDeviceDataRecord(resp *http.Response) (*DeviceDataRecord, error) {
+	var decoded DeviceDataRecord
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceDataRecordCollection is the media type for an array of DeviceDataRecord (default view)
+//
+// Identifier: application/vnd.app.device.data.record+json; type=collection; view=default
+type DeviceDataRecordCollection []*DeviceDataRecord
+
+// Validate validates the DeviceDataRecordCollection media type instance.
+func (mt DeviceDataRecordCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDeviceDataRecordCollection decodes the DeviceDataRecordCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceDataRecordCollection(resp *http.Response) (DeviceDataRecordCollection, error) {
+	var decoded DeviceDataRecordCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // DeviceDetails media type (default view)
 //
 // Identifier: application/vnd.app.device.details+json; view=default
@@ -330,6 +415,55 @@ func (c *Client) DecodeDeviceFiles(resp *http.Response) (*DeviceFiles, error) {
 	var decoded DeviceFiles
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
+}
+
+// DeviceMetaRecord media type (default view)
+//
+// Identifier: application/vnd.app.device.meta.record+json; view=default
+type DeviceMetaRecord struct {
+	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
+	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+}
+
+// Validate validates the DeviceMetaRecord media type instance.
+func (mt *DeviceMetaRecord) Validate() (err error) {
+
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DecodeDeviceMetaRecord decodes the DeviceMetaRecord instance encoded in resp body.
+func (c *Client) DecodeDeviceMetaRecord(resp *http.Response) (*DeviceMetaRecord, error) {
+	var decoded DeviceMetaRecord
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord (default view)
+//
+// Identifier: application/vnd.app.device.meta.record+json; type=collection; view=default
+type DeviceMetaRecordCollection []*DeviceMetaRecord
+
+// Validate validates the DeviceMetaRecordCollection media type instance.
+func (mt DeviceMetaRecordCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDeviceMetaRecordCollection decodes the DeviceMetaRecordCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceMetaRecordCollection(resp *http.Response) (DeviceMetaRecordCollection, error) {
+	var decoded DeviceMetaRecordCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
 }
 
 // DeviceNotesEntry media type (default view)

@@ -12,7 +12,82 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
+
+// DeleteDataPath computes a request path to the delete action of data.
+func DeleteDataPath(ingestionID int) string {
+	param0 := strconv.Itoa(ingestionID)
+
+	return fmt.Sprintf("/data/ingestions/%s", param0)
+}
+
+// Delete data
+func (c *Client) DeleteData(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteDataRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteDataRequest create the request corresponding to the delete action endpoint of the data resource.
+func (c *Client) NewDeleteDataRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// DeviceDataPath computes a request path to the device action of data.
+func DeviceDataPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/data/devices/%s", param0)
+}
+
+// Retrieve data
+func (c *Client) DeviceData(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int) (*http.Response, error) {
+	req, err := c.NewDeviceDataRequest(ctx, path, firstBlock, lastBlock, page)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeviceDataRequest create the request corresponding to the device action endpoint of the data resource.
+func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if firstBlock != nil {
+		tmp179 := strconv.Itoa(*firstBlock)
+		values.Set("first_block", tmp179)
+	}
+	if lastBlock != nil {
+		tmp180 := strconv.Itoa(*lastBlock)
+		values.Set("last_block", tmp180)
+	}
+	if page != nil {
+		tmp181 := strconv.Itoa(*page)
+		values.Set("page", tmp181)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
 
 // ProcessDataPath computes a request path to the process action of data.
 func ProcessDataPath() string {
