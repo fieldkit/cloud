@@ -83,9 +83,10 @@ var _ = Resource("data", func() {
 		Routing(GET("data/devices/:deviceId"))
 		Description("Retrieve data")
 		Params(func() {
-			Param("first_block", Integer)
-			Param("last_block", Integer)
-			Param("page", Integer)
+			Param("firstBlock", Integer)
+			Param("lastBlock", Integer)
+			Param("pageNumber", Integer)
+			Param("pageSize", Integer)
 		})
 		Response(NotFound)
 		Response(OK, func() {

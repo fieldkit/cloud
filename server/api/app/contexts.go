@@ -903,7 +903,8 @@ type DeviceDataContext struct {
 	DeviceID   string
 	FirstBlock *int
 	LastBlock  *int
-	Page       *int
+	PageNumber *int
+	PageSize   *int
 }
 
 // NewDeviceDataContext parses the incoming request URL and body, performs validations and creates the
@@ -920,7 +921,7 @@ func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Ser
 		rawDeviceID := paramDeviceID[0]
 		rctx.DeviceID = rawDeviceID
 	}
-	paramFirstBlock := req.Params["first_block"]
+	paramFirstBlock := req.Params["firstBlock"]
 	if len(paramFirstBlock) > 0 {
 		rawFirstBlock := paramFirstBlock[0]
 		if firstBlock, err2 := strconv.Atoi(rawFirstBlock); err2 == nil {
@@ -928,10 +929,10 @@ func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Ser
 			tmp13 := &tmp14
 			rctx.FirstBlock = tmp13
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("first_block", rawFirstBlock, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("firstBlock", rawFirstBlock, "integer"))
 		}
 	}
-	paramLastBlock := req.Params["last_block"]
+	paramLastBlock := req.Params["lastBlock"]
 	if len(paramLastBlock) > 0 {
 		rawLastBlock := paramLastBlock[0]
 		if lastBlock, err2 := strconv.Atoi(rawLastBlock); err2 == nil {
@@ -939,18 +940,29 @@ func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Ser
 			tmp15 := &tmp16
 			rctx.LastBlock = tmp15
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("last_block", rawLastBlock, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lastBlock", rawLastBlock, "integer"))
 		}
 	}
-	paramPage := req.Params["page"]
-	if len(paramPage) > 0 {
-		rawPage := paramPage[0]
-		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp18 := page
+	paramPageNumber := req.Params["pageNumber"]
+	if len(paramPageNumber) > 0 {
+		rawPageNumber := paramPageNumber[0]
+		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
+			tmp18 := pageNumber
 			tmp17 := &tmp18
-			rctx.Page = tmp17
+			rctx.PageNumber = tmp17
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+		}
+	}
+	paramPageSize := req.Params["pageSize"]
+	if len(paramPageSize) > 0 {
+		rawPageSize := paramPageSize[0]
+		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
+			tmp20 := pageSize
+			tmp19 := &tmp20
+			rctx.PageSize = tmp19
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1895,9 +1907,9 @@ func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Reques
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp30 := page
-			tmp29 := &tmp30
-			rctx.Page = tmp29
+			tmp32 := page
+			tmp31 := &tmp32
+			rctx.Page = tmp31
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1940,9 +1952,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp32 := page
-			tmp31 := &tmp32
-			rctx.Page = tmp31
+			tmp34 := page
+			tmp33 := &tmp34
+			rctx.Page = tmp33
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -1985,9 +1997,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp34 := page
-			tmp33 := &tmp34
-			rctx.Page = tmp33
+			tmp36 := page
+			tmp35 := &tmp36
+			rctx.Page = tmp35
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}

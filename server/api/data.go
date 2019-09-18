@@ -121,34 +121,30 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 	log := Logger(ctx).Sugar()
 
-	if true {
-		ir, err := NewIngestionRepository(c.options.Database)
-		if err != nil {
-			return err
-		}
-
-		all, err := ir.QueryPending(ctx)
-		if err != nil {
-			return err
-		}
-
-		for _, i := range all {
-			log.Infow("ingestion", "device_id", i.DeviceID)
-		}
-	}
+	_ = log
 
 	rr, err := NewRecordRepository(c.options.Database)
 	if err != nil {
 		return err
 	}
 
-	page, err := rr.QueryDevice(ctx, ctx.DeviceID, 0, 200)
+	pageNumber := 0
+	if ctx.PageNumber != nil {
+		pageNumber = *ctx.PageNumber
+	}
+
+	pageSize := 200
+	if ctx.PageSize != nil {
+		pageSize = *ctx.PageSize
+	}
+
+	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
 	if err != nil {
 		return err
 	}
 
-	dataVms := make([]*app.DeviceDataRecord, 0)
-	for _, r := range page.Data {
+	dataVms := make([]*app.DeviceDataRecord, len(page.Data))
+	for i, r := range page.Data {
 		data, err := r.GetData()
 		if err != nil {
 			return err
@@ -159,27 +155,27 @@ func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 			coordinates = r.Location.Coordinates()
 		}
 
-		dataVms = append(dataVms, &app.DeviceDataRecord{
+		dataVms[i] = &app.DeviceDataRecord{
 			Time:     r.Time,
 			Record:   int(r.Number),
 			Meta:     int(r.Meta),
 			Location: coordinates,
 			Data:     data,
-		})
+		}
 	}
 
-	metaVms := make([]*app.DeviceMetaRecord, 0)
-	for _, r := range page.Meta {
+	metaVms := make([]*app.DeviceMetaRecord, len(page.Meta))
+	for i, r := range page.Meta {
 		data, err := r.GetData()
 		if err != nil {
 			return err
 		}
 
-		metaVms = append(metaVms, &app.DeviceMetaRecord{
+		metaVms[i] = &app.DeviceMetaRecord{
 			Time:   r.Time,
 			Record: int(r.Number),
 			Data:   data,
-		})
+		}
 	}
 
 	return ctx.OK(&app.DeviceDataRecordsResponse{
@@ -266,7 +262,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 		return nil, err
 	}
 
-	log.Infow("querying", "device_id", deviceIdBytes)
+	log.Infow("querying", "device_id", deviceIdBytes, "page_number", pageNumber, "page_size", pageSize)
 
 	drs := []*data.DataRecord{}
 	if err := r.Database.SelectContext(ctx, &drs, `

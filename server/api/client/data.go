@@ -53,8 +53,8 @@ func DeviceDataPath(deviceID string) string {
 }
 
 // Retrieve data
-func (c *Client) DeviceData(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int) (*http.Response, error) {
-	req, err := c.NewDeviceDataRequest(ctx, path, firstBlock, lastBlock, page)
+func (c *Client) DeviceData(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Response, error) {
+	req, err := c.NewDeviceDataRequest(ctx, path, firstBlock, lastBlock, pageNumber, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *Client) DeviceData(ctx context.Context, path string, firstBlock *int, l
 }
 
 // NewDeviceDataRequest create the request corresponding to the device action endpoint of the data resource.
-func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int) (*http.Request, error) {
+func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -70,16 +70,20 @@ func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlo
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if firstBlock != nil {
-		tmp179 := strconv.Itoa(*firstBlock)
-		values.Set("first_block", tmp179)
+		tmp181 := strconv.Itoa(*firstBlock)
+		values.Set("firstBlock", tmp181)
 	}
 	if lastBlock != nil {
-		tmp180 := strconv.Itoa(*lastBlock)
-		values.Set("last_block", tmp180)
+		tmp182 := strconv.Itoa(*lastBlock)
+		values.Set("lastBlock", tmp182)
 	}
-	if page != nil {
-		tmp181 := strconv.Itoa(*page)
-		values.Set("page", tmp181)
+	if pageNumber != nil {
+		tmp183 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp183)
+	}
+	if pageSize != nil {
+		tmp184 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp184)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
