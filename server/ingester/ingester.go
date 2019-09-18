@@ -2,7 +2,7 @@ package ingester
 
 import (
 	"context"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"mime"
 	"net/http"
@@ -181,12 +181,12 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("Invalid %s (no header)", FkTypeHeaderName)
 	}
 
-	deviceId, err := base64.StdEncoding.DecodeString(deviceIdRaw)
+	deviceId, err := hex.DecodeString(deviceIdRaw)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid %s (%v)", FkDeviceIdHeaderName, err)
 	}
 
-	generation, err := base64.StdEncoding.DecodeString(generationRaw)
+	generation, err := hex.DecodeString(generationRaw)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid %s (%v)", FkGenerationHeaderName, err)
 	}

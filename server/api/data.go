@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/goadesign/goa"
@@ -121,7 +121,7 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 	log := Logger(ctx).Sugar()
 
-	if false {
+	if true {
 		ir, err := NewIngestionRepository(c.options.Database)
 		if err != nil {
 			return err
@@ -142,20 +142,40 @@ func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 		return err
 	}
 
-	data, err := rr.QueryDevice(ctx, ctx.DeviceID)
+	page, err := rr.QueryDevice(ctx, ctx.DeviceID, 0, 200)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("data", "records", len(data))
-
 	dataVms := make([]*app.DeviceDataRecord, 0)
-	for _, r := range data {
+	for _, r := range page.Data {
 		data, err := r.GetData()
 		if err != nil {
 			return err
 		}
+
+		coordinates := []float64{}
+		if r.Location != nil {
+			coordinates = r.Location.Coordinates()
+		}
+
 		dataVms = append(dataVms, &app.DeviceDataRecord{
+			Time:     r.Time,
+			Record:   int(r.Number),
+			Meta:     int(r.Meta),
+			Location: coordinates,
+			Data:     data,
+		})
+	}
+
+	metaVms := make([]*app.DeviceMetaRecord, 0)
+	for _, r := range page.Meta {
+		data, err := r.GetData()
+		if err != nil {
+			return err
+		}
+
+		metaVms = append(metaVms, &app.DeviceMetaRecord{
 			Time:   r.Time,
 			Record: int(r.Number),
 			Data:   data,
@@ -164,7 +184,7 @@ func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 
 	return ctx.OK(&app.DeviceDataRecordsResponse{
 		Summary: &app.DeviceDataStreamsSummary{},
-		Meta:    []*app.DeviceMetaRecord{},
+		Meta:    metaVms,
 		Data:    dataVms,
 	})
 }
@@ -186,13 +206,6 @@ func (r *IngestionRepository) QueryById(ctx context.Context, id int64) (i *data.
 		return nil, nil
 	}
 	return found[0], nil
-}
-
-func (r *IngestionRepository) Delete(ctx context.Context, id int64) (err error) {
-	if _, err := r.Database.ExecContext(ctx, `DELETE FROM fieldkit.ingestion WHERE id = $1`, id); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ingestion, err error) {
@@ -225,6 +238,13 @@ func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id int64) e
 	return nil
 }
 
+func (r *IngestionRepository) Delete(ctx context.Context, id int64) (err error) {
+	if _, err := r.Database.ExecContext(ctx, `DELETE FROM fieldkit.ingestion WHERE id = $1`, id); err != nil {
+		return err
+	}
+	return nil
+}
+
 type RecordRepository struct {
 	Database *sqlxcache.DB
 }
@@ -233,28 +253,42 @@ func NewRecordRepository(database *sqlxcache.DB) (rr *RecordRepository, err erro
 	return &RecordRepository{Database: database}, nil
 }
 
-func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string) (all []*data.DataRecord, err error) {
+type RecordsPage struct {
+	Data []*data.DataRecord
+	Meta []*data.MetaRecord
+}
+
+func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pageNumber, pageSize int) (page *RecordsPage, err error) {
 	log := Logger(ctx).Sugar()
 
-	pageSize := 200
-	page := 0
-
-	deviceIdBytes, err := base64.StdEncoding.DecodeString(deviceId)
+	deviceIdBytes, err := hex.DecodeString(deviceId)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Infow("querying", "device_id", deviceIdBytes)
 
-	data := []*data.DataRecord{}
-	if err := r.Database.SelectContext(ctx, &data, `
-	    SELECT r.*
-	    FROM fieldkit.data_record AS r JOIN fieldkit.ingestion AS i ON (r.ingestion_id = i.id)
-	    WHERE (i.device_id = $1) AND ((i.errors != true) OR (i.errors IS NULL))
-	    ORDER BY r.time DESC LIMIT $2 OFFSET $3
-	`, deviceIdBytes, pageSize, pageSize*page); err != nil {
+	drs := []*data.DataRecord{}
+	if err := r.Database.SelectContext(ctx, &drs, `
+	    SELECT r.* FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+	    WHERE (p.device_id = $1)
+	    ORDER BY r.time DESC LIMIT $2 OFFSET $3`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	mrs := []*data.MetaRecord{}
+	if err := r.Database.SelectContext(ctx, &mrs, `
+	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
+		SELECT DISTINCT r.meta FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		WHERE (p.device_id = $1) LIMIT $2 OFFSET $3
+	    ))`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
+		return nil, err
+	}
+
+	page = &RecordsPage{
+		Data: drs,
+		Meta: mrs,
+	}
+
+	return
 }

@@ -25,12 +25,16 @@ var DeviceDataRecord = MediaType("application/vnd.app.device.data.record+json", 
 	Attributes(func() {
 		Attribute("time", DateTime)
 		Attribute("record", Integer)
+		Attribute("meta", Integer)
+		Attribute("location", ArrayOf(Number))
 		Attribute("data", HashOf(String, Any))
-		Required("time", "record", "data")
+		Required("time", "record", "meta", "location", "data")
 	})
 	View("default", func() {
 		Attribute("time")
 		Attribute("record")
+		Attribute("meta")
+		Attribute("location")
 		Attribute("data")
 	})
 })

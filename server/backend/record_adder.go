@@ -148,8 +148,6 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			Location:    location,
 		}
 
-		log.Infow("adding", "data_record", dataRecord)
-
 		if err := dataRecord.SetData(pr.DataRecord); err != nil {
 			return err
 		}
@@ -160,6 +158,8 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return err
 		}
 	}
+
+	_ = log
 
 	return nil
 }

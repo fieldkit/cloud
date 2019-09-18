@@ -444,18 +444,6 @@ definitions:
       radius: 0.9710384742256701
       sourceId: 5.824585117249932e+18
       startTime: "1979-02-06T23:46:27Z"
-    - centroid:
-      - 0.10213203241898468
-      endTime: "1985-07-21T15:57:45Z"
-      envelope:
-      - - 0.18073588467812346
-      - - 0.18073588467812346
-      - - 0.18073588467812346
-      id: 7.204590710558903e+18
-      numberOfFeatures: 8.963711443699794e+18
-      radius: 0.9710384742256701
-      sourceId: 5.824585117249932e+18
-      startTime: "1979-02-06T23:46:27Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -463,12 +451,12 @@ definitions:
     type: array
   ConcatenatedFileInfo:
     example:
-      csv: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+      csv: Quidem repellendus cupiditate nemo doloribus recusandae.
       size: 6.525323513591937e+18
       time: "1986-01-17T16:31:06Z"
     properties:
       csv:
-        example: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+        example: Quidem repellendus cupiditate nemo doloribus recusandae.
         type: string
       size:
         example: 6.525323513591937e+18
@@ -487,11 +475,11 @@ definitions:
   ConcatenatedFilesInfo:
     example:
       data:
-        csv: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+        csv: Quidem repellendus cupiditate nemo doloribus recusandae.
         size: 6.525323513591937e+18
         time: "1986-01-17T16:31:06Z"
       logs:
-        csv: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+        csv: Quidem repellendus cupiditate nemo doloribus recusandae.
         size: 6.525323513591937e+18
         time: "1986-01-17T16:31:06Z"
     properties:
@@ -509,25 +497,42 @@ definitions:
     example:
       data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
-      record: 5.114928591801609e+18
-      time: "1998-11-26T18:49:12Z"
+      location:
+      - 0.014587859688453188
+      meta: 3.5212274647530583e+18
+      record: 9.930548092478253e+17
+      time: "1978-10-07T18:55:18Z"
     properties:
       data:
         additionalProperties: true
         example:
           Sapiente ipsa expedita qui eum enim deleniti.: false
         type: object
+      location:
+        example:
+        - 0.014587859688453188
+        items:
+          example: 0.014587859688453188
+          format: double
+          type: number
+        type: array
+      meta:
+        example: 3.5212274647530583e+18
+        format: int64
+        type: integer
       record:
-        example: 5.114928591801609e+18
+        example: 9.930548092478253e+17
         format: int64
         type: integer
       time:
-        example: "1998-11-26T18:49:12Z"
+        example: "1978-10-07T18:55:18Z"
         format: date-time
         type: string
     required:
     - time
     - record
+    - meta
+    - location
     - data
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; view=default'
     type: object
@@ -537,12 +542,11 @@ definitions:
     example:
     - data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
-      record: 5.114928591801609e+18
-      time: "1998-11-26T18:49:12Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      record: 5.114928591801609e+18
-      time: "1998-11-26T18:49:12Z"
+      location:
+      - 0.014587859688453188
+      meta: 3.5212274647530583e+18
+      record: 9.930548092478253e+17
+      time: "1978-10-07T18:55:18Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -554,36 +558,45 @@ definitions:
       data:
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
-        record: 5.114928591801609e+18
-        time: "1998-11-26T18:49:12Z"
+        location:
+        - 0.014587859688453188
+        meta: 3.5212274647530583e+18
+        record: 9.930548092478253e+17
+        time: "1978-10-07T18:55:18Z"
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
-        record: 5.114928591801609e+18
-        time: "1998-11-26T18:49:12Z"
+        location:
+        - 0.014587859688453188
+        meta: 3.5212274647530583e+18
+        record: 9.930548092478253e+17
+        time: "1978-10-07T18:55:18Z"
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
-        record: 5.114928591801609e+18
-        time: "1998-11-26T18:49:12Z"
+        location:
+        - 0.014587859688453188
+        meta: 3.5212274647530583e+18
+        record: 9.930548092478253e+17
+        time: "1978-10-07T18:55:18Z"
       meta:
       - data:
-          Fugit commodi ut qui.: 5.155395871906765e+18
-        record: 3.81148740746794e+18
-        time: "1996-08-04T05:23:12Z"
+          Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+        record: 5.536231043872638e+18
+        time: "1981-09-10T10:19:40Z"
       - data:
-          Fugit commodi ut qui.: 5.155395871906765e+18
-        record: 3.81148740746794e+18
-        time: "1996-08-04T05:23:12Z"
+          Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+        record: 5.536231043872638e+18
+        time: "1981-09-10T10:19:40Z"
       - data:
-          Fugit commodi ut qui.: 5.155395871906765e+18
-        record: 3.81148740746794e+18
-        time: "1996-08-04T05:23:12Z"
+          Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+        record: 5.536231043872638e+18
+        time: "1981-09-10T10:19:40Z"
       summary:
         data:
-          records: 3.995137165690477e+18
-          size: 9.060172328065066e+18
+          records: 9.060172328065066e+18
+          size: 1.9465084386106826e+18
         meta:
-          records: 3.995137165690477e+18
-          size: 9.060172328065066e+18
+          records: 9.060172328065066e+18
+          size: 1.9465084386106826e+18
     properties:
       data:
         $ref: '#/definitions/DeviceDataRecordCollection'
@@ -600,11 +613,11 @@ definitions:
   DeviceDataStreamsSummary:
     example:
       data:
-        records: 3.995137165690477e+18
-        size: 9.060172328065066e+18
+        records: 9.060172328065066e+18
+        size: 1.9465084386106826e+18
       meta:
-        records: 3.995137165690477e+18
-        size: 9.060172328065066e+18
+        records: 9.060172328065066e+18
+        size: 1.9465084386106826e+18
     properties:
       data:
         $ref: '#/definitions/DeviceStreamSummary'
@@ -615,14 +628,14 @@ definitions:
   DeviceDetails:
     description: DeviceDetails media type (default view)
     example:
-      device_id: Est amet ipsam reprehenderit totam dolorem impedit.
+      device_id: Reprehenderit totam dolorem impedit hic.
       files:
         data:
-          csv: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+          csv: Quidem repellendus cupiditate nemo doloribus recusandae.
           size: 6.525323513591937e+18
           time: "1986-01-17T16:31:06Z"
         logs:
-          csv: Dolore quidem repellendus cupiditate nemo doloribus recusandae.
+          csv: Quidem repellendus cupiditate nemo doloribus recusandae.
           size: 6.525323513591937e+18
           time: "1986-01-17T16:31:06Z"
       notes:
@@ -651,7 +664,7 @@ definitions:
           info: Sit velit quo eveniet in.
     properties:
       device_id:
-        example: Est amet ipsam reprehenderit totam dolorem impedit.
+        example: Reprehenderit totam dolorem impedit hic.
         type: string
       files:
         $ref: '#/definitions/ConcatenatedFilesInfo'
@@ -863,21 +876,21 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Fugit commodi ut qui.: 5.155395871906765e+18
-      record: 3.81148740746794e+18
-      time: "1996-08-04T05:23:12Z"
+        Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+      record: 5.536231043872638e+18
+      time: "1981-09-10T10:19:40Z"
     properties:
       data:
         additionalProperties: true
         example:
-          Fugit commodi ut qui.: 5.155395871906765e+18
+          Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
         type: object
       record:
-        example: 3.81148740746794e+18
+        example: 5.536231043872638e+18
         format: int64
         type: integer
       time:
-        example: "1996-08-04T05:23:12Z"
+        example: "1981-09-10T10:19:40Z"
         format: date-time
         type: string
     required:
@@ -891,9 +904,13 @@ definitions:
       (default view)
     example:
     - data:
-        Fugit commodi ut qui.: 5.155395871906765e+18
-      record: 3.81148740746794e+18
-      time: "1996-08-04T05:23:12Z"
+        Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+      record: 5.536231043872638e+18
+      time: "1981-09-10T10:19:40Z"
+    - data:
+        Qui et aperiam.: 6521b0bd-58fa-4d23-9333-d4dbad5aaf60
+      record: 5.536231043872638e+18
+      time: "1981-09-10T10:19:40Z"
     items:
       $ref: '#/definitions/DeviceMetaRecord'
     title: 'Mediatype identifier: application/vnd.app.device.meta.record+json; type=collection;
@@ -1128,15 +1145,15 @@ definitions:
     type: object
   DeviceStreamSummary:
     example:
-      records: 3.995137165690477e+18
-      size: 9.060172328065066e+18
+      records: 9.060172328065066e+18
+      size: 1.9465084386106826e+18
     properties:
       records:
-        example: 3.995137165690477e+18
+        example: 9.060172328065066e+18
         format: int64
         type: integer
       size:
-        example: 9.060172328065066e+18
+        example: 1.9465084386106826e+18
         format: int64
         type: integer
     title: DeviceStreamSummary
@@ -1652,6 +1669,13 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
+    - geometry:
+        coordinates:
+        - 0.8303318695657912
+        type: Doloremque aut dolore sed quisquam pariatur molestiae.
+      properties:
+        Dignissimos consectetur quo.: 0.06883001004377008
+      type: Inventore ratione nisi ea.
     - geometry:
         coordinates:
         - 0.8303318695657912

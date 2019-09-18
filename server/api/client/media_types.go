@@ -220,14 +220,19 @@ func (c *Client) DecodeDeviceDataRecordsResponse(resp *http.Response) (*DeviceDa
 //
 // Identifier: application/vnd.app.device.data.record+json; view=default
 type DeviceDataRecord struct {
-	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
-	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
-	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+	Data     map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
+	Meta     int                    `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Record   int                    `form:"record" json:"record" yaml:"record" xml:"record"`
+	Time     time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
 }
 
 // Validate validates the DeviceDataRecord media type instance.
 func (mt *DeviceDataRecord) Validate() (err error) {
 
+	if mt.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
+	}
 	if mt.Data == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
 	}
