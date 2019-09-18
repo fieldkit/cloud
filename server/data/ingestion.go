@@ -2,6 +2,8 @@ package data
 
 import (
 	"database/sql/driver"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -166,4 +168,18 @@ func (d *MetaRecord) GetData() (fields map[string]interface{}, err error) {
 		return nil, err
 	}
 	return
+}
+
+func DecodeBinaryString(s string) ([]byte, error) {
+	bytes, err := hex.DecodeString(s)
+	if err == nil {
+		return bytes, nil
+	}
+
+	bytes, err = base64.StdEncoding.DecodeString(s)
+	if err == nil {
+		return bytes, nil
+	}
+
+	return nil, fmt.Errorf("unable to decode binary string: %s", s)
 }

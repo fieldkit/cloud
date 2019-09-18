@@ -2,7 +2,6 @@ package ingester
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"mime"
 	"net/http"
@@ -181,12 +180,12 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("Invalid %s (no header)", FkTypeHeaderName)
 	}
 
-	deviceId, err := hex.DecodeString(deviceIdRaw)
+	deviceId, err := data.DecodeBinaryString(deviceIdRaw)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid %s (%v)", FkDeviceIdHeaderName, err)
 	}
 
-	generation, err := hex.DecodeString(generationRaw)
+	generation, err := data.DecodeBinaryString(generationRaw)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid %s (%v)", FkGenerationHeaderName, err)
 	}

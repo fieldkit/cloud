@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/goadesign/goa"
@@ -257,7 +256,7 @@ type RecordsPage struct {
 func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pageNumber, pageSize int) (page *RecordsPage, err error) {
 	log := Logger(ctx).Sugar()
 
-	deviceIdBytes, err := hex.DecodeString(deviceId)
+	deviceIdBytes, err := data.DecodeBinaryString(deviceId)
 	if err != nil {
 		return nil, err
 	}
