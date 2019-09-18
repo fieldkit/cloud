@@ -24,7 +24,7 @@ require (
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
-	github.com/fieldkit/data-protocol v0.0.0-20190903230951-dd4bd77f8fec
+	github.com/fieldkit/data-protocol v0.0.0-20190917153605-1851e79a9911
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.0.0-20190326234956-40f35b54ddf5
 	github.com/go-logfmt/logfmt v0.4.0

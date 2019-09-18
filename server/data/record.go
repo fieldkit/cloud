@@ -56,6 +56,9 @@ func (l *Location) Scan(data interface{}) error {
 }
 
 func (l *Location) Value() (driver.Value, error) {
+	if l == nil || l.point == nil {
+		return nil, nil
+	}
 	return l.point.ToWKT(), nil
 }
 

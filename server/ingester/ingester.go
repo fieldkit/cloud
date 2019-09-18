@@ -32,6 +32,7 @@ const (
 	ContentLengthHeaderName    = "Content-Length"
 	XForwardedForHeaderName    = "X-Forwarded-For"
 	FkDeviceIdHeaderName       = "Fk-DeviceId"
+	FkGenerationHeaderName     = "Fk-Generation"
 	FkBlocksIdHeaderName       = "Fk-Blocks"
 	FkFlagsIdHeaderName        = "Fk-Flags"
 	FkTypeHeaderName           = "Fk-Type"
@@ -80,27 +81,28 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 				}
 
 				ingestion := &data.Ingestion{
-					URL:      saved.URL,
-					UploadID: saved.ID,
-					UserID:   int32(claims["sub"].(float64)),
-					DeviceID: headers.FkDeviceId,
-					Type:     &headers.FkType,
-					Size:     int64(saved.BytesRead),
-					Blocks:   data.Int64Range(headers.FkBlocks),
-					Flags:    pq.Int64Array([]int64{}),
+					URL:        saved.URL,
+					UploadID:   saved.ID,
+					UserID:     int32(claims["sub"].(float64)),
+					DeviceID:   headers.FkDeviceId,
+					Generation: headers.FkGeneration,
+					Type:       headers.FkType,
+					Size:       int64(saved.BytesRead),
+					Blocks:     data.Int64Range(headers.FkBlocks),
+					Flags:      pq.Int64Array([]int64{}),
 				}
 
 				if err := o.Database.NamedGetContext(ctx, ingestion, `
-				  INSERT INTO fieldkit.ingestion
-				    (time, upload_id, user_id, device_id, size, url, blocks, flags) VALUES
-				    (NOW(), :upload_id, :user_id, :device_id, :size, :url, :blocks, :flags)
-                                  RETURNING * `, ingestion); err != nil {
+				    INSERT INTO fieldkit.ingestion
+					(time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags) VALUES
+					(NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
+				    RETURNING *`, ingestion); err != nil {
 					return err
 				}
 
-				log.Infow("saved", "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "ingestion_id", ingestion.ID)
+				log.Infow("saved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
 			} else {
-				log.Infow("unsaved", "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
+				log.Infow("unsaved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
 			}
 
 			// TODO Give information.
@@ -142,6 +144,7 @@ type IncomingHeaders struct {
 	XForwardedFor   string
 	FkType          string
 	FkDeviceId      []byte
+	FkGeneration    []byte
 	FkBlocks        []int64
 	FkFlags         []int64
 }
@@ -168,6 +171,11 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("Invalid %s (no header)", FkDeviceIdHeaderName)
 	}
 
+	generationRaw := req.Header.Get(FkGenerationHeaderName)
+	if len(generationRaw) == 0 {
+		return nil, fmt.Errorf("Invalid %s (no header)", FkGenerationHeaderName)
+	}
+
 	typeRaw := req.Header.Get(FkTypeHeaderName)
 	if len(typeRaw) == 0 {
 		return nil, fmt.Errorf("Invalid %s (no header)", FkTypeHeaderName)
@@ -176,6 +184,11 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	deviceId, err := base64.StdEncoding.DecodeString(deviceIdRaw)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid %s (%v)", FkDeviceIdHeaderName, err)
+	}
+
+	generation, err := base64.StdEncoding.DecodeString(generationRaw)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid %s (%v)", FkGenerationHeaderName, err)
 	}
 
 	blocks, err := data.ParseBlocks(req.Header.Get(FkBlocksIdHeaderName))
@@ -191,6 +204,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
 		FkType:          typeRaw,
 		FkDeviceId:      deviceId,
+		FkGeneration:    generation,
 		FkBlocks:        blocks,
 	}
 

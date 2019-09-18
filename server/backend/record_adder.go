@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -58,34 +59,108 @@ func (ra *RecordAdder) TryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 	return
 }
 
-func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) error {
-	if pr.SignedRecord != nil {
-		// TODO: Create provision.
-		// TODO:
+func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
+	// TODO Verify we have a valid generation.
+	provision := &data.Provision{
+		Created:    time.Now(),
+		Updated:    time.Now(),
+		DeviceID:   i.DeviceID,
+		Generation: i.Generation,
 	}
-	/*
-		if pr.SignedRecord != nil {
-			metaRecord := data.MetaRecord{
-				ProvisionID: i.ID,
-				Time:        i.Time,
-				Number:      int64(pr.SignedRecord.Record),
-			}
-			if err := metaRecord.SetData(pr.DataRecord); err != nil {
-				return err
-			}
-			return ra.Database.NamedGetContext(ctx, metaRecord, `INSERT INTO fieldkit.meta_record (ingestion_id, time, number, raw) VALUES (:ingestion_id, :time, :number, :raw) RETURNING *`, metaRecord)
-		} else {
-			dataRecord := data.DataRecord{
-				ProvisionID: i.ID,
-				Time:        i.Time,
-				Number:      int64(pr.DataRecord.Readings.Reading),
-			}
-			if err := dataRecord.SetData(pr.DataRecord); err != nil {
-				return err
-			}
-			return ra.Database.NamedGetContext(ctx, dataRecord, `INSERT INTO fieldkit.data_record (ingestion_id, time, number, raw) VALUES (:ingestion_id, :time, :number, :raw) RETURNING *`, dataRecord)
+
+	if err := ra.Database.NamedGetContext(ctx, &provision.ID, `
+		    INSERT INTO fieldkit.provision (device_id, generation, created, updated)
+		    VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
+		    DO UPDATE SET updated = NOW() RETURNING id`, provision); err != nil {
+		return nil, err
+	}
+
+	return provision, nil
+}
+
+func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
+	records := []*data.MetaRecord{}
+	if err := ra.Database.SelectContext(ctx, &records, `SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2`, provisionId, number); err != nil {
+		return nil, err
+	}
+
+	if len(records) != 1 {
+		return nil, fmt.Errorf("unable to locate meta record")
+	}
+
+	return records[0], nil
+}
+
+func (ra *RecordAdder) findLocation(location *pb.DeviceLocation) (l *data.Location, err error) {
+	lat := float64(location.Latitude)
+	lon := float64(location.Longitude)
+	altitude := float64(location.Altitude)
+
+	if lat > 90 || lat < -90 || lon > 180 || lon < -180 {
+		return nil, err
+	}
+
+	l = data.NewLocation([]float64{lon, lat, altitude})
+
+	return
+}
+
+func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) error {
+	log := Logger(ctx).Sugar()
+
+	provision, err := ra.findProvision(ctx, i)
+	if err != nil {
+		return err
+	}
+
+	if pr.SignedRecord != nil {
+		metaRecord := data.MetaRecord{
+			ProvisionID: provision.ID,
+			Time:        i.Time,
+			Number:      int64(pr.SignedRecord.Record),
 		}
-	*/
+
+		if err := metaRecord.SetData(pr.DataRecord); err != nil {
+			return err
+		}
+
+		if err := ra.Database.NamedGetContext(ctx, &metaRecord, `
+		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
+		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, metaRecord); err != nil {
+			return err
+		}
+	} else {
+		location, err := ra.findLocation(pr.DataRecord.Readings.Location)
+		if err != nil {
+			return err
+		}
+
+		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
+		if err != nil {
+			return err
+		}
+
+		dataRecord := data.DataRecord{
+			ProvisionID: provision.ID,
+			Time:        i.Time,
+			Number:      int64(pr.DataRecord.Readings.Reading),
+			Meta:        meta.ID,
+			Location:    location,
+		}
+
+		log.Infow("adding", "data_record", dataRecord)
+
+		if err := dataRecord.SetData(pr.DataRecord); err != nil {
+			return err
+		}
+
+		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
+		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location) VALUES (:provision_id, :time, :number, :raw, :meta, :location)
+		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, dataRecord); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -131,6 +206,9 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 			} else {
 				data = true
 				err = ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 
@@ -151,6 +229,9 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 				})
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 

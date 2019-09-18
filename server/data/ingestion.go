@@ -14,27 +14,28 @@ import (
 )
 
 type Ingestion struct {
-	ID        int64         `db:"id"`
-	Time      time.Time     `db:"time"`
-	UploadID  string        `db:"upload_id"`
-	UserID    int32         `db:"user_id"`
-	DeviceID  []byte        `db:"device_id"`
-	Size      int64         `db:"size"`
-	URL       string        `db:"url"`
-	Type      *string       `db:"type"`
-	Blocks    Int64Range    `db:"blocks"`
-	Flags     pq.Int64Array `db:"flags"`
-	Errors    *bool         `db:"errors"`
-	Completed *time.Time    `db:"processing_completed"`
-	Attempted *time.Time    `db:"processing_attempted"`
+	ID         int64         `db:"id"`
+	Time       time.Time     `db:"time"`
+	UploadID   string        `db:"upload_id"`
+	UserID     int32         `db:"user_id"`
+	DeviceID   []byte        `db:"device_id"`
+	Generation []byte        `db:"generation"`
+	Size       int64         `db:"size"`
+	URL        string        `db:"url"`
+	Type       string        `db:"type"`
+	Blocks     Int64Range    `db:"blocks"`
+	Flags      pq.Int64Array `db:"flags"`
+	Completed  *time.Time    `db:"completed"`
+	Attempted  *time.Time    `db:"attempted"`
+	Errors     *bool         `db:"errors"`
 }
 
 type Provision struct {
-	ID          int64     `db:"id"`
-	Time        time.Time `db:"time"`
-	DeviceID    []byte    `db:"device_id"`
-	Generation  []byte    `db:"generation"`
-	IngestionID int64     `db:"ingestion_id"`
+	ID         int64     `db:"id"`
+	Created    time.Time `db:"created"`
+	Updated    time.Time `db:"updated"`
+	DeviceID   []byte    `db:"device_id"`
+	Generation []byte    `db:"generation"`
 }
 
 type Int64Range []int64
@@ -145,6 +146,7 @@ type DataRecord struct {
 	ProvisionID int64          `db:"provision_id"`
 	Time        time.Time      `db:"time"`
 	Number      int64          `db:"number"`
+	Meta        int64          `db:"meta"`
 	Location    *Location      `db:"location"`
 	Data        types.JSONText `db:"raw"`
 }

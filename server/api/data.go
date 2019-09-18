@@ -57,7 +57,12 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 		err := recordAdder.WriteRecords(ctx, i)
 		if err != nil {
 			log.Errorw("error", "error", err)
-			err := ir.MarkHasErrors(ctx, i.ID, true)
+			err := ir.MarkProcessedHasErrors(ctx, i.ID)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := ir.MarkProcessedDone(ctx, i.ID)
 			if err != nil {
 				return err
 			}
@@ -206,8 +211,15 @@ func (r *IngestionRepository) QueryAll(ctx context.Context) (all []*data.Ingesti
 	return pending, nil
 }
 
-func (r *IngestionRepository) MarkHasErrors(ctx context.Context, id int64, errors bool) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET errors = $2 WHERE id = $1`, id, errors); err != nil {
+func (r *IngestionRepository) MarkProcessedHasErrors(ctx context.Context, id int64) error {
+	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET errors = true, attempted = NOW() WHERE id = $1`, id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id int64) error {
+	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET errors = false, completed = NOW() WHERE id = $1`, id); err != nil {
 		return err
 	}
 	return nil
@@ -236,11 +248,10 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string) (al
 
 	data := []*data.DataRecord{}
 	if err := r.Database.SelectContext(ctx, &data, `
-	  SELECT
-	    r.*
-	  FROM fieldkit.data_record AS r JOIN fieldkit.ingestion AS i ON (r.ingestion_id = i.id)
-	  WHERE (i.device_id = $1) AND ((i.errors != true) OR (i.errors IS NULL))
-	  ORDER BY r.time DESC LIMIT $2 OFFSET $3
+	    SELECT r.*
+	    FROM fieldkit.data_record AS r JOIN fieldkit.ingestion AS i ON (r.ingestion_id = i.id)
+	    WHERE (i.device_id = $1) AND ((i.errors != true) OR (i.errors IS NULL))
+	    ORDER BY r.time DESC LIMIT $2 OFFSET $3
 	`, deviceIdBytes, pageSize, pageSize*page); err != nil {
 		return nil, err
 	}
