@@ -332,12 +332,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -420,6 +414,18 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.10213203241898468
+      endTime: "1985-07-21T15:57:45Z"
+      envelope:
+      - - 0.18073588467812346
+      - - 0.18073588467812346
+      - - 0.18073588467812346
+      id: 7.204590710558903e+18
+      numberOfFeatures: 8.963711443699794e+18
+      radius: 0.9710384742256701
+      sourceId: 5.824585117249932e+18
+      startTime: "1979-02-06T23:46:27Z"
     - centroid:
       - 0.10213203241898468
       endTime: "1985-07-21T15:57:45Z"
@@ -579,15 +585,15 @@ definitions:
         time: "1978-10-07T18:55:18Z"
       meta:
       - data:
-          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
       - data:
-          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
       - data:
-          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
     properties:
@@ -913,14 +919,14 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
       record: 5.536231043872638e+18
       time: "1981-09-10T10:19:40Z"
     properties:
       data:
         additionalProperties: true
         example:
-          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
         type: object
       record:
         example: 5.536231043872638e+18
@@ -941,11 +947,11 @@ definitions:
       (default view)
     example:
     - data:
-        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
       record: 5.536231043872638e+18
       time: "1981-09-10T10:19:40Z"
     - data:
-        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
       record: 5.536231043872638e+18
       time: "1981-09-10T10:19:40Z"
     items:
@@ -5579,6 +5585,31 @@ paths:
       tags:
       - station
   /stations/{stationId}:
+    delete:
+      description: |-
+        Delete station
+
+        Required security scopes:
+          * `api:access`
+      operationId: station#delete
+      parameters:
+      - in: path
+        name: stationId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete station
+      tags:
+      - station
     patch:
       description: |-
         Update a station

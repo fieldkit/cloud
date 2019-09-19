@@ -4349,6 +4349,7 @@ func handleSourceTokenOrigin(h goa.Handler) goa.Handler {
 type StationController interface {
 	goa.Muxer
 	Add(*AddStationContext) error
+	Delete(*DeleteStationContext) error
 	Get(*GetStationContext) error
 	List(*ListStationContext) error
 	Update(*UpdateStationContext) error
@@ -4359,8 +4360,8 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -4384,6 +4385,23 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("POST", "/stations", ctrl.MuxHandler("add", h, unmarshalAddStationPayload))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Add", "route", "POST /stations", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteStationContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleStationOrigin(h)
+	service.Mux.Handle("DELETE", "/stations/:stationId", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Station", "action", "Delete", "route", "DELETE /stations/:stationId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

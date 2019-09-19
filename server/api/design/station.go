@@ -99,4 +99,16 @@ var _ = Resource("station", func() {
 			Media(Stations)
 		})
 	})
+
+	Action("delete", func() {
+		Routing(DELETE("stations/:stationId"))
+		Description("Delete station")
+		Params(func() {
+			Param("stationId", Integer)
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
+		})
+	})
 })

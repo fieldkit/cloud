@@ -57,6 +57,41 @@ func (c *Client) NewAddStationRequest(ctx context.Context, path string, payload 
 	return req, nil
 }
 
+// DeleteStationPath computes a request path to the delete action of station.
+func DeleteStationPath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/stations/%s", param0)
+}
+
+// Delete station
+func (c *Client) DeleteStation(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteStationRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteStationRequest create the request corresponding to the delete action endpoint of the station resource.
+func (c *Client) NewDeleteStationRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // GetStationPath computes a request path to the get action of station.
 func GetStationPath(stationID int) string {
 	param0 := strconv.Itoa(stationID)

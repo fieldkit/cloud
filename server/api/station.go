@@ -179,3 +179,21 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 	}
 	return ctx.OK(stationsWm)
 }
+
+func (c *StationController) Delete(ctx *app.DeleteStationContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.NamedExecContext(ctx, "DELETE FROM fieldkit.station WHERE id = :id", ctx.StationID); err != nil {
+		return err
+	}
+
+	return ctx.OK()
+}

@@ -3571,6 +3571,47 @@ func (ctx *AddStationContext) BadRequest() error {
 	return nil
 }
 
+// DeleteStationContext provides the station delete action context.
+type DeleteStationContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StationID int
+}
+
+// NewDeleteStationContext parses the incoming request URL and body, performs validations and creates the
+// context used by the station controller delete action.
+func NewDeleteStationContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteStationContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteStationContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 204.
+func (ctx *DeleteStationContext) OK() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteStationContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // GetStationContext provides the station get action context.
 type GetStationContext struct {
 	context.Context
