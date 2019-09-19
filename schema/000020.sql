@@ -46,7 +46,7 @@ CREATE TABLE fieldkit.data_record (
   provision_id integer NOT NULL REFERENCES fieldkit.provision(id),
   time timestamp NOT NULL,
   number integer NOT NULL,
-  meta integer NOT NULL,
+  meta integer NOT NULL REFERENCES fieldkit.meta_record(id),
   location geometry(POINT, 4326),
   raw json NOT NULL
 );
