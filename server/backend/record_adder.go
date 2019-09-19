@@ -61,6 +61,16 @@ func (ra *RecordAdder) TryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
 	// TODO Verify we have a valid generation.
+
+	provisions := []*data.Provision{}
+	if err := ra.Database.SelectContext(ctx, &provisions, `SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2`, i.DeviceID, i.Generation); err != nil {
+		return nil, err
+	}
+
+	if len(provisions) == 1 {
+		return provisions[0], nil
+	}
+
 	provision := &data.Provision{
 		Created:    time.Now(),
 		Updated:    time.Now(),
