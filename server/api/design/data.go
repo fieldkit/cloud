@@ -127,6 +127,10 @@ var DeviceDataSummaryResponse = MediaType("application/vnd.app.device.summary+js
 })
 
 var _ = Resource("data", func() {
+	Security(JWT, func() {
+		Scope("api:access")
+	})
+
 	Action("process", func() {
 		Routing(GET("data/process"))
 		Description("Process data")

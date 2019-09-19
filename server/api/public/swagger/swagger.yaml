@@ -547,13 +547,6 @@ definitions:
       meta: 3.5212274647530583e+18
       record: 9.930548092478253e+17
       time: "1978-10-07T18:55:18Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      location:
-      - 0.014587859688453188
-      meta: 3.5212274647530583e+18
-      record: 9.930548092478253e+17
-      time: "1978-10-07T18:55:18Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -586,15 +579,15 @@ definitions:
         time: "1978-10-07T18:55:18Z"
       meta:
       - data:
-          Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
       - data:
-          Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
       - data:
-          Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
         record: 5.536231043872638e+18
         time: "1981-09-10T10:19:40Z"
     properties:
@@ -920,14 +913,14 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
       record: 5.536231043872638e+18
       time: "1981-09-10T10:19:40Z"
     properties:
       data:
         additionalProperties: true
         example:
-          Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+          Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
         type: object
       record:
         example: 5.536231043872638e+18
@@ -948,7 +941,11 @@ definitions:
       (default view)
     example:
     - data:
-        Qui et aperiam.: 1e1ccd4b-dc08-4406-87c5-15c3f92f6732
+        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
+      record: 5.536231043872638e+18
+      time: "1981-09-10T10:19:40Z"
+    - data:
+        Qui et aperiam.: 619dd3b4-8816-44e2-b08a-2940abe66a56
       record: 5.536231043872638e+18
       time: "1981-09-10T10:19:40Z"
     items:
@@ -3131,7 +3128,11 @@ info:
 paths:
   /data/devices/{deviceId}/data:
     get:
-      description: Retrieve data
+      description: |-
+        Retrieve data
+
+        Required security scopes:
+          * `api:access`
       operationId: data#device data
       parameters:
       - in: path
@@ -3165,12 +3166,19 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: device data data
       tags:
       - data
   /data/devices/{deviceId}/summary:
     get:
-      description: Retrieve summary
+      description: |-
+        Retrieve summary
+
+        Required security scopes:
+          * `api:access`
       operationId: data#device summary
       parameters:
       - in: path
@@ -3188,12 +3196,19 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: device summary data
       tags:
       - data
   /data/ingestions/{ingestionId}:
     delete:
-      description: Delete data
+      description: |-
+        Delete data
+
+        Required security scopes:
+          * `api:access`
       operationId: data#delete
       parameters:
       - in: path
@@ -3209,12 +3224,19 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: delete data
       tags:
       - data
   /data/process:
     get:
-      description: Process data
+      description: |-
+        Process data
+
+        Required security scopes:
+          * `api:access`
       operationId: data#process
       produces:
       - text/plain
@@ -3224,6 +3246,9 @@ paths:
         "503": {}
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: process data
       tags:
       - data

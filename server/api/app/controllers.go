@@ -1334,9 +1334,10 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 		}
 		return ctrl.Delete(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleDataOrigin(h)
 	service.Mux.Handle("DELETE", "/data/ingestions/:ingestionId", ctrl.MuxHandler("delete", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Delete", "route", "DELETE /data/ingestions/:ingestionId")
+	service.LogInfo("mount", "ctrl", "Data", "action", "Delete", "route", "DELETE /data/ingestions/:ingestionId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1350,9 +1351,10 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 		}
 		return ctrl.DeviceData(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleDataOrigin(h)
 	service.Mux.Handle("GET", "/data/devices/:deviceId/data", ctrl.MuxHandler("device data", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceData", "route", "GET /data/devices/:deviceId/data")
+	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceData", "route", "GET /data/devices/:deviceId/data", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1366,9 +1368,10 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 		}
 		return ctrl.DeviceSummary(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleDataOrigin(h)
 	service.Mux.Handle("GET", "/data/devices/:deviceId/summary", ctrl.MuxHandler("device summary", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceSummary", "route", "GET /data/devices/:deviceId/summary")
+	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceSummary", "route", "GET /data/devices/:deviceId/summary", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1382,9 +1385,10 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 		}
 		return ctrl.Process(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleDataOrigin(h)
 	service.Mux.Handle("GET", "/data/process", ctrl.MuxHandler("process", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "GET /data/process")
+	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "GET /data/process", "security", "jwt")
 }
 
 // handleDataOrigin applies the CORS response headers corresponding to the origin.

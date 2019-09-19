@@ -42,6 +42,11 @@ func (c *Client) NewDeleteDataRequest(ctx context.Context, path string) (*http.R
 	if err != nil {
 		return nil, err
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -90,6 +95,11 @@ func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firs
 	if err != nil {
 		return nil, err
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -120,6 +130,11 @@ func (c *Client) NewDeviceSummaryDataRequest(ctx context.Context, path string) (
 	if err != nil {
 		return nil, err
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -148,6 +163,11 @@ func (c *Client) NewProcessDataRequest(ctx context.Context, path string) (*http.
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }

@@ -31,10 +31,18 @@ func NewPermissions(ctx context.Context) (p *Permissions, err error) {
 	return
 }
 
-func (p *Permissions) CanModifyStation(stationId int32) error {
+func (p *Permissions) CanModifyStationByStationID(stationId int32) error {
 	return nil
 }
 
-func (p *Permissions) CanViewStation(stationId int32) error {
+func (p *Permissions) CanViewStationByStationID(stationId int32) error {
+	return nil
+}
+
+func (p *Permissions) CanModifyStationByDeviceID(deviceId []byte) error {
+	return nil
+}
+
+func (p *Permissions) CanViewStationByDeviceID(deviceId []byte) error {
 	return nil
 }

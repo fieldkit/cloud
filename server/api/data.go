@@ -18,6 +18,11 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+const (
+	MetaTypeName = "meta"
+	DataTypeName = "data"
+)
+
 type DataControllerOptions struct {
 	Config   *ApiConfiguration
 	Session  *session.Session
@@ -75,6 +80,11 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 }
 
 func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
 	log := Logger(ctx).Sugar()
 
 	ir, err := NewIngestionRepository(c.options.Database)
@@ -90,6 +100,11 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 	}
 	if i == nil {
 		return ctx.NotFound()
+	}
+
+	err = p.CanModifyStationByDeviceID(i.DeviceID)
+	if err != nil {
+		return err
 	}
 
 	if err := ir.Delete(ctx, int64(ctx.IngestionID)); err != nil {
@@ -128,20 +143,25 @@ type BlocksSummaryRow struct {
 	Blocks data.Int64Range
 }
 
-const (
-	MetaTypeName = "meta"
-	DataTypeName = "data"
-)
-
 func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	_ = log
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
 
 	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
 	if err != nil {
 		return err
 	}
+
+	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	_ = log
 
 	log.Infow("summary", "device_id", deviceIdBytes)
 
@@ -156,21 +176,18 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 	}
 
 	var blockSummaries = make(map[string]map[string]BlocksSummaryRow)
-
 	for _, p := range provisions {
 		blockSummaries[hex.EncodeToString(p.Generation)] = make(map[string]BlocksSummaryRow)
 	}
 
 	for _, row := range rows {
 		g := hex.EncodeToString(row.Generation)
-
 		blockSummaries[g][row.Type] = BlocksSummaryRow{
 			Blocks: row.Blocks,
 		}
 	}
 
 	provisionVms := make([]*app.DeviceProvisionSummary, len(provisions))
-
 	for i, p := range provisions {
 		g := hex.EncodeToString(p.Generation)
 		byType := blockSummaries[g]
@@ -195,6 +212,21 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 }
 
 func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	if err != nil {
+		return err
+	}
+
 	log := Logger(ctx).Sugar()
 
 	_ = log

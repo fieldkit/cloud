@@ -111,7 +111,7 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		return err
 	}
 
-	err = p.CanModifyStation(int32(ctx.StationID))
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	err = p.CanViewStation(int32(ctx.StationID))
+	err = p.CanViewStationByStationID(int32(ctx.StationID))
 	if err != nil {
 		return err
 	}
