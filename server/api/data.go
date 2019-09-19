@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/goadesign/goa"
@@ -117,7 +118,83 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 	return ctx.OK([]byte("deleted"))
 }
 
-func (c *DataController) Device(ctx *app.DeviceDataContext) error {
+type ProvisionSummaryRow struct {
+	Generation []byte
+	Type       string
+	Blocks     data.Int64Range
+}
+
+type BlocksSummaryRow struct {
+	Blocks data.Int64Range
+}
+
+const (
+	MetaTypeName = "meta"
+	DataTypeName = "data"
+)
+
+func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error {
+	log := Logger(ctx).Sugar()
+
+	_ = log
+
+	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("summary", "device_id", deviceIdBytes)
+
+	provisions := make([]*data.Provision, 0)
+	if err := c.options.Database.SelectContext(ctx, &provisions, `SELECT * FROM fieldkit.provision WHERE (device_id = $1)`, deviceIdBytes); err != nil {
+		return err
+	}
+
+	var rows = make([]ProvisionSummaryRow, 0)
+	if err := c.options.Database.SelectContext(ctx, &rows, `SELECT generation, type, range_merge(blocks) AS blocks FROM fieldkit.ingestion WHERE (device_id = $1) GROUP BY type, generation`, deviceIdBytes); err != nil {
+		return err
+	}
+
+	var blockSummaries = make(map[string]map[string]BlocksSummaryRow)
+
+	for _, p := range provisions {
+		blockSummaries[hex.EncodeToString(p.Generation)] = make(map[string]BlocksSummaryRow)
+	}
+
+	for _, row := range rows {
+		g := hex.EncodeToString(row.Generation)
+
+		blockSummaries[g][row.Type] = BlocksSummaryRow{
+			Blocks: row.Blocks,
+		}
+	}
+
+	provisionVms := make([]*app.DeviceProvisionSummary, len(provisions))
+
+	for i, p := range provisions {
+		g := hex.EncodeToString(p.Generation)
+		byType := blockSummaries[g]
+		provisionVms[i] = &app.DeviceProvisionSummary{
+			Generation: g,
+			Created:    p.Created,
+			Updated:    p.Updated,
+			Meta: &app.DeviceMetaSummary{
+				First: int(byType[MetaTypeName].Blocks[0]),
+				Last:  int(byType[MetaTypeName].Blocks[1]),
+			},
+			Data: &app.DeviceDataSummary{
+				First: int(byType[DataTypeName].Blocks[0]),
+				Last:  int(byType[DataTypeName].Blocks[1]),
+			},
+		}
+	}
+
+	return ctx.OK(&app.DeviceDataSummaryResponse{
+		Provisions: provisionVms,
+	})
+}
+
+func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 	log := Logger(ctx).Sugar()
 
 	_ = log
@@ -178,9 +255,8 @@ func (c *DataController) Device(ctx *app.DeviceDataContext) error {
 	}
 
 	return ctx.OK(&app.DeviceDataRecordsResponse{
-		Summary: &app.DeviceDataStreamsSummary{},
-		Meta:    metaVms,
-		Data:    dataVms,
+		Meta: metaVms,
+		Data: dataVms,
 	})
 }
 

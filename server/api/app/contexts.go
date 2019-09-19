@@ -895,8 +895,8 @@ func (ctx *DeleteDataContext) NotFound() error {
 	return nil
 }
 
-// DeviceDataContext provides the data device action context.
-type DeviceDataContext struct {
+// DeviceDataDataContext provides the data device data action context.
+type DeviceDataDataContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
@@ -907,15 +907,15 @@ type DeviceDataContext struct {
 	PageSize   *int
 }
 
-// NewDeviceDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the data controller device action.
-func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceDataContext, error) {
+// NewDeviceDataDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the data controller device data action.
+func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceDataDataContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := DeviceDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := DeviceDataDataContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramDeviceID := req.Params["deviceId"]
 	if len(paramDeviceID) > 0 {
 		rawDeviceID := paramDeviceID[0]
@@ -969,7 +969,7 @@ func NewDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Ser
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *DeviceDataContext) OK(r *DeviceDataRecordsResponse) error {
+func (ctx *DeviceDataDataContext) OK(r *DeviceDataRecordsResponse) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.data+json")
 	}
@@ -977,7 +977,46 @@ func (ctx *DeviceDataContext) OK(r *DeviceDataRecordsResponse) error {
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *DeviceDataContext) NotFound() error {
+func (ctx *DeviceDataDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// DeviceSummaryDataContext provides the data device summary action context.
+type DeviceSummaryDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID string
+}
+
+// NewDeviceSummaryDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the data controller device summary action.
+func NewDeviceSummaryDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceSummaryDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeviceSummaryDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeviceSummaryDataContext) OK(r *DeviceDataSummaryResponse) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.summary+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeviceSummaryDataContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }

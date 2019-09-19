@@ -1308,7 +1308,8 @@ func unmarshalAddAdministratorPayload(ctx context.Context, service *goa.Service,
 type DataController interface {
 	goa.Muxer
 	Delete(*DeleteDataContext) error
-	Device(*DeviceDataContext) error
+	DeviceData(*DeviceDataDataContext) error
+	DeviceSummary(*DeviceSummaryDataContext) error
 	Process(*ProcessDataContext) error
 }
 
@@ -1317,7 +1318,8 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/data/ingestions/:ingestionId", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/data", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/summary", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -1342,15 +1344,31 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewDeviceDataContext(ctx, req, service)
+		rctx, err := NewDeviceDataDataContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.Device(rctx)
+		return ctrl.DeviceData(rctx)
 	}
 	h = handleDataOrigin(h)
-	service.Mux.Handle("GET", "/data/devices/:deviceId", ctrl.MuxHandler("device", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Device", "route", "GET /data/devices/:deviceId")
+	service.Mux.Handle("GET", "/data/devices/:deviceId/data", ctrl.MuxHandler("device data", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceData", "route", "GET /data/devices/:deviceId/data")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeviceSummaryDataContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.DeviceSummary(rctx)
+	}
+	h = handleDataOrigin(h)
+	service.Mux.Handle("GET", "/data/devices/:deviceId/summary", ctrl.MuxHandler("device summary", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceSummary", "route", "GET /data/devices/:deviceId/summary")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

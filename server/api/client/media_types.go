@@ -184,16 +184,12 @@ func (c *Client) DecodeDeviceSummary(resp *http.Response) (*DeviceSummary, error
 //
 // Identifier: application/vnd.app.device.data+json; view=default
 type DeviceDataRecordsResponse struct {
-	Data    DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
-	Meta    DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
-	Summary *DeviceDataStreamsSummary  `form:"summary" json:"summary" yaml:"summary" xml:"summary"`
+	Data DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
+	Meta DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 }
 
 // Validate validates the DeviceDataRecordsResponse media type instance.
 func (mt *DeviceDataRecordsResponse) Validate() (err error) {
-	if mt.Summary == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "summary"))
-	}
 	if mt.Meta == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
 	}
@@ -268,6 +264,27 @@ func (c *Client) DecodeDeviceDataRecordCollection(resp *http.Response) (DeviceDa
 	var decoded DeviceDataRecordCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
+}
+
+// DeviceDataSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.data.summary+json; view=default
+type DeviceDataSummary struct {
+	First int `form:"first" json:"first" yaml:"first" xml:"first"`
+	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+}
+
+// Validate validates the DeviceDataSummary media type instance.
+func (mt *DeviceDataSummary) Validate() (err error) {
+
+	return
+}
+
+// DecodeDeviceDataSummary decodes the DeviceDataSummary instance encoded in resp body.
+func (c *Client) DecodeDeviceDataSummary(resp *http.Response) (*DeviceDataSummary, error) {
+	var decoded DeviceDataSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
 }
 
 // DeviceDetails media type (default view)
@@ -471,6 +488,27 @@ func (c *Client) DecodeDeviceMetaRecordCollection(resp *http.Response) (DeviceMe
 	return decoded, err
 }
 
+// DeviceMetaSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.meta.summary+json; view=default
+type DeviceMetaSummary struct {
+	First int `form:"first" json:"first" yaml:"first" xml:"first"`
+	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+}
+
+// Validate validates the DeviceMetaSummary media type instance.
+func (mt *DeviceMetaSummary) Validate() (err error) {
+
+	return
+}
+
+// DecodeDeviceMetaSummary decodes the DeviceMetaSummary instance encoded in resp body.
+func (c *Client) DecodeDeviceMetaSummary(resp *http.Response) (*DeviceMetaSummary, error) {
+	var decoded DeviceMetaSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // DeviceNotesEntry media type (default view)
 //
 // Identifier: application/vnd.app.device.notes+json; view=default
@@ -497,6 +535,88 @@ func (c *Client) DecodeDeviceNotesEntryCollection(resp *http.Response) (DeviceNo
 	var decoded DeviceNotesEntryCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
+}
+
+// DeviceProvisionSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.provision.summary+json; view=default
+type DeviceProvisionSummary struct {
+	Created    time.Time          `form:"created" json:"created" yaml:"created" xml:"created"`
+	Data       *DeviceDataSummary `form:"data" json:"data" yaml:"data" xml:"data"`
+	Generation string             `form:"generation" json:"generation" yaml:"generation" xml:"generation"`
+	Meta       *DeviceMetaSummary `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Updated    time.Time          `form:"updated" json:"updated" yaml:"updated" xml:"updated"`
+}
+
+// Validate validates the DeviceProvisionSummary media type instance.
+func (mt *DeviceProvisionSummary) Validate() (err error) {
+	if mt.Generation == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "generation"))
+	}
+
+	if mt.Meta == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DecodeDeviceProvisionSummary decodes the DeviceProvisionSummary instance encoded in resp body.
+func (c *Client) DecodeDeviceProvisionSummary(resp *http.Response) (*DeviceProvisionSummary, error) {
+	var decoded DeviceProvisionSummary
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DeviceProvisionSummaryCollection is the media type for an array of DeviceProvisionSummary (default view)
+//
+// Identifier: application/vnd.app.device.provision.summary+json; type=collection; view=default
+type DeviceProvisionSummaryCollection []*DeviceProvisionSummary
+
+// Validate validates the DeviceProvisionSummaryCollection media type instance.
+func (mt DeviceProvisionSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeDeviceProvisionSummaryCollection decodes the DeviceProvisionSummaryCollection instance encoded in resp body.
+func (c *Client) DecodeDeviceProvisionSummaryCollection(resp *http.Response) (DeviceProvisionSummaryCollection, error) {
+	var decoded DeviceProvisionSummaryCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DeviceDataSummaryResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.summary+json; view=default
+type DeviceDataSummaryResponse struct {
+	Provisions DeviceProvisionSummaryCollection `form:"provisions" json:"provisions" yaml:"provisions" xml:"provisions"`
+}
+
+// Validate validates the DeviceDataSummaryResponse media type instance.
+func (mt *DeviceDataSummaryResponse) Validate() (err error) {
+	if mt.Provisions == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "provisions"))
+	}
+	if err2 := mt.Provisions.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeDeviceDataSummaryResponse decodes the DeviceDataSummaryResponse instance encoded in resp body.
+func (c *Client) DecodeDeviceDataSummaryResponse(resp *http.Response) (*DeviceDataSummaryResponse, error) {
+	var decoded DeviceDataSummaryResponse
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
 }
 
 // DeviceSummaryCollection is the media type for an array of DeviceSummary (default view)

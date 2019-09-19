@@ -141,16 +141,12 @@ func (mt *DeviceSummary) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device.data+json; view=default
 type DeviceDataRecordsResponse struct {
-	Data    DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
-	Meta    DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
-	Summary *DeviceDataStreamsSummary  `form:"summary" json:"summary" yaml:"summary" xml:"summary"`
+	Data DeviceDataRecordCollection `form:"data" json:"data" yaml:"data" xml:"data"`
+	Meta DeviceMetaRecordCollection `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 }
 
 // Validate validates the DeviceDataRecordsResponse media type instance.
 func (mt *DeviceDataRecordsResponse) Validate() (err error) {
-	if mt.Summary == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "summary"))
-	}
 	if mt.Meta == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
 	}
@@ -203,6 +199,20 @@ func (mt DeviceDataRecordCollection) Validate() (err error) {
 			}
 		}
 	}
+	return
+}
+
+// DeviceDataSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.data.summary+json; view=default
+type DeviceDataSummary struct {
+	First int `form:"first" json:"first" yaml:"first" xml:"first"`
+	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+}
+
+// Validate validates the DeviceDataSummary media type instance.
+func (mt *DeviceDataSummary) Validate() (err error) {
+
 	return
 }
 
@@ -365,6 +375,20 @@ func (mt DeviceMetaRecordCollection) Validate() (err error) {
 	return
 }
 
+// DeviceMetaSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.meta.summary+json; view=default
+type DeviceMetaSummary struct {
+	First int `form:"first" json:"first" yaml:"first" xml:"first"`
+	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+}
+
+// Validate validates the DeviceMetaSummary media type instance.
+func (mt *DeviceMetaSummary) Validate() (err error) {
+
+	return
+}
+
 // DeviceNotesEntry media type (default view)
 //
 // Identifier: application/vnd.app.device.notes+json; view=default
@@ -378,6 +402,67 @@ type DeviceNotesEntry struct {
 //
 // Identifier: application/vnd.app.device.notes+json; type=collection; view=default
 type DeviceNotesEntryCollection []*DeviceNotesEntry
+
+// DeviceProvisionSummary media type (default view)
+//
+// Identifier: application/vnd.app.device.provision.summary+json; view=default
+type DeviceProvisionSummary struct {
+	Created    time.Time          `form:"created" json:"created" yaml:"created" xml:"created"`
+	Data       *DeviceDataSummary `form:"data" json:"data" yaml:"data" xml:"data"`
+	Generation string             `form:"generation" json:"generation" yaml:"generation" xml:"generation"`
+	Meta       *DeviceMetaSummary `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Updated    time.Time          `form:"updated" json:"updated" yaml:"updated" xml:"updated"`
+}
+
+// Validate validates the DeviceProvisionSummary media type instance.
+func (mt *DeviceProvisionSummary) Validate() (err error) {
+	if mt.Generation == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "generation"))
+	}
+
+	if mt.Meta == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	return
+}
+
+// DeviceProvisionSummaryCollection is the media type for an array of DeviceProvisionSummary (default view)
+//
+// Identifier: application/vnd.app.device.provision.summary+json; type=collection; view=default
+type DeviceProvisionSummaryCollection []*DeviceProvisionSummary
+
+// Validate validates the DeviceProvisionSummaryCollection media type instance.
+func (mt DeviceProvisionSummaryCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DeviceDataSummaryResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.summary+json; view=default
+type DeviceDataSummaryResponse struct {
+	Provisions DeviceProvisionSummaryCollection `form:"provisions" json:"provisions" yaml:"provisions" xml:"provisions"`
+}
+
+// Validate validates the DeviceDataSummaryResponse media type instance.
+func (mt *DeviceDataSummaryResponse) Validate() (err error) {
+	if mt.Provisions == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "provisions"))
+	}
+	if err2 := mt.Provisions.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
 
 // DeviceSummaryCollection is the media type for an array of DeviceSummary (default view)
 //

@@ -54,3 +54,8 @@ CREATE TABLE fieldkit.data_record (
 CREATE INDEX ON fieldkit.data_record (time, provision_id, number);
 
 CREATE UNIQUE INDEX ON fieldkit.data_record (provision_id, number);
+
+CREATE AGGREGATE range_merge(anyrange) (
+  sfunc = range_merge,
+  stype = anyrange
+);

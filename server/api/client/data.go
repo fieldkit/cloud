@@ -45,24 +45,24 @@ func (c *Client) NewDeleteDataRequest(ctx context.Context, path string) (*http.R
 	return req, nil
 }
 
-// DeviceDataPath computes a request path to the device action of data.
-func DeviceDataPath(deviceID string) string {
+// DeviceDataDataPath computes a request path to the device data action of data.
+func DeviceDataDataPath(deviceID string) string {
 	param0 := deviceID
 
-	return fmt.Sprintf("/data/devices/%s", param0)
+	return fmt.Sprintf("/data/devices/%s/data", param0)
 }
 
 // Retrieve data
-func (c *Client) DeviceData(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Response, error) {
-	req, err := c.NewDeviceDataRequest(ctx, path, firstBlock, lastBlock, pageNumber, pageSize)
+func (c *Client) DeviceDataData(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Response, error) {
+	req, err := c.NewDeviceDataDataRequest(ctx, path, firstBlock, lastBlock, pageNumber, pageSize)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewDeviceDataRequest create the request corresponding to the device action endpoint of the data resource.
-func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Request, error) {
+// NewDeviceDataDataRequest create the request corresponding to the device data action endpoint of the data resource.
+func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -70,22 +70,52 @@ func (c *Client) NewDeviceDataRequest(ctx context.Context, path string, firstBlo
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if firstBlock != nil {
-		tmp181 := strconv.Itoa(*firstBlock)
-		values.Set("firstBlock", tmp181)
+		tmp182 := strconv.Itoa(*firstBlock)
+		values.Set("firstBlock", tmp182)
 	}
 	if lastBlock != nil {
-		tmp182 := strconv.Itoa(*lastBlock)
-		values.Set("lastBlock", tmp182)
+		tmp183 := strconv.Itoa(*lastBlock)
+		values.Set("lastBlock", tmp183)
 	}
 	if pageNumber != nil {
-		tmp183 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp183)
+		tmp184 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp184)
 	}
 	if pageSize != nil {
-		tmp184 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp184)
+		tmp185 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp185)
 	}
 	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// DeviceSummaryDataPath computes a request path to the device summary action of data.
+func DeviceSummaryDataPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/data/devices/%s/summary", param0)
+}
+
+// Retrieve summary
+func (c *Client) DeviceSummaryData(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeviceSummaryDataRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeviceSummaryDataRequest create the request corresponding to the device summary action endpoint of the data resource.
+func (c *Client) NewDeviceSummaryDataRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
