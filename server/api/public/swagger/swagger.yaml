@@ -332,6 +332,12 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -438,18 +444,6 @@ definitions:
       radius: 0.9710384742256701
       sourceId: 5.824585117249932e+18
       startTime: "1979-02-06T23:46:27Z"
-    - centroid:
-      - 0.10213203241898468
-      endTime: "1985-07-21T15:57:45Z"
-      envelope:
-      - - 0.18073588467812346
-      - - 0.18073588467812346
-      - - 0.18073588467812346
-      id: 7.204590710558903e+18
-      numberOfFeatures: 8.963711443699794e+18
-      radius: 0.9710384742256701
-      sourceId: 5.824585117249932e+18
-      startTime: "1979-02-06T23:46:27Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -457,19 +451,19 @@ definitions:
     type: array
   ConcatenatedFileInfo:
     example:
-      csv: Quidem repellendus cupiditate nemo doloribus recusandae.
-      size: 6.525323513591937e+18
-      time: "1986-01-17T16:31:06Z"
+      csv: Ea nobis in harum doloribus sequi placeat.
+      size: 1.8709087109387436e+18
+      time: "2005-12-24T11:29:18Z"
     properties:
       csv:
-        example: Quidem repellendus cupiditate nemo doloribus recusandae.
+        example: Ea nobis in harum doloribus sequi placeat.
         type: string
       size:
-        example: 6.525323513591937e+18
+        example: 1.8709087109387436e+18
         format: int64
         type: integer
       time:
-        example: "1986-01-17T16:31:06Z"
+        example: "2005-12-24T11:29:18Z"
         format: date-time
         type: string
     required:
@@ -481,13 +475,13 @@ definitions:
   ConcatenatedFilesInfo:
     example:
       data:
-        csv: Quidem repellendus cupiditate nemo doloribus recusandae.
-        size: 6.525323513591937e+18
-        time: "1986-01-17T16:31:06Z"
+        csv: Ea nobis in harum doloribus sequi placeat.
+        size: 1.8709087109387436e+18
+        time: "2005-12-24T11:29:18Z"
       logs:
-        csv: Quidem repellendus cupiditate nemo doloribus recusandae.
-        size: 6.525323513591937e+18
-        time: "1986-01-17T16:31:06Z"
+        csv: Ea nobis in harum doloribus sequi placeat.
+        size: 1.8709087109387436e+18
+        time: "2005-12-24T11:29:18Z"
     properties:
       data:
         $ref: '#/definitions/ConcatenatedFileInfo'
@@ -503,38 +497,44 @@ definitions:
     example:
       data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
       location:
-      - 0.014587859688453188
-      meta: 3.5212274647530583e+18
-      record: 9.930548092478253e+17
-      time: "1978-10-07T18:55:18Z"
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     properties:
       data:
         additionalProperties: true
         example:
           Sapiente ipsa expedita qui eum enim deleniti.: false
         type: object
+      id:
+        example: 5.114928591801609e+18
+        format: int64
+        type: integer
       location:
         example:
-        - 0.014587859688453188
+        - 0.3817722467100891
         items:
-          example: 0.014587859688453188
+          example: 0.3817722467100891
           format: double
           type: number
         type: array
       meta:
-        example: 3.5212274647530583e+18
-        format: int64
-        type: integer
-      record:
         example: 9.930548092478253e+17
         format: int64
         type: integer
+      record:
+        example: 3.4522485535092884e+18
+        format: int64
+        type: integer
       time:
-        example: "1978-10-07T18:55:18Z"
+        example: "1998-06-18T18:01:05Z"
         format: date-time
         type: string
     required:
+    - id
     - time
     - record
     - meta
@@ -548,11 +548,12 @@ definitions:
     example:
     - data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
       location:
-      - 0.014587859688453188
-      meta: 3.5212274647530583e+18
-      record: 9.930548092478253e+17
-      time: "1978-10-07T18:55:18Z"
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -564,38 +565,44 @@ definitions:
       data:
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
+        id: 5.114928591801609e+18
         location:
-        - 0.014587859688453188
-        meta: 3.5212274647530583e+18
-        record: 9.930548092478253e+17
-        time: "1978-10-07T18:55:18Z"
+        - 0.3817722467100891
+        meta: 9.930548092478253e+17
+        record: 3.4522485535092884e+18
+        time: "1998-06-18T18:01:05Z"
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
+        id: 5.114928591801609e+18
         location:
-        - 0.014587859688453188
-        meta: 3.5212274647530583e+18
-        record: 9.930548092478253e+17
-        time: "1978-10-07T18:55:18Z"
+        - 0.3817722467100891
+        meta: 9.930548092478253e+17
+        record: 3.4522485535092884e+18
+        time: "1998-06-18T18:01:05Z"
       - data:
           Sapiente ipsa expedita qui eum enim deleniti.: false
+        id: 5.114928591801609e+18
         location:
-        - 0.014587859688453188
-        meta: 3.5212274647530583e+18
-        record: 9.930548092478253e+17
-        time: "1978-10-07T18:55:18Z"
+        - 0.3817722467100891
+        meta: 9.930548092478253e+17
+        record: 3.4522485535092884e+18
+        time: "1998-06-18T18:01:05Z"
       meta:
       - data:
-          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-        record: 5.536231043872638e+18
-        time: "1981-09-10T10:19:40Z"
+          Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+        id: 2.4194290054188964e+18
+        record: 5.508071077920418e+18
+        time: "2016-03-26T05:44:35Z"
       - data:
-          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-        record: 5.536231043872638e+18
-        time: "1981-09-10T10:19:40Z"
+          Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+        id: 2.4194290054188964e+18
+        record: 5.508071077920418e+18
+        time: "2016-03-26T05:44:35Z"
       - data:
-          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-        record: 5.536231043872638e+18
-        time: "1981-09-10T10:19:40Z"
+          Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+        id: 2.4194290054188964e+18
+        record: 5.508071077920418e+18
+        time: "2016-03-26T05:44:35Z"
     properties:
       data:
         $ref: '#/definitions/DeviceDataRecordCollection'
@@ -609,15 +616,15 @@ definitions:
   DeviceDataSummary:
     description: DeviceDataSummary media type (default view)
     example:
-      first: 4.977542128296516e+18
-      last: 7.839764328450954e+18
+      first: 3.962019451405188e+17
+      last: 8.016932918719963e+18
     properties:
       first:
-        example: 4.977542128296516e+18
+        example: 3.962019451405188e+17
         format: int64
         type: integer
       last:
-        example: 7.839764328450954e+18
+        example: 8.016932918719963e+18
         format: int64
         type: integer
     required:
@@ -631,21 +638,21 @@ definitions:
       provisions:
       - created: "1977-03-20T04:53:19Z"
         data:
-          first: 4.977542128296516e+18
-          last: 7.839764328450954e+18
+          first: 3.962019451405188e+17
+          last: 8.016932918719963e+18
         generation: Ullam sed magni.
         meta:
-          first: 2.0414701375513126e+18
-          last: 3.2416451380914903e+18
+          first: 4.024823078775381e+18
+          last: 8.314554709954583e+18
         updated: "1979-09-06T11:30:14Z"
       - created: "1977-03-20T04:53:19Z"
         data:
-          first: 4.977542128296516e+18
-          last: 7.839764328450954e+18
+          first: 3.962019451405188e+17
+          last: 8.016932918719963e+18
         generation: Ullam sed magni.
         meta:
-          first: 2.0414701375513126e+18
-          last: 3.2416451380914903e+18
+          first: 4.024823078775381e+18
+          last: 8.314554709954583e+18
         updated: "1979-09-06T11:30:14Z"
     properties:
       provisions:
@@ -657,26 +664,26 @@ definitions:
   DeviceDetails:
     description: DeviceDetails media type (default view)
     example:
-      device_id: Reprehenderit totam dolorem impedit hic.
+      device_id: Quidem repellendus cupiditate nemo doloribus recusandae.
       files:
         data:
-          csv: Quidem repellendus cupiditate nemo doloribus recusandae.
-          size: 6.525323513591937e+18
-          time: "1986-01-17T16:31:06Z"
+          csv: Ea nobis in harum doloribus sequi placeat.
+          size: 1.8709087109387436e+18
+          time: "2005-12-24T11:29:18Z"
         logs:
-          csv: Quidem repellendus cupiditate nemo doloribus recusandae.
-          size: 6.525323513591937e+18
-          time: "1986-01-17T16:31:06Z"
+          csv: Ea nobis in harum doloribus sequi placeat.
+          size: 1.8709087109387436e+18
+          time: "2005-12-24T11:29:18Z"
       notes:
-      - name: Harum doloribus.
-        notes: Placeat amet illo reprehenderit quod provident dolorum.
-        time: "1991-11-03T13:37:39Z"
-      - name: Harum doloribus.
-        notes: Placeat amet illo reprehenderit quod provident dolorum.
-        time: "1991-11-03T13:37:39Z"
-      - name: Harum doloribus.
-        notes: Placeat amet illo reprehenderit quod provident dolorum.
-        time: "1991-11-03T13:37:39Z"
+      - name: Provident dolorum provident eligendi ut voluptatem.
+        notes: Ratione porro.
+        time: "1986-04-22T23:58:19Z"
+      - name: Provident dolorum provident eligendi ut voluptatem.
+        notes: Ratione porro.
+        time: "1986-04-22T23:58:19Z"
+      - name: Provident dolorum provident eligendi ut voluptatem.
+        notes: Ratione porro.
+        time: "1986-04-22T23:58:19Z"
       urls:
         data:
           csv: Perspiciatis quasi error voluptatem et.
@@ -693,7 +700,7 @@ definitions:
           info: Sit velit quo eveniet in.
     properties:
       device_id:
-        example: Reprehenderit totam dolorem impedit hic.
+        example: Quidem repellendus cupiditate nemo doloribus recusandae.
         type: string
       files:
         $ref: '#/definitions/ConcatenatedFilesInfo'
@@ -710,56 +717,56 @@ definitions:
   DeviceFile:
     description: DeviceFile media type (default view)
     example:
-      corrupted: false
-      device_id: Voluptatem et ratione porro.
-      file_id: Quaerat ea.
-      file_type_id: Optio autem et autem aliquid.
-      file_type_name: Natus dolores quo suscipit voluptatem magni in.
-      firmware: Asperiores nostrum.
-      id: 7.93971222930982e+18
-      meta: Aut repellendus quam soluta.
-      size: 8.732123841310651e+17
-      time: "1979-02-20T12:04:30Z"
-      url: Ut repellendus ratione voluptatum.
+      corrupted: true
+      device_id: Quibusdam optio autem et.
+      file_id: Aliquid voluptate natus dolores.
+      file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+      file_type_name: Facere dignissimos.
+      firmware: Repellendus quam soluta.
+      id: 8.732123841310651e+17
+      meta: Quis ut repellendus ratione.
+      size: 5.66413114730693e+18
+      time: "1972-09-14T07:30:30Z"
+      url: Praesentium ratione et.
       urls:
-        csv: Rerum praesentium.
-        fkpb: Et dolores a voluptas sed.
+        csv: A voluptas.
+        fkpb: Dolorum itaque qui sequi.
     properties:
       corrupted:
-        example: false
+        example: true
         type: boolean
       device_id:
-        example: Voluptatem et ratione porro.
+        example: Quibusdam optio autem et.
         type: string
       file_id:
-        example: Quaerat ea.
+        example: Aliquid voluptate natus dolores.
         type: string
       file_type_id:
-        example: Optio autem et autem aliquid.
+        example: Suscipit voluptatem magni in ipsam asperiores.
         type: string
       file_type_name:
-        example: Natus dolores quo suscipit voluptatem magni in.
+        example: Facere dignissimos.
         type: string
       firmware:
-        example: Asperiores nostrum.
+        example: Repellendus quam soluta.
         type: string
       id:
-        example: 7.93971222930982e+18
-        format: int64
-        type: integer
-      meta:
-        example: Aut repellendus quam soluta.
-        type: string
-      size:
         example: 8.732123841310651e+17
         format: int64
         type: integer
+      meta:
+        example: Quis ut repellendus ratione.
+        type: string
+      size:
+        example: 5.66413114730693e+18
+        format: int64
+        type: integer
       time:
-        example: "1979-02-20T12:04:30Z"
+        example: "1972-09-14T07:30:30Z"
         format: date-time
         type: string
       url:
-        example: Ut repellendus ratione voluptatum.
+        example: Praesentium ratione et.
         type: string
       urls:
         $ref: '#/definitions/DeviceFileUrls'
@@ -782,34 +789,34 @@ definitions:
     description: DeviceFileCollection is the media type for an array of DeviceFile
       (default view)
     example:
-    - corrupted: false
-      device_id: Voluptatem et ratione porro.
-      file_id: Quaerat ea.
-      file_type_id: Optio autem et autem aliquid.
-      file_type_name: Natus dolores quo suscipit voluptatem magni in.
-      firmware: Asperiores nostrum.
-      id: 7.93971222930982e+18
-      meta: Aut repellendus quam soluta.
-      size: 8.732123841310651e+17
-      time: "1979-02-20T12:04:30Z"
-      url: Ut repellendus ratione voluptatum.
+    - corrupted: true
+      device_id: Quibusdam optio autem et.
+      file_id: Aliquid voluptate natus dolores.
+      file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+      file_type_name: Facere dignissimos.
+      firmware: Repellendus quam soluta.
+      id: 8.732123841310651e+17
+      meta: Quis ut repellendus ratione.
+      size: 5.66413114730693e+18
+      time: "1972-09-14T07:30:30Z"
+      url: Praesentium ratione et.
       urls:
-        csv: Rerum praesentium.
-        fkpb: Et dolores a voluptas sed.
-    - corrupted: false
-      device_id: Voluptatem et ratione porro.
-      file_id: Quaerat ea.
-      file_type_id: Optio autem et autem aliquid.
-      file_type_name: Natus dolores quo suscipit voluptatem magni in.
-      firmware: Asperiores nostrum.
-      id: 7.93971222930982e+18
-      meta: Aut repellendus quam soluta.
-      size: 8.732123841310651e+17
-      time: "1979-02-20T12:04:30Z"
-      url: Ut repellendus ratione voluptatum.
+        csv: A voluptas.
+        fkpb: Dolorum itaque qui sequi.
+    - corrupted: true
+      device_id: Quibusdam optio autem et.
+      file_id: Aliquid voluptate natus dolores.
+      file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+      file_type_name: Facere dignissimos.
+      firmware: Repellendus quam soluta.
+      id: 8.732123841310651e+17
+      meta: Quis ut repellendus ratione.
+      size: 5.66413114730693e+18
+      time: "1972-09-14T07:30:30Z"
+      url: Praesentium ratione et.
       urls:
-        csv: Rerum praesentium.
-        fkpb: Et dolores a voluptas sed.
+        csv: A voluptas.
+        fkpb: Dolorum itaque qui sequi.
     items:
       $ref: '#/definitions/DeviceFile'
     title: 'Mediatype identifier: application/vnd.app.device.file+json; type=collection;
@@ -848,14 +855,14 @@ definitions:
     type: object
   DeviceFileUrls:
     example:
-      csv: Rerum praesentium.
-      fkpb: Et dolores a voluptas sed.
+      csv: A voluptas.
+      fkpb: Dolorum itaque qui sequi.
     properties:
       csv:
-        example: Rerum praesentium.
+        example: A voluptas.
         type: string
       fkpb:
-        example: Et dolores a voluptas sed.
+        example: Dolorum itaque qui sequi.
         type: string
     required:
     - csv
@@ -866,48 +873,48 @@ definitions:
     description: DeviceFiles media type (default view)
     example:
       files:
-      - corrupted: false
-        device_id: Voluptatem et ratione porro.
-        file_id: Quaerat ea.
-        file_type_id: Optio autem et autem aliquid.
-        file_type_name: Natus dolores quo suscipit voluptatem magni in.
-        firmware: Asperiores nostrum.
-        id: 7.93971222930982e+18
-        meta: Aut repellendus quam soluta.
-        size: 8.732123841310651e+17
-        time: "1979-02-20T12:04:30Z"
-        url: Ut repellendus ratione voluptatum.
+      - corrupted: true
+        device_id: Quibusdam optio autem et.
+        file_id: Aliquid voluptate natus dolores.
+        file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+        file_type_name: Facere dignissimos.
+        firmware: Repellendus quam soluta.
+        id: 8.732123841310651e+17
+        meta: Quis ut repellendus ratione.
+        size: 5.66413114730693e+18
+        time: "1972-09-14T07:30:30Z"
+        url: Praesentium ratione et.
         urls:
-          csv: Rerum praesentium.
-          fkpb: Et dolores a voluptas sed.
-      - corrupted: false
-        device_id: Voluptatem et ratione porro.
-        file_id: Quaerat ea.
-        file_type_id: Optio autem et autem aliquid.
-        file_type_name: Natus dolores quo suscipit voluptatem magni in.
-        firmware: Asperiores nostrum.
-        id: 7.93971222930982e+18
-        meta: Aut repellendus quam soluta.
-        size: 8.732123841310651e+17
-        time: "1979-02-20T12:04:30Z"
-        url: Ut repellendus ratione voluptatum.
+          csv: A voluptas.
+          fkpb: Dolorum itaque qui sequi.
+      - corrupted: true
+        device_id: Quibusdam optio autem et.
+        file_id: Aliquid voluptate natus dolores.
+        file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+        file_type_name: Facere dignissimos.
+        firmware: Repellendus quam soluta.
+        id: 8.732123841310651e+17
+        meta: Quis ut repellendus ratione.
+        size: 5.66413114730693e+18
+        time: "1972-09-14T07:30:30Z"
+        url: Praesentium ratione et.
         urls:
-          csv: Rerum praesentium.
-          fkpb: Et dolores a voluptas sed.
-      - corrupted: false
-        device_id: Voluptatem et ratione porro.
-        file_id: Quaerat ea.
-        file_type_id: Optio autem et autem aliquid.
-        file_type_name: Natus dolores quo suscipit voluptatem magni in.
-        firmware: Asperiores nostrum.
-        id: 7.93971222930982e+18
-        meta: Aut repellendus quam soluta.
-        size: 8.732123841310651e+17
-        time: "1979-02-20T12:04:30Z"
-        url: Ut repellendus ratione voluptatum.
+          csv: A voluptas.
+          fkpb: Dolorum itaque qui sequi.
+      - corrupted: true
+        device_id: Quibusdam optio autem et.
+        file_id: Aliquid voluptate natus dolores.
+        file_type_id: Suscipit voluptatem magni in ipsam asperiores.
+        file_type_name: Facere dignissimos.
+        firmware: Repellendus quam soluta.
+        id: 8.732123841310651e+17
+        meta: Quis ut repellendus ratione.
+        size: 5.66413114730693e+18
+        time: "1972-09-14T07:30:30Z"
+        url: Praesentium ratione et.
         urls:
-          csv: Rerum praesentium.
-          fkpb: Et dolores a voluptas sed.
+          csv: A voluptas.
+          fkpb: Dolorum itaque qui sequi.
     properties:
       files:
         $ref: '#/definitions/DeviceFileCollection'
@@ -919,24 +926,30 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-      record: 5.536231043872638e+18
-      time: "1981-09-10T10:19:40Z"
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     properties:
       data:
         additionalProperties: true
         example:
-          Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
+          Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
         type: object
+      id:
+        example: 2.4194290054188964e+18
+        format: int64
+        type: integer
       record:
-        example: 5.536231043872638e+18
+        example: 5.508071077920418e+18
         format: int64
         type: integer
       time:
-        example: "1981-09-10T10:19:40Z"
+        example: "2016-03-26T05:44:35Z"
         format: date-time
         type: string
     required:
+    - id
     - time
     - record
     - data
@@ -947,13 +960,15 @@ definitions:
       (default view)
     example:
     - data:
-        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-      record: 5.536231043872638e+18
-      time: "1981-09-10T10:19:40Z"
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
-        Qui et aperiam.: 7204ee9c-d473-4f3c-8093-7a96e7e211c9
-      record: 5.536231043872638e+18
-      time: "1981-09-10T10:19:40Z"
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     items:
       $ref: '#/definitions/DeviceMetaRecord'
     title: 'Mediatype identifier: application/vnd.app.device.meta.record+json; type=collection;
@@ -962,15 +977,15 @@ definitions:
   DeviceMetaSummary:
     description: DeviceMetaSummary media type (default view)
     example:
-      first: 2.0414701375513126e+18
-      last: 3.2416451380914903e+18
+      first: 4.024823078775381e+18
+      last: 8.314554709954583e+18
     properties:
       first:
-        example: 2.0414701375513126e+18
+        example: 4.024823078775381e+18
         format: int64
         type: integer
       last:
-        example: 3.2416451380914903e+18
+        example: 8.314554709954583e+18
         format: int64
         type: integer
     required:
@@ -981,18 +996,18 @@ definitions:
   DeviceNotesEntry:
     description: DeviceNotesEntry media type (default view)
     example:
-      name: Harum doloribus.
-      notes: Placeat amet illo reprehenderit quod provident dolorum.
-      time: "1991-11-03T13:37:39Z"
+      name: Provident dolorum provident eligendi ut voluptatem.
+      notes: Ratione porro.
+      time: "1986-04-22T23:58:19Z"
     properties:
       name:
-        example: Harum doloribus.
+        example: Provident dolorum provident eligendi ut voluptatem.
         type: string
       notes:
-        example: Placeat amet illo reprehenderit quod provident dolorum.
+        example: Ratione porro.
         type: string
       time:
-        example: "1991-11-03T13:37:39Z"
+        example: "1986-04-22T23:58:19Z"
         format: date-time
         type: string
     required:
@@ -1003,15 +1018,15 @@ definitions:
     description: DeviceNotesEntryCollection is the media type for an array of DeviceNotesEntry
       (default view)
     example:
-    - name: Harum doloribus.
-      notes: Placeat amet illo reprehenderit quod provident dolorum.
-      time: "1991-11-03T13:37:39Z"
-    - name: Harum doloribus.
-      notes: Placeat amet illo reprehenderit quod provident dolorum.
-      time: "1991-11-03T13:37:39Z"
-    - name: Harum doloribus.
-      notes: Placeat amet illo reprehenderit quod provident dolorum.
-      time: "1991-11-03T13:37:39Z"
+    - name: Provident dolorum provident eligendi ut voluptatem.
+      notes: Ratione porro.
+      time: "1986-04-22T23:58:19Z"
+    - name: Provident dolorum provident eligendi ut voluptatem.
+      notes: Ratione porro.
+      time: "1986-04-22T23:58:19Z"
+    - name: Provident dolorum provident eligendi ut voluptatem.
+      notes: Ratione porro.
+      time: "1986-04-22T23:58:19Z"
     items:
       $ref: '#/definitions/DeviceNotesEntry'
     title: 'Mediatype identifier: application/vnd.app.device.notes+json; type=collection;
@@ -1022,12 +1037,12 @@ definitions:
     example:
       created: "1977-03-20T04:53:19Z"
       data:
-        first: 4.977542128296516e+18
-        last: 7.839764328450954e+18
+        first: 3.962019451405188e+17
+        last: 8.016932918719963e+18
       generation: Ullam sed magni.
       meta:
-        first: 2.0414701375513126e+18
-        last: 3.2416451380914903e+18
+        first: 4.024823078775381e+18
+        last: 8.314554709954583e+18
       updated: "1979-09-06T11:30:14Z"
     properties:
       created:
@@ -1060,21 +1075,21 @@ definitions:
     example:
     - created: "1977-03-20T04:53:19Z"
       data:
-        first: 4.977542128296516e+18
-        last: 7.839764328450954e+18
+        first: 3.962019451405188e+17
+        last: 8.016932918719963e+18
       generation: Ullam sed magni.
       meta:
-        first: 2.0414701375513126e+18
-        last: 3.2416451380914903e+18
+        first: 4.024823078775381e+18
+        last: 8.314554709954583e+18
       updated: "1979-09-06T11:30:14Z"
     - created: "1977-03-20T04:53:19Z"
       data:
-        first: 4.977542128296516e+18
-        last: 7.839764328450954e+18
+        first: 3.962019451405188e+17
+        last: 8.016932918719963e+18
       generation: Ullam sed magni.
       meta:
-        first: 2.0414701375513126e+18
-        last: 3.2416451380914903e+18
+        first: 4.024823078775381e+18
+        last: 8.314554709954583e+18
       updated: "1979-09-06T11:30:14Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'

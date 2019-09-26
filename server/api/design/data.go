@@ -8,12 +8,14 @@ import (
 var DeviceMetaRecord = MediaType("application/vnd.app.device.meta.record+json", func() {
 	TypeName("DeviceMetaRecord")
 	Attributes(func() {
+		Attribute("id", Integer)
 		Attribute("time", DateTime)
 		Attribute("record", Integer)
 		Attribute("data", HashOf(String, Any))
-		Required("time", "record", "data")
+		Required("id", "time", "record", "data")
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("time")
 		Attribute("record")
 		Attribute("data")
@@ -23,14 +25,16 @@ var DeviceMetaRecord = MediaType("application/vnd.app.device.meta.record+json", 
 var DeviceDataRecord = MediaType("application/vnd.app.device.data.record+json", func() {
 	TypeName("DeviceDataRecord")
 	Attributes(func() {
+		Attribute("id", Integer)
 		Attribute("time", DateTime)
 		Attribute("record", Integer)
 		Attribute("meta", Integer)
 		Attribute("location", ArrayOf(Number))
 		Attribute("data", HashOf(String, Any))
-		Required("time", "record", "meta", "location", "data")
+		Required("id", "time", "record", "meta", "location", "data")
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("time")
 		Attribute("record")
 		Attribute("meta")

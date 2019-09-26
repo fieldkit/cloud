@@ -264,6 +264,7 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 		}
 
 		dataVms[i] = &app.DeviceDataRecord{
+			ID:       int(r.ID),
 			Time:     r.Time,
 			Record:   int(r.Number),
 			Meta:     int(r.Meta),
@@ -280,6 +281,7 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 		}
 
 		metaVms[i] = &app.DeviceMetaRecord{
+			ID:     int(r.ID),
 			Time:   r.Time,
 			Record: int(r.Number),
 			Data:   data,

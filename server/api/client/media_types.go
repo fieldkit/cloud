@@ -217,6 +217,7 @@ func (c *Client) DecodeDeviceDataRecordsResponse(resp *http.Response) (*DeviceDa
 // Identifier: application/vnd.app.device.data.record+json; view=default
 type DeviceDataRecord struct {
 	Data     map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
 	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
 	Meta     int                    `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 	Record   int                    `form:"record" json:"record" yaml:"record" xml:"record"`
@@ -444,6 +445,7 @@ func (c *Client) DecodeDeviceFiles(resp *http.Response) (*DeviceFiles, error) {
 // Identifier: application/vnd.app.device.meta.record+json; view=default
 type DeviceMetaRecord struct {
 	Data   map[string]interface{} `form:"data" json:"data" yaml:"data" xml:"data"`
+	ID     int                    `form:"id" json:"id" yaml:"id" xml:"id"`
 	Record int                    `form:"record" json:"record" yaml:"record" xml:"record"`
 	Time   time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
 }
