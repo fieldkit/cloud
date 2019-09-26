@@ -52,17 +52,12 @@ export default {
     },
     methods: {
         formatDate(date) {
-            let d = new Date(date);
+            const d = new Date(date);
             return d.toLocaleDateString("en-US");
         },
         getBatteryImg(station) {
-            let images = require.context("../assets/battery/", false, /\.png$/);
-            let battery = station.status_json.battery_level;
-            // check to see if it already has a percent sign
-            if (battery.toString().indexOf("%") > -1) {
-                battery = parseInt(battery.toString().split("%")[0]);
-            }
-            station.status_json.battery_level = battery;
+            const images = require.context("../assets/battery/", false, /\.png$/);
+            const battery = station.status_json.battery_level;
             let img = "";
             if (battery == 0) {
                 img = "0.png";
