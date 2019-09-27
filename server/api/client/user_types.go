@@ -1113,6 +1113,452 @@ func (ut *DeviceSummaryUrls) Validate() (err error) {
 	return
 }
 
+// jSONDataMeta user type.
+type jSONDataMeta struct {
+	Station *jSONDataMetaStation `form:"station,omitempty" json:"station,omitempty" yaml:"station,omitempty" xml:"station,omitempty"`
+}
+
+// Validate validates the jSONDataMeta type instance.
+func (ut *jSONDataMeta) Validate() (err error) {
+	if ut.Station != nil {
+		if err2 := ut.Station.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// Publicize creates JSONDataMeta from jSONDataMeta
+func (ut *jSONDataMeta) Publicize() *JSONDataMeta {
+	var pub JSONDataMeta
+	if ut.Station != nil {
+		pub.Station = ut.Station.Publicize()
+	}
+	return &pub
+}
+
+// JSONDataMeta user type.
+type JSONDataMeta struct {
+	Station *JSONDataMetaStation `form:"station,omitempty" json:"station,omitempty" yaml:"station,omitempty" xml:"station,omitempty"`
+}
+
+// Validate validates the JSONDataMeta type instance.
+func (ut *JSONDataMeta) Validate() (err error) {
+	if ut.Station != nil {
+		if err2 := ut.Station.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// jSONDataMetaModule user type.
+type jSONDataMetaModule struct {
+	ID           *string               `form:"id,omitempty" json:"id,omitempty" yaml:"id,omitempty" xml:"id,omitempty"`
+	Kind         *int                  `form:"kind,omitempty" json:"kind,omitempty" yaml:"kind,omitempty" xml:"kind,omitempty"`
+	Manufacturer *int                  `form:"manufacturer,omitempty" json:"manufacturer,omitempty" yaml:"manufacturer,omitempty" xml:"manufacturer,omitempty"`
+	Name         *string               `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Sensors      []*jSONDataMetaSensor `form:"sensors,omitempty" json:"sensors,omitempty" yaml:"sensors,omitempty" xml:"sensors,omitempty"`
+	Version      *int                  `form:"version,omitempty" json:"version,omitempty" yaml:"version,omitempty" xml:"version,omitempty"`
+}
+
+// Validate validates the jSONDataMetaModule type instance.
+func (ut *jSONDataMetaModule) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
+	}
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Kind == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "kind"))
+	}
+	if ut.Version == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "version"))
+	}
+	if ut.Manufacturer == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "manufacturer"))
+	}
+	for _, e := range ut.Sensors {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Publicize creates JSONDataMetaModule from jSONDataMetaModule
+func (ut *jSONDataMetaModule) Publicize() *JSONDataMetaModule {
+	var pub JSONDataMetaModule
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Kind != nil {
+		pub.Kind = *ut.Kind
+	}
+	if ut.Manufacturer != nil {
+		pub.Manufacturer = *ut.Manufacturer
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.Sensors != nil {
+		pub.Sensors = make([]*JSONDataMetaSensor, len(ut.Sensors))
+		for i2, elem2 := range ut.Sensors {
+			pub.Sensors[i2] = elem2.Publicize()
+		}
+	}
+	if ut.Version != nil {
+		pub.Version = *ut.Version
+	}
+	return &pub
+}
+
+// JSONDataMetaModule user type.
+type JSONDataMetaModule struct {
+	ID           string                `form:"id" json:"id" yaml:"id" xml:"id"`
+	Kind         int                   `form:"kind" json:"kind" yaml:"kind" xml:"kind"`
+	Manufacturer int                   `form:"manufacturer" json:"manufacturer" yaml:"manufacturer" xml:"manufacturer"`
+	Name         string                `form:"name" json:"name" yaml:"name" xml:"name"`
+	Sensors      []*JSONDataMetaSensor `form:"sensors,omitempty" json:"sensors,omitempty" yaml:"sensors,omitempty" xml:"sensors,omitempty"`
+	Version      int                   `form:"version" json:"version" yaml:"version" xml:"version"`
+}
+
+// Validate validates the JSONDataMetaModule type instance.
+func (ut *JSONDataMetaModule) Validate() (err error) {
+	if ut.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "id"))
+	}
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+
+	for _, e := range ut.Sensors {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// jSONDataMetaSensor user type.
+type jSONDataMetaSensor struct {
+	Key   *string `form:"key,omitempty" json:"key,omitempty" yaml:"key,omitempty" xml:"key,omitempty"`
+	Name  *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Units *string `form:"units,omitempty" json:"units,omitempty" yaml:"units,omitempty" xml:"units,omitempty"`
+}
+
+// Validate validates the jSONDataMetaSensor type instance.
+func (ut *jSONDataMetaSensor) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
+	}
+	if ut.Units == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "units"))
+	}
+	return
+}
+
+// Publicize creates JSONDataMetaSensor from jSONDataMetaSensor
+func (ut *jSONDataMetaSensor) Publicize() *JSONDataMetaSensor {
+	var pub JSONDataMetaSensor
+	if ut.Key != nil {
+		pub.Key = *ut.Key
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.Units != nil {
+		pub.Units = *ut.Units
+	}
+	return &pub
+}
+
+// JSONDataMetaSensor user type.
+type JSONDataMetaSensor struct {
+	Key   string `form:"key" json:"key" yaml:"key" xml:"key"`
+	Name  string `form:"name" json:"name" yaml:"name" xml:"name"`
+	Units string `form:"units" json:"units" yaml:"units" xml:"units"`
+}
+
+// Validate validates the JSONDataMetaSensor type instance.
+func (ut *JSONDataMetaSensor) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
+	}
+	if ut.Units == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "units"))
+	}
+	return
+}
+
+// jSONDataMetaStation user type.
+type jSONDataMetaStation struct {
+	Firmware *jSONDataMetaStationFirmware `form:"firmware,omitempty" json:"firmware,omitempty" yaml:"firmware,omitempty" xml:"firmware,omitempty"`
+	ID       *string                      `form:"id,omitempty" json:"id,omitempty" yaml:"id,omitempty" xml:"id,omitempty"`
+	Modules  []*jSONDataMetaModule        `form:"modules,omitempty" json:"modules,omitempty" yaml:"modules,omitempty" xml:"modules,omitempty"`
+	Name     *string                      `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+}
+
+// Validate validates the jSONDataMetaStation type instance.
+func (ut *jSONDataMetaStation) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
+	}
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "modules"))
+	}
+	if ut.Firmware == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "firmware"))
+	}
+	if ut.Firmware != nil {
+		if err2 := ut.Firmware.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range ut.Modules {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// Publicize creates JSONDataMetaStation from jSONDataMetaStation
+func (ut *jSONDataMetaStation) Publicize() *JSONDataMetaStation {
+	var pub JSONDataMetaStation
+	if ut.Firmware != nil {
+		pub.Firmware = ut.Firmware.Publicize()
+	}
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Modules != nil {
+		pub.Modules = make([]*JSONDataMetaModule, len(ut.Modules))
+		for i2, elem2 := range ut.Modules {
+			pub.Modules[i2] = elem2.Publicize()
+		}
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	return &pub
+}
+
+// JSONDataMetaStation user type.
+type JSONDataMetaStation struct {
+	Firmware *JSONDataMetaStationFirmware `form:"firmware" json:"firmware" yaml:"firmware" xml:"firmware"`
+	ID       string                       `form:"id" json:"id" yaml:"id" xml:"id"`
+	Modules  []*JSONDataMetaModule        `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
+	Name     string                       `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the JSONDataMetaStation type instance.
+func (ut *JSONDataMetaStation) Validate() (err error) {
+	if ut.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "id"))
+	}
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "modules"))
+	}
+	if ut.Firmware == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "firmware"))
+	}
+	if ut.Firmware != nil {
+		if err2 := ut.Firmware.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range ut.Modules {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// jSONDataMetaStationFirmware user type.
+type jSONDataMetaStationFirmware struct {
+	Build *string `form:"build,omitempty" json:"build,omitempty" yaml:"build,omitempty" xml:"build,omitempty"`
+	Git   *string `form:"git,omitempty" json:"git,omitempty" yaml:"git,omitempty" xml:"git,omitempty"`
+}
+
+// Validate validates the jSONDataMetaStationFirmware type instance.
+func (ut *jSONDataMetaStationFirmware) Validate() (err error) {
+	if ut.Git == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "git"))
+	}
+	if ut.Build == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "build"))
+	}
+	return
+}
+
+// Publicize creates JSONDataMetaStationFirmware from jSONDataMetaStationFirmware
+func (ut *jSONDataMetaStationFirmware) Publicize() *JSONDataMetaStationFirmware {
+	var pub JSONDataMetaStationFirmware
+	if ut.Build != nil {
+		pub.Build = *ut.Build
+	}
+	if ut.Git != nil {
+		pub.Git = *ut.Git
+	}
+	return &pub
+}
+
+// JSONDataMetaStationFirmware user type.
+type JSONDataMetaStationFirmware struct {
+	Build string `form:"build" json:"build" yaml:"build" xml:"build"`
+	Git   string `form:"git" json:"git" yaml:"git" xml:"git"`
+}
+
+// Validate validates the JSONDataMetaStationFirmware type instance.
+func (ut *JSONDataMetaStationFirmware) Validate() (err error) {
+	if ut.Git == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "git"))
+	}
+	if ut.Build == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "build"))
+	}
+	return
+}
+
+// jSONDataRow user type.
+type jSONDataRow struct {
+	D        map[string]interface{} `form:"d,omitempty" json:"d,omitempty" yaml:"d,omitempty" xml:"d,omitempty"`
+	Location []float64              `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Time     *int                   `form:"time,omitempty" json:"time,omitempty" yaml:"time,omitempty" xml:"time,omitempty"`
+}
+
+// Validate validates the jSONDataRow type instance.
+func (ut *jSONDataRow) Validate() (err error) {
+	if ut.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "time"))
+	}
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "location"))
+	}
+	if ut.D == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "d"))
+	}
+	return
+}
+
+// Publicize creates JSONDataRow from jSONDataRow
+func (ut *jSONDataRow) Publicize() *JSONDataRow {
+	var pub JSONDataRow
+	if ut.D != nil {
+		pub.D = ut.D
+	}
+	if ut.Location != nil {
+		pub.Location = ut.Location
+	}
+	if ut.Time != nil {
+		pub.Time = *ut.Time
+	}
+	return &pub
+}
+
+// JSONDataRow user type.
+type JSONDataRow struct {
+	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
+	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
+	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
+}
+
+// Validate validates the JSONDataRow type instance.
+func (ut *JSONDataRow) Validate() (err error) {
+
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "location"))
+	}
+	if ut.D == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "d"))
+	}
+	return
+}
+
+// jSONDataVersion user type.
+type jSONDataVersion struct {
+	Data []*jSONDataRow `form:"data,omitempty" json:"data,omitempty" yaml:"data,omitempty" xml:"data,omitempty"`
+	Meta *jSONDataMeta  `form:"meta,omitempty" json:"meta,omitempty" yaml:"meta,omitempty" xml:"meta,omitempty"`
+}
+
+// Validate validates the jSONDataVersion type instance.
+func (ut *jSONDataVersion) Validate() (err error) {
+	for _, e := range ut.Data {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	if ut.Meta != nil {
+		if err2 := ut.Meta.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// Publicize creates JSONDataVersion from jSONDataVersion
+func (ut *jSONDataVersion) Publicize() *JSONDataVersion {
+	var pub JSONDataVersion
+	if ut.Data != nil {
+		pub.Data = make([]*JSONDataRow, len(ut.Data))
+		for i2, elem2 := range ut.Data {
+			pub.Data[i2] = elem2.Publicize()
+		}
+	}
+	if ut.Meta != nil {
+		pub.Meta = ut.Meta.Publicize()
+	}
+	return &pub
+}
+
+// JSONDataVersion user type.
+type JSONDataVersion struct {
+	Data []*JSONDataRow `form:"data,omitempty" json:"data,omitempty" yaml:"data,omitempty" xml:"data,omitempty"`
+	Meta *JSONDataMeta  `form:"meta,omitempty" json:"meta,omitempty" yaml:"meta,omitempty" xml:"meta,omitempty"`
+}
+
+// Validate validates the JSONDataVersion type instance.
+func (ut *JSONDataVersion) Validate() (err error) {
+	for _, e := range ut.Data {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	if ut.Meta != nil {
+		if err2 := ut.Meta.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
 // loginPayload user type.
 type loginPayload struct {
 	Email    *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`

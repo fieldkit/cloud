@@ -16,6 +16,8 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
+
+	pb "github.com/fieldkit/data-protocol"
 )
 
 const (
@@ -396,4 +398,163 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	}
 
 	return
+}
+
+type JSONDataController struct {
+	options DataControllerOptions
+	*goa.Controller
+}
+
+func NewJSONDataController(ctx context.Context, service *goa.Service, options DataControllerOptions) *JSONDataController {
+	return &JSONDataController{
+		options:    options,
+		Controller: service.NewController("JSONDataController"),
+	}
+}
+
+func getLocation(l *pb.DeviceLocation) []float64 {
+	if l.Longitude > 180 || l.Longitude < -180 {
+		return nil
+	}
+	return []float64{
+		float64(l.Longitude),
+		float64(l.Latitude),
+		float64(l.Altitude),
+	}
+}
+
+func isInternalModule(m *pb.ModuleInfo) bool {
+	return m.Name == "random" || m.Name == "diagnostics"
+}
+
+func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	_ = log
+
+	rr, err := NewRecordRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	pageNumber := 0
+	if ctx.PageNumber != nil {
+		pageNumber = *ctx.PageNumber
+	}
+
+	pageSize := 200
+	if ctx.PageSize != nil {
+		pageSize = *ctx.PageSize
+	}
+
+	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
+	if err != nil {
+		return err
+	}
+
+	byMeta := make(map[int64][]*data.DataRecord)
+	for _, d := range page.Data {
+		if byMeta[d.Meta] == nil {
+			byMeta[d.Meta] = make([]*data.DataRecord, 0)
+		}
+		byMeta[d.Meta] = append(byMeta[d.Meta], d)
+	}
+
+	versions := make([]*app.JSONDataVersion, 0)
+	for _, m := range page.Meta {
+		data := byMeta[m.ID]
+
+		var metaRecord pb.DataRecord
+		err := m.Unmarshal(&metaRecord)
+		if err != nil {
+			return err
+		}
+
+		modules := make([]*app.JSONDataMetaModule, 0)
+		for _, module := range metaRecord.Modules {
+			if !isInternalModule(module) {
+				sensors := make([]*app.JSONDataMetaSensor, 0)
+				for _, sensor := range module.Sensors {
+					sensors = append(sensors, &app.JSONDataMetaSensor{
+						Name:  sensor.Name,
+						Key:   sensor.Name,
+						Units: sensor.UnitOfMeasure,
+					})
+				}
+
+				modules = append(modules, &app.JSONDataMetaModule{
+					Name:         module.Name,
+					ID:           hex.EncodeToString(module.Id),
+					Manufacturer: int(module.Header.Manufacturer),
+					Kind:         int(module.Header.Kind),
+					Version:      int(module.Header.Version),
+					Sensors:      sensors,
+				})
+			}
+		}
+
+		rows := make([]*app.JSONDataRow, 0)
+		for _, d := range data {
+			var dataRecord pb.DataRecord
+			err := d.Unmarshal(&dataRecord)
+			if err != nil {
+				return err
+			}
+
+			d := make(map[string]interface{})
+			for mi, sg := range dataRecord.Readings.SensorGroups {
+				if sg.Module == 255 {
+					continue
+				}
+				module := metaRecord.Modules[mi]
+				if !isInternalModule(module) {
+					for si, r := range sg.Readings {
+						sensor := module.Sensors[si]
+						d[sensor.Name] = r.Value
+					}
+				}
+			}
+
+			l := dataRecord.Readings.Location
+			rows = append(rows, &app.JSONDataRow{
+				Time:     int(dataRecord.Readings.Time),
+				Location: getLocation(l),
+				D:        d,
+			})
+		}
+
+		versions = append(versions, &app.JSONDataVersion{
+			Meta: &app.JSONDataMeta{
+				Station: &app.JSONDataMetaStation{
+					ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
+					Name:    metaRecord.Identity.Name,
+					Modules: modules,
+					Firmware: &app.JSONDataMetaStationFirmware{
+						Git:   metaRecord.Metadata.Firmware.Git,
+						Build: metaRecord.Metadata.Firmware.Build,
+					},
+				},
+			},
+			Data: rows,
+		})
+	}
+
+	return ctx.OK(&app.JSONDataResponse{
+		Versions: versions,
+	})
 }

@@ -13,6 +13,8 @@ import (
 	"github.com/jmoiron/sqlx/types"
 
 	"github.com/lib/pq"
+
+	pb "github.com/fieldkit/data-protocol"
 )
 
 type Ingestion struct {
@@ -143,6 +145,14 @@ func (d *DataRecord) GetData() (fields map[string]interface{}, err error) {
 	return
 }
 
+func (d *DataRecord) Unmarshal(r *pb.DataRecord) error {
+	err := json.Unmarshal(d.Data, r)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type DataRecord struct {
 	ID          int64          `db:"id"`
 	ProvisionID int64          `db:"provision_id"`
@@ -168,6 +178,14 @@ func (d *MetaRecord) GetData() (fields map[string]interface{}, err error) {
 		return nil, err
 	}
 	return
+}
+
+func (d *MetaRecord) Unmarshal(r *pb.DataRecord) error {
+	err := json.Unmarshal(d.Data, r)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func DecodeBinaryString(s string) ([]byte, error) {

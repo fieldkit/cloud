@@ -2213,6 +2213,93 @@ func (ctx *UpdateDeviceInfoFilesContext) NotFound() error {
 	return nil
 }
 
+// GetJSONDataContext provides the jsonData get action context.
+type GetJSONDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID   string
+	End        *int
+	PageNumber *int
+	PageSize   *int
+	Start      *int
+}
+
+// NewGetJSONDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the jsonData controller get action.
+func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetJSONDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetJSONDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramEnd := req.Params["end"]
+	if len(paramEnd) > 0 {
+		rawEnd := paramEnd[0]
+		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
+			tmp39 := end
+			tmp38 := &tmp39
+			rctx.End = tmp38
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
+		}
+	}
+	paramPageNumber := req.Params["pageNumber"]
+	if len(paramPageNumber) > 0 {
+		rawPageNumber := paramPageNumber[0]
+		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
+			tmp41 := pageNumber
+			tmp40 := &tmp41
+			rctx.PageNumber = tmp40
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+		}
+	}
+	paramPageSize := req.Params["pageSize"]
+	if len(paramPageSize) > 0 {
+		rawPageSize := paramPageSize[0]
+		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
+			tmp43 := pageSize
+			tmp42 := &tmp43
+			rctx.PageSize = tmp42
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
+		}
+	}
+	paramStart := req.Params["start"]
+	if len(paramStart) > 0 {
+		rawStart := paramStart[0]
+		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
+			tmp45 := start
+			tmp44 := &tmp45
+			rctx.Start = tmp44
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetJSONDataContext) OK(r *JSONDataResponse) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.json.data+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *GetJSONDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddMemberContext provides the member add action context.
 type AddMemberContext struct {
 	context.Context

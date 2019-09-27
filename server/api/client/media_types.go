@@ -440,6 +440,35 @@ func (c *Client) DecodeDeviceFiles(resp *http.Response) (*DeviceFiles, error) {
 	return &decoded, err
 }
 
+// JSONDataResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.json.data+json; view=default
+type JSONDataResponse struct {
+	Versions []*JSONDataVersion `form:"versions" json:"versions" yaml:"versions" xml:"versions"`
+}
+
+// Validate validates the JSONDataResponse media type instance.
+func (mt *JSONDataResponse) Validate() (err error) {
+	if mt.Versions == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "versions"))
+	}
+	for _, e := range mt.Versions {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeJSONDataResponse decodes the JSONDataResponse instance encoded in resp body.
+func (c *Client) DecodeJSONDataResponse(resp *http.Response) (*JSONDataResponse, error) {
+	var decoded JSONDataResponse
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // DeviceMetaRecord media type (default view)
 //
 // Identifier: application/vnd.app.device.meta.record+json; view=default

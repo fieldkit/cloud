@@ -204,6 +204,8 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	}
 	app.MountDataController(service, NewDataController(ctx, service, dco))
 
+	app.MountJSONDataController(service, NewJSONDataController(ctx, service, dco))
+
 	// Mount "files" controller
 	fco := FilesControllerOptions{
 		Config:        config,

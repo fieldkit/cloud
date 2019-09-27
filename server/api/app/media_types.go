@@ -341,6 +341,28 @@ func (mt *DeviceFiles) Validate() (err error) {
 	return
 }
 
+// JSONDataResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.json.data+json; view=default
+type JSONDataResponse struct {
+	Versions []*JSONDataVersion `form:"versions" json:"versions" yaml:"versions" xml:"versions"`
+}
+
+// Validate validates the JSONDataResponse media type instance.
+func (mt *JSONDataResponse) Validate() (err error) {
+	if mt.Versions == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "versions"))
+	}
+	for _, e := range mt.Versions {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // DeviceMetaRecord media type (default view)
 //
 // Identifier: application/vnd.app.device.meta.record+json; view=default

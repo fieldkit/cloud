@@ -182,3 +182,88 @@ var _ = Resource("data", func() {
 		})
 	})
 })
+
+var JSONDataMetaSensor = Type("JSONDataMetaSensor", func() {
+	Attribute("name", String)
+	Attribute("key", String)
+	Attribute("units", String)
+
+	Required("name", "key", "units")
+})
+
+var JSONDataMetaModule = Type("JSONDataMetaModule", func() {
+	Attribute("id", String)
+	Attribute("name", String)
+
+	Attribute("manufacturer", Integer)
+	Attribute("kind", Integer)
+	Attribute("version", Integer)
+	Attribute("sensors", ArrayOf(JSONDataMetaSensor))
+
+	Required("id", "name", "kind", "version", "manufacturer")
+})
+
+var JSONDataMetaStationFirmware = Type("JSONDataMetaStationFirmware", func() {
+	Attribute("git", String)
+	Attribute("build", String)
+
+	Required("git", "build")
+})
+
+var JSONDataMetaStation = Type("JSONDataMetaStation", func() {
+	Attribute("id", String)
+	Attribute("name", String)
+	Attribute("modules", ArrayOf(JSONDataMetaModule))
+	Attribute("firmware", JSONDataMetaStationFirmware)
+
+	Required("id", "name", "modules", "firmware")
+})
+
+var JSONDataRow = Type("JSONDataRow", func() {
+	Attribute("time", Integer)
+	Attribute("location", ArrayOf(Number))
+	Attribute("d", HashOf(String, Any))
+
+	Required("time", "location", "d")
+})
+
+var JSONDataMeta = Type("JSONDataMeta", func() {
+	Attribute("station", JSONDataMetaStation)
+})
+
+var JSONDataVersion = Type("JSONDataVersion", func() {
+	Attribute("meta", JSONDataMeta)
+	Attribute("data", ArrayOf(JSONDataRow))
+})
+
+var JSONDataResponse = MediaType("application/vnd.app.device.json.data+json", func() {
+	TypeName("JSONDataResponse")
+	Attributes(func() {
+		Attribute("versions", ArrayOf(JSONDataVersion))
+		Required("versions")
+	})
+	View("default", func() {
+		Attribute("versions")
+	})
+})
+
+var _ = Resource("jsonData", func() {
+	Security(JWT, func() {
+		Scope("api:access")
+	})
+
+	Action("get", func() {
+		Routing(GET("data/devices/:deviceId/data/json"))
+		Description("Retrieve data")
+		Params(func() {
+			Param("pageNumber", Integer)
+			Param("pageSize", Integer)
+			Param("start", Integer)
+			Param("end", Integer)
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Media(JSONDataResponse)
+		})
+	})
+})
