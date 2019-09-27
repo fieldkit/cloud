@@ -110,8 +110,11 @@ func (ra *RecordAdder) findLocation(location *pb.DeviceLocation) (l *data.Locati
 		return nil, err
 	}
 
-	l = data.NewLocation([]float64{lon, lat, altitude})
+	if lat == 0 && lon == 0 {
+		return nil, err
+	}
 
+	l = data.NewLocation([]float64{lon, lat, altitude})
 	return
 }
 
@@ -163,8 +166,9 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
-		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location) VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, dataRecord); err != nil {
+		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
+		    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING id`, dataRecord); err != nil {
 			return err
 		}
 	}

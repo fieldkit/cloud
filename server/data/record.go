@@ -63,7 +63,10 @@ func (l *Location) Value() (driver.Value, error) {
 }
 
 func (l *Location) String() string {
-	return l.point.String()
+	if l.point != nil {
+		return l.point.String()
+	}
+	return "<nil>"
 }
 
 func (l *Location) Distance(o *Location) float64 {
