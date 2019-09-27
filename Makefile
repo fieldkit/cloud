@@ -123,7 +123,7 @@ active-schema:
 restart-postgres: active-schema
 	docker-compose stop postgres
 	docker-compose rm -f postgres
-	docker-compose up postgres
+	docker-compose up -d postgres
 
 restart-postgres-foreground: active-schema
 	docker-compose stop postgres
