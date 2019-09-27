@@ -191,7 +191,7 @@ func (c *StationController) Delete(ctx *app.DeleteStationContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.NamedExecContext(ctx, "DELETE FROM fieldkit.station WHERE id = $1", ctx.StationID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.station WHERE id = $1", ctx.StationID); err != nil {
 		return err
 	}
 
