@@ -24,4 +24,29 @@ body {
 
     flex-shrink: 0;
 }
+a {
+    text-decoration: none;
+    color: inherit;
+}
+.header {
+    width: 100%;
+    height: 70px;
+    border-bottom: 2px solid rgb(235, 235, 235);
+}
+.main-panel {
+    position: absolute;
+    left: 240px;
+    color: rgb(41, 61, 81);
+    margin-left: 90px;
+    text-align: left;
+}
+.main-panel h1 {
+    font-size: 38px;
+    margin-top: 40px;
+}
+.main-panel .container {
+    width: 800px;
+    padding-bottom: 40px;
+    border-bottom: 2px solid rgb(235, 235, 235);
+}
 </style>

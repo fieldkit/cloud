@@ -1,6 +1,6 @@
 <template>
     <div id="stations-list-container">
-        <div v-if="foundStations.length == 0" class="no-stations-message">
+        <div v-if="this.stations.length == 0" class="no-stations-message">
             <p>No stations found.</p>
         </div>
         <div v-for="station in stations" :key="station.id" class="station-container">
@@ -36,14 +36,11 @@
 export default {
     name: "StationsList",
     data: () => {
-        return {
-            foundStations: []
-        };
+        return {};
     },
     props: ["stations"],
     mounted() {
         if (this.stations && this.stations.length > 0) {
-            this.foundStations = this.stations;
             this.stations.forEach(s => {
                 // console.log(s.name, s.device_id)
                 this.$set(s, "synced", this.formatDate(s.status_json.updated));

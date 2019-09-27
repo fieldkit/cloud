@@ -112,7 +112,14 @@ class FKApi {
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
+            url:
+                this.baseUrl +
+                "/data/devices/" +
+                deviceId +
+                "/data/json?page=" +
+                page +
+                "&pageSize=" +
+                pageSize,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token

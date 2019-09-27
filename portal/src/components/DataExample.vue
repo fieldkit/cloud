@@ -5,27 +5,19 @@
 </template>
 
 <script>
-import _ from "lodash";
-import FKApi from "../api/api";
-
 export default {
     name: "DataExample",
     data: () => {
-        return {
-            data: []
-        };
+        return {};
     },
-    props: {
-        stationId: Number
-    },
-    async beforeCreate() {
-        const api = new FKApi();
-        const stations = await api.getStations();
-        const id = _(stations.stations).first().device_id;
-        const summary = await api.getStationDataSummaryByDeviceId(id);
-        const data = await api.getJSONDataByDeviceId(id, 0, 1000);
-        console.log(summary);
-        console.log(data);
+    props: ["summary", "stationData"],
+    watch: {
+        summary: function(newVal, oldVal) {
+            console.log("summary", newVal, "was", oldVal);
+        },
+        stationData: function(newVal, oldVal) {
+            console.log("stationData", newVal, "was", oldVal);
+        }
     }
 };
 </script>

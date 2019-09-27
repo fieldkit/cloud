@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import FKApi from "../../api/api";
+import FKApi from "../api/api";
 
 export default {
     name: "LoginForm",
@@ -61,7 +61,7 @@ export default {
                 const isAuthenticated = await api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
-                    this.$router.push({ name: "dashboard" });
+                    this.$router.push({ name: "projects" });
                 } else {
                     alert(
                         "Unfortunately we were unable to log you in. Please check your credentials and try again."

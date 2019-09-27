@@ -7,7 +7,7 @@
                 marginBottom: '80px'
             }"
             alt="Fieldkit Logo"
-            src="../../assets/FieldKit_Logo_White.png"
+            src="../assets/FieldKit_Logo_White.png"
         />
         <br />
         <LoginForm />
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import LoginForm from "./LoginForm.vue";
+import LoginForm from "../components/LoginForm.vue";
 
 export default {
     name: "Login",
