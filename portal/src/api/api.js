@@ -108,11 +108,11 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
-    getJSONDataByDeviceId(deviceId, page) {
+    getJSONDataByDeviceId(deviceId, page, pageSize) {
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page,
+            url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token

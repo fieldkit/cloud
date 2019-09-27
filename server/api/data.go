@@ -538,20 +538,22 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 			})
 		}
 
-		versions = append(versions, &app.JSONDataVersion{
-			Meta: &app.JSONDataMeta{
-				Station: &app.JSONDataMetaStation{
-					ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
-					Name:    metaRecord.Identity.Name,
-					Modules: modules,
-					Firmware: &app.JSONDataMetaStationFirmware{
-						Git:   metaRecord.Metadata.Firmware.Git,
-						Build: metaRecord.Metadata.Firmware.Build,
+		if len(rows) > 0 {
+			versions = append(versions, &app.JSONDataVersion{
+				Meta: &app.JSONDataMeta{
+					Station: &app.JSONDataMetaStation{
+						ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
+						Name:    metaRecord.Identity.Name,
+						Modules: modules,
+						Firmware: &app.JSONDataMetaStationFirmware{
+							Git:   metaRecord.Metadata.Firmware.Git,
+							Build: metaRecord.Metadata.Firmware.Build,
+						},
 					},
 				},
-			},
-			Data: rows,
-		})
+				Data: rows,
+			})
+		}
 	}
 
 	return ctx.OK(&app.JSONDataResponse{

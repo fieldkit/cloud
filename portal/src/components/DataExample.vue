@@ -23,7 +23,7 @@ export default {
         const stations = await api.getStations();
         const id = _(stations.stations).first().device_id;
         const summary = await api.getStationDataSummaryByDeviceId(id);
-        const data = await api.getJSONDataByDeviceId(id, 0);
+        const data = await api.getJSONDataByDeviceId(id, 0, 1000);
         console.log(summary);
         console.log(data);
     }
