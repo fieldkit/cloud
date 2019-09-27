@@ -163,7 +163,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
-		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location) VALUES (:provision_id, :time, :number, :raw, :meta, :location)
+		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location) VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
 		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, dataRecord); err != nil {
 			return err
 		}
