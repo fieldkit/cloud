@@ -61,6 +61,7 @@
             <div id="data-section" v-if="viewingData">
                 <div class="section">
                     <h1>Data</h1>
+                    <DataExample />
                 </div>
             </div>
         </div>
@@ -71,12 +72,14 @@
 import FKApi from "../api/api";
 import ProjectForm from "../components/ProjectForm";
 import StationsList from "../components/StationsList";
+import DataExample from "../components/DataExample";
 
 export default {
     name: "dashboard",
     components: {
         ProjectForm,
-        StationsList
+        StationsList,
+        DataExample
     },
     data: () => {
         return {

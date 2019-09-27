@@ -83,6 +83,50 @@ class FKApi {
             }
         }
     }
+
+    getStationDataSummaryByDeviceId(deviceId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/data/devices/" + deviceId + "/summary",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getStationDataByDeviceId(deviceId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/data/devices/" + deviceId + "/data",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getJSONDataByDeviceId(deviceId, page) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    _handleResponse(response) {
+        if (response.status == 200) {
+            return response.data;
+        } else {
+            throw new Error("Api failed");
+        }
+    }
 }
 
 export default FKApi;
