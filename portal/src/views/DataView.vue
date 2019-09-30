@@ -60,4 +60,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.main-panel {
+    margin-left: 90px;
+}
+</style>

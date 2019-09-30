@@ -37,7 +37,6 @@ a {
     position: absolute;
     left: 240px;
     color: rgb(41, 61, 81);
-    margin-left: 90px;
     text-align: left;
 }
 .main-panel h1 {

@@ -68,6 +68,9 @@ export default {
 </script>
 
 <style scoped>
+.main-panel {
+    margin-left: 90px;
+}
 #add-project {
     float: right;
     padding: 12px;

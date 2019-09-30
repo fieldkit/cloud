@@ -23,7 +23,7 @@
                     </span>
                 </div>
             </router-link>
-            <router-link :to="{ name: 'data' }">
+            <!-- <router-link :to="{ name: 'data' }">
                 <div class="nav-label">
                     <img alt="Data" src="../assets/data.png" />
                     <span>
@@ -31,7 +31,7 @@
                         <div class="selected" v-if="viewingData"></div>
                     </span>
                 </div>
-            </router-link>
+            </router-link> -->
         </div>
     </div>
 </template>
@@ -73,6 +73,7 @@ export default {
     background-color: #1b80c9;
     width: 240px;
     height: 100%;
+    min-height: 600px;
     color: white;
 }
 #sidebar-nav .header {

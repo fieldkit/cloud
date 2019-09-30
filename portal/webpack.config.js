@@ -25,6 +25,9 @@ module.exports = {
         new VueLoaderPlugin(),
         new DefinePlugin({
             "process.env.PUBLIC_PATH": JSON.stringify(PUBLIC_PATH)
+        }),
+        new webpack.ProvidePlugin({
+            mapboxgl: 'mapbox-gl',
         })
     ]
 };
