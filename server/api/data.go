@@ -352,6 +352,22 @@ func (r *IngestionRepository) Delete(ctx context.Context, id int64) (err error) 
 	return nil
 }
 
+type StationRepository struct {
+	Database *sqlxcache.DB
+}
+
+func NewStationRepository(database *sqlxcache.DB) (rr *StationRepository, err error) {
+	return &StationRepository{Database: database}, nil
+}
+
+func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
+	station = &data.Station{}
+	if err := r.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE device_id = $1", deviceIdBytes); err != nil {
+		return nil, err
+	}
+	return station, nil
+}
+
 type RecordRepository struct {
 	Database *sqlxcache.DB
 }
@@ -475,14 +491,29 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		byMeta[d.Meta] = append(byMeta[d.Meta], d)
 	}
 
+	sr, err := NewStationRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
+	if err != nil {
+		return err
+	}
+
 	versions := make([]*app.JSONDataVersion, 0)
 	for _, m := range page.Meta {
-		data := byMeta[m.ID]
+		dataRecords := byMeta[m.ID]
 
 		var metaRecord pb.DataRecord
 		err := m.Unmarshal(&metaRecord)
 		if err != nil {
 			return err
+		}
+
+		name := metaRecord.Identity.Name
+		if name == "" {
+			name = station.Name
 		}
 
 		modules := make([]*app.JSONDataMetaModule, 0)
@@ -509,7 +540,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		}
 
 		rows := make([]*app.JSONDataRow, 0)
-		for _, d := range data {
+		for _, d := range dataRecords {
 			var dataRecord pb.DataRecord
 			err := d.Unmarshal(&dataRecord)
 			if err != nil {
@@ -543,7 +574,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 				Meta: &app.JSONDataMeta{
 					Station: &app.JSONDataMetaStation{
 						ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
-						Name:    metaRecord.Identity.Name,
+						Name:    name,
 						Modules: modules,
 						Firmware: &app.JSONDataMetaStationFirmware{
 							Git:   metaRecord.Metadata.Firmware.Git,
