@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/goadesign/goa"
+	"github.com/iancoleman/strcase"
 
 	"github.com/conservify/sqlxcache"
 
@@ -523,7 +524,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 				for _, sensor := range module.Sensors {
 					sensors = append(sensors, &app.JSONDataMetaSensor{
 						Name:  sensor.Name,
-						Key:   sensor.Name,
+						Key:   strcase.ToLowerCamel(sensor.Name),
 						Units: sensor.UnitOfMeasure,
 					})
 				}
@@ -556,7 +557,8 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 				if !isInternalModule(module) {
 					for si, r := range sg.Readings {
 						sensor := module.Sensors[si]
-						d[sensor.Name] = r.Value
+						key := strcase.ToLowerCamel(sensor.Name)
+						d[key] = r.Value
 					}
 				}
 			}

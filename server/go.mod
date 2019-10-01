@@ -39,6 +39,7 @@ require (
 	github.com/hashicorp/golang-lru v0.0.0-20180201235237-0fb14efe8c47
 	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect
 	github.com/hongshibao/go-kdtree v0.0.0-20180503061502-0de4e8305acf
+	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
 	github.com/jmespath/go-jmespath v0.0.0-20160803190731-bd40a432e4c7
