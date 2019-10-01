@@ -394,7 +394,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 
 	drs := []*data.DataRecord{}
 	if err := r.Database.SelectContext(ctx, &drs, `
-	    SELECT r.* FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+	    SELECT r.id, r.provision_id, r.time, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 	    WHERE (p.device_id = $1)
 	    ORDER BY r.time DESC LIMIT $2 OFFSET $3`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
 		return nil, err
@@ -430,6 +430,9 @@ func NewJSONDataController(ctx context.Context, service *goa.Service, options Da
 }
 
 func getLocation(l *pb.DeviceLocation) []float64 {
+	if l == nil {
+		return nil
+	}
 	if l.Longitude > 180 || l.Longitude < -180 {
 		return nil
 	}
@@ -551,6 +554,10 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 			d := make(map[string]interface{})
 			for mi, sg := range dataRecord.Readings.SensorGroups {
 				if sg.Module == 255 {
+					continue
+				}
+				if mi >= len(metaRecord.Modules) {
+					log.Warnw("module index range", "module_index", mi, "modules", len(metaRecord.Modules), "meta", metaRecord.Modules)
 					continue
 				}
 				module := metaRecord.Modules[mi]
