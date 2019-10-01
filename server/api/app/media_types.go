@@ -1825,3 +1825,22 @@ func (mt *Users) Validate() (err error) {
 	}
 	return
 }
+
+// BadRequestResponse media type (default view)
+//
+// Identifier: application/vnd.brr+json; view=default
+type BadRequestResponse struct {
+	Key     string `form:"key" json:"key" yaml:"key" xml:"key"`
+	Message string `form:"message" json:"message" yaml:"message" xml:"message"`
+}
+
+// Validate validates the BadRequestResponse media type instance.
+func (mt *BadRequestResponse) Validate() (err error) {
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	if mt.Message == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "message"))
+	}
+	return
+}

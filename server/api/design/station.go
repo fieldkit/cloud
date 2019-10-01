@@ -49,6 +49,19 @@ var Stations = MediaType("application/vnd.app.stations+json", func() {
 	})
 })
 
+var BadRequestResponse = MediaType("application/vnd.brr+json", func() {
+	TypeName("BadRequestResponse")
+	Attributes(func() {
+		Attribute("key", String)
+		Attribute("message", String)
+		Required("key", "message")
+	})
+	View("default", func() {
+		Attribute("key")
+		Attribute("message")
+	})
+})
+
 var _ = Resource("station", func() {
 	Security(JWT, func() {
 		Scope("api:access")
@@ -58,7 +71,9 @@ var _ = Resource("station", func() {
 		Routing(POST("stations"))
 		Description("Add a station")
 		Payload(AddStationPayload)
-		Response(BadRequest)
+		Response(BadRequest, func() {
+			Media(BadRequestResponse)
+		})
 		Response(OK, func() {
 			Media(Station)
 		})

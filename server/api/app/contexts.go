@@ -3653,9 +3653,11 @@ func (ctx *AddStationContext) OK(r *Station) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *AddStationContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *AddStationContext) BadRequest(r *BadRequestResponse) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.brr+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // DeleteStationContext provides the station delete action context.

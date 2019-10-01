@@ -74,12 +74,19 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1 AND device_id = $2", p.UserID, deviceId); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE device_id = $1", deviceId); err != nil {
 		return err
 	}
 
 	if len(stations) > 0 {
-		svm, err := StationType(stations[0])
+		existing := stations[0]
+		if existing.OwnerID != p.UserID {
+			return ctx.BadRequest(&app.BadRequestResponse{
+				Key:     "stationAlreadyRegistered",
+				Message: "This station is already registered.",
+			})
+		}
+		svm, err := StationType(existing)
 		if err != nil {
 			return err
 		}
