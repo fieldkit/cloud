@@ -101,7 +101,11 @@ func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) 
 	return records[0], nil
 }
 
-func (ra *RecordAdder) findLocation(location *pb.DeviceLocation) (l *data.Location, err error) {
+func (ra *RecordAdder) findLocation(dataRecord *pb.DataRecord) (l *data.Location, err error) {
+	if dataRecord.Readings == nil || dataRecord.Readings.Location == nil {
+		return nil, err
+	}
+	location := dataRecord.Readings.Location
 	lat := float64(location.Latitude)
 	lon := float64(location.Longitude)
 	altitude := float64(location.Altitude)
@@ -143,7 +147,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return err
 		}
 	} else {
-		location, err := ra.findLocation(pr.DataRecord.Readings.Location)
+		location, err := ra.findLocation(pr.DataRecord)
 		if err != nil {
 			return err
 		}
