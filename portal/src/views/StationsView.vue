@@ -7,7 +7,8 @@
                 :access-token="mapboxToken"
                 :map-options="{
                     style: 'mapbox://styles/mapbox/light-v10',
-                    center: coordinates
+                    center: coordinates,
+                    zoom: 14
                 }"
                 :nav-control="{
                     show: true,
