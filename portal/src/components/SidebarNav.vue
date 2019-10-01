@@ -23,6 +23,12 @@
                     </span>
                 </div>
             </router-link>
+            <div v-for="station in stations" v-bind:key="station.id">
+                <div class="station-link" v-on:click="showSummary" :data-id="station.id">
+                    {{ station.name }}
+                </div>
+            </div>
+
             <!-- <router-link :to="{ name: 'data' }">
                 <div class="nav-label">
                     <img alt="Data" src="../assets/data.png" />
@@ -46,7 +52,7 @@ export default {
             viewingData: false
         };
     },
-    props: ["viewing"],
+    props: ["viewing", "stations"],
     mounted() {
         switch (this.viewing) {
             case "projects":
@@ -62,7 +68,15 @@ export default {
                 break;
         }
     },
-    methods: {}
+    methods: {
+        showSummary(event) {
+            const id = event.target.getAttribute("data-id");
+            const station = this.stations.find(s => {
+                return s.id == id;
+            });
+            this.$emit("showStationSummary", station);
+        }
+    }
 };
 </script>
 
@@ -110,6 +124,13 @@ export default {
     font-weight: normal;
     font-size: 13px;
     margin: 20px 0 0 37px;
+    display: inline-block;
+}
+.station-link {
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 13px;
+    margin: 0 0 0 37px;
     display: inline-block;
 }
 </style>

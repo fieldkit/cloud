@@ -1,7 +1,7 @@
 <template>
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <SidebarNav viewing="stations" />
+        <SidebarNav viewing="stations" :stations="stations" @showStationSummary="showSummary" />
         <div class="main-panel">
             <mapbox
                 :access-token="mapboxToken"
@@ -52,11 +52,12 @@ export default {
         if (api.authenticated()) {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
-            if (this.stations) {
+            if (this.stations && this.stations.stations.length > 0) {
                 this.stations = this.stations.stations;
                 this.updateMap();
             } else {
                 this.$refs.stationSummary.viewSummary();
+                this.map.setZoom(6);
             }
             this.isAuthenticated = true;
             console.log("this is the user info", this.user);
@@ -158,6 +159,8 @@ export default {
                 // fitBounds is cropped too close: zoom out
                 const z = this.map.getZoom();
                 this.map.setZoom(z - 1.5);
+            } else {
+                this.map.setZoom(6);
             }
 
             const stationsView = this;
@@ -169,6 +172,11 @@ export default {
                 stationsView.activeStation = station;
                 stationsView.$refs.stationSummary.viewSummary();
             });
+        },
+
+        showSummary(station) {
+            this.activeStation = station;
+            this.$refs.stationSummary.viewSummary();
         }
     }
 };
