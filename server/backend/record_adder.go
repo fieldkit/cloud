@@ -146,34 +146,38 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, metaRecord); err != nil {
 			return err
 		}
-	} else {
-		location, err := ra.findLocation(pr.DataRecord)
-		if err != nil {
-			return err
-		}
+	} else if pr.DataRecord != nil {
+		if pr.DataRecord.Readings != nil {
+			location, err := ra.findLocation(pr.DataRecord)
+			if err != nil {
+				return err
+			}
 
-		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
-		if err != nil {
-			return err
-		}
+			meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
+			if err != nil {
+				return err
+			}
 
-		dataRecord := data.DataRecord{
-			ProvisionID: provision.ID,
-			Time:        i.Time,
-			Number:      int64(pr.DataRecord.Readings.Reading),
-			Meta:        meta.ID,
-			Location:    location,
-		}
+			dataRecord := data.DataRecord{
+				ProvisionID: provision.ID,
+				Time:        i.Time,
+				Number:      int64(pr.DataRecord.Readings.Reading),
+				Meta:        meta.ID,
+				Location:    location,
+			}
 
-		if err := dataRecord.SetData(pr.DataRecord); err != nil {
-			return err
-		}
+			if err := dataRecord.SetData(pr.DataRecord); err != nil {
+				return err
+			}
 
-		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
-		    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
-		    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING id`, dataRecord); err != nil {
-			return err
+			if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
+			    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
+			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
+			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING id`, dataRecord); err != nil {
+				return err
+			}
+		} else {
+			log.Infow("weird", "record", pr.DataRecord)
 		}
 	}
 
