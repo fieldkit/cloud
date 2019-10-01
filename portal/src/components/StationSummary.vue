@@ -3,8 +3,17 @@
         <div v-if="this.station" id="close-form-btn" v-on:click="closeForm">
             <img alt="Close" src="../assets/close.png" />
         </div>
-        <div v-if="!this.station" class="no-stations-message">
-            <p>No stations added yet</p>
+        <div v-if="!isAuthenticated" class="no-stations-message">
+            <p>
+                Please
+                <router-link :to="{ name: 'login' }" class="show-link">
+                    log in
+                </router-link>
+                to view stations.
+            </p>
+        </div>
+        <div v-if="isAuthenticated && !this.station" class="no-stations-message">
+            <p>No stations added yet.</p>
         </div>
         <div class="station-container" v-if="this.station">
             <div class="left">
@@ -72,7 +81,7 @@ export default {
             viewingSummary: false
         };
     },
-    props: ["station"],
+    props: ["station", "isAuthenticated"],
     methods: {
         viewSummary() {
             this.viewingSummary = true;
@@ -142,6 +151,9 @@ export default {
 }
 .no-stations-message {
     font-size: 20px;
+}
+.show-link {
+    text-decoration: underline;
 }
 .station-container {
     padding: 10px;

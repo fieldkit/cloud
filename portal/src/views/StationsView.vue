@@ -16,7 +16,11 @@
                 }"
                 @map-init="mapInitialized"
             />
-            <StationSummary :station="activeStation" ref="stationSummary" />
+            <StationSummary
+                :isAuthenticated="isAuthenticated"
+                :station="activeStation"
+                ref="stationSummary"
+            />
         </div>
     </div>
 </template>
@@ -40,7 +44,9 @@ export default {
     data: () => {
         return {
             user: {},
-            stations: {},
+            stations: {
+                stations: []
+            },
             activeStation: null,
             isAuthenticated: false,
             coordinates: [-96, 37.8],
@@ -52,16 +58,21 @@ export default {
         if (api.authenticated()) {
             this.user = await api.getCurrentUser();
             this.stations = await api.getStations();
-            if (this.stations && this.stations.stations.length > 0) {
-                this.stations = this.stations.stations;
-                this.updateMap();
+            if (this.map) {
+                this.initStations();
             } else {
-                this.$refs.stationSummary.viewSummary();
-                this.map.setZoom(6);
+                this.waitingForMap = true;
             }
             this.isAuthenticated = true;
             console.log("this is the user info", this.user);
             console.log("this is the station info", this.stations);
+        } else {
+            // handle non-logged in state
+            if (this.map) {
+                this.initStations.bind(this);
+            } else {
+                this.waitingForMap = true;
+            }
         }
     },
     methods: {
@@ -71,6 +82,19 @@ export default {
 
         mapInitialized(map) {
             this.map = map;
+            if (this.waitingForMap) {
+                this.initStations();
+            }
+        },
+
+        initStations() {
+            if (this.stations && this.stations.stations.length > 0) {
+                this.stations = this.stations.stations;
+                this.updateMap();
+            } else {
+                this.$refs.stationSummary.viewSummary();
+                this.map.setZoom(6);
+            }
         },
 
         updateMap() {
