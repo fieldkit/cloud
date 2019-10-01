@@ -44,12 +44,12 @@
             <div id="location-container" class="section">
                 <div>{{ this.station.status_json.location_name }}</div>
                 <div class="left">
-                    {{ this.station.status_json.latitude }}
+                    {{ this.station.status_json.latitude || "--" }}
                     <br />
                     Latitude
                 </div>
                 <div class="right">
-                    {{ this.station.status_json.longitude }}
+                    {{ this.station.status_json.longitude || "--" }}
                     <br />
                     Longitude
                 </div>
@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <router-link :to="{ name: 'data' }">
+            <router-link :to="{ name: 'data', params: { station: station } }">
                 <div id="view-data-btn" class="section">
                     View Data
                 </div>

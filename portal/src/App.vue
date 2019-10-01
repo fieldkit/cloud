@@ -44,7 +44,7 @@ a {
     margin-top: 40px;
 }
 .main-panel .container {
-    width: 800px;
+    min-width: 800px;
     padding-bottom: 40px;
     border-bottom: 2px solid rgb(235, 235, 235);
 }

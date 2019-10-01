@@ -30,7 +30,8 @@ export default new Router({
         {
             path: "/dashboard/data",
             name: "data",
-            component: DataView
+            component: DataView,
+            props: true
         }
     ]
 });

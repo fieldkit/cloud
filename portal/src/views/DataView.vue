@@ -4,57 +4,84 @@
         <SidebarNav viewing="data" />
         <div class="main-panel">
             <div id="data-container">
-                <div class="container">
-                    <h1>Data</h1>
-                    <DataExample :summary="summary" :stationData="stationData" />
+                <router-link :to="{ name: 'stations' }">
+                    <div class="map-link">&lt; Stations Map</div>
+                </router-link>
+                <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
+                <div class="spacer"></div>
+
+                <div id="readings-container" class="section" v-if="this.station">
+                    <div id="readings-label">
+                        Latest Reading <span class="synced">Last synced {{ getSyncedDate() }}</span>
+                    </div>
+                    <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
+                        <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
+                            <div class="left">{{ sensor.name }}</div>
+                            <div class="right">
+                                {{ sensor.current_reading + " " + (sensor.unit ? sensor.unit : "") }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <DataChart :summary="summary" :stationData="stationData" :station="station" />
+                <NotesList :station="station" />
+                <SensorSummary :sensor="selectedSensor" />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import _ from "lodash";
+// import _ from "lodash";
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
-import DataExample from "../components/DataExample";
+import DataChart from "../components/DataChart";
+import NotesList from "../components/NotesList";
+import SensorSummary from "../components/SensorSummary";
 
 export default {
     name: "DataView",
     components: {
         HeaderBar,
         SidebarNav,
-        DataExample
+        DataChart,
+        NotesList,
+        SensorSummary
     },
+    props: ["station"],
     data: () => {
         return {
             user: {},
-            stations: {},
             stationData: [],
+            selectedSensor: null,
             summary: [],
             isAuthenticated: false
         };
     },
+    async mounted() {
+        if (this.station) {
+            this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
+            this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
+            this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
+        }
+    },
     async beforeCreate() {
-        const api = new FKApi();
-        if (api.authenticated()) {
-            this.user = await api.getCurrentUser();
-            this.stations = await api.getStations();
-            if (this.stations) {
-                this.stations = this.stations.stations;
-                if (this.stations.length > 0) {
-                    const id = _(this.stations).first().device_id;
-                    this.summary = await api.getStationDataSummaryByDeviceId(id);
-                    this.stationData = await api.getJSONDataByDeviceId(id, 0, 1000);
-                }
-            }
+        this.api = new FKApi();
+        if (this.api.authenticated()) {
+            this.user = await this.api.getCurrentUser();
             this.isAuthenticated = true;
         }
     },
     methods: {
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
+        },
+
+        getSyncedDate() {
+            const date = this.station.status_json.updated;
+            const d = new Date(date);
+            return d.toLocaleDateString("en-US");
         }
     }
 };
@@ -62,6 +89,42 @@ export default {
 
 <style scoped>
 .main-panel {
-    margin-left: 90px;
+    width: 80%;
+    margin-left: 20px;
+}
+.map-link {
+    margin: 10px 0;
+    font-size: 13px;
+}
+#station-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+.spacer {
+    width: 100%;
+    margin: 10px 0 20px 0;
+    border-top: 2px solid rgba(230, 230, 230);
+}
+.synced {
+    margin-left: 10px;
+    font-size: 11px;
+}
+#readings-label {
+    margin-bottom: 10px;
+}
+.reading {
+    font-size: 11px;
+    width: 145px;
+    float: left;
+    margin: 5px 10px 5px 0;
+    padding: 5px 10px;
+    background-color: rgb(233, 233, 233);
+    border: 1px solid rgb(200, 200, 200);
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
 }
 </style>

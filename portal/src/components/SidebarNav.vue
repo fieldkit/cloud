@@ -129,7 +129,7 @@ export default {
 .station-link {
     cursor: pointer;
     font-weight: normal;
-    font-size: 13px;
+    font-size: 14px;
     margin: 0 0 0 37px;
     display: inline-block;
 }

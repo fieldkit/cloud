@@ -2,7 +2,7 @@
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="stations" :stations="stations" @showStationSummary="showSummary" />
-        <div class="main-panel">
+        <div id="stations-view-panel" class="main-panel">
             <mapbox
                 :access-token="mapboxToken"
                 :map-options="{
@@ -52,6 +52,12 @@ export default {
             coordinates: [-96, 37.8],
             mapboxToken: MAPBOX_ACCESS_TOKEN
         };
+    },
+    mounted() {
+        // HACK
+        const newWidth = window.innerWidth - 240; // the sidebar is 240px
+        document.getElementById("stations-view-panel").style.width = newWidth + "px";
+        this.map.resize();
     },
     async beforeCreate() {
         const api = new FKApi();
@@ -208,7 +214,7 @@ export default {
 
 <style scoped>
 .main-panel {
-    width: 100%;
+    width: 80%;
 }
 #stations-container .container {
     padding: 0;
