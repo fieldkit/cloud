@@ -189,7 +189,7 @@ export default {
                 // fitBounds is cropped too close: zoom out
                 const z = this.map.getZoom();
                 this.map.setZoom(z - 1.5);
-            } else {
+            } else if (mappable.length == 0) {
                 this.map.setZoom(6);
             }
 
