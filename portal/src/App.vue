@@ -34,8 +34,8 @@ a {
     border-bottom: 2px solid rgb(235, 235, 235);
 }
 .main-panel {
-    position: absolute;
-    left: 240px;
+    float: left;
+    margin-left: 240px;
     color: rgb(41, 61, 81);
     text-align: left;
 }

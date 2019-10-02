@@ -32,6 +32,12 @@ export default new Router({
             name: "data",
             component: DataView,
             props: true
+        },
+        {
+            path: "/dashboard/data/:id",
+            name: "dataById",
+            component: DataView,
+            props: true
         }
     ]
 });

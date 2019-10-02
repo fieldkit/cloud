@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <router-link :to="{ name: 'data', params: { station: station } }">
+            <router-link :to="{ name: 'data', params: { stationParam: station } }">
                 <div id="view-data-btn" class="section">
                     View Data
                 </div>
@@ -142,8 +142,8 @@ export default {
     background-color: #ffffff;
     width: 400px;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 40px;
+    left: 260px;
     padding: 0 15px 15px 15px;
     margin: 60px;
     border: 1px solid rgb(215, 220, 225);

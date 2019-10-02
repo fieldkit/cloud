@@ -19,8 +19,8 @@ export default {
 <style scoped>
 #notes-list-container {
     float: left;
-    width: 45%;
-    margin: 10px 11px 10px 5px;
+    width: 54%;
+    margin: 10px 10px 10px 5px;
     padding: 10px;
     border: 1px solid rgb(230, 230, 230);
 }

@@ -69,7 +69,7 @@ export default {
 
 <style scoped>
 .main-panel {
-    margin-left: 90px;
+    margin-left: 280px;
 }
 #add-project {
     float: right;

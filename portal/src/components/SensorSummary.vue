@@ -24,7 +24,7 @@ export default {
 <style scoped>
 #sensor-summary-container {
     float: left;
-    width: 29%;
+    width: 32%;
     margin: 10px;
     padding: 10px;
     border: 1px solid rgb(230, 230, 230);

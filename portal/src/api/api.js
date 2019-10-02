@@ -44,6 +44,26 @@ class FKApi {
         this.token.clear();
     }
 
+    getStation(id) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/stations/@/" + id,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(handleResponse);
+
+        function handleResponse(response) {
+            if (response.status) {
+                return response.data;
+            } else {
+                throw new Error("Get station failed");
+            }
+        }
+    }
+
     getStations() {
         const token = this.token.getToken();
         return axios({
@@ -59,7 +79,7 @@ class FKApi {
             if (response.status) {
                 return response.data;
             } else {
-                throw new Error("Get station failed");
+                throw new Error("Get stations failed");
             }
         }
     }
