@@ -20,7 +20,9 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 const (
@@ -46,6 +48,7 @@ type IngesterOptions struct {
 	AwsSession               *session.Session
 	AuthenticationMiddleware goa.Middleware
 	Archiver                 StreamArchiver
+	Publisher                jobs.MessagePublisher
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
@@ -98,6 +101,12 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 				    RETURNING *`, ingestion); err != nil {
 					return err
 				}
+
+				o.Publisher.Publish(ctx, &messages.IngestionReceived{
+					Time: ingestion.Time,
+					ID:   ingestion.ID,
+					URL:  saved.URL,
+				})
 
 				log.Infow("saved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
 			} else {

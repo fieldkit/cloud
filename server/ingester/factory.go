@@ -12,6 +12,7 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api"
+	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -41,11 +42,17 @@ func NewIngester(ctx context.Context, config *Config) http.Handler {
 		panic(err)
 	}
 
+	publisher, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
+	if err != nil {
+		panic(err)
+	}
+
 	newIngester := Ingester(ctx, &IngesterOptions{
 		Database:                 database,
 		AwsSession:               awsSession,
 		AuthenticationMiddleware: jwtMiddleware,
 		Archiver:                 archiver,
+		Publisher:                publisher,
 	})
 
 	return newIngester
