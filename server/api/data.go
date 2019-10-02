@@ -144,6 +144,7 @@ type ProvisionSummaryRow struct {
 }
 
 type BlocksSummaryRow struct {
+	Size   int64
 	Blocks data.Int64Range
 }
 
@@ -200,10 +201,12 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 			Created:    p.Created,
 			Updated:    p.Updated,
 			Meta: &app.DeviceMetaSummary{
+				Size:  int(0),
 				First: int(byType[MetaTypeName].Blocks[0]),
 				Last:  int(byType[MetaTypeName].Blocks[1]),
 			},
 			Data: &app.DeviceDataSummary{
+				Size:  int(0),
 				First: int(byType[DataTypeName].Blocks[0]),
 				Last:  int(byType[DataTypeName].Blocks[1]),
 			},

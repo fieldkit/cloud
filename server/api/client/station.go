@@ -119,6 +119,11 @@ func (c *Client) NewGetStationRequest(ctx context.Context, path string) (*http.R
 	if err != nil {
 		return nil, err
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 

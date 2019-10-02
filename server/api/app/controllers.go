@@ -4579,9 +4579,10 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 		}
 		return ctrl.Get(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/stations/@/:stationId", ctrl.MuxHandler("get", h, nil))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:stationId")
+	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:stationId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -209,6 +209,7 @@ func (mt DeviceDataRecordCollection) Validate() (err error) {
 type DeviceDataSummary struct {
 	First int `form:"first" json:"first" yaml:"first" xml:"first"`
 	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+	Size  int `form:"size" json:"size" yaml:"size" xml:"size"`
 }
 
 // Validate validates the DeviceDataSummary media type instance.
@@ -405,6 +406,7 @@ func (mt DeviceMetaRecordCollection) Validate() (err error) {
 type DeviceMetaSummary struct {
 	First int `form:"first" json:"first" yaml:"first" xml:"first"`
 	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+	Size  int `form:"size" json:"size" yaml:"size" xml:"size"`
 }
 
 // Validate validates the DeviceMetaSummary media type instance.

@@ -273,6 +273,7 @@ func (c *Client) DecodeDeviceDataRecordCollection(resp *http.Response) (DeviceDa
 type DeviceDataSummary struct {
 	First int `form:"first" json:"first" yaml:"first" xml:"first"`
 	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+	Size  int `form:"size" json:"size" yaml:"size" xml:"size"`
 }
 
 // Validate validates the DeviceDataSummary media type instance.
@@ -525,6 +526,7 @@ func (c *Client) DecodeDeviceMetaRecordCollection(resp *http.Response) (DeviceMe
 type DeviceMetaSummary struct {
 	First int `form:"first" json:"first" yaml:"first" xml:"first"`
 	Last  int `form:"last" json:"last" yaml:"last" xml:"last"`
+	Size  int `form:"size" json:"size" yaml:"size" xml:"size"`
 }
 
 // Validate validates the DeviceMetaSummary media type instance.

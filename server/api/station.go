@@ -153,7 +153,7 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 	}
 
 	station := &data.Station{}
-	if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE name = $1", ctx.StationID); err != nil {
+	if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE id = $1", ctx.StationID); err != nil {
 		return err
 	}
 

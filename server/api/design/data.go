@@ -94,12 +94,15 @@ var DeviceProvisionSummary = MediaType("application/vnd.app.device.provision.sum
 var DeviceMetaSummary = MediaType("application/vnd.app.device.meta.summary+json", func() {
 	TypeName("DeviceMetaSummary")
 	Attributes(func() {
+		Attribute("size", Integer)
 		Attribute("first", Integer)
 		Attribute("last", Integer)
+		Required("size")
 		Required("first")
 		Required("last")
 	})
 	View("default", func() {
+		Attribute("size")
 		Attribute("first")
 		Attribute("last")
 	})
@@ -108,12 +111,15 @@ var DeviceMetaSummary = MediaType("application/vnd.app.device.meta.summary+json"
 var DeviceDataSummary = MediaType("application/vnd.app.device.data.summary+json", func() {
 	TypeName("DeviceDataSummary")
 	Attributes(func() {
+		Attribute("size", Integer)
 		Attribute("first", Integer)
 		Attribute("last", Integer)
+		Required("size")
 		Required("first")
 		Required("last")
 	})
 	View("default", func() {
+		Attribute("size")
 		Attribute("first")
 		Attribute("last")
 	})
