@@ -95,7 +95,7 @@ func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) 
 	}
 
 	if len(records) != 1 {
-		return nil, fmt.Errorf("unable to locate meta record")
+		return nil, nil
 	}
 
 	return records[0], nil
@@ -156,6 +156,10 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
 			if err != nil {
 				return err
+			}
+			if meta == nil {
+				log.Errorw("error finding meta record", "data_record", pr.DataRecord, "error", err)
+				return nil
 			}
 
 			dataRecord := data.DataRecord{
