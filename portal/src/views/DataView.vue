@@ -68,10 +68,10 @@ export default {
     },
     async beforeCreate() {
         this.api = new FKApi();
-        if (this.api.authenticated()) {
-            this.user = await this.api.getCurrentUser();
+        this.api.getCurrentUser().then(user => {
+            this.user = user;
             this.isAuthenticated = true;
-        }
+        });
     },
     methods: {
         goBack() {

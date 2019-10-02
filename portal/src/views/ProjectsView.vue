@@ -46,12 +46,12 @@ export default {
     },
     async beforeCreate() {
         const api = new FKApi();
-        if (api.authenticated()) {
-            this.user = await api.getCurrentUser();
+        api.getCurrentUser().then(user => {
+            this.user = user;
             this.isAuthenticated = true;
             this.projectsTitle = "My Projects";
             console.log("this is the user info", this.user);
-        }
+        });
     },
     methods: {
         goBack() {

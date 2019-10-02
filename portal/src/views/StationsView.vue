@@ -61,25 +61,29 @@ export default {
     },
     async beforeCreate() {
         const api = new FKApi();
-        if (api.authenticated()) {
-            this.user = await api.getCurrentUser();
-            this.stations = await api.getStations();
-            if (this.map) {
-                this.initStations();
-            } else {
-                this.waitingForMap = true;
-            }
-            this.isAuthenticated = true;
-            console.log("this is the user info", this.user);
-            console.log("this is the station info", this.stations);
-        } else {
-            // handle non-logged in state
-            if (this.map) {
-                this.initStations.bind(this);
-            } else {
-                this.waitingForMap = true;
-            }
-        }
+        api.getCurrentUser()
+            .then(user => {
+                this.user = user;
+                this.isAuthenticated = true;
+                api.getStations().then(stations => {
+                    this.stations = stations;
+                    if (this.map) {
+                        this.initStations();
+                    } else {
+                        this.waitingForMap = true;
+                    }
+                    console.log("this is the user info", this.user);
+                    console.log("this is the station info", this.stations);
+                });
+            })
+            .catch(() => {
+                // handle non-logged in state
+                if (this.map) {
+                    this.initStations();
+                } else {
+                    this.waitingForMap = true;
+                }
+            });
     },
     methods: {
         goBack() {
