@@ -73,7 +73,9 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token
             }
-        }).then(handleResponse);
+        })
+            .then(handleResponse)
+            .catch(this._handleResponse);
 
         function handleResponse(response) {
             if (response.status == 200) {
