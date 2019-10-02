@@ -10,6 +10,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/inaturalist"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type TasksControllerOptions struct {
@@ -66,7 +67,7 @@ func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
 
 	if deviceSource != nil {
 		fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
-		c.options.SourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
+		c.options.SourceChanges.SourceChanged(ctx, messages.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
 	} else {
 		log.Errorw("No owned device", "device_id", ctx.DeviceID)
 	}

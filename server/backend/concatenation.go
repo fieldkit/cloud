@@ -24,6 +24,7 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 var (
@@ -265,7 +266,7 @@ func (fc *FileConcatenator) Concatenate(ctx context.Context) {
 
 	log.Infow("Uploaded", "file_url", location)
 
-	fc.Publisher.ConcatenationDone(ctx, ConcatenationDone{
+	fc.Publisher.ConcatenationDone(ctx, messages.ConcatenationDone{
 		DeviceID:    fc.DeviceID,
 		FileTypeIDs: fc.TypeIDs,
 		Location:    location,

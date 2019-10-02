@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type RecordChange struct {
@@ -14,24 +15,8 @@ type RecordChange struct {
 	Location  *data.Location
 }
 
-type SourceChange struct {
-	SourceID    int64
-	DeviceID    string
-	FileTypeIDs []string
-	QueuedAt    time.Time
-}
-
-func NewSourceChange(sourceId int64, deviceID string, fileTypeIDs []string) SourceChange {
-	return SourceChange{
-		SourceID:    sourceId,
-		DeviceID:    deviceID,
-		QueuedAt:    time.Now(),
-		FileTypeIDs: fileTypeIDs,
-	}
-}
-
 type SourceChangesPublisher interface {
-	SourceChanged(ctx context.Context, sourceChange SourceChange)
+	SourceChanged(ctx context.Context, sourceChange messages.SourceChange)
 }
 
 type SourceChangesBroadcaster struct {
@@ -44,7 +29,7 @@ func NewSourceChangesBroadcaster(publishers []SourceChangesPublisher) *SourceCha
 	}
 }
 
-func (b *SourceChangesBroadcaster) SourceChanged(ctx context.Context, sourceChange SourceChange) {
+func (b *SourceChangesBroadcaster) SourceChanged(ctx context.Context, sourceChange messages.SourceChange) {
 	for _, p := range b.Publishers {
 		p.SourceChanged(ctx, sourceChange)
 	}

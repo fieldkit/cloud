@@ -24,6 +24,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion/formatting"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 const (
@@ -188,7 +189,7 @@ func (si *StreamIngester) saveStream(ctx context.Context, headers *IncomingHeade
 	} else {
 		if deviceSource != nil {
 			fileTypeIDs := FileTypeIDsGroups[headers.FkFileId]
-			si.sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, fileTypeIDs))
+			si.sourceChanges.SourceChanged(ctx, messages.NewSourceChange(int64(deviceSource.ID), headers.FkDeviceId, fileTypeIDs))
 		} else {
 			log.Warnw("orphaned device", "device_id", headers.FkDeviceId)
 		}

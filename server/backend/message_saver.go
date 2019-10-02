@@ -6,6 +6,7 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/ingestion"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type FormattedMessageSaver struct {
@@ -66,7 +67,7 @@ func (fms *FormattedMessageSaver) EmitChanges(ctx context.Context, sourceChanges
 		sources[change.SourceID] = append(sources[change.SourceID], change)
 	}
 	for id, _ := range sources {
-		sourceChanges.SourceChanged(ctx, ingestion.NewSourceChange(id, "", []string{}))
+		sourceChanges.SourceChanged(ctx, messages.NewSourceChange(id, "", []string{}))
 	}
 }
 
