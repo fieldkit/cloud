@@ -31,6 +31,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
 
@@ -174,8 +175,14 @@ func main() {
 		Backend: be,
 	}
 
+	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
+		Database: database,
+		Session:  awsSession,
+	}
+
 	jq.Register(ingestion.SourceChange{}, sourceModifiedHandler)
 	jq.Register(backend.ConcatenationDone{}, concatenationDoneHandler)
+	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
 
 	archiver, err := createArchiver(ctx, awsSession, config)
 	if err != nil {
