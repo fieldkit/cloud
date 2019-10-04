@@ -1,7 +1,7 @@
 <template>
     <div id="sensor-summary-container" v-if="this.sensor">
         <div id="sensor-title">{{ this.sensor.name }} Statistics</div>
-        <p>{{ this.sensor.current_reading }}</p>
+        <p>{{ this.sensor.current_reading.toFixed(1) }}</p>
     </div>
 </template>
 
