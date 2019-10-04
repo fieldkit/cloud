@@ -7,23 +7,77 @@
             <div id="readings-label">
                 Latest Reading <span class="synced">Last synced {{ getSyncedDate() }}</span>
             </div>
-            <div
-                v-for="sensor in this.allSensors"
-                v-bind:key="sensor.id"
-                :class="'reading' + (selectedSensor && selectedSensor.id == sensor.id ? ' active' : '')"
-                :data-id="sensor.id"
-                v-on:click="switchSensor"
-            >
-                <div class="left">{{ sensor.name }}</div>
-                <div class="right">
-                    <span class="reading-value">{{ sensor.current_reading }} </span>
-                    <span class="reading-unit">{{ sensor.unit ? sensor.unit : "" }}</span>
+            <div id="reading-btns-container">
+                <div
+                    v-for="sensor in this.allSensors"
+                    v-bind:key="sensor.id"
+                    :class="'reading' + (selectedSensor && selectedSensor.id == sensor.id ? ' active' : '')"
+                    :data-id="sensor.id"
+                    v-on:click="switchSensor"
+                >
+                    <div class="left">
+                        <img
+                            v-if="sensor.name == 'Temperature'"
+                            alt="temperature icon"
+                            src="../assets/Temp_icon.png"
+                        />
+                        {{ sensor.name }}
+                    </div>
+                    <div class="right">
+                        <span class="reading-value">{{ sensor.current_reading }} </span>
+                        <span class="reading-unit">{{ sensor.unit ? sensor.unit : "" }}</span>
+                    </div>
+                </div>
+                <div id="left-arrow-container">
+                    <img
+                        v-if="this.allSensors.length > 5"
+                        v-on:click="showPrevSensor"
+                        alt="left arrow"
+                        src="../assets/left_arrow.png"
+                        class="left-arrow"
+                    />
+                </div>
+                <div id="right-arrow-container">
+                    <img
+                        v-if="this.allSensors.length > 5"
+                        v-on:click="showNextSensor"
+                        alt="right arrow"
+                        src="../assets/right_arrow.png"
+                        class="right-arrow"
+                    />
                 </div>
             </div>
         </div>
         <div v-if="this.station">
+            <div id="selected-sensor-controls">
+                <div id="control-btn-container">
+                    <div id="" class="control-btn">
+                        <img alt="" src="../assets/Export_icon.png" />
+                        <span>Export</span>
+                    </div>
+                    <div id="" class="control-btn">
+                        <img alt="" src="../assets/Share_icon.png" />
+                        <span>Share</span>
+                    </div>
+                    <div id="" class="control-btn">
+                        <img alt="" src="../assets/Compare_icon.png" />
+                        <span>Compare</span>
+                    </div>
+                </div>
+                <div id="time-control-container">
+                    <div class="time-btn">View By:</div>
+                    <div class="time-btn">Day</div>
+                    <div class="time-btn">Week</div>
+                    <div class="time-btn">2 Week</div>
+                    <div class="time-btn">Month</div>
+                    <div class="time-btn">Year</div>
+                    <div class="time-btn">All</div>
+                    <div class="time-btn">Custom</div>
+                </div>
+                <div class="spacer"></div>
+            </div>
+            <div id="selected-sensor-label" v-if="this.selectedSensor">{{ selectedSensor.name }}</div>
             <div id="selected-sensor-graph"></div>
-            <!-- <img alt="Data viz image" src="../assets/viz_placeholder.jpg" /> -->
         </div>
     </div>
 </template>
@@ -68,6 +122,16 @@ export default {
                 return s.id == id;
             });
             this.$emit("switchedSensor", sensor);
+        },
+        showNextSensor() {
+            const first = this.allSensors[0];
+            this.allSensors.splice(0, 1);
+            this.allSensors.push(first);
+        },
+        showPrevSensor() {
+            const last = this.allSensors[this.allSensors.length - 1];
+            this.allSensors.splice(this.allSensors.length - 1, 1);
+            this.allSensors.unshift(last);
         }
     }
 };
@@ -90,24 +154,56 @@ export default {
     font-size: 20px;
     margin-bottom: 10px;
 }
+#reading-btns-container {
+    max-width: 1110px;
+    height: 60px;
+    float: left;
+    overflow: hidden;
+}
+#left-arrow-container,
+#right-arrow-container {
+    width: 40px;
+    height: 50px;
+    clear: both;
+    margin-top: -120px;
+    padding-top: 10px;
+    cursor: pointer;
+}
+#left-arrow-container {
+    float: left;
+    margin-left: -5px;
+    background: rgb(255,255,255);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+#right-arrow-container {
+    float: right;
+    background: rgb(255,255,255);
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+}
+.right-arrow {
+    float: right;
+}
 .reading {
     font-size: 12px;
-    width: 200px;
+    width: 190px;
     float: left;
     line-height: 20px;
-    padding: 18px 10px;
+    padding: 18px 10px 18px 18px;
     background-color: #ffffff;
     border: 1px solid rgb(215, 220, 225);
 }
 .reading.active {
     border-bottom: 3px solid #1b80c9;
-    padding-bottom: 15px;
+    padding-bottom: 16px;
 }
 .reading-value {
     font-size: 16px;
 }
 .reading-unit {
     font-size: 11px;
+}
+.reading img {
+    vertical-align: middle;
 }
 .left,
 .right {
@@ -119,9 +215,53 @@ export default {
 .right {
     float: right;
 }
+#selected-sensor-controls {
+    background-color: #ffffff;
+    float: left;
+    width: 1110px;
+    clear: both;
+}
+#control-btn-container {
+    margin-left: 60px;
+    float: left;
+}
+#time-control-container {
+    float: right;
+    margin-right: 10px;
+}
+.control-btn {
+    font-size: 12px;
+    float: left;
+    padding: 5px 10px;
+    margin: 20px 10px;
+    background-color: #ffffff;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
+}
+.control-btn img {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.time-btn {
+    font-size: 12px;
+    float: left;
+    margin: 25px 10px;
+}
+.spacer {
+    float: left;
+    width: 1020px;
+    margin: 0 0 20px 70px;
+    border-top: 1px solid rgba(230, 230, 230);
+}
+#selected-sensor-label {
+    clear: both;
+    margin-left: 70px;
+}
 #selected-sensor-graph {
     width: 1110px;
     height: 500px;
+    float: left;
     background-color: #fbeef0;
 }
 </style>

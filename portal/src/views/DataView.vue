@@ -111,9 +111,4 @@ export default {
     font-weight: bold;
     margin: 20px 0;
 }
-.spacer {
-    width: 100%;
-    margin: 10px 0 20px 0;
-    border-top: 2px solid rgba(230, 230, 230);
-}
 </style>
