@@ -63,6 +63,8 @@ func NewStationController(service *goa.Service, options StationControllerOptions
 }
 
 func (c *StationController) Add(ctx *app.AddStationContext) error {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx)
 	if err != nil {
 		return err
@@ -72,6 +74,8 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 	if err != nil {
 		return err
 	}
+
+	log.Infow("adding station", "device_id", ctx.Payload.DeviceID)
 
 	stations := []*data.Station{}
 	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE device_id = $1", deviceId); err != nil {
