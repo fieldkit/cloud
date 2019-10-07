@@ -28,7 +28,7 @@
                 <div class="station-element">Last Synced {{ getSyncedDate() }}</div>
                 <div class="station-element">
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
-                    <span>{{ this.station.status_json.battery_level }}%</span>
+                    <span>{{ this.station.status_json.batteryLevel }}%</span>
                 </div>
                 <div>
                     <img
@@ -42,7 +42,7 @@
             </div>
             <div class="spacer"></div>
             <div id="location-container" class="section">
-                <div>{{ this.station.status_json.location_name }}</div>
+                <div>{{ this.station.status_json.locationName }}</div>
                 <div class="left">
                     {{ this.station.status_json.latitude || "--" }}
                     <br />
@@ -60,7 +60,7 @@
                 <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
                     <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
                         <div class="left">{{ sensor.name }}</div>
-                        <div class="right">{{ sensor.current_reading.toFixed(1) }}</div>
+                        <div class="right">{{ sensor.currentReading.toFixed(1) }}</div>
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@ export default {
 
         getBatteryImg() {
             const images = require.context("../assets/battery/", false, /\.png$/);
-            const battery = this.station.status_json.battery_level;
+            const battery = this.station.status_json.batteryLevel;
             let img = "";
             if (battery == 0) {
                 img = "0.png";

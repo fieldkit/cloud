@@ -16,7 +16,7 @@
                 <div class="station-element">Last Synced {{ station.synced }}</div>
                 <div class="station-element">
                     <img id="battery" alt="Battery level" :src="getBatteryImg(station)" />
-                    <span>{{ station.status_json.battery_level }}%</span>
+                    <span>{{ station.status_json.batteryLevel }}%</span>
                 </div>
                 <div class="">
                     <img
@@ -54,7 +54,7 @@ export default {
         },
         getBatteryImg(station) {
             const images = require.context("../assets/battery/", false, /\.png$/);
-            const battery = station.status_json.battery_level;
+            const battery = station.status_json.batteryLevel;
             let img = "";
             if (battery == 0) {
                 img = "0.png";
