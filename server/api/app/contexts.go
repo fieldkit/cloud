@@ -2220,6 +2220,7 @@ type GetJSONDataContext struct {
 	*goa.RequestData
 	DeviceID   string
 	End        *int
+	Internal   *bool
 	PageNumber *int
 	PageSize   *int
 	Start      *int
@@ -2250,13 +2251,23 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
 	}
+	paramInternal := req.Params["internal"]
+	if len(paramInternal) > 0 {
+		rawInternal := paramInternal[0]
+		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
+			tmp40 := &internal
+			rctx.Internal = tmp40
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
+		}
+	}
 	paramPageNumber := req.Params["pageNumber"]
 	if len(paramPageNumber) > 0 {
 		rawPageNumber := paramPageNumber[0]
 		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
-			tmp41 := pageNumber
-			tmp40 := &tmp41
-			rctx.PageNumber = tmp40
+			tmp42 := pageNumber
+			tmp41 := &tmp42
+			rctx.PageNumber = tmp41
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
 		}
@@ -2265,9 +2276,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp43 := pageSize
-			tmp42 := &tmp43
-			rctx.PageSize = tmp42
+			tmp44 := pageSize
+			tmp43 := &tmp44
+			rctx.PageSize = tmp43
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2276,9 +2287,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp45 := start
-			tmp44 := &tmp45
-			rctx.Start = tmp44
+			tmp46 := start
+			tmp45 := &tmp46
+			rctx.Start = tmp45
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}

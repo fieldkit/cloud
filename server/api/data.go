@@ -366,6 +366,11 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		pageSize = *ctx.PageSize
 	}
 
+	internal := false
+	if ctx.Internal != nil {
+		internal = *ctx.Internal
+	}
+
 	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
 	if err != nil {
 		return err
@@ -406,7 +411,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 
 		modules := make([]*app.JSONDataMetaModule, 0)
 		for _, module := range metaRecord.Modules {
-			if !isInternalModule(module) {
+			if internal || !isInternalModule(module) {
 				sensors := make([]*app.JSONDataMetaSensor, 0)
 				for _, sensor := range module.Sensors {
 					sensors = append(sensors, &app.JSONDataMetaSensor{
@@ -445,7 +450,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 					continue
 				}
 				module := metaRecord.Modules[mi]
-				if !isInternalModule(module) {
+				if internal || !isInternalModule(module) {
 					for si, r := range sg.Readings {
 						sensor := module.Sensors[si]
 						key := strcase.ToLowerCamel(sensor.Name)

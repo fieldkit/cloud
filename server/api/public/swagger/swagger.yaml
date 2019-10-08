@@ -335,6 +335,12 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -1824,15 +1830,6 @@ definitions:
       properties:
         Sunt illo qui odit.: 0.7899958337910338
       type: Est nobis odit necessitatibus non veritatis velit.
-    - geometry:
-        coordinates:
-        - 0.33538801589205025
-        - 0.33538801589205025
-        - 0.33538801589205025
-        type: Perspiciatis et est soluta.
-      properties:
-        Sunt illo qui odit.: 0.7899958337910338
-      type: Est nobis odit necessitatibus non veritatis velit.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -2111,7 +2108,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+            Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
           location:
           - 0.8458568810056598
           time: 8.111473215862901e+18
@@ -2164,7 +2161,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+              Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
             location:
             - 0.8458568810056598
             time: 8.111473215862901e+18
@@ -2222,7 +2219,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+        Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
       location:
       - 0.8458568810056598
       time: 8.111473215862901e+18
@@ -2230,7 +2227,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+          Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
         type: object
       location:
         example:
@@ -2254,7 +2251,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+          Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
         location:
         - 0.8458568810056598
         time: 8.111473215862901e+18
@@ -2306,7 +2303,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: a6deaa34-c252-41dc-ae7f-865320bd6a36
+            Repudiandae dignissimos.: bd8a1ccb-9f8d-4dde-9d44-2769dbce8500
           location:
           - 0.8458568810056598
           time: 8.111473215862901e+18
@@ -3674,6 +3671,10 @@ paths:
         name: end
         required: false
         type: integer
+      - in: query
+        name: internal
+        required: false
+        type: boolean
       - in: query
         name: pageNumber
         required: false

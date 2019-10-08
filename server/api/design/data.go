@@ -266,6 +266,7 @@ var _ = Resource("jsonData", func() {
 			Param("pageSize", Integer)
 			Param("start", Integer)
 			Param("end", Integer)
+			Param("internal", Boolean)
 		})
 		Response(NotFound)
 		Response(OK, func() {
