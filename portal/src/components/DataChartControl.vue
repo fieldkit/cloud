@@ -156,6 +156,8 @@ export default {
         },
         updateTime(event) {
             const time = event.target.getAttribute("data-time");
+            // HACK setting to -1 first to always trigger a change event
+            this.timeRange = -1;
             this.timeRange = time;
         }
     }
