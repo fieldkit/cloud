@@ -157,7 +157,7 @@ export default {
             // currently if stations overlap exactly, only one shows
             stationFeatures.forEach((f, i) => {
                 if (i > 0) {
-                    if (f.geometry.coordinates[0] == stationFeatures[i].geometry.coordinates[0]) {
+                    if (f.geometry.coordinates[0] == stationFeatures[i - 1].geometry.coordinates[0]) {
                         // TODO: what is an acceptable amount to offset labels by?
                         // less than this, and still only one shows
                         f.geometry.coordinates[0] += 0.00003;

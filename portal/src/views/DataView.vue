@@ -9,7 +9,7 @@
                         <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
                     </router-link>
                     <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
-                    <DataChart
+                    <DataChartControl
                         :summary="summary"
                         :stationData="stationData"
                         :station="station"
@@ -29,16 +29,17 @@
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
-import DataChart from "../components/DataChart";
+import DataChartControl from "../components/DataChartControl";
 import NotesList from "../components/NotesList";
 import SensorSummary from "../components/SensorSummary";
+import * as tempStations from "../assets/ancientGoose.json";
 
 export default {
     name: "DataView",
     components: {
         HeaderBar,
         SidebarNav,
-        DataChart,
+        DataChartControl,
         NotesList,
         SensorSummary
     },
@@ -63,8 +64,9 @@ export default {
                 this.selectedSensor = modules[0].sensorObjects[0];
             }
         } else if (this.id) {
-            this.api.getStation(this.id).then(station => {
-                this.station = station;
+            // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
+            if (this.id == 0) {
+                this.station = tempStations.stations[0];
                 this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
                 this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
                     this.summary = summary;
@@ -72,7 +74,18 @@ export default {
                 this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
                     this.stationData = data;
                 });
-            });
+            } else {
+                this.api.getStation(this.id).then(station => {
+                    this.station = station;
+                    this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
+                    this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
+                        this.summary = summary;
+                    });
+                    this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
+                        this.stationData = data;
+                    });
+                });
+            }
         }
     },
     async beforeCreate() {

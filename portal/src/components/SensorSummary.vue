@@ -1,7 +1,7 @@
 <template>
     <div id="sensor-summary-container" v-if="this.sensor">
         <div id="sensor-title">{{ this.sensor.name }} Statistics</div>
-        <p>{{ this.sensor.currentReading.toFixed(1) }}</p>
+        <p>{{ this.sensor.currentReading ? this.sensor.currentReading.toFixed(1) : "ncR" }}</p>
     </div>
 </template>
 
@@ -10,9 +10,7 @@ export default {
     name: "SensorSummary",
     props: ["sensor"],
     watch: {
-        sensor: function(newVal, oldVal) {
-            console.log("updated sensor", newVal, oldVal);
-        }
+        sensor: function() {}
     },
     data: () => {
         return {};

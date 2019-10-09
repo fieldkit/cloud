@@ -60,7 +60,7 @@
                 <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
                     <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
                         <div class="left">{{ sensor.name }}</div>
-                        <div class="right">{{ sensor.currentReading.toFixed(1) }}</div>
+                        <div class="right">{{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}</div>
                     </div>
                 </div>
             </div>
