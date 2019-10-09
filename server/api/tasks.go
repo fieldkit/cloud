@@ -7,10 +7,9 @@ import (
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/inaturalist"
-	"github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/jobs"
 )
 
 type TasksControllerOptions struct {
@@ -19,7 +18,7 @@ type TasksControllerOptions struct {
 	Emailer            email.Emailer
 	INaturalistService *inaturalist.INaturalistService
 	StreamProcessor    backend.StreamProcessor
-	SourceChanges      ingestion.SourceChangesPublisher
+	Publisher          jobs.MessagePublisher
 }
 
 type TasksController struct {
@@ -59,18 +58,20 @@ func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
 
 	log.Infow("Refresh", "device_id", ctx.DeviceID)
 
-	deviceSource, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.DeviceID)
-	if err != nil {
-		log.Errorw("Error finding DeviceByKey", "error", err)
-		return err
-	}
+	/*
+		deviceSource, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.DeviceID)
+		if err != nil {
+			log.Errorw("Error finding DeviceByKey", "error", err)
+			return err
+		}
 
-	if deviceSource != nil {
-		fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
-		c.options.SourceChanges.SourceChanged(ctx, messages.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
-	} else {
-		log.Errorw("No owned device", "device_id", ctx.DeviceID)
-	}
+		if deviceSource != nil {
+			fileTypeIDs := backend.FileTypeIDsGroups[ctx.FileTypeID]
+			c.options.SourceChanges.SourceChanged(ctx, messages.NewSourceChange(int64(deviceSource.ID), ctx.DeviceID, fileTypeIDs))
+		} else {
+			log.Errorw("No owned device", "device_id", ctx.DeviceID)
+		}
+	*/
 
 	return ctx.OK([]byte("Ok"))
 }

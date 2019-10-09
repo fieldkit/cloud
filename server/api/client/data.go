@@ -75,20 +75,20 @@ func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firs
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if firstBlock != nil {
-		tmp195 := strconv.Itoa(*firstBlock)
-		values.Set("firstBlock", tmp195)
+		tmp197 := strconv.Itoa(*firstBlock)
+		values.Set("firstBlock", tmp197)
 	}
 	if lastBlock != nil {
-		tmp196 := strconv.Itoa(*lastBlock)
-		values.Set("lastBlock", tmp196)
+		tmp198 := strconv.Itoa(*lastBlock)
+		values.Set("lastBlock", tmp198)
 	}
 	if pageNumber != nil {
-		tmp197 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp197)
+		tmp199 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp199)
 	}
 	if pageSize != nil {
-		tmp198 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp198)
+		tmp200 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp200)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -161,6 +161,41 @@ func (c *Client) NewProcessDataRequest(ctx context.Context, path string) (*http.
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// ProcessIngestionDataPath computes a request path to the process ingestion action of data.
+func ProcessIngestionDataPath(ingestionID int) string {
+	param0 := strconv.Itoa(ingestionID)
+
+	return fmt.Sprintf("/data/ingestions/%s/process", param0)
+}
+
+// Process ingestion
+func (c *Client) ProcessIngestionData(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewProcessIngestionDataRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewProcessIngestionDataRequest create the request corresponding to the process ingestion action endpoint of the data resource.
+func (c *Client) NewProcessIngestionDataRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}

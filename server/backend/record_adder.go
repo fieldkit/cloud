@@ -122,72 +122,83 @@ func (ra *RecordAdder) findLocation(dataRecord *pb.DataRecord) (l *data.Location
 	return
 }
 
-func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) error {
+func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
 
 	provision, err := ra.findProvision(ctx, i)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if pr.SignedRecord != nil {
+		metaTime := i.Time
+		if pr.SignedRecord.Time > 0 {
+			metaTime = time.Unix(int64(pr.SignedRecord.Time), 0)
+		}
+
 		metaRecord := data.MetaRecord{
 			ProvisionID: provision.ID,
-			Time:        i.Time,
+			Time:        metaTime,
 			Number:      int64(pr.SignedRecord.Record),
 		}
 
 		if err := metaRecord.SetData(pr.DataRecord); err != nil {
-			return err
+			return nil, err
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &metaRecord, `
 		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
-		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING *`, metaRecord); err != nil {
-			return err
+		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
+                    RETURNING *`, metaRecord); err != nil {
+			return nil, err
 		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Readings != nil {
 			location, err := ra.findLocation(pr.DataRecord)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
 			if err != nil {
-				return err
+				return nil, err
 			}
 			if meta == nil {
-				log.Errorw("error finding meta record", "data_record", pr.DataRecord, "error", err)
-				return nil
+				log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta, "data_record", pr.DataRecord, "error", err)
+				return fmt.Errorf("error finding meta record"), nil
+			}
+
+			dataTime := i.Time
+			if pr.DataRecord.Readings.Time > 0 {
+				dataTime = time.Unix(int64(pr.DataRecord.Readings.Time), 0)
 			}
 
 			dataRecord := data.DataRecord{
 				ProvisionID: provision.ID,
-				Time:        i.Time,
+				Time:        dataTime,
 				Number:      int64(pr.DataRecord.Readings.Reading),
 				Meta:        meta.ID,
 				Location:    location,
 			}
 
 			if err := dataRecord.SetData(pr.DataRecord); err != nil {
-				return err
+				return nil, err
 			}
 
 			if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
 			    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
 			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number RETURNING id`, dataRecord); err != nil {
-				return err
+			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
+			    RETURNING id`, dataRecord); err != nil {
+				return nil, err
 			}
 		} else {
 			log.Infow("weird", "record", pr.DataRecord)
+			return fmt.Errorf("weird record"), nil
 		}
 	}
 
-	_ = log
-
-	return nil
+	return nil, nil
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
@@ -217,6 +228,12 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 	meta := false
 	data := false
 
+	data_processed := 0
+	data_errors := 0
+	meta_processed := 0
+	meta_errors := 0
+	records := 0
+
 	unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var unmarshalError error
 		var dataRecord pb.DataRecord
@@ -231,9 +248,19 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 				unmarshalError = err
 			} else {
 				data = true
-				err = ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
-				if err != nil {
-					return nil, err
+				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
+				if fatal != nil {
+					return nil, fatal
+				}
+				if warning == nil {
+					data_processed += 1
+					records += 1
+				} else {
+					data_errors += 1
+					if records > 0 {
+						log.Infow("processed", "record_run", records)
+						records = 0
+					}
 				}
 			}
 		}
@@ -251,12 +278,22 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 				if err != nil {
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
-				err = ra.Handle(ctx, i, &ParsedRecord{
+				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 				})
-				if err != nil {
-					return nil, err
+				if fatal != nil {
+					return nil, fatal
+				}
+				if warning == nil {
+					meta_processed += 1
+					records += 1
+				} else {
+					meta_errors += 1
+					if records > 0 {
+						log.Infow("processed", "record_run", records)
+						records = 0
+					}
 				}
 			}
 		}
@@ -275,6 +312,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 		log.Errorw("Error", "error", newErr)
 		return newErr
 	}
+
+	log.Infow("processing done", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
 
 	return nil
 }

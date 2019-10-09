@@ -99,8 +99,8 @@ func (c *Client) NewListBySourceGeoJSONRequest(ctx context.Context, path string,
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if descending != nil {
-		tmp194 := strconv.FormatBool(*descending)
-		values.Set("descending", tmp194)
+		tmp196 := strconv.FormatBool(*descending)
+		values.Set("descending", tmp196)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

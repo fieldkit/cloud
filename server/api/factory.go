@@ -20,13 +20,13 @@ import (
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/ingestion"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/inaturalist"
+	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, sourceChangesPublisher ingestion.SourceChangesPublisher,
+func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, publisher jobs.MessagePublisher,
 	cw *backend.ConcatenationWorkers, config *ApiConfiguration) (service *goa.Service, err error) {
 	log := Logger(ctx).Sugar()
 
@@ -172,7 +172,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Emailer:            emailer,
 		INaturalistService: ns,
 		StreamProcessor:    streamProcessor,
-		SourceChanges:      sourceChangesPublisher,
+		Publisher:          publisher,
 	})
 	app.MountTasksController(service, c16)
 
@@ -198,9 +198,10 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "data" controller
 	dco := DataControllerOptions{
-		Config:   config,
-		Session:  awsSession,
-		Database: database,
+		Config:    config,
+		Session:   awsSession,
+		Database:  database,
+		Publisher: publisher,
 	}
 	app.MountDataController(service, NewDataController(ctx, service, dco))
 

@@ -187,6 +187,18 @@ var _ = Resource("data", func() {
 			Status(200)
 		})
 	})
+
+	Action("process ingestion", func() {
+		Routing(POST("data/ingestions/:ingestionId/process"))
+		Description("Process ingestion")
+		Params(func() {
+			Param("ingestionId", Integer)
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+		})
+	})
 })
 
 var JSONDataMetaSensor = Type("JSONDataMetaSensor", func() {

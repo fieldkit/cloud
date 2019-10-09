@@ -18,6 +18,8 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/jobs"
+	"github.com/fieldkit/cloud/server/messages"
 
 	pb "github.com/fieldkit/data-protocol"
 )
@@ -28,9 +30,10 @@ const (
 )
 
 type DataControllerOptions struct {
-	Config   *ApiConfiguration
-	Session  *session.Session
-	Database *sqlxcache.DB
+	Config    *ApiConfiguration
+	Session   *session.Session
+	Database  *sqlxcache.DB
+	Publisher jobs.MessagePublisher
 }
 
 type DataController struct {
@@ -81,6 +84,43 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 	log.Infow("done", "elapsed", 0)
 
 	return nil
+}
+
+func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	ir, err := repositories.NewIngestionRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("processing", "ingestion_id", ctx.IngestionID)
+
+	i, err := ir.QueryByID(ctx, int64(ctx.IngestionID))
+	if err != nil {
+		return err
+	}
+	if i == nil {
+		return ctx.NotFound()
+	}
+
+	err = p.CanModifyStationByDeviceID(i.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+		Time: i.Time,
+		ID:   i.ID,
+		URL:  i.URL,
+	})
+
+	return ctx.OK([]byte("queued"))
 }
 
 func (c *DataController) Delete(ctx *app.DeleteDataContext) error {

@@ -40,24 +40,24 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp204 := strconv.Itoa(*end)
-		values.Set("end", tmp204)
+		tmp206 := strconv.Itoa(*end)
+		values.Set("end", tmp206)
 	}
 	if internal != nil {
-		tmp205 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp205)
+		tmp207 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp207)
 	}
 	if pageNumber != nil {
-		tmp206 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp206)
+		tmp208 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp208)
 	}
 	if pageSize != nil {
-		tmp207 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp207)
+		tmp209 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp209)
 	}
 	if start != nil {
-		tmp208 := strconv.Itoa(*start)
-		values.Set("start", tmp208)
+		tmp210 := strconv.Itoa(*start)
+		values.Set("start", tmp210)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

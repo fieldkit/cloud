@@ -1311,6 +1311,7 @@ type DataController interface {
 	DeviceData(*DeviceDataDataContext) error
 	DeviceSummary(*DeviceSummaryDataContext) error
 	Process(*ProcessDataContext) error
+	ProcessIngestion(*ProcessIngestionDataContext) error
 }
 
 // MountDataController "mounts" a Data resource controller on the given service.
@@ -1321,6 +1322,7 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/data", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/summary", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/data/ingestions/:ingestionId/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1389,6 +1391,23 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 	h = handleDataOrigin(h)
 	service.Mux.Handle("GET", "/data/process", ctrl.MuxHandler("process", h, nil))
 	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "GET /data/process", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewProcessIngestionDataContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ProcessIngestion(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleDataOrigin(h)
+	service.Mux.Handle("POST", "/data/ingestions/:ingestionId/process", ctrl.MuxHandler("process ingestion", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "ProcessIngestion", "route", "POST /data/ingestions/:ingestionId/process", "security", "jwt")
 }
 
 // handleDataOrigin applies the CORS response headers corresponding to the origin.

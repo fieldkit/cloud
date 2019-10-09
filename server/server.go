@@ -230,7 +230,7 @@ func main() {
 		setupMemoryLogging(log)
 	}
 
-	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher, cw, apiConfig)
+	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig)
 
 	notFoundHandler := http.NotFoundHandler()
 

@@ -349,6 +349,12 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -432,6 +438,18 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.34308734660303564
+      - 0.34308734660303564
+      endTime: "1973-10-14T14:57:44Z"
+      envelope:
+      - - 0.3582211261663492
+        - 0.3582211261663492
+      id: 4.1739971167408507e+18
+      numberOfFeatures: 6.9163709344316e+18
+      radius: 0.3658214777019248
+      sourceId: 7.040775022327253e+18
+      startTime: "2011-03-22T17:06:02Z"
     - centroid:
       - 0.34308734660303564
       - 0.34308734660303564
@@ -1722,20 +1740,6 @@ definitions:
       properties:
         Necessitatibus non veritatis velit.: false
       type: Ut est tempora.
-    - geometry:
-        coordinates:
-        - 0.4202528298308348
-        type: Qui odit sed id vitae est.
-      properties:
-        Necessitatibus non veritatis velit.: false
-      type: Ut est tempora.
-    - geometry:
-        coordinates:
-        - 0.4202528298308348
-        type: Qui odit sed id vitae est.
-      properties:
-        Necessitatibus non veritatis velit.: false
-      type: Ut est tempora.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -1960,7 +1964,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+            Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -1996,7 +2000,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+              Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2037,7 +2041,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+        Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2048,7 +2052,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+          Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2079,7 +2083,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+          Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2114,7 +2118,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 4967c4e4-a62d-432f-a8d9-3ab9e93dfd45
+            Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -3591,6 +3595,34 @@ paths:
       - jwt:
         - api:access
       summary: delete data
+      tags:
+      - data
+  /data/ingestions/{ingestionId}/process:
+    post:
+      description: |-
+        Process ingestion
+
+        Required security scopes:
+          * `api:access`
+      operationId: data#process ingestion
+      parameters:
+      - in: path
+        name: ingestionId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: process ingestion data
       tags:
       - data
   /data/process:
