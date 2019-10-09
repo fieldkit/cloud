@@ -226,15 +226,19 @@ var JSONDataMetaStation = Type("JSONDataMetaStation", func() {
 })
 
 var JSONDataRow = Type("JSONDataRow", func() {
+	Attribute("id", Integer)
 	Attribute("time", Integer)
 	Attribute("location", ArrayOf(Number))
 	Attribute("d", HashOf(String, Any))
 
-	Required("time", "location", "d")
+	Required("id", "time", "location", "d")
 })
 
 var JSONDataMeta = Type("JSONDataMeta", func() {
+	Attribute("id", Integer)
 	Attribute("station", JSONDataMetaStation)
+
+	Required("id")
 })
 
 var JSONDataVersion = Type("JSONDataVersion", func() {

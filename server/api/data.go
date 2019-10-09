@@ -444,7 +444,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 				return err
 			}
 
-			d := make(map[string]interface{})
+			data := make(map[string]interface{})
 			for mi, sg := range dataRecord.Readings.SensorGroups {
 				if sg.Module == 255 {
 					continue
@@ -458,22 +458,24 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 					for si, r := range sg.Readings {
 						sensor := module.Sensors[si]
 						key := strcase.ToLowerCamel(sensor.Name)
-						d[key] = r.Value
+						data[key] = r.Value
 					}
 				}
 			}
 
 			l := dataRecord.Readings.Location
 			rows = append(rows, &app.JSONDataRow{
+				ID:       int(d.ID),
 				Time:     int(dataRecord.Readings.Time),
 				Location: getLocation(l),
-				D:        d,
+				D:        data,
 			})
 		}
 
 		if len(rows) > 0 {
 			versions = append(versions, &app.JSONDataVersion{
 				Meta: &app.JSONDataMeta{
+					ID: int(m.ID),
 					Station: &app.JSONDataMetaStation{
 						ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
 						Name:    name,
