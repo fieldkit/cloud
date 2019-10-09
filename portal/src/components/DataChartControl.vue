@@ -251,7 +251,6 @@ export default {
 #selected-sensor-controls {
     background-color: #ffffff;
     float: left;
-    width: 1110px;
     clear: both;
 }
 #control-btn-container {
