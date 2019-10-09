@@ -332,6 +332,8 @@ func isInternalModule(m *pb.ModuleInfo) bool {
 }
 
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx)
 	if err != nil {
 		return err
@@ -346,10 +348,6 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	if err != nil {
 		return err
 	}
-
-	log := Logger(ctx).Sugar()
-
-	_ = log
 
 	rr, err := repositories.NewRecordRepository(c.options.Database)
 	if err != nil {
@@ -371,10 +369,14 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		internal = *ctx.Internal
 	}
 
+	log.Infow("querying", "device_id", ctx.DeviceID, "page_number", pageNumber, "page_size", pageSize, "internal", internal)
+
 	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
 	if err != nil {
 		return err
 	}
+
+	log.Infow("querying", "nmeta", len(page.Meta), "ndata", len(page.Data))
 
 	byMeta := make(map[int64][]*data.DataRecord)
 	for _, d := range page.Data {
@@ -393,6 +395,8 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	if err != nil {
 		return err
 	}
+
+	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
 
 	versions := make([]*app.JSONDataVersion, 0)
 	for _, m := range page.Meta {
