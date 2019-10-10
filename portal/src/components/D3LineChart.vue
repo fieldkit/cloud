@@ -214,10 +214,10 @@ export default {
                 .duration(1000)
                 .call(d3.axisLeft(this.chart.y));
 
-            // this.chart.colors = d3
-            //     .scaleSequential()
-            //     .domain(this.chart.extent)
-            //     .interpolator(d3.interpolatePlasma);
+            this.chart.colors = d3
+                .scaleSequential()
+                .domain(this.chart.extent)
+                .interpolator(d3.interpolatePlasma);
         }
     }
 };
