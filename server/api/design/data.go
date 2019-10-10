@@ -142,7 +142,7 @@ var _ = Resource("data", func() {
 	})
 
 	Action("process", func() {
-		Routing(GET("data/process"))
+		Routing(POST("data/process"))
 		Description("Process data")
 		Response("Busy", func() {
 			Status(503)

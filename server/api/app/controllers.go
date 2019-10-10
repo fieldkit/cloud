@@ -1389,8 +1389,8 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleDataOrigin(h)
-	service.Mux.Handle("GET", "/data/process", ctrl.MuxHandler("process", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "GET /data/process", "security", "jwt")
+	service.Mux.Handle("POST", "/data/process", ctrl.MuxHandler("process", h, nil))
+	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "POST /data/process", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -349,12 +349,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -438,18 +432,6 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
-    - centroid:
-      - 0.34308734660303564
-      - 0.34308734660303564
-      endTime: "1973-10-14T14:57:44Z"
-      envelope:
-      - - 0.3582211261663492
-        - 0.3582211261663492
-      id: 4.1739971167408507e+18
-      numberOfFeatures: 6.9163709344316e+18
-      radius: 0.3658214777019248
-      sourceId: 7.040775022327253e+18
-      startTime: "2011-03-22T17:06:02Z"
     - centroid:
       - 0.34308734660303564
       - 0.34308734660303564
@@ -564,14 +546,6 @@ definitions:
     description: DeviceDataRecordCollection is the media type for an array of DeviceDataRecord
       (default view)
     example:
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
     - data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
       id: 5.114928591801609e+18
@@ -1001,6 +975,11 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -1740,6 +1719,20 @@ definitions:
       properties:
         Necessitatibus non veritatis velit.: false
       type: Ut est tempora.
+    - geometry:
+        coordinates:
+        - 0.4202528298308348
+        type: Qui odit sed id vitae est.
+      properties:
+        Necessitatibus non veritatis velit.: false
+      type: Ut est tempora.
+    - geometry:
+        coordinates:
+        - 0.4202528298308348
+        type: Qui odit sed id vitae est.
+      properties:
+        Necessitatibus non veritatis velit.: false
+      type: Ut est tempora.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -1964,7 +1957,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+            Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2000,7 +1993,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+              Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2041,7 +2034,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+        Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2052,7 +2045,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+          Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2083,7 +2076,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+          Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2118,7 +2111,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: b27c338c-63b8-4729-9ca0-93a12535daf4
+            Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -3626,7 +3619,7 @@ paths:
       tags:
       - data
   /data/process:
-    get:
+    post:
       description: |-
         Process data
 

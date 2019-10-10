@@ -61,27 +61,14 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 		return err
 	}
 
-	recordAdder := backend.NewRecordAdder(c.options.Session, c.options.Database)
-
 	for _, i := range pending {
-		log.Infow("pending", "ingestion", i)
-
-		err := recordAdder.WriteRecords(ctx, i)
-		if err != nil {
-			log.Errorw("error", "error", err)
-			err := ir.MarkProcessedHasErrors(ctx, i.ID)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := ir.MarkProcessedDone(ctx, i.ID)
-			if err != nil {
-				return err
-			}
-		}
+		log.Infow("queueing", "ingestion_id", i.ID)
+		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			Time: i.Time,
+			ID:   i.ID,
+			URL:  i.URL,
+		})
 	}
-
-	log.Infow("done", "elapsed", 0)
 
 	return nil
 }
