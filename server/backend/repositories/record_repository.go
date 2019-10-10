@@ -18,7 +18,7 @@ func NewRecordRepository(database *sqlxcache.DB) (rr *RecordRepository, err erro
 
 type RecordsPage struct {
 	Data []*data.DataRecord
-	Meta []*data.MetaRecord
+	Meta map[int64]*data.MetaRecord
 }
 
 func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pageNumber, pageSize int) (page *RecordsPage, err error) {
@@ -49,9 +49,14 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 		return nil, err
 	}
 
+	metas := make(map[int64]*data.MetaRecord)
+	for _, m := range mrs {
+		metas[m.ID] = m
+	}
+
 	page = &RecordsPage{
 		Data: drs,
-		Meta: mrs,
+		Meta: metas,
 	}
 
 	return

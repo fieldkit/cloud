@@ -414,6 +414,7 @@ type JSONLine struct {
 	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
 	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
 	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Meta     int                    `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
 }
 
@@ -473,6 +474,7 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 				Time:     row.Time,
 				Location: row.Location,
 				ID:       row.ID,
+				Meta:     version.Meta.ID,
 				D:        row.D,
 			}
 			bytes, err := json.Marshal(line)
@@ -495,9 +497,13 @@ type VersionRepository struct {
 func NewVersionRepository(database *sqlxcache.DB) (rr *VersionRepository, err error) {
 	return &VersionRepository{Database: database}, nil
 }
-
 func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, deviceIdBytes []byte, internal bool, pageNumber, pageSize int) (versions []*app.JSONDataVersion, err error) {
 	log := Logger(ctx).Sugar()
+
+	sr, err := repositories.NewStationRepository(r.Database)
+	if err != nil {
+		return nil, err
+	}
 
 	rr, err := repositories.NewRecordRepository(r.Database)
 	if err != nil {
@@ -506,35 +512,30 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 
 	log.Infow("querying", "device_id", deviceID, "page_number", pageNumber, "page_size", pageSize, "internal", internal)
 
-	page, err := rr.QueryDevice(ctx, deviceID, pageNumber, pageSize)
-	if err != nil {
-		return nil, err
-	}
-
-	byMeta := make(map[int64][]*data.DataRecord)
-	for _, d := range page.Data {
-		if byMeta[d.Meta] == nil {
-			byMeta[d.Meta] = make([]*data.DataRecord, 0)
-		}
-		byMeta[d.Meta] = append(byMeta[d.Meta], d)
-	}
-
-	sr, err := repositories.NewStationRepository(r.Database)
-	if err != nil {
-		return nil, err
-	}
-
 	station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
 	if err != nil {
 		return nil, err
 	}
 
+	page, err := rr.QueryDevice(ctx, deviceID, pageNumber, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	metaOrder := make([]*data.MetaRecord, 0)
+	byMeta := make(map[int64][]*data.DataRecord)
+	for _, d := range page.Data {
+		if byMeta[d.Meta] == nil {
+			byMeta[d.Meta] = make([]*data.DataRecord, 0)
+			metaOrder = append(metaOrder, page.Meta[d.Meta])
+		}
+		byMeta[d.Meta] = append(byMeta[d.Meta], d)
+	}
+
 	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
 
 	versions = make([]*app.JSONDataVersion, 0)
-	for _, m := range page.Meta {
-		dataRecords := byMeta[m.ID]
-
+	for _, m := range metaOrder {
 		var metaRecord pb.DataRecord
 		err := m.Unmarshal(&metaRecord)
 		if err != nil {
@@ -571,6 +572,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 
 		skipped := 0
 
+		dataRecords := byMeta[m.ID]
 		rows := make([]*app.JSONDataRow, 0)
 		for _, d := range dataRecords {
 			var dataRecord pb.DataRecord
@@ -599,11 +601,10 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				}
 			}
 
-			l := dataRecord.Readings.Location
 			rows = append(rows, &app.JSONDataRow{
 				ID:       int(d.ID),
 				Time:     int(dataRecord.Readings.Time),
-				Location: getLocation(l),
+				Location: getLocation(dataRecord.Readings.Location),
 				D:        data,
 			})
 		}
