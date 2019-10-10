@@ -2356,6 +2356,106 @@ func (ctx *GetJSONDataContext) NotFound() error {
 	return nil
 }
 
+// GetLinesJSONDataContext provides the jsonData get lines action context.
+type GetLinesJSONDataContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	DeviceID   string
+	End        *int
+	Internal   *bool
+	PageNumber *int
+	PageSize   *int
+	Start      *int
+}
+
+// NewGetLinesJSONDataContext parses the incoming request URL and body, performs validations and creates the
+// context used by the jsonData controller get lines action.
+func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetLinesJSONDataContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetLinesJSONDataContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramDeviceID := req.Params["deviceId"]
+	if len(paramDeviceID) > 0 {
+		rawDeviceID := paramDeviceID[0]
+		rctx.DeviceID = rawDeviceID
+	}
+	paramEnd := req.Params["end"]
+	if len(paramEnd) > 0 {
+		rawEnd := paramEnd[0]
+		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
+			tmp49 := end
+			tmp48 := &tmp49
+			rctx.End = tmp48
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
+		}
+	}
+	paramInternal := req.Params["internal"]
+	if len(paramInternal) > 0 {
+		rawInternal := paramInternal[0]
+		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
+			tmp50 := &internal
+			rctx.Internal = tmp50
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
+		}
+	}
+	paramPageNumber := req.Params["pageNumber"]
+	if len(paramPageNumber) > 0 {
+		rawPageNumber := paramPageNumber[0]
+		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
+			tmp52 := pageNumber
+			tmp51 := &tmp52
+			rctx.PageNumber = tmp51
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+		}
+	}
+	paramPageSize := req.Params["pageSize"]
+	if len(paramPageSize) > 0 {
+		rawPageSize := paramPageSize[0]
+		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
+			tmp54 := pageSize
+			tmp53 := &tmp54
+			rctx.PageSize = tmp53
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
+		}
+	}
+	paramStart := req.Params["start"]
+	if len(paramStart) > 0 {
+		rawStart := paramStart[0]
+		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
+			tmp56 := start
+			tmp55 := &tmp56
+			rctx.Start = tmp55
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetLinesJSONDataContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *GetLinesJSONDataContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddMemberContext provides the member add action context.
 type AddMemberContext struct {
 	context.Context

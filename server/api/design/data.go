@@ -289,4 +289,18 @@ var _ = Resource("jsonData", func() {
 			Media(JSONDataResponse)
 		})
 	})
+
+	Action("get lines", func() {
+		Routing(GET("data/devices/:deviceId/data/lines"))
+		Description("Retrieve data")
+		Params(func() {
+			Param("pageNumber", Integer)
+			Param("pageSize", Integer)
+			Param("start", Integer)
+			Param("end", Integer)
+			Param("internal", Boolean)
+		})
+		Response(NotFound)
+		Response(OK)
+	})
 })

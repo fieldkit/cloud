@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bufio"
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 
 	"github.com/goadesign/goa"
@@ -361,6 +363,8 @@ func isInternalModule(m *pb.ModuleInfo) bool {
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	log := Logger(ctx).Sugar()
 
+	_ = log
+
 	p, err := NewPermissions(ctx)
 	if err != nil {
 		return err
@@ -372,11 +376,6 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	}
 
 	err = p.CanViewStationByDeviceID(deviceIdBytes)
-	if err != nil {
-		return err
-	}
-
-	rr, err := repositories.NewRecordRepository(c.options.Database)
 	if err != nil {
 		return err
 	}
@@ -396,14 +395,121 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		internal = *ctx.Internal
 	}
 
-	log.Infow("querying", "device_id", ctx.DeviceID, "page_number", pageNumber, "page_size", pageSize, "internal", internal)
-
-	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
+	vr, err := NewVersionRepository(c.options.Database)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("querying", "nmeta", len(page.Meta), "ndata", len(page.Data))
+	versions, err := vr.QueryDevice(ctx, ctx.DeviceID, deviceIdBytes, internal, pageNumber, pageSize)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OK(&app.JSONDataResponse{
+		Versions: versions,
+	})
+}
+
+type JSONLine struct {
+	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
+	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
+	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
+	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
+}
+
+func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
+	log := Logger(ctx).Sugar()
+
+	_ = log
+
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	if err != nil {
+		return err
+	}
+
+	pageNumber := 0
+	if ctx.PageNumber != nil {
+		pageNumber = *ctx.PageNumber
+	}
+
+	pageSize := 200
+	if ctx.PageSize != nil {
+		pageSize = *ctx.PageSize
+	}
+
+	internal := false
+	if ctx.Internal != nil {
+		internal = *ctx.Internal
+	}
+
+	vr, err := NewVersionRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	versions, err := vr.QueryDevice(ctx, ctx.DeviceID, deviceIdBytes, internal, pageNumber, pageSize)
+	if err != nil {
+		return err
+	}
+
+	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	ctx.ResponseData.WriteHeader(200)
+
+	writer := bufio.NewWriter(ctx.ResponseData)
+
+	for _, version := range versions {
+		for _, row := range version.Data {
+			line := JSONLine{
+				Time:     row.Time,
+				Location: row.Location,
+				ID:       row.ID,
+				D:        row.D,
+			}
+			bytes, err := json.Marshal(line)
+			if err != nil {
+				return err
+			}
+			writer.WriteString(fmt.Sprintf("%s\n", string(bytes)))
+		}
+	}
+
+	writer.Flush()
+
+	return nil
+}
+
+type VersionRepository struct {
+	Database *sqlxcache.DB
+}
+
+func NewVersionRepository(database *sqlxcache.DB) (rr *VersionRepository, err error) {
+	return &VersionRepository{Database: database}, nil
+}
+
+func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, deviceIdBytes []byte, internal bool, pageNumber, pageSize int) (versions []*app.JSONDataVersion, err error) {
+	log := Logger(ctx).Sugar()
+
+	rr, err := repositories.NewRecordRepository(r.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("querying", "device_id", deviceID, "page_number", pageNumber, "page_size", pageSize, "internal", internal)
+
+	page, err := rr.QueryDevice(ctx, deviceID, pageNumber, pageSize)
+	if err != nil {
+		return nil, err
+	}
 
 	byMeta := make(map[int64][]*data.DataRecord)
 	for _, d := range page.Data {
@@ -413,26 +519,26 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		byMeta[d.Meta] = append(byMeta[d.Meta], d)
 	}
 
-	sr, err := repositories.NewStationRepository(c.options.Database)
+	sr, err := repositories.NewStationRepository(r.Database)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
 
-	versions := make([]*app.JSONDataVersion, 0)
+	versions = make([]*app.JSONDataVersion, 0)
 	for _, m := range page.Meta {
 		dataRecords := byMeta[m.ID]
 
 		var metaRecord pb.DataRecord
 		err := m.Unmarshal(&metaRecord)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		name := metaRecord.Identity.Name
@@ -463,17 +569,20 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 			}
 		}
 
+		skipped := 0
+
 		rows := make([]*app.JSONDataRow, 0)
 		for _, d := range dataRecords {
 			var dataRecord pb.DataRecord
 			err := d.Unmarshal(&dataRecord)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			data := make(map[string]interface{})
 			for mi, sg := range dataRecord.Readings.SensorGroups {
 				if sg.Module == 255 {
+					skipped += 1
 					continue
 				}
 				if mi >= len(metaRecord.Modules) {
@@ -515,10 +624,10 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 				},
 				Data: rows,
 			})
+		} else {
+			log.Infow("empty version", "meta_id", m.ID)
 		}
 	}
 
-	return ctx.OK(&app.JSONDataResponse{
-		Versions: versions,
-	})
+	return
 }

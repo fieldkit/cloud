@@ -1957,7 +1957,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+            Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -1993,7 +1993,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+              Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2034,7 +2034,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+        Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2045,7 +2045,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+          Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2076,7 +2076,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+          Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2111,7 +2111,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 8313a805-5220-4b40-9bdf-734c95c321bc
+            Repudiandae dignissimos.: 06d778ee-cd61-4dff-be98-933893e5cd98
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -3530,6 +3530,54 @@ paths:
       - jwt:
         - api:access
       summary: get jsonData
+      tags:
+      - jsonData
+  /data/devices/{deviceId}/data/lines:
+    get:
+      description: |-
+        Retrieve data
+
+        Required security scopes:
+          * `api:access`
+      operationId: jsonData#get lines
+      parameters:
+      - in: path
+        name: deviceId
+        required: true
+        type: string
+      - in: query
+        name: end
+        required: false
+        type: integer
+      - in: query
+        name: internal
+        required: false
+        type: boolean
+      - in: query
+        name: pageNumber
+        required: false
+        type: integer
+      - in: query
+        name: pageSize
+        required: false
+        type: integer
+      - in: query
+        name: start
+        required: false
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get lines jsonData
       tags:
       - jsonData
   /data/devices/{deviceId}/summary:

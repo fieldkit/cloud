@@ -40,24 +40,81 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp206 := strconv.Itoa(*end)
-		values.Set("end", tmp206)
+		tmp217 := strconv.Itoa(*end)
+		values.Set("end", tmp217)
 	}
 	if internal != nil {
-		tmp207 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp207)
+		tmp218 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp218)
 	}
 	if pageNumber != nil {
-		tmp208 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp208)
+		tmp219 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp219)
 	}
 	if pageSize != nil {
-		tmp209 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp209)
+		tmp220 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp220)
 	}
 	if start != nil {
-		tmp210 := strconv.Itoa(*start)
-		values.Set("start", tmp210)
+		tmp221 := strconv.Itoa(*start)
+		values.Set("start", tmp221)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// GetLinesJSONDataPath computes a request path to the get lines action of jsonData.
+func GetLinesJSONDataPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/data/devices/%s/data/lines", param0)
+}
+
+// Retrieve data
+func (c *Client) GetLinesJSONData(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Response, error) {
+	req, err := c.NewGetLinesJSONDataRequest(ctx, path, end, internal, pageNumber, pageSize, start)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetLinesJSONDataRequest create the request corresponding to the get lines action endpoint of the jsonData resource.
+func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if end != nil {
+		tmp222 := strconv.Itoa(*end)
+		values.Set("end", tmp222)
+	}
+	if internal != nil {
+		tmp223 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp223)
+	}
+	if pageNumber != nil {
+		tmp224 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp224)
+	}
+	if pageSize != nil {
+		tmp225 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp225)
+	}
+	if start != nil {
+		tmp226 := strconv.Itoa(*start)
+		values.Set("start", tmp226)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
