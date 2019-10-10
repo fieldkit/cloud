@@ -1,6 +1,6 @@
 <template>
     <div id="data-chart-container">
-        <div v-if="this.stationData.length == 0" class="no-data-message">
+        <div v-if="!this.station" class="no-data-message">
             <p>No data yet.</p>
         </div>
         <div id="readings-container" class="section" v-if="this.station">
@@ -68,23 +68,34 @@
                 </div>
                 <div id="time-control-container">
                     <div class="time-btn-label">View By:</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="1">Day</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="7">Week</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="14">2 Week</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="31">Month</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="365">Year</div>
-                    <div class="time-btn" v-on:click="updateTime" data-time="0">All</div>
+                    <div
+                        v-for="btn in timeButtons"
+                        v-bind:key="btn.value"
+                        :class="'time-btn' + (btn.active ? ' active' : '')"
+                        :data-time="btn.value"
+                        v-on:click="updateTime"
+                    >
+                        {{ btn.label }}
+                    </div>
                 </div>
                 <div class="spacer"></div>
             </div>
             <div id="selected-sensor-label" v-if="this.selectedSensor">
                 {{ labels[selectedSensor.name] ? labels[selectedSensor.name] : selectedSensor.name }}
             </div>
+            <div id="chart-type">
+                <select v-model="selected" v-on:change="chartTypeChanged">
+                    <option v-for="option in options" v-bind:value="option.value" v-bind:key="option.value">
+                        {{ option.text }}
+                    </option>
+                </select>
+            </div>
             <D3Chart
                 ref="d3Chart"
                 :stationData="stationData"
                 :selectedSensor="selectedSensor"
                 :timeRange="timeRange"
+                :chartType="chartType"
             />
         </div>
     </div>
@@ -101,6 +112,13 @@ export default {
     data: () => {
         return {
             message: "",
+            selected: "Line",
+            chartType: "Line",
+            options: [
+                { text: "Line", value: "Line" },
+                { text: "Histogram", value: "Histogram" }
+                // { text: "Range", value: "Range" }
+            ],
             allSensors: [],
             timeRange: 0,
             // temporary label system
@@ -111,7 +129,39 @@ export default {
                 tds: "Total Dissolved Solids",
                 salinity: "Salinity",
                 temp: "Temperature"
-            }
+            },
+            timeButtons: [
+                {
+                    active: false,
+                    label: "Day",
+                    value: 1
+                },
+                {
+                    active: false,
+                    label: "Week",
+                    value: 7
+                },
+                {
+                    active: false,
+                    label: "2 Weeks",
+                    value: 14
+                },
+                {
+                    active: false,
+                    label: "Month",
+                    value: 31
+                },
+                {
+                    active: false,
+                    label: "Year",
+                    value: 365
+                },
+                {
+                    active: false,
+                    label: "All",
+                    value: 0
+                }
+            ]
         };
     },
     props: ["summary", "stationData", "station", "selectedSensor"],
@@ -139,7 +189,7 @@ export default {
         },
         switchSensor(event) {
             const id = event.target.getAttribute("data-id");
-            let sensor = this.allSensors.find(s => {
+            const sensor = this.allSensors.find(s => {
                 return s.id == id;
             });
             this.$emit("switchedSensor", sensor);
@@ -156,9 +206,18 @@ export default {
         },
         updateTime(event) {
             const time = event.target.getAttribute("data-time");
+            this.timeButtons.forEach(b => {
+                b.active = false;
+                if (b.value == time) {
+                    b.active = true;
+                }
+            });
             // HACK setting to -1 first to always trigger a change event
             this.timeRange = -1;
             this.timeRange = time;
+        },
+        chartTypeChanged() {
+            this.chartType = this.selected;
         }
     }
 };
@@ -284,6 +343,9 @@ export default {
 .time-btn {
     cursor: pointer;
 }
+.time-btn.active {
+    text-decoration: underline;
+}
 .spacer {
     float: left;
     width: 1020px;
@@ -291,8 +353,18 @@ export default {
     border-top: 1px solid rgba(230, 230, 230);
 }
 #selected-sensor-label {
+    float: left;
     clear: both;
     margin-bottom: 10px;
     margin-left: 70px;
+}
+#chart-type {
+    float: right;
+}
+#chart-type select {
+    font-size: 16px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 2px 4px;
 }
 </style>
