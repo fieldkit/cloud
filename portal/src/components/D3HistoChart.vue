@@ -88,6 +88,10 @@ export default {
                     this.layout.marginTop
                 ]);
 
+            // set axes
+            this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
+            this.yAxis = d3.axisLeft(this.yHist).ticks(10);
+
             return bins;
         },
         makeHistogram() {
@@ -124,10 +128,6 @@ export default {
                         d3Chart.layout.marginTop
                     );
                 });
-
-            // set axes
-            this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
-            this.yAxis = d3.axisLeft(this.yHist).ticks(10);
 
             // add x axis
             this.xAxisGroup = this.chart.svg
@@ -217,10 +217,6 @@ export default {
 
             // remove any extra bars
             bars.exit().remove();
-
-            // set axes
-            this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
-            this.yAxis = d3.axisLeft(this.yHist).ticks(10);
 
             // update x axis
             this.xAxisGroup

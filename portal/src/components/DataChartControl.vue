@@ -119,8 +119,8 @@ export default {
             chartType: "Line",
             options: [
                 { text: "Line", value: "Line" },
-                { text: "Histogram", value: "Histogram" }
-                // { text: "Range", value: "Range" }
+                { text: "Histogram", value: "Histogram" },
+                { text: "Range", value: "Range" }
             ],
             allSensors: [],
             timeRange: 0,

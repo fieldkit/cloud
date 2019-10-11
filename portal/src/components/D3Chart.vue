@@ -24,6 +24,13 @@
             :selectedSensor="selectedSensor"
             ref="d3HistoChart"
         />
+        <D3RangeChart
+            :chart="chart"
+            :processedData="processedData"
+            :layout="layout"
+            :selectedSensor="selectedSensor"
+            ref="d3RangeChart"
+        />
     </div>
 </template>
 
@@ -31,6 +38,7 @@
 import * as d3 from "d3";
 import D3LineChart from "./D3LineChart";
 import D3HistoChart from "./D3HistoChart";
+import D3RangeChart from "./D3RangeChart";
 
 const DAY = 1000 * 60 * 60 * 24;
 
@@ -38,7 +46,8 @@ export default {
     name: "D3Chart",
     components: {
         D3LineChart,
-        D3HistoChart
+        D3HistoChart,
+        D3RangeChart
     },
     props: ["stationData", "selectedSensor", "timeRange", "chartType"],
     data: () => {
@@ -137,8 +146,9 @@ export default {
             }
         },
         chartTypeChange() {
-            this.$refs.d3HistoChart.setStatus(false);
             this.$refs.d3LineChart.setStatus(false);
+            this.$refs.d3HistoChart.setStatus(false);
+            this.$refs.d3RangeChart.setStatus(false);
             this.chart.svg.html(null);
             this.initSVG();
             switch (this.chartType) {
@@ -151,6 +161,8 @@ export default {
                     this.$refs.d3HistoChart.makeHistogram();
                     break;
                 case "Range":
+                    this.$refs.d3RangeChart.setStatus(true);
+                    this.$refs.d3RangeChart.makeRange();
                     break;
             }
         }
