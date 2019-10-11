@@ -103,6 +103,7 @@ export default {
             bins.forEach((bin, i) => {
                 let gradient = this.chart.svg
                     .append("defs")
+                    .attr("class", "range-gradient")
                     .append("linearGradient")
                     .attr("id", "grad-" + i)
                     .attr("x1", "0%")
@@ -222,10 +223,59 @@ export default {
         },
         updateRange(bins) {
             let d3Chart = this;
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
+
+            this.chart.svg.selectAll(".range-gradient").remove();
+            // color gradient for each bin
+            bins.forEach((bin, i) => {
+                let gradient = this.chart.svg
+                    .append("defs")
+                    .attr("class", "range-gradient")
+                    .append("linearGradient")
+                    .attr("id", "grad-" + i)
+                    .attr("x1", "0%")
+                    .attr("x2", "0%")
+                    .attr("y1", "0%")
+                    .attr("y2", "100%");
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "0%")
+                    .style(
+                        "stop-color",
+                        this.colors(
+                            d3.max(bin, d => {
+                                return d[d3Chart.selectedSensor.name];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "50%")
+                    .style(
+                        "stop-color",
+                        this.colors(
+                            d3.median(bin, d => {
+                                return d[d3Chart.selectedSensor.name];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "100%")
+                    .style(
+                        "stop-color",
+                        this.colors(
+                            d3.min(bin, d => {
+                                return d[d3Chart.selectedSensor.name];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+            });
 
             let bars = this.chart.svg.selectAll(".rangebar").data(bins);
 
@@ -257,23 +307,23 @@ export default {
                 });
 
             // updating any existing bars
-            bars.transition()
-                .duration(1000)
-                .attr("transform", d => {
-                    const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.name];
-                    });
-                    const r = mx
-                        ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                        : "translate(0,0)";
-                    return r;
-                })
+            bars.attr("transform", d => {
+                const mx = d3.max(d, b => {
+                    return b[d3Chart.selectedSensor.name];
+                });
+                const r = mx
+                    ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
+                    : "translate(0,0)";
+                return r;
+            })
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
                     return d.length > 0 ? "url(#grad-" + i + ")" : "none";
                 })
+                .transition()
+                .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
                         return b[d3Chart.selectedSensor.name];
