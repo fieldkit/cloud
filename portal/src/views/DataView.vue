@@ -2,7 +2,7 @@
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="data" />
-        <div id="data-view-background" v-if="isAuthenticated">
+        <div id="data-view-background" v-show="isAuthenticated">
             <div class="main-panel">
                 <div id="data-container">
                     <router-link :to="{ name: 'stations' }">
