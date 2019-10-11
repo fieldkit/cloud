@@ -63,29 +63,28 @@ export default {
             isAuthenticated: false
         };
     },
-    async mounted() {
-        if (this.stationParam && this.isAuthenticated) {
-            this.station = this.stationParam;
-            this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
-            this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
-            const modules = this.station.status_json.moduleObjects;
-            if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
-                this.selectedSensor = modules[0].sensorObjects[0];
-            }
-        } else if (this.id && this.isAuthenticated) {
-            // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
-            if (this.id == 0) {
-                this.station = tempStations.stations[0];
-                this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
-                this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
-                    this.summary = summary;
-                });
-                this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
-                    this.stationData = data;
-                });
-            } else if (this.isAuthenticated) {
-                this.api.getStation(this.id).then(station => {
-                    this.station = station;
+    async beforeCreate() {
+        this.api = new FKApi();
+        this.api.getCurrentUser().then(user => {
+            this.user = user;
+            this.isAuthenticated = true;
+            this.fetchData();
+        });
+    },
+    methods: {
+        async fetchData() {
+            if (this.stationParam) {
+                this.station = this.stationParam;
+                this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
+                this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
+                const modules = this.station.status_json.moduleObjects;
+                if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
+                    this.selectedSensor = modules[0].sensorObjects[0];
+                }
+            } else if (this.id) {
+                // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
+                if (this.id == 0) {
+                    this.station = tempStations.stations[0];
                     this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
                     this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
                         this.summary = summary;
@@ -93,18 +92,20 @@ export default {
                     this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
                         this.stationData = data;
                     });
-                });
+                } else {
+                    this.api.getStation(this.id).then(station => {
+                        this.station = station;
+                        this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
+                        this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
+                            this.summary = summary;
+                        });
+                        this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
+                            this.stationData = data;
+                        });
+                    });
+                }
             }
-        }
-    },
-    async beforeCreate() {
-        this.api = new FKApi();
-        this.api.getCurrentUser().then(user => {
-            this.user = user;
-            this.isAuthenticated = true;
-        });
-    },
-    methods: {
+        },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
