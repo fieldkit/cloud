@@ -307,15 +307,16 @@ export default {
                 });
 
             // updating any existing bars
-            bars.attr("transform", d => {
-                const mx = d3.max(d, b => {
-                    return b[d3Chart.selectedSensor.name];
-                });
-                const r = mx
-                    ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                    : "translate(0,0)";
-                return r;
-            })
+            bars.attr("height", 0)
+                .attr("transform", d => {
+                    const mx = d3.max(d, b => {
+                        return b[d3Chart.selectedSensor.name];
+                    });
+                    const r = mx
+                        ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
+                        : "translate(0,0)";
+                    return r;
+                })
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
