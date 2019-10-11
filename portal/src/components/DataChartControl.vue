@@ -97,6 +97,9 @@
                 :timeRange="timeRange"
                 :chartType="chartType"
             />
+            <div id="loading">
+                <img alt="" src="../assets/progress.gif" />
+            </div>
         </div>
     </div>
 </template>
@@ -224,6 +227,14 @@ export default {
 </script>
 
 <style scoped>
+#loading {
+    float: left;
+    margin-top: -600px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+}
 #data-chart-container {
     width: 1100px;
     float: left;

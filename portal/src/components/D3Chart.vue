@@ -67,6 +67,7 @@ export default {
                 this.processedData = this.processData();
                 this.initSVG();
                 // drawing line chart by default
+                // NOTE: line chart hides loading div
                 this.$refs.d3LineChart.setStatus(true);
             }
         },

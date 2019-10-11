@@ -206,6 +206,7 @@ export default {
                 .call(this.yAxis);
 
             this.drawn = true;
+            document.getElementById("loading").style.display = "none";
         },
         brushed() {
             if (!d3.event.selection) {
