@@ -78,6 +78,9 @@ export default {
                 // drawing line chart by default
                 // NOTE: line chart hides loading div
                 this.$refs.d3LineChart.setStatus(true);
+            } else {
+                // TODO: handle lack of data more completely
+                document.getElementById("loading").style.display = "none";
             }
         },
         timeRange: function() {
