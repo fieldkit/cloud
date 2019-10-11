@@ -64,7 +64,7 @@ export default {
         };
     },
     async mounted() {
-        if (this.stationParam) {
+        if (this.stationParam && this.isAuthenticated) {
             this.station = this.stationParam;
             this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
             this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
@@ -72,7 +72,7 @@ export default {
             if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
                 this.selectedSensor = modules[0].sensorObjects[0];
             }
-        } else if (this.id) {
+        } else if (this.id && this.isAuthenticated) {
             // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
             if (this.id == 0) {
                 this.station = tempStations.stations[0];
@@ -83,7 +83,7 @@ export default {
                 this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
                     this.stationData = data;
                 });
-            } else {
+            } else if (this.isAuthenticated) {
                 this.api.getStation(this.id).then(station => {
                     this.station = station;
                     this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
