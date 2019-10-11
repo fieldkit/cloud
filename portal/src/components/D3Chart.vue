@@ -126,6 +126,10 @@ export default {
             this.$refs.d3LineChart.init();
         },
         timeChange() {
+            if (this.timeRange == -1) {
+                // disregard pseudo-changes
+                return;
+            }
             this.chart.start = this.processedData[0].date;
             this.chart.end = new Date(this.chart.start.getTime() + this.timeRange * DAY);
             if (this.timeRange == 0) {

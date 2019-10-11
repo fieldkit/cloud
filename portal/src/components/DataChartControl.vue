@@ -215,9 +215,13 @@ export default {
                     b.active = true;
                 }
             });
-            // HACK setting to -1 first to always trigger a change event
+            // HACK setting to -1 first to always trigger a change event,
+            // even if the same time button is re-clicked, as a drag-to-zoom
+            // time change may have happened in the meantime
             this.timeRange = -1;
-            this.timeRange = time;
+            setTimeout(() => {
+                this.timeRange = time;
+            }, 50);
         },
         chartTypeChanged() {
             this.chartType = this.selected;
