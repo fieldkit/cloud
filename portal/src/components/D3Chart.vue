@@ -15,7 +15,6 @@
             :processedData="processedData"
             :layout="layout"
             :selectedSensor="selectedSensor"
-            @addBrush="addBrush"
             ref="d3LineChart"
         />
         <D3HistoChart
@@ -45,13 +44,7 @@ export default {
     data: () => {
         return {
             chart: {
-                x: Object,
-                y: Object,
                 svg: Object,
-                clip: Object,
-                colors: Object,
-                xAxis: Object,
-                yAxis: Object,
                 extent: [],
                 panelID: "",
                 start: 0,
@@ -121,72 +114,15 @@ export default {
                 return d[d3Chart.selectedSensor.name];
             });
 
-            // x and y map functions
             this.chart.end = processed[processed.length - 1].date;
             this.chart.start = processed[0].date;
-            this.chart.x = d3
-                .scaleTime()
-                .domain([this.chart.start, this.chart.end])
-                .range([
-                    this.layout.marginLeft,
-                    this.layout.width - (this.layout.marginRight + this.layout.marginLeft)
-                ]);
-            this.chart.y = d3
-                .scaleLinear()
-                .domain(this.chart.extent)
-                .range([
-                    this.layout.height - (this.layout.marginBottom + this.layout.marginTop),
-                    this.layout.marginTop
-                ]);
-            this.chart.xAxis = d3.axisBottom(this.chart.x).ticks(10);
-            this.chart.yAxis = d3.axisLeft(this.chart.y).ticks(6);
 
             return processed;
         },
         initSVG() {
             this.chart.svg = d3.select(this.$refs.d3Stage);
 
-            this.chart.svg
-                .append("defs")
-                .append("svg:clipPath")
-                .attr("id", "clip" + this.chart.panelID)
-                .append("svg:rect")
-                .attr("width", this.layout.width - this.layout.marginLeft * 2 - this.layout.marginRight)
-                .attr("height", this.layout.height)
-                .attr("x", this.layout.marginLeft)
-                .attr("y", 0);
-
             this.$refs.d3LineChart.init();
-
-            this.chart.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
-
-            this.brush = d3
-                .brushX()
-                .extent([[0, 0], [this.layout.width, this.layout.height - this.layout.marginBottom]])
-                .on("end", this.brushed);
-        },
-        addBrush() {
-            // Add the brushing
-            this.chart.svg
-                .append("g")
-                .attr("class", "brush")
-                .attr("data-panel", this.chart.panelID)
-                .call(this.brush);
-        },
-        brushed() {
-            if (!d3.event.selection) {
-                return;
-            }
-
-            let xRange = d3.event.selection;
-            this.chart.start = this.chart.x.invert(xRange[0]);
-            this.chart.end = this.chart.x.invert(xRange[1]);
-            this.chart.x.domain([this.chart.start, this.chart.end]);
-            // Remove the grey brush area after selection
-            this.chart.svg.select(".brush").call(this.brush.move, null);
         },
         timeChange() {
             this.chart.start = this.processedData[0].date;
@@ -194,7 +130,6 @@ export default {
             if (this.timeRange == 0) {
                 this.chart.end = this.processedData[this.processedData.length - 1].date;
             }
-            this.chart.x.domain([this.chart.start, this.chart.end]);
         },
         chartTypeChange() {
             this.$refs.d3HistoChart.setStatus(false);

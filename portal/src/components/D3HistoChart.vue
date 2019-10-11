@@ -20,7 +20,7 @@ export default {
         chart: {
             handler: function() {
                 if (this.drawn && this.activeMode) {
-                    this.updateChart();
+                    this.chartChanged();
                 }
             },
             deep: true
@@ -43,6 +43,7 @@ export default {
         },
         prepareHistogram() {
             let d3Chart = this;
+            // set x scale
             this.xHist = d3
                 .scaleLinear()
                 .domain(this.chart.extent)
@@ -57,6 +58,7 @@ export default {
             const max = this.chart.extent[1];
             const thresholds = d3.range(min, max, (max - min) / binCount);
 
+            // set histogram function
             this.histogram = d3
                 .histogram()
                 .value(d => {
@@ -65,23 +67,26 @@ export default {
                 .domain(this.xHist.domain())
                 .thresholds(thresholds);
 
+            // filter data by date
             let filteredData = this.processedData.filter(d => {
-                return d.date > d3Chart.chart.x.domain()[0] && d.date < d3Chart.chart.x.domain()[1];
+                return d.date > d3Chart.chart.start && d.date < d3Chart.chart.end;
             });
+            // apply histogram function
             let bins = this.histogram(filteredData);
 
+            // set y scale
             this.yHist = d3
                 .scaleLinear()
+                .domain([
+                    0,
+                    d3.max(bins, d => {
+                        return d.length;
+                    })
+                ])
                 .range([
                     this.layout.height - this.layout.marginTop - this.layout.marginBottom,
                     this.layout.marginTop
                 ]);
-            this.yHist.domain([
-                0,
-                d3.max(bins, d => {
-                    return d.length;
-                })
-            ]);
 
             return bins;
         },
@@ -89,6 +94,11 @@ export default {
             let d3Chart = this;
 
             let bins = this.prepareHistogram();
+
+            this.colors = d3
+                .scaleSequential()
+                .domain(this.chart.extent)
+                .interpolator(d3.interpolatePlasma);
 
             // append the bar rectangles
             this.chart.svg
@@ -103,7 +113,7 @@ export default {
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => d3Chart.colors(d.x0))
                 .transition()
                 .duration(1000)
                 .attr("height", d => {
@@ -115,11 +125,11 @@ export default {
                     );
                 });
 
-            // Axes
+            // set axes
             this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
             this.yAxis = d3.axisLeft(this.yHist).ticks(10);
 
-            // Add x axis
+            // add x axis
             this.xAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "x axis")
@@ -133,7 +143,7 @@ export default {
                 )
                 .call(this.xAxis);
 
-            // Add y axis
+            // add y axis
             this.yAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "y axis")
@@ -142,17 +152,24 @@ export default {
 
             this.drawn = true;
         },
-        updateChart() {
-            // Coming soon (need more data across time to test)
+        chartChanged() {
+            // chart changes when start and end dates change
+            // but possibly at other events, too - TODO: distinguish btw those
+            let bins = this.prepareHistogram();
+            this.updateHistogram(bins);
         },
         sensorChange() {
             let d3Chart = this;
+            // define extent for this sensor
             this.chart.extent = d3.extent(this.processedData, d => {
                 return d[d3Chart.selectedSensor.name];
             });
             let bins = this.prepareHistogram();
-
-            this.chart.colors = d3
+            this.updateHistogram(bins);
+        },
+        updateHistogram(bins) {
+            let d3Chart = this;
+            this.colors = d3
                 .scaleSequential()
                 .domain(this.chart.extent)
                 .interpolator(d3.interpolatePlasma);
@@ -169,7 +186,7 @@ export default {
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => d3Chart.colors(d.x0))
                 .attr("height", d => {
                     return (
                         d3Chart.layout.height -
@@ -182,7 +199,7 @@ export default {
             // updating any existing bars
             bars.transition()
                 .duration(1000)
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => d3Chart.colors(d.x0))
                 .attr("transform", d => {
                     return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
                 })
@@ -201,18 +218,17 @@ export default {
             // remove any extra bars
             bars.exit().remove();
 
-            // Axes
+            // set axes
             this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
             this.yAxis = d3.axisLeft(this.yHist).ticks(10);
 
-            // update the x axis
+            // update x axis
             this.xAxisGroup
                 .transition()
                 .duration(1000)
                 .call(this.xAxis);
 
             // update y axis
-            this.chart.y.domain(this.chart.extent);
             this.yAxisGroup
                 .transition()
                 .duration(1000)
