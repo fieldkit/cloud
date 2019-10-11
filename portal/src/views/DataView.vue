@@ -2,7 +2,7 @@
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="data" />
-        <div id="data-view-background">
+        <div id="data-view-background" v-if="isAuthenticated">
             <div class="main-panel">
                 <div id="data-container">
                     <router-link :to="{ name: 'stations' }">
@@ -20,6 +20,15 @@
                     <SensorSummary :sensor="selectedSensor" />
                 </div>
             </div>
+        </div>
+        <div v-if="!isAuthenticated" class="no-auth-message">
+            <p>
+                Please
+                <router-link :to="{ name: 'login' }" class="show-link">
+                    log in
+                </router-link>
+                to view data.
+            </p>
         </div>
     </div>
 </template>
@@ -110,6 +119,14 @@ export default {
 #data-view-background {
     float: left;
     background-color: rgb(252, 252, 252);
+}
+.no-auth-message {
+    float: left;
+    font-size: 20px;
+    margin: 40px 0 0 300px;
+}
+.show-link {
+    text-decoration: underline;
 }
 .main-panel {
     margin-left: 280px;
