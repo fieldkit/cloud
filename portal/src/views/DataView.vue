@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="!isAuthenticated" class="no-auth-message">
+        <div v-if="failedAuth" class="no-auth-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login' }" class="show-link">
@@ -60,16 +60,22 @@ export default {
             stationData: [],
             selectedSensor: null,
             summary: [],
-            isAuthenticated: false
+            isAuthenticated: false,
+            failedAuth: false
         };
     },
     async beforeCreate() {
         this.api = new FKApi();
-        this.api.getCurrentUser().then(user => {
-            this.user = user;
-            this.isAuthenticated = true;
-            this.fetchData();
-        });
+        this.api
+            .getCurrentUser()
+            .then(user => {
+                this.user = user;
+                this.isAuthenticated = true;
+                this.fetchData();
+            })
+            .catch(() => {
+                this.failedAuth = true;
+            });
     },
     methods: {
         async fetchData() {
