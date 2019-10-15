@@ -121,12 +121,12 @@ export default {
                 .transition()
                 .duration(1000)
                 .attr("height", d => {
-                    return (
-                        d3Chart.layout.height -
-                        d3Chart.yHist(d.length) -
-                        d3Chart.layout.marginBottom -
-                        d3Chart.layout.marginTop
-                    );
+                    return d.length == 0
+                        ? 0
+                        : d3Chart.layout.height -
+                              d3Chart.yHist(d.length) -
+                              d3Chart.layout.marginBottom -
+                              d3Chart.layout.marginTop;
                 });
 
             // add x axis
@@ -151,6 +151,7 @@ export default {
                 .call(this.yAxis);
 
             this.drawn = true;
+            document.getElementById("loading").style.display = "none";
         },
         chartChanged() {
             // chart changes when start and end dates change
@@ -188,12 +189,12 @@ export default {
                 })
                 .style("fill", d => d3Chart.colors(d.x0))
                 .attr("height", d => {
-                    return (
-                        d3Chart.layout.height -
-                        d3Chart.yHist(d.length) -
-                        d3Chart.layout.marginBottom -
-                        d3Chart.layout.marginTop
-                    );
+                    return d.length == 0
+                        ? 0
+                        : d3Chart.layout.height -
+                              d3Chart.yHist(d.length) -
+                              d3Chart.layout.marginBottom -
+                              d3Chart.layout.marginTop;
                 });
 
             // updating any existing bars
@@ -207,12 +208,12 @@ export default {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
                 .attr("height", d => {
-                    return (
-                        d3Chart.layout.height -
-                        d3Chart.yHist(d.length) -
-                        d3Chart.layout.marginBottom -
-                        d3Chart.layout.marginTop
-                    );
+                    return d.length == 0
+                        ? 0
+                        : d3Chart.layout.height -
+                              d3Chart.yHist(d.length) -
+                              d3Chart.layout.marginBottom -
+                              d3Chart.layout.marginTop;
                 });
 
             // remove any extra bars
