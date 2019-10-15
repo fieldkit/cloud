@@ -126,6 +126,12 @@ export default {
                 this.failedAuth = true;
             });
     },
+    // beforeRouteUpdate(to, from, next) {
+    //     console.log("to", to, "from", from, "next", next);
+    //     // react to route changes...
+    //     // don't forget to call next()
+    //     next();
+    // },
     methods: {
         async fetchData() {
             if (this.stationParam) {
@@ -137,7 +143,7 @@ export default {
                     this.station = tempStations.stations[0];
                     return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                 } else {
-                    this.api.getStation(this.id).then(station => {
+                    return this.api.getStation(this.id).then(station => {
                         this.station = station;
                         return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                     });
