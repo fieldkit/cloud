@@ -7,6 +7,7 @@ import * as d3 from "d3";
 
 const HOUR = 1000 * 60 * 60;
 const DAY = 1000 * 60 * 60 * 24;
+const MIN_HEIGHT = 2;
 
 export default {
     name: "D3RangeChart",
@@ -180,7 +181,8 @@ export default {
                         return b[d3Chart.selectedSensor.name];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
-                    return -(height ? height : 0);
+                    const min = d.length > 0 ? -MIN_HEIGHT : 0;
+                    return -(height ? height : min);
                 });
 
             // add x axis
@@ -205,6 +207,7 @@ export default {
                 .call(this.yAxis);
 
             this.drawn = true;
+            document.getElementById("loading").style.display = "none";
         },
         chartChanged() {
             // chart changes when start and end dates change
@@ -303,7 +306,8 @@ export default {
                         return b[d3Chart.selectedSensor.name];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
-                    return -(height ? height : 0);
+                    const min = d.length > 0 ? -MIN_HEIGHT : 0;
+                    return -(height ? height : min);
                 });
 
             // updating any existing bars
@@ -330,7 +334,8 @@ export default {
                         return b[d3Chart.selectedSensor.name];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
-                    return -(height ? height : 0);
+                    const min = d.length > 0 ? -MIN_HEIGHT : 0;
+                    return -(height ? height : min);
                 });
 
             // remove any extra bars
