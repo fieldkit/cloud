@@ -16,6 +16,7 @@
             :layout="layout"
             :selectedSensor="selectedSensor"
             ref="d3LineChart"
+            @timeZoomed="onTimeZoom"
         />
         <D3HistoChart
             :chart="chart"
@@ -49,7 +50,7 @@ export default {
         D3HistoChart,
         D3RangeChart
     },
-    props: ["stationData", "selectedSensor", "timeRange", "chartType"],
+    props: ["stationData", "selectedSensor", "chartType"],
     data: () => {
         return {
             chart: {
@@ -82,9 +83,6 @@ export default {
                 // TODO: handle lack of data more completely
                 document.getElementById("loading").style.display = "none";
             }
-        },
-        timeRange: function() {
-            this.timeChange();
         },
         chartType: function() {
             this.chartTypeChange();
@@ -137,16 +135,18 @@ export default {
 
             this.$refs.d3LineChart.init();
         },
-        timeChange() {
-            if (this.timeRange == -1) {
-                // disregard pseudo-changes
-                return;
             }
+        },
+        usePresetTimeRange(time) {
             this.chart.start = this.processedData[0].date;
-            this.chart.end = new Date(this.chart.start.getTime() + this.timeRange * DAY);
-            if (this.timeRange == 0) {
+            this.chart.end = new Date(this.chart.start.getTime() + time * DAY);
+            if (time == 0) {
                 this.chart.end = this.processedData[this.processedData.length - 1].date;
             }
+            this.$emit("timeChanged", { start: this.chart.start, end: this.chart.end });
+        },
+        onTimeZoom(range) {
+            this.$emit("timeChanged", range);
         },
         chartTypeChange() {
             this.$refs.d3LineChart.setStatus(false);

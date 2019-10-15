@@ -15,6 +15,7 @@
                         :station="station"
                         :selectedSensor="selectedSensor"
                         @switchedSensor="onSensorSwitch"
+                        @timeChanged="onTimeChange"
                     />
                     <NotesList :station="station" />
                     <SensorSummary :sensor="selectedSensor" />
@@ -117,6 +118,8 @@ export default {
         },
         onSensorSwitch(sensor) {
             this.selectedSensor = sensor;
+        onTimeChange(time) {
+            this.timeRange = time;
         }
     }
 };

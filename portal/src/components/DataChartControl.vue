@@ -94,8 +94,8 @@
                 ref="d3Chart"
                 :stationData="stationData"
                 :selectedSensor="selectedSensor"
-                :timeRange="timeRange"
                 :chartType="chartType"
+                @timeChanged="onTimeChange"
             />
             <div id="loading">
                 <img alt="" src="../assets/progress.gif" />
@@ -123,7 +123,6 @@ export default {
                 { text: "Range", value: "Range" }
             ],
             allSensors: [],
-            timeRange: 0,
             // temporary label system
             labels: {
                 ph: "pH",
@@ -215,13 +214,7 @@ export default {
                     b.active = true;
                 }
             });
-            // HACK setting to -1 first to always trigger a change event,
-            // even if the same time button is re-clicked, as a drag-to-zoom
-            // time change may have happened in the meantime
-            this.timeRange = -1;
-            setTimeout(() => {
-                this.timeRange = time;
-            }, 50);
+            this.$refs.d3Chart.usePresetTimeRange(time);
         },
         chartTypeChanged() {
             this.chartType = this.selected;

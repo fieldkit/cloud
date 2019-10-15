@@ -219,6 +219,7 @@ export default {
             // Remove the grey brush area after selection
             this.chart.svg.select(".brush").call(this.brush.move, null);
             this.timeChange();
+            this.$emit("timeZoomed", { start: this.chart.start, end: this.chart.end });
         },
         timeChange() {
             // update x scale
