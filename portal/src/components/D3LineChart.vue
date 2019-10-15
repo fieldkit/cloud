@@ -248,7 +248,6 @@ export default {
                 .attr("cy", d => {
                     return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 });
-            // setting location in url will be added back
         },
         sensorChange() {
             let d3Chart = this;

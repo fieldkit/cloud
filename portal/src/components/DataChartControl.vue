@@ -53,15 +53,15 @@
         <div class="white-bkgd" v-if="this.station">
             <div id="selected-sensor-controls">
                 <div id="control-btn-container">
-                    <div id="" class="control-btn">
+                    <div class="control-btn">
                         <img alt="" src="../assets/Export_icon.png" />
                         <span>Export</span>
                     </div>
-                    <div id="" class="control-btn">
+                    <div class="control-btn">
                         <img alt="" src="../assets/Share_icon.png" />
                         <span>Share</span>
                     </div>
-                    <div id="" class="control-btn">
+                    <div class="control-btn">
                         <img alt="" src="../assets/Compare_icon.png" />
                         <span>Compare</span>
                     </div>

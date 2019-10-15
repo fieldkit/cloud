@@ -126,12 +126,6 @@ export default {
                 this.failedAuth = true;
             });
     },
-    // beforeRouteUpdate(to, from, next) {
-    //     console.log("to", to, "from", from, "next", next);
-    //     // react to route changes...
-    //     // don't forget to call next()
-    //     next();
-    // },
     methods: {
         async fetchData() {
             if (this.stationParam) {
