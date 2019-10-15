@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 export default {
     name: "D3LineChart",
-    props: ["chart", "processedData", "layout", "selectedSensor"],
+    props: ["chart", "stationData", "layout", "selectedSensor"],
     data: () => {
         return {
             activeMode: false,
@@ -30,7 +30,7 @@ export default {
                 this.sensorChange();
             }
         },
-        processedData: function() {
+        stationData: function() {
             if (this.activeMode) {
                 this.makeLine();
             }
@@ -72,7 +72,7 @@ export default {
                 })
                 .y0(this.layout.height - (this.layout.marginBottom + this.layout.marginTop))
                 .y1(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.name]);
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 })
                 .curve(d3.curveBasis);
 
@@ -148,7 +148,7 @@ export default {
             // Add the line
             this.line
                 .append("path")
-                .data([this.processedData])
+                .data([this.stationData])
                 .attr("class", "area")
                 .attr("fill", "url(#area-gradient)")
                 .attr("stroke", "none")
@@ -167,7 +167,7 @@ export default {
             let d3Chart = this;
             this.line
                 .selectAll(".circles")
-                .data(this.processedData)
+                .data(this.stationData)
                 .enter()
                 .append("circle")
                 .attr("class", "dot")
@@ -175,10 +175,10 @@ export default {
                     return d3Chart.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.name]);
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.name]));
+                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]));
             // tooltip will be added back
 
             this.xAxis = d3.axisBottom(this.x).ticks(10);
@@ -234,26 +234,26 @@ export default {
                 .select(".area")
                 .transition()
                 .duration(1000)
-                .attr("d", this.area(this.processedData));
+                .attr("d", this.area(this.stationData));
 
             let d3Chart = this;
             this.line
                 .selectAll(".dot")
                 .transition()
                 .duration(1000)
-                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.name]))
+                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]))
                 .attr("cx", d => {
                     return d3Chart.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.name]);
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 });
             // setting location in url will be added back
         },
         sensorChange() {
             let d3Chart = this;
-            this.chart.extent = d3.extent(this.processedData, d => {
-                return d[d3Chart.selectedSensor.name];
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
             });
 
             // Area gradient fill
@@ -264,7 +264,7 @@ export default {
                 })
                 .y0(this.layout.height - (this.layout.marginBottom + this.layout.marginTop))
                 .y1(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.name]);
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 })
                 .curve(d3.curveBasis);
 

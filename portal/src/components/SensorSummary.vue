@@ -25,33 +25,17 @@ const MONTH = DAY * 30;
 
 export default {
     name: "SensorSummary",
-    props: ["selectedSensor", "stationData", "timeRange"],
+    props: ["selectedSensor", "stationData", "timeRange", "labels"],
     computed: {
-        combinedData: function() {
-            let data = [];
-            if (this.stationData.versions) {
-                this.stationData.versions.forEach(v => {
-                    v.data.forEach(d => {
-                        d.d.date = new Date(d.time * 1000);
-                        data.push(d.d);
-                    });
-                });
-            }
-            //sort data by date
-            data.sort(function(a, b) {
-                return a.date.getTime() - b.date.getTime();
-            });
-            return data;
-        },
         current: function() {
-            if (this.combinedData && this.combinedData.length > 0) {
-                let start = this.combinedData[0].date;
-                let end = this.combinedData[this.combinedData.length - 1].date;
+            if (this.stationData && this.stationData.length > 0) {
+                let start = this.stationData[0].date;
+                let end = this.stationData[this.stationData.length - 1].date;
                 if (this.timeRange) {
                     start = this.timeRange.start;
                     end = this.timeRange.end;
                 }
-                let filtered = this.combinedData.filter(d => {
+                let filtered = this.stationData.filter(d => {
                     return d.date > start && d.date < end;
                 });
                 return this.computeStats(filtered);
@@ -60,10 +44,10 @@ export default {
             }
         },
         week: function() {
-            if (this.combinedData && this.combinedData.length > 0) {
-                let end = this.combinedData[this.combinedData.length - 1].date;
+            if (this.stationData && this.stationData.length > 0) {
+                let end = this.stationData[this.stationData.length - 1].date;
                 let start = new Date(end.getTime() - WEEK);
-                let filtered = this.combinedData.filter(d => {
+                let filtered = this.stationData.filter(d => {
                     return d.date > start && d.date < end;
                 });
                 return this.computeStats(filtered);
@@ -72,10 +56,10 @@ export default {
             }
         },
         month: function() {
-            if (this.combinedData && this.combinedData.length > 0) {
-                let end = this.combinedData[this.combinedData.length - 1].date;
+            if (this.stationData && this.stationData.length > 0) {
+                let end = this.stationData[this.stationData.length - 1].date;
                 let start = new Date(end.getTime() - MONTH);
-                let filtered = this.combinedData.filter(d => {
+                let filtered = this.stationData.filter(d => {
                     return d.date > start && d.date < end;
                 });
                 return this.computeStats(filtered);
@@ -84,8 +68,8 @@ export default {
             }
         },
         overall: function() {
-            if (this.combinedData && this.combinedData.length > 0) {
-                return this.computeStats(this.combinedData);
+            if (this.stationData && this.stationData.length > 0) {
+                return this.computeStats(this.stationData);
             } else {
                 return { min: "--", max: "--", median: "--" };
             }
@@ -100,17 +84,7 @@ export default {
         }
     },
     data: () => {
-        return {
-            // temporary label system
-            labels: {
-                ph: "pH",
-                do: "Dissolved Oxygen",
-                ec: "Electrical Conductivity",
-                tds: "Total Dissolved Solids",
-                salinity: "Salinity",
-                temp: "Temperature"
-            }
-        };
+        return {};
     },
     methods: {
         computeStats: function(data) {

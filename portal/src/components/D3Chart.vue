@@ -12,7 +12,7 @@
         </svg>
         <D3LineChart
             :chart="chart"
-            :processedData="processedData"
+            :stationData="stationData"
             :layout="layout"
             :selectedSensor="selectedSensor"
             ref="d3LineChart"
@@ -20,14 +20,14 @@
         />
         <D3HistoChart
             :chart="chart"
-            :processedData="processedData"
+            :stationData="stationData"
             :layout="layout"
             :selectedSensor="selectedSensor"
             ref="d3HistoChart"
         />
         <D3RangeChart
             :chart="chart"
-            :processedData="processedData"
+            :stationData="stationData"
             :layout="layout"
             :selectedSensor="selectedSensor"
             ref="d3RangeChart"
@@ -50,7 +50,7 @@ export default {
         D3HistoChart,
         D3RangeChart
     },
-    props: ["stationData", "selectedSensor", "chartType"],
+    props: ["station", "stationData", "selectedSensor", "chartType"],
     data: () => {
         return {
             chart: {
@@ -60,7 +60,6 @@ export default {
                 start: 0,
                 end: 0
             },
-            processedData: [],
             layout: {
                 width: 1050,
                 height: 350,
@@ -73,10 +72,9 @@ export default {
     },
     watch: {
         stationData: function() {
-            if (this.stationData.versions.length > 0) {
-                this.processedData = this.processData();
-                this.initSVG();
+            if (this.stationData.length > 0) {
                 this.initChart();
+                this.initSVG();
             } else {
                 // TODO: handle lack of data more completely
                 document.getElementById("loading").style.display = "none";
@@ -103,41 +101,25 @@ export default {
         }
     },
     methods: {
-        processData() {
-            let processed = [];
-            this.stationData.versions.forEach(v => {
-                let station = v.meta.station;
-                this.chart.panelID = station.id;
-                v.data.forEach(d => {
-                    d.d.date = new Date(d.time * 1000);
-                    processed.push(d.d);
-                });
-            });
-            //sort data by date
-            processed.sort(function(a, b) {
-                return a.date.getTime() - b.date.getTime();
-            });
-
+        initSVG() {
+            this.chart.svg = d3.select(this.$refs.d3Stage);
+            this.$refs.d3LineChart.init();
+        },
+        initChart() {
             let d3Chart = this;
-            this.chart.extent = d3.extent(processed, d => {
-                return d[d3Chart.selectedSensor.name];
+            this.chart.panelID = this.station.device_id;
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
             });
 
             if (this.$route.query.start && this.$route.query.end) {
                 this.chart.start = new Date(parseInt(this.$route.query.start));
                 this.chart.end = new Date(parseInt(this.$route.query.end));
             } else {
-                this.chart.end = processed[processed.length - 1].date;
-                this.chart.start = processed[0].date;
+                this.chart.end = this.stationData[this.stationData.length - 1].date;
+                this.chart.start = this.stationData[0].date;
             }
 
-            return processed;
-        },
-        initSVG() {
-            this.chart.svg = d3.select(this.$refs.d3Stage);
-            this.$refs.d3LineChart.init();
-        },
-        initChart() {
             const type = this.$route.query.type;
             if (type) {
                 switch (type) {
@@ -157,10 +139,10 @@ export default {
             }
         },
         usePresetTimeRange(time) {
-            this.chart.start = this.processedData[0].date;
+            this.chart.start = this.stationData[0].date;
             this.chart.end = new Date(this.chart.start.getTime() + time * DAY);
             if (time == 0) {
-                this.chart.end = this.processedData[this.processedData.length - 1].date;
+                this.chart.end = this.stationData[this.stationData.length - 1].date;
             }
             this.$emit("timeChanged", { start: this.chart.start, end: this.chart.end });
         },
@@ -189,8 +171,8 @@ export default {
             }
         },
         refresh() {
-            let newStart = this.processedData[0].date;
-            let newEnd = this.processedData[this.processedData.length - 1].date;
+            let newStart = this.stationData[0].date;
+            let newEnd = this.stationData[this.stationData.length - 1].date;
             if (this.$route.query.start && this.$route.query.end) {
                 newStart = new Date(parseInt(this.$route.query.start));
                 newEnd = new Date(parseInt(this.$route.query.end));

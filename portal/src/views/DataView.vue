@@ -11,19 +11,22 @@
                     <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
                     <DataChartControl
                         ref="dataChartControl"
-                        :summary="summary"
                         :stationData="stationData"
                         :station="station"
+                        :sensors="sensors"
                         :selectedSensor="selectedSensor"
+                        :labels="labels"
                         @switchedSensor="onSensorSwitch"
                         @timeChanged="onTimeChange"
                     />
                     <NotesList :station="station" />
                     <SensorSummary
                         ref="sensorSummary"
+                        :sensors="sensors"
                         :selectedSensor="selectedSensor"
                         :stationData="stationData"
                         :timeRange="timeRange"
+                        :labels="labels"
                     />
                 </div>
             </div>
@@ -65,11 +68,37 @@ export default {
             user: {},
             station: null,
             stationData: [],
+            sensors: [],
             selectedSensor: null,
             summary: [],
             isAuthenticated: false,
             failedAuth: false,
-            timeRange: null
+            timeRange: null,
+            // temporary label system
+            labels: {
+                ph: "pH",
+                do: "Dissolved Oxygen",
+                ec: "Electrical Conductivity",
+                tds: "Total Dissolved Solids",
+                salinity: "Salinity",
+                temp: "Temperature",
+                humidity: "Humidity",
+                temperature1: "Temperature",
+                pressure: "Pressure",
+                temperature2: "Temperature 2",
+                rain: "Rain",
+                windSpeed: "Wind Speed",
+                windDir: "Wind Direction",
+                windDirMv: "Wind Direction Raw ADC",
+                windHrMaxSpeed: "Wind Max Speed (1 hour)",
+                windHrMaxDir: "Wind Max Direction (1 hour)",
+                wind10mMaxSpeed: "Wind Max Speed (10 min)",
+                wind10mMaxDir: "Wind Max Direction (10 min)",
+                wind2mAvgSpeed: "Wind Average Speed (2 min)",
+                wind2mAvgDir: "Wind Average Direction (2 min)",
+                rainThisHour: "Rain This Hour",
+                rainPrevHour: "Rain Previous Hour"
+            }
         };
     },
     async beforeCreate() {
@@ -89,7 +118,9 @@ export default {
                 this.user = user;
                 this.isAuthenticated = true;
                 this.setTimeWindow();
-                this.fetchData();
+                this.fetchData().then(data => {
+                    this.processData(data);
+                });
             })
             .catch(() => {
                 this.failedAuth = true;
@@ -99,54 +130,62 @@ export default {
         async fetchData() {
             if (this.stationParam) {
                 this.station = this.stationParam;
-                this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
-                this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
-                this.setSensor();
+                return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
             } else if (this.id) {
                 // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
                 if (this.id == 0) {
                     this.station = tempStations.stations[0];
-                    this.setSensor();
-                    this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
-                        this.summary = summary;
-                    });
-                    this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
-                        this.stationData = data;
-                    });
+                    return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                 } else {
                     this.api.getStation(this.id).then(station => {
                         this.station = station;
-                        this.setSensor();
-                        this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
-                            this.summary = summary;
-                        });
-                        this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000).then(data => {
-                            this.stationData = data;
-                        });
+                        return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                     });
                 }
             }
+        },
+        processData(data) {
+            let processed = [];
+            let sensors = [];
+            data.versions.forEach(v => {
+                v.meta.station.modules.forEach(m => {
+                    m.sensors.forEach(s => {
+                        sensors.push(s);
+                    });
+                });
+                v.data.forEach(d => {
+                    d.d.date = new Date(d.time * 1000);
+                    processed.push(d.d);
+                });
+            });
+            //sort data by date
+            processed.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            // get most recent reading for each sensor
+            let recent = processed[processed.length - 1];
+            sensors.forEach(s => {
+                s.currentReading = recent[s.key];
+            });
+            this.sensors = sensors;
+            this.stationData = processed;
+            this.setSensor();
         },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         setSensor() {
-            const modules = this.station.status_json.moduleObjects;
             // get selected sensor from url
             if (this.$route.query.sensor) {
-                modules.forEach(m => {
-                    m.sensorObjects.forEach(s => {
-                        if (s.name == this.$route.query.sensor) {
-                            this.selectedSensor = s;
-                        }
-                    });
+                this.sensors.forEach(s => {
+                    if (s.key == this.$route.query.sensor) {
+                        this.selectedSensor = s;
+                    }
                 });
             }
             // or set the first sensor to be selected sensor
             if (!this.$route.query.sensor || !this.selectedSensor) {
-                if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
-                    this.selectedSensor = modules[0].sensorObjects[0];
-                }
+                this.selectedSensor = this.sensors[0];
             }
         },
         setTimeWindow() {

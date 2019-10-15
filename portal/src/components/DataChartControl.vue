@@ -9,31 +9,31 @@
             </div>
             <div id="reading-btns-container">
                 <div
-                    v-for="sensor in this.allSensors"
-                    v-bind:key="sensor.id"
-                    :class="'reading' + (selectedSensor && selectedSensor.id == sensor.id ? ' active' : '')"
-                    :data-id="sensor.id"
+                    v-for="sensor in this.displaySensors"
+                    v-bind:key="sensor.key"
+                    :class="'reading' + (selectedSensor && selectedSensor.key == sensor.key ? ' active' : '')"
+                    :data-key="sensor.key"
                     v-on:click="switchSensor"
                 >
                     <div class="left">
                         <img
-                            v-if="labels[sensor.name] == 'Temperature'"
+                            v-if="labels[sensor.key] == 'Temperature'"
                             alt="temperature icon"
                             src="../assets/Temp_icon.png"
                         />
-                        {{ labels[sensor.name] ? labels[sensor.name] : sensor.name }}
+                        {{ labels[sensor.key] ? labels[sensor.key] : sensor.key }}
                     </div>
                     <div class="right">
                         <span class="reading-value">
                             {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
                         </span>
-                        <span class="reading-unit">{{ sensor.unit ? sensor.unit : "" }}</span>
+                        <span class="reading-unit">{{ sensor.units ? sensor.units : "" }}</span>
                     </div>
                 </div>
             </div>
             <div id="left-arrow-container">
                 <img
-                    v-if="this.allSensors.length > 5"
+                    v-if="this.displaySensors.length > 5"
                     v-on:click="showPrevSensor"
                     alt="left arrow"
                     src="../assets/left_arrow.png"
@@ -42,7 +42,7 @@
             </div>
             <div id="right-arrow-container">
                 <img
-                    v-if="this.allSensors.length > 5"
+                    v-if="this.displaySensors.length > 5"
                     v-on:click="showNextSensor"
                     alt="right arrow"
                     src="../assets/right_arrow.png"
@@ -81,7 +81,7 @@
                 <div class="spacer"></div>
             </div>
             <div id="selected-sensor-label" v-if="this.selectedSensor">
-                {{ labels[selectedSensor.name] ? labels[selectedSensor.name] : selectedSensor.name }}
+                {{ labels[selectedSensor.key] ? labels[selectedSensor.key] : selectedSensor.key }}
             </div>
             <div id="chart-type">
                 <select v-model="selected" v-on:change="chartTypeChanged">
@@ -92,6 +92,7 @@
             </div>
             <D3Chart
                 ref="d3Chart"
+                :station="station"
                 :stationData="stationData"
                 :selectedSensor="selectedSensor"
                 :chartType="chartType"
@@ -123,16 +124,7 @@ export default {
                 { text: "Histogram", value: "Histogram" },
                 { text: "Range", value: "Range" }
             ],
-            allSensors: [],
-            // temporary label system
-            labels: {
-                ph: "pH",
-                do: "Dissolved Oxygen",
-                ec: "Electrical Conductivity",
-                tds: "Total Dissolved Solids",
-                salinity: "Salinity",
-                temp: "Temperature"
-            },
+            displaySensors: [],
             timeButtons: [
                 {
                     active: false,
@@ -167,20 +159,10 @@ export default {
             ]
         };
     },
-    props: ["summary", "stationData", "station", "selectedSensor"],
+    props: ["stationData", "station", "sensors", "selectedSensor", "labels"],
     watch: {
-        summary: function(newVal, oldVal) {
-            // if(newVal.provisions.length == 0) {
-            //     this.message = "No data files uploaded for " + this.station.name + " yet.";
-            // }
-            console.log("summary", newVal.provisions, "was", oldVal);
-        },
-        station: function(_station) {
-            _station.status_json.moduleObjects.forEach(m => {
-                m.sensorObjects.forEach(s => {
-                    this.allSensors.push(s);
-                });
-            });
+        sensors(newVal) {
+            this.displaySensors = newVal;
         }
     },
     mounted() {
@@ -203,23 +185,23 @@ export default {
             return d.toLocaleDateString("en-US");
         },
         switchSensor(event) {
-            const id = event.target.getAttribute("data-id");
-            const sensor = this.allSensors.find(s => {
-                return s.id == id;
+            const key = event.target.getAttribute("data-key");
+            const sensor = this.displaySensors.find(s => {
+                return s.key == key;
             });
-            this.urlQuery.sensor = sensor.name;
+            this.urlQuery.sensor = sensor.key;
             this.updateRoute();
             this.$emit("switchedSensor", sensor);
         },
         showNextSensor() {
-            const first = this.allSensors[0];
-            this.allSensors.splice(0, 1);
-            this.allSensors.push(first);
+            const first = this.displaySensors[0];
+            this.displaySensors.splice(0, 1);
+            this.displaySensors.push(first);
         },
         showPrevSensor() {
-            const last = this.allSensors[this.allSensors.length - 1];
-            this.allSensors.splice(this.allSensors.length - 1, 1);
-            this.allSensors.unshift(last);
+            const last = this.displaySensors[this.displaySensors.length - 1];
+            this.displaySensors.splice(this.displaySensors.length - 1, 1);
+            this.displaySensors.unshift(last);
         },
         updateTime(event) {
             const time = event.target.getAttribute("data-time");

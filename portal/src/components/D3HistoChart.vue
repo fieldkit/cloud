@@ -9,7 +9,7 @@ const binCount = 16;
 
 export default {
     name: "D3HistoChart",
-    props: ["chart", "processedData", "layout", "selectedSensor"],
+    props: ["chart", "stationData", "layout", "selectedSensor"],
     data: () => {
         return {
             activeMode: false,
@@ -30,14 +30,13 @@ export default {
                 this.sensorChange();
             }
         },
-        processedData: function() {
+        stationData: function() {
             if (this.activeMode) {
                 this.makeHistogram();
             }
         }
     },
     methods: {
-        init() {},
         setStatus(status) {
             this.activeMode = status;
         },
@@ -62,13 +61,13 @@ export default {
             this.histogram = d3
                 .histogram()
                 .value(d => {
-                    return d[d3Chart.selectedSensor.name];
+                    return d[d3Chart.selectedSensor.key];
                 })
                 .domain(this.xHist.domain())
                 .thresholds(thresholds);
 
             // filter data by date
-            let filteredData = this.processedData.filter(d => {
+            let filteredData = this.stationData.filter(d => {
                 return d.date > d3Chart.chart.start && d.date < d3Chart.chart.end;
             });
             // apply histogram function
@@ -162,8 +161,8 @@ export default {
         sensorChange() {
             let d3Chart = this;
             // define extent for this sensor
-            this.chart.extent = d3.extent(this.processedData, d => {
-                return d[d3Chart.selectedSensor.name];
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
             });
             let bins = this.prepareHistogram();
             this.updateHistogram(bins);

@@ -11,7 +11,7 @@ const MIN_HEIGHT = 2;
 
 export default {
     name: "D3RangeChart",
-    props: ["chart", "processedData", "layout", "selectedSensor"],
+    props: ["chart", "stationData", "layout", "selectedSensor"],
     data: () => {
         return {
             activeMode: false,
@@ -32,7 +32,7 @@ export default {
                 this.sensorChange();
             }
         },
-        processedData: function() {
+        stationData: function() {
             if (this.activeMode) {
                 this.makeRange();
             }
@@ -79,7 +79,7 @@ export default {
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(this.processedData);
+            let bins = this.histogram(this.stationData);
 
             // set y scale
             this.yHist = d3
@@ -119,7 +119,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.max(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -132,7 +132,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.median(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -145,7 +145,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.min(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -161,7 +161,7 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const r = mx
                         ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
@@ -178,7 +178,7 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
@@ -218,8 +218,8 @@ export default {
         sensorChange() {
             let d3Chart = this;
             // define extent for this sensor
-            this.chart.extent = d3.extent(this.processedData, d => {
-                return d[d3Chart.selectedSensor.name];
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
             });
             let bins = this.prepareRange();
             this.updateRange(bins);
@@ -247,7 +247,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.max(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -260,7 +260,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.median(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -273,7 +273,7 @@ export default {
                         "stop-color",
                         this.colors(
                             d3.min(bin, d => {
-                                return d[d3Chart.selectedSensor.name];
+                                return d[d3Chart.selectedSensor.key];
                             })
                         )
                     )
@@ -288,7 +288,7 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const r = mx
                         ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
@@ -303,7 +303,7 @@ export default {
                 })
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
@@ -314,7 +314,7 @@ export default {
             bars.attr("height", 0)
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const r = mx
                         ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
@@ -331,7 +331,7 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.name];
+                        return b[d3Chart.selectedSensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
