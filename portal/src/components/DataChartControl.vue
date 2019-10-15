@@ -25,7 +25,7 @@
                     </div>
                     <div class="right">
                         <span class="reading-value">
-                            {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
+                            {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "--" }}
                         </span>
                         <span class="reading-unit">{{ sensor.units ? sensor.units : "" }}</span>
                     </div>

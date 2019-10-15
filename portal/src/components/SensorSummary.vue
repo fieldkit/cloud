@@ -1,6 +1,6 @@
 <template>
     <div id="sensor-summary-container" v-if="this.selectedSensor">
-        <div id="sensor-title">{{ this.labels[this.selectedSensor.name] }} Statistics</div>
+        <div id="sensor-title">{{ this.labels[this.selectedSensor.key] }} Statistics</div>
         <div class="sensor-summary-block" v-for="block in this.blocks" v-bind:key="block.label">
             <div class="block-heading">{{ block.label }}</div>
             <div class="block-reading">
@@ -94,10 +94,10 @@ export default {
 
             let sensorSummary = this;
             let extent = d3.extent(data, d => {
-                return d[sensorSummary.selectedSensor.name];
+                return d[sensorSummary.selectedSensor.key];
             });
             let median = d3.median(data, d => {
-                return d[sensorSummary.selectedSensor.name];
+                return d[sensorSummary.selectedSensor.key];
             });
             return { min: extent[0].toFixed(2), max: extent[1].toFixed(2), median: median.toFixed(2) };
         }
