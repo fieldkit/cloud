@@ -1,21 +1,133 @@
 <template>
-    <div id="sensor-summary-container" v-if="this.sensor">
-        <div id="sensor-title">{{ this.sensor.name }} Statistics</div>
-        <p>{{ this.sensor.currentReading ? this.sensor.currentReading.toFixed(1) : "ncR" }}</p>
+    <div id="sensor-summary-container" v-if="this.selectedSensor">
+        <div id="sensor-title">{{ this.labels[this.selectedSensor.name] }} Statistics</div>
+        <div class="sensor-summary-block" v-for="block in this.blocks" v-bind:key="block.label">
+            <div class="block-heading">{{ block.label }}</div>
+            <div class="block-reading">
+                <span class="left">Low</span><span class="right">{{ block.stats.min }}</span>
+            </div>
+            <div class="block-reading">
+                <span class="left">Median</span><span class="right">{{ block.stats.median }}</span>
+            </div>
+            <div class="block-reading">
+                <span class="left">High</span><span class="right">{{ block.stats.max }}</span>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import * as d3 from "d3";
+
+const DAY = 1000 * 60 * 60 * 24;
+const WEEK = DAY * 7;
+const MONTH = DAY * 30;
+
 export default {
     name: "SensorSummary",
-    props: ["sensor"],
-    watch: {
-        sensor: function() {}
+    props: ["selectedSensor", "stationData", "timeRange"],
+    computed: {
+        combinedData: function() {
+            let data = [];
+            if (this.stationData.versions) {
+                this.stationData.versions.forEach(v => {
+                    v.data.forEach(d => {
+                        d.d.date = new Date(d.time * 1000);
+                        data.push(d.d);
+                    });
+                });
+            }
+            //sort data by date
+            data.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            return data;
+        },
+        current: function() {
+            if (this.combinedData && this.combinedData.length > 0) {
+                let start = this.combinedData[0].date;
+                let end = this.combinedData[this.combinedData.length - 1].date;
+                if (this.timeRange) {
+                    start = this.timeRange.start;
+                    end = this.timeRange.end;
+                }
+                let filtered = this.combinedData.filter(d => {
+                    return d.date > start && d.date < end;
+                });
+                return this.computeStats(filtered);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        week: function() {
+            if (this.combinedData && this.combinedData.length > 0) {
+                let end = this.combinedData[this.combinedData.length - 1].date;
+                let start = new Date(end.getTime() - WEEK);
+                let filtered = this.combinedData.filter(d => {
+                    return d.date > start && d.date < end;
+                });
+                return this.computeStats(filtered);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        month: function() {
+            if (this.combinedData && this.combinedData.length > 0) {
+                let end = this.combinedData[this.combinedData.length - 1].date;
+                let start = new Date(end.getTime() - MONTH);
+                let filtered = this.combinedData.filter(d => {
+                    return d.date > start && d.date < end;
+                });
+                return this.computeStats(filtered);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        overall: function() {
+            if (this.combinedData && this.combinedData.length > 0) {
+                return this.computeStats(this.combinedData);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        blocks: function() {
+            return [
+                { label: "CURRENT VIEW", stats: this.current },
+                { label: "LAST 7 DAYS", stats: this.week },
+                { label: "LAST 30 DAYS", stats: this.month },
+                { label: "OVERALL", stats: this.overall }
+            ];
+        }
     },
     data: () => {
-        return {};
+        return {
+            // temporary label system
+            labels: {
+                ph: "pH",
+                do: "Dissolved Oxygen",
+                ec: "Electrical Conductivity",
+                tds: "Total Dissolved Solids",
+                salinity: "Salinity",
+                temp: "Temperature"
+            }
+        };
     },
-    methods: {}
+    methods: {
+        computeStats: function(data) {
+            if (data.length == 0) {
+                return { min: "--", max: "--", median: "--" };
+            }
+
+            let sensorSummary = this;
+            let extent = d3.extent(data, d => {
+                return d[sensorSummary.selectedSensor.name];
+            });
+            let median = d3.median(data, d => {
+                return d[sensorSummary.selectedSensor.name];
+            });
+            return { min: extent[0].toFixed(2), max: extent[1].toFixed(2), median: median.toFixed(2) };
+        }
+    }
 };
 </script>
 
@@ -29,7 +141,28 @@ export default {
 }
 #sensor-title {
     margin: 10px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgb(200, 200, 200);
+}
+.sensor-summary-block {
+    background-color: rgb(244, 245, 247);
+    padding: 4px 8px;
+    float: left;
+    width: 150px;
+    margin: 6px;
+}
+.block-heading {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.block-reading {
+    display: inline-block;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
 }
 </style>

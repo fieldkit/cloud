@@ -18,7 +18,12 @@
                         @timeChanged="onTimeChange"
                     />
                     <NotesList :station="station" />
-                    <SensorSummary :sensor="selectedSensor" />
+                    <SensorSummary
+                        ref="sensorSummary"
+                        :selectedSensor="selectedSensor"
+                        :stationData="stationData"
+                        :timeRange="timeRange"
+                    />
                 </div>
             </div>
         </div>
@@ -62,7 +67,8 @@ export default {
             selectedSensor: null,
             summary: [],
             isAuthenticated: false,
-            failedAuth: false
+            failedAuth: false,
+            timeRange: null
         };
     },
     async beforeCreate() {
@@ -118,8 +124,9 @@ export default {
         },
         onSensorSwitch(sensor) {
             this.selectedSensor = sensor;
-        onTimeChange(time) {
-            this.timeRange = time;
+        },
+        onTimeChange(range) {
+            this.timeRange = range;
         }
     }
 };
