@@ -76,9 +76,7 @@ export default {
             if (this.stationData.versions.length > 0) {
                 this.processedData = this.processData();
                 this.initSVG();
-                // drawing line chart by default
-                // NOTE: line chart hides loading div
-                this.$refs.d3LineChart.setStatus(true);
+                this.initChart();
             } else {
                 // TODO: handle lack of data more completely
                 document.getElementById("loading").style.display = "none";
@@ -125,16 +123,37 @@ export default {
                 return d[d3Chart.selectedSensor.name];
             });
 
-            this.chart.end = processed[processed.length - 1].date;
-            this.chart.start = processed[0].date;
+            if (this.$route.query.start && this.$route.query.end) {
+                this.chart.start = new Date(parseInt(this.$route.query.start));
+                this.chart.end = new Date(parseInt(this.$route.query.end));
+            } else {
+                this.chart.end = processed[processed.length - 1].date;
+                this.chart.start = processed[0].date;
+            }
 
             return processed;
         },
         initSVG() {
             this.chart.svg = d3.select(this.$refs.d3Stage);
-
             this.$refs.d3LineChart.init();
         },
+        initChart() {
+            const type = this.$route.query.type;
+            if (type) {
+                switch (type) {
+                    case "Line":
+                        this.$refs.d3LineChart.setStatus(true);
+                        break;
+                    case "Histogram":
+                        this.$refs.d3HistoChart.setStatus(true);
+                        break;
+                    case "Range":
+                        this.$refs.d3RangeChart.setStatus(true);
+                        break;
+                }
+            } else {
+                // draw line chart by default
+                this.$refs.d3LineChart.setStatus(true);
             }
         },
         usePresetTimeRange(time) {
@@ -167,6 +186,18 @@ export default {
                     this.$refs.d3RangeChart.setStatus(true);
                     this.$refs.d3RangeChart.makeRange();
                     break;
+            }
+        },
+        refresh() {
+            let newStart = this.processedData[0].date;
+            let newEnd = this.processedData[this.processedData.length - 1].date;
+            if (this.$route.query.start && this.$route.query.end) {
+                newStart = new Date(parseInt(this.$route.query.start));
+                newEnd = new Date(parseInt(this.$route.query.end));
+            }
+            if (newStart != this.chart.start || newEnd != this.chart.end) {
+                this.chart.start = newStart;
+                this.chart.end = newEnd;
             }
         }
     }

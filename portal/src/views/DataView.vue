@@ -10,6 +10,7 @@
                     </router-link>
                     <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
                     <DataChartControl
+                        ref="dataChartControl"
                         :summary="summary"
                         :stationData="stationData"
                         :station="station"
@@ -72,12 +73,22 @@ export default {
         };
     },
     async beforeCreate() {
+        const dataView = this;
+        window.onpopstate = function(event) {
+            // Note: event.state.key changes
+            dataView.componentKey = event.state ? event.state.key : 0;
+            dataView.setSensor();
+            dataView.setTimeWindow();
+            dataView.$refs.dataChartControl.refresh();
+        };
+
         this.api = new FKApi();
         this.api
             .getCurrentUser()
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
+                this.setTimeWindow();
                 this.fetchData();
             })
             .catch(() => {
@@ -90,15 +101,12 @@ export default {
                 this.station = this.stationParam;
                 this.summary = await this.api.getStationDataSummaryByDeviceId(this.station.device_id);
                 this.stationData = await this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
-                const modules = this.station.status_json.moduleObjects;
-                if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
-                    this.selectedSensor = modules[0].sensorObjects[0];
-                }
+                this.setSensor();
             } else if (this.id) {
                 // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
                 if (this.id == 0) {
                     this.station = tempStations.stations[0];
-                    this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
+                    this.setSensor();
                     this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
                         this.summary = summary;
                     });
@@ -108,7 +116,7 @@ export default {
                 } else {
                     this.api.getStation(this.id).then(station => {
                         this.station = station;
-                        this.selectedSensor = this.station.status_json.moduleObjects[0].sensorObjects[0];
+                        this.setSensor();
                         this.api.getStationDataSummaryByDeviceId(this.station.device_id).then(summary => {
                             this.summary = summary;
                         });
@@ -121,6 +129,34 @@ export default {
         },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
+        },
+        setSensor() {
+            const modules = this.station.status_json.moduleObjects;
+            // get selected sensor from url
+            if (this.$route.query.sensor) {
+                modules.forEach(m => {
+                    m.sensorObjects.forEach(s => {
+                        if (s.name == this.$route.query.sensor) {
+                            this.selectedSensor = s;
+                        }
+                    });
+                });
+            }
+            // or set the first sensor to be selected sensor
+            if (!this.$route.query.sensor || !this.selectedSensor) {
+                if (modules.length > 0 && modules[0].sensorObjects.length > 0) {
+                    this.selectedSensor = modules[0].sensorObjects[0];
+                }
+            }
+        },
+        setTimeWindow() {
+            if (this.$route.query.start && this.$route.query.end) {
+                let newStart = new Date(parseInt(this.$route.query.start));
+                let newEnd = new Date(parseInt(this.$route.query.end));
+                this.timeRange = { start: newStart, end: newEnd };
+            } else {
+                this.timeRange = null;
+            }
         },
         onSensorSwitch(sensor) {
             this.selectedSensor = sensor;

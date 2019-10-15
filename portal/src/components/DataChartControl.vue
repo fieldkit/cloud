@@ -115,6 +115,7 @@ export default {
     data: () => {
         return {
             message: "",
+            urlQuery: {},
             selected: "Line",
             chartType: "Line",
             options: [
@@ -167,7 +168,6 @@ export default {
         };
     },
     props: ["summary", "stationData", "station", "selectedSensor"],
-
     watch: {
         summary: function(newVal, oldVal) {
             // if(newVal.provisions.length == 0) {
@@ -183,6 +183,19 @@ export default {
             });
         }
     },
+    mounted() {
+        const keys = Object.keys(this.$route.query);
+        keys.forEach(k => {
+            this.urlQuery[k] = this.$route.query[k];
+        });
+        // set chart type from url
+        if (this.$route.query.type) {
+            this.chartType = this.$route.query.type;
+            this.selected = this.chartType;
+        }
+        // time window is set in D3Chart
+        // sensor is set in DataView
+    },
     methods: {
         getSyncedDate() {
             const date = this.station.status_json.updated;
@@ -194,6 +207,8 @@ export default {
             const sensor = this.allSensors.find(s => {
                 return s.id == id;
             });
+            this.urlQuery.sensor = sensor.name;
+            this.updateRoute();
             this.$emit("switchedSensor", sensor);
         },
         showNextSensor() {
@@ -216,8 +231,40 @@ export default {
             });
             this.$refs.d3Chart.usePresetTimeRange(time);
         },
+        onTimeChange(range) {
+            this.urlQuery.start = range.start.getTime();
+            this.urlQuery.end = range.end.getTime();
+            this.updateRoute();
+            this.$emit("timeChanged", range);
+        },
         chartTypeChanged() {
+            this.urlQuery.type = this.selected;
+            this.updateRoute();
             this.chartType = this.selected;
+        },
+        updateRoute() {
+            // temp temp temp
+            // just for demo of Ancient Goose, keep id = 0
+            // temp temp temp
+            let stationId = this.station.id;
+            if (stationId == 159) {
+                stationId = 0;
+            }
+            this.$router.push({ name: "dataById", params: { id: stationId }, query: this.urlQuery });
+        },
+        refresh() {
+            // refresh window (back or forward browser button pressed)
+            // set chart type from url
+            if (this.$route.query.type) {
+                this.selected = this.$route.query.type;
+                this.chartType = this.selected;
+            } else {
+                this.selected = "Line";
+                this.chartType = this.selected;
+            }
+            // time window is set in D3Chart
+            this.$refs.d3Chart.refresh();
+            // sensor was refreshed in DataView
         }
     }
 };
