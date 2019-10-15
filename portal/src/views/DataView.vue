@@ -118,8 +118,8 @@ export default {
                 this.user = user;
                 this.isAuthenticated = true;
                 this.setTimeWindow();
-                this.fetchData().then(data => {
-                    this.processData(data);
+                this.fetchData().then(result => {
+                    this.processData(result);
                 });
             })
             .catch(() => {
@@ -144,18 +144,22 @@ export default {
                 }
             }
         },
-        processData(data) {
+        processData(result) {
             let processed = [];
             let sensors = [];
-            data.versions.forEach(v => {
+            result.versions.forEach(v => {
                 v.meta.station.modules.forEach(m => {
                     m.sensors.forEach(s => {
                         sensors.push(s);
                     });
                 });
                 v.data.forEach(d => {
-                    d.d.date = new Date(d.time * 1000);
-                    processed.push(d.d);
+                    // HACK: for now only including ones with
+                    // sensor readings
+                    if (Object.keys(d.d).length > 0) {
+                        d.d.date = new Date(d.time * 1000);
+                        processed.push(d.d);
+                    }
                 });
             });
             //sort data by date
