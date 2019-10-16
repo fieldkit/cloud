@@ -220,7 +220,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	obj, err := svc.GetObject(goi)
 	if err != nil {
-		return fmt.Errorf("Error reading object %v: %v", object.Key, err)
+		return fmt.Errorf("error reading object %v: %v", object.Key, err)
 	}
 
 	defer obj.Body.Close()
@@ -308,7 +308,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
 	if err != nil {
-		newErr := fmt.Errorf("Error reading collection: %v", err)
+		newErr := fmt.Errorf("error reading collection: %v", err)
 		log.Errorw("Error", "error", newErr)
 		return newErr
 	}
