@@ -208,7 +208,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	object, err := GetBucketAndKey(i.URL)
 	if err != nil {
-		return fmt.Errorf("Error parsing URL: %v", err)
+		return fmt.Errorf("error parsing URL: %v", err)
 	}
 
 	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "stream_id", i.UploadID, "file_size", i.Size, "blocks", i.Blocks, "device_id", i.DeviceID, "user_id", i.UserID, "type", i.Type)
@@ -307,13 +307,14 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 	})
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
-	if err != nil {
-		newErr := fmt.Errorf("error reading collection: %v", err)
-		log.Errorw("Error", "error", newErr)
-		return newErr
-	}
 
 	log.Infow("processing done", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
+
+	if err != nil {
+		newErr := fmt.Errorf("error reading collection: %v", err)
+		log.Errorw("error", "error", newErr)
+		return newErr
+	}
 
 	return nil
 }

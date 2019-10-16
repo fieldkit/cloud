@@ -33,7 +33,7 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 		var messageLength uint64
 		for varIntBytes == 0 { // i.e. no varint has been decoded yet.
 			if bytesRead >= len(prefixBuf) {
-				return pbs, position, fmt.Errorf("Invalid varint32 encountered (position = %d)", position)
+				return pbs, position, fmt.Errorf("invalid varint32 encountered (position = %d)", position)
 			}
 			// We have to read byte by byte here to avoid reading more bytes
 			// than required. Each read byte is appended to what we have
@@ -43,7 +43,7 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 				if io.EOF == err {
 					return pbs, position, nil
 				} else if err != nil {
-					return pbs, position, fmt.Errorf("Error reading length (position = %d) (%v)", position, err)
+					return pbs, position, fmt.Errorf("error reading length (position = %d) (%v)", position, err)
 				}
 				// A Reader should not return (0, nil), but if it does,
 				// it should be treated as no-op (according to the
@@ -58,19 +58,19 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 		}
 
 		if messageLength > maximumMessageLength {
-			return pbs, position, fmt.Errorf("Refusing to allocate %d bytes (position = %d)", messageLength, position)
+			return pbs, position, fmt.Errorf("refusing to allocate %d bytes (position = %d)", messageLength, position)
 		}
 
 		messageBuf := make([]byte, messageLength)
 		newBytesRead, err := io.ReadFull(r, messageBuf)
 		bytesRead += newBytesRead
 		if err != nil {
-			return pbs, position, fmt.Errorf("Error reading message (position = %d) (%v)", position, err)
+			return pbs, position, fmt.Errorf("error reading message (position = %d) (%v)", position, err)
 		}
 
 		pb, err := f(messageBuf)
 		if nil != err {
-			return nil, position, fmt.Errorf("Error handling raw message (position = %d) (%v)", position, err)
+			return nil, position, fmt.Errorf("error handling raw message (position = %d) (%v)", position, err)
 		}
 
 		position += newBytesRead
