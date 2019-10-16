@@ -3,7 +3,10 @@ package backend
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/conservify/sqlxcache"
 
@@ -122,6 +125,35 @@ func (ra *RecordAdder) findLocation(dataRecord *pb.DataRecord) (l *data.Location
 	return
 }
 
+func hasNaNs(dr *pb.DataRecord) bool {
+	for _, sg := range dr.Readings.SensorGroups {
+		for _, sr := range sg.Readings {
+			if math.IsNaN(float64(sr.Value)) {
+				return true
+			}
+
+		}
+	}
+	return false
+}
+
+func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
+	if !hasNaNs(dr) {
+		return dr
+	}
+	for _, sg := range dr.Readings.SensorGroups {
+		newReadings := make([]*pb.SensorAndValue, len(sg.Readings))
+		for _, sr := range sg.Readings {
+			if !math.IsNaN(float64(sr.Value)) {
+				newReadings = append(newReadings, sr)
+			}
+
+		}
+		sg.Readings = newReadings
+	}
+	return dr
+}
+
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
 
@@ -143,7 +175,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := metaRecord.SetData(pr.DataRecord); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error setting meta json: %v", err)
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &metaRecord, `
@@ -181,8 +213,9 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 				Location:    location,
 			}
 
-			if err := dataRecord.SetData(pr.DataRecord); err != nil {
-				return nil, err
+			if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
+				spew.Dump(pr.DataRecord.Readings)
+				return nil, fmt.Errorf("error setting data json: %v", err)
 			}
 
 			if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
