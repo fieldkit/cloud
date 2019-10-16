@@ -47,6 +47,7 @@ type Config struct {
 	Emailer               string `split_words:"true" default:"default" required:"true"`
 	Archiver              string `split_words:"true" default:"default" required:"true"`
 	PortalRoot            string `split_words:"true"`
+	OcrPortalRoot         string `split_words:"true"`
 	LegacyRoot            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	ApiDomain             string `split_words:"true" default:""`
@@ -246,6 +247,18 @@ func main() {
 		portalServer = http.StripPrefix("/portal", singlePageApplication)
 	}
 
+	ocrPortalServer := notFoundHandler
+	if config.OcrPortalRoot != "" {
+		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+			Root: config.OcrPortalRoot,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		ocrPortalServer = http.StripPrefix("/ocr-portal", singlePageApplication)
+	}
+
 	legacyServer := notFoundHandler
 	if config.LegacyRoot != "" {
 		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
@@ -287,6 +300,10 @@ func main() {
 			if req.Host == config.Domain {
 				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
 					portalServer.ServeHTTP(w, req)
+					return
+				}
+				if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
+					ocrPortalServer.ServeHTTP(w, req)
 					return
 				}
 				return

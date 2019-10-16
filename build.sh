@@ -56,6 +56,9 @@ docker build -t fk-server-build server
 banner "PORTAL"
 docker build -t fk-portal-build portal
 
+banner "OCR-PORTAL"
+docker build -t fk-ocr-portal-build ocr-portal
+
 banner "LEGACY"
 docker build -t fk-legacy-build legacy
 
@@ -73,6 +76,11 @@ docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-ser
 mkdir build/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+
+mkdir build/ocr-portal
+docker rm -f fk-ocr-portal-build > /dev/null 2>&1 || true
+docker run --rm --name fk-ocr-portal-build -v $WORKING_DIRECTORY/build/ocr-portal:/build fk-ocr-portal-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
 
 mkdir build/legacy
@@ -94,6 +102,7 @@ Dockerfile' > build/.dockerignore
 echo 'FROM scratch
 ENV FIELDKIT_ADDR=:80
 ENV FIELDKIT_PORTAL_ROOT=/portal
+ENV FIELDKIT_OCR_PORTAL_ROOT=/ocr-portal
 ENV FIELDKIT_LEGACY_ROOT=/legacy
 COPY . /
 ADD ca-certificates.crt /etc/ssl/certs/
