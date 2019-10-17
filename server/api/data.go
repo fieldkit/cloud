@@ -594,9 +594,11 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				module := metaRecord.Modules[mi]
 				if internal || !isInternalModule(module) {
 					for si, r := range sg.Readings {
-						sensor := module.Sensors[si]
-						key := strcase.ToLowerCamel(sensor.Name)
-						data[key] = r.Value
+						if r != nil && si < len(module.Sensors) {
+							sensor := module.Sensors[si]
+							key := strcase.ToLowerCamel(sensor.Name)
+							data[key] = r.Value
+						}
 					}
 				}
 			}
