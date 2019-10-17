@@ -638,6 +638,7 @@ export default {
     padding: 16px 10px 16px 18px;
     background-color: #ffffff;
     border: 1px solid rgb(215, 220, 225);
+    cursor: pointer;
 }
 .reading.active {
     border-bottom: 3px solid #1b80c9;

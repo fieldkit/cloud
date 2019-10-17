@@ -85,6 +85,11 @@ export default {
             this.activeMode = status;
         },
         makeLine() {
+            let d3Chart = this;
+            this.filteredData = this.stationData.filter(d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+
             // Add the gradient area
             this.line
                 .append("linearGradient")
@@ -138,7 +143,7 @@ export default {
             // Add the line
             this.line
                 .append("path")
-                .data([this.stationData])
+                .data([this.filteredData])
                 .attr("class", "area")
                 .attr("fill", "url(#area-gradient)")
                 .attr("stroke", "none")
@@ -153,11 +158,10 @@ export default {
                 .attr("data-panel", this.chart.panelID)
                 .call(this.brush);
 
-            //Add dots
-            let d3Chart = this;
+            // Add dots
             this.line
                 .selectAll(".circles")
-                .data(this.stationData)
+                .data(this.filteredData)
                 .enter()
                 .append("circle")
                 .attr("class", "dot")
@@ -226,7 +230,7 @@ export default {
                 .select(".area")
                 .transition()
                 .duration(1000)
-                .attr("d", this.area(this.stationData));
+                .attr("d", this.area(this.filteredData));
 
             let d3Chart = this;
             this.line
@@ -243,7 +247,10 @@ export default {
         },
         sensorChange() {
             let d3Chart = this;
-            this.chart.extent = d3.extent(this.stationData, d => {
+            this.filteredData = this.stationData.filter(d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+            this.chart.extent = d3.extent(this.filteredData, d => {
                 return d[d3Chart.selectedSensor.key];
             });
             // update y domain with new extent
@@ -272,12 +279,26 @@ export default {
                 .select(".area")
                 .transition()
                 .duration(1000)
-                .attr("d", this.area(this.stationData));
+                .attr("d", this.area(this.filteredData));
 
             // update dots
-            this.line
-                .selectAll(".dot")
-                .transition()
+            let dots = this.line.selectAll(".dot").data(this.filteredData);
+
+            // add any new dots
+            dots.enter()
+                .append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => {
+                    return d3Chart.x(d.date);
+                })
+                .attr("cy", d => {
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                })
+                .attr("r", 2)
+                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]));
+
+            // updating any existing dots
+            dots.transition()
                 .duration(1000)
                 .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]))
                 .attr("cx", d => {
@@ -286,6 +307,9 @@ export default {
                 .attr("cy", d => {
                     return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 });
+
+            // remove any extra dots
+            dots.exit().remove();
 
             // update y axis
             this.yAxisGroup
