@@ -556,6 +556,15 @@ export default {
             this.initSelectedSensor();
             this.initTimeWindow();
         },
+        prepareNewStation() {
+            document.getElementById("loading").style.display = "block";
+            this.foundNoData = false;
+            this.loading = true;
+            this.charts = [];
+            this.linkedCharts = true;
+            this.urlQuery = {};
+            this.prevQuery = {};
+        },
         getSyncedDate() {
             if (!this.station.status_json) {
                 return "N/A";

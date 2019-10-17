@@ -8,7 +8,7 @@
                     <router-link :to="{ name: 'stations' }">
                         <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
                     </router-link>
-                    <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
+                    <div id="station-name">{{ this.station ? this.station.name : "" }}</div>
                     <DataChartControl
                         ref="dataChartControl"
                         :combinedStationInfo="combinedStationInfo"
@@ -67,6 +67,7 @@ export default {
             user: {},
             noStation: false,
             station: null,
+            stationId: null,
             stationData: [],
             stations: [],
             sensors: [],
@@ -108,12 +109,22 @@ export default {
         window.onpopstate = function(event) {
             // Note: event.state.key changes
             dataView.componentKey = event.state ? event.state.key : 0;
-            dataView.$refs.dataChartControl.refresh();
+            if (dataView.id != dataView.$route.params.id) {
+                dataView.getStationFromRoute();
+            } else {
+                dataView.$refs.dataChartControl.refresh();
+            }
         };
         this.api = new FKApi();
         this.api
             .getCurrentUser()
             .then(user => {
+                if (this.stationParam) {
+                    this.station = this.stationParam;
+                }
+                if (this.id) {
+                    this.stationId = this.id;
+                }
                 this.user = user;
                 this.isAuthenticated = true;
                 this.api.getStations().then(s => {
@@ -129,16 +140,15 @@ export default {
     },
     methods: {
         async fetchData() {
-            if (this.stationParam) {
-                this.station = this.stationParam;
+            if (this.station) {
                 return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
-            } else if (this.id) {
+            } else if (this.stationId) {
                 // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
-                if (this.id == 0) {
+                if (this.stationId == 0) {
                     this.station = tempStations.stations[0];
                     return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                 } else {
-                    return this.api.getStation(this.id).then(station => {
+                    return this.api.getStation(this.stationId).then(station => {
                         this.station = station;
                         return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                     });
@@ -195,9 +205,21 @@ export default {
         onTimeChange(range) {
             this.timeRange = range;
         },
+        getStationFromRoute() {
+            this.stationId = this.$route.params.id;
+            this.station = null;
+            this.showStation();
+        },
         showStation(station) {
-            this.$router.push({ name: "dataById", params: { id: station.id } });
-            this.$router.go();
+            if (station) {
+                this.$router.push({ name: "dataById", params: { id: station.id } });
+                this.station = station;
+            }
+            this.$refs.dataChartControl.prepareNewStation();
+            this.selectedSensor = null;
+            this.fetchData().then(result => {
+                this.processData(result);
+            });
         }
     }
 };
