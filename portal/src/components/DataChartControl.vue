@@ -1,14 +1,14 @@
 <template>
     <div id="data-chart-container">
-        <div v-if="!this.station" class="no-data-message">
+        <div v-if="this.noStation" class="no-data-message">
             <p>No station found.</p>
         </div>
-        <div v-if="this.station && this.noData" class="no-data-message">
+        <div v-if="this.station && this.foundNoData" class="no-data-message">
             <p>No data from {{ station.name }} has been uploaded yet.</p>
         </div>
-        <div id="readings-container" class="section" v-if="this.station && !this.noData">
+        <div id="readings-container" class="section" v-if="this.station && !this.loading">
             <div id="readings-label">
-                Latest Reading <span class="synced">Last synced {{ getSyncedDate() }}</span>
+                Latest Reading <span class="synced">{{ getSyncedDate() }}</span>
             </div>
             <!-- top row sensor selection buttons -->
             <div id="reading-btns-container">
@@ -58,7 +58,7 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
 
-        <div class="white-bkgd" v-if="this.station && !this.noData">
+        <div class="white-bkgd" v-if="this.station && !this.loading">
             <!-- export/share/compare and time window buttons -->
             <div id="selected-sensor-controls">
                 <div id="control-btn-container">
@@ -155,7 +155,8 @@ export default {
     },
     data: () => {
         return {
-            noData: false,
+            foundNoData: false,
+            loading: true,
             charts: [],
             stationData: [],
             linkedCharts: true,
@@ -202,7 +203,7 @@ export default {
             ]
         };
     },
-    props: ["combinedStationInfo", "station", "labels"],
+    props: ["combinedStationInfo", "station", "labels", "noStation"],
     watch: {
         combinedStationInfo() {
             if (this.combinedStationInfo.stationData) {
@@ -213,8 +214,9 @@ export default {
                     this.initTimeWindow();
                     this.initChartType();
                     this.initCharts();
+                    this.loading = false;
                 } else {
-                    this.noData = true;
+                    this.foundNoData = true;
                     document.getElementById("loading").style.display = "none";
                 }
             }
@@ -555,9 +557,12 @@ export default {
             this.initTimeWindow();
         },
         getSyncedDate() {
+            if (!this.station.status_json) {
+                return "N/A";
+            }
             const date = this.station.status_json.updated;
             const d = new Date(date);
-            return d.toLocaleDateString("en-US");
+            return "Last synced " + d.toLocaleDateString("en-US");
         }
     }
 };
@@ -566,7 +571,6 @@ export default {
 <style scoped>
 #loading {
     float: left;
-    margin-top: -210px;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);

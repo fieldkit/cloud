@@ -13,6 +13,7 @@
                         ref="dataChartControl"
                         :combinedStationInfo="combinedStationInfo"
                         :station="station"
+                        :noStation="noStation"
                         :labels="labels"
                         @switchedSensor="onSensorSwitch"
                         @timeChanged="onTimeChange"
@@ -64,6 +65,7 @@ export default {
     data: () => {
         return {
             user: {},
+            noStation: false,
             station: null,
             stationData: [],
             stations: [],
@@ -141,6 +143,8 @@ export default {
                         return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
                     });
                 }
+            } else {
+                this.noStation = true;
             }
         },
         processData(result) {
