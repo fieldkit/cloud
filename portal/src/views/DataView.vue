@@ -1,7 +1,7 @@
 <template>
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <SidebarNav viewing="data" />
+        <SidebarNav viewing="data" :stations="stations" @showStation="showStation" />
         <div id="data-view-background" v-show="isAuthenticated">
             <div class="main-panel">
                 <div id="data-container">
@@ -17,7 +17,7 @@
                         @switchedSensor="onSensorSwitch"
                         @timeChanged="onTimeChange"
                     />
-                    <NotesList :station="station" />
+                    <NotesList :station="station" :selectedSensor="selectedSensor" />
                     <SensorSummary
                         ref="sensorSummary"
                         :sensors="sensors"
@@ -66,6 +66,7 @@ export default {
             user: {},
             station: null,
             stationData: [],
+            stations: [],
             sensors: [],
             combinedStationInfo: {},
             selectedSensor: null,
@@ -107,13 +108,15 @@ export default {
             dataView.componentKey = event.state ? event.state.key : 0;
             dataView.$refs.dataChartControl.refresh();
         };
-
         this.api = new FKApi();
         this.api
             .getCurrentUser()
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
+                this.api.getStations().then(s => {
+                    this.stations = s.stations;
+                });
                 this.fetchData().then(result => {
                     this.processData(result);
                 });
@@ -187,6 +190,10 @@ export default {
         },
         onTimeChange(range) {
             this.timeRange = range;
+        },
+        showStation(station) {
+            this.$router.push({ name: "dataById", params: { id: station.id } });
+            this.$router.go();
         }
     }
 };

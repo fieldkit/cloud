@@ -1,7 +1,7 @@
 <template>
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <SidebarNav viewing="stations" :stations="stations" @showStationSummary="showSummary" />
+        <SidebarNav viewing="stations" :stations="stations" @showStation="showSummary" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
                 :access-token="mapboxToken"

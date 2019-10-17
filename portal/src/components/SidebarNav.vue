@@ -24,7 +24,7 @@
                 </div>
             </router-link>
             <div v-for="station in stations" v-bind:key="station.id">
-                <div class="station-link" v-on:click="showSummary" :data-id="station.id">
+                <div class="station-link" v-on:click="showStation" :data-id="station.id">
                     {{ station.name }}
                 </div>
             </div>
@@ -69,12 +69,12 @@ export default {
         }
     },
     methods: {
-        showSummary(event) {
+        showStation(event) {
             const id = event.target.getAttribute("data-id");
             const station = this.stations.find(s => {
                 return s.id == id;
             });
-            this.$emit("showStationSummary", station);
+            this.$emit("showStation", station);
         }
     }
 };
@@ -99,6 +99,7 @@ export default {
 }
 
 #inner-nav {
+    width: inherit;
     text-align: left;
     padding-top: 20px;
     padding-left: 15px;
