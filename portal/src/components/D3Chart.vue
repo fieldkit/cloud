@@ -5,6 +5,7 @@
             preserveAspectRatio="xMidYMid meet"
             :width="outerWidth"
             :height="outerHeight"
+            @dblclick="zoomOut"
         >
             <g :style="stageStyle">
                 <g ref="d3Stage"></g>
@@ -41,8 +42,6 @@ import D3LineChart from "./D3LineChart";
 import D3HistoChart from "./D3HistoChart";
 import D3RangeChart from "./D3RangeChart";
 
-const DAY = 1000 * 60 * 60 * 24;
-
 export default {
     name: "D3Chart",
     components: {
@@ -50,7 +49,7 @@ export default {
         D3HistoChart,
         D3RangeChart
     },
-    props: ["station", "stationData", "selectedSensor", "chartType"],
+    props: ["id", "station", "stationData", "selectedSensor", "chartType", "parent"],
     data: () => {
         return {
             chart: {
@@ -71,15 +70,6 @@ export default {
         };
     },
     watch: {
-        stationData: function() {
-            if (this.stationData.length > 0) {
-                this.initChart();
-                this.initSVG();
-            } else {
-                // TODO: handle lack of data more completely
-                document.getElementById("loading").style.display = "none";
-            }
-        },
         chartType: function() {
             this.chartTypeChange();
         }
@@ -101,6 +91,26 @@ export default {
         }
     },
     methods: {
+        initChild(range) {
+            this.chart.start = range.start;
+            this.chart.end = range.end;
+            this.initChart();
+            this.initSVG();
+            switch (this.chartType) {
+                case "Line":
+                    this.$refs.d3LineChart.makeLine();
+                    break;
+                case "Histogram":
+                    this.$refs.d3HistoChart.makeHistogram();
+                    break;
+                case "Range":
+                    this.$refs.d3RangeChart.makeRange();
+                    break;
+                default:
+                    this.$refs.d3LineChart.makeLine();
+                    break;
+            }
+        },
         initSVG() {
             this.chart.svg = d3.select(this.$refs.d3Stage);
             this.$refs.d3LineChart.init();
@@ -111,48 +121,48 @@ export default {
             this.chart.extent = d3.extent(this.stationData, d => {
                 return d[d3Chart.selectedSensor.key];
             });
-
-            if (this.$route.query.start && this.$route.query.end) {
-                this.chart.start = new Date(parseInt(this.$route.query.start));
-                this.chart.end = new Date(parseInt(this.$route.query.end));
-            } else {
-                this.chart.end = this.stationData[this.stationData.length - 1].date;
-                this.chart.start = this.stationData[0].date;
-            }
-
-            const type = this.$route.query.type;
-            if (type) {
-                switch (type) {
-                    case "Line":
-                        this.$refs.d3LineChart.setStatus(true);
-                        break;
-                    case "Histogram":
-                        this.$refs.d3HistoChart.setStatus(true);
-                        break;
-                    case "Range":
-                        this.$refs.d3RangeChart.setStatus(true);
-                        break;
-                }
-            } else {
-                // draw line chart by default
-                this.$refs.d3LineChart.setStatus(true);
+            switch (this.chartType) {
+                case "Line":
+                    this.$refs.d3LineChart.setStatus(true);
+                    break;
+                case "Histogram":
+                    this.$refs.d3HistoChart.setStatus(true);
+                    break;
+                case "Range":
+                    this.$refs.d3RangeChart.setStatus(true);
+                    break;
+                default:
+                    this.$refs.d3LineChart.setStatus(true);
+                    break;
             }
         },
-        usePresetTimeRange(time) {
-            this.chart.start = this.stationData[0].date;
-            this.chart.end = new Date(this.chart.start.getTime() + time * DAY);
-            if (time == 0) {
-                this.chart.end = this.stationData[this.stationData.length - 1].date;
+        setTimeRange(range) {
+            this.chart.start = range.start;
+            this.chart.end = range.end;
+            switch (this.chartType) {
+                case "Line":
+                    this.$refs.d3LineChart.timeChanged();
+                    break;
+                case "Histogram":
+                    this.$refs.d3HistoChart.timeChanged();
+                    break;
+                case "Range":
+                    this.$refs.d3RangeChart.timeChanged();
+                    break;
             }
-            this.$emit("timeChanged", { start: this.chart.start, end: this.chart.end });
         },
         onTimeZoom(range) {
-            this.$emit("timeChanged", range);
+            if (this.parent) {
+                this.$emit("timeZoomed", range);
+            } else {
+                this.$emit("unlinkCharts");
+            }
         },
         chartTypeChange() {
             this.$refs.d3LineChart.setStatus(false);
             this.$refs.d3HistoChart.setStatus(false);
             this.$refs.d3RangeChart.setStatus(false);
+            // clear this svg and start fresh
             this.chart.svg.html(null);
             this.initSVG();
             switch (this.chartType) {
@@ -170,17 +180,8 @@ export default {
                     break;
             }
         },
-        refresh() {
-            let newStart = this.stationData[0].date;
-            let newEnd = this.stationData[this.stationData.length - 1].date;
-            if (this.$route.query.start && this.$route.query.end) {
-                newStart = new Date(parseInt(this.$route.query.start));
-                newEnd = new Date(parseInt(this.$route.query.end));
-            }
-            if (newStart != this.chart.start || newEnd != this.chart.end) {
-                this.chart.start = newStart;
-                this.chart.end = newEnd;
-            }
+        zoomOut() {
+            this.$emit("zoomOut", { parent: this.parent, id: this.id });
         }
     }
 };

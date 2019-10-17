@@ -11,10 +11,8 @@
                     <div id="station-name">{{ this.station ? this.station.name : "Data" }}</div>
                     <DataChartControl
                         ref="dataChartControl"
-                        :stationData="stationData"
+                        :combinedStationInfo="combinedStationInfo"
                         :station="station"
-                        :sensors="sensors"
-                        :selectedSensor="selectedSensor"
                         :labels="labels"
                         @switchedSensor="onSensorSwitch"
                         @timeChanged="onTimeChange"
@@ -44,7 +42,7 @@
 </template>
 
 <script>
-// import _ from "lodash";
+import _ from "lodash";
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
@@ -69,6 +67,7 @@ export default {
             station: null,
             stationData: [],
             sensors: [],
+            combinedStationInfo: {},
             selectedSensor: null,
             summary: [],
             isAuthenticated: false,
@@ -106,8 +105,6 @@ export default {
         window.onpopstate = function(event) {
             // Note: event.state.key changes
             dataView.componentKey = event.state ? event.state.key : 0;
-            dataView.setSensor();
-            dataView.setTimeWindow();
             dataView.$refs.dataChartControl.refresh();
         };
 
@@ -117,7 +114,6 @@ export default {
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                this.setTimeWindow();
                 this.fetchData().then(result => {
                     this.processData(result);
                 });
@@ -168,38 +164,16 @@ export default {
             });
             // get most recent reading for each sensor
             let recent = processed[processed.length - 1];
+            sensors = _.uniqBy(sensors, "key");
             sensors.forEach(s => {
                 s.currentReading = recent[s.key];
             });
             this.sensors = sensors;
             this.stationData = processed;
-            this.setSensor();
+            this.combinedStationInfo = { sensors: sensors, stationData: processed };
         },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
-        },
-        setSensor() {
-            // get selected sensor from url
-            if (this.$route.query.sensor) {
-                this.sensors.forEach(s => {
-                    if (s.key == this.$route.query.sensor) {
-                        this.selectedSensor = s;
-                    }
-                });
-            }
-            // or set the first sensor to be selected sensor
-            if (!this.$route.query.sensor || !this.selectedSensor) {
-                this.selectedSensor = this.sensors[0];
-            }
-        },
-        setTimeWindow() {
-            if (this.$route.query.start && this.$route.query.end) {
-                let newStart = new Date(parseInt(this.$route.query.start));
-                let newEnd = new Date(parseInt(this.$route.query.end));
-                this.timeRange = { start: newStart, end: newEnd };
-            } else {
-                this.timeRange = null;
-            }
         },
         onSensorSwitch(sensor) {
             this.selectedSensor = sensor;

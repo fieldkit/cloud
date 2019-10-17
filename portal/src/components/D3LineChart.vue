@@ -15,16 +15,6 @@ export default {
         };
     },
     watch: {
-        chart: {
-            handler: function(newChart) {
-                if (this.drawn && this.activeMode) {
-                    if (newChart.start != this.x.domain()[0] || newChart.end != this.x.domain()[1]) {
-                        this.timeChange();
-                    }
-                }
-            },
-            deep: true
-        },
         selectedSensor: function() {
             if (this.drawn && this.activeMode) {
                 this.sensorChange();
@@ -184,10 +174,11 @@ export default {
             this.xAxis = d3.axisBottom(this.x).ticks(10);
             this.yAxis = d3.axisLeft(this.y).ticks(6);
 
+            this.chart.svg.selectAll(".x-axis").remove();
             //Add x axis
             this.xAxisGroup = this.chart.svg
                 .append("g")
-                .attr("class", "x axis")
+                .attr("class", "x-axis")
                 .attr(
                     "transform",
                     "translate(" +
@@ -198,10 +189,11 @@ export default {
                 )
                 .call(this.xAxis);
 
+            this.chart.svg.selectAll(".y-axis").remove();
             //Add y axis
             this.yAxisGroup = this.chart.svg
                 .append("g")
-                .attr("class", "y axis")
+                .attr("class", "y-axis")
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
@@ -218,10 +210,10 @@ export default {
             this.chart.end = this.x.invert(xRange[1]);
             // Remove the grey brush area after selection
             this.chart.svg.select(".brush").call(this.brush.move, null);
-            this.timeChange();
+            this.timeChanged();
             this.$emit("timeZoomed", { start: this.chart.start, end: this.chart.end });
         },
-        timeChange() {
+        timeChanged() {
             // update x scale
             this.x.domain([this.chart.start, this.chart.end]);
 
@@ -254,8 +246,16 @@ export default {
             this.chart.extent = d3.extent(this.stationData, d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            // update y domain with new extent
+            this.y.domain(this.chart.extent);
 
-            // Area gradient fill
+            // update colors
+            this.colors = d3
+                .scaleSequential()
+                .domain(this.chart.extent)
+                .interpolator(d3.interpolatePlasma);
+
+            // area gradient fill
             this.area = d3
                 .area()
                 .x(d => {
@@ -267,17 +267,31 @@ export default {
                 })
                 .curve(d3.curveBasis);
 
-            // Update y axis
-            this.y.domain(this.chart.extent);
+            // update line area
+            this.line
+                .select(".area")
+                .transition()
+                .duration(1000)
+                .attr("d", this.area(this.stationData));
+
+            // update dots
+            this.line
+                .selectAll(".dot")
+                .transition()
+                .duration(1000)
+                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]))
+                .attr("cx", d => {
+                    return d3Chart.x(d.date);
+                })
+                .attr("cy", d => {
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                });
+
+            // update y axis
             this.yAxisGroup
                 .transition()
                 .duration(1000)
                 .call(d3.axisLeft(this.y));
-
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
         }
     }
 };

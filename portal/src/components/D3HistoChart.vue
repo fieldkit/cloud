@@ -17,14 +17,6 @@ export default {
         };
     },
     watch: {
-        chart: {
-            handler: function() {
-                if (this.drawn && this.activeMode) {
-                    this.chartChanged();
-                }
-            },
-            deep: true
-        },
         selectedSensor: function() {
             if (this.drawn && this.activeMode) {
                 this.sensorChange();
@@ -128,10 +120,11 @@ export default {
                               d3Chart.layout.marginTop;
                 });
 
+            this.chart.svg.selectAll(".x-axis").remove();
             // add x axis
             this.xAxisGroup = this.chart.svg
                 .append("g")
-                .attr("class", "x axis")
+                .attr("class", "x-axis")
                 .attr(
                     "transform",
                     "translate(" +
@@ -142,19 +135,18 @@ export default {
                 )
                 .call(this.xAxis);
 
+            this.chart.svg.selectAll(".y-axis").remove();
             // add y axis
             this.yAxisGroup = this.chart.svg
                 .append("g")
-                .attr("class", "y axis")
+                .attr("class", "y-axis")
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
             this.drawn = true;
             document.getElementById("loading").style.display = "none";
         },
-        chartChanged() {
-            // chart changes when start and end dates change
-            // but possibly at other events, too - TODO: distinguish btw those
+        timeChanged() {
             let bins = this.prepareHistogram();
             this.updateHistogram(bins);
         },
