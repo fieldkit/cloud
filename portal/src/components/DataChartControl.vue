@@ -1,9 +1,12 @@
 <template>
     <div id="data-chart-container">
         <div v-if="!this.station" class="no-data-message">
-            <p>No data yet.</p>
+            <p>No station found.</p>
         </div>
-        <div id="readings-container" class="section" v-if="this.station">
+        <div v-if="this.station && this.noData" class="no-data-message">
+            <p>No data from {{ station.name }} has been uploaded yet.</p>
+        </div>
+        <div id="readings-container" class="section" v-if="this.station && !this.noData">
             <div id="readings-label">
                 Latest Reading <span class="synced">Last synced {{ getSyncedDate() }}</span>
             </div>
@@ -55,7 +58,7 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
 
-        <div class="white-bkgd" v-if="this.station">
+        <div class="white-bkgd" v-if="this.station && !this.noData">
             <!-- export/share/compare and time window buttons -->
             <div id="selected-sensor-controls">
                 <div id="control-btn-container">
@@ -152,7 +155,7 @@ export default {
     },
     data: () => {
         return {
-            message: "",
+            noData: false,
             charts: [],
             stationData: [],
             linkedCharts: true,
@@ -205,10 +208,15 @@ export default {
             if (this.combinedStationInfo.stationData) {
                 this.stationData = this.combinedStationInfo.stationData;
                 this.displaySensors = this.combinedStationInfo.sensors;
-                this.initSelectedSensor();
-                this.initTimeWindow();
-                this.initChartType();
-                this.initCharts();
+                if (this.stationData.length > 0) {
+                    this.initSelectedSensor();
+                    this.initTimeWindow();
+                    this.initChartType();
+                    this.initCharts();
+                } else {
+                    this.noData = true;
+                    document.getElementById("loading").style.display = "none";
+                }
             }
         }
     },

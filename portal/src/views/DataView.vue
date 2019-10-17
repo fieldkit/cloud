@@ -141,6 +141,13 @@ export default {
             }
         },
         processData(result) {
+            if (!result) {
+                this.sensors = [];
+                this.stationData = [];
+                this.combinedStationInfo = { sensors: this.sensors, stationData: this.stationData };
+                return;
+            }
+
             let processed = [];
             let sensors = [];
             result.versions.forEach(v => {

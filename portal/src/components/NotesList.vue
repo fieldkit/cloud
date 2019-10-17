@@ -1,5 +1,5 @@
 <template>
-    <div id="notes-list-container" v-if="this.station">
+    <div id="notes-list-container" v-if="this.selectedSensor">
         <div id="notes-title">Notes & Comments</div>
         <p>No notes yet</p>
     </div>
@@ -8,7 +8,7 @@
 <script>
 export default {
     name: "NotesList",
-    props: ["station"],
+    props: ["station", "selectedSensor"],
     data: () => {
         return {};
     },
