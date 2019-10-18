@@ -247,7 +247,12 @@ export default {
             }
         },
         addChartFromParams() {
-            const id = this.charts.length + 1;
+            let id = this.charts.length + 1;
+            if (this.charts.length > 0) {
+                const lastChart = this.charts[this.charts.length - 1];
+                const lastChartId = parseInt(lastChart.id.split("chart-")[1]);
+                id = lastChartId + 1;
+            }
             const chartId = "chart-" + id;
             const sensorOption = this.$route.query[chartId + "sensor"]
                 ? this.$route.query[chartId + "sensor"]
@@ -256,6 +261,13 @@ export default {
                 return s.key == sensorOption;
             });
             const type = this.$route.query[chartId + "type"] ? this.$route.query[chartId + "type"] : "Line";
+            let range = this.timeRange;
+            if (this.$route.query[chartId + "start"] && this.$route.query[chartId + "end"]) {
+                range = {
+                    start: new Date(parseInt(this.$route.query[chartId + "start"])),
+                    end: new Date(parseInt(this.$route.query[chartId + "end"]))
+                };
+            }
             const newChart = {
                 id: "chart-" + id,
                 ref: "d3Chart" + id,
@@ -270,12 +282,14 @@ export default {
             let interval = setInterval(() => {
                 if (this.$refs[newChart.ref]) {
                     clearInterval(interval);
-                    this.$refs[newChart.ref][0].initChild(this.timeRange);
+                    this.$refs[newChart.ref][0].initChild(range);
                 }
             }, 250);
         },
         addChildChart() {
-            const id = this.charts.length + 1;
+            const lastChart = this.charts[this.charts.length - 1];
+            const lastChartId = parseInt(lastChart.id.split("chart-")[1]);
+            const id = lastChartId + 1;
             const newChart = {
                 id: "chart-" + id,
                 ref: "d3Chart" + id,
@@ -477,9 +491,20 @@ export default {
             });
             this.propagateTimeChange(true);
         },
-        onTimeZoomed(range) {
-            this.timeRange = range;
-            this.propagateTimeChange(this.linkedCharts);
+        onTimeZoomed(zoomed) {
+            if (zoomed.parent) {
+                this.timeRange = zoomed.range;
+                this.propagateTimeChange(this.linkedCharts);
+            } else {
+                // only update url for the chart that emitted this zoom
+                const chart = this.charts.find(c => {
+                    return c.id == zoomed.id;
+                });
+                this.urlQuery[chart.id + "start"] = zoomed.range.start.getTime();
+                this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
+                this.updateRoute();
+                this.unlinkCharts();
+            }
         },
         propagateTimeChange(setForAll) {
             if (setForAll) {
@@ -550,11 +575,44 @@ export default {
                 });
             }
         },
+
+        updateNumberOfCharts() {
+            return new Promise(resolve => {
+                let extra = 0;
+                let missing = 0;
+                if (this.$route.query.numCharts) {
+                    if (this.$route.query.numCharts != this.charts.length) {
+                        if (this.$route.query.numCharts < this.charts.length) {
+                            extra = this.charts.length - this.$route.query.numCharts;
+                        } else if (this.$route.query.numCharts > this.charts.length) {
+                            missing = this.$route.query.numCharts - this.charts.length;
+                        }
+                    }
+                } else if (this.charts.length > 1) {
+                    // no numCharts in params, but we have more than one
+                    extra = this.charts.length - 1;
+                }
+                for (let i = 0; i < extra; i++) {
+                    this.charts.splice(this.charts.length - 1, 1);
+                }
+                for (let i = 0; i < missing; i++) {
+                    this.addChartFromParams();
+                }
+                if (missing > 0) {
+                    // takes a moment for refs to become defined
+                    setTimeout(resolve, 500);
+                } else {
+                    resolve();
+                }
+            });
+        },
         refresh() {
             // refresh window (back or forward browser button pressed)
-            this.initChartType();
-            this.initSelectedSensor();
-            this.initTimeWindow();
+            this.updateNumberOfCharts().then(() => {
+                this.initSelectedSensor();
+                this.initTimeWindow();
+                this.initChartType();
+            });
         },
         prepareNewStation() {
             document.getElementById("loading").style.display = "block";

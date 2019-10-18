@@ -152,11 +152,7 @@ export default {
             }
         },
         onTimeZoom(range) {
-            if (this.parent) {
-                this.$emit("timeZoomed", range);
-            } else {
-                this.$emit("unlinkCharts");
-            }
+            this.$emit("timeZoomed", { range: range, parent: this.parent, id: this.id });
         },
         chartTypeChange() {
             this.$refs.d3LineChart.setStatus(false);
