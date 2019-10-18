@@ -200,7 +200,7 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 	log.Infow("summary", "device_id", deviceIdBytes)
 
 	provisions := make([]*data.Provision, 0)
-	if err := c.options.Database.SelectContext(ctx, &provisions, `SELECT * FROM fieldkit.provision WHERE (device_id = $1)`, deviceIdBytes); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &provisions, `SELECT * FROM fieldkit.provision WHERE (device_id = $1) ORDER BY updated DESC`, deviceIdBytes); err != nil {
 		return err
 	}
 
