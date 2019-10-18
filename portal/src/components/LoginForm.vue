@@ -57,7 +57,7 @@ export default {
             event.preventDefault();
             try {
                 const api = new FKApi();
-                const auth = await api.login(this.email, this.password);
+                const auth = await api.login(this.email.toLowerCase(), this.password);
                 const isAuthenticated = await api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
