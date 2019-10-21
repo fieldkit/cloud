@@ -187,11 +187,13 @@ export default {
                 return a.date.getTime() - b.date.getTime();
             });
             // get most recent reading for each sensor
-            let recent = processed[processed.length - 1];
-            sensors = _.uniqBy(sensors, "key");
-            sensors.forEach(s => {
-                s.currentReading = recent[s.key];
-            });
+            if (processed.length > 0) {
+                let recent = processed[processed.length - 1];
+                sensors = _.uniqBy(sensors, "key");
+                sensors.forEach(s => {
+                    s.currentReading = recent[s.key];
+                });
+            }
             this.sensors = sensors;
             this.stationData = processed;
             this.combinedStationInfo = { sensors: sensors, stationData: processed };
