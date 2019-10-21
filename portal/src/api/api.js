@@ -6,7 +6,10 @@ class FKApi {
     constructor() {
         this.baseUrl = API_HOST;
         this.token = new TokenStorage();
-        this.handleResponse = this.handleResponse.bind(this);
+    }
+
+    authenticated() {
+        return this.token.authenticated();
     }
 
     login(email, password) {
@@ -18,12 +21,15 @@ class FKApi {
                 email: email,
                 password: password
             }
-        }).then(this.handleResponse);
+        }).then(this._handleLoginResponse.bind(this));
     }
 
-    handleResponse(response) {
+    logout() {
+        this.token.clear();
+    }
+
+    _handleLoginResponse(response) {
         try {
-            // console.log("login function response", response);
             if (response.status == 204) {
                 this.token.setToken(response.headers.authorization);
                 return response.headers.authorization;
@@ -36,14 +42,6 @@ class FKApi {
         }
     }
 
-    authenticated() {
-        return this.token.authenticated();
-    }
-
-    logout() {
-        this.token.clear();
-    }
-
     getStation(id) {
         const token = this.token.getToken();
         return axios({
@@ -53,15 +51,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token
             }
-        }).then(handleResponse);
-
-        function handleResponse(response) {
-            if (response.status) {
-                return response.data;
-            } else {
-                throw new Error("Get station failed");
-            }
-        }
+        }).then(this._handleResponse.bind(this));
     }
 
     getStations() {
@@ -73,15 +63,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token
             }
-        }).then(handleResponse);
-
-        function handleResponse(response) {
-            if (response.status) {
-                return response.data;
-            } else {
-                throw new Error("Get stations failed");
-            }
-        }
+        }).then(this._handleResponse.bind(this));
     }
 
     getCurrentUser() {
@@ -93,17 +75,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token
             }
-        })
-            .then(handleResponse)
-            .catch(this._handleResponse);
-
-        function handleResponse(response) {
-            if (response.status == 200) {
-                return response.data;
-            } else {
-                throw new Error("Get user failed");
-            }
-        }
+        }).then(this._handleResponse.bind(this));
     }
 
     getStationDataSummaryByDeviceId(deviceId) {
