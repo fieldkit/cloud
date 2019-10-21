@@ -62,7 +62,7 @@
     3) Run the server.
 
     #+BEGIN_SRC sh
-    ./run-server-containerless.sh
+    ./run-server.sh
     #+END_SRC
 
     This builds and runs the server outside of a docker container. This means that PostgreSQL is usually the only docker container running.
