@@ -11,9 +11,13 @@
                         Projects
                         <div class="selected" v-if="viewingProjects"></div>
                     </span>
-                    <span class="small-nav-text">Default FieldKit Project</span>
                 </div>
             </router-link>
+            <div v-for="project in projects" v-bind:key="project.id">
+                <router-link :to="{ name: 'projectById', params: { id: project.id } }" class="project-link">
+                    {{ project.name }}
+                </router-link>
+            </div>
             <router-link :to="{ name: 'stations' }">
                 <div class="nav-label">
                     <img alt="Stations" src="../assets/stations.png" />
@@ -52,7 +56,7 @@ export default {
             viewingData: false
         };
     },
-    props: ["viewing", "stations"],
+    props: ["viewing", "stations", "projects"],
     mounted() {
         switch (this.viewing) {
             case "projects":
@@ -127,6 +131,7 @@ export default {
     margin: 20px 0 0 37px;
     display: inline-block;
 }
+.project-link,
 .station-link {
     cursor: pointer;
     font-weight: normal;

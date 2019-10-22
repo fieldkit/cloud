@@ -1,7 +1,7 @@
 <template>
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <SidebarNav viewing="stations" :stations="stations" @showStation="showSummary" />
+        <SidebarNav viewing="stations" :stations="stations" :projects="projects" @showStation="showSummary" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
                 :access-token="mapboxToken"
@@ -41,9 +41,11 @@ export default {
         SidebarNav,
         StationSummary
     },
+    props: ["id"],
     data: () => {
         return {
             user: {},
+            projects: [],
             stations: {
                 stations: []
             },
@@ -66,14 +68,26 @@ export default {
                 this.user = user;
                 this.isAuthenticated = true;
                 api.getStations().then(stations => {
-                    this.stations = stations;
+                    this.stations = stations && stations.stations ? stations.stations : [];
                     if (this.map) {
                         this.initStations();
                     } else {
                         this.waitingForMap = true;
                     }
+                    if (this.id) {
+                        let station = this.stations.find(s => {
+                            return s.id == this.id;
+                        });
+                        this.activeStation = station;
+                        this.$refs.stationSummary.viewSummary();
+                    }
                     console.log("this is the user info", this.user);
                     console.log("this is the station info", this.stations);
+                });
+                api.getProjects().then(projects => {
+                    if (projects && projects.projects.length > 0) {
+                        this.projects = projects.projects;
+                    }
                 });
             })
             .catch(() => {
@@ -98,8 +112,7 @@ export default {
         },
 
         initStations() {
-            if (this.stations && this.stations.stations.length > 0) {
-                this.stations = this.stations.stations;
+            if (this.stations && this.stations.length > 0) {
                 this.updateMap();
             } else {
                 this.$refs.stationSummary.viewSummary();
