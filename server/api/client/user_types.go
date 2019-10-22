@@ -284,9 +284,15 @@ func (ut *AddMemberPayload) Validate() (err error) {
 
 // addProjectPayload user type.
 type addProjectPayload struct {
-	Description *string `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
-	Name        *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	Slug        *string `form:"slug,omitempty" json:"slug,omitempty" yaml:"slug,omitempty" xml:"slug,omitempty"`
+	Description *string    `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
+	EndTime     *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	Goal        *string    `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string    `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Name        *string    `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Private     *bool      `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
+	Slug        *string    `form:"slug,omitempty" json:"slug,omitempty" yaml:"slug,omitempty" xml:"slug,omitempty"`
+	StartTime   *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	Tags        *string    `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
 }
 
 // Validate validates the addProjectPayload type instance.
@@ -319,20 +325,44 @@ func (ut *addProjectPayload) Publicize() *AddProjectPayload {
 	if ut.Description != nil {
 		pub.Description = *ut.Description
 	}
+	if ut.EndTime != nil {
+		pub.EndTime = ut.EndTime
+	}
+	if ut.Goal != nil {
+		pub.Goal = ut.Goal
+	}
+	if ut.Location != nil {
+		pub.Location = ut.Location
+	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
+	if ut.Private != nil {
+		pub.Private = ut.Private
+	}
 	if ut.Slug != nil {
 		pub.Slug = *ut.Slug
+	}
+	if ut.StartTime != nil {
+		pub.StartTime = ut.StartTime
+	}
+	if ut.Tags != nil {
+		pub.Tags = ut.Tags
 	}
 	return &pub
 }
 
 // AddProjectPayload user type.
 type AddProjectPayload struct {
-	Description string `form:"description" json:"description" yaml:"description" xml:"description"`
-	Name        string `form:"name" json:"name" yaml:"name" xml:"name"`
-	Slug        string `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	Description string     `form:"description" json:"description" yaml:"description" xml:"description"`
+	EndTime     *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	Goal        *string    `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string    `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Name        string     `form:"name" json:"name" yaml:"name" xml:"name"`
+	Private     *bool      `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
+	Slug        string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	StartTime   *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	Tags        *string    `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
 }
 
 // Validate validates the AddProjectPayload type instance.

@@ -35,7 +35,13 @@ CREATE TABLE fieldkit.project (
 	id serial PRIMARY KEY,
 	name varchar(100) NOT NULL,
 	slug varchar(100) NOT NULL,
-	description text NOT NULL DEFAULT ''
+	description text NOT NULL DEFAULT '',
+	goal varchar(100) NOT NULL DEFAULT '',
+	location varchar(100) NOT NULL DEFAULT '',
+	tags varchar(100) NOT NULL DEFAULT '',
+	start_time timestamp,
+	end_time timestamp,
+	private boolean NOT NULL DEFAULT false,
 );
 
 CREATE UNIQUE INDEX ON fieldkit.project (slug);

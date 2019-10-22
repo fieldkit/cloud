@@ -1606,10 +1606,16 @@ func (c *Client) DecodePagedGeoJSON(resp *http.Response) (*PagedGeoJSON, error) 
 //
 // Identifier: application/vnd.app.project+json; view=default
 type Project struct {
-	Description string `form:"description" json:"description" yaml:"description" xml:"description"`
-	ID          int    `form:"id" json:"id" yaml:"id" xml:"id"`
-	Name        string `form:"name" json:"name" yaml:"name" xml:"name"`
-	Slug        string `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	Description string     `form:"description" json:"description" yaml:"description" xml:"description"`
+	EndTime     *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	Goal        string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
+	ID          int        `form:"id" json:"id" yaml:"id" xml:"id"`
+	Location    string     `form:"location" json:"location" yaml:"location" xml:"location"`
+	Name        string     `form:"name" json:"name" yaml:"name" xml:"name"`
+	Private     bool       `form:"private" json:"private" yaml:"private" xml:"private"`
+	Slug        string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	StartTime   *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	Tags        string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
 }
 
 // Validate validates the Project media type instance.
@@ -1623,6 +1629,16 @@ func (mt *Project) Validate() (err error) {
 	}
 	if mt.Description == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
+	}
+	if mt.Goal == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "goal"))
+	}
+	if mt.Location == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
+	}
+
+	if mt.Tags == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tags"))
 	}
 	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))

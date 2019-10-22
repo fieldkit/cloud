@@ -23,6 +23,12 @@ func ProjectType(project *data.Project) *app.Project {
 		Name:        project.Name,
 		Slug:        project.Slug,
 		Description: project.Description,
+		Goal:        project.Goal,
+		Location:    project.Location,
+		Tags:        project.Tags,
+		Private:     project.Private,
+		StartTime:   project.StartTime,
+		EndTime:     project.EndTime,
 	}
 }
 
@@ -61,10 +67,36 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		return fmt.Errorf("JWT claims error") // internal error
 	}
 
+	goal := ""
+	if ctx.Payload.Goal != nil {
+		goal = *ctx.Payload.Goal
+	}
+
+	location := ""
+	if ctx.Payload.Location != nil {
+		location = *ctx.Payload.Location
+	}
+
+	tags := ""
+	if ctx.Payload.Location != nil {
+		tags = *ctx.Payload.Tags
+	}
+
+	private := true
+	if ctx.Payload.Private != nil {
+		private = *ctx.Payload.Private
+	}
+
 	project := &data.Project{
 		Name:        ctx.Payload.Name,
 		Slug:        ctx.Payload.Slug,
 		Description: ctx.Payload.Description,
+		Goal:        goal,
+		Location:    location,
+		Tags:        tags,
+		Private:     private,
+		StartTime:   ctx.Payload.StartTime,
+		EndTime:     ctx.Payload.EndTime,
 	}
 
 	if err := c.options.Database.NamedGetContext(ctx, project, "INSERT INTO fieldkit.project (name, slug, description) VALUES (:name, :slug, :description) RETURNING *", project); err != nil {
