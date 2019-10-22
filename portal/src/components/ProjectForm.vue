@@ -3,25 +3,33 @@
         <div id="close-form-btn" v-on:click="closeForm">
             <img alt="Close" src="../assets/close.png" />
         </div>
-        <h2>New Project</h2>
+        <h2>{{ this.formHeading }}</h2>
         <input v-model="name" placeholder="Project Name" class="text-input wide-text-input" />
         <input v-model="description" placeholder="Short Description" class="text-input wide-text-input" />
         <input v-model="goal" placeholder="Project Goal" class="text-input wide-text-input" />
-        <div id="add-image">
+        <!-- <div id="add-image">
             <img alt="Add project image" src="../assets/add_image.png" />
-        </div>
+        </div> -->
         <input v-model="location" placeholder="Location" class="text-input wide-text-input" />
         <div id="start-date">
-            <input v-model="startDate" placeholder="Start Date" class="text-input" />
-            <v-date-picker v-model="startDate" :popover="{ placement: 'bottom', visibility: 'click' }">
+            <input v-model="displayStartDate" placeholder="Start Date" class="text-input" />
+            <v-date-picker
+                v-model="startDate"
+                @input="updateDisplayDates"
+                :popover="{ placement: 'bottom', visibility: 'click' }"
+            >
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
                 </button>
             </v-date-picker>
         </div>
         <div id="end-date">
-            <input v-model="endDate" placeholder="End Date" class="text-input" />
-            <v-date-picker v-model="endDate" :popover="{ placement: 'bottom', visibility: 'click' }">
+            <input v-model="displayEndDate" placeholder="End Date" class="text-input" />
+            <v-date-picker
+                v-model="endDate"
+                @input="updateDisplayDates"
+                :popover="{ placement: 'bottom', visibility: 'click' }"
+            >
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
                 </button>
@@ -33,28 +41,114 @@
             <label for="checkbox">Make this project public</label>
             <img alt="Info" src="../assets/info.png" />
         </div>
-        <button class="save-btn" :disabled="isDisabled">Save</button>
+        <button class="save-btn" v-if="formType == 'add'" v-on:click="addProject">Add</button>
+        <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProject">Update</button>
     </div>
 </template>
 
 <script>
+import FKApi from "../api/api";
+
 export default {
     name: "ProjectForm",
+    props: ["project"],
     data: () => {
         return {
+            formType: "add",
+            formHeading: "New Project",
             name: "",
             description: "",
             goal: "",
             imageName: "",
             location: "",
             startDate: "",
+            displayStartDate: "",
             endDate: "",
+            displayEndDate: "",
             tags: "",
-            publicProject: false,
-            isDisabled: true
+            publicProject: false
         };
     },
+    watch: {
+        project(_project) {
+            if (_project) {
+                this.formHeading = "Edit Project";
+                this.formType = "update";
+                this.name = _project.name;
+                this.description = _project.description;
+                this.goal = _project.goal;
+                this.location = _project.location;
+                this.startDate = _project.start_time;
+                this.endDate = _project.end_time;
+                this.tags = _project.tags;
+                this.publicProject = _project.private;
+                this.updateDisplayDates();
+            } else {
+                this.formType = "add";
+                this.formHeading = "Add Project";
+                this.resetFields();
+            }
+        }
+    },
     methods: {
+        addProject() {
+            const api = new FKApi();
+            const data = {
+                description: this.description,
+                end_time: this.endDate,
+                goal: this.goal,
+                location: this.location,
+                name: this.name,
+                private: this.publicProject,
+                slug: "proj-" + Date.now(),
+                start_time: this.startDate,
+                tags: this.tags
+            };
+            api.addProject(data).then(project => {
+                this.$router.push({ name: "projectById", params: { id: project.id } });
+            });
+        },
+        updateProject() {
+            const api = new FKApi();
+            const data = {
+                id: this.project.id,
+                description: this.description,
+                end_time: this.endDate,
+                goal: this.goal,
+                location: this.location,
+                name: this.name,
+                private: this.publicProject,
+                slug: "proj-" + Date.now(),
+                start_time: this.startDate,
+                tags: this.tags
+            };
+            api.updateProject(data).then(project => {
+                this.$router.push({ name: "projectById", params: { id: project.id } });
+            });
+        },
+        updateDisplayDates() {
+            if (this.startDate) {
+                let d = new Date(this.startDate);
+                this.displayStartDate = d.toLocaleDateString("en-US");
+            }
+            if (this.endDate) {
+                let d = new Date(this.endDate);
+                this.displayEndDate = d.toLocaleDateString("en-US");
+            }
+        },
+        resetFields() {
+            this.name = "";
+            this.description = "";
+            this.goal = "";
+            this.imageName = "";
+            this.location = "";
+            this.startDate = "";
+            this.displayStartDate = "";
+            this.endDate = "";
+            this.displayEndDate = "";
+            this.tags = "";
+            this.publicProject = false;
+        },
         closeForm() {
             this.$emit("closeProjectForm");
         }
@@ -135,14 +229,13 @@ export default {
 
 .save-btn {
     width: 300px;
-    height: 45px;
+    height: 50px;
     font-size: 18px;
-    font-weight: bold;
     color: white;
-    background: rgb(215, 220, 225);
+    background-color: #ce596b;
     border: none;
-    border-radius: 6px;
-    margin: 60px 0 20px 0;
+    border-radius: 5px;
+    margin: 50px 0 20px 0;
 }
 
 #close-form-btn {

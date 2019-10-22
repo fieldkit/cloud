@@ -1,12 +1,26 @@
 <template>
     <div id="project-summary-container" v-if="viewingSummary">
         <div class="project-container" v-if="this.project">
-            <div class="left">
+            <div class="left tall">
                 <img alt="Project image" src="../assets/fieldkit_project.png" />
             </div>
             <div class="left">
                 <div id="project-name">{{ this.project.name }}</div>
-                <div id="project-description">{{ this.project.description }}</div>
+                <div id="edit-project">
+                    <img alt="Edit project" src="../assets/edit.png" v-on:click="editProject" />
+                </div>
+                <div class="project-element">{{ this.project.description }}</div>
+                <div class="project-element">{{ this.project.location }}</div>
+                <div class="left project-element">
+                    <div class="left">
+                        <span class="date-label">Start Date</span> <br />
+                        {{ this.displayStartDate }}
+                    </div>
+                    <div class="left end-date">
+                        <span class="date-label">End Date</span> <br />
+                        {{ this.displayEndDate }}
+                    </div>
+                </div>
             </div>
             <div class="spacer"></div>
             <div class="section">
@@ -101,10 +115,19 @@ export default {
             viewingSummary: false,
             viewingStations: false,
             viewingActivity: false,
-            viewingTeam: false
+            viewingTeam: false,
+            displayStartDate: "",
+            displayEndDate: ""
         };
     },
     props: ["project", "stations", "user"],
+    watch: {
+        project() {
+            if (this.project) {
+                this.updateDisplayDates();
+            }
+        }
+    },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
@@ -117,6 +140,19 @@ export default {
         },
         toggleTeam() {
             this.viewingTeam = !this.viewingTeam;
+        },
+        editProject() {
+            this.$emit("editProject", this.project);
+        },
+        updateDisplayDates() {
+            if (this.project.start_time) {
+                let d = new Date(this.project.start_time);
+                this.displayStartDate = d.toLocaleDateString("en-US");
+            }
+            if (this.project.end_time) {
+                let d = new Date(this.project.end_time);
+                this.displayEndDate = d.toLocaleDateString("en-US");
+            }
         },
         getUpdatedDate(station) {
             if (!station.status_json) {
@@ -168,6 +204,9 @@ export default {
     border-bottom: 1px solid rgb(215, 220, 225);
     height: 1px;
 }
+.tall {
+    height: 100%;
+}
 .left {
     float: left;
 }
@@ -175,7 +214,16 @@ export default {
     float: right;
 }
 .project-element {
-    margin: 5px 5px 0 5px;
+    max-width: 425px;
+    font-size: 14px;
+    margin: 10px 20px 0 20px;
+}
+.date-label {
+    font-size: 12px;
+    color: rgb(134, 134, 134);
+}
+.end-date {
+    margin-left: 20px;
 }
 .toggle-image-container {
     display: inline-block;
@@ -200,10 +248,12 @@ export default {
 #project-name {
     font-size: 24px;
     font-weight: bold;
-    margin-left: 20px;
+    margin: 0 15px 0 20px;
+    display: inline-block;
 }
-#project-description {
-    margin-left: 20px;
+#edit-project {
+    display: inline-block;
+    cursor: pointer;
 }
 .stations-container {
     display: grid;

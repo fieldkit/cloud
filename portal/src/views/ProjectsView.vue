@@ -22,10 +22,16 @@
                     <h1>Community</h1>
                 </div>
             </div>
-            <div v-if="addingProject">
-                <ProjectForm @closeProjectForm="closeAddProject" />
+            <div v-show="addingProject">
+                <ProjectForm :project="editProject" @closeProjectForm="closeAddProject" />
             </div>
-            <ProjectSummary :project="activeProject" :stations="stations" :user="user" ref="projectSummary" />
+            <ProjectSummary
+                :project="activeProject"
+                :stations="stations"
+                :user="user"
+                ref="projectSummary"
+                @editProject="onEditProject"
+            />
         </div>
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
@@ -65,8 +71,15 @@ export default {
                 if (this.isAuthenticated) {
                     this.api.getProject(to.params.id).then(project => {
                         if (project) {
+                            this.addingProject = false;
                             this.activeProject = project;
                             this.$refs.projectSummary.viewSummary();
+                        }
+                    });
+                    // refresh projects list
+                    this.api.getProjects().then(projects => {
+                        if (projects && projects.projects.length > 0) {
+                            this.projects = projects.projects;
                         }
                     });
                 }
@@ -82,6 +95,7 @@ export default {
             projects: [],
             projectsTitle: "Projects",
             activeProject: null,
+            editProject: null,
             stations: [],
             isAuthenticated: false,
             addingProject: false,
@@ -133,7 +147,13 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         addProject() {
+            this.editProject = null;
             this.addingProject = true;
+        },
+        onEditProject(project) {
+            this.addingProject = true;
+            this.editProject = project;
+            this.$refs.projectSummary.closeSummary();
         },
         closeAddProject() {
             this.addingProject = false;
@@ -178,6 +198,7 @@ export default {
 .project-container {
     float: left;
     width: 276px;
+    margin: 0 20px 0 0;
     border: 1px solid rgb(235, 235, 235);
 }
 .project-name {
