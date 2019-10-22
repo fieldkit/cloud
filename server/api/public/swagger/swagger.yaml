@@ -2070,7 +2070,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+            Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2106,7 +2106,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+              Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2147,7 +2147,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+        Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2158,7 +2158,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+          Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2189,7 +2189,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+          Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2224,7 +2224,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: e57d5556-fcfe-41e6-8b2b-0a3b1a08e6e3
+            Repudiandae dignissimos.: abbd63ab-d76e-4e9c-8cd2-13ba3d61b348
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2998,7 +2998,7 @@ definitions:
       name: Nisi ut doloremque consequuntur ut.
       owner_id: 2.5369133844502047e+18
       status_json:
-        Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+        Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
     properties:
       device_id:
         example: Numquam voluptatem veritatis inventore incidunt quia.
@@ -3017,7 +3017,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+          Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
         type: object
     required:
     - id
@@ -3036,19 +3036,19 @@ definitions:
       name: Nisi ut doloremque consequuntur ut.
       owner_id: 2.5369133844502047e+18
       status_json:
-        Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+        Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
     - device_id: Numquam voluptatem veritatis inventore incidunt quia.
       id: 3.438485925564786e+18
       name: Nisi ut doloremque consequuntur ut.
       owner_id: 2.5369133844502047e+18
       status_json:
-        Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+        Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
     - device_id: Numquam voluptatem veritatis inventore incidunt quia.
       id: 3.438485925564786e+18
       name: Nisi ut doloremque consequuntur ut.
       owner_id: 2.5369133844502047e+18
       status_json:
-        Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+        Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -3092,7 +3092,7 @@ definitions:
         name: Nisi ut doloremque consequuntur ut.
         owner_id: 2.5369133844502047e+18
         status_json:
-          Est ea voluptas sit.: 1174a078-0c12-4548-ab00-f996a90738c5
+          Est ea voluptas sit.: 0ee3a867-fa97-4185-9eba-7ea8df5b0a49
     properties:
       stations:
         $ref: '#/definitions/StationCollection'

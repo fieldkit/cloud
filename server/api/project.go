@@ -99,7 +99,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		EndTime:     ctx.Payload.EndTime,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, project, "INSERT INTO fieldkit.project (name, slug, description) VALUES (:name, :slug, :description) RETURNING *", project); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, project, "INSERT INTO fieldkit.project (name, slug, description, goal, location, tags, private, start_time, end_time) VALUES (:name, :slug, :description, :goal, :location, :tags, :private, :start_time, :end_time) RETURNING *", project); err != nil {
 		return err
 	}
 
@@ -111,14 +111,40 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 }
 
 func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
+	goal := ""
+	if ctx.Payload.Goal != nil {
+		goal = *ctx.Payload.Goal
+	}
+
+	location := ""
+	if ctx.Payload.Location != nil {
+		location = *ctx.Payload.Location
+	}
+
+	tags := ""
+	if ctx.Payload.Location != nil {
+		tags = *ctx.Payload.Tags
+	}
+
+	private := true
+	if ctx.Payload.Private != nil {
+		private = *ctx.Payload.Private
+	}
+
 	project := &data.Project{
 		ID:          int32(ctx.ProjectID),
 		Name:        ctx.Payload.Name,
 		Slug:        ctx.Payload.Slug,
 		Description: ctx.Payload.Description,
+		Goal:        goal,
+		Location:    location,
+		Tags:        tags,
+		Private:     private,
+		StartTime:   ctx.Payload.StartTime,
+		EndTime:     ctx.Payload.EndTime,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, project, "UPDATE fieldkit.project SET name = :name, slug = :slug, description = :description WHERE id = :id RETURNING *", project); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, project, "UPDATE fieldkit.project SET name = :name, slug = :slug, description = :description, goal = :goal, location = :location, tags = :tags, private = :private, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *", project); err != nil {
 		return err
 	}
 
