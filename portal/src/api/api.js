@@ -78,6 +78,59 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getUsers() {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/users",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getProjects() {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/user/projects",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getProject(id) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/" + id,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    addDefaultProject() {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            },
+            data: {
+                name: "Default FieldKit Project",
+                description: "Any FieldKit stations you add, start life here.",
+                slug: "default-proj-" + Date.now()
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStationDataSummaryByDeviceId(deviceId) {
         const token = this.token.getToken();
         return axios({

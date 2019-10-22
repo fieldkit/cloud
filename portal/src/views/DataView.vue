@@ -1,7 +1,7 @@
 <template>
     <div>
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <SidebarNav viewing="data" :stations="stations" @showStation="showStation" />
+        <SidebarNav viewing="data" :stations="stations" :projects="projects" @showStation="showStation" />
         <div id="data-view-background" v-show="isAuthenticated">
             <div class="main-panel">
                 <div id="data-container">
@@ -70,6 +70,7 @@ export default {
             stationId: null,
             stationData: [],
             stations: [],
+            projects: [],
             sensors: [],
             combinedStationInfo: {},
             selectedSensor: null,
@@ -129,6 +130,11 @@ export default {
                 this.isAuthenticated = true;
                 this.api.getStations().then(s => {
                     this.stations = s.stations;
+                });
+                this.api.getProjects().then(projects => {
+                    if (projects && projects.projects.length > 0) {
+                        this.projects = projects.projects;
+                    }
                 });
                 this.fetchData().then(result => {
                     this.processData(result);
