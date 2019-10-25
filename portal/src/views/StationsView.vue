@@ -121,7 +121,10 @@ export default {
         },
 
         updateMap() {
-            let bounds = [];
+            let longMax = -180;
+            let longMin = 180;
+            let latMin = 90;
+            let latMax = -90;
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
                 return s.status_json.latitude && s.status_json.longitude;
@@ -134,10 +137,18 @@ export default {
                         lng: coordinates[1]
                     });
                 } else {
-                    bounds.push({
-                        lat: coordinates[0],
-                        lng: coordinates[1]
-                    });
+                    if (s.status_json.latitude > latMax) {
+                        latMax = s.status_json.latitude;
+                    }
+                    if (s.status_json.latitude < latMin) {
+                        latMin = s.status_json.latitude;
+                    }
+                    if (s.status_json.longitude > longMax) {
+                        longMax = s.status_json.longitude;
+                    }
+                    if (s.status_json.longitude < longMin) {
+                        longMin = s.status_json.longitude;
+                    }
                 }
                 stationFeatures.push({
                     type: "Feature",
@@ -202,6 +213,16 @@ export default {
             });
 
             if (mappable.length > 1) {
+                let bounds = [
+                    {
+                        lat: latMin,
+                        lng: longMin
+                    },
+                    {
+                        lat: latMax,
+                        lng: longMax
+                    }
+                ];
                 this.map.fitBounds(bounds, { duration: 0 });
                 // fitBounds is cropped too close: zoom out
                 const z = this.map.getZoom();
