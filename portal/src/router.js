@@ -41,6 +41,12 @@ export default new Router({
             props: true
         },
         {
+            path: "/dashboard/stations/:id",
+            name: "viewStation",
+            component: StationsView,
+            props: true
+        },
+        {
             path: "/dashboard/data",
             name: "data",
             component: DataView,

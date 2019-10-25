@@ -25,7 +25,7 @@
             </div>
             <!-- add or update a project -->
             <div v-show="addingOrUpdating">
-                <ProjectForm :project="activeProject" @closeProjectForm="closeAddProject" />
+                <ProjectForm :project="activeProject" @closeProjectForm="closeProjectForm" />
             </div>
             <!-- display one project -->
             <ProjectSummary :project="activeProject" :stations="stations" :user="user" ref="projectSummary" />
@@ -160,7 +160,7 @@ export default {
             this.$refs.projectSummary.closeSummary();
             this.loading = false;
         },
-        closeAddProject() {
+        closeProjectForm() {
             this.activeProject = null;
             this.resetFlags();
             this.viewingAll = true;

@@ -1,6 +1,6 @@
 <template>
     <div id="station-summary-container" v-if="viewingSummary">
-        <div v-if="this.station" id="close-form-btn" v-on:click="closeForm">
+        <div v-if="this.station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
         <div v-if="!isAuthenticated" class="no-stations-message">
@@ -60,7 +60,9 @@
                 <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
                     <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
                         <div class="left">{{ sensor.name }}</div>
-                        <div class="right">{{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}</div>
+                        <div class="right">
+                            {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -130,8 +132,11 @@ export default {
             return images("./" + img);
         },
 
-        closeForm() {
+        closeSummary() {
             this.viewingSummary = false;
+            if (this.$route.name != "stations") {
+                this.$router.push({ name: "stations" });
+            }
         }
     }
 };

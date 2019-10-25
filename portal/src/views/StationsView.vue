@@ -55,6 +55,13 @@ export default {
             mapboxToken: MAPBOX_ACCESS_TOKEN
         };
     },
+    watch: {
+        $route(to) {
+            if (to.name == "stations") {
+                this.$refs.stationSummary.closeSummary();
+            }
+        }
+    },
     mounted() {
         // HACK
         const newWidth = window.innerWidth - 240; // the sidebar is 240px
@@ -239,12 +246,20 @@ export default {
                 });
                 stationsView.activeStation = station;
                 stationsView.$refs.stationSummary.viewSummary();
+                stationsView.updateStationRoute(station);
             });
         },
 
         showSummary(station) {
             this.activeStation = station;
             this.$refs.stationSummary.viewSummary();
+            this.updateStationRoute(station);
+        },
+
+        updateStationRoute(station) {
+            if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
+                this.$router.push({ name: "viewStation", params: { id: station.id } });
+            }
         }
     }
 };
