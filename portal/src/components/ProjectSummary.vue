@@ -12,11 +12,11 @@
                 <div class="project-element">{{ this.project.description }}</div>
                 <div class="project-element">{{ this.project.location }}</div>
                 <div class="left project-element">
-                    <div class="left">
+                    <div class="left" v-if="displayStartDate">
                         <span class="date-label">Start Date</span> <br />
                         {{ this.displayStartDate }}
                     </div>
-                    <div class="left end-date">
+                    <div class="left end-date" v-if="displayEndDate">
                         <span class="date-label">End Date</span> <br />
                         {{ this.displayEndDate }}
                     </div>
@@ -142,7 +142,7 @@ export default {
             this.viewingTeam = !this.viewingTeam;
         },
         editProject() {
-            this.$emit("editProject", this.project);
+            this.$router.push({ name: "editProject", params: { id: this.project.id } });
         },
         updateDisplayDates() {
             if (this.project.start_time) {
@@ -164,9 +164,6 @@ export default {
         },
         closeSummary() {
             this.viewingSummary = false;
-            if (this.$route.name != "projects") {
-                this.$router.push({ name: "projects" });
-            }
         }
     }
 };

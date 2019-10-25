@@ -105,7 +105,7 @@ export default {
                 tags: this.tags
             };
             api.addProject(data).then(project => {
-                this.$router.push({ name: "projectById", params: { id: project.id } });
+                this.$router.push({ name: "viewProject", params: { id: project.id } });
             });
         },
         updateProject() {
@@ -123,7 +123,7 @@ export default {
                 tags: this.tags
             };
             api.updateProject(data).then(project => {
-                this.$router.push({ name: "projectById", params: { id: project.id } });
+                this.$router.push({ name: "viewProject", params: { id: project.id } });
             });
         },
         updateDisplayDates() {

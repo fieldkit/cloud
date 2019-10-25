@@ -3,7 +3,8 @@
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <div id="projects-container" v-if="!addingProject && !activeProject">
+            <!-- display all projects -->
+            <div id="projects-container" v-if="viewingAll">
                 <div class="container">
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                         <img alt="Add project" src="../assets/add.png" />
@@ -11,7 +12,7 @@
                     </div>
                     <h1>{{ projectsTitle }}</h1>
                     <div v-for="project in projects" v-bind:key="project.id" class="project-container">
-                        <router-link :to="{ name: 'projectById', params: { id: project.id } }">
+                        <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                             <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
                             <div class="project-name">{{ project.name }}</div>
                             <div class="project-description">{{ project.description }}</div>
@@ -22,16 +23,12 @@
                     <h1>Community</h1>
                 </div>
             </div>
-            <div v-show="addingProject">
-                <ProjectForm :project="editProject" @closeProjectForm="closeAddProject" />
+            <!-- add or update a project -->
+            <div v-show="addingOrUpdating">
+                <ProjectForm :project="activeProject" @closeProjectForm="closeAddProject" />
             </div>
-            <ProjectSummary
-                :project="activeProject"
-                :stations="stations"
-                :user="user"
-                ref="projectSummary"
-                @editProject="onEditProject"
-            />
+            <!-- display one project -->
+            <ProjectSummary :project="activeProject" :stations="stations" :user="user" ref="projectSummary" />
         </div>
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
@@ -67,25 +64,17 @@ export default {
     watch: {
         // watching $route picks up changes that beforeRouteUpdate does not
         $route(to) {
-            if (to.params.id) {
-                if (this.isAuthenticated) {
-                    this.api.getProject(to.params.id).then(project => {
-                        if (project) {
-                            this.addingProject = false;
-                            this.activeProject = project;
-                            this.$refs.projectSummary.viewSummary();
-                        }
-                    });
-                    // refresh projects list
-                    this.api.getProjects().then(projects => {
-                        if (projects && projects.projects.length > 0) {
-                            this.projects = projects.projects;
-                        }
-                    });
-                }
+            this.routeTo = to;
+            if (to.params.id && this.isAuthenticated) {
+                this.api.getProject(to.params.id).then(this.handleProject);
+                // refresh projects list
+                this.api.getProjects().then(projects => {
+                    if (projects && projects.projects.length > 0) {
+                        this.projects = projects.projects;
+                    }
+                });
             } else {
-                this.activeProject = null;
-                this.$refs.projectSummary.closeSummary();
+                this.viewAllProjects();
             }
         }
     },
@@ -95,10 +84,10 @@ export default {
             projects: [],
             projectsTitle: "Projects",
             activeProject: null,
-            editProject: null,
             stations: [],
             isAuthenticated: false,
-            addingProject: false,
+            viewingAll: false,
+            addingOrUpdating: false,
             failedAuth: false,
             loading: true
         };
@@ -123,15 +112,9 @@ export default {
                     }
                 });
                 if (this.id) {
-                    this.api.getProject(this.id).then(project => {
-                        if (project) {
-                            this.activeProject = project;
-                            this.$refs.projectSummary.viewSummary();
-                            this.loading = false;
-                        }
-                    });
+                    this.api.getProject(this.id).then(this.handleProject.bind(this));
                 } else {
-                    this.loading = false;
+                    this.viewAllProjects();
                 }
                 this.api.getStations().then(s => {
                     this.stations = s.stations;
@@ -146,17 +129,45 @@ export default {
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
-        addProject() {
-            this.editProject = null;
-            this.addingProject = true;
+        handleProject(project) {
+            if (!this.routeTo || this.routeTo.name == "viewProject") {
+                this.viewProject(project);
+            }
+            if (this.routeTo && this.routeTo.name == "editProject") {
+                this.editProject(project);
+            }
         },
-        onEditProject(project) {
-            this.addingProject = true;
-            this.editProject = project;
+        addProject() {
+            this.resetFlags();
+            this.activeProject = null;
+            this.addingOrUpdating = true;
+        },
+        editProject(project) {
+            this.resetFlags();
+            this.addingOrUpdating = true;
+            this.activeProject = project;
             this.$refs.projectSummary.closeSummary();
         },
+        viewProject(project) {
+            this.resetFlags();
+            this.activeProject = project;
+            this.$refs.projectSummary.viewSummary();
+            this.loading = false;
+        },
+        viewAllProjects() {
+            this.resetFlags();
+            this.viewingAll = true;
+            this.$refs.projectSummary.closeSummary();
+            this.loading = false;
+        },
         closeAddProject() {
-            this.addingProject = false;
+            this.activeProject = null;
+            this.resetFlags();
+            this.viewingAll = true;
+        },
+        resetFlags() {
+            this.viewingAll = false;
+            this.addingOrUpdating = false;
         },
         showStation(station) {
             this.$router.push({ name: "stations", params: { id: station.id } });

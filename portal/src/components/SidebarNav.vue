@@ -14,7 +14,7 @@
                 </div>
             </router-link>
             <div v-for="project in projects" v-bind:key="project.id">
-                <router-link :to="{ name: 'projectById', params: { id: project.id } }" class="project-link">
+                <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="project-link">
                     {{ project.name }}
                 </router-link>
             </div>

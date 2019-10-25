@@ -24,7 +24,13 @@ export default new Router({
         },
         {
             path: "/dashboard/projects/:id",
-            name: "projectById",
+            name: "viewProject",
+            component: ProjectsView,
+            props: true
+        },
+        {
+            path: "/dashboard/projects/:id/edit",
+            name: "editProject",
             component: ProjectsView,
             props: true
         },
