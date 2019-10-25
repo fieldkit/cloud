@@ -61,9 +61,9 @@ export default {
             goal: "",
             imageName: "",
             location: "",
-            startDate: "",
+            startDate: null,
             displayStartDate: "",
-            endDate: "",
+            endDate: null,
             displayEndDate: "",
             tags: "",
             publicProject: false
@@ -142,9 +142,9 @@ export default {
             this.goal = "";
             this.imageName = "";
             this.location = "";
-            this.startDate = "";
+            this.startDate = null;
             this.displayStartDate = "";
-            this.endDate = "";
+            this.endDate = null;
             this.displayEndDate = "";
             this.tags = "";
             this.publicProject = false;
