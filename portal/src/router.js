@@ -48,7 +48,7 @@ export default new Router({
         },
         {
             path: "/dashboard/data/:id",
-            name: "dataById",
+            name: "viewData",
             component: DataView,
             props: true
         }

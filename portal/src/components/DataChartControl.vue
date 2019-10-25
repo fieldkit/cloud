@@ -567,7 +567,7 @@ export default {
             }
             // vue throws uncaught expression: Object if the same route is pushed again
             if (!_.isEqual(this.prevQuery, this.urlQuery)) {
-                this.$router.push({ name: "dataById", params: { id: stationId }, query: this.urlQuery });
+                this.$router.push({ name: "viewData", params: { id: stationId }, query: this.urlQuery });
                 this.prevQuery = {};
                 const keys = Object.keys(this.urlQuery);
                 keys.forEach(k => {

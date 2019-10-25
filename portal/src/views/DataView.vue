@@ -220,7 +220,7 @@ export default {
         },
         showStation(station) {
             if (station) {
-                this.$router.push({ name: "dataById", params: { id: station.id } });
+                this.$router.push({ name: "viewData", params: { id: station.id } });
                 this.station = station;
             }
             this.$refs.dataChartControl.prepareNewStation();
