@@ -41,7 +41,7 @@ CREATE TABLE fieldkit.project (
 	tags varchar(100) NOT NULL DEFAULT '',
 	start_time timestamp,
 	end_time timestamp,
-	private boolean NOT NULL DEFAULT false,
+	private boolean NOT NULL DEFAULT false
 );
 
 CREATE UNIQUE INDEX ON fieldkit.project (slug);
