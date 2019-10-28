@@ -1078,6 +1078,117 @@ func (c *Client) DecodeExpeditions(resp *http.Response) (*Expeditions, error) {
 	return &decoded, err
 }
 
+// FieldNote media type (default view)
+//
+// Identifier: application/vnd.app.field_note+json; view=default
+type FieldNote struct {
+	CategoryID int       `form:"category_id" json:"category_id" yaml:"category_id" xml:"category_id"`
+	Created    time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
+	ID         int       `form:"id" json:"id" yaml:"id" xml:"id"`
+	MediaID    *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
+	Note       string    `form:"note" json:"note" yaml:"note" xml:"note"`
+	StationID  int       `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	UserID     int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+}
+
+// Validate validates the FieldNote media type instance.
+func (mt *FieldNote) Validate() (err error) {
+
+	if mt.Note == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "note"))
+	}
+	return
+}
+
+// DecodeFieldNote decodes the FieldNote instance encoded in resp body.
+func (c *Client) DecodeFieldNote(resp *http.Response) (*FieldNote, error) {
+	var decoded FieldNote
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FieldNoteQueryResult media type (default view)
+//
+// Identifier: application/vnd.app.field_note_result+json; view=default
+type FieldNoteQueryResult struct {
+	CategoryKey      string    `form:"category_key" json:"category_key" yaml:"category_key" xml:"category_key"`
+	Created          time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
+	ID               int       `form:"id" json:"id" yaml:"id" xml:"id"`
+	MediaContentType *string   `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
+	MediaURL         *string   `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
+	Note             *string   `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
+	UserID           int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+	Username         string    `form:"username" json:"username" yaml:"username" xml:"username"`
+}
+
+// Validate validates the FieldNoteQueryResult media type instance.
+func (mt *FieldNoteQueryResult) Validate() (err error) {
+
+	if mt.CategoryKey == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "category_key"))
+	}
+	if mt.Username == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "username"))
+	}
+	return
+}
+
+// DecodeFieldNoteQueryResult decodes the FieldNoteQueryResult instance encoded in resp body.
+func (c *Client) DecodeFieldNoteQueryResult(resp *http.Response) (*FieldNoteQueryResult, error) {
+	var decoded FieldNoteQueryResult
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// FieldNoteQueryResultCollection is the media type for an array of FieldNoteQueryResult (default view)
+//
+// Identifier: application/vnd.app.field_note_result+json; type=collection; view=default
+type FieldNoteQueryResultCollection []*FieldNoteQueryResult
+
+// Validate validates the FieldNoteQueryResultCollection media type instance.
+func (mt FieldNoteQueryResultCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeFieldNoteQueryResultCollection decodes the FieldNoteQueryResultCollection instance encoded in resp body.
+func (c *Client) DecodeFieldNoteQueryResultCollection(resp *http.Response) (FieldNoteQueryResultCollection, error) {
+	var decoded FieldNoteQueryResultCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// FieldNotes media type (default view)
+//
+// Identifier: application/vnd.app.field_notes+json; view=default
+type FieldNotes struct {
+	Notes FieldNoteQueryResultCollection `form:"notes" json:"notes" yaml:"notes" xml:"notes"`
+}
+
+// Validate validates the FieldNotes media type instance.
+func (mt *FieldNotes) Validate() (err error) {
+	if mt.Notes == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "notes"))
+	}
+	if err2 := mt.Notes.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
+// DecodeFieldNotes decodes the FieldNotes instance encoded in resp body.
+func (c *Client) DecodeFieldNotes(resp *http.Response) (*FieldNotes, error) {
+	var decoded FieldNotes
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // FilesStatus media type (default view)
 //
 // Identifier: application/vnd.app.files.status+json; view=default

@@ -41,8 +41,8 @@ func (c *Client) NewCsvFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp212 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp212)
+		tmp222 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp222)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -137,8 +137,8 @@ func (c *Client) NewGetDeviceLocationHistoryFilesRequest(ctx context.Context, pa
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp213 := strconv.Itoa(*page)
-		values.Set("page", tmp213)
+		tmp223 := strconv.Itoa(*page)
+		values.Set("page", tmp223)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -173,8 +173,8 @@ func (c *Client) NewListDeviceDataFilesFilesRequest(ctx context.Context, path st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp214 := strconv.Itoa(*page)
-		values.Set("page", tmp214)
+		tmp224 := strconv.Itoa(*page)
+		values.Set("page", tmp224)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -209,8 +209,8 @@ func (c *Client) NewListDeviceLogFilesFilesRequest(ctx context.Context, path str
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if page != nil {
-		tmp215 := strconv.Itoa(*page)
-		values.Set("page", tmp215)
+		tmp225 := strconv.Itoa(*page)
+		values.Set("page", tmp225)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -274,8 +274,8 @@ func (c *Client) NewRawFilesRequest(ctx context.Context, path string, dl *bool) 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if dl != nil {
-		tmp216 := strconv.FormatBool(*dl)
-		values.Set("dl", tmp216)
+		tmp226 := strconv.FormatBool(*dl)
+		values.Set("dl", tmp226)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

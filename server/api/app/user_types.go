@@ -159,6 +159,70 @@ func (ut *AddExpeditionPayload) Validate() (err error) {
 	return
 }
 
+// addFieldNotePayload user type.
+type addFieldNotePayload struct {
+	CategoryID *int       `form:"category_id,omitempty" json:"category_id,omitempty" yaml:"category_id,omitempty" xml:"category_id,omitempty"`
+	Created    *time.Time `form:"created,omitempty" json:"created,omitempty" yaml:"created,omitempty" xml:"created,omitempty"`
+	MediaID    *int       `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
+	Note       *string    `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
+	StationID  *int       `form:"station_id,omitempty" json:"station_id,omitempty" yaml:"station_id,omitempty" xml:"station_id,omitempty"`
+	UserID     *int       `form:"user_id,omitempty" json:"user_id,omitempty" yaml:"user_id,omitempty" xml:"user_id,omitempty"`
+}
+
+// Validate validates the addFieldNotePayload type instance.
+func (ut *addFieldNotePayload) Validate() (err error) {
+	if ut.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "station_id"))
+	}
+	if ut.Created == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "created"))
+	}
+	if ut.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
+	}
+	return
+}
+
+// Publicize creates AddFieldNotePayload from addFieldNotePayload
+func (ut *addFieldNotePayload) Publicize() *AddFieldNotePayload {
+	var pub AddFieldNotePayload
+	if ut.CategoryID != nil {
+		pub.CategoryID = ut.CategoryID
+	}
+	if ut.Created != nil {
+		pub.Created = *ut.Created
+	}
+	if ut.MediaID != nil {
+		pub.MediaID = ut.MediaID
+	}
+	if ut.Note != nil {
+		pub.Note = ut.Note
+	}
+	if ut.StationID != nil {
+		pub.StationID = *ut.StationID
+	}
+	if ut.UserID != nil {
+		pub.UserID = *ut.UserID
+	}
+	return &pub
+}
+
+// AddFieldNotePayload user type.
+type AddFieldNotePayload struct {
+	CategoryID *int      `form:"category_id,omitempty" json:"category_id,omitempty" yaml:"category_id,omitempty" xml:"category_id,omitempty"`
+	Created    time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
+	MediaID    *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
+	Note       *string   `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
+	StationID  int       `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
+	UserID     int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
+}
+
+// Validate validates the AddFieldNotePayload type instance.
+func (ut *AddFieldNotePayload) Validate() (err error) {
+
+	return
+}
+
 // addFirmwarePayload user type.
 type addFirmwarePayload struct {
 	Etag    *string `form:"etag,omitempty" json:"etag,omitempty" yaml:"etag,omitempty" xml:"etag,omitempty"`

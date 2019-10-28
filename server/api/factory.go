@@ -196,6 +196,12 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	})
 	app.MountStationLogController(service, c19)
 
+	// Mount "field_note" controller
+	c20 := NewFieldNoteController(service, FieldNoteControllerOptions{
+		Database: database,
+	})
+	app.MountFieldNoteController(service, c20)
+
 	// Mount "data" controller
 	dco := DataControllerOptions{
 		Config:    config,

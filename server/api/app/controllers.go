@@ -2509,6 +2509,267 @@ func unmarshalUpdateExpeditionPayload(ctx context.Context, service *goa.Service,
 	return nil
 }
 
+// FieldNoteController is the controller interface for the FieldNote actions.
+type FieldNoteController interface {
+	goa.Muxer
+	Add(*AddFieldNoteContext) error
+	Delete(*DeleteFieldNoteContext) error
+	Get(*GetFieldNoteContext) error
+	Update(*UpdateFieldNoteContext) error
+}
+
+// MountFieldNoteController "mounts" a FieldNote resource controller on the given service.
+func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes/:fieldNoteId", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAddFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddFieldNotePayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Add(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("POST", "/stations/:stationId/field-notes", ctrl.MuxHandler("add", h, unmarshalAddFieldNotePayload))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Add", "route", "POST /stations/:stationId/field-notes", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("DELETE", "/stations/:stationId/field-notes/:fieldNoteId", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Delete", "route", "DELETE /stations/:stationId/field-notes/:fieldNoteId", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Get(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("GET", "/stations/:stationId/field-notes", ctrl.MuxHandler("get", h, nil))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Get", "route", "GET /stations/:stationId/field-notes", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AddFieldNotePayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("PATCH", "/stations/:stationId/field-notes/:fieldNoteId", ctrl.MuxHandler("update", h, unmarshalUpdateFieldNotePayload))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Update", "route", "PATCH /stations/:stationId/field-notes/:fieldNoteId", "security", "jwt")
+}
+
+// handleFieldNoteOrigin applies the CORS response headers corresponding to the origin.
+func handleFieldNoteOrigin(h goa.Handler) goa.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec0) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec1) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org:8080") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.team") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalAddFieldNotePayload unmarshals the request body into the context request data Payload field.
+func unmarshalAddFieldNotePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addFieldNotePayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalUpdateFieldNotePayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateFieldNotePayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &addFieldNotePayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
 // FilesController is the controller interface for the Files actions.
 type FilesController interface {
 	goa.Muxer
