@@ -1494,6 +1494,30 @@ func (c *Client) DecodeMapFeatures(resp *http.Response) (*MapFeatures, error) {
 	return &decoded, err
 }
 
+// MediaReferenceResponse media type (default view)
+//
+// Identifier: application/vnd.app.media+json; view=default
+type MediaReferenceResponse struct {
+	ID  int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	URL string `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the MediaReferenceResponse media type instance.
+func (mt *MediaReferenceResponse) Validate() (err error) {
+
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// DecodeMediaReferenceResponse decodes the MediaReferenceResponse instance encoded in resp body.
+func (c *Client) DecodeMediaReferenceResponse(resp *http.Response) (*MediaReferenceResponse, error) {
+	var decoded MediaReferenceResponse
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // TeamMember media type (default view)
 //
 // Identifier: application/vnd.app.member+json; view=default

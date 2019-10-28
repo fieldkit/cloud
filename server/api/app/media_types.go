@@ -1122,6 +1122,23 @@ func (mt *MapFeatures) Validate() (err error) {
 	return
 }
 
+// MediaReferenceResponse media type (default view)
+//
+// Identifier: application/vnd.app.media+json; view=default
+type MediaReferenceResponse struct {
+	ID  int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	URL string `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the MediaReferenceResponse media type instance.
+func (mt *MediaReferenceResponse) Validate() (err error) {
+
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
 // TeamMember media type (default view)
 //
 // Identifier: application/vnd.app.member+json; view=default

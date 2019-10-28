@@ -1,10 +1,12 @@
 package api
 
 import (
+	"bufio"
 	"bytes"
 	"image"
 	"image/color"
 	"image/png"
+	"io"
 	"math"
 	"math/rand"
 
@@ -12,20 +14,28 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 	"github.com/lucasb-eyer/go-colorful"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 const (
 	float64MaxUint64 = float64(math.MaxUint64)
 )
 
-// PictureController implements the picture resource.
-type PictureController struct {
-	*goa.Controller
+type PictureControllerOptions struct {
+	Session *session.Session
 }
 
-func NewPictureController(service *goa.Service) *PictureController {
+type PictureController struct {
+	*goa.Controller
+	options *PictureControllerOptions
+}
+
+func NewPictureController(service *goa.Service, options *PictureControllerOptions) *PictureController {
 	return &PictureController{
+		options:    options,
 		Controller: service.NewController("PictureController"),
 	}
 }
@@ -138,7 +148,42 @@ func (c *PictureController) UserGetID(ctx *app.UserGetIDPictureContext) error {
 		return err
 	}
 
+	mr := repositories.NewMediaRepository(c.options.Session)
+
+	lm, err := mr.Load(ctx, "598c0282-5c8c-4bdd-9e82-950ab796c059")
+	if err != nil {
+		return err
+	}
+
+	if lm != nil {
+		writer := bufio.NewWriter(ctx.ResponseData)
+
+		_, err = io.Copy(writer, lm.Reader)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	return ctx.OK(picture)
+}
+
+func (c *PictureController) UserSaveID(ctx *app.UserSaveIDPictureContext) error {
+	mr := repositories.NewMediaRepository(c.options.Session)
+
+	saved, err := mr.Save(ctx, ctx.RequestData)
+	if err != nil {
+		return err
+	}
+
+	// Need to save URL and ID with whatever this media should be attached to.
+
+	_ = saved
+
+	return ctx.OK(&app.MediaReferenceResponse{
+		ID:  0,
+		URL: "",
+	})
 }
 
 func (c *PictureController) ProjectGetID(ctx *app.ProjectGetIDPictureContext) error {
