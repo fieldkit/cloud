@@ -1864,9 +1864,9 @@ func NewAddFieldNoteContext(ctx context.Context, r *http.Request, service *goa.S
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *AddFieldNoteContext) OK(r *FieldNote) error {
+func (ctx *AddFieldNoteContext) OK(r *FieldNoteQueryResult) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.field_note+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.field_note_result+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -2012,9 +2012,9 @@ func NewUpdateFieldNoteContext(ctx context.Context, r *http.Request, service *go
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UpdateFieldNoteContext) OK(r *FieldNote) error {
+func (ctx *UpdateFieldNoteContext) OK(r *FieldNoteQueryResult) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.field_note+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.field_note_result+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

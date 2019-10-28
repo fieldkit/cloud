@@ -811,28 +811,6 @@ func (mt *Expeditions) Validate() (err error) {
 	return
 }
 
-// FieldNote media type (default view)
-//
-// Identifier: application/vnd.app.field_note+json; view=default
-type FieldNote struct {
-	CategoryID int       `form:"category_id" json:"category_id" yaml:"category_id" xml:"category_id"`
-	Created    time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
-	ID         int       `form:"id" json:"id" yaml:"id" xml:"id"`
-	MediaID    *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
-	Note       string    `form:"note" json:"note" yaml:"note" xml:"note"`
-	StationID  int       `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
-	UserID     int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
-}
-
-// Validate validates the FieldNote media type instance.
-func (mt *FieldNote) Validate() (err error) {
-
-	if mt.Note == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "note"))
-	}
-	return
-}
-
 // FieldNoteQueryResult media type (default view)
 //
 // Identifier: application/vnd.app.field_note_result+json; view=default

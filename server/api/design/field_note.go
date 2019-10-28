@@ -8,11 +8,10 @@ import (
 var AddFieldNotePayload = Type("AddFieldNotePayload", func() {
 	Attribute("station_id", Integer)
 	Attribute("created", DateTime)
-	Attribute("user_id", Integer)
 	Attribute("category_id", Integer)
 	Attribute("note", String)
 	Attribute("media_id", Integer)
-	Required("station_id", "created", "user_id")
+	Required("station_id", "created")
 })
 
 var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json", func() {
@@ -21,7 +20,7 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("created")
-		Attribute("user_id")
+		Attribute("user_id", Integer)
 		Attribute("category_key")
 		Attribute("note")
 		Attribute("media_url")
@@ -38,30 +37,6 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 		Attribute("media_url")
 		Attribute("media_content_type")
 		Attribute("username")
-	})
-})
-
-var FieldNote = MediaType("application/vnd.app.field_note+json", func() {
-	TypeName("FieldNote")
-	Reference(AddFieldNotePayload)
-	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("station_id")
-		Attribute("created")
-		Attribute("user_id")
-		Attribute("category_id")
-		Attribute("note")
-		Attribute("media_id")
-		Required("id", "station_id", "created", "user_id", "category_id", "note")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("station_id")
-		Attribute("created")
-		Attribute("user_id")
-		Attribute("category_id")
-		Attribute("note")
-		Attribute("media_id")
 	})
 })
 
@@ -91,7 +66,7 @@ var _ = Resource("field_note", func() {
 		Payload(AddFieldNotePayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(FieldNote)
+			Media(FieldNoteQueryResult)
 		})
 	})
 
@@ -106,7 +81,7 @@ var _ = Resource("field_note", func() {
 		Payload(AddFieldNotePayload)
 		Response(BadRequest)
 		Response(OK, func() {
-			Media(FieldNote)
+			Media(FieldNoteQueryResult)
 		})
 	})
 

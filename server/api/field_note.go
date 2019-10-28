@@ -1,10 +1,7 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/conservify/sqlxcache"
 
@@ -40,27 +37,6 @@ func FieldNoteQueryResultType(fieldNote *data.FieldNoteQueryResult) *app.FieldNo
 	return fieldNoteQueryResultType
 }
 
-func FieldNoteType(fieldNote *data.FieldNote) *app.FieldNote {
-	fieldNoteType := &app.FieldNote{
-		ID:          int(fieldNote.ID),
-		StationID:   int(fieldNote.StationID),
-		Created:     fieldNote.Created,
-		UserID:      int(fieldNote.UserID),
-		CategoryID:  int(fieldNote.CategoryID),
-	}
-
-	if fieldNote.Note != nil {
-		fieldNoteType.Note = *fieldNote.Note
-	}
-
-	if fieldNote.MediaID != nil {
-		mediaID := int(*fieldNote.MediaID)
-		fieldNoteType.MediaID = &mediaID
-	}
-
-	return fieldNoteType
-}
-
 func FieldNotesType(fieldNotes []*data.FieldNoteQueryResult) *app.FieldNotes {
 	fieldNotesCollection := make([]*app.FieldNoteQueryResult, len(fieldNotes))
 	for i, fieldNote := range fieldNotes {
@@ -85,9 +61,14 @@ func NewFieldNoteController(service *goa.Service, options FieldNoteControllerOpt
 }
 
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context") // internal error
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStationByStationID(int32(ctx.Payload.StationID))
+	if err != nil {
+		return err
 	}
 
 	// TODO: use true default category ID
@@ -99,7 +80,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	fieldNote := &data.FieldNote{
 		StationID:   int32(ctx.Payload.StationID),
 		Created:     ctx.Payload.Created,
-		UserID:      int32(ctx.Payload.UserID),
+		UserID:      p.UserID,
 		CategoryID:  int32(categoryId),
 	}
 
@@ -121,13 +102,23 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 		return err
 	}
 
-	return ctx.OK(FieldNoteType(fieldNote))
+	fieldNoteQueryResult := &data.FieldNoteQueryResult{}
+	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
+		return err
+	}
+
+	return ctx.OK(FieldNoteQueryResultType(fieldNoteQueryResult))
 }
 
 func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context") // internal error
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStationByStationID(int32(ctx.Payload.StationID))
+	if err != nil {
+		return err
 	}
 
 	// TODO: use true default category ID
@@ -140,7 +131,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		ID:          int32(ctx.FieldNoteID),
 		StationID:   int32(ctx.Payload.StationID),
 		Created:     ctx.Payload.Created,
-		UserID:      int32(ctx.Payload.UserID),
+		UserID:      p.UserID,
 		CategoryID:  int32(categoryId),
 	}
 
@@ -162,13 +153,18 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		return err
 	}
 
-	return ctx.OK(FieldNoteType(fieldNote))
+	fieldNoteQueryResult := &data.FieldNoteQueryResult{}
+	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
+		return err
+	}
+
+	return ctx.OK(FieldNoteQueryResultType(fieldNoteQueryResult))
 }
 
 func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 	fieldNotes := []*data.FieldNoteQueryResult{}
 
-	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1", ctx.StationID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1 ORDER BY fn.created DESC", ctx.StationID); err != nil {
 		return err
 	}
 
@@ -176,9 +172,14 @@ func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 }
 
 func (c *FieldNoteController) Delete(ctx *app.DeleteFieldNoteContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context") // internal error
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	if err != nil {
+		return err
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.field_note WHERE id = $1", ctx.FieldNoteID); err != nil {

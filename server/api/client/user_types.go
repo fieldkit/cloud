@@ -166,7 +166,6 @@ type addFieldNotePayload struct {
 	MediaID    *int       `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
 	Note       *string    `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
 	StationID  *int       `form:"station_id,omitempty" json:"station_id,omitempty" yaml:"station_id,omitempty" xml:"station_id,omitempty"`
-	UserID     *int       `form:"user_id,omitempty" json:"user_id,omitempty" yaml:"user_id,omitempty" xml:"user_id,omitempty"`
 }
 
 // Validate validates the addFieldNotePayload type instance.
@@ -176,9 +175,6 @@ func (ut *addFieldNotePayload) Validate() (err error) {
 	}
 	if ut.Created == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "created"))
-	}
-	if ut.UserID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "user_id"))
 	}
 	return
 }
@@ -201,9 +197,6 @@ func (ut *addFieldNotePayload) Publicize() *AddFieldNotePayload {
 	if ut.StationID != nil {
 		pub.StationID = *ut.StationID
 	}
-	if ut.UserID != nil {
-		pub.UserID = *ut.UserID
-	}
 	return &pub
 }
 
@@ -214,7 +207,6 @@ type AddFieldNotePayload struct {
 	MediaID    *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
 	Note       *string   `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
 	StationID  int       `form:"station_id" json:"station_id" yaml:"station_id" xml:"station_id"`
-	UserID     int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
 }
 
 // Validate validates the AddFieldNotePayload type instance.
