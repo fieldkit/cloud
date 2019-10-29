@@ -23,3 +23,5 @@ CREATE TABLE fieldkit.field_note (
     media_id integer REFERENCES fieldkit.field_note_media (id),
     note text
 );
+
+INSERT INTO fieldkit.field_note_category (key, name) VALUES ('default', 'General');

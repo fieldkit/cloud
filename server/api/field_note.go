@@ -71,8 +71,8 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 		return err
 	}
 
-	// TODO: use true default category ID
-	categoryId := 0
+	// default category ID
+	categoryId := 1
 	if ctx.Payload.CategoryID != nil {
 		categoryId = *ctx.Payload.CategoryID
 	}
@@ -121,8 +121,8 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		return err
 	}
 
-	// TODO: use true default category ID
-	categoryId := 0
+	// default category ID
+	categoryId := 1
 	if ctx.Payload.CategoryID != nil {
 		categoryId = *ctx.Payload.CategoryID
 	}
