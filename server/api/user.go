@@ -18,12 +18,22 @@ import (
 )
 
 func UserType(user *data.User) *app.User {
-	return &app.User{
-		ID:    int(user.ID),
-		Name:  user.Name,
-		Email: user.Email,
-		Bio:   user.Bio,
+    userType := &app.User{
+		ID:                int(user.ID),
+		Name:              user.Name,
+		Email:             user.Email,
+		Bio:               user.Bio,
 	}
+
+    if user.MediaURL != nil {
+        userType.MediaURL = user.MediaURL
+    }
+
+    if user.MediaContentType != nil {
+        userType.MediaContentType = user.MediaContentType
+    }
+
+    return userType
 }
 
 func UsersType(users []*data.User) *app.Users {
@@ -152,7 +162,7 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	now := time.Now()
 
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE email = $1", ctx.Payload.Email)
+	err := c.options.Database.GetContext(ctx, user, "SELECT u.id, u.name, u.email, u.bio, u.username, u.password, u.valid, u.media_url AS MediaURL, u.media_content_type AS MediaContentType FROM fieldkit.user AS u WHERE u.email = $1", ctx.Payload.Email)
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
@@ -235,7 +245,7 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	}
 
 	user := &data.User{}
-	err = c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", refreshToken.UserID)
+	err = c.options.Database.GetContext(ctx, user, "u.id, u.name, u.email, u.bio, u.username, u.password, u.valid, u.media_url AS MediaURL, u.media_content_type AS MediaContentType FROM fieldkit.user AS u WHERE u.id = $1", refreshToken.UserID)
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized()
 	}
@@ -267,7 +277,7 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 	}
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, "SELECT u.id, u.name, u.email, u.bio, u.username, u.password, u.valid, u.media_url AS MediaURL, u.media_content_type AS MediaContentType FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"]); err != nil {
 		return err
 	}
 
@@ -276,7 +286,7 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 
 func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, "u.id, u.name, u.email, u.bio, u.username, u.password, u.valid, u.media_url AS MediaURL, u.media_content_type AS MediaContentType FROM fieldkit.user AS u WHERE u.id = $1", ctx.UserID); err != nil {
 		return err
 	}
 
@@ -285,7 +295,7 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 
 func (c *UserController) List(ctx *app.ListUserContext) error {
 	users := []*data.User{}
-	if err := c.options.Database.SelectContext(ctx, &users, "SELECT * FROM fieldkit.user"); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &users, "u.id, u.name, u.email, u.bio, u.username, u.password, u.valid, u.media_url AS MediaURL, u.media_content_type AS MediaContentType FROM fieldkit.user AS u"); err != nil {
 		return err
 	}
 

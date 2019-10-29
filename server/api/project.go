@@ -18,7 +18,7 @@ type ProjectControllerOptions struct {
 }
 
 func ProjectType(project *data.Project) *app.Project {
-	return &app.Project{
+    projectType := &app.Project{
 		ID:          int(project.ID),
 		Name:        project.Name,
 		Slug:        project.Slug,
@@ -30,6 +30,16 @@ func ProjectType(project *data.Project) *app.Project {
 		StartTime:   project.StartTime,
 		EndTime:     project.EndTime,
 	}
+
+    if project.MediaURL != nil {
+        projectType.MediaURL = project.MediaURL
+    }
+
+    if project.MediaContentType != nil {
+        projectType.MediaContentType = project.MediaContentType
+    }
+
+	return projectType
 }
 
 func ProjectsType(projects []*data.Project) *app.Projects {
@@ -153,7 +163,7 @@ func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
 
 func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT * FROM fieldkit.project WHERE slug = $1", ctx.Project); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, "SELECT p.id, p.name, p.slug, p.description, p.goal, p.location, p.tags, p.start_time, p.end_time, p.private, p.media_url AS MediaURL, p.media_content_type AS MediaContentType FROM fieldkit.project AS p WHERE p.slug = $1", ctx.Project); err != nil {
 		return err
 	}
 
@@ -162,7 +172,7 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 
 func (c *ProjectController) GetID(ctx *app.GetIDProjectContext) error {
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT * FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, "SELECT p.id, p.name, p.slug, p.description, p.goal, p.location, p.tags, p.start_time, p.end_time, p.private, p.media_url AS MediaURL, p.media_content_type AS MediaContentType FROM fieldkit.project AS p WHERE p.id = $1", ctx.ProjectID); err != nil {
 		return err
 	}
 
@@ -171,7 +181,7 @@ func (c *ProjectController) GetID(ctx *app.GetIDProjectContext) error {
 
 func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT * FROM fieldkit.project"); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.id, p.name, p.slug, p.description, p.goal, p.location, p.tags, p.start_time, p.end_time, p.private, p.media_url AS MediaURL, p.media_content_type AS MediaContentType FROM fieldkit.project AS p"); err != nil {
 		return err
 	}
 
@@ -190,7 +200,7 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	}
 
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.id, p.name, p.slug, p.description, p.goal, p.location, p.tags, p.start_time, p.end_time, p.private, p.media_url AS MediaURL, p.media_content_type AS MediaContentType FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1", claims["sub"]); err != nil {
 		return err
 	}
 

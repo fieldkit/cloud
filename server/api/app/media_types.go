@@ -1284,16 +1284,18 @@ func (mt *PagedGeoJSON) Validate() (err error) {
 //
 // Identifier: application/vnd.app.project+json; view=default
 type Project struct {
-	Description string     `form:"description" json:"description" yaml:"description" xml:"description"`
-	EndTime     *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
-	Goal        string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
-	ID          int        `form:"id" json:"id" yaml:"id" xml:"id"`
-	Location    string     `form:"location" json:"location" yaml:"location" xml:"location"`
-	Name        string     `form:"name" json:"name" yaml:"name" xml:"name"`
-	Private     bool       `form:"private" json:"private" yaml:"private" xml:"private"`
-	Slug        string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
-	StartTime   *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
-	Tags        string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
+	Description      string     `form:"description" json:"description" yaml:"description" xml:"description"`
+	EndTime          *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	Goal             string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
+	ID               int        `form:"id" json:"id" yaml:"id" xml:"id"`
+	Location         string     `form:"location" json:"location" yaml:"location" xml:"location"`
+	MediaContentType *string    `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
+	MediaURL         *string    `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
+	Name             string     `form:"name" json:"name" yaml:"name" xml:"name"`
+	Private          bool       `form:"private" json:"private" yaml:"private" xml:"private"`
+	Slug             string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	StartTime        *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	Tags             string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
 }
 
 // Validate validates the Project media type instance.
@@ -1857,10 +1859,12 @@ func (mt TwitterAccountSourceCollection) Validate() (err error) {
 //
 // Identifier: application/vnd.app.user+json; view=default
 type User struct {
-	Bio   string `form:"bio" json:"bio" yaml:"bio" xml:"bio"`
-	Email string `form:"email" json:"email" yaml:"email" xml:"email"`
-	ID    int    `form:"id" json:"id" yaml:"id" xml:"id"`
-	Name  string `form:"name" json:"name" yaml:"name" xml:"name"`
+	Bio              string  `form:"bio" json:"bio" yaml:"bio" xml:"bio"`
+	Email            string  `form:"email" json:"email" yaml:"email" xml:"email"`
+	ID               int     `form:"id" json:"id" yaml:"id" xml:"id"`
+	MediaContentType *string `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
+	MediaURL         *string `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
+	Name             string  `form:"name" json:"name" yaml:"name" xml:"name"`
 }
 
 // Validate validates the User media type instance.
