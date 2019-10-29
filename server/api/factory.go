@@ -137,7 +137,9 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.MountDeviceController(service, c10)
 
 	// Mount "picture" controller
-	c11 := NewPictureController(service)
+	c11 := NewPictureController(service, &PictureControllerOptions{
+		Session: awsSession,
+	})
 	app.MountPictureController(service, c11)
 
 	// Mount "source_token" controller

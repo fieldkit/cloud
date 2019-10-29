@@ -51,6 +51,7 @@ github.com/fieldkit/cloud v0.0.0-20180414192002-62152ebe8d7d/go.mod h1:3t/uXpAzd
 github.com/fieldkit/cloud v0.0.0-20190822011034-2ebd4a3af414 h1:NF0aEAKIGZTm6vFJzJWGtM3NhGPtzxwYdn9bucdn6+Q=
 github.com/fieldkit/cloud v0.0.0-20190911153726-1b72131c5b7d h1:FObJtbGmPK+z2VmnEfoHIaDA69BGqct9e5hseD3/trY=
 github.com/fieldkit/cloud v0.0.0-20191002001852-3e87ba6752d4 h1:wb88366PFYzxvJx0NgCQeE1I14tXDKWFz705ya5OBuQ=
+github.com/fieldkit/cloud v0.0.0-20191028164840-9ff8c2eb0152 h1:IYJzCA0Y/14HPMT5M23KUnMEU9cXdBBmerfhO2HNoWQ=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e h1:rFW2B+LYyxl52yCRhUXiORgPL9HXM9h40mkkyPg2jY0=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e/go.mod h1:Atpguegf5+RPc1NjBgZ3oukS3WAqckGBcLjdRJOvY6A=
 github.com/fieldkit/data-protocol v0.0.0-20190903230951-dd4bd77f8fec h1:UZ8oj/i5PLGrAV0WqiRYzy32woAictOHHrPFWhA4w18=
@@ -80,6 +81,8 @@ github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135 h1:zLTLjkaOF
 github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/h2non/filetype v1.0.10 h1:z+SJfnL6thYJ9kAST+6nPRXp1lMxnOVbMZHNYHMar0s=
+github.com/h2non/filetype v1.0.10/go.mod h1:isekKqOuhMj+s/7r3rIeTErIRy4Rub5uBWHfvMusLMU=
 github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa h1:0nA8i+6Rwqaq9xlpmVxxTwk6rxiEhX+E6Wh4vPNHiS8=
 github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa/go.mod h1:6ij3Z20p+OhOkCSrA0gImAWoHYQRGbnlcuk6XYTiaRw=
 github.com/hashicorp/golang-lru v0.0.0-20180201235237-0fb14efe8c47 h1:UnszMmmmm5vLwWzDjTFVIkfhvWF1NdrmChl8L2NUDCw=

@@ -3621,6 +3621,7 @@ type PictureController interface {
 	ExpeditionGetID(*ExpeditionGetIDPictureContext) error
 	ProjectGetID(*ProjectGetIDPictureContext) error
 	UserGetID(*UserGetIDPictureContext) error
+	UserSaveID(*UserSaveIDPictureContext) error
 }
 
 // MountPictureController "mounts" a Picture resource controller on the given service.
@@ -3678,6 +3679,22 @@ func MountPictureController(service *goa.Service, ctrl PictureController) {
 	h = handlePictureOrigin(h)
 	service.Mux.Handle("GET", "/users/:userId/picture", ctrl.MuxHandler("user get id", h, nil))
 	service.LogInfo("mount", "ctrl", "Picture", "action", "UserGetID", "route", "GET /users/:userId/picture")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUserSaveIDPictureContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.UserSaveID(rctx)
+	}
+	h = handlePictureOrigin(h)
+	service.Mux.Handle("POST", "/users/:userId/picture", ctrl.MuxHandler("user save id", h, nil))
+	service.LogInfo("mount", "ctrl", "Picture", "action", "UserSaveID", "route", "POST /users/:userId/picture")
 }
 
 // handlePictureOrigin applies the CORS response headers corresponding to the origin.

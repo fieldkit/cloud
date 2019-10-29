@@ -104,3 +104,33 @@ func (c *Client) NewUserGetIDPictureRequest(ctx context.Context, path string) (*
 	}
 	return req, nil
 }
+
+// UserSaveIDPicturePath computes a request path to the user save id action of picture.
+func UserSaveIDPicturePath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s/picture", param0)
+}
+
+// Save a user's picture
+func (c *Client) UserSaveIDPicture(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewUserSaveIDPictureRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewUserSaveIDPictureRequest create the request corresponding to the user save id action endpoint of the picture resource.
+func (c *Client) NewUserSaveIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}

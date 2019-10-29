@@ -3156,6 +3156,49 @@ func (ctx *UserGetIDPictureContext) BadRequest() error {
 	return nil
 }
 
+// UserSaveIDPictureContext provides the picture user save id action context.
+type UserSaveIDPictureContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID int
+}
+
+// NewUserSaveIDPictureContext parses the incoming request URL and body, performs validations and creates the
+// context used by the picture controller user save id action.
+func NewUserSaveIDPictureContext(ctx context.Context, r *http.Request, service *goa.Service) (*UserSaveIDPictureContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UserSaveIDPictureContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["userId"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UserSaveIDPictureContext) OK(r *MediaReferenceResponse) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.media+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UserSaveIDPictureContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // AddProjectContext provides the project add action context.
 type AddProjectContext struct {
 	context.Context

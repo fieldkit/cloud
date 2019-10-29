@@ -35,6 +35,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/google/uuid v1.1.1
+	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
 	github.com/hashicorp/golang-lru v0.0.0-20180201235237-0fb14efe8c47
 	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect

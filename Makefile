@@ -143,3 +143,9 @@ distribution:
 	cp -ar ~/.fk/tools $(BUILD)/distribution/darwin
 	GOOS=windows GOARCH=amd64 BUILD=$(BUILD)/distribution/windows $(MAKE) $(BUILD)/distribution/windows/fkflash
 	cp -ar ~/.fk/tools $(BUILD)/distribution/windows
+
+migrate-up:
+	migrate -path migrations -database postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable up
+
+migrate-down:
+	migrate -path migrations -database postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable down
