@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -20,18 +22,19 @@ import (
 type SavedMedia struct {
 	ID       string
 	URL      string
-	MimeType string
 	Size     int
+	MimeType string
 }
 
 type LoadedMedia struct {
-	ID     string
-	URL    string
-	Reader io.Reader
+	ID       string
+	Size     int
+	MimeType string
+	Reader   io.Reader
 }
 
 const (
-	MinimumRequiredBytes = 262
+	MaximumRequiredHeaderBytes = 262
 )
 
 type MediaRepository struct {
@@ -49,31 +52,44 @@ func NewMediaRepository(session *session.Session) (r *MediaRepository) {
 func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *SavedMedia, err error) {
 	log := Logger(ctx).Sugar()
 
-	contentType := rd.Header["Content-Type"]
-	if len(contentType) != 1 || contentType[0] == "" {
-		return nil, fmt.Errorf("invalid content type (empty)")
+	contentLength := rd.ContentLength
+
+	headerLength := int64(MaximumRequiredHeaderBytes)
+	if contentLength < headerLength {
+		headerLength = contentLength
 	}
 
-	cr := NewCountingReader(rd.Body)
-	hpr := NewHeaderPreservingReader(cr, 262)
+	var buf bytes.Buffer
+	headerReader := bufio.NewReader(io.TeeReader(io.LimitReader(rd.Body, headerLength), &buf))
 
-	// NOTE Ideally we'd buffer the first 262 bytes and then classify the
-	// image and then decide if we should go to S3 or not.
+	header := make([]byte, headerLength)
+	_, err = io.ReadFull(headerReader, header)
+	if err != nil {
+		return nil, err
+	}
 
-	id := uuid.Must(uuid.NewRandom())
+	kind, _ := filetype.Match(header)
+	if kind == filetype.Unknown {
+		return nil, fmt.Errorf("unknown file type")
+	}
 
-	log.Infow("saving", "content_type", contentType, "id", id)
+	contentType := kind.MIME.Value
 
 	metadata := make(map[string]*string)
-
+	id := uuid.Must(uuid.NewRandom())
 	uploader := s3manager.NewUploader(r.session)
+
+	log.Infow("saving", "content_type", contentType, "id", id, "extension", kind.Extension, "mime_type", kind.MIME.Value)
+
+	objReader := io.MultiReader(bytes.NewReader(buf.Bytes()), rd.Body)
+	cr := NewCountingReader(objReader)
 
 	o, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
-		ContentType: aws.String(contentType[0]),
+		ContentType: aws.String(contentType),
 		Bucket:      aws.String(r.bucketName),
 		Key:         aws.String(id.String()),
-		Body:        hpr,
+		Body:        cr,
 		Metadata:    metadata,
 		Tagging:     nil,
 	})
@@ -81,29 +97,7 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 		return nil, err
 	}
 
-	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead, "header_size", len(hpr.Header))
-
-	kind, _ := filetype.Match(hpr.Header)
-	if kind == filetype.Unknown {
-		svc := s3.New(r.session)
-
-		_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(r.bucketName), Key: aws.String(id.String())})
-		if err != nil {
-			return nil, fmt.Errorf("unable to delete object %q from bucket %q, %v", id, r.bucketName, err)
-		}
-
-		err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-			Bucket: aws.String(r.bucketName),
-			Key:    aws.String(id.String()),
-		})
-		if err != nil {
-			return nil, fmt.Errorf("error deleting invalid file typed upload", err)
-		}
-
-		return nil, fmt.Errorf("unknown file type")
-	}
-
-	log.Infow("file type", "extension", kind.Extension, "mime_type", kind.MIME.Value)
+	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead)
 
 	sm = &SavedMedia{
 		ID:       id.String(),
@@ -132,10 +126,17 @@ func (r *MediaRepository) Load(ctx context.Context, id string) (lm *LoadedMedia,
 		return nil, fmt.Errorf("error reading object %v: %v", id, err)
 	}
 
+	contentLength := 0
+
+	if obj.ContentLength != nil {
+		contentLength = int(*obj.ContentLength)
+	}
+
 	lm = &LoadedMedia{
-		ID:     id,
-		URL:    "",
-		Reader: obj.Body,
+		ID:       id,
+		Size:     contentLength,
+		MimeType: "",
+		Reader:   obj.Body,
 	}
 
 	return
@@ -155,30 +156,5 @@ func NewCountingReader(target io.Reader) *CountingReader {
 func (r *CountingReader) Read(p []byte) (n int, err error) {
 	n, err = r.target.Read(p)
 	r.BytesRead += n
-	return n, err
-}
-
-type HeaderPreservingReader struct {
-	target io.Reader
-	Header []byte
-}
-
-func NewHeaderPreservingReader(target io.Reader, sizeToPreserve int) *HeaderPreservingReader {
-	return &HeaderPreservingReader{
-		target: target,
-		Header: make([]byte, 0, sizeToPreserve),
-	}
-}
-
-func (r *HeaderPreservingReader) Read(p []byte) (n int, err error) {
-	n, err = r.target.Read(p)
-	avail := cap(r.Header) - len(r.Header)
-	if avail > 0 {
-		copying := avail
-		if copying > n {
-			copying = n
-		}
-		r.Header = append(r.Header, p[:copying]...)
-	}
 	return n, err
 }
