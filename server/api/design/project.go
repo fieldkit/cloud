@@ -35,6 +35,8 @@ var Project = MediaType("application/vnd.app.project+json", func() {
 		Attribute("private", Boolean)
 		Attribute("start_time", DateTime)
 		Attribute("end_time", DateTime)
+		Attribute("media_url")
+		Attribute("media_content_type")
 		Required("id", "name", "slug", "description", "goal", "location", "private", "tags")
 	})
 	View("default", func() {
@@ -48,6 +50,8 @@ var Project = MediaType("application/vnd.app.project+json", func() {
 		Attribute("private")
 		Attribute("start_time")
 		Attribute("end_time")
+		Attribute("media_url")
+		Attribute("media_content_type")
 	})
 })
 

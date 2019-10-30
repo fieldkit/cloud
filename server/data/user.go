@@ -37,13 +37,15 @@ func compareHashAndPassword(hashedPassword []byte, password string) ([]byte, err
 }
 
 type User struct {
-	ID       int32  `db:"id,omitempty"`
-	Name     string `db:"name"`
-	Username string `db:"username"`
-	Email    string `db:"email"`
-	Password []byte `db:"password"`
-	Valid    bool   `db:"valid"`
-	Bio      string `db:"bio"`
+	ID               int32   `db:"id,omitempty"`
+	Name             string  `db:"name"`
+	Username         string  `db:"username"`
+	Email            string  `db:"email"`
+	Password         []byte  `db:"password"`
+	Valid            bool    `db:"valid"`
+	Bio              string  `db:"bio"`
+	MediaURL         *string `db:"media_url"`
+	MediaContentType *string `db:"media_content_type"`
 }
 
 func (p *User) SetPassword(password string) error {

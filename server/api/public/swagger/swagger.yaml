@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      userId: 2.8320843843204664e+18
+      userId: 5.351246809013627e+18
     properties:
       userId:
-        example: 2.8320843843204664e+18
+        example: 5.351246809013627e+18
         format: int64
         type: integer
     required:
@@ -15,14 +15,14 @@ definitions:
     type: object
   AddDeviceSourcePayload:
     example:
-      key: Voluptas corrupti delectus odio.
-      name: Expedita sapiente nam.
+      key: Odio voluptate eligendi.
+      name: Voluptas sapiente pariatur doloribus.
     properties:
       key:
-        example: Voluptas corrupti delectus odio.
+        example: Odio voluptate eligendi.
         type: string
       name:
-        example: Expedita sapiente nam.
+        example: Voluptas sapiente pariatur doloribus.
         type: string
     required:
     - name
@@ -31,18 +31,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Voluptas sapiente pariatur doloribus.
-      name: Eos amet non.
-      slug: 10mgwcc1rz
+      description: Aperiam sit aut.
+      name: Repellat aliquid expedita ut sequi.
+      slug: zoszx1gdtn
     properties:
       description:
-        example: Voluptas sapiente pariatur doloribus.
+        example: Aperiam sit aut.
         type: string
       name:
-        example: Eos amet non.
+        example: Repellat aliquid expedita ut sequi.
         type: string
       slug:
-        example: 10mgwcc1rz
+        example: zoszx1gdtn
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -54,29 +54,29 @@ definitions:
     type: object
   AddFieldNotePayload:
     example:
-      category_id: 3.631489896658852e+18
-      created: "2016-03-20T03:08:40Z"
-      media_id: 3.028439514629568e+18
-      note: Optio perspiciatis explicabo ullam ea amet aspernatur.
-      station_id: 1.25167971671807e+14
+      category_id: 4.4982602406439547e+18
+      created: "1997-08-12T05:56:20Z"
+      media_id: 4.2629536880077783e+18
+      note: Voluptate quis voluptate ipsa fugiat culpa nulla.
+      station_id: 4.074229410810862e+17
     properties:
       category_id:
-        example: 3.631489896658852e+18
+        example: 4.4982602406439547e+18
         format: int64
         type: integer
       created:
-        example: "2016-03-20T03:08:40Z"
+        example: "1997-08-12T05:56:20Z"
         format: date-time
         type: string
       media_id:
-        example: 3.028439514629568e+18
+        example: 4.2629536880077783e+18
         format: int64
         type: integer
       note:
-        example: Optio perspiciatis explicabo ullam ea amet aspernatur.
+        example: Voluptate quis voluptate ipsa fugiat culpa nulla.
         type: string
       station_id:
-        example: 1.25167971671807e+14
+        example: 4.074229410810862e+17
         format: int64
         type: integer
     required:
@@ -86,26 +86,26 @@ definitions:
     type: object
   AddFirmwarePayload:
     example:
-      etag: Explicabo distinctio commodi repellendus.
-      meta: Eos ratione quis repellendus incidunt reprehenderit dolore.
-      module: Molestias commodi dolores sequi nisi excepturi ab.
-      profile: Tenetur et corporis consequatur itaque et.
-      url: Fugiat est.
+      etag: Delectus odio voluptatem expedita sapiente nam.
+      meta: In facilis non.
+      module: Nihil aut sunt nulla autem nihil suscipit.
+      profile: Repellendus consequuntur sint quidem odio dolor recusandae.
+      url: Modi omnis possimus eveniet.
     properties:
       etag:
-        example: Explicabo distinctio commodi repellendus.
+        example: Delectus odio voluptatem expedita sapiente nam.
         type: string
       meta:
-        example: Eos ratione quis repellendus incidunt reprehenderit dolore.
+        example: In facilis non.
         type: string
       module:
-        example: Molestias commodi dolores sequi nisi excepturi ab.
+        example: Nihil aut sunt nulla autem nihil suscipit.
         type: string
       profile:
-        example: Tenetur et corporis consequatur itaque et.
+        example: Repellendus consequuntur sint quidem odio dolor recusandae.
         type: string
       url:
-        example: Fugiat est.
+        example: Modi omnis possimus eveniet.
         type: string
     required:
     - etag
@@ -117,14 +117,14 @@ definitions:
     type: object
   AddMemberPayload:
     example:
-      role: Esse officiis.
-      userId: 4.4982602406439547e+18
+      role: Odit et quam.
+      userId: 5.83397975931393e+18
     properties:
       role:
-        example: Esse officiis.
+        example: Odit et quam.
         type: string
       userId:
-        example: 4.4982602406439547e+18
+        example: 5.83397975931393e+18
         format: int64
         type: integer
     required:
@@ -134,46 +134,46 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Culpa nulla quae quisquam eaque.
-      end_time: "1981-04-28T10:39:04Z"
-      goal: Unde nostrum optio voluptatem qui.
-      location: Dicta labore delectus nisi et.
-      name: Necessitatibus nostrum.
-      private: false
-      slug: 96e4tm3iin
-      start_time: "1981-11-17T16:59:31Z"
-      tags: Ut debitis.
+      description: Omnis provident ut.
+      end_time: "2003-11-12T07:46:58Z"
+      goal: Dignissimos consequatur eius corrupti voluptates ullam.
+      location: Aliquid hic soluta ab quia enim rem.
+      name: Dignissimos possimus ut et tempore doloribus.
+      private: true
+      slug: qctbdthumj
+      start_time: "2007-09-05T02:10:22Z"
+      tags: Iure iusto dolores voluptatum eveniet.
     properties:
       description:
-        example: Culpa nulla quae quisquam eaque.
+        example: Omnis provident ut.
         type: string
       end_time:
-        example: "1981-04-28T10:39:04Z"
+        example: "2003-11-12T07:46:58Z"
         format: date-time
         type: string
       goal:
-        example: Unde nostrum optio voluptatem qui.
+        example: Dignissimos consequatur eius corrupti voluptates ullam.
         type: string
       location:
-        example: Dicta labore delectus nisi et.
+        example: Aliquid hic soluta ab quia enim rem.
         type: string
       name:
-        example: Necessitatibus nostrum.
+        example: Dignissimos possimus ut et tempore doloribus.
         type: string
       private:
-        example: false
+        example: true
         type: boolean
       slug:
-        example: 96e4tm3iin
+        example: qctbdthumj
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
       start_time:
-        example: "1981-11-17T16:59:31Z"
+        example: "2007-09-05T02:10:22Z"
         format: date-time
         type: string
       tags:
-        example: Ut debitis.
+        example: Iure iusto dolores voluptatum eveniet.
         type: string
     required:
     - name
@@ -183,24 +183,24 @@ definitions:
     type: object
   AddStationLogPayload:
     example:
-      ID: 4.5638884538200883e+18
-      body: Voluptatum eveniet aut ea sint.
-      station_id: 5.423641607668444e+18
-      timestamp: Veritatis fugiat qui.
+      ID: 4.875276402383419e+18
+      body: Reiciendis temporibus et maiores.
+      station_id: 6.651773843965457e+18
+      timestamp: Quis labore quas quis error aut deserunt.
     properties:
       ID:
-        example: 4.5638884538200883e+18
+        example: 4.875276402383419e+18
         format: int64
         type: integer
       body:
-        example: Voluptatum eveniet aut ea sint.
+        example: Reiciendis temporibus et maiores.
         type: string
       station_id:
-        example: 5.423641607668444e+18
+        example: 6.651773843965457e+18
         format: int64
         type: integer
       timestamp:
-        example: Veritatis fugiat qui.
+        example: Quis labore quas quis error aut deserunt.
         type: string
     required:
     - ID
@@ -212,17 +212,25 @@ definitions:
   AddStationLogsPayload:
     example:
       station_logs:
-      - ID: 4.5638884538200883e+18
-        body: Voluptatum eveniet aut ea sint.
-        station_id: 5.423641607668444e+18
-        timestamp: Veritatis fugiat qui.
+      - ID: 4.875276402383419e+18
+        body: Reiciendis temporibus et maiores.
+        station_id: 6.651773843965457e+18
+        timestamp: Quis labore quas quis error aut deserunt.
+      - ID: 4.875276402383419e+18
+        body: Reiciendis temporibus et maiores.
+        station_id: 6.651773843965457e+18
+        timestamp: Quis labore quas quis error aut deserunt.
     properties:
       station_logs:
         example:
-        - ID: 4.5638884538200883e+18
-          body: Voluptatum eveniet aut ea sint.
-          station_id: 5.423641607668444e+18
-          timestamp: Veritatis fugiat qui.
+        - ID: 4.875276402383419e+18
+          body: Reiciendis temporibus et maiores.
+          station_id: 6.651773843965457e+18
+          timestamp: Quis labore quas quis error aut deserunt.
+        - ID: 4.875276402383419e+18
+          body: Reiciendis temporibus et maiores.
+          station_id: 6.651773843965457e+18
+          timestamp: Quis labore quas quis error aut deserunt.
         items:
           $ref: '#/definitions/AddStationLogPayload'
         type: array
@@ -232,21 +240,21 @@ definitions:
     type: object
   AddStationPayload:
     example:
-      device_id: Hic soluta.
-      name: Quia enim.
+      device_id: Soluta ut molestiae at autem.
+      name: Ut animi possimus.
       status_json:
-        Dignissimos possimus ut et tempore doloribus.: "1995-10-11T18:32:47Z"
+        Quisquam qui iste dolore non nam et.: 0.019116099652678575
     properties:
       device_id:
-        example: Hic soluta.
+        example: Soluta ut molestiae at autem.
         type: string
       name:
-        example: Quia enim.
+        example: Ut animi possimus.
         type: string
       status_json:
         additionalProperties: true
         example:
-          Dignissimos possimus ut et tempore doloribus.: "1995-10-11T18:32:47Z"
+          Quisquam qui iste dolore non nam et.: 0.019116099652678575
         type: object
     required:
     - name
@@ -256,20 +264,20 @@ definitions:
     type: object
   AddTeamPayload:
     example:
-      description: Ut molestiae at.
-      name: 0ojnp8lz3b
-      slug: zntdngxk4x
+      description: Dicta quaerat.
+      name: pgcmyia3bk
+      slug: z14zcunavf
     properties:
       description:
-        example: Ut molestiae at.
+        example: Dicta quaerat.
         type: string
       name:
-        example: 0ojnp8lz3b
+        example: pgcmyia3bk
         maxLength: 256
         pattern: \S
         type: string
       slug:
-        example: zntdngxk4x
+        example: z14zcunavf
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -281,10 +289,10 @@ definitions:
     type: object
   AddTwitterAccountSourcePayload:
     example:
-      name: Aut quas ut omnis cum eveniet.
+      name: Tempora ullam iusto voluptatibus qui.
     properties:
       name:
-        example: Aut quas ut omnis cum eveniet.
+        example: Tempora ullam iusto voluptatibus qui.
         type: string
     required:
     - name
@@ -292,25 +300,25 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: baby@morissette.org
-      invite_token: Tempora ullam iusto voluptatibus qui.
-      name: 48ba7462sj
-      password: b81jdke11t
+      email: ozella_funk@harvey.biz
+      invite_token: Sunt necessitatibus quis voluptatibus.
+      name: r1i1vgc9gf
+      password: kjpejfm10j
     properties:
       email:
-        example: baby@morissette.org
+        example: ozella_funk@harvey.biz
         format: email
         type: string
       invite_token:
-        example: Tempora ullam iusto voluptatibus qui.
+        example: Sunt necessitatibus quis voluptatibus.
         type: string
       name:
-        example: 48ba7462sj
+        example: r1i1vgc9gf
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: b81jdke11t
+        example: kjpejfm10j
         minLength: 10
         type: string
     required:
@@ -322,14 +330,14 @@ definitions:
   BadRequestResponse:
     description: BadRequestResponse media type (default view)
     example:
-      key: Perferendis illum ex.
-      message: Sunt repellendus.
+      key: Itaque et id fugiat est aperiam.
+      message: Eum quis voluptas.
     properties:
       key:
-        example: Perferendis illum ex.
+        example: Itaque et id fugiat est aperiam.
         type: string
       message:
-        example: Sunt repellendus.
+        example: Eum quis voluptas.
         type: string
     required:
     - key
@@ -508,6 +516,22 @@ definitions:
       radius: 0.6413264274751794
       sourceId: 7.079765484340422e+18
       startTime: "2007-06-02T05:09:37Z"
+    - centroid:
+      - 0.1963642971802602
+      - 0.1963642971802602
+      endTime: "1985-12-10T12:08:18Z"
+      envelope:
+      - - 0.36855272723140065
+        - 0.36855272723140065
+      - - 0.36855272723140065
+        - 0.36855272723140065
+      - - 0.36855272723140065
+        - 0.36855272723140065
+      id: 8.920319150409112e+18
+      numberOfFeatures: 4.45138242589985e+17
+      radius: 0.6413264274751794
+      sourceId: 7.079765484340422e+18
+      startTime: "2007-06-02T05:09:37Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -618,6 +642,22 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -635,12 +675,15 @@ definitions:
         meta: 9.930548092478253e+17
         record: 3.4522485535092884e+18
         time: "1998-06-18T18:01:05Z"
-      meta:
       - data:
-          Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-        id: 2.4194290054188964e+18
-        record: 5.508071077920418e+18
-        time: "2016-03-26T05:44:35Z"
+          Sapiente ipsa expedita qui eum enim deleniti.: false
+        id: 5.114928591801609e+18
+        location:
+        - 0.3817722467100891
+        meta: 9.930548092478253e+17
+        record: 3.4522485535092884e+18
+        time: "1998-06-18T18:01:05Z"
+      meta:
       - data:
           Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
         id: 2.4194290054188964e+18
@@ -690,17 +733,6 @@ definitions:
     description: DeviceDataSummaryResponse media type (default view)
     example:
       provisions:
-      - created: "1973-11-02T00:00:41Z"
-        data:
-          first: 3.962019451405188e+17
-          last: 8.016932918719963e+18
-          size: 6.04033343035064e+18
-        generation: Sint velit.
-        meta:
-          first: 3.581489287797375e+18
-          last: 3.883821826590393e+16
-          size: 7.246416408234746e+18
-        updated: "1985-12-23T02:24:18Z"
       - created: "1973-11-02T00:00:41Z"
         data:
           first: 3.962019451405188e+17
@@ -936,6 +968,34 @@ definitions:
         urls:
           csv: A voluptas.
           fkpb: Dolorum itaque qui sequi.
+      - corrupted: false
+        device_id: Ea quibusdam optio.
+        file_id: Et autem aliquid voluptate.
+        file_type_id: Dolores quo suscipit.
+        file_type_name: Magni in ipsam asperiores nostrum facere dignissimos.
+        firmware: Repellendus quam soluta.
+        id: 8.732123841310651e+17
+        meta: Quis ut repellendus ratione.
+        size: 5.66413114730693e+18
+        time: "1972-09-14T07:30:30Z"
+        url: Praesentium ratione et.
+        urls:
+          csv: A voluptas.
+          fkpb: Dolorum itaque qui sequi.
+      - corrupted: false
+        device_id: Ea quibusdam optio.
+        file_id: Et autem aliquid voluptate.
+        file_type_id: Dolores quo suscipit.
+        file_type_name: Magni in ipsam asperiores nostrum facere dignissimos.
+        firmware: Repellendus quam soluta.
+        id: 8.732123841310651e+17
+        meta: Quis ut repellendus ratione.
+        size: 5.66413114730693e+18
+        time: "1972-09-14T07:30:30Z"
+        url: Praesentium ratione et.
+        urls:
+          csv: A voluptas.
+          fkpb: Dolorum itaque qui sequi.
     properties:
       files:
         $ref: '#/definitions/DeviceFileCollection'
@@ -980,6 +1040,11 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -1102,6 +1167,28 @@ definitions:
         last: 3.883821826590393e+16
         size: 7.246416408234746e+18
       updated: "1985-12-23T02:24:18Z"
+    - created: "1973-11-02T00:00:41Z"
+      data:
+        first: 3.962019451405188e+17
+        last: 8.016932918719963e+18
+        size: 6.04033343035064e+18
+      generation: Sint velit.
+      meta:
+        first: 3.581489287797375e+18
+        last: 3.883821826590393e+16
+        size: 7.246416408234746e+18
+      updated: "1985-12-23T02:24:18Z"
+    - created: "1973-11-02T00:00:41Z"
+      data:
+        first: 3.962019451405188e+17
+        last: 8.016932918719963e+18
+        size: 6.04033343035064e+18
+      generation: Sint velit.
+      meta:
+        first: 3.581489287797375e+18
+        last: 3.883821826590393e+16
+        size: 7.246416408234746e+18
+      updated: "1985-12-23T02:24:18Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'
     title: 'Mediatype identifier: application/vnd.app.device.provision.summary+json;
@@ -1157,6 +1244,12 @@ definitions:
       key: Et vitae itaque consequatur.
       projectId: 8.956872947377188e+18
       schemaId: 8.87141068127181e+18
+    - active: true
+      deviceId: 5.157638177597977e+17
+      jsonSchema: Rerum rerum et quia ut incidunt consequatur.
+      key: Et vitae itaque consequatur.
+      projectId: 8.956872947377188e+18
+      schemaId: 8.87141068127181e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -1166,12 +1259,6 @@ definitions:
     description: DeviceSchemas media type (default view)
     example:
       schemas:
-      - active: true
-        deviceId: 5.157638177597977e+17
-        jsonSchema: Rerum rerum et quia ut incidunt consequatur.
-        key: Et vitae itaque consequatur.
-        projectId: 8.956872947377188e+18
-        schemaId: 8.87141068127181e+18
       - active: true
         deviceId: 5.157638177597977e+17
         jsonSchema: Rerum rerum et quia ut incidunt consequatur.
@@ -1269,14 +1356,6 @@ definitions:
     description: DeviceSources media type (default view)
     example:
       deviceSources:
-      - active: true
-        expeditionId: 4.86881556417374e+18
-        id: 5.509519436237e+18
-        key: Laboriosam facere et quo.
-        name: Aut vel quisquam voluptatem doloribus perferendis.
-        teamId: 1.5887009993142717e+18
-        token: Quisquam pariatur molestiae.
-        userId: 4.7126481066901e+18
       - active: true
         expeditionId: 4.86881556417374e+18
         id: 5.509519436237e+18
@@ -1406,72 +1485,6 @@ definitions:
           generate: Provident earum sit enim sapiente assumenda.
           id: Dolores dolores et.
           info: Sit velit quo eveniet in.
-    - data_size: 3.1889681637076403e+18
-      device_id: Facilis quis blanditiis recusandae est.
-      last_file_id: Rem vel est qui ratione sequi et.
-      last_file_time: "1980-07-23T03:28:45Z"
-      locations:
-        entries:
-        - coordinates:
-          - 0.9290439533835787
-          - 0.9290439533835787
-          places: Sit labore dolorem vel laboriosam aut.
-          time: "1997-06-27T12:34:14Z"
-        - coordinates:
-          - 0.9290439533835787
-          - 0.9290439533835787
-          places: Sit labore dolorem vel laboriosam aut.
-          time: "1997-06-27T12:34:14Z"
-      logs_size: 2.2726114241577267e+18
-      name: Dignissimos earum incidunt consequuntur fugit non ut.
-      number_of_files: 7.202539005223166e+18
-      urls:
-        data:
-          csv: Perspiciatis quasi error voluptatem et.
-          fkpb: Ducimus quia explicabo unde.
-          generate: Provident earum sit enim sapiente assumenda.
-          id: Dolores dolores et.
-          info: Sit velit quo eveniet in.
-        details: Debitis sit ratione aut et amet.
-        logs:
-          csv: Perspiciatis quasi error voluptatem et.
-          fkpb: Ducimus quia explicabo unde.
-          generate: Provident earum sit enim sapiente assumenda.
-          id: Dolores dolores et.
-          info: Sit velit quo eveniet in.
-    - data_size: 3.1889681637076403e+18
-      device_id: Facilis quis blanditiis recusandae est.
-      last_file_id: Rem vel est qui ratione sequi et.
-      last_file_time: "1980-07-23T03:28:45Z"
-      locations:
-        entries:
-        - coordinates:
-          - 0.9290439533835787
-          - 0.9290439533835787
-          places: Sit labore dolorem vel laboriosam aut.
-          time: "1997-06-27T12:34:14Z"
-        - coordinates:
-          - 0.9290439533835787
-          - 0.9290439533835787
-          places: Sit labore dolorem vel laboriosam aut.
-          time: "1997-06-27T12:34:14Z"
-      logs_size: 2.2726114241577267e+18
-      name: Dignissimos earum incidunt consequuntur fugit non ut.
-      number_of_files: 7.202539005223166e+18
-      urls:
-        data:
-          csv: Perspiciatis quasi error voluptatem et.
-          fkpb: Ducimus quia explicabo unde.
-          generate: Provident earum sit enim sapiente assumenda.
-          id: Dolores dolores et.
-          info: Sit velit quo eveniet in.
-        details: Debitis sit ratione aut et amet.
-        logs:
-          csv: Perspiciatis quasi error voluptatem et.
-          fkpb: Ducimus quia explicabo unde.
-          generate: Provident earum sit enim sapiente assumenda.
-          id: Dolores dolores et.
-          info: Sit velit quo eveniet in.
     items:
       $ref: '#/definitions/DeviceSummary'
     title: 'Mediatype identifier: application/vnd.app.device+json; type=collection;
@@ -1510,39 +1523,6 @@ definitions:
     description: Devices media type (default view)
     example:
       devices:
-      - data_size: 3.1889681637076403e+18
-        device_id: Facilis quis blanditiis recusandae est.
-        last_file_id: Rem vel est qui ratione sequi et.
-        last_file_time: "1980-07-23T03:28:45Z"
-        locations:
-          entries:
-          - coordinates:
-            - 0.9290439533835787
-            - 0.9290439533835787
-            places: Sit labore dolorem vel laboriosam aut.
-            time: "1997-06-27T12:34:14Z"
-          - coordinates:
-            - 0.9290439533835787
-            - 0.9290439533835787
-            places: Sit labore dolorem vel laboriosam aut.
-            time: "1997-06-27T12:34:14Z"
-        logs_size: 2.2726114241577267e+18
-        name: Dignissimos earum incidunt consequuntur fugit non ut.
-        number_of_files: 7.202539005223166e+18
-        urls:
-          data:
-            csv: Perspiciatis quasi error voluptatem et.
-            fkpb: Ducimus quia explicabo unde.
-            generate: Provident earum sit enim sapiente assumenda.
-            id: Dolores dolores et.
-            info: Sit velit quo eveniet in.
-          details: Debitis sit ratione aut et amet.
-          logs:
-            csv: Perspiciatis quasi error voluptatem et.
-            fkpb: Ducimus quia explicabo unde.
-            generate: Provident earum sit enim sapiente assumenda.
-            id: Dolores dolores et.
-            info: Sit velit quo eveniet in.
       - data_size: 3.1889681637076403e+18
         device_id: Facilis quis blanditiis recusandae est.
         last_file_id: Rem vel est qui ratione sequi et.
@@ -1621,10 +1601,6 @@ definitions:
       id: 8.447116262858397e+18
       name: Ducimus molestiae distinctio eum consequatur numquam.
       slug: q3b6z6j4q2
-    - description: Voluptate inventore ratione.
-      id: 8.447116262858397e+18
-      name: Ducimus molestiae distinctio eum consequatur numquam.
-      slug: q3b6z6j4q2
     items:
       $ref: '#/definitions/Expedition'
     title: 'Mediatype identifier: application/vnd.app.expedition+json; type=collection;
@@ -1634,6 +1610,10 @@ definitions:
     description: Expeditions media type (default view)
     example:
       expeditions:
+      - description: Voluptate inventore ratione.
+        id: 8.447116262858397e+18
+        name: Ducimus molestiae distinctio eum consequatur numquam.
+        slug: q3b6z6j4q2
       - description: Voluptate inventore ratione.
         id: 8.447116262858397e+18
         name: Ducimus molestiae distinctio eum consequatur numquam.
@@ -1704,22 +1684,6 @@ definitions:
       note: Eius iusto veritatis.
       user_id: 5.541664199228422e+18
       username: Accusantium et et perspiciatis et.
-    - category_key: Voluptatem ea hic aliquid animi sit.
-      created: "1979-02-06T23:46:27Z"
-      id: 7.68493848248218e+17
-      media_content_type: Eum qui eos maxime consequatur.
-      media_url: Odio aperiam perferendis veritatis.
-      note: Eius iusto veritatis.
-      user_id: 5.541664199228422e+18
-      username: Accusantium et et perspiciatis et.
-    - category_key: Voluptatem ea hic aliquid animi sit.
-      created: "1979-02-06T23:46:27Z"
-      id: 7.68493848248218e+17
-      media_content_type: Eum qui eos maxime consequatur.
-      media_url: Odio aperiam perferendis veritatis.
-      note: Eius iusto veritatis.
-      user_id: 5.541664199228422e+18
-      username: Accusantium et et perspiciatis et.
     items:
       $ref: '#/definitions/FieldNoteQueryResult'
     title: 'Mediatype identifier: application/vnd.app.field_note_result+json; type=collection;
@@ -1729,14 +1693,6 @@ definitions:
     description: FieldNotes media type (default view)
     example:
       notes:
-      - category_key: Voluptatem ea hic aliquid animi sit.
-        created: "1979-02-06T23:46:27Z"
-        id: 7.68493848248218e+17
-        media_content_type: Eum qui eos maxime consequatur.
-        media_url: Odio aperiam perferendis veritatis.
-        note: Eius iusto veritatis.
-        user_id: 5.541664199228422e+18
-        username: Accusantium et et perspiciatis et.
       - category_key: Voluptatem ea hic aliquid animi sit.
         created: "1979-02-06T23:46:27Z"
         id: 7.68493848248218e+17
@@ -1843,12 +1799,6 @@ definitions:
         profile: Veritatis velit.
         time: "1972-05-21T03:22:55Z"
         url: Sit ut.
-      - etag: Sunt illo qui odit.
-        id: 8.723990846803995e+18
-        module: Vitae est nobis odit necessitatibus.
-        profile: Veritatis velit.
-        time: "1972-05-21T03:22:55Z"
-        url: Sit ut.
     properties:
       firmwares:
         $ref: '#/definitions/FirmwareSummaryCollection'
@@ -1932,24 +1882,6 @@ definitions:
     description: GeoJSONFeatureCollection is the media type for an array of GeoJSONFeature
       (default view)
     example:
-    - geometry:
-        coordinates:
-        - 0.615397062933286
-        - 0.615397062933286
-        - 0.615397062933286
-        type: Et praesentium.
-      properties:
-        Ut minima quaerat voluptates.: 1.3653405491149606e+18
-      type: Deserunt et.
-    - geometry:
-        coordinates:
-        - 0.615397062933286
-        - 0.615397062933286
-        - 0.615397062933286
-        type: Et praesentium.
-      properties:
-        Ut minima quaerat voluptates.: 1.3653405491149606e+18
-      type: Deserunt et.
     - geometry:
         coordinates:
         - 0.615397062933286
@@ -2187,7 +2119,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+            Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2223,7 +2155,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+              Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2264,7 +2196,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+        Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2275,7 +2207,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+          Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2306,7 +2238,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+          Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2341,7 +2273,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 55dd55f7-1d31-4af5-8965-4d82b6872428
+            Repudiandae dignissimos.: abc3b8a4-910a-4f81-a637-fe878772a2c8
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2407,6 +2339,16 @@ definitions:
       - 0.9290439533835787
       places: Sit labore dolorem vel laboriosam aut.
       time: "1997-06-27T12:34:14Z"
+    - coordinates:
+      - 0.9290439533835787
+      - 0.9290439533835787
+      places: Sit labore dolorem vel laboriosam aut.
+      time: "1997-06-27T12:34:14Z"
+    - coordinates:
+      - 0.9290439533835787
+      - 0.9290439533835787
+      places: Sit labore dolorem vel laboriosam aut.
+      time: "1997-06-27T12:34:14Z"
     items:
       $ref: '#/definitions/LocationEntry'
     title: 'Mediatype identifier: application/vnd.app.location.entry+json; type=collection;
@@ -2435,15 +2377,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      email: norris_lowe@rohan.biz
-      password: m10jqey60g
+      email: frida_howell@rau.org
+      password: 3vz0x88eu3
     properties:
       email:
-        example: norris_lowe@rohan.biz
+        example: frida_howell@rau.org
         format: email
         type: string
       password:
-        example: m10jqey60g
+        example: 3vz0x88eu3
         minLength: 10
         type: string
     required:
@@ -2495,6 +2437,18 @@ definitions:
         - - 0.9682483955411658
         id: 5.41219004578842e+18
         sourceId: 1.6901081034442964e+18
+      - geometry:
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        id: 5.41219004578842e+18
+        sourceId: 1.6901081034442964e+18
+      - geometry:
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        - - 0.9682483955411658
+        id: 5.41219004578842e+18
+        sourceId: 1.6901081034442964e+18
       spatial:
       - centroid:
         - 0.1963642971802602
@@ -2512,7 +2466,6 @@ definitions:
         radius: 0.6413264274751794
         sourceId: 7.079765484340422e+18
         startTime: "2007-06-02T05:09:37Z"
-      temporal:
       - centroid:
         - 0.1963642971802602
         - 0.1963642971802602
@@ -2529,6 +2482,7 @@ definitions:
         radius: 0.6413264274751794
         sourceId: 7.079765484340422e+18
         startTime: "2007-06-02T05:09:37Z"
+      temporal:
       - centroid:
         - 0.1963642971802602
         - 0.1963642971802602
@@ -2597,14 +2551,14 @@ definitions:
     type: object
   MyDataUrls:
     example:
-      csv: Sunt nesciunt dolor doloremque eum quia.
-      fkpb: Occaecati ut sint.
+      csv: Doloribus et labore voluptatem.
+      fkpb: Numquam voluptatem veritatis inventore incidunt quia.
     properties:
       csv:
-        example: Sunt nesciunt dolor doloremque eum quia.
+        example: Doloribus et labore voluptatem.
         type: string
       fkpb:
-        example: Occaecati ut sint.
+        example: Numquam voluptatem veritatis inventore incidunt quia.
         type: string
     required:
     - csv
@@ -2615,18 +2569,16 @@ definitions:
     description: MySimpleSummary media type (default view)
     example:
       center:
-      - 0.3041549148802461
-      - 0.3041549148802461
+      - 0.9501844377742938
       urls:
-        csv: Sunt nesciunt dolor doloremque eum quia.
-        fkpb: Occaecati ut sint.
+        csv: Doloribus et labore voluptatem.
+        fkpb: Numquam voluptatem veritatis inventore incidunt quia.
     properties:
       center:
         example:
-        - 0.3041549148802461
-        - 0.3041549148802461
+        - 0.9501844377742938
         items:
-          example: 0.3041549148802461
+          example: 0.9501844377742938
           format: double
           type: number
         type: array
@@ -2699,11 +2651,13 @@ definitions:
       goal: Expedita non aut rem.
       id: 9.08576479661777e+18
       location: Iste illo nobis eos asperiores non nam.
-      name: Sunt commodi consequatur qui.
+      media_content_type: Sunt commodi consequatur qui.
+      media_url: Quis dolorem ipsam ad accusantium.
+      name: Eaque qui eius voluptatem placeat repellendus.
       private: false
-      slug: 4vjic5nzna
-      start_time: "1973-10-25T03:27:41Z"
-      tags: Praesentium itaque.
+      slug: bqhs3caow4
+      start_time: "1996-01-21T19:25:04Z"
+      tags: Quis rerum accusantium quia mollitia nobis.
     properties:
       description:
         example: Necessitatibus possimus voluptatem consequuntur officiis autem.
@@ -2722,23 +2676,29 @@ definitions:
       location:
         example: Iste illo nobis eos asperiores non nam.
         type: string
-      name:
+      media_content_type:
         example: Sunt commodi consequatur qui.
+        type: string
+      media_url:
+        example: Quis dolorem ipsam ad accusantium.
+        type: string
+      name:
+        example: Eaque qui eius voluptatem placeat repellendus.
         type: string
       private:
         example: false
         type: boolean
       slug:
-        example: 4vjic5nzna
+        example: bqhs3caow4
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
       start_time:
-        example: "1973-10-25T03:27:41Z"
+        example: "1996-01-21T19:25:04Z"
         format: date-time
         type: string
       tags:
-        example: Praesentium itaque.
+        example: Quis rerum accusantium quia mollitia nobis.
         type: string
     required:
     - id
@@ -2793,8 +2753,6 @@ definitions:
         userId: 6.297057674710826e+18
       - projectId: 1.2833427085391667e+18
         userId: 6.297057674710826e+18
-      - projectId: 1.2833427085391667e+18
-        userId: 6.297057674710826e+18
     properties:
       administrators:
         $ref: '#/definitions/ProjectAdministratorCollection'
@@ -2811,11 +2769,25 @@ definitions:
       goal: Expedita non aut rem.
       id: 9.08576479661777e+18
       location: Iste illo nobis eos asperiores non nam.
-      name: Sunt commodi consequatur qui.
+      media_content_type: Sunt commodi consequatur qui.
+      media_url: Quis dolorem ipsam ad accusantium.
+      name: Eaque qui eius voluptatem placeat repellendus.
       private: false
-      slug: 4vjic5nzna
-      start_time: "1973-10-25T03:27:41Z"
-      tags: Praesentium itaque.
+      slug: bqhs3caow4
+      start_time: "1996-01-21T19:25:04Z"
+      tags: Quis rerum accusantium quia mollitia nobis.
+    - description: Necessitatibus possimus voluptatem consequuntur officiis autem.
+      end_time: "1986-11-24T18:18:05Z"
+      goal: Expedita non aut rem.
+      id: 9.08576479661777e+18
+      location: Iste illo nobis eos asperiores non nam.
+      media_content_type: Sunt commodi consequatur qui.
+      media_url: Quis dolorem ipsam ad accusantium.
+      name: Eaque qui eius voluptatem placeat repellendus.
+      private: false
+      slug: bqhs3caow4
+      start_time: "1996-01-21T19:25:04Z"
+      tags: Quis rerum accusantium quia mollitia nobis.
     items:
       $ref: '#/definitions/Project'
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
@@ -2830,11 +2802,25 @@ definitions:
         goal: Expedita non aut rem.
         id: 9.08576479661777e+18
         location: Iste illo nobis eos asperiores non nam.
-        name: Sunt commodi consequatur qui.
+        media_content_type: Sunt commodi consequatur qui.
+        media_url: Quis dolorem ipsam ad accusantium.
+        name: Eaque qui eius voluptatem placeat repellendus.
         private: false
-        slug: 4vjic5nzna
-        start_time: "1973-10-25T03:27:41Z"
-        tags: Praesentium itaque.
+        slug: bqhs3caow4
+        start_time: "1996-01-21T19:25:04Z"
+        tags: Quis rerum accusantium quia mollitia nobis.
+      - description: Necessitatibus possimus voluptatem consequuntur officiis autem.
+        end_time: "1986-11-24T18:18:05Z"
+        goal: Expedita non aut rem.
+        id: 9.08576479661777e+18
+        location: Iste illo nobis eos asperiores non nam.
+        media_content_type: Sunt commodi consequatur qui.
+        media_url: Quis dolorem ipsam ad accusantium.
+        name: Eaque qui eius voluptatem placeat repellendus.
+        private: false
+        slug: bqhs3caow4
+        start_time: "1996-01-21T19:25:04Z"
+        tags: Quis rerum accusantium quia mollitia nobis.
     properties:
       projects:
         $ref: '#/definitions/ProjectCollection'
@@ -2846,18 +2832,11 @@ definitions:
     description: QueryData media type (default view)
     example:
       series:
-      - name: Et eius ipsam magnam molestiae a sed.
+      - name: Ea pariatur ut.
         rows:
-        - "1976-04-01T09:40:44Z"
-        - "1976-04-01T09:40:44Z"
-      - name: Et eius ipsam magnam molestiae a sed.
-        rows:
-        - "1976-04-01T09:40:44Z"
-        - "1976-04-01T09:40:44Z"
-      - name: Et eius ipsam magnam molestiae a sed.
-        rows:
-        - "1976-04-01T09:40:44Z"
-        - "1976-04-01T09:40:44Z"
+        - 2.8053339367784064e+18
+        - 2.8053339367784064e+18
+        - 2.8053339367784064e+18
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -2868,10 +2847,10 @@ definitions:
   ReadingSummary:
     description: ReadingSummary media type (default view)
     example:
-      name: Mollitia nobis.
+      name: Sunt nesciunt dolor doloremque eum quia.
     properties:
       name:
-        example: Mollitia nobis.
+        example: Sunt nesciunt dolor doloremque eum quia.
         type: string
     required:
     - name
@@ -2881,9 +2860,8 @@ definitions:
     description: ReadingSummaryCollection is the media type for an array of ReadingSummary
       (default view)
     example:
-    - name: Mollitia nobis.
-    - name: Mollitia nobis.
-    - name: Mollitia nobis.
+    - name: Sunt nesciunt dolor doloremque eum quia.
+    - name: Sunt nesciunt dolor doloremque eum quia.
     items:
       $ref: '#/definitions/ReadingSummary'
     title: 'Mediatype identifier: application/vnd.app.reading_summary+json; type=collection;
@@ -2891,10 +2869,10 @@ definitions:
     type: array
   RefreshUserPayload:
     example:
-      refresh_token: Ea sed similique sunt quaerat.
+      refresh_token: Deleniti ut neque ut.
     properties:
       refresh_token:
-        example: Ea sed similique sunt quaerat.
+        example: Deleniti ut neque ut.
         type: string
     required:
     - refresh_token
@@ -2903,20 +2881,22 @@ definitions:
   SeriesData:
     description: SeriesData media type (default view)
     example:
-      name: Et eius ipsam magnam molestiae a sed.
+      name: Ea pariatur ut.
       rows:
-      - "1976-04-01T09:40:44Z"
-      - "1976-04-01T09:40:44Z"
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
     properties:
       name:
-        example: Et eius ipsam magnam molestiae a sed.
+        example: Ea pariatur ut.
         type: string
       rows:
         example:
-        - "1976-04-01T09:40:44Z"
-        - "1976-04-01T09:40:44Z"
+        - 2.8053339367784064e+18
+        - 2.8053339367784064e+18
+        - 2.8053339367784064e+18
         items:
-          example: "1976-04-01T09:40:44Z"
+          example: 2.8053339367784064e+18
         type: array
     required:
     - name
@@ -2927,14 +2907,16 @@ definitions:
     description: SeriesDataCollection is the media type for an array of SeriesData
       (default view)
     example:
-    - name: Et eius ipsam magnam molestiae a sed.
+    - name: Ea pariatur ut.
       rows:
-      - "1976-04-01T09:40:44Z"
-      - "1976-04-01T09:40:44Z"
-    - name: Et eius ipsam magnam molestiae a sed.
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
+    - name: Ea pariatur ut.
       rows:
-      - "1976-04-01T09:40:44Z"
-      - "1976-04-01T09:40:44Z"
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
+      - 2.8053339367784064e+18
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -2944,32 +2926,32 @@ definitions:
     description: Source media type (default view)
     example:
       active: true
-      expeditionId: 8.269890283245766e+18
-      id: 6.722602862144142e+18
-      name: Necessitatibus doloribus.
-      teamId: 1.8595644897516045e+18
-      userId: 4.972438489104074e+17
+      expeditionId: 5.18786295669085e+18
+      id: 6.205173792884038e+18
+      name: Doloremque consequuntur ut.
+      teamId: 2.5369133844502047e+18
+      userId: 4.033963445850004e+18
     properties:
       active:
         example: true
         type: boolean
       expeditionId:
-        example: 8.269890283245766e+18
+        example: 5.18786295669085e+18
         format: int64
         type: integer
       id:
-        example: 6.722602862144142e+18
+        example: 6.205173792884038e+18
         format: int64
         type: integer
       name:
-        example: Necessitatibus doloribus.
+        example: Doloremque consequuntur ut.
         type: string
       teamId:
-        example: 1.8595644897516045e+18
+        example: 2.5369133844502047e+18
         format: int64
         type: integer
       userId:
-        example: 4.972438489104074e+17
+        example: 4.033963445850004e+18
         format: int64
         type: integer
     required:
@@ -2981,10 +2963,10 @@ definitions:
   SourceSummary:
     description: SourceSummary media type (default view)
     example:
-      id: 6.285599382231796e+18
-      name: Numquam voluptatem veritatis inventore incidunt quia.
+      id: 4.983804014597889e+18
+      name: Ea voluptas sit.
       readings:
-      - name: Mollitia nobis.
+      - name: Sunt nesciunt dolor doloremque eum quia.
       spatial:
       - centroid:
         - 0.1963642971802602
@@ -3051,29 +3033,13 @@ definitions:
         radius: 0.6413264274751794
         sourceId: 7.079765484340422e+18
         startTime: "2007-06-02T05:09:37Z"
-      - centroid:
-        - 0.1963642971802602
-        - 0.1963642971802602
-        endTime: "1985-12-10T12:08:18Z"
-        envelope:
-        - - 0.36855272723140065
-          - 0.36855272723140065
-        - - 0.36855272723140065
-          - 0.36855272723140065
-        - - 0.36855272723140065
-          - 0.36855272723140065
-        id: 8.920319150409112e+18
-        numberOfFeatures: 4.45138242589985e+17
-        radius: 0.6413264274751794
-        sourceId: 7.079765484340422e+18
-        startTime: "2007-06-02T05:09:37Z"
     properties:
       id:
-        example: 6.285599382231796e+18
+        example: 4.983804014597889e+18
         format: int64
         type: integer
       name:
-        example: Numquam voluptatem veritatis inventore incidunt quia.
+        example: Ea voluptas sit.
         type: string
       readings:
         $ref: '#/definitions/ReadingSummaryCollection'
@@ -3091,20 +3057,20 @@ definitions:
   SourceToken:
     description: SourceToken media type (default view)
     example:
-      expeditionId: 6.265794205283323e+18
-      id: 8.558680558476747e+18
-      token: Ut in quaerat et est ea.
+      expeditionId: 8.088060880983347e+18
+      id: 4.5752530722940037e+18
+      token: Ex incidunt et maiores et nobis.
     properties:
       expeditionId:
-        example: 6.265794205283323e+18
+        example: 8.088060880983347e+18
         format: int64
         type: integer
       id:
-        example: 8.558680558476747e+18
+        example: 4.5752530722940037e+18
         format: int64
         type: integer
       token:
-        example: Ut in quaerat et est ea.
+        example: Ex incidunt et maiores et nobis.
         type: string
     required:
     - id
@@ -3116,9 +3082,9 @@ definitions:
     description: SourceTokenCollection is the media type for an array of SourceToken
       (default view)
     example:
-    - expeditionId: 6.265794205283323e+18
-      id: 8.558680558476747e+18
-      token: Ut in quaerat et est ea.
+    - expeditionId: 8.088060880983347e+18
+      id: 4.5752530722940037e+18
+      token: Ex incidunt et maiores et nobis.
     items:
       $ref: '#/definitions/SourceToken'
     title: 'Mediatype identifier: application/vnd.app.source_token+json; type=collection;
@@ -3128,15 +3094,12 @@ definitions:
     description: SourceTokens media type (default view)
     example:
       sourceTokens:
-      - expeditionId: 6.265794205283323e+18
-        id: 8.558680558476747e+18
-        token: Ut in quaerat et est ea.
-      - expeditionId: 6.265794205283323e+18
-        id: 8.558680558476747e+18
-        token: Ut in quaerat et est ea.
-      - expeditionId: 6.265794205283323e+18
-        id: 8.558680558476747e+18
-        token: Ut in quaerat et est ea.
+      - expeditionId: 8.088060880983347e+18
+        id: 4.5752530722940037e+18
+        token: Ex incidunt et maiores et nobis.
+      - expeditionId: 8.088060880983347e+18
+        id: 4.5752530722940037e+18
+        token: Ex incidunt et maiores et nobis.
     properties:
       sourceTokens:
         $ref: '#/definitions/SourceTokenCollection'
@@ -3173,20 +3136,20 @@ definitions:
         token: Quisquam pariatur molestiae.
         userId: 4.7126481066901e+18
       twitterAccountSources:
-      - expeditionId: 4.429513635182679e+17
-        id: 8.088060880983347e+18
-        name: Mollitia ex incidunt.
-        screenName: Maiores et nobis quam.
-        teamId: 5.648456550801329e+18
-        twitterAccountId: 8.808291657404318e+18
-        userId: 2.315669820776694e+15
-      - expeditionId: 4.429513635182679e+17
-        id: 8.088060880983347e+18
-        name: Mollitia ex incidunt.
-        screenName: Maiores et nobis quam.
-        teamId: 5.648456550801329e+18
-        twitterAccountId: 8.808291657404318e+18
-        userId: 2.315669820776694e+15
+      - expeditionId: 5.868433439943794e+18
+        id: 3.819475435681938e+18
+        name: Minima deserunt rerum cumque et aut sunt.
+        screenName: Qui asperiores amet aliquid et.
+        teamId: 2.0975675999585198e+18
+        twitterAccountId: 9.909585102367153e+17
+        userId: 5.29596678312098e+18
+      - expeditionId: 5.868433439943794e+18
+        id: 3.819475435681938e+18
+        name: Minima deserunt rerum cumque et aut sunt.
+        screenName: Qui asperiores amet aliquid et.
+        teamId: 2.0975675999585198e+18
+        twitterAccountId: 9.909585102367153e+17
+        userId: 5.29596678312098e+18
     properties:
       deviceSources:
         $ref: '#/definitions/DeviceSourceCollection'
@@ -3197,31 +3160,31 @@ definitions:
   Station:
     description: Station media type (default view)
     example:
-      device_id: Dolores non minima.
-      id: 5.4961489755096e+18
-      name: Cumque et aut sunt aut qui.
-      owner_id: 8.534788007347602e+18
+      device_id: Consectetur molestiae.
+      id: 7.719471775124056e+18
+      name: Qui laboriosam voluptatum quos odio.
+      owner_id: 8.957998059647522e+18
       status_json:
-        Et corrupti.: 272f2e5b-aa40-461f-9099-c66ebde83b0c
+        Omnis perferendis illo.: true
     properties:
       device_id:
-        example: Dolores non minima.
+        example: Consectetur molestiae.
         type: string
       id:
-        example: 5.4961489755096e+18
+        example: 7.719471775124056e+18
         format: int64
         type: integer
       name:
-        example: Cumque et aut sunt aut qui.
+        example: Qui laboriosam voluptatum quos odio.
         type: string
       owner_id:
-        example: 8.534788007347602e+18
+        example: 8.957998059647522e+18
         format: int64
         type: integer
       status_json:
         additionalProperties: true
         example:
-          Et corrupti.: 272f2e5b-aa40-461f-9099-c66ebde83b0c
+          Omnis perferendis illo.: true
         type: object
     required:
     - id
@@ -3235,12 +3198,12 @@ definitions:
     description: StationCollection is the media type for an array of Station (default
       view)
     example:
-    - device_id: Dolores non minima.
-      id: 5.4961489755096e+18
-      name: Cumque et aut sunt aut qui.
-      owner_id: 8.534788007347602e+18
+    - device_id: Consectetur molestiae.
+      id: 7.719471775124056e+18
+      name: Qui laboriosam voluptatum quos odio.
+      owner_id: 8.957998059647522e+18
       status_json:
-        Et corrupti.: 272f2e5b-aa40-461f-9099-c66ebde83b0c
+        Omnis perferendis illo.: true
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -3249,24 +3212,24 @@ definitions:
   StationLog:
     description: StationLog media type (default view)
     example:
-      ID: 7.845199444129272e+18
-      body: Molestiae explicabo quo qui laboriosam voluptatum quos.
-      station_id: 6.733210075026997e+18
-      timestamp: Omnis recusandae omnis perferendis illo beatae.
+      ID: 7.388480818754186e+18
+      body: Quod voluptas non sit id.
+      station_id: 3.2911399154820997e+18
+      timestamp: Quam consectetur rerum.
     properties:
       ID:
-        example: 7.845199444129272e+18
+        example: 7.388480818754186e+18
         format: int64
         type: integer
       body:
-        example: Molestiae explicabo quo qui laboriosam voluptatum quos.
+        example: Quod voluptas non sit id.
         type: string
       station_id:
-        example: 6.733210075026997e+18
+        example: 3.2911399154820997e+18
         format: int64
         type: integer
       timestamp:
-        example: Omnis recusandae omnis perferendis illo beatae.
+        example: Quam consectetur rerum.
         type: string
     required:
     - ID
@@ -3279,18 +3242,24 @@ definitions:
     description: Stations media type (default view)
     example:
       stations:
-      - device_id: Dolores non minima.
-        id: 5.4961489755096e+18
-        name: Cumque et aut sunt aut qui.
-        owner_id: 8.534788007347602e+18
+      - device_id: Consectetur molestiae.
+        id: 7.719471775124056e+18
+        name: Qui laboriosam voluptatum quos odio.
+        owner_id: 8.957998059647522e+18
         status_json:
-          Et corrupti.: 272f2e5b-aa40-461f-9099-c66ebde83b0c
-      - device_id: Dolores non minima.
-        id: 5.4961489755096e+18
-        name: Cumque et aut sunt aut qui.
-        owner_id: 8.534788007347602e+18
+          Omnis perferendis illo.: true
+      - device_id: Consectetur molestiae.
+        id: 7.719471775124056e+18
+        name: Qui laboriosam voluptatum quos odio.
+        owner_id: 8.957998059647522e+18
         status_json:
-          Et corrupti.: 272f2e5b-aa40-461f-9099-c66ebde83b0c
+          Omnis perferendis illo.: true
+      - device_id: Consectetur molestiae.
+        id: 7.719471775124056e+18
+        name: Qui laboriosam voluptatum quos odio.
+        owner_id: 8.957998059647522e+18
+        status_json:
+          Omnis perferendis illo.: true
     properties:
       stations:
         $ref: '#/definitions/StationCollection'
@@ -3301,25 +3270,25 @@ definitions:
   Team:
     description: Team media type (default view)
     example:
-      description: Quod voluptas non sit id.
-      id: 3.2911399154820997e+18
-      name: 9fliq9cd69
-      slug: s0lxihnipy
+      description: Nesciunt similique omnis ut et esse.
+      id: 4.3866891592095995e+18
+      name: ihnipyk1lt
+      slug: tooazl84xo
     properties:
       description:
-        example: Quod voluptas non sit id.
+        example: Nesciunt similique omnis ut et esse.
         type: string
       id:
-        example: 3.2911399154820997e+18
+        example: 4.3866891592095995e+18
         format: int64
         type: integer
       name:
-        example: 9fliq9cd69
+        example: ihnipyk1lt
         maxLength: 256
         pattern: \S
         type: string
       slug:
-        example: s0lxihnipy
+        example: tooazl84xo
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -3333,14 +3302,10 @@ definitions:
   TeamCollection:
     description: TeamCollection is the media type for an array of Team (default view)
     example:
-    - description: Quod voluptas non sit id.
-      id: 3.2911399154820997e+18
-      name: 9fliq9cd69
-      slug: s0lxihnipy
-    - description: Quod voluptas non sit id.
-      id: 3.2911399154820997e+18
-      name: 9fliq9cd69
-      slug: s0lxihnipy
+    - description: Nesciunt similique omnis ut et esse.
+      id: 4.3866891592095995e+18
+      name: ihnipyk1lt
+      slug: tooazl84xo
     items:
       $ref: '#/definitions/Team'
     title: 'Mediatype identifier: application/vnd.app.team+json; type=collection;
@@ -3380,9 +3345,6 @@ definitions:
     - role: Dolorum aut blanditiis adipisci nam est.
       teamId: 4.686345651802217e+18
       userId: 7.321657111586183e+18
-    - role: Dolorum aut blanditiis adipisci nam est.
-      teamId: 4.686345651802217e+18
-      userId: 7.321657111586183e+18
     items:
       $ref: '#/definitions/TeamMember'
     title: 'Mediatype identifier: application/vnd.app.member+json; type=collection;
@@ -3392,9 +3354,6 @@ definitions:
     description: TeamMembers media type (default view)
     example:
       members:
-      - role: Dolorum aut blanditiis adipisci nam est.
-        teamId: 4.686345651802217e+18
-        userId: 7.321657111586183e+18
       - role: Dolorum aut blanditiis adipisci nam est.
         teamId: 4.686345651802217e+18
         userId: 7.321657111586183e+18
@@ -3409,10 +3368,10 @@ definitions:
     description: Teams media type (default view)
     example:
       teams:
-      - description: Quod voluptas non sit id.
-        id: 3.2911399154820997e+18
-        name: 9fliq9cd69
-        slug: s0lxihnipy
+      - description: Nesciunt similique omnis ut et esse.
+        id: 4.3866891592095995e+18
+        name: ihnipyk1lt
+        slug: tooazl84xo
     properties:
       teams:
         $ref: '#/definitions/TeamCollection'
@@ -3423,38 +3382,38 @@ definitions:
   TwitterAccountSource:
     description: TwitterAccountSource media type (default view)
     example:
-      expeditionId: 4.429513635182679e+17
-      id: 8.088060880983347e+18
-      name: Mollitia ex incidunt.
-      screenName: Maiores et nobis quam.
-      teamId: 5.648456550801329e+18
-      twitterAccountId: 8.808291657404318e+18
-      userId: 2.315669820776694e+15
+      expeditionId: 5.868433439943794e+18
+      id: 3.819475435681938e+18
+      name: Minima deserunt rerum cumque et aut sunt.
+      screenName: Qui asperiores amet aliquid et.
+      teamId: 2.0975675999585198e+18
+      twitterAccountId: 9.909585102367153e+17
+      userId: 5.29596678312098e+18
     properties:
       expeditionId:
-        example: 4.429513635182679e+17
+        example: 5.868433439943794e+18
         format: int64
         type: integer
       id:
-        example: 8.088060880983347e+18
+        example: 3.819475435681938e+18
         format: int64
         type: integer
       name:
-        example: Mollitia ex incidunt.
+        example: Minima deserunt rerum cumque et aut sunt.
         type: string
       screenName:
-        example: Maiores et nobis quam.
+        example: Qui asperiores amet aliquid et.
         type: string
       teamId:
-        example: 5.648456550801329e+18
+        example: 2.0975675999585198e+18
         format: int64
         type: integer
       twitterAccountId:
-        example: 8.808291657404318e+18
+        example: 9.909585102367153e+17
         format: int64
         type: integer
       userId:
-        example: 2.315669820776694e+15
+        example: 5.29596678312098e+18
         format: int64
         type: integer
     required:
@@ -3470,20 +3429,13 @@ definitions:
     description: TwitterAccountSourceCollection is the media type for an array of
       TwitterAccountSource (default view)
     example:
-    - expeditionId: 4.429513635182679e+17
-      id: 8.088060880983347e+18
-      name: Mollitia ex incidunt.
-      screenName: Maiores et nobis quam.
-      teamId: 5.648456550801329e+18
-      twitterAccountId: 8.808291657404318e+18
-      userId: 2.315669820776694e+15
-    - expeditionId: 4.429513635182679e+17
-      id: 8.088060880983347e+18
-      name: Mollitia ex incidunt.
-      screenName: Maiores et nobis quam.
-      teamId: 5.648456550801329e+18
-      twitterAccountId: 8.808291657404318e+18
-      userId: 2.315669820776694e+15
+    - expeditionId: 5.868433439943794e+18
+      id: 3.819475435681938e+18
+      name: Minima deserunt rerum cumque et aut sunt.
+      screenName: Qui asperiores amet aliquid et.
+      teamId: 2.0975675999585198e+18
+      twitterAccountId: 9.909585102367153e+17
+      userId: 5.29596678312098e+18
     items:
       $ref: '#/definitions/TwitterAccountSource'
     title: 'Mediatype identifier: application/vnd.app.twitter_account_source+json;
@@ -3493,13 +3445,27 @@ definitions:
     description: TwitterAccountSources media type (default view)
     example:
       twitterAccountSources:
-      - expeditionId: 4.429513635182679e+17
-        id: 8.088060880983347e+18
-        name: Mollitia ex incidunt.
-        screenName: Maiores et nobis quam.
-        teamId: 5.648456550801329e+18
-        twitterAccountId: 8.808291657404318e+18
-        userId: 2.315669820776694e+15
+      - expeditionId: 5.868433439943794e+18
+        id: 3.819475435681938e+18
+        name: Minima deserunt rerum cumque et aut sunt.
+        screenName: Qui asperiores amet aliquid et.
+        teamId: 2.0975675999585198e+18
+        twitterAccountId: 9.909585102367153e+17
+        userId: 5.29596678312098e+18
+      - expeditionId: 5.868433439943794e+18
+        id: 3.819475435681938e+18
+        name: Minima deserunt rerum cumque et aut sunt.
+        screenName: Qui asperiores amet aliquid et.
+        teamId: 2.0975675999585198e+18
+        twitterAccountId: 9.909585102367153e+17
+        userId: 5.29596678312098e+18
+      - expeditionId: 5.868433439943794e+18
+        id: 3.819475435681938e+18
+        name: Minima deserunt rerum cumque et aut sunt.
+        screenName: Qui asperiores amet aliquid et.
+        teamId: 2.0975675999585198e+18
+        twitterAccountId: 9.909585102367153e+17
+        userId: 5.29596678312098e+18
     properties:
       twitterAccountSources:
         $ref: '#/definitions/TwitterAccountSourceCollection'
@@ -3510,15 +3476,15 @@ definitions:
     type: object
   UpdateDeviceFirmwarePayload:
     example:
-      deviceId: 8.926172447089804e+18
-      firmwareId: 5.707687023506113e+18
+      deviceId: 5.301430894057075e+18
+      firmwareId: 3.936882160095889e+17
     properties:
       deviceId:
-        example: 8.926172447089804e+18
+        example: 5.301430894057075e+18
         format: int64
         type: integer
       firmwareId:
-        example: 5.707687023506113e+18
+        example: 3.936882160095889e+17
         format: int64
         type: integer
     required:
@@ -3528,18 +3494,18 @@ definitions:
     type: object
   'UpdateDeviceInfoPayload ':
     example:
-      deviceId: Voluptatibus non aperiam sit aut.
-      name: Repellat aliquid expedita ut sequi.
-      notes: Officiis et exercitationem enim voluptatum animi sint.
+      deviceId: Eaque distinctio ipsam unde.
+      name: Optio voluptatem qui dolores dicta.
+      notes: Delectus nisi et reiciendis necessitatibus nostrum quia.
     properties:
       deviceId:
-        example: Voluptatibus non aperiam sit aut.
+        example: Eaque distinctio ipsam unde.
         type: string
       name:
-        example: Repellat aliquid expedita ut sequi.
+        example: Optio voluptatem qui dolores dicta.
         type: string
       notes:
-        example: Officiis et exercitationem enim voluptatum animi sint.
+        example: Delectus nisi et reiciendis necessitatibus nostrum quia.
         type: string
     required:
     - deviceId
@@ -3547,19 +3513,19 @@ definitions:
     type: object
   UpdateDeviceSourceLocationPayload:
     example:
-      key: Repellendus consequuntur sint quidem odio dolor recusandae.
-      latitude: 0.30570259421869406
-      longitude: 0.6996452631441195
+      key: Molestias nulla consequatur.
+      latitude: 0.3937269235316687
+      longitude: 0.38448358661460225
     properties:
       key:
-        example: Repellendus consequuntur sint quidem odio dolor recusandae.
+        example: Molestias nulla consequatur.
         type: string
       latitude:
-        example: 0.30570259421869406
+        example: 0.3937269235316687
         format: double
         type: number
       longitude:
-        example: 0.6996452631441195
+        example: 0.38448358661460225
         format: double
         type: number
     required:
@@ -3570,14 +3536,14 @@ definitions:
     type: object
   UpdateDeviceSourcePayload:
     example:
-      key: In facilis non.
-      name: Nihil aut sunt nulla autem nihil suscipit.
+      key: Eos amet non.
+      name: Rerum magni quia in veritatis illo.
     properties:
       key:
-        example: In facilis non.
+        example: Eos amet non.
         type: string
       name:
-        example: Nihil aut sunt nulla autem nihil suscipit.
+        example: Rerum magni quia in veritatis illo.
         type: string
     required:
     - name
@@ -3587,17 +3553,17 @@ definitions:
   UpdateDeviceSourceSchemaPayload:
     example:
       active: true
-      jsonSchema: Eveniet tenetur numquam sapiente.
-      key: Odio voluptate eligendi.
+      jsonSchema: Optio perspiciatis explicabo ullam ea amet aspernatur.
+      key: Accusamus voluptatibus.
     properties:
       active:
         example: true
         type: boolean
       jsonSchema:
-        example: Eveniet tenetur numquam sapiente.
+        example: Optio perspiciatis explicabo ullam ea amet aspernatur.
         type: string
       key:
-        example: Odio voluptate eligendi.
+        example: Accusamus voluptatibus.
         type: string
     required:
     - key
@@ -3607,10 +3573,10 @@ definitions:
     type: object
   UpdateMemberPayload:
     example:
-      role: Cupiditate deleniti voluptate quis voluptate ipsa.
+      role: Quibusdam aspernatur ut vero.
     properties:
       role:
-        example: Cupiditate deleniti voluptate quis voluptate ipsa.
+        example: Quibusdam aspernatur ut vero.
         type: string
     required:
     - role
@@ -3618,23 +3584,23 @@ definitions:
     type: object
   UpdateSourcePayload:
     example:
-      active: true
-      name: Consequatur eius corrupti voluptates.
-      teamId: 1.2642116316343636e+18
-      userId: 4.36106973635001e+17
+      active: false
+      name: Sint est unde veritatis.
+      teamId: 6.721933178918728e+18
+      userId: 7.331678635864459e+18
     properties:
       active:
-        example: true
+        example: false
         type: boolean
       name:
-        example: Consequatur eius corrupti voluptates.
+        example: Sint est unde veritatis.
         type: string
       teamId:
-        example: 1.2642116316343636e+18
+        example: 6.721933178918728e+18
         format: int64
         type: integer
       userId:
-        example: 4.36106973635001e+17
+        example: 7.331678635864459e+18
         format: int64
         type: integer
     required:
@@ -3643,17 +3609,17 @@ definitions:
     type: object
   UpdateStationPayload:
     example:
-      name: Aut qui ut atque.
+      name: Quos molestiae sapiente laboriosam modi temporibus aut.
       status_json:
-        Et quia aperiam nostrum.: "2014-08-30T11:08:58Z"
+        Omnis cum eveniet dolores.: 0.6595866426829251
     properties:
       name:
-        example: Aut qui ut atque.
+        example: Quos molestiae sapiente laboriosam modi temporibus aut.
         type: string
       status_json:
         additionalProperties: true
         example:
-          Et quia aperiam nostrum.: "2014-08-30T11:08:58Z"
+          Omnis cum eveniet dolores.: 0.6595866426829251
         type: object
     required:
     - name
@@ -3662,19 +3628,19 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Optio tempore dolores.
-      email: isaac@mraz.info
-      name: kslxee2juf
+      bio: Voluptatem sit.
+      email: kariane_stokes@rath.org
+      name: 8ah624i8r1
     properties:
       bio:
-        example: Optio tempore dolores.
+        example: Voluptatem sit.
         type: string
       email:
-        example: isaac@mraz.info
+        example: kariane_stokes@rath.org
         format: email
         type: string
       name:
-        example: kslxee2juf
+        example: 8ah624i8r1
         maxLength: 256
         pattern: \S
         type: string
@@ -3687,24 +3653,32 @@ definitions:
   User:
     description: User media type (default view)
     example:
-      bio: Id quia reprehenderit voluptates consequatur.
-      email: anika_hegmann@vandervort.org
-      id: 1.0196395399026842e+18
-      name: lzzs51w67z
+      bio: Omnis voluptas molestiae rerum ut officiis vitae.
+      email: jarvis_anderson@ferry.biz
+      id: 6.13698085502437e+18
+      media_content_type: Repellendus tempora eos ratione quis.
+      media_url: Incidunt reprehenderit.
+      name: zepzc2lt4s
     properties:
       bio:
-        example: Id quia reprehenderit voluptates consequatur.
+        example: Omnis voluptas molestiae rerum ut officiis vitae.
         type: string
       email:
-        example: anika_hegmann@vandervort.org
+        example: jarvis_anderson@ferry.biz
         format: email
         type: string
       id:
-        example: 1.0196395399026842e+18
+        example: 6.13698085502437e+18
         format: int64
         type: integer
+      media_content_type:
+        example: Repellendus tempora eos ratione quis.
+        type: string
+      media_url:
+        example: Incidunt reprehenderit.
+        type: string
       name:
-        example: lzzs51w67z
+        example: zepzc2lt4s
         maxLength: 256
         pattern: \S
         type: string
@@ -3718,18 +3692,24 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - bio: Id quia reprehenderit voluptates consequatur.
-      email: anika_hegmann@vandervort.org
-      id: 1.0196395399026842e+18
-      name: lzzs51w67z
-    - bio: Id quia reprehenderit voluptates consequatur.
-      email: anika_hegmann@vandervort.org
-      id: 1.0196395399026842e+18
-      name: lzzs51w67z
-    - bio: Id quia reprehenderit voluptates consequatur.
-      email: anika_hegmann@vandervort.org
-      id: 1.0196395399026842e+18
-      name: lzzs51w67z
+    - bio: Omnis voluptas molestiae rerum ut officiis vitae.
+      email: jarvis_anderson@ferry.biz
+      id: 6.13698085502437e+18
+      media_content_type: Repellendus tempora eos ratione quis.
+      media_url: Incidunt reprehenderit.
+      name: zepzc2lt4s
+    - bio: Omnis voluptas molestiae rerum ut officiis vitae.
+      email: jarvis_anderson@ferry.biz
+      id: 6.13698085502437e+18
+      media_content_type: Repellendus tempora eos ratione quis.
+      media_url: Incidunt reprehenderit.
+      name: zepzc2lt4s
+    - bio: Omnis voluptas molestiae rerum ut officiis vitae.
+      email: jarvis_anderson@ferry.biz
+      id: 6.13698085502437e+18
+      media_content_type: Repellendus tempora eos ratione quis.
+      media_url: Incidunt reprehenderit.
+      name: zepzc2lt4s
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.app.user+json; type=collection;
@@ -3739,10 +3719,12 @@ definitions:
     description: Users media type (default view)
     example:
       users:
-      - bio: Id quia reprehenderit voluptates consequatur.
-        email: anika_hegmann@vandervort.org
-        id: 1.0196395399026842e+18
-        name: lzzs51w67z
+      - bio: Omnis voluptas molestiae rerum ut officiis vitae.
+        email: jarvis_anderson@ferry.biz
+        id: 6.13698085502437e+18
+        media_content_type: Repellendus tempora eos ratione quis.
+        media_url: Incidunt reprehenderit.
+        name: zepzc2lt4s
     properties:
       users:
         $ref: '#/definitions/UserCollection'
