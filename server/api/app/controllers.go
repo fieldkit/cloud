@@ -2515,6 +2515,7 @@ type FieldNoteController interface {
 	Add(*AddFieldNoteContext) error
 	Delete(*DeleteFieldNoteContext) error
 	Get(*GetFieldNoteContext) error
+	SaveMedia(*SaveMediaFieldNoteContext) error
 	Update(*UpdateFieldNoteContext) error
 }
 
@@ -2524,6 +2525,7 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes/:fieldNoteId", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-note-media", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -2581,6 +2583,23 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 	h = handleFieldNoteOrigin(h)
 	service.Mux.Handle("GET", "/stations/:stationId/field-notes", ctrl.MuxHandler("get", h, nil))
 	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Get", "route", "GET /stations/:stationId/field-notes", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSaveMediaFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SaveMedia(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("POST", "/stations/:stationId/field-note-media", ctrl.MuxHandler("save media", h, nil))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "SaveMedia", "route", "POST /stations/:stationId/field-note-media", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

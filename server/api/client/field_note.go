@@ -129,6 +129,41 @@ func (c *Client) NewGetFieldNoteRequest(ctx context.Context, path string) (*http
 	return req, nil
 }
 
+// SaveMediaFieldNotePath computes a request path to the save media action of field_note.
+func SaveMediaFieldNotePath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/stations/%s/field-note-media", param0)
+}
+
+// Save a field note image
+func (c *Client) SaveMediaFieldNote(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSaveMediaFieldNoteRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSaveMediaFieldNoteRequest create the request corresponding to the save media action endpoint of the field_note resource.
+func (c *Client) NewSaveMediaFieldNoteRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // UpdateFieldNotePath computes a request path to the update action of field_note.
 func UpdateFieldNotePath(stationID int, fieldNoteID int) string {
 	param0 := strconv.Itoa(stationID)

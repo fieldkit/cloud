@@ -1,15 +1,21 @@
 package api
 
 import (
+	"time"
+
 	"github.com/goadesign/goa"
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type FieldNoteControllerOptions struct {
+	Session *session.Session
 	Database *sqlxcache.DB
 }
 
@@ -48,6 +54,16 @@ func FieldNotesType(fieldNotes []*data.FieldNoteQueryResult) *app.FieldNotes {
 	}
 }
 
+func FieldNoteMediaType(fieldNoteMedia *data.FieldNoteMedia) *app.FieldNoteMedia {
+	return &app.FieldNoteMedia {
+		ID:          int(fieldNoteMedia.ID),
+		UserID:      int(fieldNoteMedia.UserID),
+		ContentType: fieldNoteMedia.ContentType,
+		Created:     fieldNoteMedia.Created,
+		URL:         fieldNoteMedia.URL,
+	}
+}
+
 type FieldNoteController struct {
 	*goa.Controller
 	options FieldNoteControllerOptions
@@ -60,13 +76,44 @@ func NewFieldNoteController(service *goa.Service, options FieldNoteControllerOpt
 	}
 }
 
+func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	if err != nil {
+		return err
+	}
+
+	mr := repositories.NewMediaRepository(c.options.Session)
+	saved, err := mr.Save(ctx, ctx.RequestData)
+	if err != nil {
+		return err
+	}
+
+	fieldNoteMedia := &data.FieldNoteMedia{
+		Created:      time.Now(),
+		UserID:       p.UserID,
+		ContentType:  saved.MimeType,
+		URL:          saved.URL,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, fieldNoteMedia, "INSERT INTO fieldkit.field_note_media (user_id, content_type, created, url) VALUES (:user_id, :content_type, :created, :url) RETURNING *", fieldNoteMedia); err != nil {
+		return err
+	}
+
+	return ctx.OK(FieldNoteMediaType(fieldNoteMedia))
+}
+
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	p, err := NewPermissions(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.Payload.StationID))
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
 	if err != nil {
 		return err
 	}
@@ -78,7 +125,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	}
 
 	fieldNote := &data.FieldNote{
-		StationID:   int32(ctx.Payload.StationID),
+		StationID:   int32(ctx.StationID),
 		Created:     ctx.Payload.Created,
 		UserID:      p.UserID,
 		CategoryID:  int32(categoryId),
@@ -116,7 +163,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.Payload.StationID))
+	err = p.CanModifyStationByStationID(int32(ctx.StationID))
 	if err != nil {
 		return err
 	}
@@ -129,7 +176,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 
 	fieldNote := &data.FieldNote{
 		ID:          int32(ctx.FieldNoteID),
-		StationID:   int32(ctx.Payload.StationID),
+		StationID:   int32(ctx.StationID),
 		Created:     ctx.Payload.Created,
 		UserID:      p.UserID,
 		CategoryID:  int32(categoryId),

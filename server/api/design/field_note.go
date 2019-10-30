@@ -6,12 +6,11 @@ import (
 )
 
 var AddFieldNotePayload = Type("AddFieldNotePayload", func() {
-	Attribute("station_id", Integer)
 	Attribute("created", DateTime)
 	Attribute("category_id", Integer)
 	Attribute("note", String)
 	Attribute("media_id", Integer)
-	Required("station_id", "created")
+	Required("created")
 })
 
 var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json", func() {
@@ -51,9 +50,41 @@ var FieldNotes = MediaType("application/vnd.app.field_notes+json", func() {
 	})
 })
 
+var FieldNoteMedia = MediaType("application/vnd.app.field_note_media+json", func() {
+	TypeName("FieldNoteMedia")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("created", DateTime)
+		Attribute("user_id", Integer)
+		Attribute("url")
+		Attribute("content_type")
+		Required("id", "created", "user_id", "url", "content_type")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("created")
+		Attribute("user_id")
+		Attribute("url")
+		Attribute("content_type")
+	})
+})
+
 var _ = Resource("field_note", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
+	})
+
+	Action("save media", func() {
+		Routing(POST("/stations/:stationId/field-note-media"))
+		Description("Save a field note image")
+		Params(func() {
+			Param("stationId", Integer)
+			Required("stationId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(FieldNoteMedia)
+		})
 	})
 
 	Action("add", func() {

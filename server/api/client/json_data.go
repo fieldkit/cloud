@@ -40,24 +40,24 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp229 := strconv.Itoa(*end)
-		values.Set("end", tmp229)
+		tmp231 := strconv.Itoa(*end)
+		values.Set("end", tmp231)
 	}
 	if internal != nil {
-		tmp230 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp230)
+		tmp232 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp232)
 	}
 	if pageNumber != nil {
-		tmp231 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp231)
+		tmp233 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp233)
 	}
 	if pageSize != nil {
-		tmp232 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp232)
+		tmp234 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp234)
 	}
 	if start != nil {
-		tmp233 := strconv.Itoa(*start)
-		values.Set("start", tmp233)
+		tmp235 := strconv.Itoa(*start)
+		values.Set("start", tmp235)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -97,24 +97,24 @@ func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, en
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp234 := strconv.Itoa(*end)
-		values.Set("end", tmp234)
+		tmp236 := strconv.Itoa(*end)
+		values.Set("end", tmp236)
 	}
 	if internal != nil {
-		tmp235 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp235)
+		tmp237 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp237)
 	}
 	if pageNumber != nil {
-		tmp236 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp236)
+		tmp238 := strconv.Itoa(*pageNumber)
+		values.Set("pageNumber", tmp238)
 	}
 	if pageSize != nil {
-		tmp237 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp237)
+		tmp239 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp239)
 	}
 	if start != nil {
-		tmp238 := strconv.Itoa(*start)
-		values.Set("start", tmp238)
+		tmp240 := strconv.Itoa(*start)
+		values.Set("start", tmp240)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

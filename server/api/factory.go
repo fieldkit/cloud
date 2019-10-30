@@ -200,6 +200,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "field_note" controller
 	c20 := NewFieldNoteController(service, FieldNoteControllerOptions{
+		Session: awsSession,
 		Database: database,
 	})
 	app.MountFieldNoteController(service, c20)
