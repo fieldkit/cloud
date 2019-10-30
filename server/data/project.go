@@ -15,6 +15,6 @@ type Project struct {
 	StartTime        *time.Time `db:"start_time"`
 	EndTime          *time.Time `db:"end_time"`
 	Private          bool       `db:"private"`
-	MediaURL         *string    `json:"media_url"`
-	MediaContentType *string    `json:"media_content_type"`
+	MediaURL         *string    `db:"media_url"`
+	MediaContentType *string    `db:"media_content_type"`
 }

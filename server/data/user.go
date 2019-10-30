@@ -44,8 +44,8 @@ type User struct {
 	Password         []byte  `db:"password"`
 	Valid            bool    `db:"valid"`
 	Bio              string  `db:"bio"`
-	MediaURL         *string `json:"media_url"`
-	MediaContentType *string `json:"media_content_type"`
+	MediaURL         *string `db:"media_url"`
+	MediaContentType *string `db:"media_content_type"`
 }
 
 func (p *User) SetPassword(password string) error {
