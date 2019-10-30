@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 
 	"github.com/google/uuid"
 
@@ -107,6 +108,15 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	}
 
 	return
+}
+
+func (r *MediaRepository) LoadByURL(ctx context.Context, s3url string) (lm *LoadedMedia, err error) {
+	u, err := url.Parse(s3url)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Load(ctx, u.Path[1:])
 }
 
 func (r *MediaRepository) Load(ctx context.Context, id string) (lm *LoadedMedia, err error) {
