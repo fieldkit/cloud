@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bufio"
+	"io"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -106,6 +108,38 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 
 	return ctx.OK(FieldNoteMediaType(fieldNoteMedia))
 }
+
+func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error {
+	_, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	fieldNoteMedia := &data.FieldNoteMedia{}
+	if err := c.options.Database.GetContext(ctx, fieldNoteMedia, "SELECT * FROM fieldkit.field_note_media WHERE id = $1", ctx.MediaID); err != nil {
+		return err
+	}
+
+	mr := repositories.NewMediaRepository(c.options.Session)
+
+	lm, err := mr.LoadByURL(ctx, fieldNoteMedia.URL)
+	if err != nil {
+		return err
+	}
+
+	if lm != nil {
+		writer := bufio.NewWriter(ctx.ResponseData)
+
+		_, err = io.Copy(writer, lm.Reader)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return ctx.OK(nil)
+}
+
 
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	p, err := NewPermissions(ctx)

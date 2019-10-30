@@ -129,6 +129,42 @@ func (c *Client) NewGetFieldNoteRequest(ctx context.Context, path string) (*http
 	return req, nil
 }
 
+// GetMediaFieldNotePath computes a request path to the get media action of field_note.
+func GetMediaFieldNotePath(stationID int, mediaID int) string {
+	param0 := strconv.Itoa(stationID)
+	param1 := strconv.Itoa(mediaID)
+
+	return fmt.Sprintf("/stations/%s/field-note-media/%s", param0, param1)
+}
+
+// Get a field note image
+func (c *Client) GetMediaFieldNote(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetMediaFieldNoteRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetMediaFieldNoteRequest create the request corresponding to the get media action endpoint of the field_note resource.
+func (c *Client) NewGetMediaFieldNoteRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // SaveMediaFieldNotePath computes a request path to the save media action of field_note.
 func SaveMediaFieldNotePath(stationID int) string {
 	param0 := strconv.Itoa(stationID)

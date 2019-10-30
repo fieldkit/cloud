@@ -87,6 +87,20 @@ var _ = Resource("field_note", func() {
 		})
 	})
 
+	Action("get media", func() {
+		Routing(GET("/stations/:stationId/field-note-media/:mediaId"))
+		Description("Get a field note image")
+		Params(func() {
+			Param("stationId", Integer)
+			Param("mediaId", Integer)
+			Required("stationId", "mediaId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media("image/png")
+		})
+	})
+
 	Action("add", func() {
 		Routing(POST("/stations/:stationId/field-notes"))
 		Description("Add a field note")

@@ -2515,6 +2515,7 @@ type FieldNoteController interface {
 	Add(*AddFieldNoteContext) error
 	Delete(*DeleteFieldNoteContext) error
 	Get(*GetFieldNoteContext) error
+	GetMedia(*GetMediaFieldNoteContext) error
 	SaveMedia(*SaveMediaFieldNoteContext) error
 	Update(*UpdateFieldNoteContext) error
 }
@@ -2525,6 +2526,7 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-notes/:fieldNoteId", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-note-media/:mediaId", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/field-note-media", ctrl.MuxHandler("preflight", handleFieldNoteOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -2583,6 +2585,23 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 	h = handleFieldNoteOrigin(h)
 	service.Mux.Handle("GET", "/stations/:stationId/field-notes", ctrl.MuxHandler("get", h, nil))
 	service.LogInfo("mount", "ctrl", "FieldNote", "action", "Get", "route", "GET /stations/:stationId/field-notes", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewGetMediaFieldNoteContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetMedia(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFieldNoteOrigin(h)
+	service.Mux.Handle("GET", "/stations/:stationId/field-note-media/:mediaId", ctrl.MuxHandler("get media", h, nil))
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "GetMedia", "route", "GET /stations/:stationId/field-note-media/:mediaId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

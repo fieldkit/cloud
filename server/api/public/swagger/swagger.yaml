@@ -387,6 +387,18 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -1861,20 +1873,6 @@ definitions:
       properties:
         Dolorum aut.: 7.964379346779114e+16
       type: Autem velit magni.
-    - geometry:
-        coordinates:
-        - 0.5893307549821114
-        type: Ut aliquid.
-      properties:
-        Dolorum aut.: 7.964379346779114e+16
-      type: Autem velit magni.
-    - geometry:
-        coordinates:
-        - 0.5893307549821114
-        type: Ut aliquid.
-      properties:
-        Dolorum aut.: 7.964379346779114e+16
-      type: Autem velit magni.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -2099,7 +2097,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+            Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2135,7 +2133,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+              Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2176,7 +2174,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+        Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2187,7 +2185,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+          Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2218,7 +2216,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+          Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2253,7 +2251,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: fee1aa9f-3a22-4661-864a-b1784d20ab2a
+            Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -6389,6 +6387,38 @@ paths:
       - jwt:
         - api:access
       summary: save media field_note
+      tags:
+      - field_note
+  /stations/{stationId}/field-note-media/{mediaId}:
+    get:
+      description: |-
+        Get a field note image
+
+        Required security scopes:
+          * `api:access`
+      operationId: field_note#get media
+      parameters:
+      - in: path
+        name: mediaId
+        required: true
+        type: integer
+      - in: path
+        name: stationId
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get media field_note
       tags:
       - field_note
   /stations/{stationId}/field-notes:
