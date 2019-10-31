@@ -193,12 +193,11 @@ var _ = Resource("user", func() {
 	})
 
 	Action("get image", func() {
-		Routing(GET("/users/:userId/media/:mediaId"))
+		Routing(GET("/users/:userId/media"))
 		Description("Get a user image")
 		Params(func() {
 			Param("userId", Integer)
-			Param("mediaId", Integer)
-			Required("userId", "mediaId")
+			Required("userId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

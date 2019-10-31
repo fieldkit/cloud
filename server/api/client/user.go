@@ -122,11 +122,10 @@ func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Re
 }
 
 // GetImageUserPath computes a request path to the get image action of user.
-func GetImageUserPath(userID int, mediaID int) string {
+func GetImageUserPath(userID int) string {
 	param0 := strconv.Itoa(userID)
-	param1 := strconv.Itoa(mediaID)
 
-	return fmt.Sprintf("/users/%s/media/%s", param0, param1)
+	return fmt.Sprintf("/users/%s/media", param0)
 }
 
 // Get a user image
