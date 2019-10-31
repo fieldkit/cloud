@@ -11,8 +11,11 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+    "github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
+    "github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 )
@@ -62,6 +65,7 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 }
 
 type UserControllerOptions struct {
+    Session *session.Session
 	Database   *sqlxcache.DB
 	Backend    *backend.Backend
 	Emailer    email.Emailer
@@ -301,3 +305,53 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 
 	return ctx.OK(UsersType(users))
 }
+
+func (c *UserController) SaveImage(ctx *app.SaveImageUserContext) error {
+    p, err := NewPermissions(ctx)
+    if err != nil {
+        return err
+    }
+
+    mr := repositories.NewMediaRepository(c.options.Session)
+    saved, err := mr.Save(ctx, ctx.RequestData)
+    if err != nil {
+        return err
+    }
+
+    user := &data.User{}
+    if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID); err != nil {
+        return err
+    }
+
+    return ctx.OK(UserType(user))
+}
+
+func (c *UserController) GetImage(ctx *app.GetImageUserContext) error {
+    p, err := NewPermissions(ctx)
+    if err != nil {
+        return err
+    }
+
+    user := &data.User{}
+    if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", p.UserID); err != nil {
+        return err
+    }
+
+    if user.MediaURL != nil {
+        mr := repositories.NewMediaRepository(c.options.Session)
+
+        lm, err := mr.LoadByURL(ctx, *user.MediaURL)
+        if err != nil {
+            return err
+        }
+
+        if lm != nil {
+            SendLoadedMedia(ctx.ResponseData, lm);
+        }
+
+        return nil
+    }
+
+    return ctx.OK(nil)
+}
+

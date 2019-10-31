@@ -121,6 +121,42 @@ func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Re
 	return req, nil
 }
 
+// GetImageUserPath computes a request path to the get image action of user.
+func GetImageUserPath(userID int, mediaID int) string {
+	param0 := strconv.Itoa(userID)
+	param1 := strconv.Itoa(mediaID)
+
+	return fmt.Sprintf("/users/%s/media/%s", param0, param1)
+}
+
+// Get a user image
+func (c *Client) GetImageUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetImageUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetImageUserRequest create the request corresponding to the get image action endpoint of the user resource.
+func (c *Client) NewGetImageUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // ListUserPath computes a request path to the list action of user.
 func ListUserPath() string {
 
@@ -263,6 +299,41 @@ func (c *Client) NewRefreshUserRequest(ctx context.Context, path string, payload
 	}
 	header := req.Header
 	header.Set("Content-Type", "application/json")
+	return req, nil
+}
+
+// SaveImageUserPath computes a request path to the save image action of user.
+func SaveImageUserPath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s/media", param0)
+}
+
+// Save a user image
+func (c *Client) SaveImageUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSaveImageUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSaveImageUserRequest create the request corresponding to the save image action endpoint of the user resource.
+func (c *Client) NewSaveImageUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 

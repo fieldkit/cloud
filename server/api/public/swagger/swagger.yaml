@@ -387,18 +387,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -485,6 +473,34 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.5179015047009488
+      - 0.5179015047009488
+      - 0.5179015047009488
+      endTime: "2002-11-07T04:34:47Z"
+      envelope:
+      - - 0.21337198569080057
+      - - 0.21337198569080057
+      - - 0.21337198569080057
+      id: 8.323829226597195e+18
+      numberOfFeatures: 4.275590274890706e+18
+      radius: 0.988378247040322
+      sourceId: 3.198012612563036e+18
+      startTime: "2000-01-12T18:33:49Z"
+    - centroid:
+      - 0.5179015047009488
+      - 0.5179015047009488
+      - 0.5179015047009488
+      endTime: "2002-11-07T04:34:47Z"
+      envelope:
+      - - 0.21337198569080057
+      - - 0.21337198569080057
+      - - 0.21337198569080057
+      id: 8.323829226597195e+18
+      numberOfFeatures: 4.275590274890706e+18
+      radius: 0.988378247040322
+      sourceId: 3.198012612563036e+18
+      startTime: "2000-01-12T18:33:49Z"
     - centroid:
       - 0.5179015047009488
       - 0.5179015047009488
@@ -601,6 +617,14 @@ definitions:
     description: DeviceDataRecordCollection is the media type for an array of DeviceDataRecord
       (default view)
     example:
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     - data:
         Sapiente ipsa expedita qui eum enim deleniti.: false
       id: 5.114928591801609e+18
@@ -999,11 +1023,6 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
-    - data:
-        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-      id: 2.4194290054188964e+18
-      record: 5.508071077920418e+18
-      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -2097,7 +2116,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+            Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2133,7 +2152,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+              Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2174,7 +2193,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+        Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2185,7 +2204,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+          Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2216,7 +2235,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+          Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2251,7 +2270,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 7f50d5c4-3834-462d-92ea-ffab01c7a3cc
+            Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -7072,6 +7091,68 @@ paths:
       - jwt:
         - api:access
       summary: update user
+      tags:
+      - user
+  /users/{userId}/media:
+    post:
+      description: |-
+        Save a user image
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#save image
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: save image user
+      tags:
+      - user
+  /users/{userId}/media/{mediaId}:
+    get:
+      description: |-
+        Get a user image
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get image
+      parameters:
+      - in: path
+        name: mediaId
+        required: true
+        type: integer
+      - in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get image user
       tags:
       - user
   /users/{userId}/picture:

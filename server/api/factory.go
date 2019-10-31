@@ -72,6 +72,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "user" controller
 	c2, err := NewUserController(service, UserControllerOptions{
+		Session:    awsSession,
 		Database:   database,
 		Backend:    be,
 		Emailer:    emailer,

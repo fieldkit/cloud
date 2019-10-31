@@ -178,4 +178,31 @@ var _ = Resource("user", func() {
 			Media(Users)
 		})
 	})
+
+	Action("save image", func() {
+		Routing(POST("/users/:userId/media"))
+		Description("Save a user image")
+		Params(func() {
+			Param("userId", Integer)
+			Required("userId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(User)
+		})
+	})
+
+	Action("get image", func() {
+		Routing(GET("/users/:userId/media/:mediaId"))
+		Description("Get a user image")
+		Params(func() {
+			Param("userId", Integer)
+			Param("mediaId", Integer)
+			Required("userId", "mediaId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media("image/png")
+		})
+	})
 })

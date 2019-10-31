@@ -5142,6 +5142,61 @@ func (ctx *GetIDUserContext) OK(r *User) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// GetImageUserContext provides the user get image action context.
+type GetImageUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	MediaID int
+	UserID  int
+}
+
+// NewGetImageUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller get image action.
+func NewGetImageUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetImageUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramMediaID := req.Params["mediaId"]
+	if len(paramMediaID) > 0 {
+		rawMediaID := paramMediaID[0]
+		if mediaID, err2 := strconv.Atoi(rawMediaID); err2 == nil {
+			rctx.MediaID = mediaID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("mediaId", rawMediaID, "integer"))
+		}
+	}
+	paramUserID := req.Params["userId"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetImageUserContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "image/png")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetImageUserContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListUserContext provides the user list action context.
 type ListUserContext struct {
 	context.Context
@@ -5304,6 +5359,49 @@ func (ctx *RefreshUserContext) NoContent() error {
 // Unauthorized sends a HTTP response with status code 401.
 func (ctx *RefreshUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// SaveImageUserContext provides the user save image action context.
+type SaveImageUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID int
+}
+
+// NewSaveImageUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller save image action.
+func NewSaveImageUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*SaveImageUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SaveImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["userId"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SaveImageUserContext) OK(r *User) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SaveImageUserContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
 
