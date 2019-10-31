@@ -122,13 +122,12 @@ func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Re
 }
 
 // GetImageUserPath computes a request path to the get image action of user.
-func GetImageUserPath(userID int) string {
-	param0 := strconv.Itoa(userID)
+func GetImageUserPath() string {
 
-	return fmt.Sprintf("/users/%s/media", param0)
+	return fmt.Sprintf("/user/media")
 }
 
-// Get a user image
+// Get the authenticated user's image
 func (c *Client) GetImageUser(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewGetImageUserRequest(ctx, path)
 	if err != nil {
@@ -302,13 +301,12 @@ func (c *Client) NewRefreshUserRequest(ctx context.Context, path string, payload
 }
 
 // SaveImageUserPath computes a request path to the save image action of user.
-func SaveImageUserPath(userID int) string {
-	param0 := strconv.Itoa(userID)
+func SaveImageUserPath() string {
 
-	return fmt.Sprintf("/users/%s/media", param0)
+	return fmt.Sprintf("/user/media")
 }
 
-// Save a user image
+// Save the authenticated user's image
 func (c *Client) SaveImageUser(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewSaveImageUserRequest(ctx, path)
 	if err != nil {

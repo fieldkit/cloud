@@ -5235,7 +5235,6 @@ type GetImageUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	UserID int
 }
 
 // NewGetImageUserContext parses the incoming request URL and body, performs validations and creates the
@@ -5247,15 +5246,6 @@ func NewGetImageUserContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["userId"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
-			rctx.UserID = userID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
-		}
-	}
 	return &rctx, err
 }
 
@@ -5445,7 +5435,6 @@ type SaveImageUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	UserID int
 }
 
 // NewSaveImageUserContext parses the incoming request URL and body, performs validations and creates the
@@ -5457,15 +5446,6 @@ func NewSaveImageUserContext(ctx context.Context, r *http.Request, service *goa.
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := SaveImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["userId"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
-			rctx.UserID = userID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
-		}
-	}
 	return &rctx, err
 }
 

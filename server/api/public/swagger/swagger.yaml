@@ -633,14 +633,6 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -1023,6 +1015,11 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -2116,7 +2113,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+            Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2152,7 +2149,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+              Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2193,7 +2190,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+        Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2204,7 +2201,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+          Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2235,7 +2232,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+          Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2270,7 +2267,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
+            Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -7017,6 +7014,53 @@ paths:
       summary: get current user
       tags:
       - user
+  /user/media:
+    get:
+      description: |-
+        Get the authenticated user's image
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get image
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get image user
+      tags:
+      - user
+    post:
+      description: |-
+        Save the authenticated user's image
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#save image
+      produces:
+      - application/vnd.app.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: save image user
+      tags:
+      - user
   /user/projects:
     get:
       description: |-
@@ -7148,63 +7192,6 @@ paths:
       - jwt:
         - api:access
       summary: update user
-      tags:
-      - user
-  /users/{userId}/media:
-    get:
-      description: |-
-        Get a user image
-
-        Required security scopes:
-          * `api:access`
-      operationId: user#get image
-      parameters:
-      - in: path
-        name: userId
-        required: true
-        type: integer
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get image user
-      tags:
-      - user
-    post:
-      description: |-
-        Save a user image
-
-        Required security scopes:
-          * `api:access`
-      operationId: user#save image
-      parameters:
-      - in: path
-        name: userId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.user+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: save image user
       tags:
       - user
   /users/{userId}/picture:
