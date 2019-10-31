@@ -1,8 +1,6 @@
 package api
 
 import (
-	"bufio"
-	"io"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -127,17 +125,11 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 		return err
 	}
 
-	if lm != nil {
-		writer := bufio.NewWriter(ctx.ResponseData)
+    if lm != nil {
+        SendLoadedMedia(ctx.ResponseData, lm);
+    }
 
-		_, err = io.Copy(writer, lm.Reader)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return ctx.OK(nil)
+	return nil
 }
 
 
