@@ -3875,8 +3875,10 @@ type ProjectController interface {
 	Add(*AddProjectContext) error
 	Get(*GetProjectContext) error
 	GetID(*GetIDProjectContext) error
+	GetImage(*GetImageProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
+	SaveImage(*SaveImageProjectContext) error
 	Update(*UpdateProjectContext) error
 }
 
@@ -3887,6 +3889,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/@/:project", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -3951,6 +3954,23 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 			return err
 		}
 		// Build the context
+		rctx, err := NewGetImageProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.GetImage(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("GET", "/projects/:projectId/media", ctrl.MuxHandler("get image", h, nil))
+	service.LogInfo("mount", "ctrl", "Project", "action", "GetImage", "route", "GET /projects/:projectId/media", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
 		rctx, err := NewListProjectContext(ctx, req, service)
 		if err != nil {
 			return err
@@ -3978,6 +3998,23 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/user/projects", ctrl.MuxHandler("list current", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "ListCurrent", "route", "GET /user/projects", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSaveImageProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SaveImage(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("POST", "/projects/:projectId/media", ctrl.MuxHandler("save image", h, nil))
+	service.LogInfo("mount", "ctrl", "Project", "action", "SaveImage", "route", "POST /projects/:projectId/media", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -6193,11 +6230,10 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/users", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/users/:userId", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/users/:userId/media/:mediaId", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/users/:userId/media", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/users/:userId/media", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/validate", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -6270,8 +6306,8 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleUserOrigin(h)
-	service.Mux.Handle("GET", "/users/:userId/media/:mediaId", ctrl.MuxHandler("get image", h, nil))
-	service.LogInfo("mount", "ctrl", "User", "action", "GetImage", "route", "GET /users/:userId/media/:mediaId", "security", "jwt")
+	service.Mux.Handle("GET", "/users/:userId/media", ctrl.MuxHandler("get image", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "GetImage", "route", "GET /users/:userId/media", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -122,6 +122,41 @@ func (c *Client) NewGetIDProjectRequest(ctx context.Context, path string) (*http
 	return req, nil
 }
 
+// GetImageProjectPath computes a request path to the get image action of project.
+func GetImageProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s/media", param0)
+}
+
+// Get a project image
+func (c *Client) GetImageProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewGetImageProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewGetImageProjectRequest create the request corresponding to the get image action endpoint of the project resource.
+func (c *Client) NewGetImageProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // ListProjectPath computes a request path to the list action of project.
 func ListProjectPath() string {
 
@@ -179,6 +214,41 @@ func (c *Client) NewListCurrentProjectRequest(ctx context.Context, path string) 
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// SaveImageProjectPath computes a request path to the save image action of project.
+func SaveImageProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s/media", param0)
+}
+
+// Save a project image
+func (c *Client) SaveImageProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSaveImageProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSaveImageProjectRequest create the request corresponding to the save image action endpoint of the project resource.
+func (c *Client) NewSaveImageProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}

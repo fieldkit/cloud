@@ -2116,7 +2116,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+            Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2152,7 +2152,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+              Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2193,7 +2193,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+        Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2204,7 +2204,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+          Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2235,7 +2235,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+          Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2270,7 +2270,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: e8dc8751-6465-4b41-bae9-f9231f3af5e3
+            Repudiandae dignissimos.: 7fd3816a-1681-451b-80ab-877afb9348b8
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -5699,6 +5699,63 @@ paths:
       summary: add expedition
       tags:
       - expedition
+  /projects/{projectId}/media:
+    get:
+      description: |-
+        Get a project image
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#get image
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get image project
+      tags:
+      - project
+    post:
+      description: |-
+        Save a project image
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#save image
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.project+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: save image project
+      tags:
+      - project
   /projects/{projectId}/picture:
     get:
       description: Get a project's picture
@@ -7094,6 +7151,33 @@ paths:
       tags:
       - user
   /users/{userId}/media:
+    get:
+      description: |-
+        Get a user image
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#get image
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: get image user
+      tags:
+      - user
     post:
       description: |-
         Save a user image
@@ -7121,38 +7205,6 @@ paths:
       - jwt:
         - api:access
       summary: save image user
-      tags:
-      - user
-  /users/{userId}/media/{mediaId}:
-    get:
-      description: |-
-        Get a user image
-
-        Required security scopes:
-          * `api:access`
-      operationId: user#get image
-      parameters:
-      - in: path
-        name: mediaId
-        required: true
-        type: integer
-      - in: path
-        name: userId
-        required: true
-        type: integer
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get image user
       tags:
       - user
   /users/{userId}/picture:

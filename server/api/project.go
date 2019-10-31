@@ -9,11 +9,15 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+    "github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/fieldkit/cloud/server/api/app"
+    "github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
 type ProjectControllerOptions struct {
+    Session *session.Session
 	Database *sqlxcache.DB
 }
 
@@ -53,7 +57,7 @@ func ProjectsType(projects []*data.Project) *app.Projects {
 	}
 }
 
-// ProjectController implements the user resource.
+// ProjectController implements the project resource.
 type ProjectController struct {
 	*goa.Controller
 	options ProjectControllerOptions
@@ -205,4 +209,53 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	}
 
 	return ctx.OK(ProjectsType(projects))
+}
+
+func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
+    _, err := NewPermissions(ctx)
+    if err != nil {
+        return err
+    }
+
+    mr := repositories.NewMediaRepository(c.options.Session)
+    saved, err := mr.Save(ctx, ctx.RequestData)
+    if err != nil {
+        return err
+    }
+
+    project := &data.Project{}
+    if err := c.options.Database.GetContext(ctx, project, "UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, ctx.ProjectID); err != nil {
+        return err
+    }
+
+    return ctx.OK(ProjectType(project))
+}
+
+func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
+    _, err := NewPermissions(ctx)
+    if err != nil {
+        return err
+    }
+
+    project := &data.Project{}
+    if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+        return err
+    }
+
+    if project.MediaURL != nil {
+        mr := repositories.NewMediaRepository(c.options.Session)
+
+        lm, err := mr.LoadByURL(ctx, *project.MediaURL)
+        if err != nil {
+            return err
+        }
+
+        if lm != nil {
+            SendLoadedMedia(ctx.ResponseData, lm);
+        }
+
+        return nil
+    }
+
+    return ctx.OK(nil)
 }

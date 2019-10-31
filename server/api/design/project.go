@@ -138,4 +138,30 @@ var _ = Resource("project", func() {
 			Media(Projects)
 		})
 	})
+
+	Action("save image", func() {
+		Routing(POST("/projects/:projectId/media"))
+		Description("Save a project image")
+		Params(func() {
+			Param("projectId", Integer)
+			Required("projectId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Project)
+		})
+	})
+
+	Action("get image", func() {
+		Routing(GET("/projects/:projectId/media"))
+		Description("Get a project image")
+		Params(func() {
+			Param("projectId", Integer)
+			Required("projectId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media("image/png")
+		})
+	})
 })

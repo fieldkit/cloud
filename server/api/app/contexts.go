@@ -3419,6 +3419,51 @@ func (ctx *GetIDProjectContext) BadRequest() error {
 	return nil
 }
 
+// GetImageProjectContext provides the project get image action context.
+type GetImageProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewGetImageProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller get image action.
+func NewGetImageProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetImageProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := GetImageProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *GetImageProjectContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "image/png")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *GetImageProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListProjectContext provides the project list action context.
 type ListProjectContext struct {
 	context.Context
@@ -3481,6 +3526,49 @@ func (ctx *ListCurrentProjectContext) OK(r *Projects) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListCurrentProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// SaveImageProjectContext provides the project save image action context.
+type SaveImageProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewSaveImageProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller save image action.
+func NewSaveImageProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*SaveImageProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SaveImageProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SaveImageProjectContext) OK(r *Project) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SaveImageProjectContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
@@ -5147,8 +5235,7 @@ type GetImageUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	MediaID int
-	UserID  int
+	UserID int
 }
 
 // NewGetImageUserContext parses the incoming request URL and body, performs validations and creates the
@@ -5160,15 +5247,6 @@ func NewGetImageUserContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramMediaID := req.Params["mediaId"]
-	if len(paramMediaID) > 0 {
-		rawMediaID := paramMediaID[0]
-		if mediaID, err2 := strconv.Atoi(rawMediaID); err2 == nil {
-			rctx.MediaID = mediaID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("mediaId", rawMediaID, "integer"))
-		}
-	}
 	paramUserID := req.Params["userId"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]

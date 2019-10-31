@@ -86,6 +86,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "project" controller
 	c3 := NewProjectController(service, ProjectControllerOptions{
+		Session:  awsSession,
 		Database: database,
 	})
 	app.MountProjectController(service, c3)
