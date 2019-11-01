@@ -232,11 +232,6 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
-    _, err := NewPermissions(ctx)
-    if err != nil {
-        return err
-    }
-
     project := &data.Project{}
     if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
         return err

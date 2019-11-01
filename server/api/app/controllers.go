@@ -3960,10 +3960,9 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 		}
 		return ctrl.GetImage(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/projects/:projectId/media", ctrl.MuxHandler("get image", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "GetImage", "route", "GET /projects/:projectId/media", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Project", "action", "GetImage", "route", "GET /projects/:projectId/media")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

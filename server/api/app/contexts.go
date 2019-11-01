@@ -3458,12 +3458,6 @@ func (ctx *GetImageProjectContext) OK(resp []byte) error {
 	return err
 }
 
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetImageProjectContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // ListProjectContext provides the project list action context.
 type ListProjectContext struct {
 	context.Context

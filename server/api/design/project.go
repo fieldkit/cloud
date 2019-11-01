@@ -153,13 +153,13 @@ var _ = Resource("project", func() {
 	})
 
 	Action("get image", func() {
+		NoSecurity()
 		Routing(GET("/projects/:projectId/media"))
 		Description("Get a project image")
 		Params(func() {
 			Param("projectId", Integer)
 			Required("projectId")
 		})
-		Response(BadRequest)
 		Response(OK, func() {
 			Media("image/png")
 		})
