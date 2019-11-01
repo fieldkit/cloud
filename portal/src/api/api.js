@@ -90,6 +90,32 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    uploadUserImage(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/user/media",
+            headers: {
+                "Content-Type": data.type,
+                Authorization: token
+            },
+            data: data.image
+        }).then(this._handleResponse.bind(this));
+    }
+
+    updateUser(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "PATCH",
+            url: this.baseUrl + "/users/" + data.id,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            },
+            data: data
+        }).then(this._handleResponse.bind(this));
+    }
+
     getProjects() {
         const token = this.token.getToken();
         return axios({

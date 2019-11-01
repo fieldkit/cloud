@@ -4,6 +4,7 @@ import Login from "./views/LoginView.vue";
 import DataView from "./views/DataView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
 import StationsView from "./views/StationsView.vue";
+import UserView from "./views/UserView.vue";
 
 Vue.use(Router);
 
@@ -18,7 +19,12 @@ export default new Router({
             component: Login
         },
         {
-            path: "/dashboard",
+            path: "/dashboard/user",
+            name: "user",
+            component: UserView
+        },
+        {
+            path: "/dashboard/",
             name: "projects",
             component: ProjectsView
         },
