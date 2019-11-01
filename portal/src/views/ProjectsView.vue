@@ -13,7 +13,16 @@
                     <h1>{{ projectsTitle }}</h1>
                     <div v-for="project in projects" v-bind:key="project.id" class="project-container">
                         <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
-                            <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
+                            <div v-if="project.media_url" class="custom-project-image-container">
+                                <img
+                                    alt="Fieldkit Project"
+                                    :src="baseUrl + '/projects/' + project.id + '/media'"
+                                    class="custom-project-image"
+                                />
+                            </div>
+                            <div v-else>
+                                <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
+                            </div>
                             <div class="project-name">{{ project.name }}</div>
                             <div class="project-description">{{ project.description }}</div>
                         </router-link>
@@ -47,6 +56,7 @@
 
 <script>
 import FKApi from "../api/api";
+import { API_HOST } from "../secrets";
 import HeaderBar from "../components/HeaderBar";
 import ProjectForm from "../components/ProjectForm";
 import ProjectSummary from "../components/ProjectSummary";
@@ -80,6 +90,7 @@ export default {
     },
     data: () => {
         return {
+            baseUrl: API_HOST,
             user: {},
             projects: [],
             projectsTitle: "Projects",
@@ -112,6 +123,7 @@ export default {
                     }
                 });
                 if (this.id) {
+                    this.routeTo = this.$route;
                     this.api.getProject(this.id).then(this.handleProject.bind(this));
                 } else {
                     this.viewAllProjects();
@@ -147,6 +159,7 @@ export default {
             this.addingOrUpdating = true;
             this.activeProject = project;
             this.$refs.projectSummary.closeSummary();
+            this.loading = false;
         },
         viewProject(project) {
             this.resetFlags();
@@ -221,5 +234,12 @@ export default {
     font-weight: lighter;
     font-size: 14px;
     margin: 0 20px 10px 20px;
+}
+.custom-project-image-container {
+    text-align: center;
+}
+.custom-project-image {
+    max-width: 275px;
+    max-height: 135px;
 }
 </style>

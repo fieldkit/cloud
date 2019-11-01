@@ -183,6 +183,19 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    uploadProjectImage(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/" + data.id + "/media",
+            headers: {
+                "Content-Type": data.type,
+                Authorization: token
+            },
+            data: data.image
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStationDataSummaryByDeviceId(deviceId) {
         const token = this.token.getToken();
         return axios({

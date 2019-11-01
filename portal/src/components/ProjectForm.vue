@@ -7,9 +7,13 @@
         <input v-model="name" placeholder="Project Name" class="text-input wide-text-input" />
         <input v-model="description" placeholder="Short Description" class="text-input wide-text-input" />
         <input v-model="goal" placeholder="Project Goal" class="text-input wide-text-input" />
-        <!-- <div id="add-image">
-            <img alt="Add project image" src="../assets/add_image.png" />
-        </div> -->
+        <div class="image-container">
+            <img alt="Project image" :src="imageUrl" class="custom-image" v-if="hasImage && !previewImage" />
+            <img :src="previewImage" class="custom-image" v-if="!hasImage || previewImage" />
+            <br />
+            {{ this.hasImage ? "Update your project image: " : "Add an image to your project: " }}
+            <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
+        </div>
         <input v-model="location" placeholder="Location" class="text-input wide-text-input" />
         <div id="start-date">
             <input v-model="displayStartDate" placeholder="Start Date" class="text-input" />
@@ -48,6 +52,7 @@
 
 <script>
 import FKApi from "../api/api";
+import { API_HOST } from "../secrets";
 
 export default {
     name: "ProjectForm",
@@ -66,7 +71,12 @@ export default {
             endDate: null,
             displayEndDate: "",
             tags: "",
-            publicProject: false
+            publicProject: false,
+            hasImage: false,
+            imageUrl: "",
+            baseUrl: API_HOST,
+            previewImage: null,
+            acceptedImageTypes: ["jpg", "jpeg", "png", "gif"]
         };
     },
     watch: {
@@ -83,6 +93,13 @@ export default {
                 this.tags = _project.tags;
                 this.publicProject = _project.private;
                 this.updateDisplayDates();
+                if (_project.media_url) {
+                    this.imageUrl = this.baseUrl + "/projects/" + _project.id + "/media";
+                    this.hasImage = true;
+                } else {
+                    this.imageUrl = "";
+                    this.hasImage = false;
+                }
             } else {
                 this.formType = "add";
                 this.formHeading = "Add Project";
@@ -104,9 +121,18 @@ export default {
                 start_time: this.startDate,
                 tags: this.tags
             };
-            api.addProject(data).then(project => {
-                this.$router.push({ name: "viewProject", params: { id: project.id } });
-            });
+            if (this.sendingImage) {
+                api.addProject(data).then(project => {
+                    let params = { type: this.imageType, image: this.sendingImage, id: project.id };
+                    api.uploadProjectImage(params).then(() => {
+                        this.$router.push({ name: "viewProject", params: { id: project.id } });
+                    });
+                });
+            } else {
+                api.addProject(data).then(project => {
+                    this.$router.push({ name: "viewProject", params: { id: project.id } });
+                });
+            }
         },
         updateProject() {
             const api = new FKApi();
@@ -122,9 +148,18 @@ export default {
                 start_time: this.startDate,
                 tags: this.tags
             };
-            api.updateProject(data).then(project => {
-                this.$router.push({ name: "viewProject", params: { id: project.id } });
-            });
+            if (this.sendingImage) {
+                let params = { type: this.imageType, image: this.sendingImage, id: this.project.id };
+                api.uploadProjectImage(params).then(() => {
+                    api.updateProject(data).then(project => {
+                        this.$router.push({ name: "viewProject", params: { id: project.id } });
+                    });
+                });
+            } else {
+                api.updateProject(data).then(project => {
+                    this.$router.push({ name: "viewProject", params: { id: project.id } });
+                });
+            }
         },
         updateDisplayDates() {
             if (this.startDate) {
@@ -148,6 +183,31 @@ export default {
             this.displayEndDate = "";
             this.tags = "";
             this.publicProject = false;
+            this.hasImage = false;
+            this.imageUrl = "";
+        },
+        uploadImage(event) {
+            this.previewImage = null;
+            this.sendingImage = null;
+            let valid = false;
+            if (event.target.files.length > 0) {
+                this.acceptedImageTypes.forEach(t => {
+                    if (event.target.files[0].type.indexOf(t) > -1) {
+                        valid = true;
+                    }
+                });
+            }
+            if (!valid) {
+                return;
+            }
+            this.imageType = event.target.files[0].type;
+            const image = event.target.files[0];
+            this.sendingImage = image;
+            const reader = new FileReader();
+            reader.readAsDataURL(image);
+            reader.onload = event => {
+                this.previewImage = event.target.result;
+            };
         },
         closeForm() {
             this.$emit("closeProjectForm");
@@ -171,8 +231,14 @@ export default {
     margin: 15px 0;
     padding-bottom: 4px;
 }
-#add-image {
+.image-container {
+    width: 98%;
     margin: 15px 0;
+    float: left;
+}
+.custom-image {
+    max-width: 275px;
+    max-height: 135px;
 }
 #start-date input,
 #end-date input {

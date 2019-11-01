@@ -1,8 +1,15 @@
 <template>
     <div id="project-summary-container" v-if="viewingSummary">
         <div class="project-container" v-if="this.project">
-            <div class="left tall">
-                <img alt="Project image" src="../assets/fieldkit_project.png" />
+            <div v-if="project.media_url" class="left tall custom-project-image-container">
+                <img
+                    alt="Fieldkit Project image"
+                    :src="baseUrl + '/projects/' + project.id + '/media'"
+                    class="custom-project-image"
+                />
+            </div>
+            <div v-else class="left tall">
+                <img alt="Fieldkit Project image" src="../assets/fieldkit_project.png" />
             </div>
             <div class="left">
                 <div id="project-name">{{ this.project.name }}</div>
@@ -108,10 +115,13 @@
 </template>
 
 <script>
+import { API_HOST } from "../secrets";
+
 export default {
     name: "ProjectSummary",
     data: () => {
         return {
+            baseUrl: API_HOST,
             viewingSummary: false,
             viewingStations: false,
             viewingActivity: false,
@@ -251,6 +261,13 @@ export default {
 #edit-project {
     display: inline-block;
     cursor: pointer;
+}
+.custom-project-image-container {
+    text-align: center;
+}
+.custom-project-image {
+    max-width: 275px;
+    max-height: 135px;
 }
 .stations-container {
     display: grid;
