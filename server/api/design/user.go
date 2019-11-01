@@ -179,7 +179,7 @@ var _ = Resource("user", func() {
 		})
 	})
 
-	Action("save image", func() {
+	Action("save current user image", func() {
 		Routing(POST("/user/media"))
 		Description("Save the authenticated user's image")
 		Response(BadRequest)
@@ -188,10 +188,23 @@ var _ = Resource("user", func() {
 		})
 	})
 
-	Action("get image", func() {
+	Action("get current user image", func() {
 		Routing(GET("/user/media"))
 		Description("Get the authenticated user's image")
 		Response(BadRequest)
+		Response(OK, func() {
+			Media("image/png")
+		})
+	})
+
+	Action("get user image", func() {
+		NoSecurity()
+		Routing(GET("/user/:userId/media"))
+		Description("Get a user image")
+		Params(func() {
+			Param("userId", Integer)
+			Required("userId")
+		})
 		Response(OK, func() {
 			Media("image/png")
 		})

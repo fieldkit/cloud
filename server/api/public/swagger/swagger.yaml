@@ -387,6 +387,18 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
+    - geometry:
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      - - 0.9682483955411658
+      id: 5.41219004578842e+18
+      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -473,34 +485,6 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
-    - centroid:
-      - 0.5179015047009488
-      - 0.5179015047009488
-      - 0.5179015047009488
-      endTime: "2002-11-07T04:34:47Z"
-      envelope:
-      - - 0.21337198569080057
-      - - 0.21337198569080057
-      - - 0.21337198569080057
-      id: 8.323829226597195e+18
-      numberOfFeatures: 4.275590274890706e+18
-      radius: 0.988378247040322
-      sourceId: 3.198012612563036e+18
-      startTime: "2000-01-12T18:33:49Z"
-    - centroid:
-      - 0.5179015047009488
-      - 0.5179015047009488
-      - 0.5179015047009488
-      endTime: "2002-11-07T04:34:47Z"
-      envelope:
-      - - 0.21337198569080057
-      - - 0.21337198569080057
-      - - 0.21337198569080057
-      id: 8.323829226597195e+18
-      numberOfFeatures: 4.275590274890706e+18
-      radius: 0.988378247040322
-      sourceId: 3.198012612563036e+18
-      startTime: "2000-01-12T18:33:49Z"
     - centroid:
       - 0.5179015047009488
       - 0.5179015047009488
@@ -2113,7 +2097,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+            Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2149,7 +2133,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+              Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2190,7 +2174,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+        Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2201,7 +2185,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+          Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2232,7 +2216,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+          Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2267,7 +2251,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: d87c1fb0-8baf-4381-8694-dea0d9797266
+            Repudiandae dignissimos.: 06220931-6c2a-4a3f-a506-89cd8b82bd7f
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -7014,6 +6998,25 @@ paths:
       summary: get current user
       tags:
       - user
+  /user/{userId}/media:
+    get:
+      description: Get a user image
+      operationId: user#get user image
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+      schemes:
+      - https
+      summary: get user image user
+      tags:
+      - user
   /user/media:
     get:
       description: |-
@@ -7021,7 +7024,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: user#get image
+      operationId: user#get current user image
       produces:
       - image/png
       responses:
@@ -7034,7 +7037,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: get image user
+      summary: get current user image user
       tags:
       - user
     post:
@@ -7043,7 +7046,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: user#save image
+      operationId: user#save current user image
       produces:
       - application/vnd.app.user+json
       responses:
@@ -7058,7 +7061,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: save image user
+      summary: save current user image user
       tags:
       - user
   /user/projects:

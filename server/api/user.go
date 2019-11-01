@@ -306,7 +306,7 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 	return ctx.OK(UsersType(users))
 }
 
-func (c *UserController) SaveImage(ctx *app.SaveImageUserContext) error {
+func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {
     p, err := NewPermissions(ctx)
     if err != nil {
         return err
@@ -326,7 +326,7 @@ func (c *UserController) SaveImage(ctx *app.SaveImageUserContext) error {
     return ctx.OK(UserType(user))
 }
 
-func (c *UserController) GetImage(ctx *app.GetImageUserContext) error {
+func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserContext) error {
     p, err := NewPermissions(ctx)
     if err != nil {
         return err
@@ -355,3 +355,26 @@ func (c *UserController) GetImage(ctx *app.GetImageUserContext) error {
     return ctx.OK(nil)
 }
 
+func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
+    user := &data.User{}
+    if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
+        return err
+    }
+
+    if user.MediaURL != nil {
+        mr := repositories.NewMediaRepository(c.options.Session)
+
+        lm, err := mr.LoadByURL(ctx, *user.MediaURL)
+        if err != nil {
+            return err
+        }
+
+        if lm != nil {
+            SendLoadedMedia(ctx.ResponseData, lm);
+        }
+
+        return nil
+    }
+
+    return ctx.OK(nil)
+}
