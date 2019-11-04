@@ -12,7 +12,7 @@ type FieldNoteQueryResult struct {
     Note                *string     `db:"note"`
     MediaURL            *string     `json:"media_url"`
     MediaContentType    *string     `json:"media_content_type"`
-    Username            string      `db:"username"`
+    Creator             string      `json:"creator"`
 }
 
 type FieldNote struct {

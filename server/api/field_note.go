@@ -25,7 +25,7 @@ func FieldNoteQueryResultType(fieldNote *data.FieldNoteQueryResult) *app.FieldNo
 		Created:     fieldNote.Created,
 		UserID:      int(fieldNote.UserID),
 		CategoryKey: fieldNote.CategoryKey,
-		Username:    fieldNote.Username,
+		Creator:     fieldNote.Creator,
 	}
 
 	if fieldNote.Note != nil {
@@ -176,7 +176,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	}
 
 	fieldNoteQueryResult := &data.FieldNoteQueryResult{}
-	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
+	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.name AS Creator, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
 		return err
 	}
 
@@ -227,7 +227,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 	}
 
 	fieldNoteQueryResult := &data.FieldNoteQueryResult{}
-	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
+	if err := c.options.Database.GetContext(ctx, fieldNoteQueryResult, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.name AS Creator, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.id = $1", fieldNote.ID); err != nil {
 		return err
 	}
 
@@ -237,7 +237,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 	fieldNotes := []*data.FieldNoteQueryResult{}
 
-	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.username, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1 ORDER BY fn.created DESC", ctx.StationID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.name AS Creator, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1 ORDER BY fn.created DESC", ctx.StationID); err != nil {
 		return err
 	}
 

@@ -24,8 +24,8 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 		Attribute("note")
 		Attribute("media_url")
 		Attribute("media_content_type")
-		Attribute("username")
-		Required("id", "created", "user_id", "category_key", "username")
+		Attribute("creator")
+		Required("id", "created", "user_id", "category_key", "creator")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -35,7 +35,7 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 		Attribute("note")
 		Attribute("media_url")
 		Attribute("media_content_type")
-		Attribute("username")
+		Attribute("creator")
 	})
 })
 
