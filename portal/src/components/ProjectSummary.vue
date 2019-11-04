@@ -2,11 +2,7 @@
     <div id="project-summary-container" v-if="viewingSummary">
         <div class="project-container" v-if="this.project">
             <div v-if="project.media_url" class="left tall custom-project-image-container">
-                <img
-                    alt="Fieldkit Project image"
-                    :src="baseUrl + '/projects/' + project.id + '/media'"
-                    class="custom-project-image"
-                />
+                <img alt="Fieldkit Project image" :src="getImageUrl(project)" class="custom-project-image" />
             </div>
             <div v-else class="left tall">
                 <img alt="Fieldkit Project image" src="../assets/fieldkit_project.png" />
@@ -153,6 +149,9 @@ export default {
         },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
+        },
+        getImageUrl(project) {
+            return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
         },
         updateDisplayDates() {
             if (this.project.start_time) {

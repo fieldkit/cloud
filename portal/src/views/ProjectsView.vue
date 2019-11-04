@@ -16,7 +16,7 @@
                             <div v-if="project.media_url" class="custom-project-image-container">
                                 <img
                                     alt="Fieldkit Project"
-                                    :src="baseUrl + '/projects/' + project.id + '/media'"
+                                    :src="getImageUrl(project)"
                                     class="custom-project-image"
                                 />
                             </div>
@@ -34,7 +34,11 @@
             </div>
             <!-- add or update a project -->
             <div v-show="addingOrUpdating">
-                <ProjectForm :project="activeProject" @closeProjectForm="closeProjectForm" />
+                <ProjectForm
+                    :project="activeProject"
+                    @closeProjectForm="closeProjectForm"
+                    @updating="onProjectUpdate"
+                />
             </div>
             <!-- display one project -->
             <ProjectSummary :project="activeProject" :stations="stations" :user="user" ref="projectSummary" />
@@ -148,6 +152,7 @@ export default {
             if (this.routeTo && this.routeTo.name == "editProject") {
                 this.editProject(project);
             }
+            this.$forceUpdate();
         },
         addProject() {
             this.resetFlags();
@@ -161,6 +166,9 @@ export default {
             this.$refs.projectSummary.closeSummary();
             this.loading = false;
         },
+        onProjectUpdate() {
+            this.loading = true;
+        },
         viewProject(project) {
             this.resetFlags();
             this.activeProject = project;
@@ -172,6 +180,9 @@ export default {
             this.viewingAll = true;
             this.$refs.projectSummary.closeSummary();
             this.loading = false;
+        },
+        getImageUrl(project) {
+            return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
         },
         closeProjectForm() {
             this.activeProject = null;

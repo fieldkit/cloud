@@ -108,8 +108,7 @@ export default {
         }
     },
     methods: {
-        addProject() {
-            const api = new FKApi();
+        createParams() {
             const data = {
                 description: this.description,
                 end_time: this.endDate,
@@ -121,6 +120,16 @@ export default {
                 start_time: this.startDate,
                 tags: this.tags
             };
+            if (this.project) {
+                data.id = this.project.id;
+                data.slug = this.project.slug;
+            }
+            return data;
+        },
+        addProject() {
+            this.$emit("updating");
+            const api = new FKApi();
+            const data = this.createParams();
             if (this.sendingImage) {
                 api.addProject(data).then(project => {
                     let params = { type: this.imageType, image: this.sendingImage, id: project.id };
@@ -135,19 +144,9 @@ export default {
             }
         },
         updateProject() {
+            this.$emit("updating");
             const api = new FKApi();
-            const data = {
-                id: this.project.id,
-                description: this.description,
-                end_time: this.endDate,
-                goal: this.goal,
-                location: this.location,
-                name: this.name,
-                private: this.publicProject,
-                slug: "proj-" + Date.now(),
-                start_time: this.startDate,
-                tags: this.tags
-            };
+            const data = this.createParams();
             if (this.sendingImage) {
                 let params = { type: this.imageType, image: this.sendingImage, id: this.project.id };
                 api.uploadProjectImage(params).then(() => {
