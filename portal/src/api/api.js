@@ -239,6 +239,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getFieldNotes(station) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/stations/" + station.id + "/field-notes",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     _handleResponse(response) {
         if (response.status == 200) {
             return response.data;
