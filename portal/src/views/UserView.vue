@@ -1,54 +1,46 @@
 <template>
     <div>
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
         <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
+        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <div id="user-container">
-                <div v-if="!isEditing">
-                    <div id="user-name">{{ this.user.name }}</div>
-                    <div id="edit-user">
-                        <img alt="Edit user" src="../assets/edit.png" v-on:click="editUser" />
-                    </div>
-                    <div class="user-element">{{ this.user.email }}</div>
-                    <div class="user-element">{{ this.user.bio }}</div>
+            <div class="view-user" v-if="!isEditing">
+                <div id="user-name">{{ this.user.name }}</div>
+                <div id="edit-user">
+                    <img alt="Edit user" src="../assets/edit.png" v-on:click="editUser" />
                 </div>
+                <div class="user-element">{{ this.user.email }}</div>
+                <div class="user-element">{{ this.user.bio }}</div>
+            </div>
 
-                <div id="user-form-container" v-if="isEditing">
-                    <div id="close-form-btn" v-on:click="closeForm">
-                        <img alt="Close" src="../assets/close.png" />
-                    </div>
-                    <div class="input-label">Name:</div>
-                    <input v-model="user.name" placeholder="Name" class="text-input wide-text-input" />
-                    <div class="input-label">Email:</div>
-                    <input v-model="user.email" placeholder="Email" class="text-input wide-text-input" />
-                    <div class="input-label">Bio:</div>
-                    <input v-model="user.bio" placeholder="Bio" class="text-input wide-text-input" />
-                    <div id="public-checkbox-container">
-                        <input type="checkbox" id="checkbox" v-model="publicProfile" />
-                        <label for="checkbox">Make my profile public</label>
-                        <img alt="Info" src="../assets/info.png" />
-                    </div>
-                    <div class="image-container">
-                        <img
-                            alt="User image"
-                            :src="baseUrl + '/user/' + user.id + '/media'"
-                            v-if="user.media_url && !previewImage"
-                        />
-                        <img
-                            :src="previewImage"
-                            class="uploading-image"
-                            v-if="!user.media_url || previewImage"
-                        />
-                        <br />
-                        {{
-                            this.user.media_url
-                                ? "Update your profile image: "
-                                : "Add an image to your profile: "
-                        }}
-                        <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
-                    </div>
-                    <button class="save-btn" v-on:click="submitUpdate">Update</button>
+            <div id="user-form-container" v-if="isEditing">
+                <div id="close-form-btn" v-on:click="closeForm">
+                    <img alt="Close" src="../assets/close.png" />
                 </div>
+                <div class="input-label">Name:</div>
+                <input v-model="user.name" placeholder="Name" class="text-input wide-text-input" />
+                <div class="input-label">Email:</div>
+                <input v-model="user.email" placeholder="Email" class="text-input wide-text-input" />
+                <div class="input-label">Bio:</div>
+                <input v-model="user.bio" placeholder="Bio" class="text-input wide-text-input" />
+                <div id="public-checkbox-container">
+                    <input type="checkbox" id="checkbox" v-model="publicProfile" />
+                    <label for="checkbox">Make my profile public</label>
+                    <img alt="Info" src="../assets/info.png" />
+                </div>
+                <div class="image-container">
+                    <img
+                        alt="User image"
+                        :src="baseUrl + '/user/' + user.id + '/media'"
+                        v-if="user.media_url && !previewImage"
+                    />
+                    <img :src="previewImage" class="uploading-image" v-if="!user.media_url || previewImage" />
+                    <br />
+                    {{
+                        this.user.media_url ? "Update your profile image: " : "Add an image to your profile: "
+                    }}
+                    <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
+                </div>
+                <button class="save-btn" v-on:click="submitUpdate">Update</button>
             </div>
         </div>
         <div id="loading" v-if="loading">
@@ -126,16 +118,19 @@ export default {
             this.isEditing = true;
         },
         submitUpdate() {
+            this.loading = true;
             if (this.sendingImage) {
                 this.api.uploadUserImage({ type: this.imageType, image: this.sendingImage }).then(() => {
                     this.$refs.headerBar.refreshImage(this.previewImage);
                     this.api.updateUser(this.user).then(() => {
                         this.isEditing = false;
+                        this.loading = false;
                     });
                 });
             } else {
                 this.api.updateUser(this.user).then(() => {
                     this.isEditing = false;
+                    this.loading = false;
                 });
             }
         },
@@ -170,15 +165,14 @@ export default {
 </script>
 
 <style scoped>
+.view-user {
+    margin: 20px 40px;
+}
 #loading {
-    float: left;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
-}
-.main-panel {
-    margin-left: 280px;
 }
 .no-auth-message {
     float: left;
@@ -205,7 +199,7 @@ export default {
 #user-form-container {
     width: 700px;
     padding: 0 15px 15px 15px;
-    margin: 60px 0;
+    margin: 60px;
     border: 1px solid rgb(215, 220, 225);
 }
 .input-label {

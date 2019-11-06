@@ -644,7 +644,6 @@ export default {
     text-align: center;
 }
 #data-chart-container {
-    width: 1100px;
     float: left;
     margin-right: 20px;
 }
@@ -733,7 +732,6 @@ export default {
     clear: both;
 }
 #control-btn-container {
-    margin-left: 60px;
     float: left;
 }
 #time-control-container {
@@ -776,7 +774,7 @@ export default {
     float: left;
     clear: both;
     margin-bottom: 10px;
-    margin-left: 70px;
+    margin-left: 10px;
 }
 .chart-type {
     float: right;

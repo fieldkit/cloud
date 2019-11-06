@@ -10,6 +10,12 @@
         <div class="image-container">
             <img alt="Project image" :src="imageUrl" class="custom-image" v-if="hasImage && !previewImage" />
             <img :src="previewImage" class="custom-image" v-if="!hasImage || previewImage" />
+            <img
+                alt="Add project image"
+                src="../assets/add_image.png"
+                class="custom-image"
+                v-if="!hasImage && !previewImage"
+            />
             <br />
             {{ this.hasImage ? "Update your project image: " : "Add an image to your project: " }}
             <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />

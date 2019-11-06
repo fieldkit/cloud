@@ -1,47 +1,57 @@
 <template>
     <div>
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
+        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <!-- display all projects -->
-            <div id="projects-container" v-if="viewingAll">
-                <div class="container">
-                    <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <img alt="Add project" src="../assets/add.png" />
-                        Add Project
+            <div id="inner-container">
+                <!-- display all projects -->
+                <div id="projects-container" v-if="viewingAll">
+                    <div class="container">
+                        <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
+                            <img alt="Add project" src="../assets/add.png" />
+                            Add Project
+                        </div>
+                        <h1>{{ projectsTitle }}</h1>
+                        <div v-for="project in projects" v-bind:key="project.id" class="project-container">
+                            <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
+                                <div v-if="project.media_url" class="custom-project-image-container">
+                                    <img
+                                        alt="Fieldkit Project"
+                                        :src="getImageUrl(project)"
+                                        class="custom-project-image"
+                                    />
+                                </div>
+                                <div v-else>
+                                    <img
+                                        alt="Default Fieldkit Project"
+                                        src="../assets/fieldkit_project.png"
+                                    />
+                                </div>
+                                <div class="project-name">{{ project.name }}</div>
+                                <div class="project-description">{{ project.description }}</div>
+                            </router-link>
+                        </div>
                     </div>
-                    <h1>{{ projectsTitle }}</h1>
-                    <div v-for="project in projects" v-bind:key="project.id" class="project-container">
-                        <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
-                            <div v-if="project.media_url" class="custom-project-image-container">
-                                <img
-                                    alt="Fieldkit Project"
-                                    :src="getImageUrl(project)"
-                                    class="custom-project-image"
-                                />
-                            </div>
-                            <div v-else>
-                                <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
-                            </div>
-                            <div class="project-name">{{ project.name }}</div>
-                            <div class="project-description">{{ project.description }}</div>
-                        </router-link>
+                    <div class="container">
+                        <h1>Community</h1>
                     </div>
                 </div>
-                <div class="container">
-                    <h1>Community</h1>
+                <!-- add or update a project -->
+                <div v-show="addingOrUpdating">
+                    <ProjectForm
+                        :project="activeProject"
+                        @closeProjectForm="closeProjectForm"
+                        @updating="onProjectUpdate"
+                    />
                 </div>
-            </div>
-            <!-- add or update a project -->
-            <div v-show="addingOrUpdating">
-                <ProjectForm
+                <!-- display one project -->
+                <ProjectSummary
                     :project="activeProject"
-                    @closeProjectForm="closeProjectForm"
-                    @updating="onProjectUpdate"
+                    :stations="stations"
+                    :user="user"
+                    ref="projectSummary"
                 />
             </div>
-            <!-- display one project -->
-            <ProjectSummary :project="activeProject" :stations="stations" :user="user" ref="projectSummary" />
         </div>
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
@@ -201,15 +211,16 @@ export default {
 </script>
 
 <style scoped>
+#inner-container {
+    width: 780px;
+    margin: 40px 60px;
+}
 #loading {
     float: left;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
-}
-.main-panel {
-    margin-left: 280px;
 }
 .no-auth-message {
     float: left;

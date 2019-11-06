@@ -8,8 +8,8 @@
 html,
 body,
 #app {
+    min-width: 1100px;
     height: 100%;
-
     display: flex;
     flex-direction: column;
 }
@@ -28,16 +28,11 @@ a {
     text-decoration: none;
     color: inherit;
 }
-.header {
-    width: 100%;
-    height: 70px;
-    border-bottom: 2px solid rgb(235, 235, 235);
-}
 .main-panel {
-    float: left;
-    margin-left: 240px;
-    color: rgb(41, 61, 81);
+    width: auto;
     text-align: left;
+    overflow: hidden;
+    color: rgb(41, 61, 81);
 }
 .main-panel h1 {
     font-size: 38px;

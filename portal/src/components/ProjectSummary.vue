@@ -181,12 +181,7 @@ export default {
 <style scoped>
 #project-summary-container {
     background-color: #ffffff;
-    width: 780px;
-    position: absolute;
-    top: 40px;
-    left: 260px;
     padding: 0 15px 15px 15px;
-    margin: 60px;
     z-index: 2;
 }
 .show-link {

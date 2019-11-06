@@ -1,23 +1,23 @@
 <template>
     <div>
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="data" :stations="stations" :projects="projects" @showStation="showStation" />
-        <div id="data-view-background" v-show="isAuthenticated">
-            <div class="main-panel">
-                <div id="data-container">
-                    <router-link :to="{ name: 'stations' }">
-                        <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
-                    </router-link>
-                    <div id="station-name">{{ this.station ? this.station.name : "" }}</div>
-                    <DataChartControl
-                        ref="dataChartControl"
-                        :combinedStationInfo="combinedStationInfo"
-                        :station="station"
-                        :noStation="noStation"
-                        :labels="labels"
-                        @switchedSensor="onSensorSwitch"
-                        @timeChanged="onTimeChange"
-                    />
+        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+        <div id="data-view-background" class="main-panel" v-show="isAuthenticated">
+            <div id="data-container">
+                <router-link :to="{ name: 'stations' }">
+                    <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
+                </router-link>
+                <div id="station-name">{{ this.station ? this.station.name : "" }}</div>
+                <DataChartControl
+                    ref="dataChartControl"
+                    :combinedStationInfo="combinedStationInfo"
+                    :station="station"
+                    :noStation="noStation"
+                    :labels="labels"
+                    @switchedSensor="onSensorSwitch"
+                    @timeChanged="onTimeChange"
+                />
+                <div id="lower-container">
                     <NotesList :station="station" :selectedSensor="selectedSensor" />
                     <SensorSummary
                         ref="sensorSummary"
@@ -199,6 +199,8 @@ export default {
                 sensors.forEach(s => {
                     s.currentReading = recent[s.key];
                 });
+                // resize div to fit sections
+                document.getElementById("lower-container").style["min-width"] = "1100px";
             }
             this.sensors = sensors;
             this.stationData = processed;
@@ -225,6 +227,8 @@ export default {
             }
             this.$refs.dataChartControl.prepareNewStation();
             this.selectedSensor = null;
+            this.noStation = false;
+            document.getElementById("lower-container").style["min-width"] = "700px";
             this.fetchData().then(result => {
                 this.processData(result);
             });
@@ -235,8 +239,15 @@ export default {
 
 <style scoped>
 #data-view-background {
-    float: left;
+    color: rgb(41, 61, 81);
     background-color: rgb(252, 252, 252);
+}
+#data-container {
+    margin: 20px;
+    overflow: scroll;
+}
+#lower-container {
+    clear: both;
 }
 .no-auth-message {
     float: left;
@@ -245,9 +256,6 @@ export default {
 }
 .show-link {
     text-decoration: underline;
-}
-.main-panel {
-    margin-left: 280px;
 }
 .small-arrow {
     font-size: 9px;

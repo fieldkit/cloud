@@ -1,7 +1,7 @@
 <template>
     <div>
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <SidebarNav viewing="stations" :stations="stations" :projects="projects" @showStation="showSummary" />
+        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
                 :access-token="mapboxToken"
@@ -62,12 +62,6 @@ export default {
             }
         }
     },
-    mounted() {
-        // HACK
-        const newWidth = window.innerWidth - 240; // the sidebar is 240px
-        document.getElementById("stations-view-panel").style.width = newWidth + "px";
-        this.map.resize();
-    },
     async beforeCreate() {
         const api = new FKApi();
         api.getCurrentUser()
@@ -88,8 +82,6 @@ export default {
                         this.activeStation = station;
                         this.$refs.stationSummary.viewSummary();
                     }
-                    console.log("this is the user info", this.user);
-                    console.log("this is the station info", this.stations);
                 });
                 api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
@@ -109,6 +101,10 @@ export default {
     methods: {
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
+        },
+
+        onSidebarToggle() {
+            this.map.resize();
         },
 
         mapInitialized(map) {
@@ -266,14 +262,8 @@ export default {
 </script>
 
 <style scoped>
-.main-panel {
-    width: 80%;
-}
-#stations-container .container {
-    padding: 0;
-}
-#stations-container {
-    margin-bottom: 60px;
+#stations-view-panel {
+    margin: 0;
 }
 #map {
     width: 100%;

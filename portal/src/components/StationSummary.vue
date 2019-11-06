@@ -44,12 +44,12 @@
             <div id="location-container" class="section">
                 <div>{{ this.station.status_json.locationName }}</div>
                 <div class="left">
-                    {{ this.station.status_json.latitude || "--" }}
+                    {{ this.getLat() || "--" }}
                     <br />
                     Latitude
                 </div>
                 <div class="right">
-                    {{ this.station.status_json.longitude || "--" }}
+                    {{ this.getLong() || "--" }}
                     <br />
                     Longitude
                 </div>
@@ -130,6 +130,22 @@ export default {
                 img = "ocean.png";
             }
             return images("./" + img);
+        },
+
+        getLat() {
+            if (!this.station.status_json.latitude) {
+                return false;
+            }
+            let lat = parseFloat(this.station.status_json.latitude);
+            return lat.toFixed(5);
+        },
+
+        getLong() {
+            if (!this.station.status_json.longitude) {
+                return false;
+            }
+            let long = parseFloat(this.station.status_json.longitude);
+            return long.toFixed(5);
         },
 
         closeSummary() {
