@@ -161,7 +161,7 @@ export default {
     watch: {
         project() {
             if (this.project) {
-                this.updateDisplayDates();
+                this.reset();
             }
         },
         users() {
@@ -178,6 +178,13 @@ export default {
     methods: {
         viewSummary() {
             this.viewingSummary = true;
+        },
+        reset() {
+            this.updateDisplayDates();
+            this.viewingStations = false;
+            this.viewingActivity = false;
+            this.viewingTeam = false;
+            this.inviteEmail = "";
         },
         toggleStations() {
             this.viewingStations = !this.viewingStations;
@@ -220,6 +227,8 @@ export default {
             return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
         },
         updateDisplayDates() {
+            this.displayStartDate = "";
+            this.displayEndDate = "";
             if (this.project.start_time) {
                 let d = new Date(this.project.start_time);
                 this.displayStartDate = d.toLocaleDateString("en-US");
