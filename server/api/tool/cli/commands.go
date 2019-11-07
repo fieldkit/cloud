@@ -820,6 +820,12 @@ type (
 		PrettyPrint bool
 	}
 
+	// ListByProjectUserCommand is the command line data structure for the list by project action of user
+	ListByProjectUserCommand struct {
+		ProjectID   string
+		PrettyPrint bool
+	}
+
 	// LoginUserCommand is the command line data structure for the login action of user
 	LoginUserCommand struct {
 		Payload     string
@@ -6050,6 +6056,32 @@ func (cmd *ListUserCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *ListUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+}
+
+// Run makes the HTTP request corresponding to the ListByProjectUserCommand command.
+func (cmd *ListByProjectUserCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/users/project/%v", url.QueryEscape(cmd.ProjectID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ListByProjectUser(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ListByProjectUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var projectID string
+	cc.Flags().StringVar(&cmd.ProjectID, "projectId", projectID, ``)
 }
 
 // Run makes the HTTP request corresponding to the LoginUserCommand command.

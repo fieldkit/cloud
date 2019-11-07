@@ -179,6 +179,14 @@ var _ = Resource("user", func() {
 		})
 	})
 
+	Action("list by project", func() {
+		Routing(GET("users/project/:projectId"))
+		Description("List users by project")
+		Response(OK, func() {
+			Media(Users)
+		})
+	})
+
 	Action("save current user image", func() {
 		Routing(POST("/user/media"))
 		Description("Save the authenticated user's image")

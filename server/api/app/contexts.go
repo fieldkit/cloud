@@ -5325,6 +5325,39 @@ func (ctx *ListUserContext) OK(r *Users) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// ListByProjectUserContext provides the user list by project action context.
+type ListByProjectUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID string
+}
+
+// NewListByProjectUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller list by project action.
+func NewListByProjectUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListByProjectUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListByProjectUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		rctx.ProjectID = rawProjectID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListByProjectUserContext) OK(r *Users) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.users+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // LoginUserContext provides the user login action context.
 type LoginUserContext struct {
 	context.Context

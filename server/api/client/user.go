@@ -219,6 +219,41 @@ func (c *Client) NewListUserRequest(ctx context.Context, path string) (*http.Req
 	return req, nil
 }
 
+// ListByProjectUserPath computes a request path to the list by project action of user.
+func ListByProjectUserPath(projectID string) string {
+	param0 := projectID
+
+	return fmt.Sprintf("/users/project/%s", param0)
+}
+
+// List users by project
+func (c *Client) ListByProjectUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListByProjectUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListByProjectUserRequest create the request corresponding to the list by project action endpoint of the user resource.
+func (c *Client) NewListByProjectUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // LoginUserPath computes a request path to the login action of user.
 func LoginUserPath() string {
 

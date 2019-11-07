@@ -306,6 +306,15 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 	return ctx.OK(UsersType(users))
 }
 
+func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
+    users := []*data.User{}
+    if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1", ctx.ProjectID); err != nil {
+        return err
+    }
+
+    return ctx.OK(UsersType(users))
+}
+
 func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {
     p, err := NewPermissions(ctx)
     if err != nil {
