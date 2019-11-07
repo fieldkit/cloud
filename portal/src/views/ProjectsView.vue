@@ -2,6 +2,9 @@
     <div>
         <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+        <div id="loading" v-if="loading">
+            <img alt="" src="../assets/progress.gif" />
+        </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
             <div id="inner-container">
                 <!-- display all projects -->
@@ -48,13 +51,11 @@
                 <ProjectSummary
                     :project="activeProject"
                     :stations="stations"
-                    :user="user"
+                    :users="users"
                     ref="projectSummary"
+                    @inviteUser="sendInvite"
                 />
             </div>
-        </div>
-        <div id="loading" v-if="loading">
-            <img alt="" src="../assets/progress.gif" />
         </div>
         <div v-if="failedAuth" class="no-auth-message">
             <p>
@@ -90,7 +91,7 @@ export default {
         $route(to) {
             this.routeTo = to;
             if (to.params.id && this.isAuthenticated) {
-                this.api.getProject(to.params.id).then(this.handleProject);
+                this.getProject(to.params.id);
                 // refresh projects list
                 this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
@@ -110,6 +111,7 @@ export default {
             projectsTitle: "Projects",
             activeProject: null,
             stations: [],
+            users: [],
             isAuthenticated: false,
             viewingAll: false,
             addingOrUpdating: false,
@@ -138,7 +140,7 @@ export default {
                 });
                 if (this.id) {
                     this.routeTo = this.$route;
-                    this.api.getProject(this.id).then(this.handleProject.bind(this));
+                    this.getProject(this.id);
                 } else {
                     this.viewAllProjects();
                 }
@@ -154,6 +156,12 @@ export default {
     methods: {
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
+        },
+        getProject(projectId) {
+            this.api.getProject(projectId).then(this.handleProject);
+            this.api.getUsersByProject(projectId).then(users => {
+                this.users = users && users.users ? users.users : [];
+            });
         },
         handleProject(project) {
             if (!this.routeTo || this.routeTo.name == "viewProject") {
@@ -203,6 +211,11 @@ export default {
             this.viewingAll = false;
             this.addingOrUpdating = false;
         },
+        sendInvite(params) {
+            this.api.sendInvite(params).then(result => {
+                console.log("invite sent?", result);
+            });
+        },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         }
@@ -216,7 +229,6 @@ export default {
     margin: 40px 60px;
 }
 #loading {
-    float: left;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);
@@ -225,7 +237,7 @@ export default {
 .no-auth-message {
     float: left;
     font-size: 20px;
-    margin: 40px 0 0 300px;
+    margin: 40px 0 0 40px;
 }
 .show-link {
     text-decoration: underline;

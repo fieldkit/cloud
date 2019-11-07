@@ -177,7 +177,7 @@ export default {
 .no-auth-message {
     float: left;
     font-size: 20px;
-    margin: 40px 0 0 300px;
+    margin: 40px 0 0 40px;
 }
 .show-link {
     text-decoration: underline;

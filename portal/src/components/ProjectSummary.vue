@@ -92,16 +92,43 @@
                     <div class="section-heading">Team</div>
                 </div>
                 <div class="section-content" v-if="viewingTeam">
-                    <div class="user-container">
-                        <div class="user-grid-heading">Members (1)</div>
-                        <div class="user-grid-heading">Role</div>
-                        <div class="user-grid-heading">Status</div>
-                        <div class="row-border">
-                            {{ this.user.name }} (you) <br />
-                            <span class="email">{{ this.user.email }}</span>
+                    <div class="users-container">
+                        <div class="user-row">
+                            <div class="cell-heading">Members ({{ this.projectUsers.length }})</div>
+                            <div class="cell-heading">Role</div>
+                            <div class="cell-heading">Status</div>
                         </div>
-                        <div class="row-border">Admin</div>
-                        <div class="row-border">Active</div>
+                        <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
+                            <div class="cell">
+                                {{ user.name }} <br />
+                                <span class="email">{{ user.email }}</span>
+                            </div>
+                            <div class="cell">{{ user.role }}</div>
+                            <div class="cell">{{ user.status }}</div>
+                        </div>
+                        <div class="user-row">
+                            <div class="cell">
+                                <input
+                                    class="text-input"
+                                    placeholder="New member email"
+                                    keyboardType="email"
+                                    autocorrect="false"
+                                    autocapitalizationType="none"
+                                    v-model="inviteEmail"
+                                    @blur="checkEmail"
+                                />
+                                <span class="validation-error" id="no-email" v-if="noEmail">
+                                    Email is a required field.
+                                </span>
+                                <span class="validation-error" id="email-not-valid" v-if="emailNotValid">
+                                    Must be a valid email address.
+                                </span>
+                            </div>
+                            <div class="cell"></div>
+                            <div class="cell">
+                                <button class="save-btn" v-on:click="sendInvite">Invite</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -123,14 +150,28 @@ export default {
             viewingActivity: false,
             viewingTeam: false,
             displayStartDate: "",
-            displayEndDate: ""
+            displayEndDate: "",
+            projectUsers: [],
+            inviteEmail: "",
+            noEmail: false,
+            emailNotValid: false
         };
     },
-    props: ["project", "stations", "user"],
+    props: ["project", "stations", "users"],
     watch: {
         project() {
             if (this.project) {
                 this.updateDisplayDates();
+            }
+        },
+        users() {
+            if (this.users) {
+                this.projectUsers = this.users.map(u => {
+                    // temp: put in role and status
+                    u.role = "Admin";
+                    u.status = "Active";
+                    return u;
+                });
             }
         }
     },
@@ -149,6 +190,31 @@ export default {
         },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
+        },
+        checkEmail() {
+            this.noEmail = false;
+            this.emailNotValid = false;
+            this.noEmail = !this.inviteEmail || this.inviteEmail.length == 0;
+            if (this.noEmail) {
+                return false;
+            }
+            // eslint-disable-next-line
+            let emailPattern = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            this.emailNotValid = !emailPattern.test(this.inviteEmail);
+            return !this.emailNotValid;
+        },
+        sendInvite() {
+            let valid = this.checkEmail();
+            if (valid) {
+                this.$emit("inviteUser", { email: this.inviteEmail, projectId: this.project.id });
+                this.projectUsers.push({
+                    name: "New member",
+                    email: this.inviteEmail,
+                    role: "",
+                    status: "Pending"
+                });
+                this.inviteEmail = "";
+            }
         },
         getImageUrl(project) {
             return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
@@ -278,21 +344,37 @@ export default {
 .station-name {
     font-weight: bold;
 }
-.user-container {
+.user-row {
     display: grid;
     grid-template-columns: 280px 220px 220px;
-    grid-auto-rows: 20px;
-    grid-gap: 15px 0;
+    border-bottom: 1px solid rgb(215, 220, 225);
+    padding: 10px 0;
 }
-.row-border {
-    border-top: 1px solid rgb(215, 220, 225);
-    padding-top: 2px;
-}
-.user-grid-heading {
+.cell-heading {
     font-weight: bold;
 }
 .email {
     font-size: 14px;
+}
+.text-input {
+    border: none;
+    border-radius: 5px;
+    background: rgb(240, 240, 240);
+    font-size: 15px;
+    padding: 4px 0 4px 8px;
+}
+.save-btn {
+    padding: 2px 8px;
+    font-size: 15px;
+    color: white;
+    background-color: #ce596b;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.validation-error {
+    color: #c42c44;
+    display: block;
 }
 #close-form-btn {
     float: right;

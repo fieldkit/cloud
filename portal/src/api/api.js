@@ -78,15 +78,35 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
-    getUsers() {
+    getUsersByProject(projectId) {
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url: this.baseUrl + "/users",
+            url: this.baseUrl + "/users/project/" + projectId,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token
             }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    sendInvite(data) {
+        // temp! until there is a real email invitation in place,
+        // only allow this to be tested with @conservify.org emails
+        if (data.email.indexOf("@conservify.org") == -1) {
+            return new Promise(resolve => {
+                resolve("pseudo-invited!");
+            });
+        }
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/" + data.projectId + "/invite",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            },
+            data: { email: data.email }
         }).then(this._handleResponse.bind(this));
     }
 
@@ -254,6 +274,8 @@ class FKApi {
     _handleResponse(response) {
         if (response.status == 200) {
             return response.data;
+        } else if (response.status == 204) {
+            return "success";
         } else {
             throw new Error("Api failed");
         }
