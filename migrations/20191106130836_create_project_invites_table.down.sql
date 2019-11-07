@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS fieldkit.project_invite;
