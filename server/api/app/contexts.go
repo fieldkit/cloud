@@ -3458,6 +3458,48 @@ func (ctx *GetImageProjectContext) OK(resp []byte) error {
 	return err
 }
 
+// InviteUserProjectContext provides the project invite user action context.
+type InviteUserProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	Payload   *InviteUserPayload
+}
+
+// NewInviteUserProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller invite user action.
+func NewInviteUserProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*InviteUserProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := InviteUserProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 204.
+func (ctx *InviteUserProjectContext) OK() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *InviteUserProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ListProjectContext provides the project list action context.
 type ListProjectContext struct {
 	context.Context

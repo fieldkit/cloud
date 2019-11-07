@@ -43,6 +43,7 @@ type Emailer interface {
 	SendValidationToken(person *data.User, validationToken *data.ValidationToken) error
 	SendSourceOfflineWarning(source *data.Source, age time.Duration) error
 	SendSourceOnlineWarning(source *data.Source, age time.Duration) error
+	SendInvitation(email string) error
 }
 
 type emailer struct {
@@ -61,6 +62,13 @@ func (e emailer) SendSourceOnlineWarning(source *data.Source, age time.Duration)
 	subject := fmt.Sprintf("FieldKit: Device %s is back online.", source.Name)
 	body := fmt.Sprintf("Your device named '%s' is back online.", source.Name)
 	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", "jacob@conservify.org", subject, body)
+	return nil
+}
+
+func (e emailer) SendInvitation(email string) error {
+	subject := fmt.Sprintf("You are invited to a FieldKit project!")
+	body := fmt.Sprintf("Soon this will be a real invitation, but for now, just consider yourself invited.")
+	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", email, subject, body)
 	return nil
 }
 

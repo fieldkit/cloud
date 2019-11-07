@@ -152,6 +152,48 @@ func (c *Client) NewGetImageProjectRequest(ctx context.Context, path string) (*h
 	return req, nil
 }
 
+// InviteUserProjectPath computes a request path to the invite user action of project.
+func InviteUserProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s/invite", param0)
+}
+
+// Invite a user to project
+func (c *Client) InviteUserProject(ctx context.Context, path string, payload *InviteUserPayload) (*http.Response, error) {
+	req, err := c.NewInviteUserProjectRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewInviteUserProjectRequest create the request corresponding to the invite user action endpoint of the project resource.
+func (c *Client) NewInviteUserProjectRequest(ctx context.Context, path string, payload *InviteUserPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // ListProjectPath computes a request path to the list action of project.
 func ListProjectPath() string {
 

@@ -106,3 +106,13 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 
 	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
 }
+
+func (a AWSSESEmailer) SendInvitation(email string) error {
+	subject := fmt.Sprintf("You are invited to a FieldKit project!")
+	body := fmt.Sprintf("Soon this will be a real invitation, but for now, just consider yourself invited.")
+	toAddresses := []*string{
+		aws.String(email),
+	}
+
+	return a.send(subject, body, toAddresses)
+}

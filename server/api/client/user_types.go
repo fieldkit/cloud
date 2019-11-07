@@ -1185,6 +1185,41 @@ func (ut *DeviceSummaryUrls) Validate() (err error) {
 	return
 }
 
+// inviteUserPayload user type.
+type inviteUserPayload struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`
+}
+
+// Validate validates the inviteUserPayload type instance.
+func (ut *inviteUserPayload) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	return
+}
+
+// Publicize creates InviteUserPayload from inviteUserPayload
+func (ut *inviteUserPayload) Publicize() *InviteUserPayload {
+	var pub InviteUserPayload
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	return &pub
+}
+
+// InviteUserPayload user type.
+type InviteUserPayload struct {
+	Email string `form:"email" json:"email" yaml:"email" xml:"email"`
+}
+
+// Validate validates the InviteUserPayload type instance.
+func (ut *InviteUserPayload) Validate() (err error) {
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	return
+}
+
 // jSONDataMeta user type.
 type jSONDataMeta struct {
 	ID      *int                 `form:"id,omitempty" json:"id,omitempty" yaml:"id,omitempty" xml:"id,omitempty"`

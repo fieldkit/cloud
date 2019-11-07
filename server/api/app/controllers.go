@@ -3876,6 +3876,7 @@ type ProjectController interface {
 	Get(*GetProjectContext) error
 	GetID(*GetIDProjectContext) error
 	GetImage(*GetImageProjectContext) error
+	InviteUser(*InviteUserProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
 	SaveImage(*SaveImageProjectContext) error
@@ -3890,6 +3891,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects/@/:project", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -3963,6 +3965,29 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/projects/:projectId/media", ctrl.MuxHandler("get image", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "GetImage", "route", "GET /projects/:projectId/media")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewInviteUserProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*InviteUserPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.InviteUser(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("POST", "/projects/:projectId/invite", ctrl.MuxHandler("invite user", h, unmarshalInviteUserProjectPayload))
+	service.LogInfo("mount", "ctrl", "Project", "action", "InviteUser", "route", "POST /projects/:projectId/invite", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -4176,6 +4201,21 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddProjectPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addProjectPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalInviteUserProjectPayload unmarshals the request body into the context request data Payload field.
+func unmarshalInviteUserProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &inviteUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

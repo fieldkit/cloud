@@ -21,6 +21,11 @@ var AddProjectPayload = Type("AddProjectPayload", func() {
 	Required("name", "slug", "description")
 })
 
+var InviteUserPayload = Type("InviteUserPayload", func() {
+	Attribute("email", String)
+	Required("email")
+})
+
 var Project = MediaType("application/vnd.app.project+json", func() {
 	TypeName("Project")
 	Reference(AddProjectPayload)
@@ -162,6 +167,20 @@ var _ = Resource("project", func() {
 		})
 		Response(OK, func() {
 			Media("image/png")
+		})
+	})
+
+	Action("invite user", func() {
+		Routing(POST("/projects/:projectId/invite"))
+		Description("Invite a user to project")
+		Payload(InviteUserPayload)
+		Params(func() {
+			Param("projectId", Integer)
+			Required("projectId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
 		})
 	})
 })
