@@ -112,7 +112,7 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         showStation(station) {
-            this.$router.push({ name: "stations", params: { id: station.id } });
+            this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
         editUser() {
             this.isEditing = true;

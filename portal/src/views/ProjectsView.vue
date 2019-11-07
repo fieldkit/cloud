@@ -204,7 +204,7 @@ export default {
             this.addingOrUpdating = false;
         },
         showStation(station) {
-            this.$router.push({ name: "stations", params: { id: station.id } });
+            this.$router.push({ name: "viewStation", params: { id: station.id } });
         }
     }
 };
