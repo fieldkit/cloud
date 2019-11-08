@@ -171,7 +171,7 @@ export default {
             if (this.routeTo && this.routeTo.name == "editProject") {
                 this.editProject(project);
             }
-            this.$forceUpdate();
+            // this.$forceUpdate();
         },
         addProject() {
             this.resetFlags();
