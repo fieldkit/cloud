@@ -1790,6 +1790,41 @@ func (ut *MyDataUrls) Validate() (err error) {
 	return
 }
 
+// removeUserPayload user type.
+type removeUserPayload struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`
+}
+
+// Validate validates the removeUserPayload type instance.
+func (ut *removeUserPayload) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	return
+}
+
+// Publicize creates RemoveUserPayload from removeUserPayload
+func (ut *removeUserPayload) Publicize() *RemoveUserPayload {
+	var pub RemoveUserPayload
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	return &pub
+}
+
+// RemoveUserPayload user type.
+type RemoveUserPayload struct {
+	Email string `form:"email" json:"email" yaml:"email" xml:"email"`
+}
+
+// Validate validates the RemoveUserPayload type instance.
+func (ut *RemoveUserPayload) Validate() (err error) {
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	return
+}
+
 // updateDeviceFirmwarePayload user type.
 type updateDeviceFirmwarePayload struct {
 	DeviceID   *int `form:"deviceId,omitempty" json:"deviceId,omitempty" yaml:"deviceId,omitempty" xml:"deviceId,omitempty"`

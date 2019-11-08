@@ -3879,6 +3879,7 @@ type ProjectController interface {
 	InviteUser(*InviteUserProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
+	RemoveUser(*RemoveUserProjectContext) error
 	SaveImage(*SaveImageProjectContext) error
 	Update(*UpdateProjectContext) error
 }
@@ -3893,6 +3894,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:projectId/members/:userId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -4022,6 +4024,29 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/user/projects", ctrl.MuxHandler("list current", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "ListCurrent", "route", "GET /user/projects", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewRemoveUserProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*RemoveUserPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.RemoveUser(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("DELETE", "/projects/:projectId/members/:userId", ctrl.MuxHandler("remove user", h, unmarshalRemoveUserProjectPayload))
+	service.LogInfo("mount", "ctrl", "Project", "action", "RemoveUser", "route", "DELETE /projects/:projectId/members/:userId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -4216,6 +4241,21 @@ func unmarshalAddProjectPayload(ctx context.Context, service *goa.Service, req *
 // unmarshalInviteUserProjectPayload unmarshals the request body into the context request data Payload field.
 func unmarshalInviteUserProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &inviteUserPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalRemoveUserProjectPayload unmarshals the request body into the context request data Payload field.
+func unmarshalRemoveUserProjectPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &removeUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

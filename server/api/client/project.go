@@ -262,6 +262,49 @@ func (c *Client) NewListCurrentProjectRequest(ctx context.Context, path string) 
 	return req, nil
 }
 
+// RemoveUserProjectPath computes a request path to the remove user action of project.
+func RemoveUserProjectPath(projectID int, userID int) string {
+	param0 := strconv.Itoa(projectID)
+	param1 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/projects/%s/members/%s", param0, param1)
+}
+
+// Remove a user from project
+func (c *Client) RemoveUserProject(ctx context.Context, path string, payload *RemoveUserPayload) (*http.Response, error) {
+	req, err := c.NewRemoveUserProjectRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRemoveUserProjectRequest create the request corresponding to the remove user action endpoint of the project resource.
+func (c *Client) NewRemoveUserProjectRequest(ctx context.Context, path string, payload *RemoveUserPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // SaveImageProjectPath computes a request path to the save image action of project.
 func SaveImageProjectPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)

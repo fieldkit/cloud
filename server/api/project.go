@@ -277,3 +277,20 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 	return ctx.OK()
 }
 
+func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error {
+	_, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2", ctx.ProjectID, ctx.UserID); err != nil {
+		return err
+	}
+
+	// delete invite as well
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
+		return err
+	}
+
+	return ctx.OK()
+}

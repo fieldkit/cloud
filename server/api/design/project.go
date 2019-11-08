@@ -26,6 +26,11 @@ var InviteUserPayload = Type("InviteUserPayload", func() {
 	Required("email")
 })
 
+var RemoveUserPayload = Type("RemoveUserPayload", func() {
+	Attribute("email", String)
+	Required("email")
+})
+
 var Project = MediaType("application/vnd.app.project+json", func() {
 	TypeName("Project")
 	Reference(AddProjectPayload)
@@ -182,5 +187,21 @@ var _ = Resource("project", func() {
 		Response(OK, func() {
 			Status(204)
 		})
+	})
+
+	Action("remove user", func() {
+		Routing(DELETE("/projects/:projectId/members/:userId"))
+		Description("Remove a user from project")
+		Payload(RemoveUserPayload)
+		Params(func() {
+			Param("projectId", Integer)
+			Param("userId", Integer)
+			Required("projectId", "userId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
+		})
+
 	})
 })
