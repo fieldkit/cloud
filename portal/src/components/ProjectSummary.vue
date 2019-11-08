@@ -97,6 +97,7 @@
                             <div class="cell-heading">Members ({{ this.projectUsers.length }})</div>
                             <div class="cell-heading">Role</div>
                             <div class="cell-heading">Status</div>
+                            <div class="cell"></div>
                         </div>
                         <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
                             <div class="cell">
@@ -105,6 +106,15 @@
                             </div>
                             <div class="cell">{{ user.role }}</div>
                             <div class="cell">{{ user.status }}</div>
+                            <div class="cell">
+                                <img
+                                    alt="Remove user"
+                                    src="../assets/close.png"
+                                    class="remove-btn"
+                                    :data-user="user.id"
+                                    v-on:click="removeUser"
+                                />
+                            </div>
                         </div>
                         <div class="user-row">
                             <div class="cell">
@@ -128,6 +138,7 @@
                             <div class="cell">
                                 <button class="save-btn" v-on:click="sendInvite">Invite</button>
                             </div>
+                            <div class="cell"></div>
                         </div>
                     </div>
                 </div>
@@ -215,12 +226,39 @@ export default {
             if (valid) {
                 this.$emit("inviteUser", { email: this.inviteEmail, projectId: this.project.id });
                 this.projectUsers.push({
+                    id: "pending-" + Date.now(),
                     name: "New member",
                     email: this.inviteEmail,
                     role: "",
                     status: "Pending"
                 });
                 this.inviteEmail = "";
+            }
+        },
+        removeUser(event) {
+            let id = event.target.getAttribute("data-user");
+            if (confirm("Are you sure you want to remove this team member?")) {
+                const index = this.projectUsers.findIndex(u => {
+                    return u.id == id;
+                });
+                // remove pending-, if newly added member
+                if (id.indexOf("pending-") == 0) {
+                    id = id.split("pending-")[1];
+                    // and make in range for type integer
+                    id = parseInt(id / 1000000);
+                }
+                const params = {
+                    projectId: this.project.id,
+                    userId: id,
+                    email: this.projectUsers[index].email
+                };
+                this.$emit("removeUser", params);
+                // also remove from projectUsers
+                if (index > -1) {
+                    this.projectUsers.splice(index, 1);
+                }
+            } else {
+                // canceled
             }
         },
         getImageUrl(project) {
@@ -355,7 +393,7 @@ export default {
 }
 .user-row {
     display: grid;
-    grid-template-columns: 280px 220px 220px;
+    grid-template-columns: 280px 200px 200px 40px;
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
 }
@@ -384,6 +422,9 @@ export default {
 .validation-error {
     color: #c42c44;
     display: block;
+}
+.remove-btn {
+    cursor: pointer;
 }
 #close-form-btn {
     float: right;

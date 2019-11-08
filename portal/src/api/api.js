@@ -110,6 +110,19 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    removeUserFromProject(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "DELETE",
+            url: this.baseUrl + "/projects/" + data.projectId + "/members/" + data.userId,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            },
+            data: { email: data.email }
+        }).then(this._handleResponse.bind(this));
+    }
+
     uploadUserImage(data) {
         const token = this.token.getToken();
         return axios({

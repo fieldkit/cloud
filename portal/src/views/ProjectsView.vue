@@ -54,6 +54,7 @@
                     :users="users"
                     ref="projectSummary"
                     @inviteUser="sendInvite"
+                    @removeUser="removeUser"
                 />
             </div>
         </div>
@@ -214,6 +215,11 @@ export default {
         sendInvite(params) {
             this.api.sendInvite(params).then(result => {
                 console.log("invite sent?", result);
+            });
+        },
+        removeUser(params) {
+            this.api.removeUserFromProject(params).then(result => {
+                console.log("user removed", result);
             });
         },
         showStation(station) {
