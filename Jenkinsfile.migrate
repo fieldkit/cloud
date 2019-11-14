@@ -1,0 +1,32 @@
+@Library('conservify') _
+
+timestamps {
+    node () {
+        try {
+            slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting... (<${env.BUILD_URL}|Open>)"
+
+            stage ('build') {
+                withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
+                    sh "rm -f migrate.*"
+					sh "wget https://github.com/golang-migrate/migrate/releases/download/v4.7.0/migrate.linux-amd64.tar.gz"
+					sh "tar xf migrate.linux-amd64.tar.gz"
+					git url: 'https://github.com/fieldkit/cloud.git'
+                }
+            }
+
+            stage ('deploy') {
+                sshagent (credentials: ['ssh-fkdev-deploy']) {
+                    sh "mv migrate.linux-amd64 migrations"
+                    sh "rsync -vua migrations core@fk-server-a.aws.fkdev.org:"
+                    sh "ssh -o StrictHostKeyChecking=no core@fk-server-a.aws.fkdev.org ./fkdev-migrate.sh"
+                }
+
+                notifySuccess()
+            }
+        }
+        catch (Exception e) {
+            notifyFailure()
+            throw e
+        }
+    }
+}
