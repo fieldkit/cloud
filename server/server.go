@@ -283,7 +283,6 @@ func main() {
 		}
 	}
 
-	suffix := "." + config.Domain
 	server := &http.Server{
 		Addr: config.Addr,
 		Handler: insecureRedirection(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -306,10 +305,6 @@ func main() {
 					ocrPortalServer.ServeHTTP(w, req)
 					return
 				}
-				return
-			}
-
-			if strings.HasSuffix(req.Host, suffix) {
 				legacyServer.ServeHTTP(w, req)
 				return
 			}
