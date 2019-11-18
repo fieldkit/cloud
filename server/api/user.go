@@ -54,7 +54,7 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
 		"iat":           now.Unix(),
-		"exp":           now.Add(time.Hour * 24).Unix(),
+		"exp":           now.Add(time.Hour * 168).Unix(),
 		"sub":           user.ID,
 		"email":         user.Email,
 		"refresh_token": refreshToken.Token.String(),
