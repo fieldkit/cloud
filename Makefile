@@ -100,12 +100,14 @@ refresh-production: clean-production clone-production
 
 schema-production:
 	mkdir schema-production
-	@if [ -d ~/conservify/dev-ops ]; then                                     \
+	@if [ -d ~/conservify/dev-ops ]; then                                       \
 		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
-		cp ~/conservify/dev-ops/schema.sql schema-production/000001.sql;        \
-		cp ~/conservify/dev-ops/data.sql schema-production/000100.sql;          \
-		cp schema/0000??.sql schema-production/;                                \
-	else                                                                      \
+		echo "CREATE USER fk;" > schema-production/000000.sql;                  \
+		echo "CREATE USER server;" >> schema-production/000000.sql;             \
+		echo "CREATE USER rdsadmin;" >> schema-production/000000.sql;           \
+		cp ~/conservify/dev-ops/schema.sql schema-production/000100.sql;        \
+		cp ~/conservify/dev-ops/data.sql schema-production/000200.sql;          \
+	else                                                                        \
 		echo "No dev-ops directory found";                                      \
 	fi
 
