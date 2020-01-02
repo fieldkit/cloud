@@ -305,7 +305,9 @@ export default {
                 if (this.$refs[newChart.ref]) {
                     clearInterval(interval);
                     this.$refs[newChart.ref][0].initChild(this.timeRange);
-                    // TODO: scroll down a bit so they see it
+                    document.getElementById(newChart.id).scrollIntoView({
+                        behavior: "smooth"
+                    });
                 }
             }, 250);
         },

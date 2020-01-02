@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :id="id">
         <svg
             :view-box.camel="viewBox"
             preserveAspectRatio="xMidYMid meet"
