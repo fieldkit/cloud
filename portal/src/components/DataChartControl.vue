@@ -35,18 +35,16 @@
                     </div>
                 </div>
             </div>
-            <div id="left-arrow-container">
+            <div id="left-arrow-container" v-if="this.displaySensors.length > 5">
                 <img
-                    v-if="this.displaySensors.length > 5"
                     v-on:click="showPrevSensor"
                     alt="left arrow"
                     src="../assets/left_arrow.png"
                     class="left-arrow"
                 />
             </div>
-            <div id="right-arrow-container">
+            <div id="right-arrow-container" v-if="this.displaySensors.length > 5">
                 <img
-                    v-if="this.displaySensors.length > 5"
                     v-on:click="showNextSensor"
                     alt="right arrow"
                     src="../assets/right_arrow.png"
@@ -723,6 +721,7 @@ export default {
     float: right;
 }
 .white-bkgd {
+    float: left;
     background-color: #ffffff;
 }
 #selected-sensor-controls {
