@@ -80,6 +80,19 @@ export default {
                     this.layout.height - (this.layout.marginBottom + this.layout.marginTop),
                     this.layout.marginTop
                 ]);
+
+            this.lineFn = d3
+                .line()
+                .defined(d => {
+                    return !d.blankPoint;
+                })
+                .x(d => {
+                    return d3Chart.x(d.date);
+                })
+                .y(d => {
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                })
+                .curve(d3.curveBasis);
         },
         setStatus(status) {
             this.activeMode = status;
@@ -89,6 +102,7 @@ export default {
             this.filteredData = this.stationData.filter(d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            this.createBlankPoints();
 
             // Add the gradient area
             this.line
@@ -141,15 +155,24 @@ export default {
                 });
 
             // Add the line
+            // this.line
+            //     .append("path")
+            //     .data([this.filteredData])
+            //     .attr("class", "area")
+            //     .attr("stroke-width", "3")
+            //     .attr("stroke", "url(#area-gradient)")
+            //     .attr("fill", "none")
+            //     .transition()
+            //     .duration(1000)
+            //     .attr("d", this.area);
+
             this.line
                 .append("path")
-                .data([this.filteredData])
-                .attr("class", "area")
-                .attr("fill", "url(#area-gradient)")
-                .attr("stroke", "none")
-                .transition()
-                .duration(1000)
-                .attr("d", this.area);
+                .attr("class", "data-line")
+                .attr("d", this.lineFn(this.filteredData))
+                .attr("stroke-width", "3")
+                .attr("stroke", "url(#area-gradient)")
+                .attr("fill", "none");
 
             // Add the brushing
             this.chart.svg
@@ -161,7 +184,11 @@ export default {
             // Add dots
             this.line
                 .selectAll(".circles")
-                .data(this.filteredData)
+                .data(
+                    this.filteredData.filter(d => {
+                        return !d.blankPoint;
+                    })
+                )
                 .enter()
                 .append("circle")
                 .attr("class", "dot")
@@ -204,6 +231,31 @@ export default {
             this.drawn = true;
             document.getElementById("loading").style.display = "none";
         },
+        createBlankPoints() {
+            // TODO: relying on span between first two points is not reliable
+            // use better method for creating "blank" points
+            if (this.filteredData.length > 1) {
+                const start = this.filteredData[0].date.getTime();
+                const next = this.filteredData[1].date.getTime();
+                const last = this.filteredData[this.filteredData.length - 1].date.getTime();
+                const interval = next - start;
+                for (let i = start; i < last; i += interval) {
+                    const point = this.filteredData.find(d => {
+                        return d.date.getTime() >= i - interval && d.date.getTime() <= i;
+                    });
+                    if (!point) {
+                        // insert "blank" point
+                        this.filteredData.push({
+                            date: new Date(i),
+                            blankPoint: true
+                        });
+                    }
+                }
+            }
+            this.filteredData.sort(function(a, b) {
+                return a.date - b.date;
+            });
+        },
         brushed() {
             if (!d3.event.selection) {
                 return;
@@ -226,11 +278,17 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(d3.axisBottom(this.x));
+
+            // this.line
+            //     .select(".area")
+            //     .transition()
+            //     .duration(1000)
+            //     .attr("d", this.area(this.filteredData));
             this.line
-                .select(".area")
+                .select(".data-line")
                 .transition()
                 .duration(1000)
-                .attr("d", this.area(this.filteredData));
+                .attr("d", this.lineFn(this.filteredData));
 
             let d3Chart = this;
             this.line
@@ -255,6 +313,7 @@ export default {
             });
             // update y domain with new extent
             this.y.domain(this.chart.extent);
+            this.createBlankPoints();
 
             // update colors
             this.colors = d3
@@ -275,14 +334,23 @@ export default {
                 .curve(d3.curveBasis);
 
             // update line area
+            // this.line
+            //     .select(".area")
+            //     .transition()
+            //     .duration(1000)
+            //     .attr("d", this.area(this.filteredData));
             this.line
-                .select(".area")
+                .select(".data-line")
                 .transition()
                 .duration(1000)
-                .attr("d", this.area(this.filteredData));
+                .attr("d", this.lineFn(this.filteredData));
 
             // update dots
-            let dots = this.line.selectAll(".dot").data(this.filteredData);
+            let dots = this.line.selectAll(".dot").data(
+                this.filteredData.filter(d => {
+                    return !d.blankPoint;
+                })
+            );
 
             // add any new dots
             dots.enter()
