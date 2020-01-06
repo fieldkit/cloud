@@ -80,7 +80,7 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	id := uuid.Must(uuid.NewRandom())
 	uploader := s3manager.NewUploader(r.session)
 
-	log.Infow("saving", "content_type", contentType, "id", id, "extension", kind.Extension, "mime_type", kind.MIME.Value)
+	log.Infow("saving", "content_type", contentType, "id", id, "extension", kind.Extension, "mime_type", kind.MIME.Value, "bucket", r.bucketName)
 
 	objReader := io.MultiReader(bytes.NewReader(buf.Bytes()), rd.Body)
 	cr := NewCountingReader(objReader)
@@ -98,7 +98,7 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 		return nil, err
 	}
 
-	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead)
+	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead, "bucket", r.bucketName)
 
 	sm = &SavedMedia{
 		ID:       id.String(),
