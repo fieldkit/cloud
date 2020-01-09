@@ -254,7 +254,7 @@
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-  SELECT 
+  SELECT
     DISTINCT ON (dsl.location)
     dsl.device_id,
     dsl.timestamp,
@@ -501,7 +501,7 @@ SELECT ST_Buffer(ST_GeomFromText('POINT(1 1)'), 10) ~ ST_MakeBox2D(ST_MakePoint(
 
 SELECT * FROM (
   SELECT source_id, end_time, centroid FROM fieldkit.sources_temporal_clusters UNION
-  SELECT source_id, end_time, centroid FROM fieldkit.sources_spatial_clusters 
+  SELECT source_id, end_time, centroid FROM fieldkit.sources_spatial_clusters
 ) AS q WHERE
 q.source_id IN (
   SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = 2
@@ -697,3 +697,15 @@ UPDATE fieldkit.sources_temporal_geometries SET geometry = PostGIS_AddBBox(geome
 
 #+RESULTS:
 |   |
+
+
+/*
+
+Archive process
+
+INSERT INTO fieldkit.archive_history (old_device_id, new_device_id) VALUES ('\x506c024d5335353334202020ff182138', '\x506c024d5335353334202020ff182138202001');
+
+UPDATE fieldkit.provision SET device_id = '\x506c024d5335353334202020ff182138202001' WHERE device_id = '\x506c024d5335353334202020ff182138';
+UPDATE fieldkit.ingestion SET device_id = '\x506c024d5335353334202020ff182138202001' WHERE device_id = '\x506c024d5335353334202020ff182138';
+
+*/
