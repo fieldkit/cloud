@@ -102,7 +102,7 @@ export default {
             this.filteredData = this.stationData.filter(d => {
                 return d[d3Chart.selectedSensor.key];
             });
-            this.createBlankPoints();
+            // this.createBlankPoints();
 
             // Add the gradient area
             this.line
@@ -313,7 +313,7 @@ export default {
             });
             // update y domain with new extent
             this.y.domain(this.chart.extent);
-            this.createBlankPoints();
+            // this.createBlankPoints();
 
             // update colors
             this.colors = d3
