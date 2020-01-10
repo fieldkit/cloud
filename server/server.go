@@ -65,8 +65,11 @@ type Config struct {
 	MemoryProfile string
 }
 
-func getAwsSessionOptions(config *Config) session.Options {
+func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
+	log := logging.Logger(ctx).Sugar()
+
 	if config.AwsId == "" || config.AwsSecret == "" {
+		log.Infow("using ambient aws profile")
 		return session.Options{
 			Profile: config.AWSProfile,
 			Config: aws.Config{
@@ -75,6 +78,7 @@ func getAwsSessionOptions(config *Config) session.Options {
 			},
 		}
 	}
+	log.Infow("using aws credentials")
 	return session.Options{
 		Profile: config.AWSProfile,
 		Config: aws.Config{
@@ -141,7 +145,7 @@ func main() {
 		panic(err)
 	}
 
-	awsSessionOptions := getAwsSessionOptions(&config)
+	awsSessionOptions := getAwsSessionOptions(ctx, &config)
 
 	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
 	if err != nil {

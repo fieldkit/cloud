@@ -95,7 +95,7 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 		Tagging:     nil,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error uploading: %v", err)
 	}
 
 	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead, "bucket", r.bucketName)
