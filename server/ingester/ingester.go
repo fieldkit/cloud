@@ -52,7 +52,9 @@ type IngesterOptions struct {
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
-	handler := authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	errors := ErrorHandler()
+
+	handler := errorHandling(errors, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		startedAt := time.Now()
 
 		log := logging.Logger(ctx).Sugar()
@@ -122,7 +124,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		_ = log
 
 		return nil
-	})
+	}))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		startedAt := time.Now()
@@ -217,6 +219,12 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	}
 
 	return headers, nil
+}
+
+func errorHandling(middleware goa.Middleware, next goa.Handler) goa.Handler {
+	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
+		return middleware(next)(ctx, res, req)
+	}
 }
 
 func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
