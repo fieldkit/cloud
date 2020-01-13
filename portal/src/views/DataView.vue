@@ -175,9 +175,11 @@ export default {
             let sensors = [];
             result.versions.forEach(v => {
                 v.meta.station.modules.forEach(m => {
-                    m.sensors.forEach(s => {
-                        sensors.push(s);
-                    });
+                    if (m.sensors) {
+                        m.sensors.forEach(s => {
+                            sensors.push(s);
+                        });
+                    }
                 });
                 v.data.forEach(d => {
                     // HACK: for now only including ones with
