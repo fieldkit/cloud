@@ -162,7 +162,7 @@ type (
 		DeviceID    string
 		FirstBlock  int
 		LastBlock   int
-		PageNumber  int
+		Page        int
 		PageSize    int
 		PrettyPrint bool
 	}
@@ -400,7 +400,7 @@ type (
 		DeviceID    string
 		End         int
 		Internal    string
-		PageNumber  int
+		Page        int
 		PageSize    int
 		Start       int
 		PrettyPrint bool
@@ -411,7 +411,7 @@ type (
 		DeviceID    string
 		End         int
 		Internal    string
-		PageNumber  int
+		Page        int
 		PageSize    int
 		Start       int
 		PrettyPrint bool
@@ -3382,7 +3382,7 @@ func (cmd *DeviceDataDataCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.DeviceDataData(ctx, path, intFlagVal("firstBlock", cmd.FirstBlock), intFlagVal("lastBlock", cmd.LastBlock), intFlagVal("pageNumber", cmd.PageNumber), intFlagVal("pageSize", cmd.PageSize))
+	resp, err := c.DeviceDataData(ctx, path, intFlagVal("firstBlock", cmd.FirstBlock), intFlagVal("lastBlock", cmd.LastBlock), intFlagVal("page", cmd.Page), intFlagVal("pageSize", cmd.PageSize))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -3400,8 +3400,8 @@ func (cmd *DeviceDataDataCommand) RegisterFlags(cc *cobra.Command, c *client.Cli
 	cc.Flags().IntVar(&cmd.FirstBlock, "firstBlock", firstBlock, ``)
 	var lastBlock int
 	cc.Flags().IntVar(&cmd.LastBlock, "lastBlock", lastBlock, ``)
-	var pageNumber int
-	cc.Flags().IntVar(&cmd.PageNumber, "pageNumber", pageNumber, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
 	var pageSize int
 	cc.Flags().IntVar(&cmd.PageSize, "pageSize", pageSize, ``)
 }
@@ -4394,7 +4394,7 @@ func (cmd *GetJSONDataCommand) Run(c *client.Client, args []string) error {
 			return err
 		}
 	}
-	resp, err := c.GetJSONData(ctx, path, intFlagVal("end", cmd.End), tmp236, intFlagVal("pageNumber", cmd.PageNumber), intFlagVal("pageSize", cmd.PageSize), intFlagVal("start", cmd.Start))
+	resp, err := c.GetJSONData(ctx, path, intFlagVal("end", cmd.End), tmp236, intFlagVal("page", cmd.Page), intFlagVal("pageSize", cmd.PageSize), intFlagVal("start", cmd.Start))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -4412,8 +4412,8 @@ func (cmd *GetJSONDataCommand) RegisterFlags(cc *cobra.Command, c *client.Client
 	cc.Flags().IntVar(&cmd.End, "end", end, ``)
 	var internal string
 	cc.Flags().StringVar(&cmd.Internal, "internal", internal, ``)
-	var pageNumber int
-	cc.Flags().IntVar(&cmd.PageNumber, "pageNumber", pageNumber, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
 	var pageSize int
 	cc.Flags().IntVar(&cmd.PageSize, "pageSize", pageSize, ``)
 	var start int
@@ -4439,7 +4439,7 @@ func (cmd *GetLinesJSONDataCommand) Run(c *client.Client, args []string) error {
 			return err
 		}
 	}
-	resp, err := c.GetLinesJSONData(ctx, path, intFlagVal("end", cmd.End), tmp237, intFlagVal("pageNumber", cmd.PageNumber), intFlagVal("pageSize", cmd.PageSize), intFlagVal("start", cmd.Start))
+	resp, err := c.GetLinesJSONData(ctx, path, intFlagVal("end", cmd.End), tmp237, intFlagVal("page", cmd.Page), intFlagVal("pageSize", cmd.PageSize), intFlagVal("start", cmd.Start))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -4457,8 +4457,8 @@ func (cmd *GetLinesJSONDataCommand) RegisterFlags(cc *cobra.Command, c *client.C
 	cc.Flags().IntVar(&cmd.End, "end", end, ``)
 	var internal string
 	cc.Flags().StringVar(&cmd.Internal, "internal", internal, ``)
-	var pageNumber int
-	cc.Flags().IntVar(&cmd.PageNumber, "pageNumber", pageNumber, ``)
+	var page int
+	cc.Flags().IntVar(&cmd.Page, "page", page, ``)
 	var pageSize int
 	cc.Flags().IntVar(&cmd.PageSize, "pageSize", pageSize, ``)
 	var start int

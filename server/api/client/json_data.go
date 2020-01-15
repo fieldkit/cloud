@@ -23,8 +23,8 @@ func GetJSONDataPath(deviceID string) string {
 }
 
 // Retrieve data
-func (c *Client) GetJSONData(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Response, error) {
-	req, err := c.NewGetJSONDataRequest(ctx, path, end, internal, pageNumber, pageSize, start)
+func (c *Client) GetJSONData(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, start *int) (*http.Response, error) {
+	req, err := c.NewGetJSONDataRequest(ctx, path, end, internal, page, pageSize, start)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (c *Client) GetJSONData(ctx context.Context, path string, end *int, interna
 }
 
 // NewGetJSONDataRequest create the request corresponding to the get action endpoint of the jsonData resource.
-func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Request, error) {
+func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, start *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -47,9 +47,9 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 		tmp249 := strconv.FormatBool(*internal)
 		values.Set("internal", tmp249)
 	}
-	if pageNumber != nil {
-		tmp250 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp250)
+	if page != nil {
+		tmp250 := strconv.Itoa(*page)
+		values.Set("page", tmp250)
 	}
 	if pageSize != nil {
 		tmp251 := strconv.Itoa(*pageSize)
@@ -80,8 +80,8 @@ func GetLinesJSONDataPath(deviceID string) string {
 }
 
 // Retrieve data
-func (c *Client) GetLinesJSONData(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Response, error) {
-	req, err := c.NewGetLinesJSONDataRequest(ctx, path, end, internal, pageNumber, pageSize, start)
+func (c *Client) GetLinesJSONData(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, start *int) (*http.Response, error) {
+	req, err := c.NewGetLinesJSONDataRequest(ctx, path, end, internal, page, pageSize, start)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Client) GetLinesJSONData(ctx context.Context, path string, end *int, in
 }
 
 // NewGetLinesJSONDataRequest create the request corresponding to the get lines action endpoint of the jsonData resource.
-func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, pageNumber *int, pageSize *int, start *int) (*http.Request, error) {
+func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, start *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -104,9 +104,9 @@ func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, en
 		tmp254 := strconv.FormatBool(*internal)
 		values.Set("internal", tmp254)
 	}
-	if pageNumber != nil {
-		tmp255 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp255)
+	if page != nil {
+		tmp255 := strconv.Itoa(*page)
+		values.Set("page", tmp255)
 	}
 	if pageSize != nil {
 		tmp256 := strconv.Itoa(*pageSize)

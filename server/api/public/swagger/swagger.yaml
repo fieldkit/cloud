@@ -393,12 +393,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -493,6 +487,23 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.7956132100446545
+      - 0.7956132100446545
+      - 0.7956132100446545
+      endTime: "1990-07-12T13:48:13Z"
+      envelope:
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      id: 1.4115510825130394e+18
+      numberOfFeatures: 6.289260029459094e+18
+      radius: 0.8411303627670746
+      sourceId: 7.08898507340788e+18
+      startTime: "2010-02-16T07:14:04Z"
     - centroid:
       - 0.7956132100446545
       - 0.7956132100446545
@@ -1831,7 +1842,7 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+          Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1853,7 +1864,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+        Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -1861,7 +1872,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+          Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -1881,14 +1892,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+        Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+        Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2125,7 +2136,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+            Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2161,7 +2172,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+              Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2202,7 +2213,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+        Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2213,7 +2224,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+          Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2244,7 +2255,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+          Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2279,7 +2290,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: aa1e5ab5-093b-4322-a06b-5e4e2164f98d
+            Repudiandae dignissimos.: 387e95f7-b96b-4f61-8bdd-b14d3bf5b778
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2405,7 +2416,7 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+              Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: false
@@ -2565,7 +2576,7 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 4dfeb377-8d6a-4a6b-a84e-ebbd5cbbc9ec
+            Quas deserunt a.: e4dab3e9-c2f1-4909-ac72-472a5cb37851
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: false
@@ -3792,7 +3803,7 @@ paths:
         required: false
         type: integer
       - in: query
-        name: pageNumber
+        name: page
         required: false
         type: integer
       - in: query
@@ -3838,7 +3849,7 @@ paths:
         required: false
         type: boolean
       - in: query
-        name: pageNumber
+        name: page
         required: false
         type: integer
       - in: query
@@ -3888,7 +3899,7 @@ paths:
         required: false
         type: boolean
       - in: query
-        name: pageNumber
+        name: page
         required: false
         type: integer
       - in: query

@@ -167,7 +167,7 @@ var _ = Resource("data", func() {
 		Params(func() {
 			Param("firstBlock", Integer)
 			Param("lastBlock", Integer)
-			Param("pageNumber", Integer)
+			Param("page", Integer)
 			Param("pageSize", Integer)
 		})
 		Response(NotFound)
@@ -278,7 +278,7 @@ var _ = Resource("jsonData", func() {
 		Routing(GET("data/devices/:deviceId/data/json"))
 		Description("Retrieve data")
 		Params(func() {
-			Param("pageNumber", Integer)
+			Param("page", Integer)
 			Param("pageSize", Integer)
 			Param("start", Integer)
 			Param("end", Integer)
@@ -294,7 +294,7 @@ var _ = Resource("jsonData", func() {
 		Routing(GET("data/devices/:deviceId/data/lines"))
 		Description("Retrieve data")
 		Params(func() {
-			Param("pageNumber", Integer)
+			Param("page", Integer)
 			Param("pageSize", Integer)
 			Param("start", Integer)
 			Param("end", Integer)

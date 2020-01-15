@@ -903,7 +903,7 @@ type DeviceDataDataContext struct {
 	DeviceID   string
 	FirstBlock *int
 	LastBlock  *int
-	PageNumber *int
+	Page       *int
 	PageSize   *int
 }
 
@@ -943,15 +943,15 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lastBlock", rawLastBlock, "integer"))
 		}
 	}
-	paramPageNumber := req.Params["pageNumber"]
-	if len(paramPageNumber) > 0 {
-		rawPageNumber := paramPageNumber[0]
-		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
-			tmp18 := pageNumber
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp18 := page
 			tmp17 := &tmp18
-			rctx.PageNumber = tmp17
+			rctx.Page = tmp17
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
 	}
 	paramPageSize := req.Params["pageSize"]
@@ -2553,12 +2553,12 @@ type GetJSONDataContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	DeviceID   string
-	End        *int
-	Internal   *bool
-	PageNumber *int
-	PageSize   *int
-	Start      *int
+	DeviceID string
+	End      *int
+	Internal *bool
+	Page     *int
+	PageSize *int
+	Start    *int
 }
 
 // NewGetJSONDataContext parses the incoming request URL and body, performs validations and creates the
@@ -2596,15 +2596,15 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
 	}
-	paramPageNumber := req.Params["pageNumber"]
-	if len(paramPageNumber) > 0 {
-		rawPageNumber := paramPageNumber[0]
-		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
-			tmp52 := pageNumber
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp52 := page
 			tmp51 := &tmp52
-			rctx.PageNumber = tmp51
+			rctx.Page = tmp51
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
 	}
 	paramPageSize := req.Params["pageSize"]
@@ -2651,12 +2651,12 @@ type GetLinesJSONDataContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	DeviceID   string
-	End        *int
-	Internal   *bool
-	PageNumber *int
-	PageSize   *int
-	Start      *int
+	DeviceID string
+	End      *int
+	Internal *bool
+	Page     *int
+	PageSize *int
+	Start    *int
 }
 
 // NewGetLinesJSONDataContext parses the incoming request URL and body, performs validations and creates the
@@ -2694,15 +2694,15 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
 	}
-	paramPageNumber := req.Params["pageNumber"]
-	if len(paramPageNumber) > 0 {
-		rawPageNumber := paramPageNumber[0]
-		if pageNumber, err2 := strconv.Atoi(rawPageNumber); err2 == nil {
-			tmp61 := pageNumber
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp61 := page
 			tmp60 := &tmp61
-			rctx.PageNumber = tmp60
+			rctx.Page = tmp60
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageNumber", rawPageNumber, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
 	}
 	paramPageSize := req.Params["pageSize"]

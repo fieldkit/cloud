@@ -273,8 +273,8 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 	}
 
 	pageNumber := 0
-	if ctx.PageNumber != nil {
-		pageNumber = *ctx.PageNumber
+	if ctx.Page != nil {
+		pageNumber = *ctx.Page
 	}
 
 	pageSize := 200
@@ -381,8 +381,8 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	}
 
 	pageNumber := 0
-	if ctx.PageNumber != nil {
-		pageNumber = *ctx.PageNumber
+	if ctx.Page != nil {
+		pageNumber = *ctx.Page
 	}
 
 	pageSize := 200
@@ -439,8 +439,8 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 	}
 
 	pageNumber := 0
-	if ctx.PageNumber != nil {
-		pageNumber = *ctx.PageNumber
+	if ctx.Page != nil {
+		pageNumber = *ctx.Page
 	}
 
 	pageSize := 200

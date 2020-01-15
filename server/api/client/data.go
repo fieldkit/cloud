@@ -58,8 +58,8 @@ func DeviceDataDataPath(deviceID string) string {
 }
 
 // Retrieve data
-func (c *Client) DeviceDataData(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Response, error) {
-	req, err := c.NewDeviceDataDataRequest(ctx, path, firstBlock, lastBlock, pageNumber, pageSize)
+func (c *Client) DeviceDataData(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int, pageSize *int) (*http.Response, error) {
+	req, err := c.NewDeviceDataDataRequest(ctx, path, firstBlock, lastBlock, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Client) DeviceDataData(ctx context.Context, path string, firstBlock *in
 }
 
 // NewDeviceDataDataRequest create the request corresponding to the device data action endpoint of the data resource.
-func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, pageNumber *int, pageSize *int) (*http.Request, error) {
+func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firstBlock *int, lastBlock *int, page *int, pageSize *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -82,9 +82,9 @@ func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firs
 		tmp240 := strconv.Itoa(*lastBlock)
 		values.Set("lastBlock", tmp240)
 	}
-	if pageNumber != nil {
-		tmp241 := strconv.Itoa(*pageNumber)
-		values.Set("pageNumber", tmp241)
+	if page != nil {
+		tmp241 := strconv.Itoa(*page)
+		values.Set("page", tmp241)
 	}
 	if pageSize != nil {
 		tmp242 := strconv.Itoa(*pageSize)
