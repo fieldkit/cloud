@@ -19,26 +19,43 @@ type StationControllerOptions struct {
 	Database *sqlxcache.DB
 }
 
-func StationType(station *data.Station) (*app.Station, error) {
+func StationType(station *data.Station, ingestions []*data.Ingestion) (*app.Station, error) {
 	status, err := station.GetStatus()
 	if err != nil {
 		return nil, err
 	}
 
+	lastUploads := make([]*app.LastUpload, len(ingestions))
+
+	for i, ingestion := range ingestions {
+		lastUploads[i] = &app.LastUpload{
+			ID:       int(ingestion.ID),
+			Time:     ingestion.Time,
+			UploadID: ingestion.UploadID,
+			Size:     int(ingestion.Size),
+			Type:     ingestion.Type,
+			URL:      ingestion.URL,
+			Blocks:   ingestion.Blocks.ToIntArray(),
+		}
+	}
+
 	return &app.Station{
-		ID:         int(station.ID),
-		OwnerID:    int(station.OwnerID),
-		DeviceID:   hex.EncodeToString(station.DeviceID),
-		Name:       station.Name,
-		StatusJSON: status,
+		ID:          int(station.ID),
+		OwnerID:     int(station.OwnerID),
+		DeviceID:    hex.EncodeToString(station.DeviceID),
+		Name:        station.Name,
+		LastUploads: lastUploads,
+		StatusJSON:  status,
 	}, nil
 }
 
 func StationsType(stations []*data.Station) (*app.Stations, error) {
 	stationsCollection := make([]*app.Station, len(stations))
 
+	uploads := make([]*data.Ingestion, 0)
+
 	for i, station := range stations {
-		appStation, err := StationType(station)
+		appStation, err := StationType(station, uploads)
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +107,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 				Message: "This station is already registered.",
 			})
 		}
-		svm, err := StationType(existing)
+		svm, err := StationType(existing, make([]*data.Ingestion, 0))
 		if err != nil {
 			return err
 		}
@@ -109,7 +126,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station)
+	svm, err := StationType(station, make([]*data.Ingestion, 0))
 	if err != nil {
 		return err
 	}
@@ -138,7 +155,12 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station)
+	ingestions := []*data.Ingestion{}
+	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
+		return err
+	}
+
+	svm, err := StationType(station, ingestions)
 	if err != nil {
 		return err
 	}
@@ -161,7 +183,12 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station)
+	ingestions := []*data.Ingestion{}
+	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
+		return err
+	}
+
+	svm, err := StationType(station, ingestions)
 	if err != nil {
 		return err
 	}

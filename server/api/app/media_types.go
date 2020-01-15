@@ -1630,11 +1630,12 @@ func (mt *Sources) Validate() (err error) {
 //
 // Identifier: application/vnd.app.station+json; view=default
 type Station struct {
-	DeviceID   string                 `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
-	ID         int                    `form:"id" json:"id" yaml:"id" xml:"id"`
-	Name       string                 `form:"name" json:"name" yaml:"name" xml:"name"`
-	OwnerID    int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
-	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
+	DeviceID    string                 `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
+	ID          int                    `form:"id" json:"id" yaml:"id" xml:"id"`
+	LastUploads LastUploadCollection   `form:"last_uploads,omitempty" json:"last_uploads,omitempty" yaml:"last_uploads,omitempty" xml:"last_uploads,omitempty"`
+	Name        string                 `form:"name" json:"name" yaml:"name" xml:"name"`
+	OwnerID     int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
+	StatusJSON  map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
 }
 
 // Validate validates the Station media type instance.
@@ -1649,6 +1650,9 @@ func (mt *Station) Validate() (err error) {
 	}
 	if mt.StatusJSON == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "status_json"))
+	}
+	if err2 := mt.LastUploads.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	return
 }
@@ -1868,6 +1872,55 @@ type TwitterAccountSourceCollection []*TwitterAccountSource
 
 // Validate validates the TwitterAccountSourceCollection media type instance.
 func (mt TwitterAccountSourceCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// LastUpload media type (default view)
+//
+// Identifier: application/vnd.app.upload+json; view=default
+type LastUpload struct {
+	Blocks   []int     `form:"blocks" json:"blocks" yaml:"blocks" xml:"blocks"`
+	ID       int       `form:"id" json:"id" yaml:"id" xml:"id"`
+	Size     int       `form:"size" json:"size" yaml:"size" xml:"size"`
+	Time     time.Time `form:"time" json:"time" yaml:"time" xml:"time"`
+	Type     string    `form:"type" json:"type" yaml:"type" xml:"type"`
+	UploadID string    `form:"upload_id" json:"upload_id" yaml:"upload_id" xml:"upload_id"`
+	URL      string    `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the LastUpload media type instance.
+func (mt *LastUpload) Validate() (err error) {
+
+	if mt.UploadID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "upload_id"))
+	}
+
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	if mt.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "type"))
+	}
+	if mt.Blocks == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "blocks"))
+	}
+	return
+}
+
+// LastUploadCollection is the media type for an array of LastUpload (default view)
+//
+// Identifier: application/vnd.app.upload+json; type=collection; view=default
+type LastUploadCollection []*LastUpload
+
+// Validate validates the LastUploadCollection media type instance.
+func (mt LastUploadCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
