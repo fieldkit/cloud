@@ -455,18 +455,24 @@ export default {
                     this.$refs[c.ref][0].setTimeRange(range);
                 }
             });
+            // check to see if we have enough data
+            // and fetch more if needed by triggering a time change
+            if (this.timeRange.start < this.stationData[0].date) {
+                this.$emit("timeChanged", this.timeRange);
+            }
         },
         setTimeRangeByDays(event) {
             // method can be called by time buttons,
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
             const days = event.id ? 0 : event.target.getAttribute("data-time");
+            const endDate = this.stationData[this.stationData.length - 1].date;
             this.timeRange = {
-                start: this.stationData[0].date,
-                end: new Date(this.stationData[0].date.getTime() + days * DAY)
+                start: new Date(endDate.getTime() - days * DAY),
+                end: endDate
             };
             if (days == 0) {
-                this.timeRange.end = this.stationData[this.stationData.length - 1].date;
+                this.timeRange.start = this.stationData[0].date;
             }
             if (event.id && !event.parent) {
                 // if a D3Chart emitted this and they are not parent, only change them
@@ -557,6 +563,13 @@ export default {
             }
             this.updateRoute();
         },
+        showLoading() {
+            document.getElementById("loading").style.display = "block";
+        },
+        updateData(data) {
+            this.stationData = data;
+            document.getElementById("loading").style.display = "none";
+        },
         updateRoute() {
             // temp temp temp
             // just for demo of Ancient Goose, keep id = 0
@@ -641,6 +654,7 @@ export default {
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
+    position: absolute;
 }
 #data-chart-container {
     float: left;

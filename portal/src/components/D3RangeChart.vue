@@ -145,6 +145,7 @@ export default {
             });
 
             // append the bar rectangles
+            this.chart.svg.selectAll(".rangebar").remove();
             this.chart.svg
                 .selectAll(".rangebar")
                 .data(bins)

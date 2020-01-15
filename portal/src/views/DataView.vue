@@ -64,6 +64,7 @@ export default {
     props: ["stationParam", "id"],
     data: () => {
         return {
+            requestPage: 0,
             user: {},
             noStation: false,
             station: null,
@@ -147,21 +148,25 @@ export default {
     methods: {
         async fetchData() {
             if (this.station) {
-                return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
+                return this.api.getJSONDataByDeviceId(this.station.device_id, this.requestPage, 1000);
             } else if (this.stationId) {
                 // temporarily show Ancient Goose 81 to anyone who views /dashboard/data/0
                 if (this.stationId == 0) {
                     this.station = tempStations.stations[0];
-                    return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
+                    return this.api.getJSONDataByDeviceId(this.station.device_id, this.requestPage, 1000);
                 } else {
                     return this.api.getStation(this.stationId).then(station => {
                         this.station = station;
-                        return this.api.getJSONDataByDeviceId(this.station.device_id, 0, 1000);
+                        return this.api.getJSONDataByDeviceId(this.station.device_id, this.requestPage, 1000);
                     });
                 }
             } else {
                 this.noStation = true;
             }
+        },
+        async fetchNewPage() {
+            this.requestPage += 1;
+            return this.api.getJSONDataByDeviceId(this.station.device_id, this.requestPage, 1000);
         },
         processData(result) {
             if (!result) {
@@ -208,6 +213,42 @@ export default {
             this.stationData = processed;
             this.combinedStationInfo = { sensors: sensors, stationData: processed };
         },
+        addNewPage(result) {
+            let processed = [];
+            // TODO: handle possible addition of sensors
+            // from new pages of data
+            // let sensors = [];
+            result.versions.forEach(v => {
+                // v.meta.station.modules.forEach(m => {
+                //     if (m.sensors) {
+                //         m.sensors.forEach(s => {
+                //             sensors.push(s);
+                //         });
+                //     }
+                // });
+                v.data.forEach(d => {
+                    // HACK: for now only including ones with
+                    // sensor readings
+                    if (Object.keys(d.d).length > 0) {
+                        d.d.date = new Date(d.time * 1000);
+                        processed.push(d.d);
+                    }
+                });
+            });
+            this.stationData = this.stationData.concat(processed);
+            //sort data by date
+            this.stationData.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            if (processed.length == 1000 && this.timeRange.start < this.stationData[0].date) {
+                this.$refs.dataChartControl.showLoading();
+                this.fetchNewPage().then(result => {
+                    this.addNewPage(result);
+                });
+            } else {
+                this.$refs.dataChartControl.updateData(this.stationData);
+            }
+        },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
@@ -216,6 +257,12 @@ export default {
         },
         onTimeChange(range) {
             this.timeRange = range;
+            // fetch more data if needed
+            if (this.timeRange.start < this.stationData[0].date) {
+                this.fetchNewPage().then(result => {
+                    this.addNewPage(result);
+                });
+            }
         },
         getStationFromRoute() {
             this.stationId = this.$route.params.id;

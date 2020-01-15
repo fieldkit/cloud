@@ -72,6 +72,12 @@ export default {
     watch: {
         chartType: function() {
             this.chartTypeChange();
+        },
+        stationData: function() {
+            let d3Chart = this;
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
         }
     },
     computed: {

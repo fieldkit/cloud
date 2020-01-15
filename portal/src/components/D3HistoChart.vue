@@ -96,6 +96,7 @@ export default {
                 .interpolator(d3.interpolatePlasma);
 
             // append the bar rectangles
+            this.chart.svg.selectAll(".histobar").remove();
             this.chart.svg
                 .selectAll(".histobar")
                 .data(bins)
