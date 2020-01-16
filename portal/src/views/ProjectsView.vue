@@ -262,7 +262,8 @@ export default {
 .project-container {
     float: left;
     width: 276px;
-    margin: 0 20px 0 0;
+    height: 225px;
+    margin: 0 20px 20px 0;
     border: 1px solid rgb(235, 235, 235);
 }
 .project-name {

@@ -108,7 +108,7 @@ export default {
                 }
             } else {
                 this.formType = "add";
-                this.formHeading = "Add Project";
+                this.formHeading = "New Project";
                 this.resetFields();
             }
         }
@@ -190,6 +190,7 @@ export default {
             this.publicProject = false;
             this.hasImage = false;
             this.imageUrl = "";
+            this.previewImage = null;
         },
         uploadImage(event) {
             this.previewImage = null;
