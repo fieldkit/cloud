@@ -2,7 +2,9 @@
     <div>
         <div id="sidebar-nav-wide">
             <div class="sidebar-header">
-                <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
+                <router-link :to="{ name: 'projects' }" class="project-link">
+                    <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
+                </router-link>
             </div>
             <div id="inner-nav">
                 <div class="nav-section">
