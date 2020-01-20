@@ -49,13 +49,29 @@ func StationType(station *data.Station, ingestions []*data.Ingestion) (*app.Stat
 	}, nil
 }
 
-func StationsType(stations []*data.Station) (*app.Stations, error) {
+func sortByStation(ingestions []*data.Ingestion) map[string][]*data.Ingestion {
+	m := make(map[string][]*data.Ingestion)
+	for _, i := range ingestions {
+		key := hex.EncodeToString(i.DeviceID)
+		if m[key] == nil {
+			m[key] = make([]*data.Ingestion, 0)
+		}
+		m[key] = append(m[key], i)
+	}
+	return m
+}
+
+func StationsType(stations []*data.Station, ingestions []*data.Ingestion) (*app.Stations, error) {
 	stationsCollection := make([]*app.Station, len(stations))
 
-	uploads := make([]*data.Ingestion, 0)
-
+	ingestionsByStation := sortByStation(ingestions)
 	for i, station := range stations {
-		appStation, err := StationType(station, uploads)
+		key := hex.EncodeToString(station.DeviceID)
+		byStation := ingestionsByStation[key]
+		if byStation == nil {
+			byStation = make([]*data.Ingestion, 0)
+		}
+		appStation, err := StationType(station, byStation)
 		if err != nil {
 			return nil, err
 		}
@@ -206,12 +222,19 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 		return fmt.Errorf("JWT claims error")
 	}
 
+	ownerId := claims["sub"]
+
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1", ownerId); err != nil {
 		return err
 	}
 
-	stationsWm, err := StationsType(stations)
+	ingestions := []*data.Ingestion{}
+	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC", ownerId); err != nil {
+		return err
+	}
+
+	stationsWm, err := StationsType(stations, ingestions)
 	if err != nil {
 		return err
 	}
