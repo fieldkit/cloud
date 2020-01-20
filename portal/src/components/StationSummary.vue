@@ -66,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            <router-link :to="{ name: 'data', params: { stationParam: station } }">
+            <router-link :to="{ name: 'viewData', params: { id: station.id } }">
                 <div id="view-data-btn" class="section">
                     View Data
                 </div>
