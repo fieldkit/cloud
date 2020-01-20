@@ -130,9 +130,12 @@ export default {
             let latMax = -90;
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
-                return s.status_json.latitude && s.status_json.longitude
-                    && s.status_json.latitude != 1000
-                    && s.status_json.longitude != 1000;
+                return (
+                    s.status_json.latitude &&
+                    s.status_json.longitude &&
+                    s.status_json.latitude != 1000 &&
+                    s.status_json.longitude != 1000
+                );
             });
             mappable.forEach(s => {
                 let coordinates = [s.status_json.latitude, s.status_json.longitude];
