@@ -254,9 +254,9 @@ export default {
             this.filteredData = this.stationData.filter(d => {
                 return d[d3Chart.selectedSensor.key];
             });
-            // this.chart.extent = d3.extent(this.filteredData, d => {
-            //     return d[d3Chart.selectedSensor.key];
-            // });
+            this.chart.extent = d3.extent(this.filteredData, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
             this.updateChart();
         },
         updateChart() {
