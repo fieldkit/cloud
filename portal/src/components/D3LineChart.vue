@@ -25,10 +25,10 @@ export default {
                 if (d3.selectAll(".data-line").empty()) {
                     this.makeLine();
                 } else {
-                    // let d3Chart = this;
-                    // this.filteredData = this.stationData.filter(d => {
-                    //     return d[d3Chart.selectedSensor.key];
-                    // });
+                    let d3Chart = this;
+                    this.filteredData = this.stationData.filter(d => {
+                        return d[d3Chart.selectedSensor.key];
+                    });
                     // this.chart.extent = d3.extent(this.filteredData, d => {
                     //     return d[d3Chart.selectedSensor.key];
                     // });

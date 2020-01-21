@@ -191,7 +191,10 @@ export default {
                     // sensor readings
                     if (Object.keys(d.d).length > 0) {
                         d.d.date = new Date(d.time * 1000);
-                        processed.push(d.d);
+                        // and only ones with dates after 2018
+                        if (d.d.date.getFullYear() > 2018) {
+                            processed.push(d.d);
+                        }
                     }
                 });
             });
@@ -215,6 +218,7 @@ export default {
         },
         addNewPage(result) {
             let processed = [];
+            let numRecords = 0;
             // TODO: handle possible addition of sensors
             // from new pages of data
             // let sensors = [];
@@ -227,11 +231,15 @@ export default {
                 //     }
                 // });
                 v.data.forEach(d => {
+                    numRecords += 1;
                     // HACK: for now only including ones with
                     // sensor readings
                     if (Object.keys(d.d).length > 0) {
                         d.d.date = new Date(d.time * 1000);
-                        processed.push(d.d);
+                        // and only ones with dates after 2018
+                        if (d.d.date.getFullYear() > 2018) {
+                            processed.push(d.d);
+                        }
                     }
                 });
             });
@@ -240,7 +248,8 @@ export default {
             this.stationData.sort(function(a, b) {
                 return a.date.getTime() - b.date.getTime();
             });
-            if (processed.length == 1000 && this.timeRange.start < this.stationData[0].date) {
+            // numRecords checks to see if this was a full page of results
+            if (numRecords >= 1000 && this.timeRange.start < this.stationData[0].date) {
                 this.$refs.dataChartControl.showLoading();
                 this.fetchNewPage().then(result => {
                     this.addNewPage(result);
