@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -108,6 +109,38 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	}
 
 	return
+}
+
+func (r *MediaRepository) DeleteByURL(ctx context.Context, s3url string) (err error) {
+	u, err := url.Parse(s3url)
+	if err != nil {
+		return err
+	}
+
+	parts := strings.Split(u.Host, ".")
+	key := u.Path[1:]
+
+	if parts[0] != r.bucketName {
+		return fmt.Errorf("unexpected bucket name: %s", parts[0])
+	}
+
+	return r.DeleteByID(ctx, key)
+}
+
+func (r *MediaRepository) DeleteByID(ctx context.Context, id string) (err error) {
+	svc := s3.New(r.session)
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(r.bucketName), Key: aws.String(id)})
+	if err != nil {
+		return fmt.Errorf("Unable to delete object %q from bucket %q, %v", id, r.bucketName, err)
+	}
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(r.bucketName),
+		Key:    aws.String(id),
+	})
+
+	return err
 }
 
 func (r *MediaRepository) LoadByURL(ctx context.Context, s3url string) (lm *LoadedMedia, err error) {
