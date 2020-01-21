@@ -71,6 +71,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		headers, err := NewIncomingHeaders(req)
 		if err != nil {
+			log.Infow("headers error", "headers", req.Header)
 			return err
 		}
 
