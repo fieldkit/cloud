@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import * as utils from "../utilities";
+
 export default {
     name: "StationSummary",
     data: () => {
@@ -90,9 +92,7 @@ export default {
         },
 
         getSyncedDate() {
-            const date = this.station.status_json.updated;
-            const d = new Date(date);
-            return d.toLocaleDateString("en-US");
+            return utils.getUpdatedDate(this.station);
         },
 
         getBatteryImg() {

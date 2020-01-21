@@ -142,6 +142,7 @@
 
 <script>
 import _ from "lodash";
+import * as utils from "../utilities";
 import D3Chart from "./D3Chart";
 
 const DAY = 1000 * 60 * 60 * 24;
@@ -637,12 +638,7 @@ export default {
             this.prevQuery = {};
         },
         getSyncedDate() {
-            if (!this.station.status_json) {
-                return "N/A";
-            }
-            const date = this.station.status_json.updated;
-            const d = new Date(date);
-            return "Last synced " + d.toLocaleDateString("en-US");
+            return "Last synced " + utils.getUpdatedDate(this.station);
         }
     }
 };

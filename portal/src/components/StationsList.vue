@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import * as utils from "../utilities"
+
 export default {
     name: "StationsList",
     data: () => {
@@ -43,15 +45,11 @@ export default {
         if (this.stations && this.stations.length > 0) {
             this.stations.forEach(s => {
                 // console.log(s.name, s.device_id)
-                this.$set(s, "synced", this.formatDate(s.status_json.updated));
+                this.$set(s, "synced", utils.getUpdatedDate(s));
             });
         }
     },
     methods: {
-        formatDate(date) {
-            const d = new Date(date);
-            return d.toLocaleDateString("en-US");
-        },
         getBatteryImg(station) {
             const images = require.context("../assets/battery/", false, /\.png$/);
             const battery = station.status_json.batteryLevel;
