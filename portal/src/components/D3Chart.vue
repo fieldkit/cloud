@@ -55,6 +55,7 @@ export default {
             chart: {
                 svg: Object,
                 extent: [],
+                colors: {},
                 panelID: "",
                 start: 0,
                 end: 0
@@ -124,9 +125,22 @@ export default {
         initChart() {
             let d3Chart = this;
             this.chart.panelID = this.station.device_id;
-            this.chart.extent = d3.extent(this.stationData, d => {
+
+            let fullRange = d3.extent(this.stationData, d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            this.chart.colors = d3
+                .scaleSequential()
+                .domain(fullRange)
+                .interpolator(d3.interpolatePlasma);
+
+            let filtered = this.stationData.filter(d => {
+                return d.date > this.chart.start && d.date < this.chart.end;
+            });
+            this.chart.extent = d3.extent(filtered, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+
             switch (this.chartType) {
                 case "Line":
                     this.$refs.d3LineChart.setStatus(true);

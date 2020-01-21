@@ -114,7 +114,7 @@ export default {
             if (dataView.id != dataView.$route.params.id) {
                 dataView.getStationFromRoute();
             } else {
-                dataView.$refs.dataChartControl.refresh();
+                dataView.$refs.dataChartControl.refresh(dataView.stationData);
             }
         };
         this.api = new FKApi();
@@ -262,6 +262,12 @@ export default {
                 this.fetchNewPage().then(result => {
                     this.addNewPage(result);
                 });
+            } else {
+                // filter data to match time range
+                const filtered = this.stationData.filter(d => {
+                    return d.date > this.timeRange.start && d.date < this.timeRange.end;
+                });
+                this.$refs.dataChartControl.updateData(filtered);
             }
         },
         getStationFromRoute() {

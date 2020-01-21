@@ -35,10 +35,10 @@ export default {
             this.activeMode = status;
         },
         prepareRange() {
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
+            // this.colors = d3
+            //     .scaleSequential()
+            //     .domain(this.chart.extent)
+            //     .interpolator(d3.interpolatePlasma);
 
             // set x scale
             this.xHist = d3
@@ -109,7 +109,7 @@ export default {
                     .attr("offset", "0%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.max(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })
@@ -122,7 +122,7 @@ export default {
                     .attr("offset", "50%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.median(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })
@@ -135,7 +135,7 @@ export default {
                     .attr("offset", "100%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.min(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })
@@ -238,7 +238,7 @@ export default {
                     .attr("offset", "0%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.max(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })
@@ -251,7 +251,7 @@ export default {
                     .attr("offset", "50%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.median(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })
@@ -264,7 +264,7 @@ export default {
                     .attr("offset", "100%")
                     .style(
                         "stop-color",
-                        this.colors(
+                        this.chart.colors(
                             d3.min(bin, d => {
                                 return d[d3Chart.selectedSensor.key];
                             })

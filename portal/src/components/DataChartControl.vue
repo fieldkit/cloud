@@ -206,8 +206,13 @@ export default {
     watch: {
         combinedStationInfo() {
             if (this.combinedStationInfo.stationData) {
+                // this.fullData = this.combinedStationInfo.stationData;
                 this.stationData = this.combinedStationInfo.stationData;
                 this.displaySensors = this.combinedStationInfo.sensors;
+                this.initialRange = [
+                    this.stationData[0].date,
+                    this.stationData[this.stationData.length - 1].date
+                ];
                 if (this.stationData.length > 0) {
                     this.initSelectedSensor();
                     this.initTimeWindow();
@@ -458,7 +463,7 @@ export default {
             });
             // check to see if we have enough data
             // and fetch more if needed by triggering a time change
-            if (this.timeRange.start < this.stationData[0].date) {
+            if (this.timeRange.start < this.initialRange[0]) {
                 this.$emit("timeChanged", this.timeRange);
             }
         },
@@ -467,13 +472,13 @@ export default {
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
             const days = event.id ? 0 : event.target.getAttribute("data-time");
-            const endDate = this.stationData[this.stationData.length - 1].date;
+            const endDate = this.initialRange[1];
             this.timeRange = {
                 start: new Date(endDate.getTime() - days * DAY),
                 end: endDate
             };
             if (days == 0) {
-                this.timeRange.start = this.stationData[0].date;
+                this.timeRange.start = this.initialRange[0];
             }
             if (event.id && !event.parent) {
                 // if a D3Chart emitted this and they are not parent, only change them
@@ -569,6 +574,13 @@ export default {
         },
         updateData(data) {
             this.stationData = data;
+            // allow expansion of total time range
+            if (this.stationData[0].date < this.initialRange[0]) {
+                this.initialRange[0] = this.stationData[0].date;
+            }
+            if (this.stationData[1].date > this.initialRange[1]) {
+                this.initialRange[1] = this.stationData[this.stationData.length - 1].date;
+            }
             document.getElementById("loading").style.display = "none";
         },
         updateRoute() {
@@ -620,7 +632,8 @@ export default {
                 }
             });
         },
-        refresh() {
+        refresh(data) {
+            this.updateData(data);
             // refresh window (back or forward browser button pressed)
             this.updateNumberOfCharts().then(() => {
                 this.initSelectedSensor();

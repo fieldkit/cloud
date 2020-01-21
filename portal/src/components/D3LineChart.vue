@@ -25,13 +25,14 @@ export default {
                 if (d3.selectAll(".data-line").empty()) {
                     this.makeLine();
                 } else {
-                    let d3Chart = this;
-                    this.filteredData = this.stationData.filter(d => {
-                        return d[d3Chart.selectedSensor.key];
-                    });
-                    this.chart.extent = d3.extent(this.filteredData, d => {
-                        return d[d3Chart.selectedSensor.key];
-                    });
+                    // let d3Chart = this;
+                    // this.filteredData = this.stationData.filter(d => {
+                    //     return d[d3Chart.selectedSensor.key];
+                    // });
+                    // this.chart.extent = d3.extent(this.filteredData, d => {
+                    //     return d[d3Chart.selectedSensor.key];
+                    // });
+
                     this.timeChanged();
                 }
             }
@@ -59,10 +60,10 @@ export default {
                 .extent([[0, 0], [this.layout.width, this.layout.height - this.layout.marginBottom]])
                 .on("end", this.brushed);
 
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
+            // this.colors = d3
+            //     .scaleSequential()
+            //     .domain(this.chart.extent)
+            //     .interpolator(d3.interpolatePlasma);
 
             let d3Chart = this;
             // Area gradient fill
@@ -116,55 +117,7 @@ export default {
             // this.createBlankPoints();
 
             // Add the gradient area
-            this.chart.svg.selectAll("#area-gradient").remove();
-            this.line
-                .append("linearGradient")
-                .attr("id", "area-gradient")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", 0)
-                .attr("y1", this.y(this.chart.extent[0]))
-                .attr("x2", 0)
-                .attr("y2", this.y(this.chart.extent[1]))
-                .selectAll("stop")
-                .data([
-                    { offset: "0%", color: this.colors(this.chart.extent[0]) },
-                    {
-                        offset: "20%",
-                        color: this.colors(
-                            this.chart.extent[0] + 0.2 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
-                    },
-                    {
-                        offset: "40%",
-                        color: this.colors(
-                            this.chart.extent[0] + 0.4 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
-                    },
-                    {
-                        offset: "60%",
-                        color: this.colors(
-                            this.chart.extent[0] + 0.6 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
-                    },
-                    {
-                        offset: "80%",
-                        color: this.colors(
-                            this.chart.extent[0] + 0.8 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
-                    },
-                    {
-                        offset: "100%",
-                        color: this.colors(this.chart.extent[1])
-                    }
-                ])
-                .enter()
-                .append("stop")
-                .attr("offset", d => {
-                    return d.offset;
-                })
-                .attr("stop-color", d => {
-                    return d.color;
-                });
+            this.createGradient();
 
             // Add the line
             // this.line
@@ -214,7 +167,7 @@ export default {
                     return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]));
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]));
             // tooltip will be added back
 
             this.xAxis = d3.axisBottom(this.x).ticks(10);
@@ -301,9 +254,9 @@ export default {
             this.filteredData = this.stationData.filter(d => {
                 return d[d3Chart.selectedSensor.key];
             });
-            this.chart.extent = d3.extent(this.filteredData, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
+            // this.chart.extent = d3.extent(this.filteredData, d => {
+            //     return d[d3Chart.selectedSensor.key];
+            // });
             this.updateChart();
         },
         updateChart() {
@@ -313,23 +266,7 @@ export default {
             this.y.domain(this.chart.extent);
             // this.createBlankPoints();
 
-            // update colors
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
-
-            // area gradient fill
-            this.area = d3
-                .area()
-                .x(d => {
-                    return d3Chart.x(d.date);
-                })
-                .y0(this.layout.height - (this.layout.marginBottom + this.layout.marginTop))
-                .y1(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
-                })
-                .curve(d3.curveBasis);
+            this.createGradient();
 
             // update line area
             // this.line
@@ -361,12 +298,12 @@ export default {
                     return d3Chart.y(d[d3Chart.selectedSensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]));
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]));
 
             // updating any existing dots
             dots.transition()
                 .duration(1000)
-                .attr("fill", d => d3Chart.colors(d[d3Chart.selectedSensor.key]))
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]))
                 .attr("cx", d => {
                     return d3Chart.x(d.date);
                 })
@@ -382,6 +319,58 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(d3.axisLeft(this.y));
+        },
+        createGradient() {
+           // Add the gradient area
+            this.chart.svg.selectAll("#area-gradient").remove();
+            this.line
+                .append("linearGradient")
+                .attr("id", "area-gradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0)
+                .attr("y1", this.y(this.chart.extent[0]))
+                .attr("x2", 0)
+                .attr("y2", this.y(this.chart.extent[1]))
+                .selectAll("stop")
+                .data([
+                    { offset: "0%", color: this.chart.colors(this.chart.extent[0]) },
+                    {
+                        offset: "20%",
+                        color: this.chart.colors(
+                            this.chart.extent[0] + 0.2 * (this.chart.extent[1] - this.chart.extent[0])
+                        )
+                    },
+                    {
+                        offset: "40%",
+                        color: this.chart.colors(
+                            this.chart.extent[0] + 0.4 * (this.chart.extent[1] - this.chart.extent[0])
+                        )
+                    },
+                    {
+                        offset: "60%",
+                        color: this.chart.colors(
+                            this.chart.extent[0] + 0.6 * (this.chart.extent[1] - this.chart.extent[0])
+                        )
+                    },
+                    {
+                        offset: "80%",
+                        color: this.chart.colors(
+                            this.chart.extent[0] + 0.8 * (this.chart.extent[1] - this.chart.extent[0])
+                        )
+                    },
+                    {
+                        offset: "100%",
+                        color: this.chart.colors(this.chart.extent[1])
+                    }
+                ])
+                .enter()
+                .append("stop")
+                .attr("offset", d => {
+                    return d.offset;
+                })
+                .attr("stop-color", d => {
+                    return d.color;
+                });
         }
     }
 };

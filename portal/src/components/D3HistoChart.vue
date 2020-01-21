@@ -90,10 +90,10 @@ export default {
 
             let bins = this.prepareHistogram();
 
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
+            // this.colors = d3
+            //     .scaleSequential()
+            //     .domain(this.chart.extent)
+            //     .interpolator(d3.interpolatePlasma);
 
             // append the bar rectangles
             this.chart.svg.selectAll(".histobar").remove();
@@ -109,7 +109,7 @@ export default {
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
-                .style("fill", d => d3Chart.colors(d.x0))
+                .style("fill", d => d3Chart.chart.colors(d.x0))
                 .transition()
                 .duration(1000)
                 .attr("height", d => {
@@ -162,10 +162,10 @@ export default {
         },
         updateHistogram(bins) {
             let d3Chart = this;
-            this.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
+            // this.colors = d3
+            //     .scaleSequential()
+            //     .domain(this.chart.extent)
+            //     .interpolator(d3.interpolatePlasma);
 
             let bars = this.chart.svg.selectAll(".histobar").data(bins);
 
@@ -179,7 +179,7 @@ export default {
                 .attr("width", d => {
                     return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
                 })
-                .style("fill", d => d3Chart.colors(d.x0))
+                .style("fill", d => d3Chart.chart.colors(d.x0))
                 .attr("height", d => {
                     return d.length == 0
                         ? 0
@@ -192,7 +192,7 @@ export default {
             // updating any existing bars
             bars.transition()
                 .duration(1000)
-                .style("fill", d => d3Chart.colors(d.x0))
+                .style("fill", d => d3Chart.chart.colors(d.x0))
                 .attr("transform", d => {
                     return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
                 })
