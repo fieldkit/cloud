@@ -3331,6 +3331,47 @@ func (ctx *AddProjectContext) BadRequest() error {
 	return nil
 }
 
+// DeleteProjectContext provides the project delete action context.
+type DeleteProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+}
+
+// NewDeleteProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller delete action.
+func NewDeleteProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 204.
+func (ctx *DeleteProjectContext) OK() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // GetProjectContext provides the project get action context.
 type GetProjectContext struct {
 	context.Context

@@ -53,6 +53,10 @@
         </div>
         <button class="save-btn" v-if="formType == 'add'" v-on:click="addProject">Add</button>
         <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProject">Update</button>
+        <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProject">
+            <img alt="Info" src="../assets/Delete.png" />
+            Delete this project
+        </div>
     </div>
 </template>
 
@@ -163,6 +167,17 @@ export default {
             } else {
                 api.updateProject(data).then(project => {
                     this.$router.push({ name: "viewProject", params: { id: project.id } });
+                });
+            }
+        },
+        deleteProject() {
+            if (window.confirm("Are you sure you want to delete this project?")) {
+                const api = new FKApi();
+                const params = {
+                    projectId: this.project.id
+                };
+                api.deleteProject(params).then(() => {
+                    this.$router.push({ name: "projects" });
                 });
             }
         },
@@ -314,5 +329,15 @@ export default {
     float: right;
     margin-top: 15px;
     cursor: pointer;
+}
+
+.delete-container {
+    cursor: pointer;
+    margin-left: 230px;
+    display: inline-block;
+}
+.delete-container img {
+    width: 12px;
+    margin-right: 4px;
 }
 </style>

@@ -204,4 +204,16 @@ var _ = Resource("project", func() {
 		})
 
 	})
+
+	Action("delete", func() {
+		Routing(DELETE("projects/:projectId"))
+		Description("Delete project")
+		Params(func() {
+			Param("projectId", Integer)
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
+		})
+	})
 })

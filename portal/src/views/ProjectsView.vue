@@ -91,14 +91,16 @@ export default {
         // watching $route picks up changes that beforeRouteUpdate does not
         $route(to) {
             this.routeTo = to;
-            if (to.params.id && this.isAuthenticated) {
-                this.getProject(to.params.id);
+            if (this.isAuthenticated) {
                 // refresh projects list
                 this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
                 });
+            }
+            if (to.params.id && this.isAuthenticated) {
+                this.getProject(to.params.id);
             } else {
                 this.viewAllProjects();
             }
@@ -159,7 +161,12 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         getProject(projectId) {
-            this.api.getProject(projectId).then(this.handleProject);
+            this.api
+                .getProject(projectId)
+                .then(this.handleProject)
+                .catch(() => {
+                    this.$router.push({ name: "projects" });
+                });
             this.api.getUsersByProject(projectId).then(users => {
                 this.users = users && users.users ? users.users : [];
             });

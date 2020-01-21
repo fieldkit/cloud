@@ -294,3 +294,20 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 
 	return ctx.OK()
 }
+
+func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
+    _, err := NewPermissions(ctx)
+    if err != nil {
+        return err
+    }
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	return ctx.OK()
+}

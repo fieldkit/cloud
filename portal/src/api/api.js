@@ -229,6 +229,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    deleteProject(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "DELETE",
+            url: this.baseUrl + "/projects/" + data.projectId,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStationDataSummaryByDeviceId(deviceId) {
         const token = this.token.getToken();
         return axios({

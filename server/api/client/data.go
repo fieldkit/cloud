@@ -75,20 +75,20 @@ func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firs
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if firstBlock != nil {
-		tmp239 := strconv.Itoa(*firstBlock)
-		values.Set("firstBlock", tmp239)
+		tmp241 := strconv.Itoa(*firstBlock)
+		values.Set("firstBlock", tmp241)
 	}
 	if lastBlock != nil {
-		tmp240 := strconv.Itoa(*lastBlock)
-		values.Set("lastBlock", tmp240)
+		tmp242 := strconv.Itoa(*lastBlock)
+		values.Set("lastBlock", tmp242)
 	}
 	if page != nil {
-		tmp241 := strconv.Itoa(*page)
-		values.Set("page", tmp241)
+		tmp243 := strconv.Itoa(*page)
+		values.Set("page", tmp243)
 	}
 	if pageSize != nil {
-		tmp242 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp242)
+		tmp244 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp244)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

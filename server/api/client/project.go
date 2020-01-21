@@ -57,6 +57,41 @@ func (c *Client) NewAddProjectRequest(ctx context.Context, path string, payload 
 	return req, nil
 }
 
+// DeleteProjectPath computes a request path to the delete action of project.
+func DeleteProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
+
+	return fmt.Sprintf("/projects/%s", param0)
+}
+
+// Delete project
+func (c *Client) DeleteProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteProjectRequest create the request corresponding to the delete action endpoint of the project resource.
+func (c *Client) NewDeleteProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // GetProjectPath computes a request path to the get action of project.
 func GetProjectPath(project string) string {
 	param0 := project

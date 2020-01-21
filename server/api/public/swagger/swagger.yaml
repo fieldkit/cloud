@@ -387,18 +387,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -493,6 +481,40 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.7956132100446545
+      - 0.7956132100446545
+      - 0.7956132100446545
+      endTime: "1990-07-12T13:48:13Z"
+      envelope:
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      id: 1.4115510825130394e+18
+      numberOfFeatures: 6.289260029459094e+18
+      radius: 0.8411303627670746
+      sourceId: 7.08898507340788e+18
+      startTime: "2010-02-16T07:14:04Z"
+    - centroid:
+      - 0.7956132100446545
+      - 0.7956132100446545
+      - 0.7956132100446545
+      endTime: "1990-07-12T13:48:13Z"
+      envelope:
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      id: 1.4115510825130394e+18
+      numberOfFeatures: 6.289260029459094e+18
+      radius: 0.8411303627670746
+      sourceId: 7.08898507340788e+18
+      startTime: "2010-02-16T07:14:04Z"
     - centroid:
       - 0.7956132100446545
       - 0.7956132100446545
@@ -1853,7 +1875,7 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+          Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1875,7 +1897,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+        Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -1883,7 +1905,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+          Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -1903,7 +1925,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+        Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2140,7 +2162,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+            Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2176,7 +2198,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+              Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2217,7 +2239,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+        Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2228,7 +2250,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+          Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2259,7 +2281,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+          Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2294,7 +2316,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: e596f298-c4fa-4c69-820a-8d4a7d55764c
+            Repudiandae dignissimos.: efd67218-3dd4-490f-a586-08bdff28d94f
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2493,7 +2515,7 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+              Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: false
@@ -2698,7 +2720,7 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 96872675-a41d-4ceb-aec5-00e9935b13be
+            Quas deserunt a.: ed6e6a31-18a0-489d-861d-8f7051bfbcf9
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: false
@@ -5758,6 +5780,31 @@ paths:
       tags:
       - member
   /projects/{projectId}:
+    delete:
+      description: |-
+        Delete project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#delete
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete project
+      tags:
+      - project
     get:
       description: |-
         Get a project
