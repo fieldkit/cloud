@@ -74,6 +74,16 @@ export default {
         chartType: function() {
             this.chartTypeChange();
         },
+        selectedSensor: function() {
+            let d3Chart = this;
+            this.chart.extent = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+            this.chart.colors = d3
+                .scaleSequential()
+                .domain(this.chart.extent)
+                .interpolator(d3.interpolatePlasma);
+        },
         stationData: function() {
             let d3Chart = this;
             this.chart.extent = d3.extent(this.stationData, d => {
