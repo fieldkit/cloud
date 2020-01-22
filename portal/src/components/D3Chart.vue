@@ -89,6 +89,10 @@ export default {
             this.chart.extent = d3.extent(this.stationData, d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            this.chart.colors = d3
+                .scaleSequential()
+                .domain(this.chart.extent)
+                .interpolator(d3.interpolatePlasma);
         }
     },
     computed: {
@@ -109,6 +113,7 @@ export default {
     },
     methods: {
         initChild(range) {
+            this.chart.id = "child-" + this.id;
             this.chart.start = range.start;
             this.chart.end = range.end;
             this.initChart();

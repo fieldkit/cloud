@@ -504,7 +504,7 @@ export default {
             this.propagateTimeChange(true);
         },
         onTimeZoomed(zoomed) {
-            if (zoomed.parent) {
+            if (zoomed.parent && this.linkedCharts) {
                 this.timeRange = zoomed.range;
                 this.propagateTimeChange(this.linkedCharts);
             } else {
