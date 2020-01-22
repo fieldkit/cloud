@@ -207,7 +207,7 @@ var _ = Resource("project", func() {
 
 	Action("add station", func() {
 		Routing(POST("/projects/:projectId/stations/:stationId"))
-		Description("Invite a user to project")
+		Description("Add a station to project")
 		Params(func() {
 			Param("projectId", Integer)
 			Param("stationId", Integer)
