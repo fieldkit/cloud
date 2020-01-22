@@ -1117,6 +1117,7 @@ type FieldNoteQueryResult struct {
 	Creator          string    `form:"creator" json:"creator" yaml:"creator" xml:"creator"`
 	ID               int       `form:"id" json:"id" yaml:"id" xml:"id"`
 	MediaContentType *string   `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
+	MediaID          *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
 	MediaURL         *string   `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
 	Note             *string   `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
 	UserID           int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`

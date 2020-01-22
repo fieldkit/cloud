@@ -157,11 +157,6 @@ func (c *Client) NewGetMediaFieldNoteRequest(ctx context.Context, path string) (
 	if err != nil {
 		return nil, err
 	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
 	return req, nil
 }
 

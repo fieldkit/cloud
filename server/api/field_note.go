@@ -32,6 +32,11 @@ func FieldNoteQueryResultType(fieldNote *data.FieldNoteQueryResult) *app.FieldNo
 		fieldNoteQueryResultType.Note = fieldNote.Note
 	}
 
+	if fieldNote.MediaID != nil {
+		mediaID := int(*fieldNote.MediaID)
+		fieldNoteQueryResultType.MediaID = &mediaID
+	}
+
 	if fieldNote.MediaURL != nil {
 		fieldNoteQueryResultType.MediaURL = fieldNote.MediaURL
 	}
@@ -108,11 +113,6 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 }
 
 func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error {
-	_, err := NewPermissions(ctx)
-	if err != nil {
-		return err
-	}
-
 	fieldNoteMedia := &data.FieldNoteMedia{}
 	if err := c.options.Database.GetContext(ctx, fieldNoteMedia, "SELECT * FROM fieldkit.field_note_media WHERE id = $1", ctx.MediaID); err != nil {
 		return err
@@ -237,7 +237,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 	fieldNotes := []*data.FieldNoteQueryResult{}
 
-	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, c.key AS CategoryKey, u.name AS Creator, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1 ORDER BY fn.created DESC", ctx.StationID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &fieldNotes, "SELECT fn.id AS ID, fn.created, fn.user_id, fn.note, fn.media_id, c.key AS CategoryKey, u.name AS Creator, m.url AS MediaURL, m.content_type AS MediaContentType FROM fieldkit.field_note AS fn JOIN fieldkit.user u ON (u.id = fn.user_id) JOIN fieldkit.field_note_category AS c ON (c.id = fn.category_id) LEFT OUTER JOIN fieldkit.field_note_media AS m ON (m.id = fn.media_id) WHERE fn.station_id = $1 ORDER BY fn.created DESC", ctx.StationID); err != nil {
 		return err
 	}
 

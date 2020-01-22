@@ -2020,12 +2020,6 @@ func (ctx *GetMediaFieldNoteContext) OK(resp []byte) error {
 	return err
 }
 
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetMediaFieldNoteContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // SaveMediaFieldNoteContext provides the field_note save media action context.
 type SaveMediaFieldNoteContext struct {
 	context.Context

@@ -385,12 +385,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -485,6 +479,23 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.7956132100446545
+      - 0.7956132100446545
+      - 0.7956132100446545
+      endTime: "1990-07-12T13:48:13Z"
+      envelope:
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      id: 1.4115510825130394e+18
+      numberOfFeatures: 6.289260029459094e+18
+      radius: 0.8411303627670746
+      sourceId: 7.08898507340788e+18
+      startTime: "2010-02-16T07:14:04Z"
     - centroid:
       - 0.7956132100446545
       - 0.7956132100446545
@@ -1683,7 +1694,8 @@ definitions:
       creator: Est accusantium et et perspiciatis et.
       id: 1.0196082008082544e+17
       media_content_type: Et aut sunt illo qui odit.
-      media_url: Id vitae est nobis odit necessitatibus.
+      media_id: 8.723990846803995e+18
+      media_url: Vitae est nobis odit necessitatibus.
       note: Veritatis velit.
       user_id: 2.9741547542351846e+18
     properties:
@@ -1704,8 +1716,12 @@ definitions:
       media_content_type:
         example: Et aut sunt illo qui odit.
         type: string
+      media_id:
+        example: 8.723990846803995e+18
+        format: int64
+        type: integer
       media_url:
-        example: Id vitae est nobis odit necessitatibus.
+        example: Vitae est nobis odit necessitatibus.
         type: string
       note:
         example: Veritatis velit.
@@ -1731,7 +1747,8 @@ definitions:
       creator: Est accusantium et et perspiciatis et.
       id: 1.0196082008082544e+17
       media_content_type: Et aut sunt illo qui odit.
-      media_url: Id vitae est nobis odit necessitatibus.
+      media_id: 8.723990846803995e+18
+      media_url: Vitae est nobis odit necessitatibus.
       note: Veritatis velit.
       user_id: 2.9741547542351846e+18
     - category_key: Aperiam perferendis veritatis dolore eius iusto.
@@ -1739,7 +1756,8 @@ definitions:
       creator: Est accusantium et et perspiciatis et.
       id: 1.0196082008082544e+17
       media_content_type: Et aut sunt illo qui odit.
-      media_url: Id vitae est nobis odit necessitatibus.
+      media_id: 8.723990846803995e+18
+      media_url: Vitae est nobis odit necessitatibus.
       note: Veritatis velit.
       user_id: 2.9741547542351846e+18
     items:
@@ -1756,7 +1774,8 @@ definitions:
         creator: Est accusantium et et perspiciatis et.
         id: 1.0196082008082544e+17
         media_content_type: Et aut sunt illo qui odit.
-        media_url: Id vitae est nobis odit necessitatibus.
+        media_id: 8.723990846803995e+18
+        media_url: Vitae est nobis odit necessitatibus.
         note: Veritatis velit.
         user_id: 2.9741547542351846e+18
       - category_key: Aperiam perferendis veritatis dolore eius iusto.
@@ -1764,7 +1783,8 @@ definitions:
         creator: Est accusantium et et perspiciatis et.
         id: 1.0196082008082544e+17
         media_content_type: Et aut sunt illo qui odit.
-        media_url: Id vitae est nobis odit necessitatibus.
+        media_id: 8.723990846803995e+18
+        media_url: Vitae est nobis odit necessitatibus.
         note: Veritatis velit.
         user_id: 2.9741547542351846e+18
       - category_key: Aperiam perferendis veritatis dolore eius iusto.
@@ -1772,7 +1792,8 @@ definitions:
         creator: Est accusantium et et perspiciatis et.
         id: 1.0196082008082544e+17
         media_content_type: Et aut sunt illo qui odit.
-        media_url: Id vitae est nobis odit necessitatibus.
+        media_id: 8.723990846803995e+18
+        media_url: Vitae est nobis odit necessitatibus.
         note: Veritatis velit.
         user_id: 2.9741547542351846e+18
     properties:
@@ -1881,14 +1902,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+          Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+          Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1910,7 +1931,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+        Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -1918,7 +1939,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+          Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -1938,21 +1959,21 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+        Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+        Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+        Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2213,7 +2234,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+            Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2249,7 +2270,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+              Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2290,7 +2311,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+        Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2301,7 +2322,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+          Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2332,7 +2353,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+          Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2367,7 +2388,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 48f99d17-c5df-42d0-a2ef-fb8d40f9f522
+            Repudiandae dignissimos.: bbe5788a-5abb-4658-a3e3-f008901043bb
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2567,14 +2588,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+              Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+              Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2753,14 +2774,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+            Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: be7e794e-d105-4507-b4b9-8bb39fef9bea
+            Quas deserunt a.: be48d478-cf22-4014-95e9-5cbe1a882d0f
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -3335,7 +3356,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
     properties:
       device_id:
         example: Nesciunt similique omnis ut et esse.
@@ -3358,7 +3379,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
         type: object
     required:
     - id
@@ -3401,7 +3422,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
     - device_id: Nesciunt similique omnis ut et esse.
       id: 4.3866891592095995e+18
       images:
@@ -3430,7 +3451,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
     - device_id: Nesciunt similique omnis ut et esse.
       id: 4.3866891592095995e+18
       images:
@@ -3459,7 +3480,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -3526,7 +3547,7 @@ definitions:
         name: Id quia reprehenderit voluptates consequatur.
         owner_id: 3.5835518496883635e+18
         status_json:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
       - device_id: Nesciunt similique omnis ut et esse.
         id: 4.3866891592095995e+18
         images:
@@ -3555,7 +3576,7 @@ definitions:
         name: Id quia reprehenderit voluptates consequatur.
         owner_id: 3.5835518496883635e+18
         status_json:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: ea7706f8-693c-4185-a617-e83d9b4a55cd
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 9ffc2f0f-e5c4-4acc-a133-c1a0edf740b2
     properties:
       stations:
         $ref: '#/definitions/StationCollection'
@@ -6974,11 +6995,7 @@ paths:
       - field_note
   /stations/{stationId}/field-note-media/{mediaId}:
     get:
-      description: |-
-        Get a field note image
-
-        Required security scopes:
-          * `api:access`
+      description: Get a field note image
       operationId: field_note#get media
       parameters:
       - in: path
@@ -6994,13 +7011,8 @@ paths:
       responses:
         "200":
           description: OK
-        "400":
-          description: Bad Request
       schemes:
       - https
-      security:
-      - jwt:
-        - api:access
       summary: get media field_note
       tags:
       - field_note

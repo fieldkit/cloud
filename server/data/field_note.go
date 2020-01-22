@@ -10,6 +10,7 @@ type FieldNoteQueryResult struct {
 	UserID           int32     `db:"user_id"`
 	CategoryKey      string    `json:"category_key"`
 	Note             *string   `db:"note"`
+	MediaID    		 *int32    `db:"media_id"`
 	MediaURL         *string   `json:"media_url"`
 	MediaContentType *string   `json:"media_content_type"`
 	Creator          string    `json:"creator"`

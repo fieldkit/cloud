@@ -2598,10 +2598,9 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 		}
 		return ctrl.GetMedia(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleFieldNoteOrigin(h)
 	service.Mux.Handle("GET", "/stations/:stationId/field-note-media/:mediaId", ctrl.MuxHandler("get media", h, nil))
-	service.LogInfo("mount", "ctrl", "FieldNote", "action", "GetMedia", "route", "GET /stations/:stationId/field-note-media/:mediaId", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "FieldNote", "action", "GetMedia", "route", "GET /stations/:stationId/field-note-media/:mediaId")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

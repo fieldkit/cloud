@@ -22,6 +22,7 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 		Attribute("user_id", Integer)
 		Attribute("category_key")
 		Attribute("note")
+		Attribute("media_id")
 		Attribute("media_url")
 		Attribute("media_content_type")
 		Attribute("creator")
@@ -33,6 +34,7 @@ var FieldNoteQueryResult = MediaType("application/vnd.app.field_note_result+json
 		Attribute("user_id")
 		Attribute("category_key")
 		Attribute("note")
+		Attribute("media_id")
 		Attribute("media_url")
 		Attribute("media_content_type")
 		Attribute("creator")
@@ -88,6 +90,7 @@ var _ = Resource("field_note", func() {
 	})
 
 	Action("get media", func() {
+		NoSecurity()
 		Routing(GET("/stations/:stationId/field-note-media/:mediaId"))
 		Description("Get a field note image")
 		Params(func() {
@@ -95,7 +98,6 @@ var _ = Resource("field_note", func() {
 			Param("mediaId", Integer)
 			Required("stationId", "mediaId")
 		})
-		Response(BadRequest)
 		Response(OK, func() {
 			Media("image/png")
 		})
