@@ -209,11 +209,11 @@ export default {
                 // this.fullData = this.combinedStationInfo.stationData;
                 this.stationData = this.combinedStationInfo.stationData;
                 this.displaySensors = this.combinedStationInfo.sensors;
-                this.initialRange = [
-                    this.stationData[0].date,
-                    this.stationData[this.stationData.length - 1].date
-                ];
                 if (this.stationData.length > 0) {
+                    this.initialRange = [
+                        this.stationData[0].date,
+                        this.stationData[this.stationData.length - 1].date
+                    ];
                     this.initSelectedSensor();
                     this.initTimeWindow();
                     this.initChartType();
