@@ -161,6 +161,41 @@ func (c *Client) NewListStationRequest(ctx context.Context, path string) (*http.
 	return req, nil
 }
 
+// ListProjectStationPath computes a request path to the list project action of station.
+func ListProjectStationPath(projectID string) string {
+	param0 := projectID
+
+	return fmt.Sprintf("/projects/%s/stations", param0)
+}
+
+// List project stations
+func (c *Client) ListProjectStation(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListProjectStationRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListProjectStationRequest create the request corresponding to the list project action endpoint of the station resource.
+func (c *Client) NewListProjectStationRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // UpdateStationPath computes a request path to the update action of station.
 func UpdateStationPath(stationID int) string {
 	param0 := strconv.Itoa(stationID)

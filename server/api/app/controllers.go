@@ -5041,6 +5041,7 @@ type StationController interface {
 	Delete(*DeleteStationContext) error
 	Get(*GetStationContext) error
 	List(*ListStationContext) error
+	ListProject(*ListProjectStationContext) error
 	Update(*UpdateStationContext) error
 }
 
@@ -5051,6 +5052,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	service.Mux.Handle("OPTIONS", "/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -5125,6 +5127,23 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/stations", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Station", "action", "List", "route", "GET /stations", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListProjectStationContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListProject(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleStationOrigin(h)
+	service.Mux.Handle("GET", "/projects/:projectId/stations", ctrl.MuxHandler("list project", h, nil))
+	service.LogInfo("mount", "ctrl", "Station", "action", "ListProject", "route", "GET /projects/:projectId/stations", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

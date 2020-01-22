@@ -158,6 +158,15 @@ var _ = Resource("station", func() {
 		})
 	})
 
+	Action("list project", func() {
+		Routing(GET("projects/:projectId/stations"))
+		Description("List project stations")
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Stations)
+		})
+	})
+
 	Action("delete", func() {
 		Routing(DELETE("stations/:stationId"))
 		Description("Delete station")

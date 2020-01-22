@@ -250,6 +250,36 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 	return ctx.OK(svm)
 }
 
+func (c *StationController) ListProject(ctx *app.ListProjectStationContext) error {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context")
+	}
+
+	stations := []*data.Station{}
+	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	ingestions := []*data.Ingestion{}
+	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id IN (SELECT s.device_id FROM fieldkit.station AS s JOIN fieldkit.project_station AS ps ON (s.id = ps.station_id) WHERE project_id = $1) ORDER BY time DESC", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	note_media := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &note_media, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) ORDER BY fnm.created DESC`, ctx.ProjectID); err != nil {
+		return err
+	}
+
+	stationsWm, err := StationsType(stations, ingestions, note_media)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(stationsWm)
+}
+
 func (c *StationController) List(ctx *app.ListStationContext) error {
 	token := jwt.ContextJWT(ctx)
 	if token == nil {

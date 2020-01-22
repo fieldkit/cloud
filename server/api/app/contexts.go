@@ -4585,6 +4585,45 @@ func (ctx *ListStationContext) BadRequest() error {
 	return nil
 }
 
+// ListProjectStationContext provides the station list project action context.
+type ListProjectStationContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID string
+}
+
+// NewListProjectStationContext parses the incoming request URL and body, performs validations and creates the
+// context used by the station controller list project action.
+func NewListProjectStationContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListProjectStationContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListProjectStationContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		rctx.ProjectID = rawProjectID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListProjectStationContext) OK(r *Stations) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.stations+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListProjectStationContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // UpdateStationContext provides the station update action context.
 type UpdateStationContext struct {
 	context.Context

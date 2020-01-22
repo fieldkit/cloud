@@ -40,24 +40,24 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp256 := strconv.Itoa(*end)
-		values.Set("end", tmp256)
+		tmp257 := strconv.Itoa(*end)
+		values.Set("end", tmp257)
 	}
 	if internal != nil {
-		tmp257 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp257)
+		tmp258 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp258)
 	}
 	if page != nil {
-		tmp258 := strconv.Itoa(*page)
-		values.Set("page", tmp258)
+		tmp259 := strconv.Itoa(*page)
+		values.Set("page", tmp259)
 	}
 	if pageSize != nil {
-		tmp259 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp259)
+		tmp260 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp260)
 	}
 	if start != nil {
-		tmp260 := strconv.Itoa(*start)
-		values.Set("start", tmp260)
+		tmp261 := strconv.Itoa(*start)
+		values.Set("start", tmp261)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -97,24 +97,24 @@ func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, en
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp261 := strconv.Itoa(*end)
-		values.Set("end", tmp261)
+		tmp262 := strconv.Itoa(*end)
+		values.Set("end", tmp262)
 	}
 	if internal != nil {
-		tmp262 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp262)
+		tmp263 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp263)
 	}
 	if page != nil {
-		tmp263 := strconv.Itoa(*page)
-		values.Set("page", tmp263)
+		tmp264 := strconv.Itoa(*page)
+		values.Set("page", tmp264)
 	}
 	if pageSize != nil {
-		tmp264 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp264)
+		tmp265 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp265)
 	}
 	if start != nil {
-		tmp265 := strconv.Itoa(*start)
-		values.Set("start", tmp265)
+		tmp266 := strconv.Itoa(*start)
+		values.Set("start", tmp266)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
