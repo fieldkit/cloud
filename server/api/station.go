@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 
@@ -19,14 +20,22 @@ type StationControllerOptions struct {
 	Database *sqlxcache.DB
 }
 
-func StationType(station *data.Station, ingestions []*data.Ingestion) (*app.Station, error) {
+func StationType(station *data.Station, ingestions []*data.Ingestion, note_media []*data.FieldNoteMediaForStation) (*app.Station, error) {
 	status, err := station.GetStatus()
 	if err != nil {
 		return nil, err
 	}
 
-	lastUploads := make([]*app.LastUpload, len(ingestions))
+	images := make([]*app.ImageRef, 0)
+	for _, row := range note_media {
+		if row.URL != "" && strings.Contains(row.ContentType, "image") {
+			images = append(images, &app.ImageRef{
+				URL: row.URL,
+			})
+		}
+	}
 
+	lastUploads := make([]*app.LastUpload, len(ingestions))
 	for i, ingestion := range ingestions {
 		lastUploads[i] = &app.LastUpload{
 			ID:       int(ingestion.ID),
@@ -61,17 +70,33 @@ func sortByStation(ingestions []*data.Ingestion) map[string][]*data.Ingestion {
 	return m
 }
 
-func StationsType(stations []*data.Station, ingestions []*data.Ingestion) (*app.Stations, error) {
+func sortMediaByStation(all []*data.FieldNoteMediaForStation) map[int32][]*data.FieldNoteMediaForStation {
+	m := make(map[int32][]*data.FieldNoteMediaForStation)
+	for _, row := range all {
+		if m[row.StationID] == nil {
+			m[row.StationID] = make([]*data.FieldNoteMediaForStation, 0)
+		}
+		m[row.StationID] = append(m[row.StationID], row)
+	}
+	return m
+}
+
+func StationsType(stations []*data.Station, ingestions []*data.Ingestion, note_media []*data.FieldNoteMediaForStation) (*app.Stations, error) {
 	stationsCollection := make([]*app.Station, len(stations))
 
+	noteMediaByStation := sortMediaByStation(note_media)
 	ingestionsByStation := sortByStation(ingestions)
 	for i, station := range stations {
 		key := hex.EncodeToString(station.DeviceID)
-		byStation := ingestionsByStation[key]
-		if byStation == nil {
-			byStation = make([]*data.Ingestion, 0)
+		ingestionsByStation := ingestionsByStation[key]
+		if ingestionsByStation == nil {
+			ingestionsByStation = make([]*data.Ingestion, 0)
 		}
-		appStation, err := StationType(station, byStation)
+		noteMediaByStation := noteMediaByStation[station.ID]
+		if noteMediaByStation == nil {
+			noteMediaByStation = make([]*data.FieldNoteMediaForStation, 0)
+		}
+		appStation, err := StationType(station, ingestionsByStation, noteMediaByStation)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +148,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 				Message: "This station is already registered.",
 			})
 		}
-		svm, err := StationType(existing, make([]*data.Ingestion, 0))
+		svm, err := StationType(existing, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
 		if err != nil {
 			return err
 		}
@@ -142,7 +167,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station, make([]*data.Ingestion, 0))
+	svm, err := StationType(station, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
 	if err != nil {
 		return err
 	}
@@ -176,7 +201,14 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station, ingestions)
+	note_media := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &note_media, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.id = $1 ORDER BY fnm.created DESC`, ctx.StationID); err != nil {
+		return err
+	}
+
+	svm, err := StationType(station, ingestions, note_media)
 	if err != nil {
 		return err
 	}
@@ -204,7 +236,14 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(station, ingestions)
+	note_media := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &note_media, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.id = $1 ORDER BY fnm.created DESC`, ctx.StationID); err != nil {
+		return err
+	}
+
+	svm, err := StationType(station, ingestions, note_media)
 	if err != nil {
 		return err
 	}
@@ -234,7 +273,14 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 		return err
 	}
 
-	stationsWm, err := StationsType(stations, ingestions)
+	note_media := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &note_media, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.owner_id = $1 ORDER BY fnm.created DESC`, ownerId); err != nil {
+		return err
+	}
+
+	stationsWm, err := StationsType(stations, ingestions, note_media)
 	if err != nil {
 		return err
 	}

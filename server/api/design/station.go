@@ -47,6 +47,17 @@ var LastUpload = MediaType("application/vnd.app.upload+json", func() {
 	})
 })
 
+var ImageRef = MediaType("application/vnd.app.imageref+json", func() {
+	TypeName("ImageRef")
+	Attributes(func() {
+		Attribute("url", String)
+		Required("url")
+	})
+	View("default", func() {
+		Attribute("url")
+	})
+})
+
 var Station = MediaType("application/vnd.app.station+json", func() {
 	TypeName("Station")
 	Reference(AddStationPayload)
@@ -57,7 +68,8 @@ var Station = MediaType("application/vnd.app.station+json", func() {
 		Attribute("device_id", String)
 		Attribute("last_uploads", CollectionOf(LastUpload))
 		Attribute("status_json", HashOf(String, Any))
-		Required("id", "name", "owner_id", "device_id", "status_json")
+		Attribute("images", CollectionOf(ImageRef))
+		Required("id", "name", "owner_id", "device_id", "status_json", "images")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -66,6 +78,7 @@ var Station = MediaType("application/vnd.app.station+json", func() {
 		Attribute("device_id")
 		Attribute("last_uploads")
 		Attribute("status_json")
+		Attribute("images")
 	})
 })
 

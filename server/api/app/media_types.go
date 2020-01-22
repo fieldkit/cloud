@@ -1094,6 +1094,38 @@ func (mt ClusterSummaryCollection) Validate() (err error) {
 	return
 }
 
+// ImageRef media type (default view)
+//
+// Identifier: application/vnd.app.imageref+json; view=default
+type ImageRef struct {
+	URL string `form:"url" json:"url" yaml:"url" xml:"url"`
+}
+
+// Validate validates the ImageRef media type instance.
+func (mt *ImageRef) Validate() (err error) {
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	return
+}
+
+// ImageRefCollection is the media type for an array of ImageRef (default view)
+//
+// Identifier: application/vnd.app.imageref+json; type=collection; view=default
+type ImageRefCollection []*ImageRef
+
+// Validate validates the ImageRefCollection media type instance.
+func (mt ImageRefCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // Location media type (default view)
 //
 // Identifier: application/vnd.app.location+json; view=default
@@ -1632,6 +1664,7 @@ func (mt *Sources) Validate() (err error) {
 type Station struct {
 	DeviceID    string                 `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
 	ID          int                    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Images      ImageRefCollection     `form:"images" json:"images" yaml:"images" xml:"images"`
 	LastUploads LastUploadCollection   `form:"last_uploads,omitempty" json:"last_uploads,omitempty" yaml:"last_uploads,omitempty" xml:"last_uploads,omitempty"`
 	Name        string                 `form:"name" json:"name" yaml:"name" xml:"name"`
 	OwnerID     int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
@@ -1650,6 +1683,12 @@ func (mt *Station) Validate() (err error) {
 	}
 	if mt.StatusJSON == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "status_json"))
+	}
+	if mt.Images == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "images"))
+	}
+	if err2 := mt.Images.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
 	}
 	if err2 := mt.LastUploads.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
