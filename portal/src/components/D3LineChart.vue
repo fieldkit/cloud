@@ -22,7 +22,7 @@ export default {
         },
         stationData: function() {
             if (this.activeMode) {
-                if (d3.selectAll(".data-line").empty()) {
+                if (this.chart.svg.selectAll(".data-line").empty()) {
                     this.makeLine();
                 } else {
                     let d3Chart = this;
@@ -125,7 +125,7 @@ export default {
             //     .data([this.filteredData])
             //     .attr("class", "area")
             //     .attr("stroke-width", "3")
-            //     .attr("stroke", "url(#area-gradient)")
+            //     .attr("stroke", "url(#" + this.chart.id + "-area-gradient)")
             //     .attr("fill", "none")
             //     .transition()
             //     .duration(1000)
@@ -137,7 +137,7 @@ export default {
                 .attr("class", "data-line")
                 .attr("d", this.lineFn(this.filteredData))
                 .attr("stroke-width", "3")
-                .attr("stroke", "url(#area-gradient)")
+                .attr("stroke", "url(#" + this.chart.id + "-area-gradient)")
                 .attr("fill", "none");
 
             // Add the brushing
@@ -321,11 +321,11 @@ export default {
                 .call(d3.axisLeft(this.y));
         },
         createGradient() {
-           // Add the gradient area
-            this.chart.svg.selectAll("#area-gradient").remove();
+            // Add the gradient area
+            this.chart.svg.selectAll("#" + this.chart.id + "-area-gradient").remove();
             this.line
                 .append("linearGradient")
-                .attr("id", "area-gradient")
+                .attr("id", this.chart.id + "-area-gradient")
                 .attr("gradientUnits", "userSpaceOnUse")
                 .attr("x1", 0)
                 .attr("y1", this.y(this.chart.extent[0]))

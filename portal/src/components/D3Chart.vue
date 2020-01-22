@@ -171,9 +171,28 @@ export default {
                     break;
             }
         },
+        getTimeRange() {
+            return { start: this.chart.start, end: this.chart.end };
+        },
         setTimeRange(range) {
             this.chart.start = range.start;
             this.chart.end = range.end;
+            let d3Chart = this;
+            let filtered = this.stationData.filter(d => {
+                return d.date > this.chart.start && d.date < this.chart.end;
+            });
+            // set the extent to the filtered data
+            this.chart.extent = d3.extent(filtered, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+            let fullRange = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+            // but still set the colors based on the full range
+            this.chart.colors = d3
+                .scaleSequential()
+                .domain(fullRange)
+                .interpolator(d3.interpolatePlasma);
             switch (this.chartType) {
                 case "Line":
                     this.$refs.d3LineChart.timeChanged();

@@ -339,6 +339,7 @@ export default {
             this.linkedCharts = !this.linkedCharts;
             if (this.linkedCharts) {
                 // now re-linked, reset all to parent
+                const parentTime = this.$refs[this.charts[0].ref][0].getTimeRange();
                 this.charts.forEach((c, i) => {
                     if (i > 0) {
                         c.type = this.charts[0].type;
@@ -347,9 +348,9 @@ export default {
                         c.sensor = this.charts[0].sensor;
                         c.sensorOption = this.charts[0].sensorOption;
                         this.urlQuery[c.id + "sensor"] = this.charts[0].sensorOption;
-                        this.$refs[c.ref][0].setTimeRange(this.timeRange);
-                        this.urlQuery[c.id + "start"] = this.timeRange.start.getTime();
-                        this.urlQuery[c.id + "end"] = this.timeRange.end.getTime();
+                        this.$refs[c.ref][0].setTimeRange(parentTime);
+                        this.urlQuery[c.id + "start"] = parentTime.start.getTime();
+                        this.urlQuery[c.id + "end"] = parentTime.end.getTime();
                     }
                 });
                 this.updateRoute();
@@ -481,7 +482,8 @@ export default {
                 this.timeRange.start = this.initialRange[0];
             }
             if (event.id && !event.parent) {
-                // if a D3Chart emitted this and they are not parent, only change them
+                // if a D3Chart emitted this and they are not parent, *ideally* only change them
+                // but for now day ranges need to affect everything bc of data filtering
                 const chart = this.charts.find(c => {
                     return c.id == event.id;
                 });
@@ -491,8 +493,9 @@ export default {
                     this.urlQuery[chart.id + "end"] = this.timeRange.end.getTime();
                     this.updateRoute();
                 }
-                this.unlinkCharts();
-                return;
+                // allow ranges to affect everything for now
+                // this.unlinkCharts();
+                // return;
             }
             // display active state for appropriate button
             this.timeButtons.forEach(b => {
@@ -512,6 +515,7 @@ export default {
                 const chart = this.charts.find(c => {
                     return c.id == zoomed.id;
                 });
+                this.$refs[chart.ref][0].setTimeRange(zoomed.range);
                 this.urlQuery[chart.id + "start"] = zoomed.range.start.getTime();
                 this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
                 this.updateRoute();
