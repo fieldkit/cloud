@@ -77,7 +77,7 @@ export default {
         selectedSensor: function() {
             let d3Chart = this;
             let filtered = this.stationData.filter(d => {
-                return d.date > this.chart.start && d.date < this.chart.end;
+                return d.date >= this.chart.start && d.date <= this.chart.end;
             });
             // set the extent to the filtered data
             this.chart.extent = d3.extent(filtered, d => {
@@ -158,7 +158,7 @@ export default {
                 .interpolator(d3.interpolatePlasma);
 
             let filtered = this.stationData.filter(d => {
-                return d.date > this.chart.start && d.date < this.chart.end;
+                return d.date >= this.chart.start && d.date <= this.chart.end;
             });
             this.chart.extent = d3.extent(filtered, d => {
                 return d[d3Chart.selectedSensor.key];
@@ -187,7 +187,7 @@ export default {
             this.chart.end = range.end;
             let d3Chart = this;
             let filtered = this.stationData.filter(d => {
-                return d.date > this.chart.start && d.date < this.chart.end;
+                return d.date >= this.chart.start && d.date <= this.chart.end;
             });
             // set the extent to the filtered data
             this.chart.extent = d3.extent(filtered, d => {

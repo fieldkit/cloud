@@ -58,10 +58,6 @@ export default {
                 .domain(this.xHist.domain())
                 .thresholds(thresholds);
 
-            // filter data by date
-            let filteredData = this.stationData.filter(d => {
-                return d.date > d3Chart.chart.start && d.date < d3Chart.chart.end;
-            });
             // apply histogram function
             let bins = this.histogram(filteredData);
 

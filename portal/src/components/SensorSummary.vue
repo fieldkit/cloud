@@ -36,7 +36,7 @@ export default {
                     end = this.timeRange.end;
                 }
                 let filtered = this.stationData.filter(d => {
-                    return d.date > start && d.date < end;
+                    return d.date >= start && d.date <= end;
                 });
                 return this.computeStats(filtered);
             } else {
@@ -48,7 +48,7 @@ export default {
                 let end = this.stationData[this.stationData.length - 1].date;
                 let start = new Date(end.getTime() - WEEK);
                 let filtered = this.stationData.filter(d => {
-                    return d.date > start && d.date < end;
+                    return d.date >= start && d.date <= end;
                 });
                 return this.computeStats(filtered);
             } else {
@@ -60,7 +60,7 @@ export default {
                 let end = this.stationData[this.stationData.length - 1].date;
                 let start = new Date(end.getTime() - MONTH);
                 let filtered = this.stationData.filter(d => {
-                    return d.date > start && d.date < end;
+                    return d.date >= start && d.date <= end;
                 });
                 return this.computeStats(filtered);
             } else {

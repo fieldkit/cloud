@@ -274,7 +274,7 @@ export default {
             } else {
                 // filter data to match time range
                 const filtered = this.stationData.filter(d => {
-                    return d.date > this.timeRange.start && d.date < this.timeRange.end;
+                    return d.date >= this.timeRange.start && d.date <= this.timeRange.end;
                 });
                 this.$refs.dataChartControl.updateData(filtered);
             }
