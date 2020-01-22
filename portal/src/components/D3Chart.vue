@@ -76,12 +76,20 @@ export default {
         },
         selectedSensor: function() {
             let d3Chart = this;
-            this.chart.extent = d3.extent(this.stationData, d => {
+            let filtered = this.stationData.filter(d => {
+                return d.date > this.chart.start && d.date < this.chart.end;
+            });
+            // set the extent to the filtered data
+            this.chart.extent = d3.extent(filtered, d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            let fullRange = d3.extent(this.stationData, d => {
+                return d[d3Chart.selectedSensor.key];
+            });
+            // but still set the colors based on the full range
             this.chart.colors = d3
                 .scaleSequential()
-                .domain(this.chart.extent)
+                .domain(fullRange)
                 .interpolator(d3.interpolatePlasma);
         },
         stationData: function() {

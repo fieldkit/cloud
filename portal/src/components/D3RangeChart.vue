@@ -210,10 +210,13 @@ export default {
         },
         sensorChange() {
             let d3Chart = this;
-            // define extent for this sensor
-            this.chart.extent = d3.extent(this.stationData, d => {
+            this.filteredData = this.stationData.filter(d => {
                 return d[d3Chart.selectedSensor.key];
             });
+            // define extent for this sensor
+            // this.chart.extent = d3.extent(this.stationData, d => {
+            //     return d[d3Chart.selectedSensor.key];
+            // });
             let bins = this.prepareRange();
             this.updateRange(bins);
         },
