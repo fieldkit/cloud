@@ -59,7 +59,7 @@ export default {
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(filteredData);
+            let bins = this.histogram(this.stationData);
 
             // set y scale
             this.yHist = d3
