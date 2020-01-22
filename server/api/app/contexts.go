@@ -3331,6 +3331,57 @@ func (ctx *AddProjectContext) BadRequest() error {
 	return nil
 }
 
+// AddStationProjectContext provides the project add station action context.
+type AddStationProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	StationID int
+}
+
+// NewAddStationProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller add station action.
+func NewAddStationProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddStationProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AddStationProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 204.
+func (ctx *AddStationProjectContext) OK() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *AddStationProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // DeleteProjectContext provides the project delete action context.
 type DeleteProjectContext struct {
 	context.Context
@@ -3603,6 +3654,57 @@ func (ctx *ListCurrentProjectContext) OK(r *Projects) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *ListCurrentProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// RemoveStationProjectContext provides the project remove station action context.
+type RemoveStationProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ProjectID int
+	StationID int
+}
+
+// NewRemoveStationProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller remove station action.
+func NewRemoveStationProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*RemoveStationProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := RemoveStationProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
+		}
+	}
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 204.
+func (ctx *RemoveStationProjectContext) OK() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *RemoveStationProjectContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

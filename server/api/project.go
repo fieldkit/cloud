@@ -10,18 +10,18 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-    "github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/fieldkit/cloud/server/api/app"
-    "github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 )
 
 type ProjectControllerOptions struct {
-    Session *session.Session
+	Session  *session.Session
 	Database *sqlxcache.DB
-	Emailer email.Emailer
+	Emailer  email.Emailer
 }
 
 func ProjectType(project *data.Project) *app.Project {
@@ -215,47 +215,47 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 }
 
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
-    _, err := NewPermissions(ctx)
-    if err != nil {
-        return err
-    }
+	_, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
 
-    mr := repositories.NewMediaRepository(c.options.Session)
-    saved, err := mr.Save(ctx, ctx.RequestData)
-    if err != nil {
-        return err
-    }
+	mr := repositories.NewMediaRepository(c.options.Session)
+	saved, err := mr.Save(ctx, ctx.RequestData)
+	if err != nil {
+		return err
+	}
 
-    project := &data.Project{}
-    if err := c.options.Database.GetContext(ctx, project, "UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, ctx.ProjectID); err != nil {
-        return err
-    }
+	project := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, project, "UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, ctx.ProjectID); err != nil {
+		return err
+	}
 
-    return ctx.OK(ProjectType(project))
+	return ctx.OK(ProjectType(project))
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
-    project := &data.Project{}
-    if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
-        return err
-    }
+	project := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
 
-    if project.MediaURL != nil {
-        mr := repositories.NewMediaRepository(c.options.Session)
+	if project.MediaURL != nil {
+		mr := repositories.NewMediaRepository(c.options.Session)
 
-        lm, err := mr.LoadByURL(ctx, *project.MediaURL)
-        if err != nil {
-            return err
-        }
+		lm, err := mr.LoadByURL(ctx, *project.MediaURL)
+		if err != nil {
+			return err
+		}
 
-        if lm != nil {
-            SendLoadedMedia(ctx.ResponseData, lm);
-        }
+		if lm != nil {
+			SendLoadedMedia(ctx.ResponseData, lm)
+		}
 
-        return nil
-    }
+		return nil
+	}
 
-    return ctx.OK(nil)
+	return ctx.OK(nil)
 }
 
 func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error {
@@ -295,11 +295,47 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 	return ctx.OK()
 }
 
+func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyProject(int32(ctx.ProjectID))
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)", ctx.ProjectID, ctx.StationID); err != nil {
+		return err
+	}
+
+	return ctx.OK()
+}
+
+func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) error {
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanModifyProject(int32(ctx.ProjectID))
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_station WHERE project_id = $1 AND station_id = $2", ctx.ProjectID, ctx.StationID); err != nil {
+		return err
+	}
+
+	return ctx.OK()
+}
+
 func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
-    _, err := NewPermissions(ctx)
-    if err != nil {
-        return err
-    }
+	_, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
 
 	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1", ctx.ProjectID); err != nil {
 		return err

@@ -385,12 +385,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -485,6 +479,23 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.7956132100446545
+      - 0.7956132100446545
+      - 0.7956132100446545
+      endTime: "1990-07-12T13:48:13Z"
+      envelope:
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      - - 0.8085809692396987
+        - 0.8085809692396987
+        - 0.8085809692396987
+      id: 1.4115510825130394e+18
+      numberOfFeatures: 6.289260029459094e+18
+      radius: 0.8411303627670746
+      sourceId: 7.08898507340788e+18
+      startTime: "2010-02-16T07:14:04Z"
     - centroid:
       - 0.7956132100446545
       - 0.7956132100446545
@@ -1881,14 +1892,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+          Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+          Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1910,7 +1921,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+        Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -1918,7 +1929,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+          Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -1938,21 +1949,21 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+        Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+        Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+        Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2213,7 +2224,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+            Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2249,7 +2260,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+              Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2290,7 +2301,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+        Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2301,7 +2312,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+          Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2332,7 +2343,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+          Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2367,7 +2378,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: d0e39d9b-ec6b-4fdc-bb86-cf82b6b19eda
+            Repudiandae dignissimos.: 385385ad-72c7-49f7-9821-bacf4c0ff596
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2567,14 +2578,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+              Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+              Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2753,14 +2764,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+            Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: d0068320-3b0a-41ca-8612-d7af22f0653e
+            Quas deserunt a.: afa036e8-7854-4942-bfc7-dee002b52d03
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -3335,7 +3346,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
     properties:
       device_id:
         example: Nesciunt similique omnis ut et esse.
@@ -3358,7 +3369,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
         type: object
     required:
     - id
@@ -3401,7 +3412,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
     - device_id: Nesciunt similique omnis ut et esse.
       id: 4.3866891592095995e+18
       images:
@@ -3430,7 +3441,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
     - device_id: Nesciunt similique omnis ut et esse.
       id: 4.3866891592095995e+18
       images:
@@ -3459,7 +3470,7 @@ definitions:
       name: Id quia reprehenderit voluptates consequatur.
       owner_id: 3.5835518496883635e+18
       status_json:
-        Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+        Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -3526,7 +3537,7 @@ definitions:
         name: Id quia reprehenderit voluptates consequatur.
         owner_id: 3.5835518496883635e+18
         status_json:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
       - device_id: Nesciunt similique omnis ut et esse.
         id: 4.3866891592095995e+18
         images:
@@ -3555,7 +3566,7 @@ definitions:
         name: Id quia reprehenderit voluptates consequatur.
         owner_id: 3.5835518496883635e+18
         status_json:
-          Suscipit voluptatem quae eum voluptatibus magnam non.: 84c8167a-d31b-44ed-beeb-4e8ca1ed6c03
+          Suscipit voluptatem quae eum voluptatibus magnam non.: 6d5f9928-8948-46ed-82bd-1146a5d5e6e5
     properties:
       stations:
         $ref: '#/definitions/StationCollection'
@@ -6197,6 +6208,63 @@ paths:
       summary: project get id picture
       tags:
       - picture
+  /projects/{projectId}/stations/{stationId}:
+    delete:
+      description: |-
+        Required security scopes:
+          * `api:access`
+      operationId: project#remove station
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        type: integer
+      - in: path
+        name: stationId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: remove station project
+      tags:
+      - project
+    post:
+      description: |-
+        Invite a user to project
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#add station
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        type: integer
+      - in: path
+        name: stationId
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: add station project
+      tags:
+      - project
   /refresh:
     post:
       description: Creates a valid JWT given a refresh token.

@@ -46,3 +46,7 @@ func (p *Permissions) CanModifyStationByDeviceID(deviceId []byte) error {
 func (p *Permissions) CanViewStationByDeviceID(deviceId []byte) error {
 	return nil
 }
+
+func (p *Permissions) CanModifyProject(projectId int32) error {
+	return nil
+}

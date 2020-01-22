@@ -205,6 +205,34 @@ var _ = Resource("project", func() {
 
 	})
 
+	Action("add station", func() {
+		Routing(POST("/projects/:projectId/stations/:stationId"))
+		Description("Invite a user to project")
+		Params(func() {
+			Param("projectId", Integer)
+			Param("stationId", Integer)
+			Required("projectId", "stationId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
+		})
+	})
+
+	Action("remove station", func() {
+		Routing(DELETE("/projects/:projectId/stations/:stationId"))
+		Params(func() {
+			Param("projectId", Integer)
+			Param("stationId", Integer)
+			Required("projectId", "stationId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Status(204)
+		})
+
+	})
+
 	Action("delete", func() {
 		Routing(DELETE("projects/:projectId"))
 		Description("Delete project")

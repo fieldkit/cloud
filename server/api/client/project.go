@@ -57,6 +57,42 @@ func (c *Client) NewAddProjectRequest(ctx context.Context, path string, payload 
 	return req, nil
 }
 
+// AddStationProjectPath computes a request path to the add station action of project.
+func AddStationProjectPath(projectID int, stationID int) string {
+	param0 := strconv.Itoa(projectID)
+	param1 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/projects/%s/stations/%s", param0, param1)
+}
+
+// Invite a user to project
+func (c *Client) AddStationProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewAddStationProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewAddStationProjectRequest create the request corresponding to the add station action endpoint of the project resource.
+func (c *Client) NewAddStationProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // DeleteProjectPath computes a request path to the delete action of project.
 func DeleteProjectPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)
@@ -286,6 +322,42 @@ func (c *Client) NewListCurrentProjectRequest(ctx context.Context, path string) 
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// RemoveStationProjectPath computes a request path to the remove station action of project.
+func RemoveStationProjectPath(projectID int, stationID int) string {
+	param0 := strconv.Itoa(projectID)
+	param1 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/projects/%s/stations/%s", param0, param1)
+}
+
+// RemoveStationProject makes a request to the remove station action endpoint of the project resource
+func (c *Client) RemoveStationProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRemoveStationProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRemoveStationProjectRequest create the request corresponding to the remove station action endpoint of the project resource.
+func (c *Client) NewRemoveStationProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
