@@ -198,6 +198,12 @@ export default {
                             if (d.d.date.getFullYear() > 2018) {
                                 processed.push(d.d);
                             }
+                        } else if (!d.d["ph"]) {
+                            d.d.date = new Date(d.time * 1000);
+                            // and only ones with dates after 2018
+                            if (d.d.date.getFullYear() > 2018) {
+                                processed.push(d.d);
+                            }
                         }
                     }
                 });
@@ -242,6 +248,12 @@ export default {
                         // TEMPORARY: hack to exclude "out of range" data
                         // TODO: Do this with accurate ranges (and all sensors?)
                         if (d.d["ph"] < 14) {
+                            d.d.date = new Date(d.time * 1000);
+                            // and only ones with dates after 2018
+                            if (d.d.date.getFullYear() > 2018) {
+                                processed.push(d.d);
+                            }
+                        } else if (!d.d["ph"]) {
                             d.d.date = new Date(d.time * 1000);
                             // and only ones with dates after 2018
                             if (d.d.date.getFullYear() > 2018) {
