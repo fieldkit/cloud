@@ -18,7 +18,11 @@
                     @timeChanged="onTimeChange"
                 />
                 <div id="lower-container">
-                    <NotesList :station="station" :selectedSensor="selectedSensor" />
+                    <NotesList
+                        :station="station"
+                        :selectedSensor="selectedSensor"
+                        :isAuthenticated="isAuthenticated"
+                    />
                     <SensorSummary
                         ref="sensorSummary"
                         :sensors="sensors"

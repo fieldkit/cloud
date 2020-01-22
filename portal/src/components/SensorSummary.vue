@@ -114,6 +114,7 @@ export default {
     border: 1px solid rgb(230, 230, 230);
 }
 #sensor-title {
+    font-weight: bold;
     margin: 10px 0;
 }
 .sensor-summary-block {

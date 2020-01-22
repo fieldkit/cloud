@@ -241,6 +241,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    deleteFieldNote(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "DELETE",
+            url: this.baseUrl + "/stations/" + data.stationId + "/field-notes/" + data.fieldNoteId,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStationDataSummaryByDeviceId(deviceId) {
         const token = this.token.getToken();
         return axios({
