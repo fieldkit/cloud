@@ -579,11 +579,13 @@ export default {
         updateData(data) {
             this.stationData = data;
             // allow expansion of total time range
-            if (this.stationData[0].date < this.initialRange[0]) {
-                this.initialRange[0] = this.stationData[0].date;
-            }
-            if (this.stationData[1].date > this.initialRange[1]) {
-                this.initialRange[1] = this.stationData[this.stationData.length - 1].date;
+            if (this.stationData.length > 0) {
+                if (this.stationData[0].date < this.initialRange[0]) {
+                    this.initialRange[0] = this.stationData[0].date;
+                }
+                if (this.stationData[1].date > this.initialRange[1]) {
+                    this.initialRange[1] = this.stationData[this.stationData.length - 1].date;
+                }
             }
             document.getElementById("loading").style.display = "none";
         },
