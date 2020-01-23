@@ -5041,6 +5041,7 @@ type StationController interface {
 	Get(*GetStationContext) error
 	List(*ListStationContext) error
 	ListProject(*ListProjectStationContext) error
+	Photo(*PhotoStationContext) error
 	Update(*UpdateStationContext) error
 }
 
@@ -5052,6 +5053,7 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	service.Mux.Handle("OPTIONS", "/stations/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/photo", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -5143,6 +5145,22 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/projects/:projectId/stations", ctrl.MuxHandler("list project", h, nil))
 	service.LogInfo("mount", "ctrl", "Station", "action", "ListProject", "route", "GET /projects/:projectId/stations", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewPhotoStationContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Photo(rctx)
+	}
+	h = handleStationOrigin(h)
+	service.Mux.Handle("GET", "/stations/:stationId/photo", ctrl.MuxHandler("photo", h, nil))
+	service.LogInfo("mount", "ctrl", "Station", "action", "Photo", "route", "GET /stations/:stationId/photo")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

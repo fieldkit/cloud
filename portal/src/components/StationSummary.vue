@@ -18,8 +18,9 @@
         <div class="station-container" v-if="this.station">
             <div class="left">
                 <img
+					style="width: 124px; height: 100px;"
                     alt="Station image"
-                    src="../assets/placeholder_station_thumbnail.png"
+                    :src="stationSmallPhoto"
                     class="station-element"
                 />
             </div>
@@ -77,6 +78,7 @@
 
 <script>
 import * as utils from "../utilities";
+import { API_HOST } from "../secrets";
 
 export default {
     name: "StationSummary",
@@ -86,6 +88,11 @@ export default {
         };
     },
     props: ["station", "isAuthenticated"],
+	computed: {
+		stationSmallPhoto: function() {
+			return API_HOST + this.station.photos.small;
+		}
+	},
     methods: {
         viewSummary() {
             this.viewingSummary = true;

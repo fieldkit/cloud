@@ -1669,6 +1669,7 @@ type Station struct {
 	LastUploads LastUploadCollection   `form:"last_uploads,omitempty" json:"last_uploads,omitempty" yaml:"last_uploads,omitempty" xml:"last_uploads,omitempty"`
 	Name        string                 `form:"name" json:"name" yaml:"name" xml:"name"`
 	OwnerID     int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
+	Photos      *StationPhotos         `form:"photos" json:"photos" yaml:"photos" xml:"photos"`
 	StatusJSON  map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
 }
 
@@ -1688,11 +1689,34 @@ func (mt *Station) Validate() (err error) {
 	if mt.Images == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "images"))
 	}
+	if mt.Photos == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "photos"))
+	}
 	if err2 := mt.Images.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	if err2 := mt.LastUploads.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
+	}
+	if mt.Photos != nil {
+		if err2 := mt.Photos.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// StationPhotos media type (default view)
+//
+// Identifier: application/vnd.app.station.photos+json; view=default
+type StationPhotos struct {
+	Small string `form:"small" json:"small" yaml:"small" xml:"small"`
+}
+
+// Validate validates the StationPhotos media type instance.
+func (mt *StationPhotos) Validate() (err error) {
+	if mt.Small == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "small"))
 	}
 	return
 }

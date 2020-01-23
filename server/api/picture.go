@@ -142,6 +142,48 @@ func ExpeditionDefaultPicture(id int64) ([]byte, error) {
 
 	return picture.Bytes(), nil
 }
+
+func StationDefaultPicture(id int64) ([]byte, error) {
+	r := rand.New(rand.NewSource(id))
+	x := 124
+	y := 100
+
+	img := image.NewRGBA(image.Rect(0, 0, x, y))
+	gc := draw2dimg.NewGraphicContext(img)
+
+	c := colorful.Hsv(r.Float64()*360., .8, .6)
+	cRGBA := color.RGBAModel.Convert(c).(color.RGBA)
+	gc.SetFillColor(cRGBA)
+	gc.SetStrokeColor(cRGBA)
+	gc.SetLineWidth(5)
+
+	xd8 := float64(x / 8)
+	yd8 := float64(y / 8)
+	xd16 := float64(x / 16)
+	yd16 := float64(y / 16)
+	xd4 := float64(x / 4)
+	yd4 := float64(y / 4)
+
+	for i := 0; i < 32; i++ {
+		x := math.Max(math.Min(r.NormFloat64()*xd8+float64(x/2.), float64(x)-float64(x/4)-8-2.5), 8.+float64(x/4)+2.5)
+		y := math.Max(math.Min(r.NormFloat64()*yd8+float64(y/2.), float64(y)-float64(y/4)-8-2.5), 8.+float64(y/4)+2.5)
+
+		gc.MoveTo(x+r.Float64()*xd8-xd16, y+r.Float64()*yd8-yd4)
+		gc.LineTo(x+r.Float64()*xd8+xd8, y+r.Float64()*yd8-yd16)
+		gc.LineTo(x+r.Float64()*xd8-xd16, y+r.Float64()*yd8+yd8)
+		gc.LineTo(x+r.Float64()*xd8-xd4, y+r.Float64()*yd8-yd16)
+		gc.Close()
+		gc.FillStroke()
+	}
+
+	picture := bytes.NewBuffer([]byte{})
+	if err := png.Encode(picture, img); err != nil {
+		return nil, err
+	}
+
+	return picture.Bytes(), nil
+}
+
 func (c *PictureController) UserGetID(ctx *app.UserGetIDPictureContext) error {
 	picture, err := UserDefaultPicture(int64(ctx.UserID))
 	if err != nil {

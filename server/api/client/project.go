@@ -65,7 +65,7 @@ func AddStationProjectPath(projectID int, stationID int) string {
 	return fmt.Sprintf("/projects/%s/stations/%s", param0, param1)
 }
 
-// Invite a user to project
+// Add a station to project
 func (c *Client) AddStationProject(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewAddStationProjectRequest(ctx, path)
 	if err != nil {

@@ -10,12 +10,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type FieldNoteControllerOptions struct {
-	Session *session.Session
+	Session  *session.Session
 	Database *sqlxcache.DB
 }
 
@@ -60,7 +60,7 @@ func FieldNotesType(fieldNotes []*data.FieldNoteQueryResult) *app.FieldNotes {
 }
 
 func FieldNoteMediaType(fieldNoteMedia *data.FieldNoteMedia) *app.FieldNoteMedia {
-	return &app.FieldNoteMedia {
+	return &app.FieldNoteMedia{
 		ID:          int(fieldNoteMedia.ID),
 		UserID:      int(fieldNoteMedia.UserID),
 		ContentType: fieldNoteMedia.ContentType,
@@ -99,10 +99,10 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 	}
 
 	fieldNoteMedia := &data.FieldNoteMedia{
-		Created:      time.Now(),
-		UserID:       p.UserID,
-		ContentType:  saved.MimeType,
-		URL:          saved.URL,
+		Created:     time.Now(),
+		UserID:      p.UserID,
+		ContentType: saved.MimeType,
+		URL:         saved.URL,
 	}
 
 	if err := c.options.Database.NamedGetContext(ctx, fieldNoteMedia, "INSERT INTO fieldkit.field_note_media (user_id, content_type, created, url) VALUES (:user_id, :content_type, :created, :url) RETURNING *", fieldNoteMedia); err != nil {
@@ -125,13 +125,12 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 		return err
 	}
 
-    if lm != nil {
-        SendLoadedMedia(ctx.ResponseData, lm);
-    }
+	if lm != nil {
+		SendLoadedMedia(ctx.ResponseData, lm)
+	}
 
 	return nil
 }
-
 
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	p, err := NewPermissions(ctx)
@@ -151,10 +150,10 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	}
 
 	fieldNote := &data.FieldNote{
-		StationID:   int32(ctx.StationID),
-		Created:     ctx.Payload.Created,
-		UserID:      p.UserID,
-		CategoryID:  int32(categoryId),
+		StationID:  int32(ctx.StationID),
+		Created:    ctx.Payload.Created,
+		UserID:     p.UserID,
+		CategoryID: int32(categoryId),
 	}
 
 	if ctx.Payload.Note != nil {
@@ -201,11 +200,11 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 	}
 
 	fieldNote := &data.FieldNote{
-		ID:          int32(ctx.FieldNoteID),
-		StationID:   int32(ctx.StationID),
-		Created:     ctx.Payload.Created,
-		UserID:      p.UserID,
-		CategoryID:  int32(categoryId),
+		ID:         int32(ctx.FieldNoteID),
+		StationID:  int32(ctx.StationID),
+		Created:    ctx.Payload.Created,
+		UserID:     p.UserID,
+		CategoryID: int32(categoryId),
 	}
 
 	if ctx.Payload.Note != nil {

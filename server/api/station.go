@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"image"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
+
+	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
@@ -13,10 +17,12 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
 type StationControllerOptions struct {
+	Session  *session.Session
 	Database *sqlxcache.DB
 }
 
@@ -30,7 +36,7 @@ func StationType(station *data.Station, ingestions []*data.Ingestion, note_media
 	for _, row := range note_media {
 		if row.URL != "" && strings.Contains(row.ContentType, "image") {
 			images = append(images, &app.ImageRef{
-				URL: row.URL,
+				URL: fmt.Sprintf("/stations/%d/field-note-media/%d", station.ID, row.ID),
 			})
 		}
 	}
@@ -55,6 +61,10 @@ func StationType(station *data.Station, ingestions []*data.Ingestion, note_media
 		Name:        station.Name,
 		LastUploads: lastUploads,
 		StatusJSON:  status,
+		Images:      images,
+		Photos: &app.StationPhotos{
+			Small: fmt.Sprintf("/stations/%d/photo", station.ID),
+		},
 	}, nil
 }
 
@@ -333,4 +343,51 @@ func (c *StationController) Delete(ctx *app.DeleteStationContext) error {
 	}
 
 	return ctx.OK()
+}
+
+func (c *StationController) Photo(ctx *app.PhotoStationContext) error {
+	x := uint(124)
+	y := uint(100)
+
+	defaultPhotoContentType := "image/png"
+	defaultPhoto, err := StationDefaultPicture(int64(ctx.StationID))
+	if err != nil {
+		// NOTE This, hopefully never happens because we've got no image to send back.
+		return err
+	}
+
+	allMedia := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &allMedia, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.id = $1 ORDER BY fnm.created DESC`, ctx.StationID); err != nil {
+		return LogErrorAndSendData(ctx, ctx.ResponseData, err, defaultPhotoContentType, defaultPhoto)
+	}
+
+	if len(allMedia) == 0 {
+		return SendData(ctx.ResponseData, defaultPhotoContentType, defaultPhoto)
+	}
+
+	mr := repositories.NewMediaRepository(c.options.Session)
+
+	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
+	if err != nil {
+		return LogErrorAndSendData(ctx, ctx.ResponseData, err, defaultPhotoContentType, defaultPhoto)
+	}
+
+	original, _, err := image.Decode(lm.Reader)
+	if err != nil {
+		return LogErrorAndSendData(ctx, ctx.ResponseData, err, defaultPhotoContentType, defaultPhoto)
+	}
+
+	cropped, err := SmartCrop(original, x, y)
+	if err != nil {
+		return LogErrorAndSendData(ctx, ctx.ResponseData, err, defaultPhotoContentType, defaultPhoto)
+	}
+
+	err = SendImage(ctx.ResponseData, cropped)
+	if err != nil {
+		return LogErrorAndSendData(ctx, ctx.ResponseData, err, defaultPhotoContentType, defaultPhoto)
+	}
+
+	return nil
 }

@@ -4618,6 +4618,45 @@ func (ctx *ListProjectStationContext) BadRequest() error {
 	return nil
 }
 
+// PhotoStationContext provides the station photo action context.
+type PhotoStationContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StationID int
+}
+
+// NewPhotoStationContext parses the incoming request URL and body, performs validations and creates the
+// context used by the station controller photo action.
+func NewPhotoStationContext(ctx context.Context, r *http.Request, service *goa.Service) (*PhotoStationContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := PhotoStationContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *PhotoStationContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "image/jpeg")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
 // UpdateStationContext provides the station update action context.
 type UpdateStationContext struct {
 	context.Context

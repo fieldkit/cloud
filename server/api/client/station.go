@@ -196,6 +196,36 @@ func (c *Client) NewListProjectStationRequest(ctx context.Context, path string) 
 	return req, nil
 }
 
+// PhotoStationPath computes a request path to the photo action of station.
+func PhotoStationPath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/stations/%s/photo", param0)
+}
+
+// PhotoStation makes a request to the photo action endpoint of the station resource
+func (c *Client) PhotoStation(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewPhotoStationRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewPhotoStationRequest create the request corresponding to the photo action endpoint of the station resource.
+func (c *Client) NewPhotoStationRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // UpdateStationPath computes a request path to the update action of station.
 func UpdateStationPath(stationID int) string {
 	param0 := strconv.Itoa(stationID)

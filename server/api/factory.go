@@ -88,7 +88,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	c3 := NewProjectController(service, ProjectControllerOptions{
 		Session:  awsSession,
 		Database: database,
-		Emailer: emailer,
+		Emailer:  emailer,
 	})
 	app.MountProjectController(service, c3)
 
@@ -191,6 +191,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "station" controller
 	c18 := NewStationController(service, StationControllerOptions{
+		Session:  awsSession,
 		Database: database,
 	})
 	app.MountStationController(service, c18)
@@ -203,7 +204,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "field_note" controller
 	c20 := NewFieldNoteController(service, FieldNoteControllerOptions{
-		Session: awsSession,
+		Session:  awsSession,
 		Database: database,
 	})
 	app.MountFieldNoteController(service, c20)
