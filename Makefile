@@ -147,7 +147,7 @@ distribution:
 	cp -ar ~/.fk/tools $(BUILD)/distribution/windows
 
 migrate-up:
-	migrate -path migrations -database postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable up
+	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" up
 
 migrate-down:
-	migrate -path migrations -database postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable down
+	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
