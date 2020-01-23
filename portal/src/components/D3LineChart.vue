@@ -280,7 +280,8 @@ export default {
             // update dots
             let dots = this.line.selectAll(".dot").data(
                 this.filteredData.filter(d => {
-                    return !d.blankPoint;
+                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    // return !d.blankPoint;
                 })
             );
 
