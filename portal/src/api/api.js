@@ -110,6 +110,42 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getStationsByProject(projectId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/" + projectId + "/stations",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    addStationToProject(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
+    removeStationFromProject(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "DELETE",
+            url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     removeUserFromProject(data) {
         const token = this.token.getToken();
         return axios({

@@ -40,12 +40,35 @@
                             v-if="viewingStations"
                         />
                     </div>
-                    <div class="section-heading">FieldKit Stations ({{ this.stations.length }})</div>
+                    <div class="section-heading" v-if="projectStations.length != 0">
+                        FieldKit Stations ({{ this.projectStations.length }})
+                    </div>
+                    <div class="section-heading" v-else>FieldKit Stations</div>
                 </div>
                 <div class="section-content" v-if="viewingStations">
+                    <div class="station-dropdown">
+                        Add a station:
+                        <select v-model="stationOption" v-on:change="stationSelected">
+                            <option
+                                v-for="station in userStations"
+                                v-bind:value="station.id"
+                                v-bind:key="station.id"
+                            >
+                                {{ station.name }}
+                            </option>
+                        </select>
+                    </div>
                     <div class="stations-container">
-                        <div v-for="station in stations" v-bind:key="station.id">
+                        <div v-for="station in projectStations" v-bind:key="station.id">
                             <div class="station-cell">
+                                <div class="delete-link">
+                                    <img
+                                        alt="Info"
+                                        src="../assets/Delete.png"
+                                        :data-id="station.id"
+                                        v-on:click="deleteStation"
+                                    />
+                                </div>
                                 <span class="station-name">{{ station.name }}</span> <br />
                                 Last seen {{ getUpdatedDate(station) }}
                             </div>
@@ -149,6 +172,7 @@
 </template>
 
 <script>
+import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 
 export default {
@@ -156,6 +180,7 @@ export default {
     data: () => {
         return {
             baseUrl: API_HOST,
+            projectStations: [],
             viewingSummary: false,
             viewingStations: false,
             viewingActivity: false,
@@ -165,10 +190,11 @@ export default {
             projectUsers: [],
             inviteEmail: "",
             noEmail: false,
-            emailNotValid: false
+            emailNotValid: false,
+            stationOption: ""
         };
     },
-    props: ["project", "stations", "users"],
+    props: ["project", "userStations", "users"],
     watch: {
         project() {
             if (this.project) {
@@ -191,6 +217,9 @@ export default {
             this.viewingSummary = true;
         },
         reset() {
+            this.stationOption = "";
+            this.projectStations = [];
+            this.fetchStations();
             this.updateDisplayDates();
             this.viewingStations = false;
             this.viewingActivity = false;
@@ -208,6 +237,35 @@ export default {
         },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
+        },
+        fetchStations() {
+            const api = new FKApi();
+            api.getStationsByProject(this.project.id).then(result => {
+                this.projectStations = result.stations;
+            });
+        },
+        stationSelected() {
+            const api = new FKApi();
+            const params = {
+                projectId: this.project.id,
+                stationId: this.stationOption
+            };
+            api.addStationToProject(params).then(() => {
+                this.fetchStations();
+            });
+        },
+        deleteStation(event) {
+            const stationId = event.target.getAttribute("data-id");
+            if (window.confirm("Are you sure you want to remove this station?")) {
+                const api = new FKApi();
+                const params = {
+                    projectId: this.project.id,
+                    stationId: stationId
+                };
+                api.removeStationFromProject(params).then(() => {
+                    this.fetchStations();
+                });
+            }
         },
         checkEmail() {
             this.noEmail = false;
@@ -351,7 +409,7 @@ export default {
     clear: both;
     float: left;
     padding-bottom: 20px;
-    margin: 20px 0 10px 40px;
+    margin: 20px 0 10px 20px;
 }
 .section-heading {
     font-size: 20px;
@@ -376,6 +434,17 @@ export default {
     max-width: 275px;
     max-height: 135px;
 }
+.station-dropdown {
+    float: left;
+    clear: both;
+    margin-bottom: 20px;
+}
+.station-dropdown select {
+    font-size: 16px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
 .stations-container {
     display: grid;
     width: 720px;
@@ -390,6 +459,13 @@ export default {
 }
 .station-name {
     font-weight: bold;
+}
+.delete-link {
+    float: right;
+    /*opacity: 0;*/
+}
+.delete-link:hover {
+    opacity: 1;
 }
 .user-row {
     display: grid;

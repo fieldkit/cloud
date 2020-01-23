@@ -50,7 +50,7 @@
                 <!-- display one project -->
                 <ProjectSummary
                     :project="activeProject"
-                    :stations="stations"
+                    :userStations="stations"
                     :users="users"
                     ref="projectSummary"
                     @inviteUser="sendInvite"
