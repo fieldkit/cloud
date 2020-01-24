@@ -94,11 +94,6 @@ func (c *Client) NewCheckFirmwareRequest(ctx context.Context, path string, fkCom
 
 		header.Set("If-None-Match", *ifNoneMatch)
 	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
 	return req, nil
 }
 
@@ -163,11 +158,6 @@ func (c *Client) NewDownloadFirmwareRequest(ctx context.Context, path string) (*
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }
@@ -248,11 +238,6 @@ func (c *Client) NewListDeviceFirmwareRequest(ctx context.Context, path string) 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }

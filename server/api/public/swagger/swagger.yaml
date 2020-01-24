@@ -1964,14 +1964,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+          Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+          Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1993,7 +1993,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+        Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -2001,7 +2001,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+          Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -2021,14 +2021,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+        Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+        Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2074,7 +2074,6 @@ definitions:
     description: ImageRefCollection is the media type for an array of ImageRef (default
       view)
     example:
-    - url: Occaecati est consequatur dolorum voluptas omnis.
     - url: Occaecati est consequatur dolorum voluptas omnis.
     items:
       $ref: '#/definitions/ImageRef'
@@ -2288,7 +2287,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+            Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2324,7 +2323,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+              Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2365,7 +2364,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+        Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2376,7 +2375,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+          Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2407,7 +2406,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+          Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2442,7 +2441,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
+            Repudiandae dignissimos.: a395f5b4-53f1-416c-a2e7-29829c5cfa21
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2515,6 +2514,16 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
+    - blocks:
+      - 1.566805123913401e+18
+      - 1.566805123913401e+18
+      - 1.566805123913401e+18
+      id: 6.474398459750394e+18
+      size: 1.9460409358880453e+18
+      time: "1986-03-10T00:22:10Z"
+      type: Soluta aut consequuntur.
+      upload_id: Tempore facere tempora ut eveniet alias fuga.
+      url: Alias voluptates repellendus aut.
     - blocks:
       - 1.566805123913401e+18
       - 1.566805123913401e+18
@@ -2637,14 +2646,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+              Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+              Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2811,14 +2820,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+            Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
+            Quas deserunt a.: 1b7f8c77-ec61-4df8-aad8-b10fb64271a4
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -4474,11 +4483,7 @@ paths:
       - files
   /devices/{deviceId}/{module}/firmware:
     get:
-      description: |-
-        Return firmware for a device
-
-        Required security scopes:
-          * `api:admin`
+      description: Return firmware for a device
       operationId: Firmware#check
       parameters:
       - in: path
@@ -4511,9 +4516,6 @@ paths:
           description: Not Found
       schemes:
       - https
-      security:
-      - jwt:
-        - api:admin
       summary: check Firmware
       tags:
       - Firmware
@@ -4596,11 +4598,7 @@ paths:
       - files
   /devices/{deviceId}/firmware:
     get:
-      description: |-
-        List device firmware
-
-        Required security scopes:
-          * `api:admin`
+      description: List device firmware
       operationId: Firmware#list device
       parameters:
       - in: path
@@ -4616,9 +4614,6 @@ paths:
             $ref: '#/definitions/Firmwares'
       schemes:
       - https
-      security:
-      - jwt:
-        - api:admin
       summary: list device Firmware
       tags:
       - Firmware
@@ -5292,9 +5287,6 @@ paths:
       - Firmware
   /firmware/{firmwareId}/download:
     get:
-      description: |-
-        Required security scopes:
-          * `api:admin`
       operationId: Firmware#download
       parameters:
       - in: path
@@ -5313,9 +5305,6 @@ paths:
           description: Not Found
       schemes:
       - https
-      security:
-      - jwt:
-        - api:admin
       summary: download Firmware
       tags:
       - Firmware

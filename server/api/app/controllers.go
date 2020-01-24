@@ -247,10 +247,9 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Check(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("check", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -281,10 +280,9 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Download(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware/:firmwareId/download", ctrl.MuxHandler("download", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -315,10 +313,9 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.ListDevice(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/firmware", ctrl.MuxHandler("list device", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "ListDevice", "route", "GET /devices/:deviceId/firmware", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "ListDevice", "route", "GET /devices/:deviceId/firmware")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
