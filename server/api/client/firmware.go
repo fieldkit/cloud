@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // AddFirmwarePath computes a request path to the add action of Firmware.
@@ -91,6 +92,36 @@ func (c *Client) NewCheckFirmwareRequest(ctx context.Context, path string, fkCom
 	return req, nil
 }
 
+// DownloadFirmwarePath computes a request path to the download action of Firmware.
+func DownloadFirmwarePath(firmwareID int) string {
+	param0 := strconv.Itoa(firmwareID)
+
+	return fmt.Sprintf("/firmware/%s/download", param0)
+}
+
+// DownloadFirmware makes a request to the download action endpoint of the Firmware resource
+func (c *Client) DownloadFirmware(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDownloadFirmwareRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDownloadFirmwareRequest create the request corresponding to the download action endpoint of the Firmware resource.
+func (c *Client) NewDownloadFirmwareRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ListFirmwarePath computes a request path to the list action of Firmware.
 func ListFirmwarePath() string {
 
@@ -98,8 +129,8 @@ func ListFirmwarePath() string {
 }
 
 // List firmware
-func (c *Client) ListFirmware(ctx context.Context, path string, module *string, profile *string) (*http.Response, error) {
-	req, err := c.NewListFirmwareRequest(ctx, path, module, profile)
+func (c *Client) ListFirmware(ctx context.Context, path string, module *string, page *int, pageSize *int, profile *string) (*http.Response, error) {
+	req, err := c.NewListFirmwareRequest(ctx, path, module, page, pageSize, profile)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +138,7 @@ func (c *Client) ListFirmware(ctx context.Context, path string, module *string, 
 }
 
 // NewListFirmwareRequest create the request corresponding to the list action endpoint of the Firmware resource.
-func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module *string, profile *string) (*http.Request, error) {
+func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module *string, page *int, pageSize *int, profile *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
@@ -116,6 +147,14 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 	values := u.Query()
 	if module != nil {
 		values.Set("module", *module)
+	}
+	if page != nil {
+		tmp255 := strconv.Itoa(*page)
+		values.Set("page", tmp255)
+	}
+	if pageSize != nil {
+		tmp256 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp256)
 	}
 	if profile != nil {
 		values.Set("profile", *profile)

@@ -64,6 +64,21 @@ var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
 })
 
 var _ = Resource("Firmware", func() {
+	Action("download", func() {
+		Routing(GET("firmware/:firmwareId/download"))
+		Params(func() {
+			Param("firmwareId", Integer)
+			Required("firmwareId")
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
+			Headers(func() {
+				Header("ETag")
+			})
+		})
+	})
+
 	Action("check", func() {
 		Routing(GET("devices/:deviceId/:module/firmware"))
 		Description("Return firmware for a device")
@@ -122,6 +137,8 @@ var _ = Resource("Firmware", func() {
 		Params(func() {
 			Param("module", String)
 			Param("profile", String)
+			Param("pageSize", Integer)
+			Param("page", Integer)
 		})
 		Response(OK, func() {
 			Media(Firmwares)

@@ -12,12 +12,13 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type FirmwareControllerOptions struct {
@@ -56,6 +57,83 @@ func isOutgoingFirmwareOlderThanIncoming(compiled string, fw *data.DeviceFirmwar
 	}
 	incoming := time.Unix(int64(unix), 0)
 	return incoming.After(fw.Time)
+}
+
+func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
+	return &app.FirmwareSummary{
+		ID:      int(fw.ID),
+		Time:    fw.Time,
+		Module:  fw.Module,
+		Profile: fw.Profile,
+		Etag:    fw.ETag,
+		URL:     fw.URL,
+	}
+}
+
+func FirmwareSummariesType(firmwares []*data.Firmware) []*app.FirmwareSummary {
+	summaries := make([]*app.FirmwareSummary, len(firmwares))
+	for i, summary := range firmwares {
+		summaries[i] = FirmwareSummaryType(summary)
+	}
+	return summaries
+}
+
+func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
+	return &app.Firmwares{
+		Firmwares: FirmwareSummariesType(firmwares),
+	}
+}
+
+func (c *FirmwareController) Download(ctx *app.DownloadFirmwareContext) error {
+	log := Logger(ctx).Sugar()
+
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, `SELECT * FROM fieldkit.firmware WHERE id = $1`, ctx.FirmwareID); err != nil {
+		return err
+	}
+
+	if len(firmwares) == 0 {
+		log.Errorw("firmware missing", "firmware_id", ctx.FirmwareID)
+		return ctx.NotFound()
+	}
+
+	fw := firmwares[0]
+
+	bucketAndKey, err := backend.GetBucketAndKey(fw.URL)
+	if err != nil {
+		return err
+	}
+
+	goi := &s3.GetObjectInput{
+		Bucket: aws.String(bucketAndKey.Bucket),
+		Key:    aws.String(bucketAndKey.Key),
+	}
+
+	svc := s3.New(c.options.Session)
+
+	obj, err := svc.GetObject(goi)
+	if err != nil {
+		return fmt.Errorf("error reading object %v: %v", bucketAndKey.Key, err)
+	}
+
+	contentLength := 0
+
+	if obj.ContentLength != nil {
+		contentLength = int(*obj.ContentLength)
+	}
+
+	ctx.ResponseData.Header().Set("ETag", fmt.Sprintf("\"%s\"", fw.ETag))
+	ctx.ResponseData.Header().Set("Content-Length", fmt.Sprintf("%d", contentLength))
+	ctx.ResponseData.WriteHeader(http.StatusOK)
+
+	n, err := io.Copy(ctx.ResponseData, obj.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("firmware sent", "bytes", n)
+
+	return nil
 }
 
 func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
@@ -187,47 +265,38 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 	return ctx.OK([]byte("OK"))
 }
 
-func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
-	return &app.FirmwareSummary{
-		ID:      int(fw.ID),
-		Time:    fw.Time,
-		Module:  fw.Module,
-		Profile: fw.Profile,
-		Etag:    fw.ETag,
-		URL:     fw.URL,
-	}
-}
-
-func FirmwareSummariesType(firmwares []*data.Firmware) []*app.FirmwareSummary {
-	summaries := make([]*app.FirmwareSummary, len(firmwares))
-	for i, summary := range firmwares {
-		summaries[i] = FirmwareSummaryType(summary)
-	}
-	return summaries
-}
-
-func FirmwaresType(firmwares []*data.Firmware) *app.Firmwares {
-	return &app.Firmwares{
-		Firmwares: FirmwareSummariesType(firmwares),
-	}
-}
-
 func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	firmwares := []*data.Firmware{}
 
+	page := 0
+	if ctx.Page != nil {
+		page = *ctx.Page
+	}
+
+	pageSize := 10
+	if ctx.PageSize != nil {
+		pageSize = *ctx.PageSize
+	}
+
 	if err := c.options.Database.SelectContext(ctx, &firmwares,
-		`SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC LIMIT 100`, ctx.Module, ctx.Profile); err != nil {
+		`SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.Module, ctx.Profile, pageSize, page*pageSize); err != nil {
 		return err
 	}
 
 	svc := s3.New(c.options.Session)
 
-	for _, f := range firmwares {
-		signed, err := backend.SignS3URL(svc, f.URL)
-		if err != nil {
-			return err
+	if false {
+		for _, f := range firmwares {
+			signed, err := backend.SignS3URL(svc, f.URL)
+			if err != nil {
+				return err
+			}
+			f.URL = signed
 		}
-		f.URL = signed
+	} else {
+		for _, f := range firmwares {
+			f.URL = fmt.Sprintf("/firmware/%d/download", f.ID)
+		}
 	}
 
 	return ctx.OK(FirmwaresType(firmwares))

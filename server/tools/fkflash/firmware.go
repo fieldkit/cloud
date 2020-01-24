@@ -229,7 +229,7 @@ func (fm *FirmwareManager) ListRemote(ctx context.Context) (fc *FirmwareCollecti
 		return nil, err
 	}
 
-	res, err := c.ListFirmware(ctx, fk.ListFirmwarePath(), nil, nil)
+	res, err := c.ListFirmware(ctx, fk.ListFirmwarePath(), nil, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}

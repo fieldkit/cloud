@@ -163,13 +163,60 @@ func (ctx *CheckFirmwareContext) NotFound() error {
 	return nil
 }
 
+// DownloadFirmwareContext provides the Firmware download action context.
+type DownloadFirmwareContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	FirmwareID int
+}
+
+// NewDownloadFirmwareContext parses the incoming request URL and body, performs validations and creates the
+// context used by the Firmware controller download action.
+func NewDownloadFirmwareContext(ctx context.Context, r *http.Request, service *goa.Service) (*DownloadFirmwareContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DownloadFirmwareContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramFirmwareID := req.Params["firmwareId"]
+	if len(paramFirmwareID) > 0 {
+		rawFirmwareID := paramFirmwareID[0]
+		if firmwareID, err2 := strconv.Atoi(rawFirmwareID); err2 == nil {
+			rctx.FirmwareID = firmwareID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("firmwareId", rawFirmwareID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DownloadFirmwareContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DownloadFirmwareContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // ListFirmwareContext provides the Firmware list action context.
 type ListFirmwareContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Module  *string
-	Profile *string
+	Module   *string
+	Page     *int
+	PageSize *int
+	Profile  *string
 }
 
 // NewListFirmwareContext parses the incoming request URL and body, performs validations and creates the
@@ -185,6 +232,28 @@ func NewListFirmwareContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramModule) > 0 {
 		rawModule := paramModule[0]
 		rctx.Module = &rawModule
+	}
+	paramPage := req.Params["page"]
+	if len(paramPage) > 0 {
+		rawPage := paramPage[0]
+		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
+			tmp4 := page
+			tmp3 := &tmp4
+			rctx.Page = tmp3
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
+		}
+	}
+	paramPageSize := req.Params["pageSize"]
+	if len(paramPageSize) > 0 {
+		rawPageSize := paramPageSize[0]
+		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
+			tmp6 := pageSize
+			tmp5 := &tmp6
+			rctx.PageSize = tmp5
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
+		}
 	}
 	paramProfile := req.Params["profile"]
 	if len(paramProfile) > 0 {
@@ -375,8 +444,8 @@ func NewListBySourceGeoJSONContext(ctx context.Context, r *http.Request, service
 	if len(paramDescending) > 0 {
 		rawDescending := paramDescending[0]
 		if descending, err2 := strconv.ParseBool(rawDescending); err2 == nil {
-			tmp3 := &descending
-			rctx.Descending = tmp3
+			tmp8 := &descending
+			rctx.Descending = tmp8
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("descending", rawDescending, "boolean"))
 		}
@@ -925,9 +994,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramFirstBlock) > 0 {
 		rawFirstBlock := paramFirstBlock[0]
 		if firstBlock, err2 := strconv.Atoi(rawFirstBlock); err2 == nil {
-			tmp14 := firstBlock
-			tmp13 := &tmp14
-			rctx.FirstBlock = tmp13
+			tmp19 := firstBlock
+			tmp18 := &tmp19
+			rctx.FirstBlock = tmp18
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("firstBlock", rawFirstBlock, "integer"))
 		}
@@ -936,9 +1005,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramLastBlock) > 0 {
 		rawLastBlock := paramLastBlock[0]
 		if lastBlock, err2 := strconv.Atoi(rawLastBlock); err2 == nil {
-			tmp16 := lastBlock
-			tmp15 := &tmp16
-			rctx.LastBlock = tmp15
+			tmp21 := lastBlock
+			tmp20 := &tmp21
+			rctx.LastBlock = tmp20
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lastBlock", rawLastBlock, "integer"))
 		}
@@ -947,9 +1016,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp18 := page
-			tmp17 := &tmp18
-			rctx.Page = tmp17
+			tmp23 := page
+			tmp22 := &tmp23
+			rctx.Page = tmp22
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -958,9 +1027,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp20 := pageSize
-			tmp19 := &tmp20
-			rctx.PageSize = tmp19
+			tmp25 := pageSize
+			tmp24 := &tmp25
+			rctx.PageSize = tmp24
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2275,9 +2344,9 @@ func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Reques
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp42 := page
-			tmp41 := &tmp42
-			rctx.Page = tmp41
+			tmp47 := page
+			tmp46 := &tmp47
+			rctx.Page = tmp46
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2320,9 +2389,9 @@ func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp44 := page
-			tmp43 := &tmp44
-			rctx.Page = tmp43
+			tmp49 := page
+			tmp48 := &tmp49
+			rctx.Page = tmp48
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2365,9 +2434,9 @@ func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, ser
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp46 := page
-			tmp45 := &tmp46
-			rctx.Page = tmp45
+			tmp51 := page
+			tmp50 := &tmp51
+			rctx.Page = tmp50
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2573,9 +2642,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp49 := end
-			tmp48 := &tmp49
-			rctx.End = tmp48
+			tmp54 := end
+			tmp53 := &tmp54
+			rctx.End = tmp53
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -2584,8 +2653,8 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp50 := &internal
-			rctx.Internal = tmp50
+			tmp55 := &internal
+			rctx.Internal = tmp55
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -2594,9 +2663,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp52 := page
-			tmp51 := &tmp52
-			rctx.Page = tmp51
+			tmp57 := page
+			tmp56 := &tmp57
+			rctx.Page = tmp56
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2605,9 +2674,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp54 := pageSize
-			tmp53 := &tmp54
-			rctx.PageSize = tmp53
+			tmp59 := pageSize
+			tmp58 := &tmp59
+			rctx.PageSize = tmp58
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2616,9 +2685,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp56 := start
-			tmp55 := &tmp56
-			rctx.Start = tmp55
+			tmp61 := start
+			tmp60 := &tmp61
+			rctx.Start = tmp60
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}
@@ -2671,9 +2740,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp58 := end
-			tmp57 := &tmp58
-			rctx.End = tmp57
+			tmp63 := end
+			tmp62 := &tmp63
+			rctx.End = tmp62
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -2682,8 +2751,8 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp59 := &internal
-			rctx.Internal = tmp59
+			tmp64 := &internal
+			rctx.Internal = tmp64
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -2692,9 +2761,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp61 := page
-			tmp60 := &tmp61
-			rctx.Page = tmp60
+			tmp66 := page
+			tmp65 := &tmp66
+			rctx.Page = tmp65
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2703,9 +2772,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp63 := pageSize
-			tmp62 := &tmp63
-			rctx.PageSize = tmp62
+			tmp68 := pageSize
+			tmp67 := &tmp68
+			rctx.PageSize = tmp67
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2714,9 +2783,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp65 := start
-			tmp64 := &tmp65
-			rctx.Start = tmp64
+			tmp70 := start
+			tmp69 := &tmp70
+			rctx.Start = tmp69
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}

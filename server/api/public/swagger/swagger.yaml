@@ -387,12 +387,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -1970,14 +1964,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1999,7 +1993,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -2007,7 +2001,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -2027,7 +2021,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+      type: Illo fugiat modi quis.
+    - geometry:
+        coordinates:
+        - 0.3406955390547533
+        type: Dolor hic voluptatibus autem velit magni.
+      properties:
+        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2286,7 +2287,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+            Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2322,7 +2323,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+              Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2363,7 +2364,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+        Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2374,7 +2375,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+          Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2405,7 +2406,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+          Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2440,7 +2441,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 658dd9fd-6505-4a67-8ecc-127ab2862e2e
+            Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2645,14 +2646,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+              Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+              Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2819,14 +2820,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+            Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 6ebd3173-b25b-4720-becb-63820f0daf05
+            Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -5191,6 +5192,14 @@ paths:
         required: false
         type: string
       - in: query
+        name: page
+        required: false
+        type: integer
+      - in: query
+        name: pageSize
+        required: false
+        type: integer
+      - in: query
         name: profile
         required: false
         type: string
@@ -5225,6 +5234,29 @@ paths:
       schemes:
       - https
       summary: add Firmware
+      tags:
+      - Firmware
+  /firmware/{firmwareId}/download:
+    get:
+      operationId: Firmware#download
+      parameters:
+      - in: path
+        name: firmwareId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          headers:
+            ETag:
+              type: string
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: download Firmware
       tags:
       - Firmware
   /login:

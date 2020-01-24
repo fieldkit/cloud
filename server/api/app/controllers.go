@@ -194,6 +194,7 @@ type FirmwareController interface {
 	goa.Muxer
 	Add(*AddFirmwareContext) error
 	Check(*CheckFirmwareContext) error
+	Download(*DownloadFirmwareContext) error
 	List(*ListFirmwareContext) error
 	ListDevice(*ListDeviceFirmwareContext) error
 	Update(*UpdateFirmwareContext) error
@@ -205,6 +206,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/firmware/:firmwareId/download", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 
@@ -245,6 +247,22 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("check", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDownloadFirmwareContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Download(rctx)
+	}
+	h = handleFirmwareOrigin(h)
+	service.Mux.Handle("GET", "/firmware/:firmwareId/download", ctrl.MuxHandler("download", h, nil))
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
