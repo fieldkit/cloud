@@ -26,7 +26,7 @@ import (
 type options struct {
 	Scheme   string
 	Host     string
-	Username string
+	Email    string
 	Password string
 
 	Project    string
@@ -141,7 +141,7 @@ func uploadAllFirmware(ctx context.Context, c *fk.Client, moduleOverride, direct
 func createAwsSession() (s *session.Session, err error) {
 	configs := []aws.Config{
 		aws.Config{
-			Region: aws.String("us-east-1"),
+			Region:                        aws.String("us-east-1"),
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 		aws.Config{
@@ -238,7 +238,7 @@ func main() {
 
 	flag.StringVar(&o.Scheme, "scheme", "http", "fk instance scheme")
 	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "fk instance hostname")
-	flag.StringVar(&o.Username, "username", "demo-user", "username")
+	flag.StringVar(&o.Email, "email", "info@conservify.org", "email")
 	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password")
 
 	flag.StringVar(&o.Project, "project", "www", "project")
@@ -261,12 +261,12 @@ func main() {
 
 	flag.Parse()
 
-	c, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
+	c, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Email, o.Password)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	log.Printf("Authenticated as %s (%s)", o.Username, o.Host)
+	log.Printf("Authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
 		err := uploadFirmware(ctx, c, o.Module, o.FirmwareFile)
