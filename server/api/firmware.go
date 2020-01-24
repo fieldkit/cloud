@@ -315,3 +315,48 @@ func (c *FirmwareController) ListDevice(ctx *app.ListDeviceFirmwareContext) erro
 
 	return ctx.OK(FirmwaresType(firmwares))
 }
+
+func (c *FirmwareController) Delete(ctx *app.DeleteFirmwareContext) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("deleting", "firmware_id", ctx.FirmwareID)
+
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, `SELECT * FROM fieldkit.firmware WHERE id = $1`, ctx.FirmwareID); err != nil {
+		return err
+	}
+
+	if len(firmwares) == 0 {
+		return ctx.NotFound()
+	}
+
+	svc := s3.New(c.options.Session)
+
+	for _, fw := range firmwares {
+		object, err := backend.GetBucketAndKey(fw.URL)
+		if err != nil {
+			return fmt.Errorf("error parsing URL: %v", err)
+		}
+
+		log.Infow("deleting", "url", fw.URL)
+
+		_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(object.Bucket), Key: aws.String(object.Key)})
+		if err != nil {
+			return fmt.Errorf("unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
+		}
+
+		err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+			Bucket: aws.String(object.Bucket),
+			Key:    aws.String(object.Key),
+		})
+		if err != nil {
+			return err
+		}
+
+		if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.firmware WHERE id = $1`, ctx.FirmwareID); err != nil {
+			return err
+		}
+	}
+
+	return ctx.OK([]byte("{}"))
+}

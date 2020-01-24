@@ -64,6 +64,10 @@ var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
 })
 
 var _ = Resource("Firmware", func() {
+	Security(JWT, func() {
+		Scope("api:access")
+	})
+
 	Action("download", func() {
 		Routing(GET("firmware/:firmwareId/download"))
 		Params(func() {
@@ -142,6 +146,19 @@ var _ = Resource("Firmware", func() {
 		})
 		Response(OK, func() {
 			Media(Firmwares)
+		})
+	})
+
+	Action("delete", func() {
+		Routing(DELETE("firmware/:firmwareId"))
+		Description("Delete firmware")
+		Params(func() {
+			Param("firmwareId", Integer)
+			Required("firmwareId")
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Status(200)
 		})
 	})
 })

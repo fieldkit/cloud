@@ -1964,14 +1964,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1993,7 +1993,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -2001,7 +2001,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -2021,14 +2021,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2287,7 +2287,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+            Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2323,7 +2323,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+              Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2364,7 +2364,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+        Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2375,7 +2375,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+          Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2406,7 +2406,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+          Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2441,7 +2441,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 939b35aa-d046-4fa8-91f0-0a8b019714de
+            Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2646,14 +2646,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+              Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+              Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2820,14 +2820,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+            Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: aa540436-e336-48d8-a38d-f69ca909456c
+            Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -4483,7 +4483,11 @@ paths:
       - files
   /devices/{deviceId}/{module}/firmware:
     get:
-      description: Return firmware for a device
+      description: |-
+        Return firmware for a device
+
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#check
       parameters:
       - in: path
@@ -4516,6 +4520,9 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: check Firmware
       tags:
       - Firmware
@@ -4598,7 +4605,11 @@ paths:
       - files
   /devices/{deviceId}/firmware:
     get:
-      description: List device firmware
+      description: |-
+        List device firmware
+
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#list device
       parameters:
       - in: path
@@ -4614,6 +4625,9 @@ paths:
             $ref: '#/definitions/Firmwares'
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: list device Firmware
       tags:
       - Firmware
@@ -4671,7 +4685,11 @@ paths:
       - device_logs
   /devices/firmware:
     patch:
-      description: Update an Device firmware
+      description: |-
+        Update an Device firmware
+
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#update
       parameters:
       - in: body
@@ -4690,6 +4708,9 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: update Firmware
       tags:
       - Firmware
@@ -5184,7 +5205,11 @@ paths:
       - files
   /firmware:
     get:
-      description: List firmware
+      description: |-
+        List firmware
+
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#list
       parameters:
       - in: query
@@ -5212,11 +5237,18 @@ paths:
             $ref: '#/definitions/Firmwares'
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: list Firmware
       tags:
       - Firmware
     patch:
-      description: Add firmware
+      description: |-
+        Add firmware
+
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#add
       parameters:
       - in: body
@@ -5233,11 +5265,45 @@ paths:
           description: Bad Request
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: add Firmware
+      tags:
+      - Firmware
+  /firmware/{firmwareId}:
+    delete:
+      description: |-
+        Delete firmware
+
+        Required security scopes:
+          * `api:access`
+      operationId: Firmware#delete
+      parameters:
+      - in: path
+        name: firmwareId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete Firmware
       tags:
       - Firmware
   /firmware/{firmwareId}/download:
     get:
+      description: |-
+        Required security scopes:
+          * `api:access`
       operationId: Firmware#download
       parameters:
       - in: path
@@ -5256,6 +5322,9 @@ paths:
           description: Not Found
       schemes:
       - https
+      security:
+      - jwt:
+        - api:access
       summary: download Firmware
       tags:
       - Firmware

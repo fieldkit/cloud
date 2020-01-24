@@ -158,6 +158,9 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 		Bucket: aws.String(object.Bucket),
 		Key:    aws.String(object.Key),
 	})
+	if err != nil {
+		return err
+	}
 
 	if err := ir.Delete(ctx, int64(ctx.IngestionID)); err != nil {
 		return err

@@ -194,6 +194,7 @@ type FirmwareController interface {
 	goa.Muxer
 	Add(*AddFirmwareContext) error
 	Check(*CheckFirmwareContext) error
+	Delete(*DeleteFirmwareContext) error
 	Download(*DownloadFirmwareContext) error
 	List(*ListFirmwareContext) error
 	ListDevice(*ListDeviceFirmwareContext) error
@@ -206,6 +207,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/firmware/:firmwareId", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/firmware/:firmwareId/download", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/:deviceId/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/devices/firmware", ctrl.MuxHandler("preflight", handleFirmwareOrigin(cors.HandlePreflight()), nil))
@@ -228,9 +230,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Add(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("PATCH", "/firmware", ctrl.MuxHandler("add", h, unmarshalAddFirmwarePayload))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Add", "route", "PATCH /firmware")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Add", "route", "PATCH /firmware", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -244,9 +247,27 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Check(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("check", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewDeleteFirmwareContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Delete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFirmwareOrigin(h)
+	service.Mux.Handle("DELETE", "/firmware/:firmwareId", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Delete", "route", "DELETE /firmware/:firmwareId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -260,9 +281,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Download(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware/:firmwareId/download", ctrl.MuxHandler("download", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -276,9 +298,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.List(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -292,9 +315,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.ListDevice(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/firmware", ctrl.MuxHandler("list device", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "ListDevice", "route", "GET /devices/:deviceId/firmware")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "ListDevice", "route", "GET /devices/:deviceId/firmware", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -314,9 +338,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Update(rctx)
 	}
+	h = handleSecurity("jwt", h, "api:access")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("PATCH", "/devices/firmware", ctrl.MuxHandler("update", h, unmarshalUpdateFirmwarePayload))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "Update", "route", "PATCH /devices/firmware")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "Update", "route", "PATCH /devices/firmware", "security", "jwt")
 }
 
 // handleFirmwareOrigin applies the CORS response headers corresponding to the origin.

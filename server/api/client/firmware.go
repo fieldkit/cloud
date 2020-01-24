@@ -49,6 +49,11 @@ func (c *Client) NewAddFirmwareRequest(ctx context.Context, path string, payload
 	}
 	header := req.Header
 	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -89,6 +94,46 @@ func (c *Client) NewCheckFirmwareRequest(ctx context.Context, path string, fkCom
 
 		header.Set("If-None-Match", *ifNoneMatch)
 	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// DeleteFirmwarePath computes a request path to the delete action of Firmware.
+func DeleteFirmwarePath(firmwareID int) string {
+	param0 := strconv.Itoa(firmwareID)
+
+	return fmt.Sprintf("/firmware/%s", param0)
+}
+
+// Delete firmware
+func (c *Client) DeleteFirmware(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewDeleteFirmwareRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewDeleteFirmwareRequest create the request corresponding to the delete action endpoint of the Firmware resource.
+func (c *Client) NewDeleteFirmwareRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
 
@@ -118,6 +163,11 @@ func (c *Client) NewDownloadFirmwareRequest(ctx context.Context, path string) (*
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }
@@ -149,12 +199,12 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 		values.Set("module", *module)
 	}
 	if page != nil {
-		tmp255 := strconv.Itoa(*page)
-		values.Set("page", tmp255)
+		tmp257 := strconv.Itoa(*page)
+		values.Set("page", tmp257)
 	}
 	if pageSize != nil {
-		tmp256 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp256)
+		tmp258 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp258)
 	}
 	if profile != nil {
 		values.Set("profile", *profile)
@@ -163,6 +213,11 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }
@@ -193,6 +248,11 @@ func (c *Client) NewListDeviceFirmwareRequest(ctx context.Context, path string) 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }
@@ -230,5 +290,10 @@ func (c *Client) NewUpdateFirmwareRequest(ctx context.Context, path string, payl
 	}
 	header := req.Header
 	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
 	return req, nil
 }
