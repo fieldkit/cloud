@@ -44,16 +44,19 @@ type options struct {
 	FirmwareURL  string
 	FirmwareETag string
 
-	Module string
+	Module  string
+	Profile string
 
 	FirmwareDirectory string
 	FirmwareFile      string
 	FirmwareMeta      string
+
+	DryRun bool
 }
 
 type Metadata struct {
-	Module  string
 	ETag    string
+	Module  string
 	Profile string
 	Map     map[string]*string
 }
@@ -67,12 +70,12 @@ func getProfileFromFile(module, path string) (string, error) {
 	re := regexp.MustCompile(fmt.Sprintf("%s-(.+).bin", module))
 	m := re.FindAllStringSubmatch(file, -1)
 	if len(m) == 0 {
-		return "", fmt.Errorf("Malformed file name %s (%s), no profile for %s", path, file, module)
+		return "", fmt.Errorf("malformed file name %s (%s), no profile for %s", path, file, module)
 	}
 	return m[0][1], nil
 }
 
-func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metadata, err error) {
+func getMetaFromEnvironment(moduleOverride, profileOverride string, file string) (metadata *Metadata, err error) {
 	jobName := os.Getenv("JOB_NAME")
 	if jobName == "" {
 		return nil, fmt.Errorf("ENV[JOB_NAME] missing.")
@@ -84,9 +87,9 @@ func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metad
 		if err != nil {
 			return nil, fmt.Errorf("Error getting module from job name: %v", err)
 		}
-		log.Printf("Found module name: '%s'", module)
+		log.Printf("found module name: '%s'", module)
 	} else {
-		log.Printf("Using module override: '%s'", module)
+		log.Printf("using module override: '%s'", module)
 	}
 
 	buildTime := os.Getenv("BUILD_TIMESTAMP")
@@ -96,9 +99,12 @@ func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metad
 		return nil, fmt.Errorf("ENV[BUILD_TIMESTAMP] parse failed.")
 	}
 
-	profile, err := getProfileFromFile(module, file)
-	if err != nil {
-		return nil, err
+	profile := profileOverride
+	if profile == "" {
+		profile, err = getProfileFromFile(module, file)
+		if err != nil {
+			return nil, err
+		}
 	}
 	etag := fmt.Sprintf("%s_%s_%s", module, profile, buildTime)
 
@@ -123,16 +129,16 @@ func getMetaFromEnvironment(moduleOverride string, file string) (metadata *Metad
 	return
 }
 
-func uploadAllFirmware(ctx context.Context, c *fk.Client, moduleOverride, directory string) error {
+func uploadAllFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, directory string, dryRun bool) error {
 	files, err := filepath.Glob(directory + "/*.bin")
 	if err != nil {
 		return err
 	}
 	for _, filename := range files {
-		log.Printf("Processing %s...", filename)
-		err := uploadFirmware(ctx, c, moduleOverride, filename)
+		log.Printf("processing %s...", filename)
+		err := uploadFirmware(ctx, c, moduleOverride, profileOverride, filename, dryRun)
 		if err != nil {
-			log.Printf("Error: %v", err)
+			log.Printf("error: %v", err)
 		}
 	}
 	return nil
@@ -162,23 +168,23 @@ func createAwsSession() (s *session.Session, err error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Error creating AWS session: %v", err)
+	return nil, fmt.Errorf("error creating AWS session: %v", err)
 }
 
-func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, filename string) error {
+func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, filename string, dryRun bool) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
-		return fmt.Errorf("Error creating UUID: %v", err)
+		return fmt.Errorf("error creating UUID: %v", err)
 	}
 
 	file, err := os.Open(filename)
 	if err != nil {
-		return fmt.Errorf("Error opening file: %v", filename)
+		return fmt.Errorf("error opening file: %v", filename)
 	}
 
 	defer file.Close()
 
-	metadata, err := getMetaFromEnvironment(moduleOverride, filename)
+	metadata, err := getMetaFromEnvironment(moduleOverride, profileOverride, filename)
 	if err != nil {
 		return err
 	}
@@ -190,43 +196,52 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, filename 
 
 	uploader := s3manager.NewUploader(session)
 
-	log.Printf("Uploading %s...", filename)
+	url := ""
 
-	r, err := uploader.Upload(&s3manager.UploadInput{
-		ACL:         nil,
-		ContentType: aws.String("application/octet-stream"),
-		Bucket:      aws.String("conservify-firmware"),
-		Key:         aws.String(id.String()),
-		Body:        file,
-		Metadata:    metadata.Map,
-		Tagging:     nil,
-	})
-	if err != nil {
-		return fmt.Errorf("Error uploading firmware: %v", err)
+	if !dryRun {
+		log.Printf("uploading %s...", filename)
+
+		r, err := uploader.Upload(&s3manager.UploadInput{
+			ACL:         nil,
+			ContentType: aws.String("application/octet-stream"),
+			Bucket:      aws.String("conservify-firmware"),
+			Key:         aws.String(id.String()),
+			Body:        file,
+			Metadata:    metadata.Map,
+			Tagging:     nil,
+		})
+		if err != nil {
+			return fmt.Errorf("error uploading firmware: %v", err)
+		}
+
+		log.Printf("uploaded %s", r.Location)
+
+		url = r.Location
 	}
 
-	log.Printf("Uploaded %s", r.Location)
-
-	log.Printf("Creating database entry...")
+	log.Printf("creating database entry...")
 
 	jsonData, err := json.Marshal(metadata.Map)
 	if err != nil {
-		return fmt.Errorf("Error serializing metadata: %v", err)
+		return fmt.Errorf("error serializing metadata: %v", err)
 	}
 
 	addFirmwarePayload := fk.AddFirmwarePayload{
 		Etag:    metadata.ETag,
 		Module:  metadata.Module,
 		Profile: metadata.Profile,
-		URL:     r.Location,
+		URL:     url,
 		Meta:    string(jsonData),
 	}
-	_, err = c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
-	if err != nil {
-		return fmt.Errorf("Error adding firmware: %v", err)
+
+	if !dryRun {
+		_, err = c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
+		if err != nil {
+			return fmt.Errorf("error adding firmware: %v", err)
+		}
 	}
 
-	log.Printf("Done!")
+	log.Printf("done!")
 
 	return nil
 }
@@ -254,10 +269,13 @@ func main() {
 	flag.IntVar(&o.FirmwareID, "firmware-id", 0, "firmware id")
 
 	flag.StringVar(&o.Module, "module", "", "override module")
+	flag.StringVar(&o.Profile, "profile", "", "override profile")
 
 	flag.StringVar(&o.FirmwareDirectory, "firmware-directory", "", "firmware directory")
 	flag.StringVar(&o.FirmwareFile, "firmware-file", "", "firmware file")
 	flag.StringVar(&o.FirmwareMeta, "firmware-meta", "", "firmware meta")
+
+	flag.BoolVar(&o.DryRun, "dry", false, "dry run")
 
 	flag.Parse()
 
@@ -269,14 +287,14 @@ func main() {
 	log.Printf("Authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
-		err := uploadFirmware(ctx, c, o.Module, o.FirmwareFile)
+		err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
 		if err != nil {
 			log.Fatalf("Error adding firmware: %v", err)
 		}
 	}
 
 	if o.FirmwareDirectory != "" {
-		err := uploadAllFirmware(ctx, c, o.Module, o.FirmwareDirectory)
+		err := uploadAllFirmware(ctx, c, o.Module, o.Profile, o.FirmwareDirectory, o.DryRun)
 		if err != nil {
 			log.Fatalf("Error adding firmware: %v", err)
 		}
