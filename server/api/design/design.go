@@ -34,7 +34,8 @@ var _ = API("fieldkit", func() {
 
 var JWT = JWTSecurity("jwt", func() {
 	Header("Authorization")
-	Scope("api:access", "API access") // Define "api:access" scope
+	Scope("api:access", "API access")
+	Scope("api:admin", "API admin access")
 })
 
 var Location = MediaType("application/vnd.app.location+json", func() {

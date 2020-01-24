@@ -49,7 +49,7 @@ var StationLogs = MediaType("application/vnd.app.stationlogs+json", func() {
 
 var _ = Resource("stationLog", func() {
 	Security(JWT, func() {
-		Scope("api: access")
+		Scope("api:access")
 	})
 
 	Action("add", func() {

@@ -625,22 +625,6 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -1042,6 +1026,16 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -1964,14 +1958,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1993,7 +1987,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -2001,7 +1995,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -2021,14 +2015,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2074,6 +2068,7 @@ definitions:
     description: ImageRefCollection is the media type for an array of ImageRef (default
       view)
     example:
+    - url: Occaecati est consequatur dolorum voluptas omnis.
     - url: Occaecati est consequatur dolorum voluptas omnis.
     items:
       $ref: '#/definitions/ImageRef'
@@ -2287,7 +2282,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+            Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2323,7 +2318,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+              Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2364,7 +2359,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+        Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2375,7 +2370,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+          Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2406,7 +2401,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+          Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2441,7 +2436,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 63b40986-9ecf-42a0-8ae9-9d16fb9ca8ce
+            Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2514,16 +2509,6 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
-    - blocks:
-      - 1.566805123913401e+18
-      - 1.566805123913401e+18
-      - 1.566805123913401e+18
-      id: 6.474398459750394e+18
-      size: 1.9460409358880453e+18
-      time: "1986-03-10T00:22:10Z"
-      type: Soluta aut consequuntur.
-      upload_id: Tempore facere tempora ut eveniet alias fuga.
-      url: Alias voluptates repellendus aut.
     - blocks:
       - 1.566805123913401e+18
       - 1.566805123913401e+18
@@ -2646,14 +2631,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+              Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+              Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2820,14 +2805,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+            Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 4eb67fb8-5115-4d30-b915-3d039dd09df6
+            Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -6891,7 +6876,7 @@ paths:
         Add a station log
 
         Required security scopes:
-          * `api: access`
+          * `api:access`
       operationId: stationLog#add
       parameters:
       - in: body
@@ -6912,7 +6897,7 @@ paths:
       - https
       security:
       - jwt:
-        - 'api: access'
+        - api:access
       summary: add stationLog
       tags:
       - stationLog
@@ -6922,7 +6907,7 @@ paths:
         Add multiple station logs
 
         Required security scopes:
-          * `api: access`
+          * `api:access`
       operationId: stationLog#addMultiple
       parameters:
       - in: body
@@ -6941,7 +6926,7 @@ paths:
       - https
       security:
       - jwt:
-        - 'api: access'
+        - api:access
       summary: addMultiple stationLog
       tags:
       - stationLog
@@ -6974,7 +6959,7 @@ paths:
         Update a station log
 
         Required security scopes:
-          * `api: access`
+          * `api:access`
       operationId: stationLog#update
       parameters:
       - in: path
@@ -6999,7 +6984,7 @@ paths:
       - https
       security:
       - jwt:
-        - 'api: access'
+        - api:access
       summary: update stationLog
       tags:
       - stationLog
@@ -8058,6 +8043,7 @@ securityDefinitions:
 
       **Security Scopes**:
         * `api:access`: API access
+        * `api:admin`: API admin access
     in: header
     name: Authorization
     type: apiKey

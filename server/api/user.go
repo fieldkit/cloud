@@ -11,11 +11,11 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-    "github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
-    "github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 )
@@ -51,6 +51,12 @@ func UsersType(users []*data.User) *app.Users {
 }
 
 func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *jwtgo.Token {
+	scopes := []string{"api:access"}
+
+	if user.Admin {
+		scopes = []string{"api:access", "api:admin"}
+	}
+
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
 		"iat":           now.Unix(),
@@ -58,14 +64,14 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 		"sub":           user.ID,
 		"email":         user.Email,
 		"refresh_token": refreshToken.Token.String(),
-		"scopes":        "api:access",
+		"scopes":        scopes,
 	}
 
 	return token
 }
 
 type UserControllerOptions struct {
-    Session *session.Session
+	Session    *session.Session
 	Database   *sqlxcache.DB
 	Backend    *backend.Backend
 	Emailer    email.Emailer
@@ -307,83 +313,83 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 }
 
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
-    users := []*data.User{}
-    if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1", ctx.ProjectID); err != nil {
-        return err
-    }
+	users := []*data.User{}
+	if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
 
-    return ctx.OK(UsersType(users))
+	return ctx.OK(UsersType(users))
 }
 
 func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {
-    p, err := NewPermissions(ctx)
-    if err != nil {
-        return err
-    }
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
 
-    mr := repositories.NewMediaRepository(c.options.Session)
-    saved, err := mr.Save(ctx, ctx.RequestData)
-    if err != nil {
-        return err
-    }
+	mr := repositories.NewMediaRepository(c.options.Session)
+	saved, err := mr.Save(ctx, ctx.RequestData)
+	if err != nil {
+		return err
+	}
 
-    user := &data.User{}
-    if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID); err != nil {
-        return err
-    }
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID); err != nil {
+		return err
+	}
 
-    return ctx.OK(UserType(user))
+	return ctx.OK(UserType(user))
 }
 
 func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserContext) error {
-    p, err := NewPermissions(ctx)
-    if err != nil {
-        return err
-    }
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
+	}
 
-    user := &data.User{}
-    if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", p.UserID); err != nil {
-        return err
-    }
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", p.UserID); err != nil {
+		return err
+	}
 
-    if user.MediaURL != nil {
-        mr := repositories.NewMediaRepository(c.options.Session)
+	if user.MediaURL != nil {
+		mr := repositories.NewMediaRepository(c.options.Session)
 
-        lm, err := mr.LoadByURL(ctx, *user.MediaURL)
-        if err != nil {
-            return err
-        }
+		lm, err := mr.LoadByURL(ctx, *user.MediaURL)
+		if err != nil {
+			return err
+		}
 
-        if lm != nil {
-            SendLoadedMedia(ctx.ResponseData, lm);
-        }
+		if lm != nil {
+			SendLoadedMedia(ctx.ResponseData, lm)
+		}
 
-        return nil
-    }
+		return nil
+	}
 
-    return ctx.OK(nil)
+	return ctx.OK(nil)
 }
 
 func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
-    user := &data.User{}
-    if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
-        return err
-    }
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
+		return err
+	}
 
-    if user.MediaURL != nil {
-        mr := repositories.NewMediaRepository(c.options.Session)
+	if user.MediaURL != nil {
+		mr := repositories.NewMediaRepository(c.options.Session)
 
-        lm, err := mr.LoadByURL(ctx, *user.MediaURL)
-        if err != nil {
-            return err
-        }
+		lm, err := mr.LoadByURL(ctx, *user.MediaURL)
+		if err != nil {
+			return err
+		}
 
-        if lm != nil {
-            SendLoadedMedia(ctx.ResponseData, lm);
-        }
+		if lm != nil {
+			SendLoadedMedia(ctx.ResponseData, lm)
+		}
 
-        return nil
-    }
+		return nil
+	}
 
-    return ctx.OK(nil)
+	return ctx.OK(nil)
 }
