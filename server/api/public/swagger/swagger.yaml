@@ -625,6 +625,22 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -1026,16 +1042,6 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
-    - data:
-        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-      id: 2.4194290054188964e+18
-      record: 5.508071077920418e+18
-      time: "2016-03-26T05:44:35Z"
-    - data:
-        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-      id: 2.4194290054188964e+18
-      record: 5.508071077920418e+18
-      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -1958,14 +1964,14 @@ definitions:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
         type: Illo fugiat modi quis.
       - geometry:
           coordinates:
           - 0.3406955390547533
           type: Dolor hic voluptatibus autem velit magni.
         properties:
-          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
         type: Illo fugiat modi quis.
       type: Iure repudiandae.
     properties:
@@ -1987,7 +1993,7 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
       type: Illo fugiat modi quis.
     properties:
       geometry:
@@ -1995,7 +2001,7 @@ definitions:
       properties:
         additionalProperties: true
         example:
-          Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+          Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
         type: object
       type:
         example: Illo fugiat modi quis.
@@ -2015,14 +2021,14 @@ definitions:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
       type: Illo fugiat modi quis.
     - geometry:
         coordinates:
         - 0.3406955390547533
         type: Dolor hic voluptatibus autem velit magni.
       properties:
-        Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+        Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
       type: Illo fugiat modi quis.
     items:
       $ref: '#/definitions/GeoJSONFeature'
@@ -2282,7 +2288,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+            Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2318,7 +2324,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+              Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2359,7 +2365,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+        Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2370,7 +2376,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+          Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2401,7 +2407,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+          Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2436,7 +2442,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: ae13f7bc-83e0-4859-815e-4694272050f7
+            Repudiandae dignissimos.: 92f47c68-09fc-4615-9d11-fd648ab0a700
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2631,14 +2637,14 @@ definitions:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+              Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
             type: Illo fugiat modi quis.
           - geometry:
               coordinates:
               - 0.3406955390547533
               type: Dolor hic voluptatibus autem velit magni.
             properties:
-              Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+              Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
             type: Illo fugiat modi quis.
           type: Iure repudiandae.
         hasMore: true
@@ -2805,14 +2811,14 @@ definitions:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+            Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
           type: Illo fugiat modi quis.
         - geometry:
             coordinates:
             - 0.3406955390547533
             type: Dolor hic voluptatibus autem velit magni.
           properties:
-            Quas deserunt a.: 1236fa65-5afd-4ee5-9897-de50363796b0
+            Quas deserunt a.: 49170319-b32f-4ecd-b83e-8e668ba6a99b
           type: Illo fugiat modi quis.
         type: Iure repudiandae.
       hasMore: true
@@ -4472,7 +4478,7 @@ paths:
         Return firmware for a device
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#check
       parameters:
       - in: path
@@ -4507,7 +4513,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: check Firmware
       tags:
       - Firmware
@@ -4594,7 +4600,7 @@ paths:
         List device firmware
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#list device
       parameters:
       - in: path
@@ -4612,7 +4618,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: list device Firmware
       tags:
       - Firmware
@@ -4674,7 +4680,7 @@ paths:
         Update an Device firmware
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#update
       parameters:
       - in: body
@@ -4695,7 +4701,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: update Firmware
       tags:
       - Firmware
@@ -5194,7 +5200,7 @@ paths:
         List firmware
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#list
       parameters:
       - in: query
@@ -5224,7 +5230,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: list Firmware
       tags:
       - Firmware
@@ -5233,7 +5239,7 @@ paths:
         Add firmware
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#add
       parameters:
       - in: body
@@ -5252,7 +5258,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: add Firmware
       tags:
       - Firmware
@@ -5262,7 +5268,7 @@ paths:
         Delete firmware
 
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#delete
       parameters:
       - in: path
@@ -5280,7 +5286,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: delete Firmware
       tags:
       - Firmware
@@ -5288,7 +5294,7 @@ paths:
     get:
       description: |-
         Required security scopes:
-          * `api:access`
+          * `api:admin`
       operationId: Firmware#download
       parameters:
       - in: path
@@ -5309,7 +5315,7 @@ paths:
       - https
       security:
       - jwt:
-        - api:access
+        - api:admin
       summary: download Firmware
       tags:
       - Firmware

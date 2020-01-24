@@ -65,7 +65,7 @@ var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
 
 var _ = Resource("Firmware", func() {
 	Security(JWT, func() {
-		Scope("api:access")
+		Scope("api:admin")
 	})
 
 	Action("download", func() {

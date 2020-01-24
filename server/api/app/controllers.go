@@ -230,7 +230,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Add(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("PATCH", "/firmware", ctrl.MuxHandler("add", h, unmarshalAddFirmwarePayload))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Add", "route", "PATCH /firmware", "security", "jwt")
@@ -247,7 +247,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Check(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/:module/firmware", ctrl.MuxHandler("check", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Check", "route", "GET /devices/:deviceId/:module/firmware", "security", "jwt")
@@ -264,7 +264,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Delete(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("DELETE", "/firmware/:firmwareId", ctrl.MuxHandler("delete", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Delete", "route", "DELETE /firmware/:firmwareId", "security", "jwt")
@@ -281,7 +281,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Download(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware/:firmwareId/download", ctrl.MuxHandler("download", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Download", "route", "GET /firmware/:firmwareId/download", "security", "jwt")
@@ -298,7 +298,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware", "security", "jwt")
@@ -315,7 +315,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.ListDevice(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/devices/:deviceId/firmware", ctrl.MuxHandler("list device", h, nil))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "ListDevice", "route", "GET /devices/:deviceId/firmware", "security", "jwt")
@@ -338,7 +338,7 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.Update(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
+	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("PATCH", "/devices/firmware", ctrl.MuxHandler("update", h, unmarshalUpdateFirmwarePayload))
 	service.LogInfo("mount", "ctrl", "Firmware", "action", "Update", "route", "PATCH /devices/firmware", "security", "jwt")
