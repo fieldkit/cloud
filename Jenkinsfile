@@ -19,10 +19,13 @@ which go
 docker ps -a
 go version
 make
-cp build/fktool ~/workspace/bin
 """
             }
         }
+
+		stage ('update tools') {
+			sh "cp build/fktool ~/workspace/bin"
+		}
 
         stage ('archive') {
             archiveArtifacts artifacts: 'build/fktool'
