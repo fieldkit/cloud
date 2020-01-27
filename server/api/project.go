@@ -337,6 +337,23 @@ func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
 		return err
 	}
 
+	project := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+	if project.MediaURL != nil {
+		mr := repositories.NewMediaRepository(c.options.Session)
+
+		err := mr.DeleteByURL(ctx, *project.MediaURL)
+		if err != nil {
+			return err
+		}
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_station WHERE project_id = $1", ctx.ProjectID); err != nil {
+		return err
+	}
+
 	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1", ctx.ProjectID); err != nil {
 		return err
 	}
