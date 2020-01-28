@@ -18,7 +18,7 @@
         <div class="station-container" v-if="this.station">
             <div class="left">
                 <img
-					style="width: 124px; height: 100px;"
+                    style="width: 124px; height: 100px;"
                     alt="Station image"
                     :src="stationSmallPhoto"
                     class="station-element"
@@ -88,11 +88,11 @@ export default {
         };
     },
     props: ["station", "isAuthenticated"],
-	computed: {
-		stationSmallPhoto: function() {
-			return API_HOST + this.station.photos.small;
-		}
-	},
+    computed: {
+        stationSmallPhoto: function() {
+            return API_HOST + this.station.photos.small;
+        }
+    },
     methods: {
         viewSummary() {
             this.viewingSummary = true;

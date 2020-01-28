@@ -142,7 +142,7 @@ export default {
                     }
                 });
                 this.fetchData().then(result => {
-                    this.processData(result);
+                    this.handleFirstDataPage(result);
                 });
             })
             .catch(() => {
@@ -172,14 +172,56 @@ export default {
             this.requestPage += 1;
             return this.api.getJSONDataByDeviceId(this.station.device_id, this.requestPage, 1000);
         },
-        processData(result) {
+        handleFirstDataPage(result) {
             if (!result) {
                 this.sensors = [];
                 this.stationData = [];
                 this.combinedStationInfo = { sensors: this.sensors, stationData: this.stationData };
                 return;
             }
-
+            const processedData = this.processData(result);
+            let sensors = processedData.sensors;
+            let processed = processedData.data;
+            //sort data by date
+            processed.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            // get most recent reading for each sensor
+            if (processed.length > 0) {
+                let recent = processed[processed.length - 1];
+                sensors = _.uniqBy(sensors, "key");
+                sensors.forEach(s => {
+                    s.currentReading = recent[s.key];
+                });
+                // resize div to fit sections
+                document.getElementById("lower-container").style["min-width"] = "1100px";
+            }
+            this.sensors = sensors;
+            this.stationData = processed;
+            this.combinedStationInfo = { sensors: sensors, stationData: processed };
+        },
+        addNewPage(result) {
+            const processedData = this.processData(result);
+            // TODO: handle possible addition of sensors
+            // from new pages of data (processedData.sensors)
+            this.stationData = this.stationData.concat(processedData.data);
+            //sort all by date
+            this.stationData.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            const numRecords = processedData.numRecords;
+            // numRecords checks to see if this was a full page of results
+            if (numRecords >= 1000 && this.timeRange.start < this.stationData[0].date) {
+                this.$refs.dataChartControl.showLoading();
+                this.fetchNewPage().then(result => {
+                    this.addNewPage(result);
+                });
+            } else {
+                this.$refs.dataChartControl.updateData(this.stationData);
+            }
+        },
+        processData(result) {
+            let numRecords = 0;
             let processed = [];
             let sensors = [];
             result.versions.forEach(v => {
@@ -191,6 +233,7 @@ export default {
                     }
                 });
                 v.data.forEach(d => {
+                    numRecords += 1;
                     // HACK: for now only including ones with
                     // sensor readings
                     const sensorKeys = Object.keys(d.d);
@@ -223,84 +266,7 @@ export default {
                     }
                 });
             });
-            //sort data by date
-            processed.sort(function(a, b) {
-                return a.date.getTime() - b.date.getTime();
-            });
-            // get most recent reading for each sensor
-            if (processed.length > 0) {
-                let recent = processed[processed.length - 1];
-                sensors = _.uniqBy(sensors, "key");
-                sensors.forEach(s => {
-                    s.currentReading = recent[s.key];
-                });
-                // resize div to fit sections
-                document.getElementById("lower-container").style["min-width"] = "1100px";
-            }
-            this.sensors = sensors;
-            this.stationData = processed;
-            this.combinedStationInfo = { sensors: sensors, stationData: processed };
-        },
-        addNewPage(result) {
-            let processed = [];
-            let numRecords = 0;
-            // TODO: handle possible addition of sensors
-            // from new pages of data
-            // let sensors = [];
-            result.versions.forEach(v => {
-                // v.meta.station.modules.forEach(m => {
-                //     if (m.sensors) {
-                //         m.sensors.forEach(s => {
-                //             sensors.push(s);
-                //         });
-                //     }
-                // });
-                v.data.forEach(d => {
-                    numRecords += 1;
-                    const sensorKeys = Object.keys(d.d);
-                    if (Object.keys(d.d).length > 0) {
-                        // exclude anything > 1000
-                        let valid = true;
-                        sensorKeys.forEach(k => {
-                            if (d.d[k] > 1000) {
-                                valid = false;
-                            }
-                        });
-                        if (valid) {
-                            // TEMPORARY: hack to exclude "out of range" data
-                            // TODO: Do this with accurate ranges (and all sensors?)
-                            if (d.d["ph"] < 14) {
-                                d.d.date = new Date(d.time * 1000);
-                                // and only ones with dates after 2018
-                                // and less than 1000
-                                if (d.d.date.getFullYear() > 2018) {
-                                    processed.push(d.d);
-                                }
-                            } else if (!d.d["ph"]) {
-                                d.d.date = new Date(d.time * 1000);
-                                // and only ones with dates after 2018
-                                if (d.d.date.getFullYear() > 2018) {
-                                    processed.push(d.d);
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-            this.stationData = this.stationData.concat(processed);
-            //sort data by date
-            this.stationData.sort(function(a, b) {
-                return a.date.getTime() - b.date.getTime();
-            });
-            // numRecords checks to see if this was a full page of results
-            if (numRecords >= 1000 && this.timeRange.start < this.stationData[0].date) {
-                this.$refs.dataChartControl.showLoading();
-                this.fetchNewPage().then(result => {
-                    this.addNewPage(result);
-                });
-            } else {
-                this.$refs.dataChartControl.updateData(this.stationData);
-            }
+            return { numRecords: numRecords, data: processed, sensors: sensors };
         },
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
@@ -338,7 +304,7 @@ export default {
             this.noStation = false;
             document.getElementById("lower-container").style["min-width"] = "700px";
             this.fetchData().then(result => {
-                this.processData(result);
+                this.handleFirstDataPage(result);
             });
         }
     }
