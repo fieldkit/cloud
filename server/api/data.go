@@ -342,10 +342,6 @@ func NewJSONDataController(ctx context.Context, service *goa.Service, options Da
 	}
 }
 
-func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
-	return ctx.OK(nil)
-}
-
 func JSONDataRowsType(dm []*repositories.DataRow) []*app.JSONDataRow {
 	wm := make([]*app.JSONDataRow, len(dm))
 	for i, r := range dm {
@@ -406,10 +402,59 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 	return nil
 }
 
+func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("summarize", "device_id", ctx.DeviceID)
+
+	r, err := repositories.NewDataRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	opts := &repositories.SummaryQueryOpts{
+		DeviceID:   ctx.DeviceID,
+		Page:       0,
+		PageSize:   1000,
+		Resolution: 1000,
+		Internal:   false,
+		Start:      0,
+		End:        0,
+	}
+
+	if ctx.Page != nil {
+		opts.Page = *ctx.Page
+	}
+	if ctx.PageSize != nil {
+		opts.PageSize = *ctx.PageSize
+	}
+	if ctx.Start != nil {
+		opts.Start = int64(*ctx.Start)
+	}
+	if ctx.End != nil {
+		opts.End = int64(*ctx.End)
+	}
+	if ctx.Resolution != nil {
+		opts.Resolution = *ctx.Resolution
+	}
+	if ctx.Internal != nil {
+		opts.Internal = *ctx.Internal
+	}
+
+	v, err := r.QueryDevice(ctx, opts)
+	if err != nil {
+		return err
+	}
+
+	_ = v
+
+	return ctx.OK(nil)
+}
+
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	log := Logger(ctx).Sugar()
 
-	_ = log
+	log.Infow("json", "device_id", ctx.DeviceID)
 
 	p, err := NewPermissions(ctx)
 	if err != nil {
