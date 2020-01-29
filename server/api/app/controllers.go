@@ -296,10 +296,9 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:admin")
 	h = handleFirmwareOrigin(h)
 	service.Mux.Handle("GET", "/firmware", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Firmware", "action", "List", "route", "GET /firmware")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3197,6 +3196,7 @@ type JSONDataController interface {
 	goa.Muxer
 	Get(*GetJSONDataContext) error
 	GetLines(*GetLinesJSONDataContext) error
+	Summary(*SummaryJSONDataContext) error
 }
 
 // MountJSONDataController "mounts" a JSONData resource controller on the given service.
@@ -3205,6 +3205,7 @@ func MountJSONDataController(service *goa.Service, ctrl JSONDataController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/data/json", ctrl.MuxHandler("preflight", handleJSONDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/data/lines", ctrl.MuxHandler("preflight", handleJSONDataOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/summary/json", ctrl.MuxHandler("preflight", handleJSONDataOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3239,6 +3240,23 @@ func MountJSONDataController(service *goa.Service, ctrl JSONDataController) {
 	h = handleJSONDataOrigin(h)
 	service.Mux.Handle("GET", "/data/devices/:deviceId/data/lines", ctrl.MuxHandler("get lines", h, nil))
 	service.LogInfo("mount", "ctrl", "JSONData", "action", "GetLines", "route", "GET /data/devices/:deviceId/data/lines", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSummaryJSONDataContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Summary(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleJSONDataOrigin(h)
+	service.Mux.Handle("GET", "/data/devices/:deviceId/summary/json", ctrl.MuxHandler("summary", h, nil))
+	service.LogInfo("mount", "ctrl", "JSONData", "action", "Summary", "route", "GET /data/devices/:deviceId/summary/json", "security", "jwt")
 }
 
 // handleJSONDataOrigin applies the CORS response headers corresponding to the origin.

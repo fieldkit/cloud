@@ -40,24 +40,24 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp269 := strconv.Itoa(*end)
-		values.Set("end", tmp269)
+		tmp282 := strconv.Itoa(*end)
+		values.Set("end", tmp282)
 	}
 	if internal != nil {
-		tmp270 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp270)
+		tmp283 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp283)
 	}
 	if page != nil {
-		tmp271 := strconv.Itoa(*page)
-		values.Set("page", tmp271)
+		tmp284 := strconv.Itoa(*page)
+		values.Set("page", tmp284)
 	}
 	if pageSize != nil {
-		tmp272 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp272)
+		tmp285 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp285)
 	}
 	if start != nil {
-		tmp273 := strconv.Itoa(*start)
-		values.Set("start", tmp273)
+		tmp286 := strconv.Itoa(*start)
+		values.Set("start", tmp286)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -97,24 +97,85 @@ func (c *Client) NewGetLinesJSONDataRequest(ctx context.Context, path string, en
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp274 := strconv.Itoa(*end)
-		values.Set("end", tmp274)
+		tmp287 := strconv.Itoa(*end)
+		values.Set("end", tmp287)
 	}
 	if internal != nil {
-		tmp275 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp275)
+		tmp288 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp288)
 	}
 	if page != nil {
-		tmp276 := strconv.Itoa(*page)
-		values.Set("page", tmp276)
+		tmp289 := strconv.Itoa(*page)
+		values.Set("page", tmp289)
 	}
 	if pageSize != nil {
-		tmp277 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp277)
+		tmp290 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp290)
 	}
 	if start != nil {
-		tmp278 := strconv.Itoa(*start)
-		values.Set("start", tmp278)
+		tmp291 := strconv.Itoa(*start)
+		values.Set("start", tmp291)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// SummaryJSONDataPath computes a request path to the summary action of jsonData.
+func SummaryJSONDataPath(deviceID string) string {
+	param0 := deviceID
+
+	return fmt.Sprintf("/data/devices/%s/summary/json", param0)
+}
+
+// Retrieve summarized data
+func (c *Client) SummaryJSONData(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, resolution *int, start *int) (*http.Response, error) {
+	req, err := c.NewSummaryJSONDataRequest(ctx, path, end, internal, page, pageSize, resolution, start)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSummaryJSONDataRequest create the request corresponding to the summary action endpoint of the jsonData resource.
+func (c *Client) NewSummaryJSONDataRequest(ctx context.Context, path string, end *int, internal *bool, page *int, pageSize *int, resolution *int, start *int) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if end != nil {
+		tmp292 := strconv.Itoa(*end)
+		values.Set("end", tmp292)
+	}
+	if internal != nil {
+		tmp293 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp293)
+	}
+	if page != nil {
+		tmp294 := strconv.Itoa(*page)
+		values.Set("page", tmp294)
+	}
+	if pageSize != nil {
+		tmp295 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp295)
+	}
+	if resolution != nil {
+		tmp296 := strconv.Itoa(*resolution)
+		values.Set("resolution", tmp296)
+	}
+	if start != nil {
+		tmp297 := strconv.Itoa(*start)
+		values.Set("start", tmp297)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

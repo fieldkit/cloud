@@ -303,4 +303,21 @@ var _ = Resource("jsonData", func() {
 		Response(NotFound)
 		Response(OK)
 	})
+
+	Action("summary", func() {
+		Routing(GET("data/devices/:deviceId/summary/json"))
+		Description("Retrieve summarized data")
+		Params(func() {
+			Param("page", Integer)
+			Param("pageSize", Integer)
+			Param("start", Integer)
+			Param("end", Integer)
+			Param("resolution", Integer)
+			Param("internal", Boolean)
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Media(JSONDataResponse)
+		})
+	})
 })

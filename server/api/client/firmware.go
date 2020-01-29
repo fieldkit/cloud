@@ -189,12 +189,12 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 		values.Set("module", *module)
 	}
 	if page != nil {
-		tmp257 := strconv.Itoa(*page)
-		values.Set("page", tmp257)
+		tmp270 := strconv.Itoa(*page)
+		values.Set("page", tmp270)
 	}
 	if pageSize != nil {
-		tmp258 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp258)
+		tmp271 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp271)
 	}
 	if profile != nil {
 		values.Set("profile", *profile)
@@ -203,11 +203,6 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }
