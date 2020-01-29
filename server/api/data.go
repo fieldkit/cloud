@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/goadesign/goa"
-	"github.com/iancoleman/strcase"
 
 	"github.com/conservify/sqlxcache"
 
@@ -22,8 +21,6 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/messages"
-
-	pb "github.com/fieldkit/data-protocol"
 )
 
 const (
@@ -345,22 +342,68 @@ func NewJSONDataController(ctx context.Context, service *goa.Service, options Da
 	}
 }
 
-func getLocation(l *pb.DeviceLocation) []float64 {
-	if l == nil {
-		return nil
+func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
+	return ctx.OK(nil)
+}
+
+func JSONDataRowsType(dm []*repositories.DataRow) []*app.JSONDataRow {
+	wm := make([]*app.JSONDataRow, len(dm))
+	for i, r := range dm {
+		wm[i] = &app.JSONDataRow{
+			ID:       r.ID,
+			Time:     r.Time,
+			Location: r.Location,
+			D:        r.D,
+		}
 	}
-	if l.Longitude > 180 || l.Longitude < -180 {
-		return nil
+	return wm
+}
+
+func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
+	modules := make([]*app.JSONDataMetaModule, len(dm.Station.Modules))
+	for i, m := range dm.Station.Modules {
+		sensors := make([]*app.JSONDataMetaSensor, len(m.Sensors))
+
+		for j, s := range m.Sensors {
+			sensors[j] = &app.JSONDataMetaSensor{
+				Name:  s.Name,
+				Key:   s.Key,
+				Units: s.Units,
+			}
+		}
+
+		modules[i] = &app.JSONDataMetaModule{
+			Manufacturer: m.Manufacturer,
+			Kind:         m.Kind,
+			Version:      m.Version,
+			ID:           m.ID,
+			Name:         m.Name,
+			Sensors:      sensors,
+		}
 	}
-	return []float64{
-		float64(l.Longitude),
-		float64(l.Latitude),
-		float64(l.Altitude),
+	return &app.JSONDataMeta{
+		ID: dm.ID,
+		Station: &app.JSONDataMetaStation{
+			ID:   dm.Station.ID,
+			Name: dm.Station.Name,
+			Firmware: &app.JSONDataMetaStationFirmware{
+				Git:   dm.Station.Firmware.Git,
+				Build: dm.Station.Firmware.Build,
+			},
+			Modules: modules,
+		},
 	}
 }
 
-func isInternalModule(m *pb.ModuleInfo) bool {
-	return m.Name == "random" || m.Name == "diagnostics"
+func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
+	wm := make([]*app.JSONDataVersion, len(dm))
+	for i, r := range dm {
+		wm[i] = &app.JSONDataVersion{
+			Meta: JSONDataMetaType(r.Meta),
+			Data: JSONDataRowsType(r.Data),
+		}
+	}
+	return nil
 }
 
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
@@ -398,7 +441,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		internal = *ctx.Internal
 	}
 
-	vr, err := NewVersionRepository(c.options.Database)
+	vr, err := repositories.NewVersionRepository(c.options.Database)
 	if err != nil {
 		return err
 	}
@@ -409,7 +452,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	}
 
 	return ctx.OK(&app.JSONDataResponse{
-		Versions: versions,
+		Versions: JSONDataResponseType(versions),
 	})
 }
 
@@ -456,7 +499,7 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 		internal = *ctx.Internal
 	}
 
-	vr, err := NewVersionRepository(c.options.Database)
+	vr, err := repositories.NewVersionRepository(c.options.Database)
 	if err != nil {
 		return err
 	}
@@ -491,149 +534,4 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 	writer.Flush()
 
 	return nil
-}
-
-type VersionRepository struct {
-	Database *sqlxcache.DB
-}
-
-func NewVersionRepository(database *sqlxcache.DB) (rr *VersionRepository, err error) {
-	return &VersionRepository{Database: database}, nil
-}
-func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, deviceIdBytes []byte, internal bool, pageNumber, pageSize int) (versions []*app.JSONDataVersion, err error) {
-	log := Logger(ctx).Sugar()
-
-	sr, err := repositories.NewStationRepository(r.Database)
-	if err != nil {
-		return nil, err
-	}
-
-	rr, err := repositories.NewRecordRepository(r.Database)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Infow("querying", "device_id", deviceID, "page_number", pageNumber, "page_size", pageSize, "internal", internal)
-
-	station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	page, err := rr.QueryDevice(ctx, deviceID, pageNumber, pageSize)
-	if err != nil {
-		return nil, err
-	}
-
-	metaOrder := make([]*data.MetaRecord, 0)
-	byMeta := make(map[int64][]*data.DataRecord)
-	for _, d := range page.Data {
-		if byMeta[d.Meta] == nil {
-			byMeta[d.Meta] = make([]*data.DataRecord, 0)
-			metaOrder = append(metaOrder, page.Meta[d.Meta])
-		}
-		byMeta[d.Meta] = append(byMeta[d.Meta], d)
-	}
-
-	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
-
-	versions = make([]*app.JSONDataVersion, 0)
-	for _, m := range metaOrder {
-		var metaRecord pb.DataRecord
-		err := m.Unmarshal(&metaRecord)
-		if err != nil {
-			return nil, err
-		}
-
-		name := metaRecord.Identity.Name
-		if name == "" {
-			name = station.Name
-		}
-
-		modules := make([]*app.JSONDataMetaModule, 0)
-		for _, module := range metaRecord.Modules {
-			if internal || !isInternalModule(module) {
-				sensors := make([]*app.JSONDataMetaSensor, 0)
-				for _, sensor := range module.Sensors {
-					sensors = append(sensors, &app.JSONDataMetaSensor{
-						Name:  sensor.Name,
-						Key:   strcase.ToLowerCamel(sensor.Name),
-						Units: sensor.UnitOfMeasure,
-					})
-				}
-
-				modules = append(modules, &app.JSONDataMetaModule{
-					Name:         module.Name,
-					ID:           hex.EncodeToString(module.Id),
-					Manufacturer: int(module.Header.Manufacturer),
-					Kind:         int(module.Header.Kind),
-					Version:      int(module.Header.Version),
-					Sensors:      sensors,
-				})
-			}
-		}
-
-		skipped := 0
-
-		dataRecords := byMeta[m.ID]
-		rows := make([]*app.JSONDataRow, 0)
-		for _, d := range dataRecords {
-			var dataRecord pb.DataRecord
-			err := d.Unmarshal(&dataRecord)
-			if err != nil {
-				return nil, err
-			}
-
-			data := make(map[string]interface{})
-			for mi, sg := range dataRecord.Readings.SensorGroups {
-				if sg.Module == 255 {
-					skipped += 1
-					continue
-				}
-				if mi >= len(metaRecord.Modules) {
-					log.Warnw("module index range", "module_index", mi, "modules", len(metaRecord.Modules), "meta", metaRecord.Modules)
-					continue
-				}
-				module := metaRecord.Modules[mi]
-				if internal || !isInternalModule(module) {
-					for si, r := range sg.Readings {
-						if r != nil && si < len(module.Sensors) {
-							sensor := module.Sensors[si]
-							key := strcase.ToLowerCamel(sensor.Name)
-							data[key] = r.Value
-						}
-					}
-				}
-			}
-
-			rows = append(rows, &app.JSONDataRow{
-				ID:       int(d.ID),
-				Time:     int(dataRecord.Readings.Time),
-				Location: getLocation(dataRecord.Readings.Location),
-				D:        data,
-			})
-		}
-
-		if len(rows) > 0 {
-			versions = append(versions, &app.JSONDataVersion{
-				Meta: &app.JSONDataMeta{
-					ID: int(m.ID),
-					Station: &app.JSONDataMetaStation{
-						ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
-						Name:    name,
-						Modules: modules,
-						Firmware: &app.JSONDataMetaStationFirmware{
-							Git:   metaRecord.Metadata.Firmware.Git,
-							Build: metaRecord.Metadata.Firmware.Build,
-						},
-					},
-				},
-				Data: rows,
-			})
-		} else {
-			log.Infow("empty version", "meta_id", m.ID)
-		}
-	}
-
-	return
 }
