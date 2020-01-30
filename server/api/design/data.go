@@ -222,10 +222,13 @@ var JSONDataMetaModule = Type("JSONDataMetaModule", func() {
 })
 
 var JSONDataMetaStationFirmware = Type("JSONDataMetaStationFirmware", func() {
-	Attribute("git", String)
+	Attribute("version", String)
 	Attribute("build", String)
+	Attribute("number", String)
+	Attribute("timestamp", Integer)
+	Attribute("hash", String)
 
-	Required("git", "build")
+	Required("version", "build", "number", "timestamp", "hash")
 })
 
 var JSONDataMetaStation = Type("JSONDataMetaStation", func() {

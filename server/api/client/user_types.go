@@ -1514,17 +1514,29 @@ func (ut *JSONDataMetaStation) Validate() (err error) {
 
 // jSONDataMetaStationFirmware user type.
 type jSONDataMetaStationFirmware struct {
-	Build *string `form:"build,omitempty" json:"build,omitempty" yaml:"build,omitempty" xml:"build,omitempty"`
-	Git   *string `form:"git,omitempty" json:"git,omitempty" yaml:"git,omitempty" xml:"git,omitempty"`
+	Build     *string `form:"build,omitempty" json:"build,omitempty" yaml:"build,omitempty" xml:"build,omitempty"`
+	Hash      *string `form:"hash,omitempty" json:"hash,omitempty" yaml:"hash,omitempty" xml:"hash,omitempty"`
+	Number    *string `form:"number,omitempty" json:"number,omitempty" yaml:"number,omitempty" xml:"number,omitempty"`
+	Timestamp *int    `form:"timestamp,omitempty" json:"timestamp,omitempty" yaml:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Version   *string `form:"version,omitempty" json:"version,omitempty" yaml:"version,omitempty" xml:"version,omitempty"`
 }
 
 // Validate validates the jSONDataMetaStationFirmware type instance.
 func (ut *jSONDataMetaStationFirmware) Validate() (err error) {
-	if ut.Git == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "git"))
+	if ut.Version == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "version"))
 	}
 	if ut.Build == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "build"))
+	}
+	if ut.Number == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "number"))
+	}
+	if ut.Timestamp == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "timestamp"))
+	}
+	if ut.Hash == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "hash"))
 	}
 	return
 }
@@ -1535,25 +1547,44 @@ func (ut *jSONDataMetaStationFirmware) Publicize() *JSONDataMetaStationFirmware 
 	if ut.Build != nil {
 		pub.Build = *ut.Build
 	}
-	if ut.Git != nil {
-		pub.Git = *ut.Git
+	if ut.Hash != nil {
+		pub.Hash = *ut.Hash
+	}
+	if ut.Number != nil {
+		pub.Number = *ut.Number
+	}
+	if ut.Timestamp != nil {
+		pub.Timestamp = *ut.Timestamp
+	}
+	if ut.Version != nil {
+		pub.Version = *ut.Version
 	}
 	return &pub
 }
 
 // JSONDataMetaStationFirmware user type.
 type JSONDataMetaStationFirmware struct {
-	Build string `form:"build" json:"build" yaml:"build" xml:"build"`
-	Git   string `form:"git" json:"git" yaml:"git" xml:"git"`
+	Build     string `form:"build" json:"build" yaml:"build" xml:"build"`
+	Hash      string `form:"hash" json:"hash" yaml:"hash" xml:"hash"`
+	Number    string `form:"number" json:"number" yaml:"number" xml:"number"`
+	Timestamp int    `form:"timestamp" json:"timestamp" yaml:"timestamp" xml:"timestamp"`
+	Version   string `form:"version" json:"version" yaml:"version" xml:"version"`
 }
 
 // Validate validates the JSONDataMetaStationFirmware type instance.
 func (ut *JSONDataMetaStationFirmware) Validate() (err error) {
-	if ut.Git == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "git"))
+	if ut.Version == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "version"))
 	}
 	if ut.Build == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "build"))
+	}
+	if ut.Number == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "number"))
+	}
+
+	if ut.Hash == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "hash"))
 	}
 	return
 }
