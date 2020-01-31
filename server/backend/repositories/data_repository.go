@@ -123,7 +123,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 
 	log.Infow("querying for meta")
 
-	metas, err := r.queryMetaRecords(ctx, opts)
+	dbMetas, err := r.queryMetaRecords(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -141,9 +141,20 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		return nil, err
 	}
 
-	metaIds := make([]int64, 0)
-	bin := NewResamplingBin(summary, opts)
-	resampled := make([]*Downsampled, 0, opts.Resolution)
+	metaFactory := NewMetaFactory()
+	for _, dbMeta := range dbMetas {
+		_, err := metaFactory.Add(dbMeta)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	resampler, err := NewResampler(summary, metaFactory, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	resampled := make([]*Resampled, 0, opts.Resolution)
 
 	for rows.Next() {
 		data := &data.DataRecord{}
@@ -151,12 +162,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 			return nil, err
 		}
 
-		nmetas := len(metaIds)
-		if nmetas == 0 || metaIds[nmetas-1] != data.Meta {
-			metaIds = append(metaIds, data.Meta)
-		}
-
-		d, err := bin.Insert(data)
+		d, err := resampler.Insert(ctx, data)
 		if err != nil {
 			return nil, err
 		}
@@ -166,7 +172,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		}
 	}
 
-	d, err := bin.Close()
+	d, err := resampler.Close(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -177,9 +183,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		resampled = append(resampled, d)
 	}
 
-	_ = metas
-
-	log.Infow("resampling", "start", summary.Start, "end", summary.End, "resolution", opts.Resolution, "number_metas", len(metaIds), "nsamples", len(resampled))
+	log.Infow("resampling", "start", summary.Start, "end", summary.End, "resolution", opts.Resolution, "number_metas", len(dbMetas), "nsamples", len(resampled))
 
 	return
 }
