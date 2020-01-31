@@ -10,6 +10,13 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type DataSummary struct {
+	Start               time.Time `db:"start"`
+	End                 time.Time `db:"end"`
+	NumberOfDataRecords int64     `db:"number_of_data_records"`
+	NumberOfMetaRecords int64     `db:"number_of_meta_records"`
+}
+
 type DataRepository struct {
 	Database *sqlxcache.DB
 }
@@ -19,40 +26,48 @@ func NewDataRepository(database *sqlxcache.DB) (rr *DataRepository, err error) {
 }
 
 type SummaryQueryOpts struct {
-	DeviceID      string
-	DeviceIdBytes []byte
-	Internal      bool
-	Start         int64
-	End           int64
-	Resolution    int
-	Page          int
-	PageSize      int
+	DeviceID   string
+	Internal   bool
+	Start      int64
+	End        int64
+	Resolution int
+	Page       int
+	PageSize   int
 }
 
-func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts) (versions []*Version, err error) {
-	log := Logger(ctx).Sugar()
-
-	sr, err := NewStationRepository(r.Database)
-	if err != nil {
-		return nil, err
-	}
-
-	start := time.Unix(opts.Start, 0)
-	end := time.Unix(opts.End, 0)
-
-	log.Infow("querying", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_unix", opts.Start, "end_unix", opts.End, "start", start, "end", end)
-
+func (r *DataRepository) queryMetaRecords(ctx context.Context, opts *SummaryQueryOpts) (map[int64]*data.MetaRecord, error) {
 	deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
 	if err != nil {
 		return nil, err
 	}
+	start := time.Unix(opts.Start, 0)
+	end := time.Unix(opts.End, 0)
 
-	station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
-	if err != nil {
+	mrs := []*data.MetaRecord{}
+	if err := r.Database.SelectContext(ctx, &mrs, `
+	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
+	      SELECT DISTINCT q.meta FROM (
+			SELECT r.meta FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (r.time BETWEEN $2 AND $3)
+	      ) AS q
+	    ))`, deviceIdBytes, start, end); err != nil {
 		return nil, err
 	}
 
-	log.Infow("querying", "station_name", station.Name, "station_id", station.ID)
+	metas := make(map[int64]*data.MetaRecord)
+	for _, m := range mrs {
+		metas[m.ID] = m
+	}
+
+	return metas, nil
+}
+
+func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpts) (*DataSummary, error) {
+	deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
+	if err != nil {
+		return nil, err
+	}
+	start := time.Unix(opts.Start, 0)
+	end := time.Unix(opts.End, 0)
 
 	summaries := make([]*DataSummary, 0)
 	if err := r.Database.SelectContext(ctx, &summaries, `
@@ -73,12 +88,53 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 
 	summary := summaries[0]
 
-	log.Infow("querying for data records")
+	return summary, nil
+}
+
+func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts) (versions []*Version, err error) {
+	log := Logger(ctx).Sugar()
+
+	deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
+	if err != nil {
+		return nil, err
+	}
+	start := time.Unix(opts.Start, 0)
+	end := time.Unix(opts.End, 0)
+
+	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_unix", opts.Start, "end_unix", opts.End, "start", start, "end", end)
+
+	if false {
+		sr, err := NewStationRepository(r.Database)
+		if err != nil {
+			return nil, err
+		}
+		station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Infow("station", "station_id", station.ID, "station_name", station.Name)
+	}
+
+	summary, err := r.querySummary(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("querying for meta")
+
+	metas, err := r.queryMetaRecords(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("querying for data")
 
 	rows, err := r.Database.QueryxContext(ctx, `
 		SELECT
 			r.id, r.provision_id, r.time, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw
-		FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		FROM
+            fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		WHERE (p.device_id = $1) AND (r.time BETWEEN $2 AND $3)
         ORDER BY r.time`, deviceIdBytes, start, end)
 	if err != nil {
@@ -87,6 +143,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 
 	metaIds := make([]int64, 0)
 	bin := NewResamplingBin(summary, opts)
+	resampled := make([]*Downsampled, 0, opts.Resolution)
 
 	for rows.Next() {
 		data := &data.DataRecord{}
@@ -104,9 +161,8 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 			return nil, err
 		}
 
-		if false && d != nil {
-			b := d.Bin
-			log.Infow("row", "bin", b.Index, "bin_start", b.BinStart, "bin_end", b.BinEnd, "bin_size", d.NumberOfSamples)
+		if d != nil {
+			resampled = append(resampled, d)
 		}
 	}
 
@@ -115,117 +171,15 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		return nil, err
 	}
 
-	if false && d != nil {
-		b := d.Bin
-		log.Infow("row", "bin", b.Index, "bin_start", b.BinStart, "bin_end", b.BinEnd, "bin_size", d.NumberOfSamples)
+	if d == nil {
+		log.Warnw("final resample was empty")
+	} else {
+		resampled = append(resampled, d)
 	}
 
-	log.Infow("resampling", "start", summary.Start, "end", summary.End, "resolution", opts.Resolution, "number_metas", len(metaIds))
+	_ = metas
+
+	log.Infow("resampling", "start", summary.Start, "end", summary.End, "resolution", opts.Resolution, "number_metas", len(metaIds), "nsamples", len(resampled))
 
 	return
-}
-
-type ResamplingBin struct {
-	Index    int32
-	Start    time.Time
-	End      time.Time
-	BinStart time.Time
-	BinEnd   time.Time
-	Step     time.Duration
-	Records  []*data.DataRecord
-}
-
-func NewResamplingBin(s *DataSummary, o *SummaryQueryOpts) (b *ResamplingBin) {
-	start := s.Start
-	end := s.End
-	step := time.Duration(end.Sub(start).Nanoseconds() / int64(o.Resolution))
-
-	return &ResamplingBin{
-		Index:    0,
-		Start:    start,
-		End:      end,
-		BinStart: start,
-		BinEnd:   start.Add(step),
-		Step:     step,
-		Records:  make([]*data.DataRecord, 0, 1),
-	}
-}
-
-func (b *ResamplingBin) Contains(i time.Time) bool {
-	return (i == b.BinStart || i.After(b.BinStart)) && (i.Before(b.BinEnd) || i == b.End)
-}
-
-func (b *ResamplingBin) Next() bool {
-	b.BinStart = b.BinEnd
-	b.BinEnd = b.BinStart.Add(b.Step)
-	b.Index += 1
-	return b.BinEnd.Before(b.End) || b.BinEnd == b.End
-}
-
-func (b *ResamplingBin) FastForward(i time.Time) bool {
-	for {
-		if b.Contains(i) {
-			return true
-		}
-
-		if len(b.Records) != 0 {
-			panic("losing records")
-		}
-
-		if !b.Next() {
-			return false
-		}
-	}
-}
-
-func (b *ResamplingBin) Insert(data *data.DataRecord) (d *Downsampled, err error) {
-	if !b.Contains(data.Time) {
-		d, err = b.Close()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if !b.FastForward(data.Time) {
-		return nil, fmt.Errorf("unable to find bin")
-	}
-
-	b.Records = append(b.Records, data)
-
-	return
-}
-
-func (b *ResamplingBin) Clone() *ResamplingBin {
-	return &ResamplingBin{
-		Index:    b.Index,
-		Start:    b.Start,
-		End:      b.End,
-		BinStart: b.BinStart,
-		BinEnd:   b.BinEnd,
-		Step:     b.Step,
-		Records:  b.Records,
-	}
-}
-
-func (b *ResamplingBin) Close() (d *Downsampled, err error) {
-	d = &Downsampled{
-		Bin:             b.Clone(),
-		NumberOfSamples: len(b.Records),
-	}
-
-	b.Records = b.Records[:0]
-
-	return
-}
-
-type Downsampled struct {
-	Bin             *ResamplingBin
-	NumberOfSamples int
-}
-
-type DataSummary struct {
-	Start               time.Time `db:"start"`
-	End                 time.Time `db:"end"`
-	NumberOfDataRecords int64     `db:"number_of_data_records"`
-	NumberOfMetaRecords int64     `db:"number_of_meta_records"`
 }

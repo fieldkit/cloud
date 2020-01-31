@@ -128,11 +128,13 @@ func ParseBlocks(s string) ([]int64, error) {
 	return blocks, nil
 }
 
-type MetaRecord struct {
+type DataRecord struct {
 	ID          int64          `db:"id"`
 	ProvisionID int64          `db:"provision_id"`
 	Time        time.Time      `db:"time"`
 	Number      int64          `db:"number"`
+	Meta        int64          `db:"meta"`
+	Location    *Location      `db:"location"`
 	Data        types.JSONText `db:"raw"`
 }
 
@@ -161,13 +163,11 @@ func (d *DataRecord) Unmarshal(r *pb.DataRecord) error {
 	return nil
 }
 
-type DataRecord struct {
+type MetaRecord struct {
 	ID          int64          `db:"id"`
 	ProvisionID int64          `db:"provision_id"`
 	Time        time.Time      `db:"time"`
 	Number      int64          `db:"number"`
-	Meta        int64          `db:"meta"`
-	Location    *Location      `db:"location"`
 	Data        types.JSONText `db:"raw"`
 }
 

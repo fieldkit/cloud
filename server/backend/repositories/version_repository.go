@@ -2,9 +2,6 @@ package repositories
 
 import (
 	"context"
-	"encoding/hex"
-
-	"github.com/iancoleman/strcase"
 
 	"github.com/conservify/sqlxcache"
 
@@ -37,14 +34,15 @@ type Version struct {
 }
 
 type VersionMeta struct {
-	ID      int
+	ID      int64
 	Station *DataMetaStation
 }
 
 type DataMetaSensor struct {
-	Name  string
-	Key   string
-	Units string
+	Name     string
+	Key      string
+	Units    string
+	Internal bool
 }
 
 type DataMetaModule struct {
@@ -54,6 +52,7 @@ type DataMetaModule struct {
 	Name         string
 	ID           string
 	Sensors      []*DataMetaSensor
+	Internal     bool
 }
 
 type DataMetaStation struct {
@@ -64,8 +63,11 @@ type DataMetaStation struct {
 }
 
 type DataMetaStationFirmware struct {
-	Git   string
-	Build string
+	Version   string
+	Build     string
+	Number    string
+	Timestamp uint64
+	Hash      string
 }
 
 type DataRow struct {
@@ -118,45 +120,16 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 		byMeta[d.Meta] = append(byMeta[d.Meta], d)
 	}
 
+	mf := NewMetaFactory()
+
 	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
 
 	versions = make([]*Version, 0)
 	for _, m := range metaOrder {
-		var metaRecord pb.DataRecord
-		err := m.Unmarshal(&metaRecord)
+		versionMeta, err := mf.Add(m)
 		if err != nil {
 			return nil, err
 		}
-
-		name := metaRecord.Identity.Name
-		if name == "" {
-			name = station.Name
-		}
-
-		modules := make([]*DataMetaModule, 0)
-		for _, module := range metaRecord.Modules {
-			if internal || !isInternalModule(module) {
-				sensors := make([]*DataMetaSensor, 0)
-				for _, sensor := range module.Sensors {
-					sensors = append(sensors, &DataMetaSensor{
-						Name:  sensor.Name,
-						Key:   strcase.ToLowerCamel(sensor.Name),
-						Units: sensor.UnitOfMeasure,
-					})
-				}
-
-				modules = append(modules, &DataMetaModule{
-					Name:         module.Name,
-					ID:           hex.EncodeToString(module.Id),
-					Manufacturer: int(module.Header.Manufacturer),
-					Kind:         int(module.Header.Kind),
-					Version:      int(module.Header.Version),
-					Sensors:      sensors,
-				})
-			}
-		}
-
-		skipped := 0
 
 		dataRecords := byMeta[m.ID]
 		rows := make([]*DataRow, 0)
@@ -167,50 +140,17 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				return nil, err
 			}
 
-			data := make(map[string]interface{})
-			for mi, sg := range dataRecord.Readings.SensorGroups {
-				if sg.Module == 255 {
-					skipped += 1
-					continue
-				}
-				if mi >= len(metaRecord.Modules) {
-					log.Warnw("module index range", "module_index", mi, "modules", len(metaRecord.Modules), "meta", metaRecord.Modules)
-					continue
-				}
-				module := metaRecord.Modules[mi]
-				if internal || !isInternalModule(module) {
-					for si, r := range sg.Readings {
-						if r != nil && si < len(module.Sensors) {
-							sensor := module.Sensors[si]
-							key := strcase.ToLowerCamel(sensor.Name)
-							data[key] = r.Value
-						}
-					}
-				}
+			row, err := mf.Resolve(d)
+			if err != nil {
+				return nil, err
 			}
 
-			rows = append(rows, &DataRow{
-				ID:       int(d.ID),
-				Time:     int(dataRecord.Readings.Time),
-				Location: getLocation(dataRecord.Readings.Location),
-				D:        data,
-			})
+			rows = append(rows, row)
 		}
 
 		if len(rows) > 0 {
 			versions = append(versions, &Version{
-				Meta: &VersionMeta{
-					ID: int(m.ID),
-					Station: &DataMetaStation{
-						ID:      hex.EncodeToString(metaRecord.Metadata.DeviceId),
-						Name:    name,
-						Modules: modules,
-						Firmware: &DataMetaStationFirmware{
-							Git:   metaRecord.Metadata.Firmware.Git,
-							Build: metaRecord.Metadata.Firmware.Build,
-						},
-					},
-				},
+				Meta: versionMeta,
 				Data: rows,
 			})
 		} else {

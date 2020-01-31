@@ -378,13 +378,16 @@ func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
 		}
 	}
 	return &app.JSONDataMeta{
-		ID: dm.ID,
+		ID: int(dm.ID),
 		Station: &app.JSONDataMetaStation{
 			ID:   dm.Station.ID,
 			Name: dm.Station.Name,
 			Firmware: &app.JSONDataMetaStationFirmware{
-				Git:   dm.Station.Firmware.Git,
-				Build: dm.Station.Firmware.Build,
+				Version:   dm.Station.Firmware.Version,
+				Build:     dm.Station.Firmware.Build,
+				Number:    dm.Station.Firmware.Number,
+				Timestamp: int(dm.Station.Firmware.Timestamp),
+				Hash:      dm.Station.Firmware.Hash,
 			},
 			Modules: modules,
 		},
@@ -565,7 +568,7 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 				Time:     row.Time,
 				Location: row.Location,
 				ID:       row.ID,
-				Meta:     version.Meta.ID,
+				Meta:     int(version.Meta.ID),
 				D:        row.D,
 			}
 			bytes, err := json.Marshal(line)

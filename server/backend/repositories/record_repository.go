@@ -43,7 +43,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	if err := r.Database.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
 	      SELECT DISTINCT q.meta FROM (
-		SELECT r.meta, r.time FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) ORDER BY r.time DESC LIMIT $2 OFFSET $3
+			SELECT r.meta, r.time FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) ORDER BY r.time DESC LIMIT $2 OFFSET $3
 	      ) AS q
 	    ))`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
 		return nil, err
