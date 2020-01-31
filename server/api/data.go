@@ -346,8 +346,8 @@ func JSONDataRowsType(dm []*repositories.DataRow) []*app.JSONDataRow {
 	wm := make([]*app.JSONDataRow, len(dm))
 	for i, r := range dm {
 		wm[i] = &app.JSONDataRow{
-			ID:       r.ID,
-			Time:     r.Time,
+			ID:       int(r.ID),
+			Time:     int(r.Time),
 			Location: r.Location,
 			D:        r.D,
 		}
@@ -402,7 +402,7 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 			Data: JSONDataRowsType(r.Data),
 		}
 	}
-	return nil
+	return wm
 }
 
 func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
@@ -444,14 +444,14 @@ func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
 		opts.Internal = *ctx.Internal
 	}
 
-	v, err := r.QueryDevice(ctx, opts)
+	versions, err := r.QueryDevice(ctx, opts)
 	if err != nil {
 		return err
 	}
 
-	_ = v
-
-	return ctx.OK(nil)
+	return ctx.OK(&app.JSONDataResponse{
+		Versions: JSONDataResponseType(versions),
+	})
 }
 
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
@@ -505,10 +505,10 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 }
 
 type JSONLine struct {
-	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
+	ID       int64                  `form:"id" json:"id" yaml:"id" xml:"id"`
+	Time     int64                  `form:"time" json:"time" yaml:"time" xml:"time"`
+	Meta     int64                  `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
-	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
-	Meta     int                    `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
 	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
 }
 
@@ -568,7 +568,7 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 				Time:     row.Time,
 				Location: row.Location,
 				ID:       row.ID,
-				Meta:     int(version.Meta.ID),
+				Meta:     version.Meta.ID,
 				D:        row.D,
 			}
 			bytes, err := json.Marshal(line)

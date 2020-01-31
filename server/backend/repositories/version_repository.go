@@ -39,6 +39,7 @@ type VersionMeta struct {
 }
 
 type DataMetaSensor struct {
+	Number   int
 	Name     string
 	Key      string
 	Units    string
@@ -46,6 +47,8 @@ type DataMetaSensor struct {
 }
 
 type DataMetaModule struct {
+	Position     int
+	Address      int
 	Manufacturer int
 	Kind         int
 	Version      int
@@ -71,8 +74,9 @@ type DataMetaStationFirmware struct {
 }
 
 type DataRow struct {
-	ID       int
-	Time     int
+	ID       int64
+	MetaID   int64
+	Time     int64
 	Location []float64
 	D        map[string]interface{}
 }
@@ -110,28 +114,26 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 		return nil, err
 	}
 
-	metaOrder := make([]*data.MetaRecord, 0)
-	byMeta := make(map[int64][]*data.DataRecord)
-	for _, d := range page.Data {
-		if byMeta[d.Meta] == nil {
-			byMeta[d.Meta] = make([]*data.DataRecord, 0)
-			metaOrder = append(metaOrder, page.Meta[d.Meta])
-		}
-		byMeta[d.Meta] = append(byMeta[d.Meta], d)
-	}
-
 	mf := NewMetaFactory()
+
+	byMeta := make(map[int64][]*data.DataRecord)
+	for _, dbDataRecord := range page.Data {
+		metaID := dbDataRecord.Meta
+		_, err := mf.Add(page.Meta[metaID])
+		if err != nil {
+			return nil, err
+		}
+		if byMeta[metaID] == nil {
+			byMeta[metaID] = make([]*data.DataRecord, 0)
+		}
+		byMeta[metaID] = append(byMeta[metaID], dbDataRecord)
+	}
 
 	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
 
 	versions = make([]*Version, 0)
-	for _, m := range metaOrder {
-		versionMeta, err := mf.Add(m)
-		if err != nil {
-			return nil, err
-		}
-
-		dataRecords := byMeta[m.ID]
+	for _, versionMeta := range mf.InOrder() {
+		dataRecords := byMeta[versionMeta.ID]
 		rows := make([]*DataRow, 0)
 		for _, d := range dataRecords {
 			var dataRecord pb.DataRecord
@@ -154,7 +156,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				Data: rows,
 			})
 		} else {
-			log.Infow("empty version", "meta_id", m.ID)
+			log.Infow("empty version", "meta_id", versionMeta.ID)
 		}
 	}
 

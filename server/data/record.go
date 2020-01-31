@@ -73,6 +73,32 @@ func (l *Location) Distance(o *Location) float64 {
 	return l.point.GeoDistanceFrom(o.point)
 }
 
+func (l *Location) Latitude() float64 {
+	return l.point.Lat()
+}
+
+func (l *Location) Longitude() float64 {
+	return l.point.Lng()
+}
+
+func (l *Location) Valid() bool {
+	if l == nil {
+		return false
+	}
+
+	// Simple range checks...
+	if l.Latitude() > 90 || l.Latitude() < -90 || l.Longitude() > 180 || l.Longitude() < -180 {
+		return false
+	}
+
+	// HACK jlewallen
+	if l.Longitude() == 0.0 && l.Latitude() == 0.0 {
+		return false
+	}
+
+	return true
+}
+
 type RecordAnalysis struct {
 	RecordID         int64 `db:"record_id"`
 	ManuallyExcluded bool  `db:"manually_excluded"`

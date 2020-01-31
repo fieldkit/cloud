@@ -183,6 +183,11 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		resampled = append(resampled, d)
 	}
 
+	versions, err = metaFactory.ToVersions(resampled)
+	if err != nil {
+		return nil, err
+	}
+
 	log.Infow("resampling", "start", summary.Start, "end", summary.End, "resolution", opts.Resolution, "number_metas", len(dbMetas), "nsamples", len(resampled))
 
 	return

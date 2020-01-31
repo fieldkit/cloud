@@ -16,20 +16,24 @@ const (
 )
 
 type MetaFactory struct {
-	ByMetaID map[int64]*VersionMeta
-	Ordered  []*VersionMeta
+	byMetaID map[int64]*VersionMeta
+	ordered  []*VersionMeta
 }
 
 func NewMetaFactory() *MetaFactory {
 	return &MetaFactory{
-		ByMetaID: make(map[int64]*VersionMeta),
-		Ordered:  make([]*VersionMeta, 0),
+		byMetaID: make(map[int64]*VersionMeta),
+		ordered:  make([]*VersionMeta, 0),
 	}
 }
 
+func (mf *MetaFactory) InOrder() []*VersionMeta {
+	return mf.ordered
+}
+
 func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error) {
-	if mf.ByMetaID[databaseRecord.ID] != nil {
-		return mf.ByMetaID[databaseRecord.ID], nil
+	if mf.byMetaID[databaseRecord.ID] != nil {
+		return mf.byMetaID[databaseRecord.ID], nil
 	}
 
 	var meta pb.DataRecord
@@ -43,6 +47,7 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 		sensors := make([]*DataMetaSensor, 0)
 		for _, sensor := range module.Sensors {
 			sensors = append(sensors, &DataMetaSensor{
+				Number:   int(sensor.Number),
 				Name:     sensor.Name,
 				Key:      strcase.ToLowerCamel(sensor.Name),
 				Units:    sensor.UnitOfMeasure,
@@ -52,6 +57,8 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 
 		modules = append(modules, &DataMetaModule{
 			Name:         module.Name,
+			Position:     int(module.Position),
+			Address:      int(module.Address),
 			ID:           hex.EncodeToString(module.Id),
 			Manufacturer: int(module.Header.Manufacturer),
 			Kind:         int(module.Header.Kind),
@@ -76,14 +83,14 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 		},
 	}
 
-	mf.ByMetaID[versionMeta.ID] = versionMeta
-	mf.Ordered = append(mf.Ordered, versionMeta)
+	mf.byMetaID[versionMeta.ID] = versionMeta
+	mf.ordered = append(mf.ordered, versionMeta)
 
 	return versionMeta, nil
 }
 
 func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error) {
-	meta := mf.ByMetaID[databaseRecord.Meta]
+	meta := mf.byMetaID[databaseRecord.Meta]
 	if meta == nil {
 		return nil, fmt.Errorf("data record (%d) with unexpected meta (%d)", databaseRecord.ID, databaseRecord.Meta)
 	}
@@ -95,11 +102,12 @@ func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error
 	}
 
 	data := make(map[string]interface{})
-	for _, sensorGroup := range dataRecord.Readings.SensorGroups {
-		moduleIndex := sensorGroup.Module
-		if moduleIndex >= uint32(len(meta.Station.Modules)) {
+	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
+		moduleIndex := sgIndex
+		if moduleIndex >= len(meta.Station.Modules) {
 			continue
 		}
+
 		module := meta.Station.Modules[moduleIndex]
 		for sensorIndex, reading := range sensorGroup.Readings {
 			if sensorIndex >= len(module.Sensors) {
@@ -113,11 +121,82 @@ func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error
 	}
 
 	row := &DataRow{
-		ID:       int(databaseRecord.ID),
-		Time:     int(dataRecord.Readings.Time),
+		ID:       databaseRecord.ID,
+		MetaID:   databaseRecord.Meta,
+		Time:     dataRecord.Readings.Time,
 		Location: getLocation(dataRecord.Readings.Location),
 		D:        data,
 	}
 
 	return row, nil
+}
+
+func (mf *MetaFactory) CombinedMetaByIDs(ids []int64) (combined *VersionMeta, err error) {
+	station := &DataMetaStation{}
+	modulesByID := make(map[string]*DataMetaModule)
+
+	for _, id := range ids {
+		meta := mf.byMetaID[id]
+
+		for _, module := range meta.Station.Modules {
+			modulesByID[module.ID] = module
+		}
+
+		station = meta.Station
+	}
+
+	modules := make([]*DataMetaModule, 0)
+	for _, module := range modulesByID {
+		modules = append(modules, module)
+	}
+
+	station.Modules = modules
+
+	combined = &VersionMeta{
+		ID:      0,
+		Station: station,
+	}
+
+	return
+}
+
+type ModuleAndMetaID struct {
+	MetaID int64
+	Module *DataMetaModule
+}
+
+func (mf *MetaFactory) AllModules() map[string]*ModuleAndMetaID {
+	modulesByID := make(map[string]*ModuleAndMetaID)
+
+	for _, meta := range mf.ordered {
+		for _, module := range meta.Station.Modules {
+			modulesByID[module.ID] = &ModuleAndMetaID{
+				MetaID: meta.ID,
+				Module: module,
+			}
+		}
+	}
+
+	return modulesByID
+}
+
+func (mf *MetaFactory) ToVersions(resampled []*Resampled) (versions []*Version, err error) {
+	allModules := mf.AllModules()
+
+	_ = allModules
+
+	data := make([]*DataRow, 0, len(resampled))
+
+	for _, r := range resampled {
+		data = append(data, r.ToDataRow())
+	}
+
+	version := &Version{
+		Meta: nil,
+		Data: data,
+	}
+
+	versions = append(versions, version)
+
+	return
 }
