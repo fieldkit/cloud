@@ -174,7 +174,7 @@ func getResampledLocation(records []*DataRow) []float64 {
 			return r.Location
 		}
 	}
-	return []float64{}
+	return nil
 }
 
 func getResampledData(records []*DataRow) (map[string]interface{}, error) {
