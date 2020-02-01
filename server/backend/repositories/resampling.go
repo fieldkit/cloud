@@ -28,7 +28,7 @@ type Resampled struct {
 func (r *Resampled) ToDataRow() *DataRow {
 	return &DataRow{
 		ID:       0,
-		MetaID:   0,
+		MetaIDs:  r.MetaIDs,
 		Time:     r.Time.Unix(),
 		Location: r.Location,
 		D:        r.D,
@@ -132,8 +132,11 @@ type ResamplingBin struct {
 func (b *ResamplingBin) MetaIDs() []int64 {
 	ids := make([]int64, 0)
 	for _, record := range b.Records {
-		if len(ids) == 0 || ids[len(ids)-1] != record.MetaID {
-			ids = append(ids, record.MetaID)
+		if len(record.MetaIDs) != 1 {
+			panic("record with invalid meta-ids collection")
+		}
+		if len(ids) == 0 || ids[len(ids)-1] != record.MetaIDs[0] {
+			ids = append(ids, record.MetaIDs[0])
 		}
 	}
 	return ids

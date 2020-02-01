@@ -244,6 +244,7 @@ var JSONDataRow = Type("JSONDataRow", func() {
 	Attribute("id", Integer)
 	Attribute("time", Integer)
 	Attribute("location", ArrayOf(Number))
+	Attribute("metas", ArrayOf(Integer))
 	Attribute("d", HashOf(String, Any))
 
 	Required("id", "time", "location", "d")

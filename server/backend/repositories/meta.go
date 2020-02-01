@@ -122,7 +122,7 @@ func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error
 
 	row := &DataRow{
 		ID:       databaseRecord.ID,
-		MetaID:   databaseRecord.Meta,
+		MetaIDs:  []int64{databaseRecord.Meta},
 		Time:     dataRecord.Readings.Time,
 		Location: getLocation(dataRecord.Readings.Location),
 		D:        data,

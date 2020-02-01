@@ -1594,6 +1594,7 @@ type jSONDataRow struct {
 	D        map[string]interface{} `form:"d,omitempty" json:"d,omitempty" yaml:"d,omitempty" xml:"d,omitempty"`
 	ID       *int                   `form:"id,omitempty" json:"id,omitempty" yaml:"id,omitempty" xml:"id,omitempty"`
 	Location []float64              `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Metas    []int                  `form:"metas,omitempty" json:"metas,omitempty" yaml:"metas,omitempty" xml:"metas,omitempty"`
 	Time     *int                   `form:"time,omitempty" json:"time,omitempty" yaml:"time,omitempty" xml:"time,omitempty"`
 }
 
@@ -1626,6 +1627,9 @@ func (ut *jSONDataRow) Publicize() *JSONDataRow {
 	if ut.Location != nil {
 		pub.Location = ut.Location
 	}
+	if ut.Metas != nil {
+		pub.Metas = ut.Metas
+	}
 	if ut.Time != nil {
 		pub.Time = *ut.Time
 	}
@@ -1637,6 +1641,7 @@ type JSONDataRow struct {
 	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
 	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
 	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
+	Metas    []int                  `form:"metas,omitempty" json:"metas,omitempty" yaml:"metas,omitempty" xml:"metas,omitempty"`
 	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
 }
 

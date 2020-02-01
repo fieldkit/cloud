@@ -342,14 +342,22 @@ func NewJSONDataController(ctx context.Context, service *goa.Service, options Da
 	}
 }
 
-func JSONDataRowsType(dm []*repositories.DataRow) []*app.JSONDataRow {
+func JSONDataRowsType(dm []*repositories.DataRow, includeMetas bool) []*app.JSONDataRow {
 	wm := make([]*app.JSONDataRow, len(dm))
 	for i, r := range dm {
+		var metas []int
+		if includeMetas {
+			metas = make([]int, len(r.MetaIDs))
+			for i, v := range r.MetaIDs {
+				metas[i] = int(v)
+			}
+		}
 		wm[i] = &app.JSONDataRow{
 			ID:       int(r.ID),
 			Time:     int(r.Time),
 			Location: r.Location,
 			D:        r.D,
+			Metas:    metas,
 		}
 	}
 	return wm
@@ -403,7 +411,7 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 	for i, r := range dm {
 		wm[i] = &app.JSONDataVersion{
 			Meta: JSONDataMetaType(r.Meta),
-			Data: JSONDataRowsType(r.Data),
+			Data: JSONDataRowsType(r.Data, false),
 		}
 	}
 	return wm
@@ -412,7 +420,7 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 func JSONDataSummaryResponseType(dm *repositories.ModulesAndData) *app.JSONDataSummaryResponse {
 	return &app.JSONDataSummaryResponse{
 		Modules: JSONDataMetaModuleType(dm.Modules),
-		Data:    JSONDataRowsType(dm.Data),
+		Data:    JSONDataRowsType(dm.Data, true),
 	}
 }
 

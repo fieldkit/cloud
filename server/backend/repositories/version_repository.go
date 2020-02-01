@@ -75,7 +75,7 @@ type DataMetaStationFirmware struct {
 
 type DataRow struct {
 	ID       int64
-	MetaID   int64
+	MetaIDs  []int64
 	Time     int64
 	Location []float64
 	D        map[string]interface{}

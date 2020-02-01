@@ -387,12 +387,6 @@ definitions:
       - - 0.9682483955411658
       id: 5.41219004578842e+18
       sourceId: 1.6901081034442964e+18
-    - geometry:
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      - - 0.9682483955411658
-      id: 5.41219004578842e+18
-      sourceId: 1.6901081034442964e+18
     items:
       $ref: '#/definitions/ClusterGeometrySummary'
     title: 'Mediatype identifier: application/vnd.app.cluster_geometry_summary+json;
@@ -477,6 +471,18 @@ definitions:
     description: ClusterSummaryCollection is the media type for an array of ClusterSummary
       (default view)
     example:
+    - centroid:
+      - 0.5408775402802485
+      endTime: "2005-01-11T03:51:21Z"
+      envelope:
+      - - 0.7520434281331757
+        - 0.7520434281331757
+        - 0.7520434281331757
+      id: 8.282634339368904e+18
+      numberOfFeatures: 8.252764702077084e+18
+      radius: 0.729149602582465
+      sourceId: 6.822439840585685e+18
+      startTime: "2005-03-28T09:27:43Z"
     - centroid:
       - 0.5408775402802485
       endTime: "2005-01-11T03:51:21Z"
@@ -698,39 +704,39 @@ definitions:
     description: DeviceDataSummaryResponse media type (default view)
     example:
       provisions:
-      - created: "1970-08-24T10:03:04Z"
+      - created: "1994-01-08T15:12:25Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Nisi dolor autem sint vitae.
+        generation: Sint vitae et corrupti ipsum fugit nisi.
         meta:
-          first: 4.791279341070292e+18
-          last: 6.939366097402898e+18
-          size: 3.008084869957272e+18
-        updated: "1998-10-16T18:45:30Z"
-      - created: "1970-08-24T10:03:04Z"
+          first: 5.723273287415042e+18
+          last: 1.1069023609181236e+18
+          size: 5.157638177597977e+17
+        updated: "1975-04-23T11:49:31Z"
+      - created: "1994-01-08T15:12:25Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Nisi dolor autem sint vitae.
+        generation: Sint vitae et corrupti ipsum fugit nisi.
         meta:
-          first: 4.791279341070292e+18
-          last: 6.939366097402898e+18
-          size: 3.008084869957272e+18
-        updated: "1998-10-16T18:45:30Z"
-      - created: "1970-08-24T10:03:04Z"
+          first: 5.723273287415042e+18
+          last: 1.1069023609181236e+18
+          size: 5.157638177597977e+17
+        updated: "1975-04-23T11:49:31Z"
+      - created: "1994-01-08T15:12:25Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Nisi dolor autem sint vitae.
+        generation: Sint vitae et corrupti ipsum fugit nisi.
         meta:
-          first: 4.791279341070292e+18
-          last: 6.939366097402898e+18
-          size: 3.008084869957272e+18
-        updated: "1998-10-16T18:45:30Z"
+          first: 5.723273287415042e+18
+          last: 1.1069023609181236e+18
+          size: 5.157638177597977e+17
+        updated: "1975-04-23T11:49:31Z"
     properties:
       provisions:
         $ref: '#/definitions/DeviceProvisionSummaryCollection'
@@ -1029,20 +1035,20 @@ definitions:
   DeviceMetaSummary:
     description: DeviceMetaSummary media type (default view)
     example:
-      first: 4.791279341070292e+18
-      last: 6.939366097402898e+18
-      size: 3.008084869957272e+18
+      first: 5.723273287415042e+18
+      last: 1.1069023609181236e+18
+      size: 5.157638177597977e+17
     properties:
       first:
-        example: 4.791279341070292e+18
+        example: 5.723273287415042e+18
         format: int64
         type: integer
       last:
-        example: 6.939366097402898e+18
+        example: 1.1069023609181236e+18
         format: int64
         type: integer
       size:
-        example: 3.008084869957272e+18
+        example: 5.157638177597977e+17
         format: int64
         type: integer
     required:
@@ -1090,31 +1096,31 @@ definitions:
   DeviceProvisionSummary:
     description: DeviceProvisionSummary media type (default view)
     example:
-      created: "1970-08-24T10:03:04Z"
+      created: "1994-01-08T15:12:25Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Nisi dolor autem sint vitae.
+      generation: Sint vitae et corrupti ipsum fugit nisi.
       meta:
-        first: 4.791279341070292e+18
-        last: 6.939366097402898e+18
-        size: 3.008084869957272e+18
-      updated: "1998-10-16T18:45:30Z"
+        first: 5.723273287415042e+18
+        last: 1.1069023609181236e+18
+        size: 5.157638177597977e+17
+      updated: "1975-04-23T11:49:31Z"
     properties:
       created:
-        example: "1970-08-24T10:03:04Z"
+        example: "1994-01-08T15:12:25Z"
         format: date-time
         type: string
       data:
         $ref: '#/definitions/DeviceDataSummary'
       generation:
-        example: Nisi dolor autem sint vitae.
+        example: Sint vitae et corrupti ipsum fugit nisi.
         type: string
       meta:
         $ref: '#/definitions/DeviceMetaSummary'
       updated:
-        example: "1998-10-16T18:45:30Z"
+        example: "1975-04-23T11:49:31Z"
         format: date-time
         type: string
     required:
@@ -1130,28 +1136,28 @@ definitions:
     description: DeviceProvisionSummaryCollection is the media type for an array of
       DeviceProvisionSummary (default view)
     example:
-    - created: "1970-08-24T10:03:04Z"
+    - created: "1994-01-08T15:12:25Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Nisi dolor autem sint vitae.
+      generation: Sint vitae et corrupti ipsum fugit nisi.
       meta:
-        first: 4.791279341070292e+18
-        last: 6.939366097402898e+18
-        size: 3.008084869957272e+18
-      updated: "1998-10-16T18:45:30Z"
-    - created: "1970-08-24T10:03:04Z"
+        first: 5.723273287415042e+18
+        last: 1.1069023609181236e+18
+        size: 5.157638177597977e+17
+      updated: "1975-04-23T11:49:31Z"
+    - created: "1994-01-08T15:12:25Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Nisi dolor autem sint vitae.
+      generation: Sint vitae et corrupti ipsum fugit nisi.
       meta:
-        first: 4.791279341070292e+18
-        last: 6.939366097402898e+18
-        size: 3.008084869957272e+18
-      updated: "1998-10-16T18:45:30Z"
+        first: 5.723273287415042e+18
+        last: 1.1069023609181236e+18
+        size: 5.157638177597977e+17
+      updated: "1975-04-23T11:49:31Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'
     title: 'Mediatype identifier: application/vnd.app.device.provision.summary+json;
@@ -1160,32 +1166,32 @@ definitions:
   DeviceSchema:
     description: DeviceSchema media type (default view)
     example:
-      active: true
-      deviceId: 4.86881556417374e+18
-      jsonSchema: Tempore laboriosam facere et quo vel.
-      key: Vel quisquam voluptatem doloribus.
-      projectId: 7.658459747062466e+18
-      schemaId: 4.270568374574214e+18
+      active: false
+      deviceId: 8.620775420842828e+18
+      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      key: Minus doloremque.
+      projectId: 3.267256188525231e+18
+      schemaId: 1.5887009993142717e+18
     properties:
       active:
-        example: true
+        example: false
         type: boolean
       deviceId:
-        example: 4.86881556417374e+18
+        example: 8.620775420842828e+18
         format: int64
         type: integer
       jsonSchema:
-        example: Tempore laboriosam facere et quo vel.
+        example: Vel aut vel quisquam voluptatem doloribus.
         type: string
       key:
-        example: Vel quisquam voluptatem doloribus.
+        example: Minus doloremque.
         type: string
       projectId:
-        example: 7.658459747062466e+18
+        example: 3.267256188525231e+18
         format: int64
         type: integer
       schemaId:
-        example: 4.270568374574214e+18
+        example: 1.5887009993142717e+18
         format: int64
         type: integer
     required:
@@ -1201,18 +1207,18 @@ definitions:
     description: DeviceSchemaCollection is the media type for an array of DeviceSchema
       (default view)
     example:
-    - active: true
-      deviceId: 4.86881556417374e+18
-      jsonSchema: Tempore laboriosam facere et quo vel.
-      key: Vel quisquam voluptatem doloribus.
-      projectId: 7.658459747062466e+18
-      schemaId: 4.270568374574214e+18
-    - active: true
-      deviceId: 4.86881556417374e+18
-      jsonSchema: Tempore laboriosam facere et quo vel.
-      key: Vel quisquam voluptatem doloribus.
-      projectId: 7.658459747062466e+18
-      schemaId: 4.270568374574214e+18
+    - active: false
+      deviceId: 8.620775420842828e+18
+      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      key: Minus doloremque.
+      projectId: 3.267256188525231e+18
+      schemaId: 1.5887009993142717e+18
+    - active: false
+      deviceId: 8.620775420842828e+18
+      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      key: Minus doloremque.
+      projectId: 3.267256188525231e+18
+      schemaId: 1.5887009993142717e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -1222,18 +1228,18 @@ definitions:
     description: DeviceSchemas media type (default view)
     example:
       schemas:
-      - active: true
-        deviceId: 4.86881556417374e+18
-        jsonSchema: Tempore laboriosam facere et quo vel.
-        key: Vel quisquam voluptatem doloribus.
-        projectId: 7.658459747062466e+18
-        schemaId: 4.270568374574214e+18
-      - active: true
-        deviceId: 4.86881556417374e+18
-        jsonSchema: Tempore laboriosam facere et quo vel.
-        key: Vel quisquam voluptatem doloribus.
-        projectId: 7.658459747062466e+18
-        schemaId: 4.270568374574214e+18
+      - active: false
+        deviceId: 8.620775420842828e+18
+        jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+        key: Minus doloremque.
+        projectId: 3.267256188525231e+18
+        schemaId: 1.5887009993142717e+18
+      - active: false
+        deviceId: 8.620775420842828e+18
+        jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+        key: Minus doloremque.
+        projectId: 3.267256188525231e+18
+        schemaId: 1.5887009993142717e+18
     properties:
       schemas:
         $ref: '#/definitions/DeviceSchemaCollection'
@@ -1244,41 +1250,41 @@ definitions:
   DeviceSource:
     description: DeviceSource media type (default view)
     example:
-      active: true
-      expeditionId: 3.7123157358872125e+18
-      id: 8.753840879962463e+18
-      key: Assumenda voluptas.
-      name: Inventore ratione nisi ea.
-      teamId: 7.871057918915739e+18
-      token: Consequatur numquam repellat accusamus ipsa rerum et.
-      userId: 7.867312227264694e+17
+      active: false
+      expeditionId: 3.0020301235635297e+18
+      id: 6.348447899341423e+17
+      key: Inventore ratione nisi ea.
+      name: Ducimus molestiae distinctio eum consequatur numquam.
+      teamId: 3.387812945162109e+18
+      token: Sed dolorem.
+      userId: 8.176206767848327e+18
     properties:
       active:
-        example: true
+        example: false
         type: boolean
       expeditionId:
-        example: 3.7123157358872125e+18
+        example: 3.0020301235635297e+18
         format: int64
         type: integer
       id:
-        example: 8.753840879962463e+18
+        example: 6.348447899341423e+17
         format: int64
         type: integer
       key:
-        example: Assumenda voluptas.
-        type: string
-      name:
         example: Inventore ratione nisi ea.
         type: string
+      name:
+        example: Ducimus molestiae distinctio eum consequatur numquam.
+        type: string
       teamId:
-        example: 7.871057918915739e+18
+        example: 3.387812945162109e+18
         format: int64
         type: integer
       token:
-        example: Consequatur numquam repellat accusamus ipsa rerum et.
+        example: Sed dolorem.
         type: string
       userId:
-        example: 7.867312227264694e+17
+        example: 8.176206767848327e+18
         format: int64
         type: integer
     required:
@@ -1294,30 +1300,30 @@ definitions:
     description: DeviceSourceCollection is the media type for an array of DeviceSource
       (default view)
     example:
-    - active: true
-      expeditionId: 3.7123157358872125e+18
-      id: 8.753840879962463e+18
-      key: Assumenda voluptas.
-      name: Inventore ratione nisi ea.
-      teamId: 7.871057918915739e+18
-      token: Consequatur numquam repellat accusamus ipsa rerum et.
-      userId: 7.867312227264694e+17
-    - active: true
-      expeditionId: 3.7123157358872125e+18
-      id: 8.753840879962463e+18
-      key: Assumenda voluptas.
-      name: Inventore ratione nisi ea.
-      teamId: 7.871057918915739e+18
-      token: Consequatur numquam repellat accusamus ipsa rerum et.
-      userId: 7.867312227264694e+17
-    - active: true
-      expeditionId: 3.7123157358872125e+18
-      id: 8.753840879962463e+18
-      key: Assumenda voluptas.
-      name: Inventore ratione nisi ea.
-      teamId: 7.871057918915739e+18
-      token: Consequatur numquam repellat accusamus ipsa rerum et.
-      userId: 7.867312227264694e+17
+    - active: false
+      expeditionId: 3.0020301235635297e+18
+      id: 6.348447899341423e+17
+      key: Inventore ratione nisi ea.
+      name: Ducimus molestiae distinctio eum consequatur numquam.
+      teamId: 3.387812945162109e+18
+      token: Sed dolorem.
+      userId: 8.176206767848327e+18
+    - active: false
+      expeditionId: 3.0020301235635297e+18
+      id: 6.348447899341423e+17
+      key: Inventore ratione nisi ea.
+      name: Ducimus molestiae distinctio eum consequatur numquam.
+      teamId: 3.387812945162109e+18
+      token: Sed dolorem.
+      userId: 8.176206767848327e+18
+    - active: false
+      expeditionId: 3.0020301235635297e+18
+      id: 6.348447899341423e+17
+      key: Inventore ratione nisi ea.
+      name: Ducimus molestiae distinctio eum consequatur numquam.
+      teamId: 3.387812945162109e+18
+      token: Sed dolorem.
+      userId: 8.176206767848327e+18
     items:
       $ref: '#/definitions/DeviceSource'
     title: 'Mediatype identifier: application/vnd.app.device_source+json; type=collection;
@@ -1327,30 +1333,30 @@ definitions:
     description: DeviceSources media type (default view)
     example:
       deviceSources:
-      - active: true
-        expeditionId: 3.7123157358872125e+18
-        id: 8.753840879962463e+18
-        key: Assumenda voluptas.
-        name: Inventore ratione nisi ea.
-        teamId: 7.871057918915739e+18
-        token: Consequatur numquam repellat accusamus ipsa rerum et.
-        userId: 7.867312227264694e+17
-      - active: true
-        expeditionId: 3.7123157358872125e+18
-        id: 8.753840879962463e+18
-        key: Assumenda voluptas.
-        name: Inventore ratione nisi ea.
-        teamId: 7.871057918915739e+18
-        token: Consequatur numquam repellat accusamus ipsa rerum et.
-        userId: 7.867312227264694e+17
-      - active: true
-        expeditionId: 3.7123157358872125e+18
-        id: 8.753840879962463e+18
-        key: Assumenda voluptas.
-        name: Inventore ratione nisi ea.
-        teamId: 7.871057918915739e+18
-        token: Consequatur numquam repellat accusamus ipsa rerum et.
-        userId: 7.867312227264694e+17
+      - active: false
+        expeditionId: 3.0020301235635297e+18
+        id: 6.348447899341423e+17
+        key: Inventore ratione nisi ea.
+        name: Ducimus molestiae distinctio eum consequatur numquam.
+        teamId: 3.387812945162109e+18
+        token: Sed dolorem.
+        userId: 8.176206767848327e+18
+      - active: false
+        expeditionId: 3.0020301235635297e+18
+        id: 6.348447899341423e+17
+        key: Inventore ratione nisi ea.
+        name: Ducimus molestiae distinctio eum consequatur numquam.
+        teamId: 3.387812945162109e+18
+        token: Sed dolorem.
+        userId: 8.176206767848327e+18
+      - active: false
+        expeditionId: 3.0020301235635297e+18
+        id: 6.348447899341423e+17
+        key: Inventore ratione nisi ea.
+        name: Ducimus molestiae distinctio eum consequatur numquam.
+        teamId: 3.387812945162109e+18
+        token: Sed dolorem.
+        userId: 8.176206767848327e+18
     properties:
       deviceSources:
         $ref: '#/definitions/DeviceSourceCollection'
@@ -1652,13 +1658,13 @@ definitions:
   Expedition:
     description: Expedition media type (default view)
     example:
-      description: Expedita impedit et incidunt illo voluptatem.
+      description: Et incidunt illo voluptatem.
       id: 7.204590710558903e+18
       name: Animi sit.
       slug: e7n4jt477a
     properties:
       description:
-        example: Expedita impedit et incidunt illo voluptatem.
+        example: Et incidunt illo voluptatem.
         type: string
       id:
         example: 7.204590710558903e+18
@@ -1683,7 +1689,7 @@ definitions:
     description: ExpeditionCollection is the media type for an array of Expedition
       (default view)
     example:
-    - description: Expedita impedit et incidunt illo voluptatem.
+    - description: Et incidunt illo voluptatem.
       id: 7.204590710558903e+18
       name: Animi sit.
       slug: e7n4jt477a
@@ -1696,11 +1702,11 @@ definitions:
     description: Expeditions media type (default view)
     example:
       expeditions:
-      - description: Expedita impedit et incidunt illo voluptatem.
+      - description: Et incidunt illo voluptatem.
         id: 7.204590710558903e+18
         name: Animi sit.
         slug: e7n4jt477a
-      - description: Expedita impedit et incidunt illo voluptatem.
+      - description: Et incidunt illo voluptatem.
         id: 7.204590710558903e+18
         name: Animi sit.
         slug: e7n4jt477a
@@ -2054,6 +2060,7 @@ definitions:
       view)
     example:
     - url: Hic quibusdam est rem.
+    - url: Hic quibusdam est rem.
     items:
       $ref: '#/definitions/ImageRef'
     title: 'Mediatype identifier: application/vnd.app.imageref+json; type=collection;
@@ -2072,47 +2079,35 @@ definitions:
     type: object
   JSONDataMeta:
     example:
-      id: 1.576519638086125e+18
+      id: 4.2667581563153295e+18
       station:
         firmware:
-          build: Itaque ipsa soluta minus consequatur ullam.
-          hash: Magni consequatur et blanditiis debitis eos iure.
-          number: Dolorem et magnam alias.
-          timestamp: 3.30566342895377e+18
-          version: Ipsa et hic sunt ut.
-        id: Nobis ea dolores sit qui perspiciatis.
+          build: Soluta minus consequatur.
+          hash: Sed magni consequatur et.
+          number: Debitis eos iure ea dolorem et magnam.
+          timestamp: 5.169380996047036e+18
+          version: Delectus ipsa et hic sunt ut fugit.
+        id: Ea dolores sit qui perspiciatis adipisci aut.
         modules:
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
+        - id: Et nisi sunt iste expedita.
+          kind: 5.6952062682169e+18
+          manufacturer: 4.0889983356661555e+18
+          name: Praesentium ut cum iusto iusto quia officia.
           sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
-          sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
-          sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
-        name: Quas voluptates ad consectetur occaecati occaecati.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          version: 3.6664198543922755e+18
+        name: Consectetur occaecati occaecati omnis sint excepturi rerum.
     properties:
       id:
-        example: 1.576519638086125e+18
+        example: 4.2667581563153295e+18
         format: int64
         type: integer
       station:
@@ -2123,40 +2118,52 @@ definitions:
     type: object
   JSONDataMetaModule:
     example:
-      id: Ducimus autem.
-      kind: 4.998324106974388e+18
-      manufacturer: 5.23996271352083e+18
-      name: Iste expedita libero.
+      id: Et nisi sunt iste expedita.
+      kind: 5.6952062682169e+18
+      manufacturer: 4.0889983356661555e+18
+      name: Praesentium ut cum iusto iusto quia officia.
       sensors:
-      - key: Praesentium ut cum iusto iusto quia officia.
-        name: Architecto nobis omnis dolores quia id exercitationem.
-        units: Error et.
-      version: 3.1106551483003817e+18
+      - key: Nobis omnis.
+        name: Quia id.
+        units: Aliquam error et asperiores qui quas.
+      - key: Nobis omnis.
+        name: Quia id.
+        units: Aliquam error et asperiores qui quas.
+      - key: Nobis omnis.
+        name: Quia id.
+        units: Aliquam error et asperiores qui quas.
+      version: 3.6664198543922755e+18
     properties:
       id:
-        example: Ducimus autem.
+        example: Et nisi sunt iste expedita.
         type: string
       kind:
-        example: 4.998324106974388e+18
+        example: 5.6952062682169e+18
         format: int64
         type: integer
       manufacturer:
-        example: 5.23996271352083e+18
+        example: 4.0889983356661555e+18
         format: int64
         type: integer
       name:
-        example: Iste expedita libero.
+        example: Praesentium ut cum iusto iusto quia officia.
         type: string
       sensors:
         example:
-        - key: Praesentium ut cum iusto iusto quia officia.
-          name: Architecto nobis omnis dolores quia id exercitationem.
-          units: Error et.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
         items:
           $ref: '#/definitions/JSONDataMetaSensor'
         type: array
       version:
-        example: 3.1106551483003817e+18
+        example: 3.6664198543922755e+18
         format: int64
         type: integer
     required:
@@ -2169,18 +2176,18 @@ definitions:
     type: object
   JSONDataMetaSensor:
     example:
-      key: Praesentium ut cum iusto iusto quia officia.
-      name: Architecto nobis omnis dolores quia id exercitationem.
-      units: Error et.
+      key: Nobis omnis.
+      name: Quia id.
+      units: Aliquam error et asperiores qui quas.
     properties:
       key:
-        example: Praesentium ut cum iusto iusto quia officia.
+        example: Nobis omnis.
         type: string
       name:
-        example: Architecto nobis omnis dolores quia id exercitationem.
+        example: Quia id.
         type: string
       units:
-        example: Error et.
+        example: Aliquam error et asperiores qui quas.
         type: string
     required:
     - name
@@ -2191,81 +2198,57 @@ definitions:
   JSONDataMetaStation:
     example:
       firmware:
-        build: Itaque ipsa soluta minus consequatur ullam.
-        hash: Magni consequatur et blanditiis debitis eos iure.
-        number: Dolorem et magnam alias.
-        timestamp: 3.30566342895377e+18
-        version: Ipsa et hic sunt ut.
-      id: Nobis ea dolores sit qui perspiciatis.
+        build: Soluta minus consequatur.
+        hash: Sed magni consequatur et.
+        number: Debitis eos iure ea dolorem et magnam.
+        timestamp: 5.169380996047036e+18
+        version: Delectus ipsa et hic sunt ut fugit.
+      id: Ea dolores sit qui perspiciatis adipisci aut.
       modules:
-      - id: Ducimus autem.
-        kind: 4.998324106974388e+18
-        manufacturer: 5.23996271352083e+18
-        name: Iste expedita libero.
+      - id: Et nisi sunt iste expedita.
+        kind: 5.6952062682169e+18
+        manufacturer: 4.0889983356661555e+18
+        name: Praesentium ut cum iusto iusto quia officia.
         sensors:
-        - key: Praesentium ut cum iusto iusto quia officia.
-          name: Architecto nobis omnis dolores quia id exercitationem.
-          units: Error et.
-        version: 3.1106551483003817e+18
-      - id: Ducimus autem.
-        kind: 4.998324106974388e+18
-        manufacturer: 5.23996271352083e+18
-        name: Iste expedita libero.
-        sensors:
-        - key: Praesentium ut cum iusto iusto quia officia.
-          name: Architecto nobis omnis dolores quia id exercitationem.
-          units: Error et.
-        version: 3.1106551483003817e+18
-      - id: Ducimus autem.
-        kind: 4.998324106974388e+18
-        manufacturer: 5.23996271352083e+18
-        name: Iste expedita libero.
-        sensors:
-        - key: Praesentium ut cum iusto iusto quia officia.
-          name: Architecto nobis omnis dolores quia id exercitationem.
-          units: Error et.
-        version: 3.1106551483003817e+18
-      name: Quas voluptates ad consectetur occaecati occaecati.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        version: 3.6664198543922755e+18
+      name: Consectetur occaecati occaecati omnis sint excepturi rerum.
     properties:
       firmware:
         $ref: '#/definitions/JSONDataMetaStationFirmware'
       id:
-        example: Nobis ea dolores sit qui perspiciatis.
+        example: Ea dolores sit qui perspiciatis adipisci aut.
         type: string
       modules:
         example:
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
+        - id: Et nisi sunt iste expedita.
+          kind: 5.6952062682169e+18
+          manufacturer: 4.0889983356661555e+18
+          name: Praesentium ut cum iusto iusto quia officia.
           sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
-          sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
-          sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          version: 3.6664198543922755e+18
         items:
           $ref: '#/definitions/JSONDataMetaModule'
         type: array
       name:
-        example: Quas voluptates ad consectetur occaecati occaecati.
+        example: Consectetur occaecati occaecati omnis sint excepturi rerum.
         type: string
     required:
     - id
@@ -2276,27 +2259,27 @@ definitions:
     type: object
   JSONDataMetaStationFirmware:
     example:
-      build: Itaque ipsa soluta minus consequatur ullam.
-      hash: Magni consequatur et blanditiis debitis eos iure.
-      number: Dolorem et magnam alias.
-      timestamp: 3.30566342895377e+18
-      version: Ipsa et hic sunt ut.
+      build: Soluta minus consequatur.
+      hash: Sed magni consequatur et.
+      number: Debitis eos iure ea dolorem et magnam.
+      timestamp: 5.169380996047036e+18
+      version: Delectus ipsa et hic sunt ut fugit.
     properties:
       build:
-        example: Itaque ipsa soluta minus consequatur ullam.
+        example: Soluta minus consequatur.
         type: string
       hash:
-        example: Magni consequatur et blanditiis debitis eos iure.
+        example: Sed magni consequatur et.
         type: string
       number:
-        example: Dolorem et magnam alias.
+        example: Debitis eos iure ea dolorem et magnam.
         type: string
       timestamp:
-        example: 3.30566342895377e+18
+        example: 5.169380996047036e+18
         format: int64
         type: integer
       version:
-        example: Ipsa et hic sunt ut.
+        example: Delectus ipsa et hic sunt ut fugit.
         type: string
     required:
     - version
@@ -2312,103 +2295,83 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
           - 0.8794476882696538
           - 0.8794476882696538
-          time: 5.575925322071088e+18
+          metas:
+          - 1.576519638086125e+18
+          time: 5.011953152089054e+18
         meta:
-          id: 1.576519638086125e+18
+          id: 4.2667581563153295e+18
           station:
             firmware:
-              build: Itaque ipsa soluta minus consequatur ullam.
-              hash: Magni consequatur et blanditiis debitis eos iure.
-              number: Dolorem et magnam alias.
-              timestamp: 3.30566342895377e+18
-              version: Ipsa et hic sunt ut.
-            id: Nobis ea dolores sit qui perspiciatis.
+              build: Soluta minus consequatur.
+              hash: Sed magni consequatur et.
+              number: Debitis eos iure ea dolorem et magnam.
+              timestamp: 5.169380996047036e+18
+              version: Delectus ipsa et hic sunt ut fugit.
+            id: Ea dolores sit qui perspiciatis adipisci aut.
             modules:
-            - id: Ducimus autem.
-              kind: 4.998324106974388e+18
-              manufacturer: 5.23996271352083e+18
-              name: Iste expedita libero.
+            - id: Et nisi sunt iste expedita.
+              kind: 5.6952062682169e+18
+              manufacturer: 4.0889983356661555e+18
+              name: Praesentium ut cum iusto iusto quia officia.
               sensors:
-              - key: Praesentium ut cum iusto iusto quia officia.
-                name: Architecto nobis omnis dolores quia id exercitationem.
-                units: Error et.
-              version: 3.1106551483003817e+18
-            - id: Ducimus autem.
-              kind: 4.998324106974388e+18
-              manufacturer: 5.23996271352083e+18
-              name: Iste expedita libero.
-              sensors:
-              - key: Praesentium ut cum iusto iusto quia officia.
-                name: Architecto nobis omnis dolores quia id exercitationem.
-                units: Error et.
-              version: 3.1106551483003817e+18
-            - id: Ducimus autem.
-              kind: 4.998324106974388e+18
-              manufacturer: 5.23996271352083e+18
-              name: Iste expedita libero.
-              sensors:
-              - key: Praesentium ut cum iusto iusto quia officia.
-                name: Architecto nobis omnis dolores quia id exercitationem.
-                units: Error et.
-              version: 3.1106551483003817e+18
-            name: Quas voluptates ad consectetur occaecati occaecati.
+              - key: Nobis omnis.
+                name: Quia id.
+                units: Aliquam error et asperiores qui quas.
+              - key: Nobis omnis.
+                name: Quia id.
+                units: Aliquam error et asperiores qui quas.
+              - key: Nobis omnis.
+                name: Quia id.
+                units: Aliquam error et asperiores qui quas.
+              version: 3.6664198543922755e+18
+            name: Consectetur occaecati occaecati omnis sint excepturi rerum.
     properties:
       versions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+              Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
             - 0.8794476882696538
             - 0.8794476882696538
-            time: 5.575925322071088e+18
+            metas:
+            - 1.576519638086125e+18
+            time: 5.011953152089054e+18
           meta:
-            id: 1.576519638086125e+18
+            id: 4.2667581563153295e+18
             station:
               firmware:
-                build: Itaque ipsa soluta minus consequatur ullam.
-                hash: Magni consequatur et blanditiis debitis eos iure.
-                number: Dolorem et magnam alias.
-                timestamp: 3.30566342895377e+18
-                version: Ipsa et hic sunt ut.
-              id: Nobis ea dolores sit qui perspiciatis.
+                build: Soluta minus consequatur.
+                hash: Sed magni consequatur et.
+                number: Debitis eos iure ea dolorem et magnam.
+                timestamp: 5.169380996047036e+18
+                version: Delectus ipsa et hic sunt ut fugit.
+              id: Ea dolores sit qui perspiciatis adipisci aut.
               modules:
-              - id: Ducimus autem.
-                kind: 4.998324106974388e+18
-                manufacturer: 5.23996271352083e+18
-                name: Iste expedita libero.
+              - id: Et nisi sunt iste expedita.
+                kind: 5.6952062682169e+18
+                manufacturer: 4.0889983356661555e+18
+                name: Praesentium ut cum iusto iusto quia officia.
                 sensors:
-                - key: Praesentium ut cum iusto iusto quia officia.
-                  name: Architecto nobis omnis dolores quia id exercitationem.
-                  units: Error et.
-                version: 3.1106551483003817e+18
-              - id: Ducimus autem.
-                kind: 4.998324106974388e+18
-                manufacturer: 5.23996271352083e+18
-                name: Iste expedita libero.
-                sensors:
-                - key: Praesentium ut cum iusto iusto quia officia.
-                  name: Architecto nobis omnis dolores quia id exercitationem.
-                  units: Error et.
-                version: 3.1106551483003817e+18
-              - id: Ducimus autem.
-                kind: 4.998324106974388e+18
-                manufacturer: 5.23996271352083e+18
-                name: Iste expedita libero.
-                sensors:
-                - key: Praesentium ut cum iusto iusto quia officia.
-                  name: Architecto nobis omnis dolores quia id exercitationem.
-                  units: Error et.
-                version: 3.1106551483003817e+18
-              name: Quas voluptates ad consectetur occaecati occaecati.
+                - key: Nobis omnis.
+                  name: Quia id.
+                  units: Aliquam error et asperiores qui quas.
+                - key: Nobis omnis.
+                  name: Quia id.
+                  units: Aliquam error et asperiores qui quas.
+                - key: Nobis omnis.
+                  name: Quia id.
+                  units: Aliquam error et asperiores qui quas.
+                version: 3.6664198543922755e+18
+              name: Consectetur occaecati occaecati omnis sint excepturi rerum.
         items:
           $ref: '#/definitions/JSONDataVersion'
         type: array
@@ -2419,18 +2382,20 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+        Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
       - 0.8794476882696538
       - 0.8794476882696538
-      time: 5.575925322071088e+18
+      metas:
+      - 1.576519638086125e+18
+      time: 5.011953152089054e+18
     properties:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2446,8 +2411,16 @@ definitions:
           format: double
           type: number
         type: array
+      metas:
+        example:
+        - 1.576519638086125e+18
+        items:
+          example: 1.576519638086125e+18
+          format: int64
+          type: integer
+        type: array
       time:
-        example: 5.575925322071088e+18
+        example: 5.011953152089054e+18
         format: int64
         type: integer
     required:
@@ -2462,64 +2435,164 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
         - 0.8794476882696538
         - 0.8794476882696538
-        time: 5.575925322071088e+18
+        metas:
+        - 1.576519638086125e+18
+        time: 5.011953152089054e+18
       - d:
-          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
         - 0.8794476882696538
         - 0.8794476882696538
-        time: 5.575925322071088e+18
+        metas:
+        - 1.576519638086125e+18
+        time: 5.011953152089054e+18
+      - d:
+          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+        id: 3.7495146985014707e+18
+        location:
+        - 0.8794476882696538
+        - 0.8794476882696538
+        - 0.8794476882696538
+        metas:
+        - 1.576519638086125e+18
+        time: 5.011953152089054e+18
       modules:
-      - id: Ducimus autem.
-        kind: 4.998324106974388e+18
-        manufacturer: 5.23996271352083e+18
-        name: Iste expedita libero.
+      - id: Et nisi sunt iste expedita.
+        kind: 5.6952062682169e+18
+        manufacturer: 4.0889983356661555e+18
+        name: Praesentium ut cum iusto iusto quia officia.
         sensors:
-        - key: Praesentium ut cum iusto iusto quia officia.
-          name: Architecto nobis omnis dolores quia id exercitationem.
-          units: Error et.
-        version: 3.1106551483003817e+18
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        version: 3.6664198543922755e+18
+      - id: Et nisi sunt iste expedita.
+        kind: 5.6952062682169e+18
+        manufacturer: 4.0889983356661555e+18
+        name: Praesentium ut cum iusto iusto quia officia.
+        sensors:
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        version: 3.6664198543922755e+18
+      - id: Et nisi sunt iste expedita.
+        kind: 5.6952062682169e+18
+        manufacturer: 4.0889983356661555e+18
+        name: Praesentium ut cum iusto iusto quia officia.
+        sensors:
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        - key: Nobis omnis.
+          name: Quia id.
+          units: Aliquam error et asperiores qui quas.
+        version: 3.6664198543922755e+18
     properties:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
           - 0.8794476882696538
           - 0.8794476882696538
-          time: 5.575925322071088e+18
+          metas:
+          - 1.576519638086125e+18
+          time: 5.011953152089054e+18
         - d:
-            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
           - 0.8794476882696538
           - 0.8794476882696538
-          time: 5.575925322071088e+18
+          metas:
+          - 1.576519638086125e+18
+          time: 5.011953152089054e+18
+        - d:
+            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          id: 3.7495146985014707e+18
+          location:
+          - 0.8794476882696538
+          - 0.8794476882696538
+          - 0.8794476882696538
+          metas:
+          - 1.576519638086125e+18
+          time: 5.011953152089054e+18
         items:
           $ref: '#/definitions/JSONDataRow'
         type: array
       modules:
         example:
-        - id: Ducimus autem.
-          kind: 4.998324106974388e+18
-          manufacturer: 5.23996271352083e+18
-          name: Iste expedita libero.
+        - id: Et nisi sunt iste expedita.
+          kind: 5.6952062682169e+18
+          manufacturer: 4.0889983356661555e+18
+          name: Praesentium ut cum iusto iusto quia officia.
           sensors:
-          - key: Praesentium ut cum iusto iusto quia officia.
-            name: Architecto nobis omnis dolores quia id exercitationem.
-            units: Error et.
-          version: 3.1106551483003817e+18
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          version: 3.6664198543922755e+18
+        - id: Et nisi sunt iste expedita.
+          kind: 5.6952062682169e+18
+          manufacturer: 4.0889983356661555e+18
+          name: Praesentium ut cum iusto iusto quia officia.
+          sensors:
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          version: 3.6664198543922755e+18
+        - id: Et nisi sunt iste expedita.
+          kind: 5.6952062682169e+18
+          manufacturer: 4.0889983356661555e+18
+          name: Praesentium ut cum iusto iusto quia officia.
+          sensors:
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          - key: Nobis omnis.
+            name: Quia id.
+            units: Aliquam error et asperiores qui quas.
+          version: 3.6664198543922755e+18
         items:
           $ref: '#/definitions/JSONDataMetaModule'
         type: array
@@ -2533,63 +2606,55 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
         - 0.8794476882696538
         - 0.8794476882696538
-        time: 5.575925322071088e+18
+        metas:
+        - 1.576519638086125e+18
+        time: 5.011953152089054e+18
       meta:
-        id: 1.576519638086125e+18
+        id: 4.2667581563153295e+18
         station:
           firmware:
-            build: Itaque ipsa soluta minus consequatur ullam.
-            hash: Magni consequatur et blanditiis debitis eos iure.
-            number: Dolorem et magnam alias.
-            timestamp: 3.30566342895377e+18
-            version: Ipsa et hic sunt ut.
-          id: Nobis ea dolores sit qui perspiciatis.
+            build: Soluta minus consequatur.
+            hash: Sed magni consequatur et.
+            number: Debitis eos iure ea dolorem et magnam.
+            timestamp: 5.169380996047036e+18
+            version: Delectus ipsa et hic sunt ut fugit.
+          id: Ea dolores sit qui perspiciatis adipisci aut.
           modules:
-          - id: Ducimus autem.
-            kind: 4.998324106974388e+18
-            manufacturer: 5.23996271352083e+18
-            name: Iste expedita libero.
+          - id: Et nisi sunt iste expedita.
+            kind: 5.6952062682169e+18
+            manufacturer: 4.0889983356661555e+18
+            name: Praesentium ut cum iusto iusto quia officia.
             sensors:
-            - key: Praesentium ut cum iusto iusto quia officia.
-              name: Architecto nobis omnis dolores quia id exercitationem.
-              units: Error et.
-            version: 3.1106551483003817e+18
-          - id: Ducimus autem.
-            kind: 4.998324106974388e+18
-            manufacturer: 5.23996271352083e+18
-            name: Iste expedita libero.
-            sensors:
-            - key: Praesentium ut cum iusto iusto quia officia.
-              name: Architecto nobis omnis dolores quia id exercitationem.
-              units: Error et.
-            version: 3.1106551483003817e+18
-          - id: Ducimus autem.
-            kind: 4.998324106974388e+18
-            manufacturer: 5.23996271352083e+18
-            name: Iste expedita libero.
-            sensors:
-            - key: Praesentium ut cum iusto iusto quia officia.
-              name: Architecto nobis omnis dolores quia id exercitationem.
-              units: Error et.
-            version: 3.1106551483003817e+18
-          name: Quas voluptates ad consectetur occaecati occaecati.
+            - key: Nobis omnis.
+              name: Quia id.
+              units: Aliquam error et asperiores qui quas.
+            - key: Nobis omnis.
+              name: Quia id.
+              units: Aliquam error et asperiores qui quas.
+            - key: Nobis omnis.
+              name: Quia id.
+              units: Aliquam error et asperiores qui quas.
+            version: 3.6664198543922755e+18
+          name: Consectetur occaecati occaecati omnis sint excepturi rerum.
     properties:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
           - 0.8794476882696538
           - 0.8794476882696538
-          time: 5.575925322071088e+18
+          metas:
+          - 1.576519638086125e+18
+          time: 5.011953152089054e+18
         items:
           $ref: '#/definitions/JSONDataRow'
         type: array
@@ -2656,16 +2721,6 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
-    - blocks:
-      - 1.566805123913401e+18
-      - 1.566805123913401e+18
-      - 1.566805123913401e+18
-      id: 6.474398459750394e+18
-      size: 1.9460409358880453e+18
-      time: "1986-03-10T00:22:10Z"
-      type: Soluta aut consequuntur.
-      upload_id: Tempore facere tempora ut eveniet alias fuga.
-      url: Alias voluptates repellendus aut.
     - blocks:
       - 1.566805123913401e+18
       - 1.566805123913401e+18
@@ -3418,14 +3473,14 @@ definitions:
     description: Sources media type (default view)
     example:
       deviceSources:
-      - active: true
-        expeditionId: 3.7123157358872125e+18
-        id: 8.753840879962463e+18
-        key: Assumenda voluptas.
-        name: Inventore ratione nisi ea.
-        teamId: 7.871057918915739e+18
-        token: Consequatur numquam repellat accusamus ipsa rerum et.
-        userId: 7.867312227264694e+17
+      - active: false
+        expeditionId: 3.0020301235635297e+18
+        id: 6.348447899341423e+17
+        key: Inventore ratione nisi ea.
+        name: Ducimus molestiae distinctio eum consequatur numquam.
+        teamId: 3.387812945162109e+18
+        token: Sed dolorem.
+        userId: 8.176206767848327e+18
       twitterAccountSources:
       - expeditionId: 4.934842300299876e+18
         id: 1.2625324203172908e+18
