@@ -188,8 +188,17 @@ func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled) (modulesAndData 
 		modules = append(modules, m.Module)
 	}
 
-	data := make([]*DataRow, 0, len(resampled))
+	// The long term plan in here is to take the unique modules map
+	// and look for key collisions and then introduce prefixes on the
+	// keys to disambiguate things.
 
+	// I think a generalized disambigation will be necessary anyway,
+	// akin to having modules with differening
+	// kind/manufacture/version with the same keys, to avoid
+	// misinterpreting those. For now, I'm leaving this alone and just
+	// returning all the modules.
+
+	data := make([]*DataRow, 0, len(resampled))
 	for _, r := range resampled {
 		data = append(data, r.ToDataRow())
 	}
