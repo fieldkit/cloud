@@ -489,18 +489,6 @@ definitions:
       radius: 0.729149602582465
       sourceId: 6.822439840585685e+18
       startTime: "2005-03-28T09:27:43Z"
-    - centroid:
-      - 0.5408775402802485
-      endTime: "2005-01-11T03:51:21Z"
-      envelope:
-      - - 0.7520434281331757
-        - 0.7520434281331757
-        - 0.7520434281331757
-      id: 8.282634339368904e+18
-      numberOfFeatures: 8.252764702077084e+18
-      radius: 0.729149602582465
-      sourceId: 6.822439840585685e+18
-      startTime: "2005-03-28T09:27:43Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -611,6 +599,22 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
+    - data:
+        Sapiente ipsa expedita qui eum enim deleniti.: false
+      id: 5.114928591801609e+18
+      location:
+      - 0.3817722467100891
+      meta: 9.930548092478253e+17
+      record: 3.4522485535092884e+18
+      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -694,39 +698,39 @@ definitions:
     description: DeviceDataSummaryResponse media type (default view)
     example:
       provisions:
-      - created: "1982-08-01T22:19:01Z"
+      - created: "1970-08-24T10:03:04Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Non nisi dolor autem sint.
+        generation: Nisi dolor autem sint vitae.
         meta:
-          first: 6.612883432598194e+18
-          last: 2.7758978795668065e+18
-          size: 4.791279341070292e+18
-        updated: "1970-08-27T00:58:03Z"
-      - created: "1982-08-01T22:19:01Z"
+          first: 4.791279341070292e+18
+          last: 6.939366097402898e+18
+          size: 3.008084869957272e+18
+        updated: "1998-10-16T18:45:30Z"
+      - created: "1970-08-24T10:03:04Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Non nisi dolor autem sint.
+        generation: Nisi dolor autem sint vitae.
         meta:
-          first: 6.612883432598194e+18
-          last: 2.7758978795668065e+18
-          size: 4.791279341070292e+18
-        updated: "1970-08-27T00:58:03Z"
-      - created: "1982-08-01T22:19:01Z"
+          first: 4.791279341070292e+18
+          last: 6.939366097402898e+18
+          size: 3.008084869957272e+18
+        updated: "1998-10-16T18:45:30Z"
+      - created: "1970-08-24T10:03:04Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Non nisi dolor autem sint.
+        generation: Nisi dolor autem sint vitae.
         meta:
-          first: 6.612883432598194e+18
-          last: 2.7758978795668065e+18
-          size: 4.791279341070292e+18
-        updated: "1970-08-27T00:58:03Z"
+          first: 4.791279341070292e+18
+          last: 6.939366097402898e+18
+          size: 3.008084869957272e+18
+        updated: "1998-10-16T18:45:30Z"
     properties:
       provisions:
         $ref: '#/definitions/DeviceProvisionSummaryCollection'
@@ -1017,16 +1021,6 @@ definitions:
       id: 2.4194290054188964e+18
       record: 5.508071077920418e+18
       time: "2016-03-26T05:44:35Z"
-    - data:
-        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-      id: 2.4194290054188964e+18
-      record: 5.508071077920418e+18
-      time: "2016-03-26T05:44:35Z"
-    - data:
-        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
-      id: 2.4194290054188964e+18
-      record: 5.508071077920418e+18
-      time: "2016-03-26T05:44:35Z"
     items:
       $ref: '#/definitions/DeviceMetaRecord'
     title: 'Mediatype identifier: application/vnd.app.device.meta.record+json; type=collection;
@@ -1035,20 +1029,20 @@ definitions:
   DeviceMetaSummary:
     description: DeviceMetaSummary media type (default view)
     example:
-      first: 6.612883432598194e+18
-      last: 2.7758978795668065e+18
-      size: 4.791279341070292e+18
+      first: 4.791279341070292e+18
+      last: 6.939366097402898e+18
+      size: 3.008084869957272e+18
     properties:
       first:
-        example: 6.612883432598194e+18
+        example: 4.791279341070292e+18
         format: int64
         type: integer
       last:
-        example: 2.7758978795668065e+18
+        example: 6.939366097402898e+18
         format: int64
         type: integer
       size:
-        example: 4.791279341070292e+18
+        example: 3.008084869957272e+18
         format: int64
         type: integer
     required:
@@ -1096,31 +1090,31 @@ definitions:
   DeviceProvisionSummary:
     description: DeviceProvisionSummary media type (default view)
     example:
-      created: "1982-08-01T22:19:01Z"
+      created: "1970-08-24T10:03:04Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Non nisi dolor autem sint.
+      generation: Nisi dolor autem sint vitae.
       meta:
-        first: 6.612883432598194e+18
-        last: 2.7758978795668065e+18
-        size: 4.791279341070292e+18
-      updated: "1970-08-27T00:58:03Z"
+        first: 4.791279341070292e+18
+        last: 6.939366097402898e+18
+        size: 3.008084869957272e+18
+      updated: "1998-10-16T18:45:30Z"
     properties:
       created:
-        example: "1982-08-01T22:19:01Z"
+        example: "1970-08-24T10:03:04Z"
         format: date-time
         type: string
       data:
         $ref: '#/definitions/DeviceDataSummary'
       generation:
-        example: Non nisi dolor autem sint.
+        example: Nisi dolor autem sint vitae.
         type: string
       meta:
         $ref: '#/definitions/DeviceMetaSummary'
       updated:
-        example: "1970-08-27T00:58:03Z"
+        example: "1998-10-16T18:45:30Z"
         format: date-time
         type: string
     required:
@@ -1136,28 +1130,28 @@ definitions:
     description: DeviceProvisionSummaryCollection is the media type for an array of
       DeviceProvisionSummary (default view)
     example:
-    - created: "1982-08-01T22:19:01Z"
+    - created: "1970-08-24T10:03:04Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Non nisi dolor autem sint.
+      generation: Nisi dolor autem sint vitae.
       meta:
-        first: 6.612883432598194e+18
-        last: 2.7758978795668065e+18
-        size: 4.791279341070292e+18
-      updated: "1970-08-27T00:58:03Z"
-    - created: "1982-08-01T22:19:01Z"
+        first: 4.791279341070292e+18
+        last: 6.939366097402898e+18
+        size: 3.008084869957272e+18
+      updated: "1998-10-16T18:45:30Z"
+    - created: "1970-08-24T10:03:04Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Non nisi dolor autem sint.
+      generation: Nisi dolor autem sint vitae.
       meta:
-        first: 6.612883432598194e+18
-        last: 2.7758978795668065e+18
-        size: 4.791279341070292e+18
-      updated: "1970-08-27T00:58:03Z"
+        first: 4.791279341070292e+18
+        last: 6.939366097402898e+18
+        size: 3.008084869957272e+18
+      updated: "1998-10-16T18:45:30Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'
     title: 'Mediatype identifier: application/vnd.app.device.provision.summary+json;
@@ -1166,32 +1160,32 @@ definitions:
   DeviceSchema:
     description: DeviceSchema media type (default view)
     example:
-      active: false
-      deviceId: 5.117885353850221e+18
-      jsonSchema: Vel tempore laboriosam.
-      key: Et quo vel aut vel quisquam.
-      projectId: 6.023653026669815e+18
-      schemaId: 1.999501909620784e+17
+      active: true
+      deviceId: 4.86881556417374e+18
+      jsonSchema: Tempore laboriosam facere et quo vel.
+      key: Vel quisquam voluptatem doloribus.
+      projectId: 7.658459747062466e+18
+      schemaId: 4.270568374574214e+18
     properties:
       active:
-        example: false
+        example: true
         type: boolean
       deviceId:
-        example: 5.117885353850221e+18
+        example: 4.86881556417374e+18
         format: int64
         type: integer
       jsonSchema:
-        example: Vel tempore laboriosam.
+        example: Tempore laboriosam facere et quo vel.
         type: string
       key:
-        example: Et quo vel aut vel quisquam.
+        example: Vel quisquam voluptatem doloribus.
         type: string
       projectId:
-        example: 6.023653026669815e+18
+        example: 7.658459747062466e+18
         format: int64
         type: integer
       schemaId:
-        example: 1.999501909620784e+17
+        example: 4.270568374574214e+18
         format: int64
         type: integer
     required:
@@ -1207,18 +1201,18 @@ definitions:
     description: DeviceSchemaCollection is the media type for an array of DeviceSchema
       (default view)
     example:
-    - active: false
-      deviceId: 5.117885353850221e+18
-      jsonSchema: Vel tempore laboriosam.
-      key: Et quo vel aut vel quisquam.
-      projectId: 6.023653026669815e+18
-      schemaId: 1.999501909620784e+17
-    - active: false
-      deviceId: 5.117885353850221e+18
-      jsonSchema: Vel tempore laboriosam.
-      key: Et quo vel aut vel quisquam.
-      projectId: 6.023653026669815e+18
-      schemaId: 1.999501909620784e+17
+    - active: true
+      deviceId: 4.86881556417374e+18
+      jsonSchema: Tempore laboriosam facere et quo vel.
+      key: Vel quisquam voluptatem doloribus.
+      projectId: 7.658459747062466e+18
+      schemaId: 4.270568374574214e+18
+    - active: true
+      deviceId: 4.86881556417374e+18
+      jsonSchema: Tempore laboriosam facere et quo vel.
+      key: Vel quisquam voluptatem doloribus.
+      projectId: 7.658459747062466e+18
+      schemaId: 4.270568374574214e+18
     items:
       $ref: '#/definitions/DeviceSchema'
     title: 'Mediatype identifier: application/vnd.app.device_schema+json; type=collection;
@@ -1228,18 +1222,18 @@ definitions:
     description: DeviceSchemas media type (default view)
     example:
       schemas:
-      - active: false
-        deviceId: 5.117885353850221e+18
-        jsonSchema: Vel tempore laboriosam.
-        key: Et quo vel aut vel quisquam.
-        projectId: 6.023653026669815e+18
-        schemaId: 1.999501909620784e+17
-      - active: false
-        deviceId: 5.117885353850221e+18
-        jsonSchema: Vel tempore laboriosam.
-        key: Et quo vel aut vel quisquam.
-        projectId: 6.023653026669815e+18
-        schemaId: 1.999501909620784e+17
+      - active: true
+        deviceId: 4.86881556417374e+18
+        jsonSchema: Tempore laboriosam facere et quo vel.
+        key: Vel quisquam voluptatem doloribus.
+        projectId: 7.658459747062466e+18
+        schemaId: 4.270568374574214e+18
+      - active: true
+        deviceId: 4.86881556417374e+18
+        jsonSchema: Tempore laboriosam facere et quo vel.
+        key: Vel quisquam voluptatem doloribus.
+        projectId: 7.658459747062466e+18
+        schemaId: 4.270568374574214e+18
     properties:
       schemas:
         $ref: '#/definitions/DeviceSchemaCollection'
@@ -1250,28 +1244,28 @@ definitions:
   DeviceSource:
     description: DeviceSource media type (default view)
     example:
-      active: false
-      expeditionId: 4.7126481066901e+18
-      id: 1.4959624471911836e+18
-      key: Consectetur quo assumenda voluptas.
+      active: true
+      expeditionId: 3.7123157358872125e+18
+      id: 8.753840879962463e+18
+      key: Assumenda voluptas.
       name: Inventore ratione nisi ea.
       teamId: 7.871057918915739e+18
       token: Consequatur numquam repellat accusamus ipsa rerum et.
       userId: 7.867312227264694e+17
     properties:
       active:
-        example: false
+        example: true
         type: boolean
       expeditionId:
-        example: 4.7126481066901e+18
+        example: 3.7123157358872125e+18
         format: int64
         type: integer
       id:
-        example: 1.4959624471911836e+18
+        example: 8.753840879962463e+18
         format: int64
         type: integer
       key:
-        example: Consectetur quo assumenda voluptas.
+        example: Assumenda voluptas.
         type: string
       name:
         example: Inventore ratione nisi ea.
@@ -1300,26 +1294,26 @@ definitions:
     description: DeviceSourceCollection is the media type for an array of DeviceSource
       (default view)
     example:
-    - active: false
-      expeditionId: 4.7126481066901e+18
-      id: 1.4959624471911836e+18
-      key: Consectetur quo assumenda voluptas.
+    - active: true
+      expeditionId: 3.7123157358872125e+18
+      id: 8.753840879962463e+18
+      key: Assumenda voluptas.
       name: Inventore ratione nisi ea.
       teamId: 7.871057918915739e+18
       token: Consequatur numquam repellat accusamus ipsa rerum et.
       userId: 7.867312227264694e+17
-    - active: false
-      expeditionId: 4.7126481066901e+18
-      id: 1.4959624471911836e+18
-      key: Consectetur quo assumenda voluptas.
+    - active: true
+      expeditionId: 3.7123157358872125e+18
+      id: 8.753840879962463e+18
+      key: Assumenda voluptas.
       name: Inventore ratione nisi ea.
       teamId: 7.871057918915739e+18
       token: Consequatur numquam repellat accusamus ipsa rerum et.
       userId: 7.867312227264694e+17
-    - active: false
-      expeditionId: 4.7126481066901e+18
-      id: 1.4959624471911836e+18
-      key: Consectetur quo assumenda voluptas.
+    - active: true
+      expeditionId: 3.7123157358872125e+18
+      id: 8.753840879962463e+18
+      key: Assumenda voluptas.
       name: Inventore ratione nisi ea.
       teamId: 7.871057918915739e+18
       token: Consequatur numquam repellat accusamus ipsa rerum et.
@@ -1333,26 +1327,26 @@ definitions:
     description: DeviceSources media type (default view)
     example:
       deviceSources:
-      - active: false
-        expeditionId: 4.7126481066901e+18
-        id: 1.4959624471911836e+18
-        key: Consectetur quo assumenda voluptas.
+      - active: true
+        expeditionId: 3.7123157358872125e+18
+        id: 8.753840879962463e+18
+        key: Assumenda voluptas.
         name: Inventore ratione nisi ea.
         teamId: 7.871057918915739e+18
         token: Consequatur numquam repellat accusamus ipsa rerum et.
         userId: 7.867312227264694e+17
-      - active: false
-        expeditionId: 4.7126481066901e+18
-        id: 1.4959624471911836e+18
-        key: Consectetur quo assumenda voluptas.
+      - active: true
+        expeditionId: 3.7123157358872125e+18
+        id: 8.753840879962463e+18
+        key: Assumenda voluptas.
         name: Inventore ratione nisi ea.
         teamId: 7.871057918915739e+18
         token: Consequatur numquam repellat accusamus ipsa rerum et.
         userId: 7.867312227264694e+17
-      - active: false
-        expeditionId: 4.7126481066901e+18
-        id: 1.4959624471911836e+18
-        key: Consectetur quo assumenda voluptas.
+      - active: true
+        expeditionId: 3.7123157358872125e+18
+        id: 8.753840879962463e+18
+        key: Assumenda voluptas.
         name: Inventore ratione nisi ea.
         teamId: 7.871057918915739e+18
         token: Consequatur numquam repellat accusamus ipsa rerum et.
@@ -2002,6 +1996,15 @@ definitions:
       properties:
         Magnam minima cupiditate ullam impedit placeat consequatur.: "2008-09-02T04:04:53Z"
       type: Sequi eum aspernatur nulla rerum aliquam.
+    - geometry:
+        coordinates:
+        - 0.7675897118809775
+        - 0.7675897118809775
+        - 0.7675897118809775
+        type: Repudiandae eaque necessitatibus voluptatum odit.
+      properties:
+        Magnam minima cupiditate ullam impedit placeat consequatur.: "2008-09-02T04:04:53Z"
+      type: Sequi eum aspernatur nulla rerum aliquam.
     items:
       $ref: '#/definitions/GeoJSONFeature'
     title: 'Mediatype identifier: application/vnd.app.geojson-feature+json; type=collection;
@@ -2309,7 +2312,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2360,7 +2363,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+              Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2416,7 +2419,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+        Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2427,7 +2430,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2454,11 +2457,83 @@ definitions:
     - d
     title: JSONDataRow
     type: object
+  JSONDataSummaryResponse:
+    description: JSONDataSummaryResponse media type (default view)
+    example:
+      data:
+      - d:
+          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+        id: 3.7495146985014707e+18
+        location:
+        - 0.8794476882696538
+        - 0.8794476882696538
+        - 0.8794476882696538
+        time: 5.575925322071088e+18
+      - d:
+          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+        id: 3.7495146985014707e+18
+        location:
+        - 0.8794476882696538
+        - 0.8794476882696538
+        - 0.8794476882696538
+        time: 5.575925322071088e+18
+      modules:
+      - id: Ducimus autem.
+        kind: 4.998324106974388e+18
+        manufacturer: 5.23996271352083e+18
+        name: Iste expedita libero.
+        sensors:
+        - key: Praesentium ut cum iusto iusto quia officia.
+          name: Architecto nobis omnis dolores quia id exercitationem.
+          units: Error et.
+        version: 3.1106551483003817e+18
+    properties:
+      data:
+        example:
+        - d:
+            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          id: 3.7495146985014707e+18
+          location:
+          - 0.8794476882696538
+          - 0.8794476882696538
+          - 0.8794476882696538
+          time: 5.575925322071088e+18
+        - d:
+            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
+          id: 3.7495146985014707e+18
+          location:
+          - 0.8794476882696538
+          - 0.8794476882696538
+          - 0.8794476882696538
+          time: 5.575925322071088e+18
+        items:
+          $ref: '#/definitions/JSONDataRow'
+        type: array
+      modules:
+        example:
+        - id: Ducimus autem.
+          kind: 4.998324106974388e+18
+          manufacturer: 5.23996271352083e+18
+          name: Iste expedita libero.
+          sensors:
+          - key: Praesentium ut cum iusto iusto quia officia.
+            name: Architecto nobis omnis dolores quia id exercitationem.
+            units: Error et.
+          version: 3.1106551483003817e+18
+        items:
+          $ref: '#/definitions/JSONDataMetaModule'
+        type: array
+    required:
+    - modules
+    - data
+    title: 'Mediatype identifier: application/vnd.app.device.json.data.summary+json;
+      view=default'
+    type: object
   JSONDataVersion:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+          Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2508,7 +2583,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: d2442253-45f0-40cd-b6ff-123a1724ceb9
+            Repudiandae dignissimos.: 3c408478-9d2e-4cda-9c05-5a779fcbc007
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -3343,10 +3418,10 @@ definitions:
     description: Sources media type (default view)
     example:
       deviceSources:
-      - active: false
-        expeditionId: 4.7126481066901e+18
-        id: 1.4959624471911836e+18
-        key: Consectetur quo assumenda voluptas.
+      - active: true
+        expeditionId: 3.7123157358872125e+18
+        id: 8.753840879962463e+18
+        key: Assumenda voluptas.
         name: Inventore ratione nisi ea.
         teamId: 7.871057918915739e+18
         token: Consequatur numquam repellat accusamus ipsa rerum et.
@@ -4416,12 +4491,12 @@ paths:
         required: false
         type: integer
       produces:
-      - application/vnd.app.device.json.data+json
+      - application/vnd.app.device.json.data.summary+json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/JSONDataResponse'
+            $ref: '#/definitions/JSONDataSummaryResponse'
         "404":
           description: Not Found
       schemes:

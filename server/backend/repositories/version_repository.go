@@ -81,6 +81,11 @@ type DataRow struct {
 	D        map[string]interface{}
 }
 
+type ModulesAndData struct {
+	Modules []*DataMetaModule
+	Data    []*DataRow
+}
+
 type VersionRepository struct {
 	Database *sqlxcache.DB
 }

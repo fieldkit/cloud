@@ -2951,9 +2951,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *SummaryJSONDataContext) OK(r *JSONDataResponse) error {
+func (ctx *SummaryJSONDataContext) OK(r *JSONDataSummaryResponse) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.json.data+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.json.data.summary+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

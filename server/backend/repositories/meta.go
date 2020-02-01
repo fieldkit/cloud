@@ -180,10 +180,13 @@ func (mf *MetaFactory) AllModules() map[string]*ModuleAndMetaID {
 	return modulesByID
 }
 
-func (mf *MetaFactory) ToVersions(resampled []*Resampled) (versions []*Version, err error) {
+func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled) (modulesAndData *ModulesAndData, err error) {
 	allModules := mf.AllModules()
 
-	_ = allModules
+	modules := make([]*DataMetaModule, 0)
+	for _, m := range allModules {
+		modules = append(modules, m.Module)
+	}
 
 	data := make([]*DataRow, 0, len(resampled))
 
@@ -191,12 +194,10 @@ func (mf *MetaFactory) ToVersions(resampled []*Resampled) (versions []*Version, 
 		data = append(data, r.ToDataRow())
 	}
 
-	version := &Version{
-		Meta: nil,
-		Data: data,
+	modulesAndData = &ModulesAndData{
+		Modules: modules,
+		Data:    data,
 	}
-
-	versions = append(versions, version)
 
 	return
 }

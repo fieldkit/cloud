@@ -364,6 +364,39 @@ func (mt *JSONDataResponse) Validate() (err error) {
 	return
 }
 
+// JSONDataSummaryResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.json.data.summary+json; view=default
+type JSONDataSummaryResponse struct {
+	Data    []*JSONDataRow        `form:"data" json:"data" yaml:"data" xml:"data"`
+	Modules []*JSONDataMetaModule `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
+}
+
+// Validate validates the JSONDataSummaryResponse media type instance.
+func (mt *JSONDataSummaryResponse) Validate() (err error) {
+	if mt.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "modules"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	for _, e := range mt.Data {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range mt.Modules {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // DeviceMetaRecord media type (default view)
 //
 // Identifier: application/vnd.app.device.meta.record+json; view=default

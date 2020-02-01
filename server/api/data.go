@@ -355,9 +355,9 @@ func JSONDataRowsType(dm []*repositories.DataRow) []*app.JSONDataRow {
 	return wm
 }
 
-func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
-	modules := make([]*app.JSONDataMetaModule, len(dm.Station.Modules))
-	for i, m := range dm.Station.Modules {
+func JSONDataMetaModuleType(dm []*repositories.DataMetaModule) []*app.JSONDataMetaModule {
+	modules := make([]*app.JSONDataMetaModule, len(dm))
+	for i, m := range dm {
 		sensors := make([]*app.JSONDataMetaSensor, len(m.Sensors))
 
 		for j, s := range m.Sensors {
@@ -377,11 +377,16 @@ func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
 			Sensors:      sensors,
 		}
 	}
+	return modules
+}
+
+func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
 	return &app.JSONDataMeta{
 		ID: int(dm.ID),
 		Station: &app.JSONDataMetaStation{
-			ID:   dm.Station.ID,
-			Name: dm.Station.Name,
+			ID:      dm.Station.ID,
+			Name:    dm.Station.Name,
+			Modules: JSONDataMetaModuleType(dm.Station.Modules),
 			Firmware: &app.JSONDataMetaStationFirmware{
 				Version:   dm.Station.Firmware.Version,
 				Build:     dm.Station.Firmware.Build,
@@ -389,7 +394,6 @@ func JSONDataMetaType(dm *repositories.VersionMeta) *app.JSONDataMeta {
 				Timestamp: int(dm.Station.Firmware.Timestamp),
 				Hash:      dm.Station.Firmware.Hash,
 			},
-			Modules: modules,
 		},
 	}
 }
@@ -403,6 +407,13 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 		}
 	}
 	return wm
+}
+
+func JSONDataSummaryResponseType(dm *repositories.ModulesAndData) *app.JSONDataSummaryResponse {
+	return &app.JSONDataSummaryResponse{
+		Modules: JSONDataMetaModuleType(dm.Modules),
+		Data:    JSONDataRowsType(dm.Data),
+	}
 }
 
 func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
@@ -444,14 +455,12 @@ func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
 		opts.Internal = *ctx.Internal
 	}
 
-	versions, err := r.QueryDevice(ctx, opts)
+	modulesAndData, err := r.QueryDeviceModulesAndData(ctx, opts)
 	if err != nil {
 		return err
 	}
 
-	return ctx.OK(&app.JSONDataResponse{
-		Versions: JSONDataResponseType(versions),
-	})
+	return ctx.OK(JSONDataSummaryResponseType(modulesAndData))
 }
 
 func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {

@@ -272,6 +272,19 @@ var JSONDataResponse = MediaType("application/vnd.app.device.json.data+json", fu
 	})
 })
 
+var JSONDataSummaryResponse = MediaType("application/vnd.app.device.json.data.summary+json", func() {
+	TypeName("JSONDataSummaryResponse")
+	Attributes(func() {
+		Attribute("modules", ArrayOf(JSONDataMetaModule))
+		Attribute("data", ArrayOf(JSONDataRow))
+		Required("modules", "data")
+	})
+	View("default", func() {
+		Attribute("modules")
+		Attribute("data")
+	})
+})
+
 var _ = Resource("jsonData", func() {
 	Security(JWT, func() {
 		Scope("api:access")
@@ -320,7 +333,7 @@ var _ = Resource("jsonData", func() {
 		})
 		Response(NotFound)
 		Response(OK, func() {
-			Media(JSONDataResponse)
+			Media(JSONDataSummaryResponse)
 		})
 	})
 })

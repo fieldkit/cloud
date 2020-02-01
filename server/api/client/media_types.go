@@ -470,6 +470,46 @@ func (c *Client) DecodeJSONDataResponse(resp *http.Response) (*JSONDataResponse,
 	return &decoded, err
 }
 
+// JSONDataSummaryResponse media type (default view)
+//
+// Identifier: application/vnd.app.device.json.data.summary+json; view=default
+type JSONDataSummaryResponse struct {
+	Data    []*JSONDataRow        `form:"data" json:"data" yaml:"data" xml:"data"`
+	Modules []*JSONDataMetaModule `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
+}
+
+// Validate validates the JSONDataSummaryResponse media type instance.
+func (mt *JSONDataSummaryResponse) Validate() (err error) {
+	if mt.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "modules"))
+	}
+	if mt.Data == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	for _, e := range mt.Data {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range mt.Modules {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeJSONDataSummaryResponse decodes the JSONDataSummaryResponse instance encoded in resp body.
+func (c *Client) DecodeJSONDataSummaryResponse(resp *http.Response) (*JSONDataSummaryResponse, error) {
+	var decoded JSONDataSummaryResponse
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // DeviceMetaRecord media type (default view)
 //
 // Identifier: application/vnd.app.device.meta.record+json; view=default

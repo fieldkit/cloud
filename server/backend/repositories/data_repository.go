@@ -91,7 +91,7 @@ func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpt
 	return summary, nil
 }
 
-func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts) (versions []*Version, err error) {
+func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *SummaryQueryOpts) (modulesAndData *ModulesAndData, err error) {
 	log := Logger(ctx).Sugar()
 
 	deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
@@ -183,7 +183,7 @@ func (r *DataRepository) QueryDevice(ctx context.Context, opts *SummaryQueryOpts
 		resampled = append(resampled, d)
 	}
 
-	versions, err = metaFactory.ToVersions(resampled)
+	modulesAndData, err = metaFactory.ToModulesAndData(resampled)
 	if err != nil {
 		return nil, err
 	}
