@@ -11,6 +11,8 @@ endif
 
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
 BUILD ?= $(abspath build)
+WORKING_DIRECTORY ?= `pwd`
+DOCKER_TAG ?= master
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
@@ -112,4 +114,4 @@ aws-image:
 	cp ocr-portal/src/js/secrets.js.aws ocr-portal/src/js/secrets.js
 	cp legacy/src/js/secrets.js.aws legacy/src/js/secrets.js
 	cp portal/src/secrets.js.aws portal/src/secrets.js
-	./build.sh
+	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh
