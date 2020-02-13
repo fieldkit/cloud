@@ -1,5 +1,3 @@
-modules = server/sqs-worker server/sqs-sender server/tools/fktool
-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 GOARCH ?= amd64
@@ -19,7 +17,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: setup binaries
 
-setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js server/inaturalist/secrets.go
+setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
 
 legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 	cp $^ $@
@@ -30,10 +28,7 @@ ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
 portal/src/secrets.js: portal/src/secrets.js.template
 	cp $^ $@
 
-server/inaturalist/secrets.go: server/inaturalist/secrets.go.template
-	cp $^ $@
-
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/sqs-worker $(BUILD)/sqs-sender $(BUILD)/fktool $(BUILD)/fkflash $(BUILD)/testing-random $(BUILD)/weather-proxy $(BUILD)/inaturalist
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool
 
 all: binaries
 
@@ -46,41 +41,14 @@ ingester: $(BUILD)/ingester
 
 fktool: $(BUILD)/fktool
 
-$(BUILD)/server: $(SERVER_SOURCES) server/inaturalist/secrets.go
+$(BUILD)/server: $(SERVER_SOURCES)
 	cd server && $(GO) build -o $@ server.go
 
-$(BUILD)/ingester: $(SERVER_SOURCES) server/inaturalist/secrets.go
+$(BUILD)/ingester: $(SERVER_SOURCES)
 	cd server && $(GO) build -o $@ ingester.go
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	cd server/tools/fktool && $(GO) build -o $@ *.go
-
-$(BUILD)/fkflash: server/tools/fkflash/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	cd server/tools/fkflash && $(GO) build -o $@ *.go
-
-$(BUILD)/inaturalist: server/tools/inaturalist/*.go $(SERVER_SOURCES) $(TESTING_SOURCES) server/inaturalist/secrets.go
-	cd server/tools/inaturalist && $(GO) build -o $@ *.go
-
-$(BUILD)/sqs-worker: server/sqs-worker/*.go $(SERVER_SOURCES)
-	cd server/sqs-worker && $(GO) build -o $@ *.go
-
-$(BUILD)/sqs-sender: server/sqs-sender/*.go $(SERVER_SOURCES)
-	cd server/sqs-sender && $(GO) build -o $@ *.go
-
-$(BUILD)/testing-random: testing/random/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	cd testing/random && $(GO) build -o $@ *.go
-
-$(BUILD)/weather-proxy: testing/weather-proxy/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
-	cd testing/weather-proxy && $(GO) build -o $@ *.go
-
-install: all
-	cp $(BUILD)/fktool $(INSTALLDIR)
-	cp $(BUILD)/testing-random $(INSTALLDIR)
-	cp $(BUILD)/sqs-sender $(INSTALLDIR)
-	cp $(BUILD)/sqs-worker $(INSTALLDIR)
-	@for d in $(modules); do                           \
-		(cd $$d && echo $$d && go install) || exit 1;  \
-	done
 
 generate:
 	./tools/goa-generate.sh

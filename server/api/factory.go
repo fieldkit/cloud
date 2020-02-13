@@ -21,7 +21,6 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/inaturalist"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 )
@@ -35,10 +34,6 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		panic(err)
 	}
 
-	ns, err := inaturalist.NewINaturalistService(ctx, database, be, false)
-	if err != nil {
-		panic(err)
-	}
 
 	streamProcessor := backend.NewS3StreamProcessor(awsSession, ingester, config.BucketName)
 
@@ -175,7 +170,6 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Database:           database,
 		Backend:            be,
 		Emailer:            emailer,
-		INaturalistService: ns,
 		StreamProcessor:    streamProcessor,
 		Publisher:          publisher,
 	})

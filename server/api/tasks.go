@@ -8,7 +8,6 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/inaturalist"
 	"github.com/fieldkit/cloud/server/jobs"
 )
 
@@ -16,7 +15,6 @@ type TasksControllerOptions struct {
 	Database           *sqlxcache.DB
 	Backend            *backend.Backend
 	Emailer            email.Emailer
-	INaturalistService *inaturalist.INaturalistService
 	StreamProcessor    backend.StreamProcessor
 	Publisher          jobs.MessagePublisher
 }
@@ -44,10 +42,6 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
 	if err := c.options.Backend.CreateMissingDevices(ctx); err != nil {
 		return err
-	}
-
-	if false {
-		go c.options.INaturalistService.RefreshObservations(ctx)
 	}
 
 	return ctx.OK([]byte("Ok"))
