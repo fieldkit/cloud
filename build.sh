@@ -1,7 +1,17 @@
 #!/bin/bash
 
-USER_ID=`id -u $USER`
-WORKING_DIRECTORY=`pwd`
+if [ -z "$USER_ID" ]; then
+	USER_ID=`id -u $USER`
+	GROUP_ID=`id -gr`
+fi
+
+if [ -z "$WORKING_DIRECTORY" ]; then
+	WORKING_DIRECTORY=`pwd`
+fi
+
+if [ -z "$DOCKER_TAG" ]; then
+	DOCKER_TAG="master"
+fi
 
 banner() {
     set +x
@@ -12,35 +22,6 @@ banner() {
     echo "+------------------------------------------+"
     set -x
 }
-
-function show_help {
-    echo "build.sh [-h] [-p] [-w WORKING_DIRECTORY]"
-    echo " -h this text"
-    echo " -p push image"
-    echo " -w absolute path from HOST to this working copy"
-}
-
-# A POSIX variable
-OPTIND=1
-push=0
-
-while getopts "h?pw:" opt; do
-    case "$opt" in
-        h|\?)
-            show_help
-            exit 0
-            ;;
-        w)
-            WORKING_DIRECTORY=$OPTARG
-            ;;
-        p)  push=1
-            ;;
-    esac
-done
-
-shift $((OPTIND-1))
-
-[ "$1" = "--" ] && shift
 
 set -xe
 cd `dirname $0`
@@ -71,22 +52,22 @@ mkdir build/tmp
 mkdir build/api
 docker rm -f fk-server-build > /dev/null 2>&1 || true
 docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-server-build \
-       sh -c "cp -r /app/build/* /build && cp -r api/public /build/api/ && chown -R $USER_ID /build/api /build/server"
+       sh -c "cp -r /app/build/* /build && cp -r api/public /build/api/ && chown -R $USER_ID.$GROUP_ID /build"
 
 mkdir build/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
 mkdir build/ocr-portal
 docker rm -f fk-ocr-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-ocr-portal-build -v $WORKING_DIRECTORY/build/ocr-portal:/build fk-ocr-portal-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
 mkdir build/legacy
 docker rm -f fk-legacy-build > /dev/null 2>&1 || true
 docker run --rm --name fk-legacy-build -v $WORKING_DIRECTORY/build/legacy:/build fk-legacy-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID /build"
+       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
 banner "Final Container"
 
@@ -109,17 +90,4 @@ ADD ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
 ENTRYPOINT ["/server"]' > build/Dockerfile
 
-if [ "$1" = "production" ]; then
-	DOCKER_TAG=latest
-elif [ "$1" != "" ]; then
-	DOCKER_TAG=$1
-else
-	DOCKER_TAG=`git rev-parse --abbrev-ref HEAD`
-fi
-
 docker build -t conservify/fk-cloud:$DOCKER_TAG build
-
-if [ "$push" == "1" ]; then
-    banner "Pushing!"
-    docker push conservify/fk-cloud:$DOCKER_TAG
-fi

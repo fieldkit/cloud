@@ -19,10 +19,7 @@ TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/v
 
 default: setup binaries
 
-setup: fieldkit.env legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js server/inaturalist/secrets.go
-
-fieldkit.env:
-	echo FIELDKIT_ADDR=0.0.0.0:8080 > $@
+setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js server/inaturalist/secrets.go
 
 legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 	cp $^ $@
@@ -88,8 +85,6 @@ install: all
 generate:
 	./tools/goa-generate.sh
 
-deps: server/inaturalist/secrets.go
-
 clean:
 	rm -rf $(BUILD)
 
@@ -139,15 +134,14 @@ run-postgres:
 
 veryclean:
 
-distribution:
-	rm -rf distribution
-	GOOS=darwin GOARCH=amd64 BUILD=$(BUILD)/distribution/darwin $(MAKE) $(BUILD)/distribution/darwin/fkflash
-	cp -ar ~/.fk/tools $(BUILD)/distribution/darwin
-	GOOS=windows GOARCH=amd64 BUILD=$(BUILD)/distribution/windows $(MAKE) $(BUILD)/distribution/windows/fkflash
-	cp -ar ~/.fk/tools $(BUILD)/distribution/windows
-
 migrate-up:
 	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" up
 
 migrate-down:
 	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
+
+aws-image:
+	cp ocr-portal/src/js/secrets.js.aws ocr-portal/src/js/secrets.js
+	cp legacy/src/js/secrets.js.aws legacy/src/js/secrets.js
+	cp portal/src/secrets.js.aws portal/src/secrets.js
+	./build.sh
