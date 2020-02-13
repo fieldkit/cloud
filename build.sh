@@ -69,6 +69,11 @@ docker rm -f fk-legacy-build > /dev/null 2>&1 || true
 docker run --rm --name fk-legacy-build -v $WORKING_DIRECTORY/build/legacy:/build fk-legacy-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
+docker rm -f fk-server-build > /dev/null 2>&1 || true
+docker rm -f fk-portal-build > /dev/null 2>&1 || true
+docker rm -f fk-ocr-portal-build > /dev/null 2>&1 || true
+docker rm -f fk-legacy-build > /dev/null 2>&1 || true
+
 banner "Final Container"
 
 for e in css csv html js json map svg txt; do
