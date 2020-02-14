@@ -17,9 +17,9 @@ timestamps {
             stage ('deploy') {
                 sshagent (credentials: ['ssh-fkdev-deploy']) {
                     sh "mv migrate.linux-amd64 migrations"
-                    sh "rsync -vua migrations core@fk-server-a.aws.fkdev.org:"
-                    sh "scp tools/fkdev-migrate.sh core@fk-server-a.aws.fkdev.org:"
-                    sh "ssh -o StrictHostKeyChecking=no core@fk-server-a.aws.fkdev.org ./fkdev-migrate.sh"
+                    sh "rsync -vua migrations ubuntu@fk-server-a.aws.fkdev.org:"
+                    sh "scp tools/fkdev-migrate.sh ubuntu@fk-server-a.aws.fkdev.org:"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@fk-server-a.aws.fkdev.org ./fkdev-migrate.sh"
                 }
 
                 notifySuccess()
