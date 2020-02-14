@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 
@@ -89,7 +90,7 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 	return versionMeta, nil
 }
 
-func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error) {
+func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord) (*DataRow, error) {
 	meta := mf.byMetaID[databaseRecord.Meta]
 	if meta == nil {
 		return nil, fmt.Errorf("data record (%d) with unexpected meta (%d)", databaseRecord.ID, databaseRecord.Meta)
@@ -115,6 +116,13 @@ func (mf *MetaFactory) Resolve(databaseRecord *data.DataRecord) (*DataRow, error
 			}
 
 			sensor := module.Sensors[sensorIndex]
+
+			if reading == nil {
+				log := Logger(ctx).Sugar()
+				log.Errorw("nil reading in sample", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+				continue
+			}
+
 			key := strcase.ToLowerCamel(sensor.Name)
 			data[key] = reading.Value
 		}
