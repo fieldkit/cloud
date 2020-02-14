@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -57,12 +56,7 @@ type Config struct {
 	AwsSecret             string `split_words:"true" default:""`
 	ProductionLogging     bool   `envconfig:"production_logging"`
 
-	DisableMemoryLogging  bool `envconfig:"disable_memory_logging" default:"false"`
-	DisableStartupRefresh bool `envconfig:"disable_startup_refresh" default:"false"`
-
-	Help          bool
-	CpuProfile    string
-	MemoryProfile string
+	Help bool
 }
 
 func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
@@ -93,8 +87,6 @@ func main() {
 	var config Config
 
 	flag.BoolVar(&config.Help, "help", false, "usage")
-	flag.StringVar(&config.CpuProfile, "profile-cpu", "", "write cpu profile")
-	flag.StringVar(&config.MemoryProfile, "profile-memory", "", "write memory profile")
 
 	flag.Parse()
 
@@ -215,10 +207,6 @@ func main() {
 		panic(err)
 	}
 
-	if !config.DisableMemoryLogging {
-		setupMemoryLogging(log)
-	}
-
 	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig)
 
 	notFoundHandler := http.NotFoundHandler()
@@ -304,18 +292,6 @@ func main() {
 
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
-	}
-
-	if config.MemoryProfile != "" {
-		f, err := os.Create(config.MemoryProfile)
-		if err != nil {
-			log.Fatal("Unable to create memory profile: ", err)
-		}
-		runtime.GC()
-		if err := pprof.WriteHeapProfile(f); err != nil {
-			log.Fatal("Unable to write memory profile: ", err)
-		}
-		f.Close()
 	}
 }
 
