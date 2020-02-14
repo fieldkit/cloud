@@ -1,25 +1,12 @@
-version: '2'
+version: "3.7"
 services:
-  server:
-    build: ./server
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    command: server
-    restart: always
-    env_file:
-      - fieldkit.env
-    environment:
-      - FIELDKIT_ADDR=:8080
-      - FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@postgres/fieldkit?sslmode=disable
   postgres:
     image: mdillon/postgis:9.6-alpine
     ports:
       - "5432:5432"
     environment:
+      - POSTGRES_DB=fieldkit
       - POSTGRES_USER=fieldkit
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=fieldkit
     volumes:
       - ./active-schema:/docker-entrypoint-initdb.d/:ro
