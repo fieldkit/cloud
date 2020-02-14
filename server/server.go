@@ -275,6 +275,7 @@ func main() {
 		Addr: config.Addr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/status" {
+				log.Infow("status", "headers", req.Header)
 				fmt.Fprint(w, "ok")
 				return
 			}
