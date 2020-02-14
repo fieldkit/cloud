@@ -86,10 +86,6 @@ echo '.DS_Store
 Dockerfile' > build/.dockerignore
 
 echo 'FROM scratch
-ENV FIELDKIT_ADDR=:80
-ENV FIELDKIT_PORTAL_ROOT=/portal
-ENV FIELDKIT_OCR_PORTAL_ROOT=/ocr-portal
-ENV FIELDKIT_LEGACY_ROOT=/legacy
 COPY . /
 ADD ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
