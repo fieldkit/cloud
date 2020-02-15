@@ -93,7 +93,7 @@ func getConfiguration(production bool) *zap.Config {
 	return getOurDevelopmentConfig()
 }
 
-func Configure(production bool) (*zap.SugaredLogger, error) {
+func Configure(production bool, name string) (*zap.SugaredLogger, error) {
 	config := getConfiguration(production)
 
 	logger, err := config.Build()
@@ -107,7 +107,7 @@ func Configure(production bool) (*zap.SugaredLogger, error) {
 				return NewStructuredErrorsCore(core)
 			},
 		),
-	).Named("fieldkit")
+	).Named("fk").Named(name)
 
 	zap.RedirectStdLog(rootLogger)
 

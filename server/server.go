@@ -106,7 +106,7 @@ func main() {
 		config.ApiHost = "https://" + config.ApiDomain
 	}
 
-	logging.Configure(config.ProductionLogging)
+	logging.Configure(config.ProductionLogging, "server")
 
 	log := logging.Logger(ctx).Sugar()
 

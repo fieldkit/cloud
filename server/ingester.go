@@ -20,7 +20,7 @@ func main() {
 
 	config := getConfig()
 
-	logging.Configure(config.ProductionLogging)
+	logging.Configure(config.ProductionLogging, "ingester")
 
 	log := logging.Logger(ctx).Sugar()
 
