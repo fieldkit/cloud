@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
-	"time"
 
 	_ "net/http"
 	_ "net/http/pprof"
@@ -18,8 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/kelseyhightower/envconfig"
-
-	"go.uber.org/zap"
 
 	_ "github.com/lib/pq"
 
@@ -114,7 +110,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Info("Starting")
+	log.Info("starting")
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
@@ -304,56 +300,12 @@ func createArchiver(ctx context.Context, awsSession *session.Session, config Con
 	case "aws":
 		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
-		panic("Unknown archiver: " + config.Archiver)
+		panic("unknown archiver: " + config.Archiver)
 	}
 
 	log.Infow("configuration", "archiver", config.Archiver)
 
 	return
-}
-
-func setupMemoryLogging(log *zap.SugaredLogger) {
-	go func() {
-		for {
-			var mem runtime.MemStats
-			runtime.ReadMemStats(&mem)
-
-			logged := struct {
-				Alloc        uint64
-				TotalAlloc   uint64
-				Sys          uint64
-				Mallocs      uint64
-				Frees        uint64
-				HeapAlloc    uint64
-				HeapSys      uint64
-				HeapObjects  uint64
-				StackInuse   uint64
-				StackSys     uint64
-				LastGC       uint64
-				PauseTotalNs uint64
-				NumGC        uint32
-			}{
-				mem.Alloc,
-				mem.TotalAlloc,
-				mem.Sys,
-				mem.Mallocs,
-				mem.Frees,
-				mem.HeapAlloc,
-				mem.HeapSys,
-				mem.HeapObjects,
-				mem.StackInuse,
-				mem.StackSys,
-				mem.LastGC,
-				mem.PauseTotalNs,
-				mem.NumGC,
-			}
-
-			log.Infow("Memory", "memory", logged)
-
-			time.Sleep(60 * time.Second)
-		}
-	}()
-
 }
 
 func getIngesterConfig() *ingester.Config {

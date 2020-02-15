@@ -57,7 +57,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	handler := errorHandling(errors, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		startedAt := time.Now()
 
-		log := logging.Logger(ctx).Sugar()
+		log := Logger(ctx).Sugar()
 
 		token := jwt.ContextJWT(ctx)
 		if token == nil {
@@ -132,7 +132,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		ctx := logging.WithNewTaskId(req.Context(), ids)
 
-		log := logging.Logger(ctx).Sugar()
+		log := Logger(ctx).Sugar()
 
 		log.Infow("begin")
 
@@ -164,47 +164,47 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	contentType := req.Header.Get(ContentTypeHeaderName)
 	mediaType, mediaTypeParams, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid %s (%s)", ContentTypeHeaderName, contentType)
+		return nil, fmt.Errorf("invalid %s (%s)", ContentTypeHeaderName, contentType)
 	}
 
 	contentLengthString := req.Header.Get(ContentLengthHeaderName)
 	contentLength, err := strconv.Atoi(contentLengthString)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid %s (%s)", ContentLengthHeaderName, contentLengthString)
+		return nil, fmt.Errorf("invalid %s (%s)", ContentLengthHeaderName, contentLengthString)
 	}
 
 	if contentLength <= 0 {
-		return nil, fmt.Errorf("Invalid %s (%v)", ContentLengthHeaderName, contentLength)
+		return nil, fmt.Errorf("invalid %s (%v)", ContentLengthHeaderName, contentLength)
 	}
 
 	deviceIdRaw := req.Header.Get(FkDeviceIdHeaderName)
 	if len(deviceIdRaw) == 0 {
-		return nil, fmt.Errorf("Invalid %s (no header)", FkDeviceIdHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", FkDeviceIdHeaderName)
 	}
 
 	generationRaw := req.Header.Get(FkGenerationHeaderName)
 	if len(generationRaw) == 0 {
-		return nil, fmt.Errorf("Invalid %s (no header)", FkGenerationHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", FkGenerationHeaderName)
 	}
 
 	typeRaw := req.Header.Get(FkTypeHeaderName)
 	if len(typeRaw) == 0 {
-		return nil, fmt.Errorf("Invalid %s (no header)", FkTypeHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", FkTypeHeaderName)
 	}
 
 	deviceId, err := data.DecodeBinaryString(deviceIdRaw)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid %s (%v)", FkDeviceIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", FkDeviceIdHeaderName, err)
 	}
 
 	generation, err := data.DecodeBinaryString(generationRaw)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid %s (%v)", FkGenerationHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", FkGenerationHeaderName, err)
 	}
 
 	blocks, err := data.ParseBlocks(req.Header.Get(FkBlocksIdHeaderName))
 	if err != nil {
-		return nil, fmt.Errorf("Invalid %s (%v)", FkBlocksIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", FkBlocksIdHeaderName, err)
 	}
 
 	headers := &IncomingHeaders{

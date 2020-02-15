@@ -12,11 +12,11 @@ import (
 )
 
 type TasksControllerOptions struct {
-	Database           *sqlxcache.DB
-	Backend            *backend.Backend
-	Emailer            email.Emailer
-	StreamProcessor    backend.StreamProcessor
-	Publisher          jobs.MessagePublisher
+	Database        *sqlxcache.DB
+	Backend         *backend.Backend
+	Emailer         email.Emailer
+	StreamProcessor backend.StreamProcessor
+	Publisher       jobs.MessagePublisher
 }
 
 type TasksController struct {
@@ -50,7 +50,7 @@ func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
 func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Refresh", "device_id", ctx.DeviceID)
+	log.Infow("refresh", "device_id", ctx.DeviceID)
 
 	/*
 		deviceSource, err := c.options.Backend.GetDeviceSourceByKey(ctx, ctx.DeviceID)

@@ -67,7 +67,7 @@ func (n *Notifier) SendOnline(ctx context.Context, sourceId int32, age time.Dura
 
 // TODO: Should narrow this query down eventually.
 func (n *Notifier) Check(ctx context.Context) error {
-	log := Logger(ctx).Sugar()
+	log := Logger(ctx).Named("notifier").Sugar()
 
 	summaries := []*backend.FeatureSummary{}
 	if err := n.Database.SelectContext(ctx, &summaries, `SELECT c.source_id, c.end_time FROM fieldkit.sources_summaries c ORDER BY c.end_time`); err != nil {
@@ -101,27 +101,27 @@ func (n *Notifier) Check(ctx context.Context) error {
 
 		if age < ThirtyMinutes {
 			if wasNotified {
-				details.Infof("Online!")
+				details.Infof("online!")
 				if err := n.SendOnline(ctx, int32(summary.SourceID), age, notification); err != nil {
 					return err
 				}
 			} else {
-				details.Infof("Have readings")
+				details.Infof("have readings")
 			}
 			continue
 		}
 
 		if age > TwoDays {
-			details.Infof("Too old")
+			details.Infof("too old")
 			continue
 		}
 
 		for _, interval := range []time.Duration{SixHours, TwoHours, ThirtyMinutes} {
 			if age > interval {
 				if lastNotification < interval {
-					details.Infof("Already notified (%v)", interval)
+					details.Infof("already notified", "interval", interval)
 				} else {
-					details.Infof("Offline! (%v)", interval)
+					details.Infof("offline!", "interval", interval)
 					if err := n.SendOffline(ctx, int32(summary.SourceID), age, notification); err != nil {
 						return err
 					}
