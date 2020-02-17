@@ -46,6 +46,7 @@ type Config struct {
 	LegacyRoot            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	ApiDomain             string `split_words:"true" default:""`
+	PortalDomain          string `split_words:"true" default:""`
 	ApiHost               string `split_words:"true" default:""`
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 	AwsId                 string `split_words:"true" default:""`
@@ -100,6 +101,10 @@ func main() {
 
 	if config.ApiDomain == "" {
 		config.ApiDomain = "api." + config.Domain
+	}
+
+	if config.PortalDomain == "" {
+		config.PortalDomain = "portal." + config.Domain
 	}
 
 	if config.ApiHost == "" {
@@ -269,7 +274,12 @@ func main() {
 				return
 			}
 
-			if req.Host == config.Domain || req.Host == "portal."+config.Domain {
+			if req.Host == config.PortalDomain {
+				portalServer.ServeHTTP(w, req)
+				return
+			}
+
+			if req.Host == config.Domain {
 				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
 					portalServer.ServeHTTP(w, req)
 					return
