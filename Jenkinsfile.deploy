@@ -7,9 +7,9 @@ timestamps {
 
             stage ('deploy') {
                 sshagent (credentials: ['ssh-fkdev-deploy']) {
-					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R fk-server-a.aws.fkdev.org"
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@fk-server-a.aws.fkdev.org curl 'https://jlewallen:11dd13d93bef23cdc97a57fcfa500ddb17@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/fk-cloud-stack.tar' --output fk-cloud-stack.tar"
-                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@fk-server-a.aws.fkdev.org sudo mv fk-cloud-stack.tar /tmp/incoming-stacks'
+					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R app-servers.aws.fkdev.org"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@app-servers.aws.fkdev.org wget --auth-no-challenge 'https://jlewallen:11dd13d93bef23cdc97a57fcfa500ddb17@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/fk-cloud-stack.tar'"
+                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@app-servers.aws.fkdev.org sudo mv fk-cloud-stack.tar /tmp/incoming-stacks'
                 }
 
                 notifySuccess()
