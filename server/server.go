@@ -269,7 +269,7 @@ func main() {
 				return
 			}
 
-			if req.Host == config.Domain || req.Host == "www."+config.Domain {
+			if req.Host == config.Domain || req.Host == "portal."+config.Domain {
 				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
 					portalServer.ServeHTTP(w, req)
 					return
