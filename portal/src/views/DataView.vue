@@ -236,35 +236,25 @@ export default {
                     numRecords += 1;
                     // HACK: for now only including ones with
                     // sensor readings
-                    const sensorKeys = Object.keys(d.d);
                     if (Object.keys(d.d).length > 0) {
-                        // exclude anything > 1000
-                        let valid = true;
-                        sensorKeys.forEach(k => {
-                            if (d.d[k] > 1000) {
-                                valid = false;
-                            }
-                        });
-                        if (valid) {
-                            // TEMPORARY: hack to exclude "out of range" data
-                            // TODO: Do this with accurate ranges (and all sensors?)
-                            if (d.d["ph"] < 14) {
-                                d.d.date = new Date(d.time * 1000);
-                                // and only ones with dates after 2018
-                                // and less than 1000
-                                if (d.d.date.getFullYear() > 2018) {
-                                    processed.push(d.d);
-                                }
-                            } else if (!d.d["ph"]) {
-                                d.d.date = new Date(d.time * 1000);
-                                // and only ones with dates after 2018
-                                if (d.d.date.getFullYear() > 2018) {
-                                    processed.push(d.d);
-                                }
-                            }
-                        }
-                    }
-                });
+						// TEMPORARY: hack to exclude "out of range" data
+						// TODO: Do this with accurate ranges (and all sensors?)
+						if (d.d["ph"] < 14) {
+							d.d.date = new Date(d.time * 1000);
+							// and only ones with dates after 2018
+							// and less than 1000
+							if (d.d.date.getFullYear() > 2018) {
+								processed.push(d.d);
+							}
+						} else if (!d.d["ph"]) {
+							d.d.date = new Date(d.time * 1000);
+							// and only ones with dates after 2018
+							if (d.d.date.getFullYear() > 2018) {
+								processed.push(d.d);
+							}
+						}
+					}
+				});
             });
             return { numRecords: numRecords, data: processed, sensors: sensors };
         },
