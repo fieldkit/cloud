@@ -11,6 +11,9 @@ import (
 )
 
 func isInternalModule(m *pb.ModuleInfo) bool {
+	if m.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK {
+		return true
+	}
 	return m.Name == "random" || m.Name == "diagnostics"
 }
 
@@ -59,10 +62,11 @@ type DataMetaModule struct {
 }
 
 type DataMetaStation struct {
-	ID       string
-	Name     string
-	Firmware *DataMetaStationFirmware
-	Modules  []*DataMetaModule
+	ID         string
+	Name       string
+	Firmware   *DataMetaStationFirmware
+	Modules    []*DataMetaModule
+	AllModules []*DataMetaModule
 }
 
 type DataMetaStationFirmware struct {
@@ -134,7 +138,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 		byMeta[metaID] = append(byMeta[metaID], dbDataRecord)
 	}
 
-	log.Infow("querying", "station_id", station.ID, "station_name", station.Name)
+	log.Infow("querying", "station_id", station.ID, "station_name", station.Name, "data_records", len(page.Data), "meta_records", len(byMeta))
 
 	versions = make([]*Version, 0)
 	for _, versionMeta := range mf.InOrder() {

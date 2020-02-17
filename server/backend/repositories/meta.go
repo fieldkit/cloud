@@ -43,20 +43,23 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 		return nil, err
 	}
 
+	allModules := make([]*DataMetaModule, 0)
 	modules := make([]*DataMetaModule, 0)
+
 	for _, module := range meta.Modules {
 		sensors := make([]*DataMetaSensor, 0)
 		for _, sensor := range module.Sensors {
-			sensors = append(sensors, &DataMetaSensor{
+			sensorMeta := &DataMetaSensor{
 				Number:   int(sensor.Number),
 				Name:     sensor.Name,
 				Key:      strcase.ToLowerCamel(sensor.Name),
 				Units:    sensor.UnitOfMeasure,
 				Internal: sensor.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK,
-			})
+			}
+			sensors = append(sensors, sensorMeta)
 		}
 
-		modules = append(modules, &DataMetaModule{
+		moduleMeta := &DataMetaModule{
 			Name:         module.Name,
 			Position:     int(module.Position),
 			Address:      int(module.Address),
@@ -64,16 +67,23 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 			Manufacturer: int(module.Header.Manufacturer),
 			Kind:         int(module.Header.Kind),
 			Version:      int(module.Header.Version),
-			Internal:     module.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK,
+			Internal:     isInternalModule(module),
 			Sensors:      sensors,
-		})
+		}
+
+		if !moduleMeta.Internal {
+			modules = append(modules, moduleMeta)
+		}
+
+		allModules = append(allModules, moduleMeta)
 	}
 	versionMeta := &VersionMeta{
 		ID: databaseRecord.ID,
 		Station: &DataMetaStation{
-			ID:      hex.EncodeToString(meta.Metadata.DeviceId),
-			Name:    meta.Identity.Name,
-			Modules: modules,
+			ID:         hex.EncodeToString(meta.Metadata.DeviceId),
+			Name:       meta.Identity.Name,
+			AllModules: allModules,
+			Modules:    modules,
 			Firmware: &DataMetaStationFirmware{
 				Version:   meta.Metadata.Firmware.Version,
 				Build:     meta.Metadata.Firmware.Build,
@@ -109,22 +119,24 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 			continue
 		}
 
-		module := meta.Station.Modules[moduleIndex]
-		for sensorIndex, reading := range sensorGroup.Readings {
-			if sensorIndex >= len(module.Sensors) {
-				continue
+		module := meta.Station.AllModules[moduleIndex]
+		if !module.Internal {
+			for sensorIndex, reading := range sensorGroup.Readings {
+				if sensorIndex >= len(module.Sensors) {
+					continue
+				}
+
+				sensor := module.Sensors[sensorIndex]
+
+				if reading == nil {
+					log := Logger(ctx).Sugar()
+					log.Errorw("nil reading in sample", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					continue
+				}
+
+				key := strcase.ToLowerCamel(sensor.Name)
+				data[key] = reading.Value
 			}
-
-			sensor := module.Sensors[sensorIndex]
-
-			if reading == nil {
-				log := Logger(ctx).Sugar()
-				log.Errorw("nil reading in sample", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
-				continue
-			}
-
-			key := strcase.ToLowerCamel(sensor.Name)
-			data[key] = reading.Value
 		}
 	}
 
