@@ -1,28 +1,39 @@
 @Library('conservify') _
 
+properties([
+     parameters([string(defaultValue: 'dev', name: 'DeployEnv')])
+])
+
 timestamps {
     node () {
-        try {
-            slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting... (<${env.BUILD_URL}|Open>)"
-
-            stage ('build') {
-                withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
-					sh "cd migrations && make"
+        stage ('terraform env') {
+            if (!fileExists('deploy-${params.DeployEnv}.env')) {
+                withCredentials([file(credentialsId: "terraform.tfvars.json", variable: 'TERRAFORM_VARS_JSON')]) {
+                    withAWS(credentials: 'AWS Default', region: 'us-east-1') {
+                        dir ('dev-ops') {
+                            git url: 'https://github.com/conservify/dev-ops.git'
+                            sh "mv -f $TERRAFORM_VARS_JSON terraform"
+                            sh "cd terraform && TF_IN_AUTOMATION=true TF_CLI_ARGS='-no-color' make ${params.DeployEnv} env"
+                            sh "mv terraform/deploy.env ../deploy-${params.DeployEnv}.env"
+                        }
+                    }
                 }
             }
-
-            stage ('migrate') {
-                sshagent (credentials: ['ssh-fkdev-deploy']) {
-					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
-                    sh "scp -o StrictHostKeyChecking=no migrations/*.di.bz2 ubuntu@${params.DeployFrom}"
-                }
-
-                notifySuccess()
+            else {
+                echo 'have deploy-${params.DeployEnv}.env, skipping generation'
             }
         }
-        catch (Exception e) {
-            notifyFailure()
-            throw e
+
+        stage ('migrate') {
+            def deploy = readProperties(file: "deploy-${params.DeployEnv}.env")
+
+            dir ('cloud') {
+                git url: 'https://github.com/fieldkit/cloud.git'
+
+                sh "cd migrations && make image"
+
+                sh "docker run --rm conservify/fk-cloud-migrate --path /migrations --database '${deploy.DATABASE_URL}' up"
+            }
         }
     }
 }
