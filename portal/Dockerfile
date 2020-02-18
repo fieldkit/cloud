@@ -14,5 +14,5 @@ RUN apk --no-cache --virtual build-dependencies add \
 
 COPY . /usr/app/
 
-ENV PUBLIC_PATH /portal
+ENV PUBLIC_PATH /
 RUN yarn build

@@ -45,6 +45,7 @@ type Config struct {
 	OcrPortalRoot         string `split_words:"true"`
 	LegacyRoot            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
+	HttpScheme            string `split_words:"true" default:"https"`
 	ApiDomain             string `split_words:"true" default:""`
 	PortalDomain          string `split_words:"true" default:""`
 	ApiHost               string `split_words:"true" default:""`
@@ -108,14 +109,16 @@ func main() {
 	}
 
 	if config.ApiHost == "" {
-		config.ApiHost = "https://" + config.ApiDomain
+		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
 	}
 
 	logging.Configure(config.ProductionLogging, "server")
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Info("starting")
+	log.Infow("starting")
+
+	log.Infow("hostnames", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain)
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
@@ -221,7 +224,7 @@ func main() {
 			panic(err)
 		}
 
-		portalServer = http.StripPrefix("/portal", singlePageApplication)
+		portalServer = singlePageApplication
 	}
 
 	ocrPortalServer := notFoundHandler
@@ -275,19 +278,25 @@ func main() {
 			}
 
 			if req.Host == config.PortalDomain {
+				log.Infow("portal", "url", req.URL)
 				portalServer.ServeHTTP(w, req)
 				return
 			}
 
 			if req.Host == config.Domain {
 				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
-					portalServer.ServeHTTP(w, req)
+					log.Infow("redirecting", "url", req.URL)
+					http.Redirect(w, req, config.HttpScheme+"://"+config.PortalDomain, 301)
 					return
 				}
+
 				if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
+					log.Infow("ocr portal", "url", req.URL)
 					ocrPortalServer.ServeHTTP(w, req)
 					return
 				}
+
+				log.Infow("legacy portal", "url", req.URL)
 				legacyServer.ServeHTTP(w, req)
 				return
 			}
