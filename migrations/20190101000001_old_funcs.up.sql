@@ -1,3 +1,4 @@
+/*
 DROP FUNCTION IF EXISTS fieldkit.fk_clustered_identical(desired_source_id BIGINT);
 DROP FUNCTION IF EXISTS fieldkit.fk_tracks(desired_source_id BIGINT);
 
@@ -11,13 +12,11 @@ DROP FUNCTION IF EXISTS fieldkit.fk_update_temporal_clusters(desired_source_id B
 DROP FUNCTION IF EXISTS fieldkit.fk_update_temporal_geometries(desired_source_id BIGINT);
 DROP FUNCTION IF EXISTS fieldkit.fk_update_source_summary(desired_source_id BIGINT);
 
-/*
-DROP TABLE fieldkit.sources_summaries CASCADE;
-DROP TABLE fieldkit.sources_temporal_clusters CASCADE;
-DROP TABLE fieldkit.sources_spatial_clusters CASCADE;
-DROP TABLE fieldkit.sources_temporal_geometries CASCADE;
-DROP TABLE fieldkit.notification CASCADE;
-*/
+// DROP TABLE fieldkit.sources_summaries CASCADE;
+// DROP TABLE fieldkit.sources_temporal_clusters CASCADE;
+// DROP TABLE fieldkit.sources_spatial_clusters CASCADE;
+// DROP TABLE fieldkit.sources_temporal_geometries CASCADE;
+// DROP TABLE fieldkit.notification CASCADE;
 
 CREATE OR REPLACE VIEW fieldkit.device_locations_view AS
   WITH
@@ -369,3 +368,4 @@ CREATE TABLE fieldkit.notification (
 );
 
 CREATE UNIQUE INDEX ON fieldkit.notification (source_id);
+*/

@@ -130,17 +130,6 @@ CREATE TABLE fieldkit.schema (
 
 CREATE UNIQUE INDEX ON fieldkit.schema ((json_schema->'id'));
 
--- raw_message
-
-CREATE TABLE fieldkit.raw_message (
-    id serial PRIMARY KEY,
-    time timestamp,
-    origin_id varchar NOT NULL, -- SQS Id or some other provider generated identifier.
-    data json NOT NULL
-);
-
-CREATE UNIQUE INDEX ON fieldkit.raw_message (origin_id);
-
 -- device
 
 CREATE TABLE fieldkit.device (
@@ -148,8 +137,6 @@ CREATE TABLE fieldkit.device (
     key varchar NOT NULL,
     token bytea NOT NULL
 );
-
-CREATE UNIQUE INDEX ON fieldkit.raw_message (origin_id);
 
 CREATE UNIQUE INDEX ON fieldkit.device (key);
 CREATE UNIQUE INDEX ON fieldkit.device (token);
@@ -238,41 +225,6 @@ CREATE TABLE fieldkit.device_location (
 
 CREATE INDEX ON fieldkit.device_location (device_id, timestamp);
 
--- records
-
-CREATE TABLE fieldkit.record (
-	id bigserial PRIMARY KEY,
-	source_id int REFERENCES fieldkit.source (id) NOT NULL,
-	schema_id int REFERENCES fieldkit.schema (id) NOT NULL,
-	team_id int REFERENCES fieldkit.team (id),
-	user_id int REFERENCES fieldkit.user (id),
-	insertion timestamp NOT NULL DEFAULT now(),
-	timestamp timestamp NOT NULL,
-	location geometry(POINT, 4326) NOT NULL,
-	visible boolean NOT NULL DEFAULT true,
-	fixed boolean NOT NULL DEFAULT true,
-	metadata boolean NOT NULL DEFAULT false,
-	data jsonb NOT NULL
-);
-
-CREATE INDEX ON fieldkit.record (timestamp, source_id);
-CREATE INDEX ON fieldkit.record USING GIST (location);
-
-CREATE TABLE fieldkit.record_analysis (
-  record_id BIGINT REFERENCES fieldkit.record (id) ON DELETE CASCADE,
-  manually_excluded BOOL NOT NULL DEFAULT false,
-  outlier BOOL NOT NULL DEFAULT false
-);
-
-CREATE UNIQUE INDEX ON fieldkit.record_analysis (record_id);
-
-CREATE VIEW fieldkit.record_visible AS
-SELECT * FROM fieldkit.record r LEFT JOIN fieldkit.record_analysis a ON (r.id = a.record_id)
-WHERE
-  r.visible AND
-  (a.outlier IS NULL OR NOT a.outlier) AND
-  (a.manually_excluded IS NULL OR NOT a.manually_excluded);
-
 -- data
 
 CREATE TABLE fieldkit.countries (
@@ -299,11 +251,7 @@ CREATE INDEX ON fieldkit.countries USING GIST (geom);
 DO
 $body$
 BEGIN
-   IF NOT EXISTS (
-      SELECT *
-      FROM   pg_catalog.pg_user
-      WHERE  usename = 'server') THEN
-
+   IF NOT EXISTS (SELECT * FROM pg_catalog.pg_user WHERE usename = 'server') THEN
       CREATE ROLE server LOGIN PASSWORD 'changeme';
    END IF;
 END

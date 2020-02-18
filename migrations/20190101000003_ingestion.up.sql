@@ -1,22 +1,5 @@
 -- ingestion
 
-CREATE TABLE fieldkit.ingestion_old (
-  id serial PRIMARY KEY,
-  time timestamp NOT NULL,
-  upload_id varchar(64) NOT NULL,
-  user_id integer NOT NULL,
-  device_id bytea NOT NULL,
-  size integer NOT NULL,
-  url varchar NOT NULL,
-  blocks int8range NOT NULL,
-  flags integer[] NOT NULL DEFAULT '{}',
-  attempted timestamp,
-  completed timestamp,
-  errors boolean
-);
-
-ALTER SEQUENCE fieldkit.ingestion_old_id_seq RENAME TO ingestion_id_seq1;
-
 CREATE TABLE fieldkit.ingestion (
   id serial PRIMARY KEY,
   time timestamp NOT NULL,
