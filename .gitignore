@@ -13,3 +13,4 @@ temp-go
 node_modules
 secrets.js
 *.fkpb
+*.di.bz2

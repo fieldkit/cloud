@@ -7,19 +7,14 @@ timestamps {
 
             stage ('build') {
                 withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
-                    sh "rm -f migrate.*"
-					sh "wget https://github.com/golang-migrate/migrate/releases/download/v4.7.0/migrate.linux-amd64.tar.gz"
-					sh "tar xf migrate.linux-amd64.tar.gz"
-					git url: 'https://github.com/fieldkit/cloud.git'
+					sh "cd migrations && make"
                 }
             }
 
-            stage ('deploy') {
+            stage ('migrate') {
                 sshagent (credentials: ['ssh-fkdev-deploy']) {
-                    sh "mv migrate.linux-amd64 migrations"
-                    sh "rsync -vua migrations ubuntu@fk-server-a.aws.fkdev.org:"
-                    sh "scp tools/fkdev-migrate.sh ubuntu@fk-server-a.aws.fkdev.org:"
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@fk-server-a.aws.fkdev.org ./fkdev-migrate.sh"
+					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
+                    sh "scp -o StrictHostKeyChecking=no migrations/*.di.bz2 ubuntu@${params.DeployFrom}"
                 }
 
                 notifySuccess()
