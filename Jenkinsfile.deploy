@@ -9,7 +9,7 @@ timestamps {
                 sshagent (credentials: ['ssh-fkdev-deploy']) {
 					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} wget -nv --auth-no-challenge 'https://jlewallen:11dd13d93bef23cdc97a57fcfa500ddb17@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/fk-cloud-stack.tar'"
-                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks'
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks"
                 }
 
                 notifySuccess()
