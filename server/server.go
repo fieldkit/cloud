@@ -84,9 +84,14 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 }
 
 func configureMetrics(ctx context.Context, config *Config, next http.Handler) http.Handler {
+	log := logging.Logger(ctx).Sugar()
+
 	if config.StatsdAddress == "" {
+		log.Infow("stats: skipping")
 		return next
 	}
+
+	log.Infow("stats", "address", config.StatsdAddress)
 
 	metricsSettings := metrics.MetricsSettings{
 		Prefix:  "fk.service",
