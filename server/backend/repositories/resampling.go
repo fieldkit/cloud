@@ -130,14 +130,18 @@ type ResamplingBin struct {
 }
 
 func (b *ResamplingBin) MetaIDs() []int64 {
-	ids := make([]int64, 0)
+	idsMap := make(map[int64]bool)
 	for _, record := range b.Records {
 		if len(record.MetaIDs) != 1 {
 			panic("record with invalid meta-ids collection")
 		}
-		if len(ids) == 0 || ids[len(ids)-1] != record.MetaIDs[0] {
-			ids = append(ids, record.MetaIDs[0])
+		for _, id := range record.MetaIDs {
+			idsMap[id] = true
 		}
+	}
+	ids := make([]int64, 0)
+	for k, _ := range idsMap {
+		ids = append(ids, k)
 	}
 	return ids
 }
