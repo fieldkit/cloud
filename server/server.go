@@ -283,7 +283,12 @@ func main() {
 		}
 	}
 
-	coreHandler := configureMetrics(ctx, &config, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	metricsSettings := metrics.MetricsSettings{
+		Prefix:  "fk.service",
+		Address: config.StatsdAddress,
+	}
+
+	coreHandler := metrics.GatherMetrics(ctx, metricsSettings, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
 			fmt.Fprint(w, "ok")

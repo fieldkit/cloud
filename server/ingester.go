@@ -31,7 +31,12 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 
-	coreHandler := configureMetrics(ctx, config, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	metricsSettings := metrics.MetricsSettings{
+		Prefix:  "fk.ingester",
+		Address: config.StatsdAddress,
+	}
+
+	coreHandler := metrics.GatherMetrics(ctx, metricsSettings, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
 			fmt.Fprint(w, "ok")
@@ -57,24 +62,6 @@ func main() {
 }
 
 // I'd like to make this common with server where possible.
-
-func configureMetrics(ctx context.Context, config *ingester.Config, next http.Handler) http.Handler {
-	log := logging.Logger(ctx).Sugar()
-
-	if config.StatsdAddress == "" {
-		log.Infow("stats: skipping")
-		return next
-	}
-
-	log.Infow("stats", "address", config.StatsdAddress)
-
-	metricsSettings := metrics.MetricsSettings{
-		Prefix:  "fk.ingester",
-		Address: config.StatsdAddress,
-	}
-
-	return metrics.GatherMetrics(ctx, metricsSettings, next)
-}
 
 func getConfig() *ingester.Config {
 	var config ingester.Config

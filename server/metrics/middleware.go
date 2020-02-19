@@ -14,10 +14,18 @@ type MetricsSettings struct {
 }
 
 func GatherMetrics(ctx context.Context, settings MetricsSettings, next http.Handler) http.Handler {
+	log := Logger(ctx).Sugar()
+
+	if settings.Address == "" {
+		log.Infow("statsd: skipping")
+		return next
+	}
+
+	log.Infow("statsd", "address", settings.Address)
+
 	c, err := statsd.New(statsd.Address(settings.Address))
 	if err != nil {
-		log := Logger(ctx).Sugar()
-		log.Warnw("error starting statsd", "error", err)
+		log.Warnw("statsd: error starting", "error", err)
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
