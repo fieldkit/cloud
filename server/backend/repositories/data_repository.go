@@ -40,8 +40,9 @@ func (r *DataRepository) queryMetaRecords(ctx context.Context, opts *SummaryQuer
 	if err != nil {
 		return nil, err
 	}
-	start := time.Unix(0, opts.Start*1000)
-	end := time.Unix(0, opts.End*1000)
+
+	start := time.Unix(0, opts.Start*int64(time.Millisecond))
+	end := time.Unix(0, opts.End*int64(time.Millisecond))
 
 	mrs := []*data.MetaRecord{}
 	if err := r.Database.SelectContext(ctx, &mrs, `
@@ -66,8 +67,9 @@ func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpt
 	if err != nil {
 		return nil, err
 	}
-	start := time.Unix(0, opts.Start*1000)
-	end := time.Unix(0, opts.End*1000)
+
+	start := time.Unix(0, opts.Start*int64(time.Millisecond))
+	end := time.Unix(0, opts.End*int64(time.Millisecond))
 
 	summaries := make([]*DataSummary, 0)
 	if err := r.Database.SelectContext(ctx, &summaries, `
@@ -98,8 +100,9 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 	if err != nil {
 		return nil, err
 	}
-	start := time.Unix(0, opts.Start*1000)
-	end := time.Unix(0, opts.End*1000)
+
+	start := time.Unix(0, opts.Start*int64(time.Millisecond))
+	end := time.Unix(0, opts.End*int64(time.Millisecond))
 
 	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_ms", opts.Start, "end_ms", opts.End, "start", start, "end", end)
 
