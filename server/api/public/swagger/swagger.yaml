@@ -605,22 +605,6 @@ definitions:
       meta: 9.930548092478253e+17
       record: 3.4522485535092884e+18
       time: "1998-06-18T18:01:05Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
-    - data:
-        Sapiente ipsa expedita qui eum enim deleniti.: false
-      id: 5.114928591801609e+18
-      location:
-      - 0.3817722467100891
-      meta: 9.930548092478253e+17
-      record: 3.4522485535092884e+18
-      time: "1998-06-18T18:01:05Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -1022,6 +1006,16 @@ definitions:
     description: DeviceMetaRecordCollection is the media type for an array of DeviceMetaRecord
       (default view)
     example:
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
+    - data:
+        Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
+      id: 2.4194290054188964e+18
+      record: 5.508071077920418e+18
+      time: "2016-03-26T05:44:35Z"
     - data:
         Et aperiam amet nulla dolore.: "1973-10-09T04:25:02Z"
       id: 2.4194290054188964e+18
@@ -2060,7 +2054,6 @@ definitions:
       view)
     example:
     - url: Hic quibusdam est rem.
-    - url: Hic quibusdam est rem.
     items:
       $ref: '#/definitions/ImageRef'
     title: 'Mediatype identifier: application/vnd.app.imageref+json; type=collection;
@@ -2295,7 +2288,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+            Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2336,7 +2329,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+              Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2382,7 +2375,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+        Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2395,7 +2388,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2435,7 +2428,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2445,7 +2438,7 @@ definitions:
         - 1.576519638086125e+18
         time: 5.011953152089054e+18
       - d:
-          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2455,7 +2448,7 @@ definitions:
         - 1.576519638086125e+18
         time: 5.011953152089054e+18
       - d:
-          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2514,7 +2507,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+            Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2524,7 +2517,7 @@ definitions:
           - 1.576519638086125e+18
           time: 5.011953152089054e+18
         - d:
-            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+            Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2534,7 +2527,7 @@ definitions:
           - 1.576519638086125e+18
           time: 5.011953152089054e+18
         - d:
-            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+            Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2606,7 +2599,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+          Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2646,7 +2639,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: a408dd25-c3a3-4f91-90b0-3e17f082d74d
+            Repudiandae dignissimos.: bdffb919-13ca-4164-b0dd-2a96413e690b
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2721,6 +2714,16 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
+    - blocks:
+      - 1.566805123913401e+18
+      - 1.566805123913401e+18
+      - 1.566805123913401e+18
+      id: 6.474398459750394e+18
+      size: 1.9460409358880453e+18
+      time: "1986-03-10T00:22:10Z"
+      type: Soluta aut consequuntur.
+      upload_id: Tempore facere tempora ut eveniet alias fuga.
+      url: Alias voluptates repellendus aut.
     - blocks:
       - 1.566805123913401e+18
       - 1.566805123913401e+18
