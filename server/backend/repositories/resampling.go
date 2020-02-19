@@ -42,7 +42,7 @@ func NewResampler(summary *DataSummary, metaFactory *MetaFactory, opts *SummaryQ
 	// is too small.
 	epsilon := 1 * time.Millisecond
 	end := summary.End.Add(epsilon)
-	start := summary.Start
+	start := *summary.Start
 	step := time.Duration(end.Sub(start).Nanoseconds() / int64(opts.Resolution))
 
 	bin := &ResamplingBin{

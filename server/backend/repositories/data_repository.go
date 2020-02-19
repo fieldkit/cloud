@@ -11,10 +11,10 @@ import (
 )
 
 type DataSummary struct {
-	Start               time.Time `db:"start"`
-	End                 time.Time `db:"end"`
-	NumberOfDataRecords int64     `db:"number_of_data_records"`
-	NumberOfMetaRecords int64     `db:"number_of_meta_records"`
+	Start               *time.Time `db:"start"`
+	End                 *time.Time `db:"end"`
+	NumberOfDataRecords int64      `db:"number_of_data_records"`
+	NumberOfMetaRecords int64      `db:"number_of_meta_records"`
 }
 
 type DataRepository struct {
@@ -103,22 +103,16 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 
 	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_ms", opts.Start, "end_ms", opts.End, "start", start, "end", end)
 
-	if false {
-		sr, err := NewStationRepository(r.Database)
-		if err != nil {
-			return nil, err
-		}
-		station, err := sr.QueryStationByDeviceID(ctx, deviceIdBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		log.Infow("station", "station_id", station.ID, "station_name", station.Name)
-	}
-
 	summary, err := r.querySummary(ctx, opts)
 	if err != nil {
 		return nil, err
+	}
+	if summary.NumberOfDataRecords == 0 {
+		modulesAndData = &ModulesAndData{
+			Modules: make([]*DataMetaModule, 0),
+			Data:    make([]*DataRow, 0),
+		}
+		return
 	}
 
 	log.Infow("querying for meta")
