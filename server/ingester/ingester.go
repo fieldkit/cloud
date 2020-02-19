@@ -49,6 +49,7 @@ type IngesterOptions struct {
 	AuthenticationMiddleware goa.Middleware
 	Archiver                 StreamArchiver
 	Publisher                jobs.MessagePublisher
+	Metrics                  *logging.Metrics
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
@@ -69,11 +70,17 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			return fmt.Errorf("JWT claims error")
 		}
 
+		userID := int32(claims["sub"].(float64))
+
+		o.Metrics.UserID(userID)
+
 		headers, err := NewIncomingHeaders(req)
 		if err != nil {
 			log.Infow("headers error", "headers", req.Header)
 			return err
 		}
+
+		o.Metrics.IngestionDevice(headers.FkDeviceId)
 
 		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks)
 
@@ -88,7 +95,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 				ingestion := &data.Ingestion{
 					URL:        saved.URL,
 					UploadID:   saved.ID,
-					UserID:     int32(claims["sub"].(float64)),
+					UserID:     userID,
 					DeviceID:   headers.FkDeviceId,
 					Generation: headers.FkGeneration,
 					Type:       headers.FkType,
@@ -110,6 +117,9 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 					ID:   ingestion.ID,
 					URL:  saved.URL,
 				})
+
+				b := ingestion.Blocks[1] - ingestion.Blocks[0]
+				o.Metrics.Ingested(int(b), saved.BytesRead)
 
 				log.Infow("saved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
 			} else {

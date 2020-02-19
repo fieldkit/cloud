@@ -16,7 +16,7 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-func NewIngester(ctx context.Context, config *Config) http.Handler {
+func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOptions) {
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
 		panic(err)
@@ -47,15 +47,23 @@ func NewIngester(ctx context.Context, config *Config) http.Handler {
 		panic(err)
 	}
 
-	newIngester := Ingester(ctx, &IngesterOptions{
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+		Prefix:  "fk.ingester",
+		Address: config.StatsdAddress,
+	})
+
+	options := &IngesterOptions{
 		Database:                 database,
 		AwsSession:               awsSession,
 		AuthenticationMiddleware: jwtMiddleware,
 		Archiver:                 archiver,
 		Publisher:                publisher,
-	})
+		Metrics:                  metrics,
+	}
 
-	return newIngester
+	handler := Ingester(ctx, options)
+
+	return handler, options
 }
 
 func getAwsSessionOptions(config *Config) session.Options {

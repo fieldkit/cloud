@@ -173,6 +173,8 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	now := time.Now()
 
+	c.options.Metrics.AuthTry()
+
 	user := &data.User{}
 	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1", ctx.Payload.Email)
 	if err == sql.ErrNoRows {
@@ -206,6 +208,8 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 		return fmt.Errorf("failed to sign token: %s", err) // internal error
 	}
 
+	c.options.Metrics.AuthSuccess()
+
 	// Send response
 	ctx.ResponseData.Header().Set("Authorization", "Bearer "+signedToken)
 	return ctx.NoContent()
@@ -236,6 +240,8 @@ func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
 
 func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	now := time.Now()
+
+	c.options.Metrics.AuthRefreshTry()
 
 	token := data.Token{}
 	if err := token.UnmarshalText([]byte(ctx.Payload.RefreshToken)); err != nil {
@@ -271,6 +277,8 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	if err != nil {
 		return fmt.Errorf("failed to sign token: %s", err) // internal error
 	}
+
+	c.options.Metrics.AuthRefreshSuccess()
 
 	// Send response
 	ctx.ResponseData.Header().Set("Authorization", "Bearer "+signedToken)

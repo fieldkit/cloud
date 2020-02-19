@@ -179,8 +179,9 @@ func main() {
 		panic(err)
 	}
 
-	newIngesterConfig := getIngesterConfig()
-	newIngester := ingester.NewIngester(ctx, newIngesterConfig)
+	ingesterConfig := getIngesterConfig()
+
+	ingesterHandler, _ := ingester.NewIngester(ctx, ingesterConfig)
 
 	if flag.Arg(0) == "twitter" {
 		twitterListCredentialer := be.TwitterListCredentialer()
@@ -263,7 +264,7 @@ func main() {
 		} else if req.URL.Path == "/messages/ingestion/stream" {
 			oldIngester.ServeHTTP(w, req)
 		} else if req.URL.Path == "/ingestion" {
-			newIngester.ServeHTTP(w, req)
+			ingesterHandler.ServeHTTP(w, req)
 		} else {
 			service.Mux.ServeHTTP(w, req)
 		}

@@ -26,16 +26,11 @@ func main() {
 
 	log.Info("starting")
 
-	newIngester := ingester.NewIngester(ctx, config)
+	ingesterHandler, ingesterOptions := ingester.NewIngester(ctx, config)
 
 	notFoundHandler := http.NotFoundHandler()
 
-	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
-		Prefix:  "fk.ingester",
-		Address: config.StatsdAddress,
-	})
-
-	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	coreHandler := ingesterOptions.Metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
 			fmt.Fprint(w, "ok")
@@ -43,7 +38,7 @@ func main() {
 		}
 
 		if req.URL.Path == "/ingestion" {
-			newIngester.ServeHTTP(w, req)
+			ingesterHandler.ServeHTTP(w, req)
 			return
 		}
 
