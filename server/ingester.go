@@ -13,6 +13,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/metrics"
 )
 
 func main() {
@@ -30,22 +31,24 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 
+	coreHandler := configureMetrics(ctx, config, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/status" {
+			log.Infow("status", "headers", req.Header)
+			fmt.Fprint(w, "ok")
+			return
+		}
+
+		if req.URL.Path == "/ingestion" {
+			newIngester.ServeHTTP(w, req)
+			return
+		}
+
+		notFoundHandler.ServeHTTP(w, req)
+	}))
+
 	server := &http.Server{
-		Addr: config.Addr,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/status" {
-				log.Infow("status", "headers", req.Header)
-				fmt.Fprint(w, "ok")
-				return
-			}
-
-			if req.URL.Path == "/ingestion" {
-				newIngester.ServeHTTP(w, req)
-				return
-			}
-
-			notFoundHandler.ServeHTTP(w, req)
-		}),
+		Addr:    config.Addr,
+		Handler: coreHandler,
 	}
 
 	if err := server.ListenAndServe(); err != nil {
@@ -54,6 +57,19 @@ func main() {
 }
 
 // I'd like to make this common with server where possible.
+
+func configureMetrics(ctx context.Context, config *ingester.Config, next http.Handler) http.Handler {
+	if config.StatsdAddress == "" {
+		return next
+	}
+
+	metricsSettings := metrics.MetricsSettings{
+		Prefix:  "fk.ingester",
+		Address: config.StatsdAddress,
+	}
+
+	return metrics.GatherMetrics(ctx, metricsSettings, next)
+}
 
 func getConfig() *ingester.Config {
 	var config ingester.Config

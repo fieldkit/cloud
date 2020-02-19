@@ -2,12 +2,14 @@ package metrics
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 type MetricsSettings struct {
+	Prefix  string
 	Address string
 }
 
@@ -23,6 +25,6 @@ func GatherMetrics(ctx context.Context, settings MetricsSettings, next http.Hand
 
 		next.ServeHTTP(w, r)
 
-		t.Send("fk.http.req.time")
+		t.Send(fmt.Sprintf("%s.http.req.time", settings.Prefix))
 	})
 }

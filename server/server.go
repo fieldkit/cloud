@@ -89,6 +89,7 @@ func configureMetrics(ctx context.Context, config *Config, next http.Handler) ht
 	}
 
 	metricsSettings := metrics.MetricsSettings{
+		Prefix:  "fk.service",
 		Address: config.StatsdAddress,
 	}
 
@@ -126,7 +127,7 @@ func main() {
 		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
 	}
 
-	logging.Configure(config.ProductionLogging, "server")
+	logging.Configure(config.ProductionLogging, "service")
 
 	log := logging.Logger(ctx).Sugar()
 
