@@ -353,8 +353,8 @@ func JSONDataRowsType(dm []*repositories.DataRow, includeMetas bool) []*app.JSON
 			}
 		}
 		wm[i] = &app.JSONDataRow{
-			ID:       int(r.ID),
-			Time:     int(r.Time),
+			ID:       int64(r.ID),
+			Time:     int64(r.Time * 1000),
 			Location: r.Location,
 			D:        r.D,
 			Metas:    metas,
@@ -582,7 +582,7 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 	for _, version := range versions {
 		for _, row := range version.Data {
 			line := JSONLine{
-				Time:     row.Time,
+				Time:     row.Time * 1000,
 				Location: row.Location,
 				ID:       row.ID,
 				Meta:     version.Meta.ID,
