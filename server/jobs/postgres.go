@@ -33,7 +33,7 @@ var (
 func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
 	onProblem := func(ev pq.ListenerEventType, err error) {
 		if err != nil {
-			Logger(nil).Sugar().Errorw("Problem", "error", err, "queue", name)
+			Logger(nil).Sugar().Errorw("problem", "error", err, "queue", name)
 		}
 	}
 
@@ -82,7 +82,7 @@ func (jq *PgJobQueue) Register(messageExample interface{}, handler interface{}) 
 	value := reflect.ValueOf(handler)
 	method := value.MethodByName("Handle")
 	if !method.IsValid() {
-		return fmt.Errorf("No Handle method on %v", handler)
+		return fmt.Errorf("no 'Handle' method on %v", handler)
 	}
 	messageType := reflect.TypeOf(messageExample)
 	jq.handlers[messageType] = &HandlerRegistration{
@@ -98,7 +98,7 @@ func (jq *PgJobQueue) Listen(ctx context.Context, concurrency int) error {
 		return err
 	}
 
-	Logger(ctx).Sugar().Infow("Listening", "queue", jq.name)
+	Logger(ctx).Sugar().Infow("listening", "queue", jq.name)
 
 	go jq.waitForNotification(concurrency)
 
@@ -120,7 +120,7 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, log *zap.SugaredLogger, tm *
 		if messageType.Name() == tm.Type && messageType.PkgPath() == tm.Package {
 			message := reflect.New(messageType).Interface()
 			if err := json.Unmarshal(tm.Body, message); err != nil {
-				log.Errorw("Error", "error", err)
+				log.Errorw("error", "error", err)
 				return
 			}
 
@@ -134,14 +134,14 @@ func (jq *PgJobQueue) dispatch(ctx context.Context, log *zap.SugaredLogger, tm *
 				err := res[0].Interface().(error)
 				f := logging.CreateFacilityForType(registration.HandlerType)
 				handlerLog := Logger(handlerCtx).Sugar().Named(f)
-				handlerLog.Errorw("Error", "error", err)
+				handlerLog.Errorw("error", "error", err)
 			}
 
 			return
 		}
 	}
 
-	log.Warnw("No handlers", "message_type", tm.Package+"."+tm.Type, "queue", jq.name)
+	log.Warnw("no handlers", "message_type", tm.Package+"."+tm.Type, "queue", jq.name)
 }
 
 func (jq *PgJobQueue) waitForNotification(concurrency int) {
@@ -159,7 +159,7 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 			transport := &TransportMessage{}
 			err := json.Unmarshal([]byte(n.Extra), transport)
 			if err != nil {
-				log.Errorf("Error processing JSON: %v", err)
+				log.Errorf("error processing JSON: %v", err)
 				break
 			}
 
@@ -173,7 +173,7 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 			break
 		case c := <-jq.control:
 			if c {
-				log.Infow("Listener exiting", "queue", jq.name)
+				log.Infow("listener exiting", "queue", jq.name)
 				jq.wg.Done()
 				return
 			}

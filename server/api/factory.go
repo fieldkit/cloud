@@ -34,14 +34,13 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		panic(err)
 	}
 
-
 	streamProcessor := backend.NewS3StreamProcessor(awsSession, ingester, config.BucketName)
 
 	service = goa.New("fieldkit")
 
 	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
 
-	log.Infow("Config", "config", config)
+	log.Infow("config", "config", config)
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
@@ -167,11 +166,11 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 
 	// Mount "tasks" controller
 	c16 := NewTasksController(service, TasksControllerOptions{
-		Database:           database,
-		Backend:            be,
-		Emailer:            emailer,
-		StreamProcessor:    streamProcessor,
-		Publisher:          publisher,
+		Database:        database,
+		Backend:         be,
+		Emailer:         emailer,
+		StreamProcessor: streamProcessor,
+		Publisher:       publisher,
 	})
 	app.MountTasksController(service, c16)
 

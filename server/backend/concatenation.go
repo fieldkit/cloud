@@ -141,7 +141,7 @@ func (fc *FileConcatenator) ProcessRecord(ctx context.Context, file *data.Device
 func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Concatenating device files", "device_id", fc.DeviceID, "file_type_ids", fc.TypeIDs)
+	log.Infow("concatenating device files", "device_id", fc.DeviceID, "file_type_ids", fc.TypeIDs)
 
 	files := []*data.DeviceFile{}
 	if err := fc.Database.SelectContext(ctx, &files,
@@ -152,7 +152,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 
 	temporaryFile, err := ioutil.TempFile("", fmt.Sprintf("%s-*.fkpb", fc.DeviceID))
 	if err != nil {
-		return "", fmt.Errorf("Error opening temporary file: %v", err)
+		return "", fmt.Errorf("error opening temporary file: %v", err)
 	}
 
 	defer temporaryFile.Close()
@@ -162,10 +162,10 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 	for _, file := range files {
 		object, err := GetBucketAndKey(file.URL)
 		if err != nil {
-			return "", fmt.Errorf("Error parsing URL: %v", err)
+			return "", fmt.Errorf("error parsing URL: %v", err)
 		}
 
-		log.Infow("File", "file_url", file.URL, "file_stamp", file.Time, "stream_id", file.StreamID, "file_size", file.Size)
+		log.Infow("file", "file_url", file.URL, "file_stamp", file.Time, "stream_id", file.StreamID, "file_size", file.Size)
 
 		goi := &s3.GetObjectInput{
 			Bucket: aws.String(object.Bucket),
@@ -174,7 +174,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 
 		obj, err := svc.GetObject(goi)
 		if err != nil {
-			return "", fmt.Errorf("Error reading object %v: %v", object.Key, err)
+			return "", fmt.Errorf("error reading object %v: %v", object.Key, err)
 		}
 
 		unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
@@ -200,9 +200,9 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 
 		_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
 		if err != nil {
-			newErr := fmt.Errorf("Error reading collection: %v", err)
+			newErr := fmt.Errorf("error reading collection: %v", err)
 
-			log.Errorw("Error", "error", newErr)
+			log.Errorw("error", "error", newErr)
 
 			if _, err := fc.Database.ExecContext(ctx, `UPDATE fieldkit.device_stream SET flags = '{1}' WHERE id = $1`, file.ID); err != nil {
 				return "", err
@@ -222,7 +222,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 func (fc *FileConcatenator) Upload(ctx context.Context, path string) (string, error) {
 	reading, err := os.Open(path)
 	if err != nil {
-		return "", fmt.Errorf("Error reading collection: %v", err)
+		return "", fmt.Errorf("error reading collection: %v", err)
 	}
 
 	defer reading.Close()
@@ -254,17 +254,17 @@ func (fc *FileConcatenator) Concatenate(ctx context.Context) {
 
 	name, err := fc.WriteAllFiles(ctx)
 	if err != nil {
-		log.Errorw("Error", "error", fmt.Errorf("Error writing files: %v", err))
+		log.Errorw("error", "error", fmt.Errorf("error writing files: %v", err))
 		return
 	}
 
 	location, err := fc.Upload(ctx, name)
 	if err != nil {
-		log.Errorw("Error", "error", fmt.Errorf("Error uploading file: %v", err))
+		log.Errorw("error", "error", fmt.Errorf("error uploading file: %v", err))
 		return
 	}
 
-	log.Infow("Uploaded", "file_url", location)
+	log.Infow("uploaded", "file_url", location)
 
 	fc.Publisher.ConcatenationDone(ctx, messages.ConcatenationDone{
 		DeviceID:    fc.DeviceID,
@@ -318,12 +318,12 @@ func (cw *ConcatenationWorkers) QueueJob(ctx context.Context, deviceID string, f
 func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Worker starting")
+	log.Infow("worker starting")
 
 	for job := range cw.channel {
 		jobLog := Logger(job.ctx).Sugar()
 
-		jobLog.Infow("Worker", "job", job, "file_type_ids", job.fileTypeIDs)
+		jobLog.Infow("worker", "job", job, "file_type_ids", job.fileTypeIDs)
 
 		if len(job.fileTypeIDs) > 0 {
 			fileTypeID := job.fileTypeIDs[0]
@@ -344,5 +344,5 @@ func (cw *ConcatenationWorkers) worker(ctx context.Context) {
 		}
 	}
 
-	log.Infow("Worker exiting")
+	log.Infow("worker exiting")
 }
