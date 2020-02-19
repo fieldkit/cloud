@@ -26,7 +26,7 @@ import (
 )
 
 func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, publisher jobs.MessagePublisher,
-	cw *backend.ConcatenationWorkers, config *ApiConfiguration) (service *goa.Service, err error) {
+	cw *backend.ConcatenationWorkers, config *ApiConfiguration, metrics *logging.Metrics) (service *goa.Service, err error) {
 	log := Logger(ctx).Sugar()
 
 	emailer, err := createEmailer(awsSession, config)
@@ -72,6 +72,7 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 		Emailer:    emailer,
 		JWTHMACKey: jwtHMACKey,
 		Domain:     config.Domain,
+		Metrics:    metrics,
 	})
 	if err != nil {
 		panic(err)

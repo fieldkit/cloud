@@ -18,6 +18,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 func UserType(user *data.User) *app.User {
@@ -77,6 +78,7 @@ type UserControllerOptions struct {
 	Emailer    email.Emailer
 	JWTHMACKey []byte
 	Domain     string
+	Metrics    *logging.Metrics
 }
 
 // UserController implements the user resource.

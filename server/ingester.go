@@ -13,7 +13,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/logging"
-	"github.com/fieldkit/cloud/server/metrics"
 )
 
 func main() {
@@ -31,12 +30,12 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 
-	metricsSettings := metrics.MetricsSettings{
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
 		Prefix:  "fk.ingester",
 		Address: config.StatsdAddress,
-	}
+	})
 
-	coreHandler := metrics.GatherMetrics(ctx, metricsSettings, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
 			fmt.Fprint(w, "ok")

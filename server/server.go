@@ -26,7 +26,6 @@ import (
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/metrics"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
 
@@ -81,24 +80,6 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 	}
-}
-
-func configureMetrics(ctx context.Context, config *Config, next http.Handler) http.Handler {
-	log := logging.Logger(ctx).Sugar()
-
-	if config.StatsdAddress == "" {
-		log.Infow("stats: skipping")
-		return next
-	}
-
-	log.Infow("stats", "address", config.StatsdAddress)
-
-	metricsSettings := metrics.MetricsSettings{
-		Prefix:  "fk.service",
-		Address: config.StatsdAddress,
-	}
-
-	return metrics.GatherMetrics(ctx, metricsSettings, next)
 }
 
 func main() {
@@ -226,12 +207,17 @@ func main() {
 		Domain:     config.Domain,
 	}
 
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+		Prefix:  "fk.service",
+		Address: config.StatsdAddress,
+	})
+
 	err = jq.Listen(ctx, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig)
+	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig, metrics)
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -283,12 +269,7 @@ func main() {
 		}
 	}
 
-	metricsSettings := metrics.MetricsSettings{
-		Prefix:  "fk.service",
-		Address: config.StatsdAddress,
-	}
-
-	coreHandler := metrics.GatherMetrics(ctx, metricsSettings, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
 			fmt.Fprint(w, "ok")
