@@ -32,18 +32,21 @@ func NewTasksController(service *goa.Service, options TasksControllerOptions) *T
 }
 
 func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
-	notifier := NewNotifier(c.options.Backend, c.options.Database, c.options.Emailer)
-	if err := notifier.Check(ctx); err != nil {
-		return err
-	}
+	/*
+		notifier := NewNotifier(c.options.Backend, c.options.Database, c.options.Emailer)
+		if err := notifier.Check(ctx); err != nil {
+			return err
+		}
+	*/
 	return ctx.OK([]byte("Ok"))
 }
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
-	if err := c.options.Backend.CreateMissingDevices(ctx); err != nil {
-		return err
-	}
-
+	/*
+		if err := c.options.Backend.CreateMissingDevices(ctx); err != nil {
+			return err
+		}
+	*/
 	return ctx.OK([]byte("Ok"))
 }
 
