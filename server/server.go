@@ -26,6 +26,7 @@ import (
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/metrics"
 	"github.com/fieldkit/cloud/server/social"
 	"github.com/fieldkit/cloud/server/social/twitter"
 
@@ -52,6 +53,7 @@ type Config struct {
 	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
 	AwsId                 string `split_words:"true" default:""`
 	AwsSecret             string `split_words:"true" default:""`
+	StatsdAddress         string `split_words:"true" default:""`
 	ProductionLogging     bool   `envconfig:"production_logging"`
 
 	Help bool
@@ -79,6 +81,18 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 	}
+}
+
+func configureMetrics(ctx context.Context, config *Config, next http.Handler) http.Handler {
+	if config.StatsdAddress == "" {
+		return next
+	}
+
+	metricsSettings := metrics.MetricsSettings{
+		Address: config.StatsdAddress,
+	}
+
+	return metrics.GatherMetrics(ctx, metricsSettings, next)
 }
 
 func main() {
@@ -263,46 +277,48 @@ func main() {
 		}
 	}
 
-	server := &http.Server{
-		Addr: config.Addr,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/status" {
-				log.Infow("status", "headers", req.Header)
-				fmt.Fprint(w, "ok")
-				return
-			}
+	coreHandler := configureMetrics(ctx, &config, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path == "/status" {
+			log.Infow("status", "headers", req.Header)
+			fmt.Fprint(w, "ok")
+			return
+		}
 
-			if req.Host == config.ApiDomain {
-				serveApi(w, req)
-				return
-			}
-
-			if req.Host == config.PortalDomain {
-				log.Infow("portal", "url", req.URL)
-				portalServer.ServeHTTP(w, req)
-				return
-			}
-
-			if req.Host == config.Domain {
-				if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
-					log.Infow("redirecting", "url", req.URL)
-					http.Redirect(w, req, config.HttpScheme+"://"+config.PortalDomain, 301)
-					return
-				}
-
-				if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
-					log.Infow("ocr portal", "url", req.URL)
-					ocrPortalServer.ServeHTTP(w, req)
-					return
-				}
-
-				log.Infow("legacy portal", "url", req.URL)
-				legacyServer.ServeHTTP(w, req)
-				return
-			}
-
+		if req.Host == config.ApiDomain {
 			serveApi(w, req)
-		}),
+			return
+		}
+
+		if req.Host == config.PortalDomain {
+			log.Infow("portal", "url", req.URL)
+			portalServer.ServeHTTP(w, req)
+			return
+		}
+
+		if req.Host == config.Domain {
+			if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
+				log.Infow("redirecting", "url", req.URL)
+				http.Redirect(w, req, config.HttpScheme+"://"+config.PortalDomain, 301)
+				return
+			}
+
+			if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
+				log.Infow("ocr portal", "url", req.URL)
+				ocrPortalServer.ServeHTTP(w, req)
+				return
+			}
+
+			log.Infow("legacy portal", "url", req.URL)
+			legacyServer.ServeHTTP(w, req)
+			return
+		}
+
+		serveApi(w, req)
+	}))
+
+	server := &http.Server{
+		Addr:    config.Addr,
+		Handler: coreHandler,
 	}
 
 	if err := server.ListenAndServe(); err != nil {

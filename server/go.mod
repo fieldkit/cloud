@@ -87,6 +87,6 @@ require (
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190916201440-b31ee645dd40
 	google.golang.org/appengine v1.4.0
-	gopkg.in/alexcesaro/statsd.v2 v2.0.0 // indirect
+	gopkg.in/alexcesaro/statsd.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.2
 )
