@@ -58,27 +58,20 @@ generate:
 clean:
 	rm -rf $(BUILD)
 
-clean-production:
-	rm -rf schema-production
-
-refresh-production: clean-production clone-production
-
 schema-production:
-	mkdir schema-production
-	@if [ -d ~/conservify/dev-ops ]; then                                       \
-		(cd ~/conservify/dev-ops/provisioning && ./db-dump.sh);                 \
-		echo "CREATE USER fk;" > schema-production/000000.sql;                  \
-		echo "CREATE USER server;" >> schema-production/000000.sql;             \
-		echo "CREATE USER rdsadmin;" >> schema-production/000000.sql;           \
-		cp ~/conservify/dev-ops/schema.sql schema-production/000100.sql;        \
-		cp ~/conservify/dev-ops/data.sql schema-production/000200.sql;          \
-	else                                                                        \
-		echo "No dev-ops directory found";                                      \
-	fi
+	@mkdir -p schema-production
+	@rm -f schema-production/*.sql
+	@echo "CREATE USER fk;" > schema-production/0.sql
+	@echo "CREATE USER server;" >> schema-production/0.sql
+	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
+	@for f in `find schema-production -name "*.bz2"`; do              \
+		echo $$f                                                     ;\
+		bunzip2 < $$f > schema-production/1.sql                      ;\
+		rm $$f                                                       ;\
+	done
+	$(MAKE) restart-postgres
 
-clone-production: schema-production
-	rm -f active-schema
-	ln -sf schema-production active-schema
+.PHONY: schema-production
 
 clean-postgres:
 	docker-compose stop postgres
@@ -91,16 +84,6 @@ restart-postgres: active-schema
 	docker-compose stop postgres
 	docker-compose rm -f postgres
 	docker-compose up -d postgres
-
-restart-postgres-foreground: active-schema
-	docker-compose stop postgres
-	docker-compose rm -f postgres
-	docker-compose up postgres
-
-run-postgres:
-	docker-compose stop postgres
-	docker-compose rm -f postgres
-	docker-compose up postgres
 
 veryclean:
 
