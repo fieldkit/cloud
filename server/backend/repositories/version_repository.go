@@ -156,7 +156,9 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				return nil, err
 			}
 
-			rows = append(rows, row)
+			if len(row.D) > 0 {
+				rows = append(rows, row)
+			}
 		}
 
 		if len(rows) > 0 {
