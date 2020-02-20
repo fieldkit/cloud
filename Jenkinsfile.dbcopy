@@ -22,8 +22,9 @@ timestamps {
 					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${ws.servers.value[0].ip}"
                     sh "ssh -o StrictHostKeyChecking=no ${ws.servers.value[0].sshAt} docker run --rm postgres pg_dump '${ws.database_url.value}' > db.slq"
                 }
-                */
+                 */
 
+				sh "rm -rf *.bz2"
                 sh "docker run --rm postgres pg_dump '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
             }
 
