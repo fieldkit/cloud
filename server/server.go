@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -23,6 +22,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/health"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
@@ -272,10 +272,11 @@ func main() {
 
 	staticLog := log.Named("static")
 
+	statusHandler := health.StatusHandler(ctx)
+
 	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
-			log.Infow("status", "headers", req.Header)
-			fmt.Fprint(w, "ok")
+			statusHandler.ServeHTTP(w, req)
 			return
 		}
 

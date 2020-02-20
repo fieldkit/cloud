@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -11,6 +10,7 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/fieldkit/cloud/server/health"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/logging"
 )
@@ -30,10 +30,11 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 
+	statusHandler := health.StatusHandler(ctx)
+
 	coreHandler := ingesterOptions.Metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
-			log.Infow("status", "headers", req.Header)
-			fmt.Fprint(w, "ok")
+			statusHandler.ServeHTTP(w, req)
 			return
 		}
 
