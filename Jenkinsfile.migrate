@@ -1,39 +1,26 @@
 @Library('conservify') _
 
 properties([
-     parameters([string(defaultValue: 'dev', name: 'DeployEnv')])
+	parameters([string(defaultValue: 'dev', name: 'WorkEnv', description: '')])
 ])
 
 timestamps {
     node () {
-        stage ('terraform env') {
-            if (!fileExists('deploy-${params.DeployEnv}.env')) {
-                withCredentials([file(credentialsId: "terraform.tfvars.json", variable: 'TERRAFORM_VARS_JSON')]) {
-                    withAWS(credentials: 'AWS Default', region: 'us-east-1') {
-                        dir ('dev-ops') {
-                            git url: 'https://github.com/conservify/dev-ops.git'
-                            sh "mv -f $TERRAFORM_VARS_JSON terraform"
-                            sh "cd terraform && TF_IN_AUTOMATION=true TF_CLI_ARGS='-no-color' make ${params.DeployEnv} env"
-                            sh "mv terraform/deploy.env ../deploy-${params.DeployEnv}.env"
-                        }
-                    }
-                }
-            }
-            else {
-                echo 'have deploy-${params.DeployEnv}.env, skipping generation'
-            }
+        try {
+			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+
+			stage ('migrate') {
+				dir ('cloud') {
+					git url: 'https://github.com/fieldkit/cloud.git'
+
+					sh "cd migrations && make image"
+
+					sh "docker run --rm conservify/fk-cloud-migrate --path /migrations --database '${ws.database_url.value}' up"
+				}
+			}
         }
-
-        stage ('migrate') {
-            def deploy = readProperties(file: "deploy-${params.DeployEnv}.env")
-
-            dir ('cloud') {
-                git url: 'https://github.com/fieldkit/cloud.git'
-
-                sh "cd migrations && make image"
-
-                sh "docker run --rm conservify/fk-cloud-migrate --path /migrations --database '${deploy.DATABASE_URL}' up"
-            }
+        catch (Exception e) {
+            throw e
         }
     }
 }

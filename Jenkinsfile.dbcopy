@@ -1,0 +1,38 @@
+@Library('conservify') _
+
+properties([
+	buildDiscarder(logRotator(numToKeepStr: '5')),
+    disableConcurrentBuilds(),
+    parameters([
+        string(defaultValue: 'dev', name: 'WorkEnv')
+    ])
+])
+
+timestamps {
+    node () {
+        try {
+            def ws = conservifyTerraformWorkspace(env: "dev")
+
+            def now = new Date()
+            def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
+
+            stage ('dbcopy') {
+                /*
+                sshagent (credentials: ['ssh-fkdev-deploy']) {
+					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${ws.servers.value[0].ip}"
+                    sh "ssh -o StrictHostKeyChecking=no ${ws.servers.value[0].sshAt} docker run --rm postgres pg_dump '${ws.database_url.value}' > db.slq"
+                }
+                */
+
+                sh "docker run --rm postgres pg_dump '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
+            }
+
+			stage ('archive') {
+				archiveArtifacts(artifacts: "*.bz2")
+			}
+        }
+        catch (Exception e) {
+            throw e
+        }
+    }
+}
