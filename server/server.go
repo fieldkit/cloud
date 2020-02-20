@@ -270,6 +270,8 @@ func main() {
 		}
 	}
 
+	staticLog := log.Named("static")
+
 	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			log.Infow("status", "headers", req.Header)
@@ -283,25 +285,25 @@ func main() {
 		}
 
 		if req.Host == config.PortalDomain {
-			log.Infow("portal", "url", req.URL)
+			staticLog.Infow("portal", "url", req.URL)
 			portalServer.ServeHTTP(w, req)
 			return
 		}
 
 		if req.Host == config.Domain {
 			if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
-				log.Infow("redirecting", "url", req.URL)
+				staticLog.Infow("redirecting", "url", req.URL)
 				http.Redirect(w, req, config.HttpScheme+"://"+config.PortalDomain, 301)
 				return
 			}
 
 			if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
-				log.Infow("ocr portal", "url", req.URL)
+				staticLog.Infow("ocr portal", "url", req.URL)
 				ocrPortalServer.ServeHTTP(w, req)
 				return
 			}
 
-			log.Infow("legacy portal", "url", req.URL)
+			staticLog.Infow("legacy portal", "url", req.URL)
 			legacyServer.ServeHTTP(w, req)
 			return
 		}
