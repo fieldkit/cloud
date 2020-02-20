@@ -4066,6 +4066,96 @@ func (ctx *UpdateProjectContext) BadRequest() error {
 	return nil
 }
 
+// DataRecordsContext provides the records data action context.
+type DataRecordsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	RecordID int
+}
+
+// NewDataRecordsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the records controller data action.
+func NewDataRecordsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DataRecordsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DataRecordsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramRecordID := req.Params["recordId"]
+	if len(paramRecordID) > 0 {
+		rawRecordID := paramRecordID[0]
+		if recordID, err2 := strconv.Atoi(rawRecordID); err2 == nil {
+			rctx.RecordID = recordID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("recordId", rawRecordID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DataRecordsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DataRecordsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// MetaRecordsContext provides the records meta action context.
+type MetaRecordsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	RecordID int
+}
+
+// NewMetaRecordsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the records controller meta action.
+func NewMetaRecordsContext(ctx context.Context, r *http.Request, service *goa.Service) (*MetaRecordsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := MetaRecordsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramRecordID := req.Params["recordId"]
+	if len(paramRecordID) > 0 {
+		rawRecordID := paramRecordID[0]
+		if recordID, err2 := strconv.Atoi(rawRecordID); err2 == nil {
+			rctx.RecordID = recordID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("recordId", rawRecordID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *MetaRecordsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *MetaRecordsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // DownloadSimpleContext provides the simple download action context.
 type DownloadSimpleContext struct {
 	context.Context

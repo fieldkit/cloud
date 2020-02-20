@@ -129,13 +129,13 @@ func ParseBlocks(s string) ([]int64, error) {
 }
 
 type DataRecord struct {
-	ID          int64          `db:"id"`
-	ProvisionID int64          `db:"provision_id"`
-	Time        time.Time      `db:"time"`
-	Number      int64          `db:"number"`
-	Meta        int64          `db:"meta"`
-	Location    *Location      `db:"location"`
-	Data        types.JSONText `db:"raw"`
+	ID          int64          `db:"id" json:"id"`
+	ProvisionID int64          `db:"provision_id" json:"provision_id"`
+	Time        time.Time      `db:"time" json:"time"`
+	Number      int64          `db:"number" json:"number"`
+	Meta        int64          `db:"meta" json:"meta"`
+	Location    *Location      `db:"location" json:"location"`
+	Data        types.JSONText `db:"raw" json:"raw"`
 }
 
 func (d *DataRecord) SetData(data interface{}) error {
@@ -164,11 +164,11 @@ func (d *DataRecord) Unmarshal(r *pb.DataRecord) error {
 }
 
 type MetaRecord struct {
-	ID          int64          `db:"id"`
-	ProvisionID int64          `db:"provision_id"`
-	Time        time.Time      `db:"time"`
-	Number      int64          `db:"number"`
-	Data        types.JSONText `db:"raw"`
+	ID          int64          `db:"id" json:"id"`
+	ProvisionID int64          `db:"provision_id" json:"provision_id"`
+	Time        time.Time      `db:"time" json:"time"`
+	Number      int64          `db:"number" json:"number"`
+	Data        types.JSONText `db:"raw" json:"raw"`
 }
 
 func (d *MetaRecord) SetData(data interface{}) error {
