@@ -11,7 +11,7 @@ properties([
 timestamps {
     node () {
         try {
-            def ws = conservifyTerraformWorkspace(env: "dev")
+            def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 
             def now = new Date()
             def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
