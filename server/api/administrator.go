@@ -3,15 +3,9 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type AdministratorControllerOptions struct {
-	Database *sqlxcache.DB
-}
 
 func ProjectAdministratorType(administrator *data.Administrator) *app.ProjectAdministrator {
 	return &app.ProjectAdministrator{
@@ -34,10 +28,10 @@ func ProjectAdministratorsType(administrators []*data.Administrator) *app.Projec
 // AdministratorController implements the user resource.
 type AdministratorController struct {
 	*goa.Controller
-	options AdministratorControllerOptions
+	options *ControllerOptions
 }
 
-func NewAdministratorController(service *goa.Service, options AdministratorControllerOptions) *AdministratorController {
+func NewAdministratorController(service *goa.Service, options *ControllerOptions) *AdministratorController {
 	return &AdministratorController{
 		Controller: service.NewController("AdministratorController"),
 		options:    options,

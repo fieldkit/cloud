@@ -9,22 +9,13 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
-
-	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type StationControllerOptions struct {
-	Session  *session.Session
-	Database *sqlxcache.DB
-}
 
 func StationType(station *data.Station, ingestions []*data.Ingestion, note_media []*data.FieldNoteMediaForStation) (*app.Station, error) {
 	status, err := station.GetStatus()
@@ -120,10 +111,10 @@ func StationsType(stations []*data.Station, ingestions []*data.Ingestion, note_m
 
 type StationController struct {
 	*goa.Controller
-	options StationControllerOptions
+	options *ControllerOptions
 }
 
-func NewStationController(service *goa.Service, options StationControllerOptions) *StationController {
+func NewStationController(service *goa.Service, options *ControllerOptions) *StationController {
 	return &StationController{
 		Controller: service.NewController("StationController"),
 		options:    options,

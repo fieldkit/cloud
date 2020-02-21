@@ -9,16 +9,9 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/conservify/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 func UserType(user *data.User) *app.User {
@@ -71,27 +64,16 @@ func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *
 	return token
 }
 
-type UserControllerOptions struct {
-	Session    *session.Session
-	Database   *sqlxcache.DB
-	Backend    *backend.Backend
-	Emailer    email.Emailer
-	JWTHMACKey []byte
-	Domain     string
-	Metrics    *logging.Metrics
-}
-
-// UserController implements the user resource.
 type UserController struct {
 	*goa.Controller
-	options UserControllerOptions
+	options *ControllerOptions
 }
 
-func NewUserController(service *goa.Service, options UserControllerOptions) (*UserController, error) {
+func NewUserController(service *goa.Service, options *ControllerOptions) *UserController {
 	return &UserController{
 		Controller: service.NewController("UserController"),
 		options:    options,
-	}, nil
+	}
 }
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {

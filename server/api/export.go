@@ -13,16 +13,12 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 )
 
-type ExportControllerOptions struct {
-	Backend *backend.Backend
-}
-
 type ExportController struct {
 	*goa.Controller
-	options ExportControllerOptions
+	options *ControllerOptions
 }
 
-func NewExportController(service *goa.Service, options ExportControllerOptions) *ExportController {
+func NewExportController(service *goa.Service, options *ControllerOptions) *ExportController {
 	return &ExportController{
 		Controller: service.NewController("ExportController"),
 		options:    options,

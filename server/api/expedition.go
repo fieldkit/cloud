@@ -3,17 +3,9 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type ExpeditionControllerOptions struct {
-	Database *sqlxcache.DB
-	Backend  *backend.Backend
-}
 
 func ExpeditionType(expedition *data.Expedition) *app.Expedition {
 	return &app.Expedition{
@@ -38,10 +30,10 @@ func ExpeditionsType(expeditions []*data.Expedition) *app.Expeditions {
 // ExpeditionController implements the user resource.
 type ExpeditionController struct {
 	*goa.Controller
-	options ExpeditionControllerOptions
+	options *ControllerOptions
 }
 
-func NewExpeditionController(service *goa.Service, options ExpeditionControllerOptions) *ExpeditionController {
+func NewExpeditionController(service *goa.Service, options *ControllerOptions) *ExpeditionController {
 	return &ExpeditionController{
 		Controller: service.NewController("ExpeditionController"),
 		options:    options,

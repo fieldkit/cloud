@@ -3,15 +3,9 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type StationLogControllerOptions struct {
-	Database *sqlxcache.DB
-}
 
 func StationLogType(stationLog *data.StationLog) *app.StationLog {
 	return &app.StationLog{
@@ -34,10 +28,10 @@ func StationLogsType(stationLogs []*data.StationLog) *app.StationLogs {
 
 type StationLogController struct {
 	*goa.Controller
-	options StationLogControllerOptions
+	options *ControllerOptions
 }
 
-func NewStationLogController(service *goa.Service, options StationLogControllerOptions) *StationLogController {
+func NewStationLogController(service *goa.Service, options *ControllerOptions) *StationLogController {
 	return &StationLogController{
 		Controller: service.NewController("StationLogController"),
 		options:    options,

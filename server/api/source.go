@@ -87,16 +87,12 @@ func ClusterGeometriesType(source []*backend.TemporalGeometry) []*app.ClusterGeo
 	return summaries
 }
 
-type SourceControllerOptions struct {
-	Backend *backend.Backend
-}
-
 type SourceController struct {
 	*goa.Controller
-	options SourceControllerOptions
+	options *ControllerOptions
 }
 
-func NewSourceController(service *goa.Service, options SourceControllerOptions) *SourceController {
+func NewSourceController(service *goa.Service, options *ControllerOptions) *SourceController {
 	return &SourceController{
 		Controller: service.NewController("SourceController"),
 		options:    options,

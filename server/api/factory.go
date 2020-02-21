@@ -25,6 +25,24 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
+type ControllerOptions struct {
+	Config          *ApiConfiguration
+	Session         *session.Session
+	Database        *sqlxcache.DB
+	Backend         *backend.Backend
+	ConcatWorkers   *backend.ConcatenationWorkers
+	JWTHMACKey      []byte
+	Emailer         email.Emailer
+	Domain          string
+	Metrics         *logging.Metrics
+	Publisher       jobs.MessagePublisher
+	StreamProcessor backend.StreamProcessor
+
+	// Twitter
+	ConsumerKey    string
+	ConsumerSecret string
+}
+
 func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, publisher jobs.MessagePublisher,
 	cw *backend.ConcatenationWorkers, config *ApiConfiguration, metrics *logging.Metrics) (service *goa.Service, err error) {
 	log := Logger(ctx).Sugar()
@@ -60,181 +78,47 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	// Mount "swagger" controller
-	c := NewSwaggerController(service)
-	app.MountSwaggerController(service, c)
-
-	// Mount "user" controller
-	c2, err := NewUserController(service, UserControllerOptions{
-		Session:    awsSession,
-		Database:   database,
-		Backend:    be,
-		Emailer:    emailer,
-		JWTHMACKey: jwtHMACKey,
-		Domain:     config.Domain,
-		Metrics:    metrics,
-	})
-	if err != nil {
-		panic(err)
-	}
-	app.MountUserController(service, c2)
-
-	// Mount "project" controller
-	c3 := NewProjectController(service, ProjectControllerOptions{
-		Session:  awsSession,
-		Database: database,
-		Emailer:  emailer,
-	})
-	app.MountProjectController(service, c3)
-
-	// Mount "expedition" controller
-	c4 := NewExpeditionController(service, ExpeditionControllerOptions{
-		Database: database,
-		Backend:  be,
-	})
-	app.MountExpeditionController(service, c4)
-
-	// Mount "team" controller
-	c5 := NewTeamController(service, TeamControllerOptions{
-		Database: database,
-	})
-	app.MountTeamController(service, c5)
-
-	// Mount "member" controller
-	c6 := NewMemberController(service, MemberControllerOptions{
-		Database: database,
-	})
-	app.MountMemberController(service, c6)
-
-	// Mount "administrator" controller
-	c7 := NewAdministratorController(service, AdministratorControllerOptions{
-		Database: database,
-	})
-	app.MountAdministratorController(service, c7)
-
-	// Mount "source" controller
-	c8 := NewSourceController(service, SourceControllerOptions{
-		Backend: be,
-	})
-	app.MountSourceController(service, c8)
-
-	// Mount "twitter" controller
-	c9 := NewTwitterController(service, TwitterControllerOptions{
-		Backend: be,
-		// ConsumerKey:    config.TwitterConsumerKey,
-		// ConsumerSecret: config.TwitterConsumerSecret,
-		Domain: config.Domain,
-	})
-	app.MountTwitterController(service, c9)
-
-	// Mount "device" controller
-	c10 := NewDeviceController(service, DeviceControllerOptions{
-		Database: database,
-		Backend:  be,
-	})
-	app.MountDeviceController(service, c10)
-
-	// Mount "picture" controller
-	c11 := NewPictureController(service, &PictureControllerOptions{
-		Session: awsSession,
-	})
-	app.MountPictureController(service, c11)
-
-	// Mount "source_token" controller
-	c12 := NewSourceTokenController(service, SourceTokenControllerOptions{
-		Backend: be,
-	})
-	app.MountSourceTokenController(service, c12)
-
-	// Mount "geojson" controller
-	c13 := NewGeoJSONController(service, GeoJSONControllerOptions{
-		Backend: be,
-	})
-	app.MountGeoJSONController(service, c13)
-
-	// Mount "export" controller
-	c14 := NewExportController(service, ExportControllerOptions{
-		Backend: be,
-	})
-	app.MountExportController(service, c14)
-
-	// Mount "query" controller
-	c15 := NewQueryController(service, QueryControllerOptions{
-		Database: database,
-		Backend:  be,
-	})
-	app.MountQueryController(service, c15)
-
-	// Mount "tasks" controller
-	c16 := NewTasksController(service, TasksControllerOptions{
+	controllerOptions := &ControllerOptions{
+		Session:         awsSession,
 		Database:        database,
 		Backend:         be,
 		Emailer:         emailer,
+		JWTHMACKey:      jwtHMACKey,
+		Domain:          config.Domain,
+		Metrics:         metrics,
 		StreamProcessor: streamProcessor,
+		Config:          config,
+		ConcatWorkers:   cw,
 		Publisher:       publisher,
-	})
-	app.MountTasksController(service, c16)
-
-	// Mount "firmware" controller
-	c17 := NewFirmwareController(service, FirmwareControllerOptions{
-		Session:  awsSession,
-		Database: database,
-		Backend:  be,
-	})
-	app.MountFirmwareController(service, c17)
-
-	// Mount "station" controller
-	c18 := NewStationController(service, StationControllerOptions{
-		Session:  awsSession,
-		Database: database,
-	})
-	app.MountStationController(service, c18)
-
-	// Mount "station log" controller
-	c19 := NewStationLogController(service, StationLogControllerOptions{
-		Database: database,
-	})
-	app.MountStationLogController(service, c19)
-
-	// Mount "field_note" controller
-	c20 := NewFieldNoteController(service, FieldNoteControllerOptions{
-		Session:  awsSession,
-		Database: database,
-	})
-	app.MountFieldNoteController(service, c20)
-
-	// Mount "data" controller
-	dco := DataControllerOptions{
-		Config:    config,
-		Session:   awsSession,
-		Database:  database,
-		Publisher: publisher,
 	}
-	app.MountDataController(service, NewDataController(ctx, service, dco))
-	app.MountJSONDataController(service, NewJSONDataController(ctx, service, dco))
-	app.MountRecordsController(service, NewRecordsController(ctx, service, dco))
 
-	// Mount "files" controller
-	fco := FilesControllerOptions{
-		Config:        config,
-		Session:       awsSession,
-		Database:      database,
-		Backend:       be,
-		ConcatWorkers: cw,
-	}
-	app.MountFilesController(service, NewFilesController(ctx, service, fco))
-	app.MountDeviceLogsController(service, NewDeviceLogsController(ctx, service, fco))
-	app.MountDeviceDataController(service, NewDeviceDataController(ctx, service, fco))
-
-	sco := SimpleControllerOptions{
-		Config:        config,
-		Session:       awsSession,
-		Database:      database,
-		Backend:       be,
-		ConcatWorkers: cw,
-		JWTHMACKey:    jwtHMACKey,
-	}
-	app.MountSimpleController(service, NewSimpleController(ctx, service, sco))
+	app.MountSwaggerController(service, NewSwaggerController(service))
+	app.MountUserController(service, NewUserController(service, controllerOptions))
+	app.MountProjectController(service, NewProjectController(service, controllerOptions))
+	app.MountExpeditionController(service, NewExpeditionController(service, controllerOptions))
+	app.MountTeamController(service, NewTeamController(service, controllerOptions))
+	app.MountMemberController(service, NewMemberController(service, controllerOptions))
+	app.MountAdministratorController(service, NewAdministratorController(service, controllerOptions))
+	app.MountSourceController(service, NewSourceController(service, controllerOptions))
+	app.MountTwitterController(service, NewTwitterController(service, controllerOptions))
+	app.MountDeviceController(service, NewDeviceController(service, controllerOptions))
+	app.MountPictureController(service, NewPictureController(service, controllerOptions))
+	app.MountSourceTokenController(service, NewSourceTokenController(service, controllerOptions))
+	app.MountGeoJSONController(service, NewGeoJSONController(service, controllerOptions))
+	app.MountExportController(service, NewExportController(service, controllerOptions))
+	app.MountQueryController(service, NewQueryController(service, controllerOptions))
+	app.MountTasksController(service, NewTasksController(service, controllerOptions))
+	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
+	app.MountStationController(service, NewStationController(service, controllerOptions))
+	app.MountStationLogController(service, NewStationLogController(service, controllerOptions))
+	app.MountFieldNoteController(service, NewFieldNoteController(service, controllerOptions))
+	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))
+	app.MountJSONDataController(service, NewJSONDataController(ctx, service, controllerOptions))
+	app.MountRecordsController(service, NewRecordsController(ctx, service, controllerOptions))
+	app.MountFilesController(service, NewFilesController(ctx, service, controllerOptions))
+	app.MountDeviceLogsController(service, NewDeviceLogsController(ctx, service, controllerOptions))
+	app.MountDeviceDataController(service, NewDeviceDataController(ctx, service, controllerOptions))
+	app.MountSimpleController(service, NewSimpleController(ctx, service, controllerOptions))
 
 	setupErrorHandling()
 

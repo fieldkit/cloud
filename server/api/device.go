@@ -3,8 +3,6 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
@@ -79,17 +77,12 @@ func DeviceSchemasType(deviceSource *data.DeviceSource, deviceSchemas []*data.De
 	}
 }
 
-type DeviceControllerOptions struct {
-	Backend  *backend.Backend
-	Database *sqlxcache.DB
-}
-
 type DeviceController struct {
 	*goa.Controller
-	options DeviceControllerOptions
+	options *ControllerOptions
 }
 
-func NewDeviceController(service *goa.Service, options DeviceControllerOptions) *DeviceController {
+func NewDeviceController(service *goa.Service, options *ControllerOptions) *DeviceController {
 	return &DeviceController{
 		Controller: service.NewController("DeviceController"),
 		options:    options,

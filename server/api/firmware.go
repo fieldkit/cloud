@@ -10,10 +10,7 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/fieldkit/cloud/server/api/app"
@@ -21,18 +18,12 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type FirmwareControllerOptions struct {
-	Session  *session.Session
-	Database *sqlxcache.DB
-	Backend  *backend.Backend
-}
-
 type FirmwareController struct {
 	*goa.Controller
-	options FirmwareControllerOptions
+	options *ControllerOptions
 }
 
-func NewFirmwareController(service *goa.Service, options FirmwareControllerOptions) *FirmwareController {
+func NewFirmwareController(service *goa.Service, options *ControllerOptions) *FirmwareController {
 	return &FirmwareController{
 		Controller: service.NewController("FirmwareController"),
 		options:    options,

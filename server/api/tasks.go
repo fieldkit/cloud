@@ -3,28 +3,15 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/jobs"
 )
-
-type TasksControllerOptions struct {
-	Database        *sqlxcache.DB
-	Backend         *backend.Backend
-	Emailer         email.Emailer
-	StreamProcessor backend.StreamProcessor
-	Publisher       jobs.MessagePublisher
-}
 
 type TasksController struct {
 	*goa.Controller
-	options TasksControllerOptions
+	options *ControllerOptions
 }
 
-func NewTasksController(service *goa.Service, options TasksControllerOptions) *TasksController {
+func NewTasksController(service *goa.Service, options *ControllerOptions) *TasksController {
 	return &TasksController{
 		Controller: service.NewController("TasksController"),
 		options:    options,

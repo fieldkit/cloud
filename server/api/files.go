@@ -14,25 +14,13 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type FilesControllerOptions struct {
-	Config        *ApiConfiguration
-	Session       *session.Session
-	Database      *sqlxcache.DB
-	Backend       *backend.Backend
-	ConcatWorkers *backend.ConcatenationWorkers
-}
-
 type BaseFilesController struct {
-	options FilesControllerOptions
+	options *ControllerOptions
 }
 
 type FilesController struct {
@@ -40,7 +28,7 @@ type FilesController struct {
 	*goa.Controller
 }
 
-func NewFilesController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *FilesController {
+func NewFilesController(ctx context.Context, service *goa.Service, options *ControllerOptions) *FilesController {
 	return &FilesController{
 		BaseFilesController: BaseFilesController{
 			options: options,
@@ -345,7 +333,7 @@ type DeviceLogsController struct {
 	*goa.Controller
 }
 
-func NewDeviceLogsController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceLogsController {
+func NewDeviceLogsController(ctx context.Context, service *goa.Service, options *ControllerOptions) *DeviceLogsController {
 	return &DeviceLogsController{
 		BaseFilesController: BaseFilesController{
 			options: options,
@@ -373,7 +361,7 @@ type DeviceDataController struct {
 	*goa.Controller
 }
 
-func NewDeviceDataController(ctx context.Context, service *goa.Service, options FilesControllerOptions) *DeviceDataController {
+func NewDeviceDataController(ctx context.Context, service *goa.Service, options *ControllerOptions) *DeviceDataController {
 	return &DeviceDataController{
 		BaseFilesController: BaseFilesController{
 			options: options,

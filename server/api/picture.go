@@ -14,8 +14,6 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 	"github.com/lucasb-eyer/go-colorful"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
@@ -24,16 +22,12 @@ const (
 	float64MaxUint64 = float64(math.MaxUint64)
 )
 
-type PictureControllerOptions struct {
-	Session *session.Session
-}
-
 type PictureController struct {
 	*goa.Controller
-	options *PictureControllerOptions
+	options *ControllerOptions
 }
 
-func NewPictureController(service *goa.Service, options *PictureControllerOptions) *PictureController {
+func NewPictureController(service *goa.Service, options *ControllerOptions) *PictureController {
 	return &PictureController{
 		options:    options,
 		Controller: service.NewController("PictureController"),

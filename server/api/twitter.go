@@ -1,14 +1,14 @@
 package api
 
 import (
-	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	oauth1Twitter "github.com/dghubble/oauth1/twitter"
 	"github.com/goadesign/goa"
 
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
+
+	"github.com/dghubble/go-twitter/twitter"
+	oauth1Twitter "github.com/dghubble/oauth1/twitter"
 )
 
 func TwitterAccountSourceType(twitterAccount *data.TwitterAccountSource) *app.TwitterAccountSource {
@@ -44,21 +44,13 @@ func TwitterAccountSourcesType(twitterAccounts []*data.TwitterAccountSource) *ap
 	}
 }
 
-type TwitterControllerOptions struct {
-	Backend        *backend.Backend
-	ConsumerKey    string
-	ConsumerSecret string
-	Domain         string
-}
-
-// TwitterController implements the twitter resource.
 type TwitterController struct {
 	*goa.Controller
-	options TwitterControllerOptions
+	options *ControllerOptions
 	config  *oauth1.Config
 }
 
-func NewTwitterController(service *goa.Service, options TwitterControllerOptions) *TwitterController {
+func NewTwitterController(service *goa.Service, options *ControllerOptions) *TwitterController {
 	return &TwitterController{
 		Controller: service.NewController("TwitterController"),
 		options:    options,

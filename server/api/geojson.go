@@ -16,16 +16,12 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type GeoJSONControllerOptions struct {
-	Backend *backend.Backend
-}
-
 type GeoJSONController struct {
 	*goa.Controller
-	options GeoJSONControllerOptions
+	options *ControllerOptions
 }
 
-func NewGeoJSONController(service *goa.Service, options GeoJSONControllerOptions) *GeoJSONController {
+func NewGeoJSONController(service *goa.Service, options *ControllerOptions) *GeoJSONController {
 	return &GeoJSONController{
 		Controller: service.NewController("GeoJSONController"),
 		options:    options,

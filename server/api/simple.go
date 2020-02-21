@@ -8,29 +8,16 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/conservify/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 )
 
-type SimpleControllerOptions struct {
-	Config        *ApiConfiguration
-	Session       *session.Session
-	Database      *sqlxcache.DB
-	Backend       *backend.Backend
-	ConcatWorkers *backend.ConcatenationWorkers
-	JWTHMACKey    []byte
-}
-
 type SimpleController struct {
-	options SimpleControllerOptions
+	options *ControllerOptions
 	*goa.Controller
 }
 
-func NewSimpleController(ctx context.Context, service *goa.Service, options SimpleControllerOptions) *SimpleController {
+func NewSimpleController(ctx context.Context, service *goa.Service, options *ControllerOptions) *SimpleController {
 	return &SimpleController{
 		options:    options,
 		Controller: service.NewController("SimpleController"),

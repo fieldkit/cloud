@@ -5,19 +5,10 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type FieldNoteControllerOptions struct {
-	Session  *session.Session
-	Database *sqlxcache.DB
-}
 
 func FieldNoteQueryResultType(fieldNote *data.FieldNoteQueryResult) *app.FieldNoteQueryResult {
 	fieldNoteQueryResultType := &app.FieldNoteQueryResult{
@@ -71,10 +62,10 @@ func FieldNoteMediaType(fieldNoteMedia *data.FieldNoteMedia) *app.FieldNoteMedia
 
 type FieldNoteController struct {
 	*goa.Controller
-	options FieldNoteControllerOptions
+	options *ControllerOptions
 }
 
-func NewFieldNoteController(service *goa.Service, options FieldNoteControllerOptions) *FieldNoteController {
+func NewFieldNoteController(service *goa.Service, options *ControllerOptions) *FieldNoteController {
 	return &FieldNoteController{
 		Controller: service.NewController("FieldNoteController"),
 		options:    options,

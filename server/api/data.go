@@ -9,17 +9,13 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/messages"
 )
 
@@ -28,19 +24,12 @@ const (
 	DataTypeName = "data"
 )
 
-type DataControllerOptions struct {
-	Config    *ApiConfiguration
-	Session   *session.Session
-	Database  *sqlxcache.DB
-	Publisher jobs.MessagePublisher
-}
-
 type DataController struct {
-	options DataControllerOptions
 	*goa.Controller
+	options *ControllerOptions
 }
 
-func NewDataController(ctx context.Context, service *goa.Service, options DataControllerOptions) *DataController {
+func NewDataController(ctx context.Context, service *goa.Service, options *ControllerOptions) *DataController {
 	return &DataController{
 		options:    options,
 		Controller: service.NewController("DataController"),
@@ -331,11 +320,11 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 }
 
 type JSONDataController struct {
-	options DataControllerOptions
 	*goa.Controller
+	options *ControllerOptions
 }
 
-func NewJSONDataController(ctx context.Context, service *goa.Service, options DataControllerOptions) *JSONDataController {
+func NewJSONDataController(ctx context.Context, service *goa.Service, options *ControllerOptions) *JSONDataController {
 	return &JSONDataController{
 		options:    options,
 		Controller: service.NewController("JSONDataController"),
@@ -602,11 +591,11 @@ func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
 }
 
 type RecordsController struct {
-	options DataControllerOptions
+	options *ControllerOptions
 	*goa.Controller
 }
 
-func NewRecordsController(ctx context.Context, service *goa.Service, options DataControllerOptions) *RecordsController {
+func NewRecordsController(ctx context.Context, service *goa.Service, options *ControllerOptions) *RecordsController {
 	return &RecordsController{
 		options:    options,
 		Controller: service.NewController("RecordsController"),

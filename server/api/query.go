@@ -8,24 +8,16 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type QueryControllerOptions struct {
-	Database *sqlxcache.DB
-	Backend  *backend.Backend
-}
-
 type QueryController struct {
 	*goa.Controller
-	options QueryControllerOptions
+	options *ControllerOptions
 }
 
-func NewQueryController(service *goa.Service, options QueryControllerOptions) *QueryController {
+func NewQueryController(service *goa.Service, options *ControllerOptions) *QueryController {
 	return &QueryController{
 		Controller: service.NewController("QueryController"),
 		options:    options,

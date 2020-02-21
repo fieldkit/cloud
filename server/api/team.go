@@ -3,15 +3,9 @@ package api
 import (
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/data"
 )
-
-type TeamControllerOptions struct {
-	Database *sqlxcache.DB
-}
 
 func TeamType(team *data.Team) *app.Team {
 	return &app.Team{
@@ -36,10 +30,10 @@ func TeamsType(teams []*data.Team) *app.Teams {
 // TeamController implements the user resource.
 type TeamController struct {
 	*goa.Controller
-	options TeamControllerOptions
+	options *ControllerOptions
 }
 
-func NewTeamController(service *goa.Service, options TeamControllerOptions) *TeamController {
+func NewTeamController(service *goa.Service, options *ControllerOptions) *TeamController {
 	return &TeamController{
 		Controller: service.NewController("TeamController"),
 		options:    options,

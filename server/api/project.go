@@ -8,21 +8,10 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/conservify/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/email"
 )
-
-type ProjectControllerOptions struct {
-	Session  *session.Session
-	Database *sqlxcache.DB
-	Emailer  email.Emailer
-}
 
 func ProjectType(project *data.Project) *app.Project {
 	projectType := &app.Project{
@@ -63,10 +52,10 @@ func ProjectsType(projects []*data.Project) *app.Projects {
 // ProjectController implements the project resource.
 type ProjectController struct {
 	*goa.Controller
-	options ProjectControllerOptions
+	options *ControllerOptions
 }
 
-func NewProjectController(service *goa.Service, options ProjectControllerOptions) *ProjectController {
+func NewProjectController(service *goa.Service, options *ControllerOptions) *ProjectController {
 	return &ProjectController{
 		Controller: service.NewController("ProjectController"),
 		options:    options,

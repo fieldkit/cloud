@@ -4,7 +4,6 @@ import (
 	"github.com/goadesign/goa"
 
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -27,17 +26,12 @@ func SourceTokensType(sourceTokens []*data.SourceToken) *app.SourceTokens {
 	}
 }
 
-type SourceTokenControllerOptions struct {
-	Backend *backend.Backend
-}
-
-// SourceTokenController implements the sourceToken resource.
 type SourceTokenController struct {
 	*goa.Controller
-	options SourceTokenControllerOptions
+	options *ControllerOptions
 }
 
-func NewSourceTokenController(service *goa.Service, options SourceTokenControllerOptions) *SourceTokenController {
+func NewSourceTokenController(service *goa.Service, options *ControllerOptions) *SourceTokenController {
 	return &SourceTokenController{
 		Controller: service.NewController("SourceTokenController"),
 		options:    options,
