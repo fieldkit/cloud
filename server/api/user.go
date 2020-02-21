@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -124,8 +126,6 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 }
 
 func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
-	fmt.Println(ctx.Token)
-
 	validationToken := &data.ValidationToken{}
 	if err := validationToken.Token.UnmarshalText([]byte(ctx.Token)); err != nil {
 		return err
@@ -152,27 +152,62 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	return ctx.Found()
 }
 
+func (c *UserController) authenticateOrSpoof(ctx context.Context, email, password string) (*data.User, error) {
+	user := &data.User{}
+	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1", email)
+	if err == sql.ErrNoRows {
+		return nil, data.IncorrectPasswordError
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	parts := strings.Split(password, " ")
+	if len(parts) == 2 {
+		log := Logger(ctx).Sugar()
+
+		// NOTE Not logging password here, may be a real one.
+		log.Infow("spoofing", "email", email)
+
+		adminUser := &data.User{}
+		err := c.options.Database.GetContext(ctx, adminUser, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1 AND u.admin", parts[0])
+		if err == nil {
+			// We can safely log the user doing the spoofing here.
+			err = adminUser.CheckPassword(parts[1])
+			if err == nil {
+				log.Infow("spoofed", "email", email, "spoofer", adminUser.Email)
+				return user, nil
+			} else {
+				log.Infow("denied", "email", email, "spoofer", adminUser.Email, "spoofing", true)
+			}
+		}
+	}
+
+	err = user.CheckPassword(password)
+	if err == data.IncorrectPasswordError {
+		return nil, data.IncorrectPasswordError
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (c *UserController) Login(ctx *app.LoginUserContext) error {
 	now := time.Now()
 
 	c.options.Metrics.AuthTry()
 
-	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1", ctx.Payload.Email)
-	if err == sql.ErrNoRows {
-		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
-	}
-	if err != nil {
-		return err
-	}
-
-	err = user.CheckPassword(ctx.Payload.Password)
+	user, err := c.authenticateOrSpoof(ctx, ctx.Payload.Email, ctx.Payload.Password)
 	if err == data.IncorrectPasswordError {
 		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
-
 	if err != nil {
 		return err
+	}
+	if user == nil {
+		return ctx.Unauthorized(goa.ErrUnauthorized("invalid email or password"))
 	}
 
 	refreshToken, err := data.NewRefreshToken(user.ID, 20, now.Add(time.Duration(72)*time.Hour))
@@ -192,7 +227,6 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 
 	c.options.Metrics.AuthSuccess()
 
-	// Send response
 	ctx.ResponseData.Header().Set("Authorization", "Bearer "+signedToken)
 	return ctx.NoContent()
 }
