@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/goadesign/goa"
@@ -16,60 +17,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 
-	"github.com/conservify/sqlxcache"
-
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-type ControllerOptions struct {
-	Config          *ApiConfiguration
-	Session         *session.Session
-	Database        *sqlxcache.DB
-	Backend         *backend.Backend
-	ConcatWorkers   *backend.ConcatenationWorkers
-	JWTHMACKey      []byte
-	Emailer         email.Emailer
-	Domain          string
-	Metrics         *logging.Metrics
-	Publisher       jobs.MessagePublisher
-	StreamProcessor backend.StreamProcessor
-
-	// Twitter
-	ConsumerKey    string
-	ConsumerSecret string
-}
-
-func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, ingester *backend.StreamIngester, publisher jobs.MessagePublisher,
-	cw *backend.ConcatenationWorkers, config *ApiConfiguration, metrics *logging.Metrics) (service *goa.Service, err error) {
-	log := Logger(ctx).Sugar()
-
-	emailer, err := createEmailer(awsSession, config)
+func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions, next http.Handler) (service *goa.Service, err error) {
+	jwtMiddleware, err := controllerOptions.Config.NewJWTMiddleware()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-
-	streamProcessor := backend.NewS3StreamProcessor(awsSession, ingester, config.BucketName)
 
 	service = goa.New("fieldkit")
-
 	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
-
-	log.Infow("config", "config", config)
-
-	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
-	if err != nil {
-		panic(err)
-	}
-
-	jwtMiddleware, err := config.NewJWTMiddleware()
-	if err != nil {
-		panic(err)
-	}
-
 	service.Use(gzip.Middleware(6))
 	app.UseJWTMiddleware(service, jwtMiddleware)
 	service.Use(middleware.RequestID())
@@ -77,20 +37,6 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	service.Use(middleware.LogRequest(false))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
-
-	controllerOptions := &ControllerOptions{
-		Session:         awsSession,
-		Database:        database,
-		Backend:         be,
-		Emailer:         emailer,
-		JWTHMACKey:      jwtHMACKey,
-		Domain:          config.Domain,
-		Metrics:         metrics,
-		StreamProcessor: streamProcessor,
-		Config:          config,
-		ConcatWorkers:   cw,
-		Publisher:       publisher,
-	}
 
 	app.MountSwaggerController(service, NewSwaggerController(service))
 	app.MountUserController(service, NewUserController(service, controllerOptions))
@@ -119,6 +65,10 @@ func CreateApiService(ctx context.Context, database *sqlxcache.DB, be *backend.B
 	app.MountDeviceLogsController(service, NewDeviceLogsController(ctx, service, controllerOptions))
 	app.MountDeviceDataController(service, NewDeviceDataController(ctx, service, controllerOptions))
 	app.MountSimpleController(service, NewSimpleController(ctx, service, controllerOptions))
+
+	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
+		next.ServeHTTP(rw, req)
+	})
 
 	setupErrorHandling()
 

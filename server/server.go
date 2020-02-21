@@ -218,8 +218,13 @@ func main() {
 		panic(err)
 	}
 
-	service, err := api.CreateApiService(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig, metrics)
+	if err != nil {
+		panic(err)
+	}
 
+	v3Handler := api.CreateGoaV3Handler(ctx, controllerOptions)
+	service, err := api.CreateApiService(ctx, controllerOptions, v3Handler)
 	notFoundHandler := http.NotFoundHandler()
 
 	portalServer := notFoundHandler

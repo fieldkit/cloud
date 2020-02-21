@@ -168,7 +168,7 @@ func Logger(ctx context.Context) *zap.Logger {
 		if false {
 			logger := goa.ContextLogger(ctx)
 			if a, ok := logger.(*adapter); ok {
-				newLogger = a.Logger
+				newLogger = a.logger
 			}
 		}
 
@@ -195,26 +195,26 @@ func Logger(ctx context.Context) *zap.Logger {
 }
 
 type adapter struct {
-	Logger *zap.Logger
+	logger *zap.Logger
 }
 
 func NewGoaAdapter(logger *zap.Logger) goa.LogAdapter {
-	return &adapter{Logger: logger.Named("goa")}
+	return &adapter{logger: logger.Named("goa")}
 }
 
 func (a *adapter) Info(msg string, data ...interface{}) {
-	fields := toZapFields(data)
+	fields := ToZapFields(data)
 	a.getTaskedLogger(fields).Info(msg, *fields...)
 }
 
 func (a *adapter) Error(msg string, data ...interface{}) {
-	fields := toZapFields(data)
+	fields := ToZapFields(data)
 	a.getTaskedLogger(fields).Error(msg, *fields...)
 }
 
 func (a *adapter) New(data ...interface{}) goa.LogAdapter {
-	fields := toZapFields(data)
-	return &adapter{Logger: a.getTaskedLogger(fields).With(*fields...)}
+	fields := ToZapFields(data)
+	return &adapter{logger: a.getTaskedLogger(fields).With(*fields...)}
 }
 
 func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
@@ -229,12 +229,12 @@ func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 func (a *adapter) getTaskedLogger(fields *[]zapcore.Field) *zap.Logger {
 	id := a.getRequestId(fields)
 	if len(id) > 0 {
-		return a.Logger.With(zap.String(taskIdTagName, id))
+		return a.logger.With(zap.String(taskIdTagName, id))
 	}
-	return a.Logger
+	return a.logger
 }
 
-func toZapFields(data []interface{}) *[]zapcore.Field {
+func ToZapFields(data []interface{}) *[]zapcore.Field {
 	n := (len(data) + 1) / 2
 	fields := make([]zapcore.Field, n)
 

@@ -61,7 +61,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/paulmach/go.geo v0.0.0-20170321183534-b160a6efed6c
 	github.com/paulmach/go.geojson v0.0.0-20170327170536-40612a87147b
-	github.com/pkg/errors v0.0.0-20190227000051-27936f6d90f9
+	github.com/pkg/errors v0.8.1
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v0.0.0-20180103174451-36e9d2ebbde5
 	github.com/segmentio/ksuid v1.0.1
@@ -78,15 +78,15 @@ require (
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v0.0.0-20180122172545-ddea229ff1df
 	go.uber.org/zap v1.8.0
-	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
+	goa.design/goa/v3 v3.0.10
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
 	golang.org/x/net v0.0.0-20190916140828-c8589233b77d
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
-	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190916201440-b31ee645dd40
+	golang.org/x/tools v0.0.0-20200110213125-a7a6caa82ab2
 	google.golang.org/appengine v1.4.0
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.7
 )
