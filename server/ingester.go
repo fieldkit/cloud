@@ -27,12 +27,10 @@ func main() {
 	log.Info("starting")
 
 	ingesterHandler, ingesterOptions := ingester.NewIngester(ctx, config)
-
 	notFoundHandler := http.NotFoundHandler()
-
 	statusHandler := health.StatusHandler(ctx)
-
-	coreHandler := ingesterOptions.Metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	monitoring := logging.Monitoring(ingesterOptions.Metrics)
+	coreHandler := monitoring(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			statusHandler.ServeHTTP(w, req)
 			return

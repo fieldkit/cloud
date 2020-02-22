@@ -276,10 +276,9 @@ func main() {
 	}
 
 	staticLog := log.Named("static")
-
 	statusHandler := health.StatusHandler(ctx)
-
-	coreHandler := metrics.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	monitoring := logging.Monitoring(metrics)
+	coreHandler := monitoring(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			statusHandler.ServeHTTP(w, req)
 			return

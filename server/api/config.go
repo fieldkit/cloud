@@ -4,7 +4,12 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ses"
+
 	"github.com/goadesign/goa"
+
+	"github.com/fieldkit/cloud/server/email"
 )
 
 type ApiConfiguration struct {
@@ -32,4 +37,16 @@ func (ac *ApiConfiguration) NewJWTMiddleware() (goa.Middleware, error) {
 	}
 
 	return jwtMiddleware, nil
+}
+
+func createEmailer(awsSession *session.Session, config *ApiConfiguration) (emailer email.Emailer, err error) {
+	switch config.Emailer {
+	case "default":
+		emailer = email.NewEmailer("admin", config.Domain)
+	case "aws":
+		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
+	default:
+		panic("invalid emailer")
+	}
+	return
 }

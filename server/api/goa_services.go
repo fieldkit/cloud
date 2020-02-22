@@ -9,8 +9,6 @@ import (
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
 
-	"github.com/fieldkit/cloud/server/logging"
-
 	testsvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 )
@@ -41,13 +39,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 
 	testsvr.Mount(mux, testServer)
 
-	loggingAdapter := logging.NewGoaMiddlewareAdapter(logging.Logger(ctx))
-
-	var handler http.Handler = mux
-	handler = httpmdlwr.Log(loggingAdapter)(handler)
-	handler = httpmdlwr.RequestID()(handler)
-
-	return handler
+	return mux
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {

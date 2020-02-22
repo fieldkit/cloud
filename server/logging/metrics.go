@@ -71,11 +71,11 @@ func (m *Metrics) UserID(id int32) {
 	m.SC.Unique("api.users", fmt.Sprintf("%d", id))
 }
 
-func (m *Metrics) GatherMetrics(next http.Handler) http.Handler {
+func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t := m.SC.NewTiming()
 
-		next.ServeHTTP(w, r)
+		h.ServeHTTP(w, r)
 
 		t.Send("http.req.time")
 	})
