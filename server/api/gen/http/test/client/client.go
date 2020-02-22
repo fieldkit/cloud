@@ -20,6 +20,9 @@ type Client struct {
 	// Get Doer is the HTTP client used to make requests to the get endpoint.
 	GetDoer goahttp.Doer
 
+	// Error Doer is the HTTP client used to make requests to the error endpoint.
+	ErrorDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -41,6 +44,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		GetDoer:             doer,
+		ErrorDoer:           doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -64,6 +68,26 @@ func (c *Client) Get() goa.Endpoint {
 
 		if err != nil {
 			return nil, goahttp.ErrRequestError("test", "get", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Error returns an endpoint that makes HTTP requests to the test service error
+// server.
+func (c *Client) Error() goa.Endpoint {
+	var (
+		decodeResponse = DecodeErrorResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildErrorRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ErrorDoer.Do(req)
+
+		if err != nil {
+			return nil, goahttp.ErrRequestError("test", "error", err)
 		}
 		return decodeResponse(resp)
 	}

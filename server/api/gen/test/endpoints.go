@@ -15,19 +15,22 @@ import (
 
 // Endpoints wraps the "test" service endpoints.
 type Endpoints struct {
-	Get goa.Endpoint
+	Get   goa.Endpoint
+	Error goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "test" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Get: NewGetEndpoint(s),
+		Get:   NewGetEndpoint(s),
+		Error: NewErrorEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "test" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
+	e.Error = m(e.Error)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -36,5 +39,13 @@ func NewGetEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetPayload)
 		return nil, s.Get(ctx, p)
+	}
+}
+
+// NewErrorEndpoint returns an endpoint function that calls the method "error"
+// of service "test".
+func NewErrorEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return nil, s.Error(ctx)
 	}
 }

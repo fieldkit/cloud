@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 )
@@ -18,4 +19,8 @@ func NewTestSevice(ctx context.Context, options *ControllerOptions) *TestService
 
 func (sc *TestService) Get(ctx context.Context, payload *test.GetPayload) error {
 	return nil
+}
+
+func (sc *TestService) Error(ctx context.Context) error {
+	return fmt.Errorf("life is unpredictable")
 }

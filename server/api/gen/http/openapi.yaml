@@ -12,6 +12,17 @@ produces:
 - application/xml
 - application/gob
 paths:
+  /error:
+    get:
+      tags:
+      - test
+      summary: error test
+      operationId: test#error
+      responses:
+        "204":
+          description: No Content response.
+      schemes:
+      - http
   /test/{id}:
     get:
       tags:

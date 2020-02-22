@@ -14,4 +14,10 @@ var _ = Service("test", func() {
 			GET("test/{id}")
 		})
 	})
+
+	Method("error", func() {
+		HTTP(func() {
+			GET("error")
+		})
+	})
 })

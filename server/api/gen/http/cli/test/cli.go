@@ -23,7 +23,7 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `test get
+	return `test (get|error)
 `
 }
 
@@ -47,9 +47,12 @@ func ParseEndpoint(
 
 		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
 		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
+
+		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
 	)
 	testFlags.Usage = testUsage
 	testGetFlags.Usage = testGetUsage
+	testErrorFlags.Usage = testErrorUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -88,6 +91,9 @@ func ParseEndpoint(
 			case "get":
 				epf = testGetFlags
 
+			case "error":
+				epf = testErrorFlags
+
 			}
 
 		}
@@ -116,6 +122,9 @@ func ParseEndpoint(
 			case "get":
 				endpoint = c.Get()
 				data, err = testc.BuildGetPayload(*testGetIDFlag)
+			case "error":
+				endpoint = c.Error()
+				data = nil
 			}
 		}
 	}
@@ -134,6 +143,7 @@ Usage:
 
 COMMAND:
     get: Get implements get.
+    error: Error implements error.
 
 Additional help:
     %s test COMMAND --help
@@ -147,5 +157,15 @@ Get implements get.
 
 Example:
     `+os.Args[0]+` test get --id 3166109748888346624
+`, os.Args[0])
+}
+
+func testErrorUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test error
+
+Error implements error.
+
+Example:
+    `+os.Args[0]+` test error
 `, os.Args[0])
 }

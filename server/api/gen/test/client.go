@@ -15,18 +15,26 @@ import (
 
 // Client is the "test" service client.
 type Client struct {
-	GetEndpoint goa.Endpoint
+	GetEndpoint   goa.Endpoint
+	ErrorEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "test" service client given the endpoints.
-func NewClient(get goa.Endpoint) *Client {
+func NewClient(get, error goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint: get,
+		GetEndpoint:   get,
+		ErrorEndpoint: error,
 	}
 }
 
 // Get calls the "get" endpoint of the "test" service.
 func (c *Client) Get(ctx context.Context, p *GetPayload) (err error) {
 	_, err = c.GetEndpoint(ctx, p)
+	return
+}
+
+// Error calls the "error" endpoint of the "test" service.
+func (c *Client) Error(ctx context.Context) (err error) {
+	_, err = c.ErrorEndpoint(ctx, nil)
 	return
 }

@@ -15,3 +15,8 @@ import (
 func GetTestPath(id int64) string {
 	return fmt.Sprintf("/test/%v", id)
 }
+
+// ErrorTestPath returns the URL path to the test service error HTTP endpoint.
+func ErrorTestPath() string {
+	return "/error"
+}

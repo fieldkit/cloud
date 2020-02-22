@@ -71,3 +71,45 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 		}
 	}
 }
+
+// BuildErrorRequest instantiates a HTTP request object with method and path
+// set to call the "test" service "error" endpoint
+func (c *Client) BuildErrorRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ErrorTestPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("test", "error", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeErrorResponse returns a decoder for responses returned by the test
+// error endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("test", "error", resp.StatusCode, string(body))
+		}
+	}
+}
