@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"go.uber.org/zap"
-
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
@@ -16,20 +14,6 @@ import (
 	testsvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 )
-
-type adapter struct {
-	logger *zap.Logger
-}
-
-func newGoaAdapter(logger *zap.Logger) middleware.Logger {
-	return &adapter{logger: logger.Named("goa")}
-}
-
-func (a *adapter) Log(keyvals ...interface{}) error {
-	fields := logging.ToZapFields(keyvals)
-	a.logger.Info("goa", *fields...)
-	return nil
-}
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Handler {
 	debug := false
@@ -57,7 +41,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 
 	testsvr.Mount(mux, testServer)
 
-	loggingAdapter := newGoaAdapter(logging.Logger(nil))
+	loggingAdapter := logging.NewGoaMiddlewareAdapter(logging.Logger(ctx))
 
 	var handler http.Handler = mux
 	handler = httpmdlwr.Log(loggingAdapter)(handler)

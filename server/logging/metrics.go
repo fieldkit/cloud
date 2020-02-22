@@ -42,16 +42,6 @@ func NewMetrics(ctx context.Context, ms *MetricsSettings) *Metrics {
 	}
 }
 
-func (m *Metrics) GatherMetrics(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t := m.SC.NewTiming()
-
-		next.ServeHTTP(w, r)
-
-		t.Send("http.req.time")
-	})
-}
-
 func (m *Metrics) AuthTry() {
 	m.SC.Increment("api.auth.try")
 }
@@ -79,4 +69,14 @@ func (m *Metrics) IngestionDevice(id []byte) {
 
 func (m *Metrics) UserID(id int32) {
 	m.SC.Unique("api.users", fmt.Sprintf("%d", id))
+}
+
+func (m *Metrics) GatherMetrics(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t := m.SC.NewTiming()
+
+		next.ServeHTTP(w, r)
+
+		t.Send("http.req.time")
+	})
 }

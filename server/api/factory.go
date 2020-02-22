@@ -29,7 +29,7 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	}
 
 	service = goa.New("fieldkit")
-	service.WithLogger(logging.NewGoaAdapter(logging.Logger(nil)))
+	service.WithLogger(logging.NewGoaAdapter(logging.Logger(ctx)))
 	service.Use(gzip.Middleware(6))
 	app.UseJWTMiddleware(service, jwtMiddleware)
 	service.Use(middleware.RequestID())
