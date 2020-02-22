@@ -39,6 +39,12 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 
 	testsvr.Mount(mux, testServer)
 
+	log := Logger(ctx).Sugar()
+
+	for _, m := range testServer.Mounts {
+		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+
 	return mux
 }
 
