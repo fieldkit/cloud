@@ -275,7 +275,7 @@ func main() {
 		}
 	}
 
-	staticLog := log.Named("static")
+	staticLog := log.Named("http").Named("static")
 	statusHandler := health.StatusHandler(ctx)
 	monitoring := logging.Monitoring(metrics)
 	coreHandler := monitoring(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
