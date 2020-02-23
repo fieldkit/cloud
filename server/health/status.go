@@ -60,6 +60,7 @@ func StatusHandler(ctx context.Context) http.Handler {
 			return
 		}
 
+		w.WriteHeader(http.StatusOK)
 		w.Write(b)
 	})
 }
