@@ -25,7 +25,7 @@ func (c *TasksController) Check(ctx *app.CheckTasksContext) error {
 			return err
 		}
 	*/
-	return ctx.OK([]byte("Ok"))
+	return ctx.OK([]byte("{}"))
 }
 
 func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
@@ -34,7 +34,7 @@ func (c *TasksController) Five(ctx *app.FiveTasksContext) error {
 			return err
 		}
 	*/
-	return ctx.OK([]byte("Ok"))
+	return ctx.OK([]byte("{}"))
 }
 
 func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
@@ -57,5 +57,5 @@ func (c *TasksController) Refresh(ctx *app.RefreshTasksContext) error {
 		}
 	*/
 
-	return ctx.OK([]byte("Ok"))
+	return ctx.OK([]byte("{}"))
 }
