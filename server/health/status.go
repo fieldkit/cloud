@@ -11,17 +11,31 @@ import (
 )
 
 type StatusResponse struct {
-	Name string `json:"name"`
+	ServerName string `json:"server_name,omitempty"`
+	Name       string `json:"name"`
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
 func MakeStatusResponse(ctx context.Context) (sr *StatusResponse, err error) {
+	serverName := getEnv("FIELDKIT_SERVER_NAME", "")
+	if serverName == "" {
+		serverName = getEnv("HOSTNAME", "")
+	}
+
 	name, err := os.Hostname()
 	if err != nil {
 		return nil, err
 	}
 
 	sr = &StatusResponse{
-		Name: name,
+		ServerName: serverName,
+		Name:       name,
 	}
 
 	return
