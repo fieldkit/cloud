@@ -27,7 +27,9 @@ func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
 			rw := CaptureResponse(w)
 			h.ServeHTTP(rw, withCtx)
 
-			log.Infow("done", "status", rw.StatusCode, "bytes", rw.ContentLength, "time", time.Since(started).String())
+			elapsed := time.Since(started)
+
+			log.Infow("done", "status", rw.StatusCode, "bytes", rw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String())
 		}))
 	}
 }
