@@ -564,129 +564,6 @@ func (ctx *ListBySourceQueryContext) BadRequest() error {
 	return nil
 }
 
-// CheckTasksContext provides the Tasks check action context.
-type CheckTasksContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewCheckTasksContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Tasks controller check action.
-func NewCheckTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*CheckTasksContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := CheckTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *CheckTasksContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *CheckTasksContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// FiveTasksContext provides the Tasks five action context.
-type FiveTasksContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewFiveTasksContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Tasks controller five action.
-func NewFiveTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*FiveTasksContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := FiveTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *FiveTasksContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *FiveTasksContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// RefreshTasksContext provides the Tasks refresh action context.
-type RefreshTasksContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID   string
-	FileTypeID string
-}
-
-// NewRefreshTasksContext parses the incoming request URL and body, performs validations and creates the
-// context used by the Tasks controller refresh action.
-func NewRefreshTasksContext(ctx context.Context, r *http.Request, service *goa.Service) (*RefreshTasksContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := RefreshTasksContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	paramFileTypeID := req.Params["fileTypeId"]
-	if len(paramFileTypeID) > 0 {
-		rawFileTypeID := paramFileTypeID[0]
-		rctx.FileTypeID = rawFileTypeID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *RefreshTasksContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *RefreshTasksContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *RefreshTasksContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
 // AddAdministratorContext provides the administrator add action context.
 type AddAdministratorContext struct {
 	context.Context
@@ -2862,6 +2739,7 @@ type SummaryJSONDataContext struct {
 	DeviceID   string
 	End        *int
 	Internal   *bool
+	Interval   *int
 	Page       *int
 	PageSize   *int
 	Resolution *int
@@ -2903,13 +2781,24 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
 	}
+	paramInterval := req.Params["interval"]
+	if len(paramInterval) > 0 {
+		rawInterval := paramInterval[0]
+		if interval, err2 := strconv.Atoi(rawInterval); err2 == nil {
+			tmp76 := interval
+			tmp75 := &tmp76
+			rctx.Interval = tmp75
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("interval", rawInterval, "integer"))
+		}
+	}
 	paramPage := req.Params["page"]
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp76 := page
-			tmp75 := &tmp76
-			rctx.Page = tmp75
+			tmp78 := page
+			tmp77 := &tmp78
+			rctx.Page = tmp77
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2918,9 +2807,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp78 := pageSize
-			tmp77 := &tmp78
-			rctx.PageSize = tmp77
+			tmp80 := pageSize
+			tmp79 := &tmp80
+			rctx.PageSize = tmp79
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2929,9 +2818,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramResolution) > 0 {
 		rawResolution := paramResolution[0]
 		if resolution, err2 := strconv.Atoi(rawResolution); err2 == nil {
-			tmp80 := resolution
-			tmp79 := &tmp80
-			rctx.Resolution = tmp79
+			tmp82 := resolution
+			tmp81 := &tmp82
+			rctx.Resolution = tmp81
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("resolution", rawResolution, "integer"))
 		}
@@ -2940,9 +2829,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp82 := start
-			tmp81 := &tmp82
-			rctx.Start = tmp81
+			tmp84 := start
+			tmp83 := &tmp84
+			rctx.Start = tmp83
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}

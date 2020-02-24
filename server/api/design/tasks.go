@@ -6,8 +6,6 @@ import (
 
 var _ = Service("tasks", func() {
 	Method("five", func() {
-		Response(OK)
-
 		HTTP(func() {
 			GET("tasks/five")
 		})

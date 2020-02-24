@@ -6,3 +6,17 @@
 // $ goa gen github.com/fieldkit/cloud/server/api/design
 
 package client
+
+import (
+	test "github.com/fieldkit/cloud/server/api/gen/test"
+)
+
+// NewJSONResultOK builds a "test" service "json" endpoint result from a HTTP
+// "OK" response.
+func NewJSONResultOK(body string) *test.JSONResult {
+	v := body
+	res := &test.JSONResult{
+		JSON: v,
+	}
+	return res
+}

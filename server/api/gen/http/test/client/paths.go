@@ -20,3 +20,8 @@ func GetTestPath(id int64) string {
 func ErrorTestPath() string {
 	return "/error"
 }
+
+// JSONTestPath returns the URL path to the test service json HTTP endpoint.
+func JSONTestPath(id int64) string {
+	return fmt.Sprintf("/test/json/%v", id)
+}

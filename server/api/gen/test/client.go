@@ -17,13 +17,15 @@ import (
 type Client struct {
 	GetEndpoint   goa.Endpoint
 	ErrorEndpoint goa.Endpoint
+	JSONEndpoint  goa.Endpoint
 }
 
 // NewClient initializes a "test" service client given the endpoints.
-func NewClient(get, error goa.Endpoint) *Client {
+func NewClient(get, error, json_ goa.Endpoint) *Client {
 	return &Client{
 		GetEndpoint:   get,
 		ErrorEndpoint: error,
+		JSONEndpoint:  json_,
 	}
 }
 
@@ -37,4 +39,14 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (err error) {
 func (c *Client) Error(ctx context.Context) (err error) {
 	_, err = c.ErrorEndpoint(ctx, nil)
 	return
+}
+
+// JSON calls the "json" endpoint of the "test" service.
+func (c *Client) JSON(ctx context.Context, p *JSONPayload) (res *JSONResult, err error) {
+	var ires interface{}
+	ires, err = c.JSONEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*JSONResult), nil
 }

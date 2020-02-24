@@ -21,6 +21,7 @@ type Server struct {
 	Mounts []*MountPoint
 	Get    http.Handler
 	Error  http.Handler
+	JSON   http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -58,9 +59,11 @@ func New(
 		Mounts: []*MountPoint{
 			{"Get", "GET", "/test/{id}"},
 			{"Error", "GET", "/error"},
+			{"JSON", "GET", "/test/json/{id}"},
 		},
 		Get:   NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		Error: NewErrorHandler(e.Error, mux, decoder, encoder, errhandler, formatter),
+		JSON:  NewJSONHandler(e.JSON, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -71,12 +74,14 @@ func (s *Server) Service() string { return "test" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.Error = m(s.Error)
+	s.JSON = m(s.JSON)
 }
 
 // Mount configures the mux to serve the test endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountErrorHandler(mux, h.Error)
+	MountJSONHandler(mux, h.JSON)
 }
 
 // MountGetHandler configures the mux to serve the "test" service "get"
@@ -165,6 +170,59 @@ func NewErrorHandler(
 		var err error
 
 		res, err := endpoint(ctx, nil)
+
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountJSONHandler configures the mux to serve the "test" service "json"
+// endpoint.
+func MountJSONHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/test/json/{id}", f)
+}
+
+// NewJSONHandler creates a HTTP handler which loads the HTTP request and calls
+// the "test" service "json" endpoint.
+func NewJSONHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeJSONRequest(mux, decoder)
+		encodeResponse = EncodeJSONResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "json")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "test")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+
+		res, err := endpoint(ctx, payload)
 
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {

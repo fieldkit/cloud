@@ -17,3 +17,10 @@ func NewGetPayload(id int64) *test.GetPayload {
 		ID: &id,
 	}
 }
+
+// NewJSONPayload builds a test service json endpoint payload.
+func NewJSONPayload(id int64) *test.JSONPayload {
+	return &test.JSONPayload{
+		ID: &id,
+	}
+}

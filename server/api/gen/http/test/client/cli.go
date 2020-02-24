@@ -29,3 +29,20 @@ func BuildGetPayload(testGetID string) (*test.GetPayload, error) {
 	}
 	return payload, nil
 }
+
+// BuildJSONPayload builds the payload for the test json endpoint from CLI
+// flags.
+func BuildJSONPayload(testJSONID string) (*test.JSONPayload, error) {
+	var err error
+	var id int64
+	{
+		id, err = strconv.ParseInt(testJSONID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT64")
+		}
+	}
+	payload := &test.JSONPayload{
+		ID: &id,
+	}
+	return payload, nil
+}

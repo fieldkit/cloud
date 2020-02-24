@@ -41,7 +41,6 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	app.MountGeoJSONController(service, NewGeoJSONController(service, controllerOptions))
 	app.MountExportController(service, NewExportController(service, controllerOptions))
 	app.MountQueryController(service, NewQueryController(service, controllerOptions))
-	app.MountTasksController(service, NewTasksController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
 	app.MountStationController(service, NewStationController(service, controllerOptions))
 	app.MountStationLogController(service, NewStationLogController(service, controllerOptions))
