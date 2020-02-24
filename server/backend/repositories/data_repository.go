@@ -48,7 +48,7 @@ func (r *DataRepository) queryMetaRecords(ctx context.Context, opts *SummaryQuer
 	if err := r.Database.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
 	      SELECT DISTINCT q.meta FROM (
-			SELECT r.meta FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (r.time BETWEEN $2 AND $3)
+			SELECT r.meta FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
 	      ) AS q
 	    ))`, deviceIdBytes, start, end); err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpt
 				COUNT(DISTINCT provision_id) AS number_of_meta_records
 			FROM
 				fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-		    WHERE (p.device_id = $1) AND (r.time BETWEEN $2 AND $3)`, deviceIdBytes, start, end); err != nil {
+		    WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)`, deviceIdBytes, start, end); err != nil {
 		return nil, err
 	}
 
@@ -110,7 +110,9 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 	if err != nil {
 		return nil, err
 	}
+
 	if summary.NumberOfDataRecords == 0 {
+		log.Infow("empty")
 		modulesAndData = &ModulesAndData{
 			Modules: make([]*DataMetaModule, 0),
 			Data:    make([]*DataRow, 0),
@@ -118,21 +120,19 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		return
 	}
 
-	log.Infow("querying for meta")
+	log.Infow("summary", "start", summary.Start, "end", summary.End, "number_data_records", summary.NumberOfDataRecords, "number_meta", summary.NumberOfMetaRecords)
 
 	dbMetas, err := r.queryMetaRecords(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Infow("querying for data")
-
 	rows, err := r.Database.QueryxContext(ctx, `
 		SELECT
 			r.id, r.provision_id, r.time, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw
 		FROM
             fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-		WHERE (p.device_id = $1) AND (r.time BETWEEN $2 AND $3)
+		WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
         ORDER BY r.time`, deviceIdBytes, start, end)
 	if err != nil {
 		return nil, err
