@@ -104,6 +104,10 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 	start := time.Unix(0, opts.Start*int64(time.Millisecond))
 	end := time.Unix(0, opts.End*int64(time.Millisecond))
 
+	if start.After(end) {
+		return nil, fmt.Errorf("malformed query: times")
+	}
+
 	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_ms", opts.Start, "end_ms", opts.End, "start", start, "end", end)
 
 	summary, err := r.querySummary(ctx, opts)
