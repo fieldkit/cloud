@@ -138,22 +138,15 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	}))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		startedAt := time.Now()
-
-		ctx := logging.WithNewTaskId(req.Context(), ids)
-
-		log := Logger(ctx).Sugar()
-
-		log.Infow("begin")
+		ctx := req.Context()
 
 		err := handler(ctx, w, req)
 		if err != nil {
-			log.Errorw("completed", "error", err, "time", time.Since(startedAt).String())
+			log := Logger(ctx).Sugar()
+			log.Errorw("completed", "error", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		log.Infow("completed", "time", time.Since(startedAt).String())
 	})
 }
 
