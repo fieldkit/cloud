@@ -43,5 +43,5 @@ type JSONPayload struct {
 
 // JSONResult is the result type of the test service json method.
 type JSONResult struct {
-	JSON string
+	Object interface{}
 }

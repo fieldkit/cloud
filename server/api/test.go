@@ -26,5 +26,11 @@ func (sc *TestService) Error(ctx context.Context) error {
 }
 
 func (sc *TestService) JSON(ctx context.Context, payload *test.JSONPayload) (*test.JSONResult, error) {
-	return nil, nil
+	v := make(map[string]interface{})
+
+	v["value"] = 100
+
+	return &test.JSONResult{
+		Object: v,
+	}, nil
 }

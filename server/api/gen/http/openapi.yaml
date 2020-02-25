@@ -66,7 +66,6 @@ paths:
       responses:
         "200":
           description: OK response.
-          schema:
-            type: string
+          schema: {}
       schemes:
       - http

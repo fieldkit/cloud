@@ -161,7 +161,7 @@ func DecodeJSONResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body string
+				body interface{}
 				err  error
 			)
 			err = decoder(resp).Decode(&body)

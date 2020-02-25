@@ -13,10 +13,10 @@ import (
 
 // NewJSONResultOK builds a "test" service "json" endpoint result from a HTTP
 // "OK" response.
-func NewJSONResultOK(body string) *test.JSONResult {
+func NewJSONResultOK(body interface{}) *test.JSONResult {
 	v := body
 	res := &test.JSONResult{
-		JSON: v,
+		Object: v,
 	}
 	return res
 }

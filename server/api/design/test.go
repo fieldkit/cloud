@@ -27,15 +27,15 @@ var _ = Service("test", func() {
 		})
 
 		Result(func() {
-			Attribute("json", String)
-			Required("json")
+			Attribute("object", Any)
+			Required("object")
 		})
 
 		HTTP(func() {
 			GET("test/json/{id}")
 
 			Response(func() {
-				Body("json")
+				Body("object")
 			})
 		})
 	})

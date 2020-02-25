@@ -68,7 +68,7 @@ func EncodeJSONResponse(encoder func(context.Context, http.ResponseWriter) goaht
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*test.JSONResult)
 		enc := encoder(ctx, w)
-		body := res.JSON
+		body := res.Object
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
