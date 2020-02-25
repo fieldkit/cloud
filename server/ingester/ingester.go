@@ -19,24 +19,12 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
-)
-
-const (
-	FkDataBinaryContentType    = "application/vnd.fk.data+binary"
-	FkDataBase64ContentType    = "application/vnd.fk.data+base64"
-	MultiPartFormDataMediaType = "multipart/form-data"
-	ContentTypeHeaderName      = "Content-Type"
-	ContentLengthHeaderName    = "Content-Length"
-	XForwardedForHeaderName    = "X-Forwarded-For"
-	FkDeviceIdHeaderName       = "Fk-DeviceId"
-	FkGenerationHeaderName     = "Fk-Generation"
-	FkBlocksIdHeaderName       = "Fk-Blocks"
-	FkFlagsIdHeaderName        = "Fk-Flags"
-	FkTypeHeaderName           = "Fk-Type"
 )
 
 var (
@@ -47,7 +35,7 @@ type IngesterOptions struct {
 	Database                 *sqlxcache.DB
 	AwsSession               *session.Session
 	AuthenticationMiddleware goa.Middleware
-	Archiver                 StreamArchiver
+	Archiver                 files.StreamArchiver
 	Publisher                jobs.MessagePublisher
 	Metrics                  *logging.Metrics
 }
@@ -84,7 +72,14 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks)
 
-		if saved, err := o.Archiver.Archive(ctx, headers, req.Body); err != nil {
+		fileMeta := &files.FileMeta{
+			ContentType: headers.ContentType,
+			DeviceID:    headers.FkDeviceId,
+			Generation:  headers.FkGeneration,
+			Blocks:      headers.FkBlocks,
+			Flags:       headers.FkFlags,
+		}
+		if saved, err := o.Archiver.Archive(ctx, fileMeta, req.Body); err != nil {
 			return err
 		} else {
 			if saved != nil {
@@ -164,50 +159,50 @@ type IncomingHeaders struct {
 }
 
 func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
-	contentType := req.Header.Get(ContentTypeHeaderName)
+	contentType := req.Header.Get(common.ContentTypeHeaderName)
 	mediaType, mediaTypeParams, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%s)", ContentTypeHeaderName, contentType)
+		return nil, fmt.Errorf("invalid %s (%s)", common.ContentTypeHeaderName, contentType)
 	}
 
-	contentLengthString := req.Header.Get(ContentLengthHeaderName)
+	contentLengthString := req.Header.Get(common.ContentLengthHeaderName)
 	contentLength, err := strconv.Atoi(contentLengthString)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%s)", ContentLengthHeaderName, contentLengthString)
+		return nil, fmt.Errorf("invalid %s (%s)", common.ContentLengthHeaderName, contentLengthString)
 	}
 
 	if contentLength <= 0 {
-		return nil, fmt.Errorf("invalid %s (%v)", ContentLengthHeaderName, contentLength)
+		return nil, fmt.Errorf("invalid %s (%v)", common.ContentLengthHeaderName, contentLength)
 	}
 
-	deviceIdRaw := req.Header.Get(FkDeviceIdHeaderName)
+	deviceIdRaw := req.Header.Get(common.FkDeviceIdHeaderName)
 	if len(deviceIdRaw) == 0 {
-		return nil, fmt.Errorf("invalid %s (no header)", FkDeviceIdHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", common.FkDeviceIdHeaderName)
 	}
 
-	generationRaw := req.Header.Get(FkGenerationHeaderName)
+	generationRaw := req.Header.Get(common.FkGenerationHeaderName)
 	if len(generationRaw) == 0 {
-		return nil, fmt.Errorf("invalid %s (no header)", FkGenerationHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", common.FkGenerationHeaderName)
 	}
 
-	typeRaw := req.Header.Get(FkTypeHeaderName)
+	typeRaw := req.Header.Get(common.FkTypeHeaderName)
 	if len(typeRaw) == 0 {
-		return nil, fmt.Errorf("invalid %s (no header)", FkTypeHeaderName)
+		return nil, fmt.Errorf("invalid %s (no header)", common.FkTypeHeaderName)
 	}
 
 	deviceId, err := data.DecodeBinaryString(deviceIdRaw)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", FkDeviceIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", common.FkDeviceIdHeaderName, err)
 	}
 
 	generation, err := data.DecodeBinaryString(generationRaw)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", FkGenerationHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", common.FkGenerationHeaderName, err)
 	}
 
-	blocks, err := data.ParseBlocks(req.Header.Get(FkBlocksIdHeaderName))
+	blocks, err := data.ParseBlocks(req.Header.Get(common.FkBlocksIdHeaderName))
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", FkBlocksIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", common.FkBlocksIdHeaderName, err)
 	}
 
 	headers := &IncomingHeaders{
@@ -215,7 +210,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		ContentLength:   int32(contentLength),
 		MediaType:       mediaType,
 		MediaTypeParams: mediaTypeParams,
-		XForwardedFor:   req.Header.Get(XForwardedForHeaderName),
+		XForwardedFor:   req.Header.Get(common.XForwardedForHeaderName),
 		FkType:          typeRaw,
 		FkDeviceId:      deviceId,
 		FkGeneration:    generation,

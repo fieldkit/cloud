@@ -12,6 +12,7 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/api"
+	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 )
@@ -86,14 +87,14 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
-func createArchiver(ctx context.Context, config *Config, awsSession *session.Session) (archiver StreamArchiver, err error) {
+func createArchiver(ctx context.Context, config *Config, awsSession *session.Session) (archiver files.StreamArchiver, err error) {
 	log := logging.Logger(ctx).Sugar()
 
 	switch config.Archiver {
 	case "default":
-		archiver = NewFileStreamArchiver()
+		archiver = files.NewFileStreamArchiver()
 	case "aws":
-		archiver = NewS3StreamArchiver(awsSession, config.BucketName)
+		archiver = files.NewS3StreamArchiver(awsSession, config.BucketName)
 	default:
 		panic("Unknown archiver: " + config.Archiver)
 	}
