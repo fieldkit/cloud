@@ -35,6 +35,23 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *pb.ModuleHeader) (mm *ModuleMet
 	return nil, fmt.Errorf("missing module meta")
 }
 
+func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm *SensorMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+	for _, module := range all {
+		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
+			for _, s := range module.Sensors {
+				if s.Key == sensor {
+					return s, nil
+				}
+			}
+		}
+	}
+	return nil, fmt.Errorf("missing sensor meta")
+}
+
 func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
 	mm = []*ModuleMeta{
 		&ModuleMeta{
@@ -433,6 +450,66 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature",
 					UnitOfMeasure: "C",
+					Ranges:        []SensorRanges{},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "modules.random",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyRandom,
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "random_0",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_1",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_2",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_3",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_4",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_5",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_6",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_7",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_8",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "random_9",
+					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 			},

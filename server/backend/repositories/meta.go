@@ -50,18 +50,13 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 
 	for _, module := range meta.Modules {
 		header := module.Header
-		extra, err := mf.modulesRepository.FindModuleMeta(header)
-		if err != nil {
-			return nil, errors.Structured("missing module meta", "manufacturer", header.Manufacturer, "kind", header.Kind)
-		}
-
 		sensors := make([]*DataMetaSensor, 0)
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
 
-			extraSensor := extra.Sensor(sensor.Name)
-			if extraSensor == nil {
-				return nil, errors.Structured("missing sensor meta", "manufacturer", header.Manufacturer, "kind", header.Kind, "sensor", sensor.Name)
+			extraSensor, err := mf.modulesRepository.FindSensor(header, sensor.Name)
+			if err != nil {
+				return nil, errors.Structured(err, "manufacturer", header.Manufacturer, "kind", header.Kind, "sensor", sensor.Name)
 			}
 
 			sensorMeta := &DataMetaSensor{
