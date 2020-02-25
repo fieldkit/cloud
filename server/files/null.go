@@ -5,11 +5,11 @@ import (
 	"io"
 )
 
-type DevNullStreamArchiver struct {
+type DevNullFileArchive struct {
 }
 
-func (a *DevNullStreamArchiver) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*SavedStream, error) {
-	Logger(ctx).Sugar().Infof("Streaming %s to /dev/null", meta.ContentType)
+func (a *DevNullFileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
+	Logger(ctx).Sugar().Infof("Fileing %s to /dev/null", meta.ContentType)
 
 	return nil, nil
 }

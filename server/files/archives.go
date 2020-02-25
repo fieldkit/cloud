@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type SavedStream struct {
+type ArchivedFile struct {
 	ID        string
 	URL       string
 	BytesRead int
@@ -19,6 +19,6 @@ type FileMeta struct {
 	Flags       []int64
 }
 
-type StreamArchiver interface {
-	Archive(ctx context.Context, meta *FileMeta, read io.Reader) (*SavedStream, error)
+type FileArchive interface {
+	Archive(ctx context.Context, meta *FileMeta, read io.Reader) (*ArchivedFile, error)
 }

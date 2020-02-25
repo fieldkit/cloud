@@ -15,19 +15,19 @@ import (
 	"github.com/fieldkit/cloud/server/common"
 )
 
-type S3StreamArchiver struct {
+type S3FileArchive struct {
 	session    *session.Session
 	bucketName string
 }
 
-func NewS3StreamArchiver(session *session.Session, bucketName string) *S3StreamArchiver {
-	return &S3StreamArchiver{
+func NewS3FileArchive(session *session.Session, bucketName string) *S3FileArchive {
+	return &S3FileArchive{
 		session:    session,
 		bucketName: bucketName,
 	}
 }
 
-func (a *S3StreamArchiver) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*SavedStream, error) {
+func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
 	id := uuid.Must(uuid.NewRandom())
 
 	log := Logger(ctx).Sugar()
@@ -57,7 +57,7 @@ func (a *S3StreamArchiver) Archive(ctx context.Context, meta *FileMeta, reader i
 
 	log.Infow("saved", "url", r.Location, "bytes_read", countingReader.bytesRead)
 
-	ss := &SavedStream{
+	ss := &ArchivedFile{
 		ID:        id.String(),
 		URL:       r.Location,
 		BytesRead: countingReader.bytesRead,

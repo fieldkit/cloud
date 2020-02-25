@@ -9,14 +9,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type FileStreamArchiver struct {
+type LocalFilesArchive struct {
 }
 
-func NewFileStreamArchiver() (a *FileStreamArchiver) {
-	return &FileStreamArchiver{}
+func NewLocalFilesArchive() (a *LocalFilesArchive) {
+	return &LocalFilesArchive{}
 }
 
-func (a *FileStreamArchiver) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*SavedStream, error) {
+func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 
 	countingReader := newCountingReader(reader)
@@ -42,7 +42,7 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, meta *FileMeta, reader
 
 	io.Copy(file, countingReader)
 
-	ss := &SavedStream{
+	ss := &ArchivedFile{
 		ID:        id.String(),
 		URL:       fn,
 		BytesRead: countingReader.bytesRead,

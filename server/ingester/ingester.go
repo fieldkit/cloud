@@ -35,7 +35,7 @@ type IngesterOptions struct {
 	Database                 *sqlxcache.DB
 	AwsSession               *session.Session
 	AuthenticationMiddleware goa.Middleware
-	Archiver                 files.StreamArchiver
+	Files                    files.FileArchive
 	Publisher                jobs.MessagePublisher
 	Metrics                  *logging.Metrics
 }
@@ -79,7 +79,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			Blocks:      headers.FkBlocks,
 			Flags:       headers.FkFlags,
 		}
-		if saved, err := o.Archiver.Archive(ctx, fileMeta, req.Body); err != nil {
+		if saved, err := o.Files.Archive(ctx, fileMeta, req.Body); err != nil {
 			return err
 		} else {
 			if saved != nil {

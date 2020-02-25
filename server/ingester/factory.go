@@ -28,7 +28,7 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		panic(err)
 	}
 
-	archiver, err := createArchiver(ctx, config, awsSession)
+	files, err := createFileArchive(ctx, config, awsSession)
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +57,7 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		Database:                 database,
 		AwsSession:               awsSession,
 		AuthenticationMiddleware: jwtMiddleware,
-		Archiver:                 archiver,
+		Files:                    files,
 		Publisher:                publisher,
 		Metrics:                  metrics,
 	}
@@ -87,14 +87,14 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
-func createArchiver(ctx context.Context, config *Config, awsSession *session.Session) (archiver files.StreamArchiver, err error) {
+func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session) (archive files.FileArchive, err error) {
 	log := logging.Logger(ctx).Sugar()
 
 	switch config.Archiver {
 	case "default":
-		archiver = files.NewFileStreamArchiver()
+		archive = files.NewLocalFilesArchive()
 	case "aws":
-		archiver = files.NewS3StreamArchiver(awsSession, config.BucketName)
+		archive = files.NewS3FileArchive(awsSession, config.BucketName)
 	default:
 		panic("Unknown archiver: " + config.Archiver)
 	}
