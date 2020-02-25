@@ -368,8 +368,9 @@ func (mt *JSONDataResponse) Validate() (err error) {
 //
 // Identifier: application/vnd.app.device.json.data.summary+json; view=default
 type JSONDataSummaryResponse struct {
-	Data    []*JSONDataRow        `form:"data" json:"data" yaml:"data" xml:"data"`
-	Modules []*JSONDataMetaModule `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
+	Data       []*JSONDataRow        `form:"data" json:"data" yaml:"data" xml:"data"`
+	Modules    []*JSONDataMetaModule `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
+	Statistics *JSONDataStatistics   `form:"statistics" json:"statistics" yaml:"statistics" xml:"statistics"`
 }
 
 // Validate validates the JSONDataSummaryResponse media type instance.
@@ -379,6 +380,9 @@ func (mt *JSONDataSummaryResponse) Validate() (err error) {
 	}
 	if mt.Data == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
+	}
+	if mt.Statistics == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "statistics"))
 	}
 	for _, e := range mt.Data {
 		if e != nil {

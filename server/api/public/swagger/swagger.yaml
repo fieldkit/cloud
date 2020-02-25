@@ -704,39 +704,39 @@ definitions:
     description: DeviceDataSummaryResponse media type (default view)
     example:
       provisions:
-      - created: "1994-01-08T15:12:25Z"
+      - created: "1971-07-15T07:38:29Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Sint vitae et corrupti ipsum fugit nisi.
+        generation: Fugit nisi odio vel tempore.
         meta:
-          first: 5.723273287415042e+18
-          last: 1.1069023609181236e+18
-          size: 5.157638177597977e+17
-        updated: "1975-04-23T11:49:31Z"
-      - created: "1994-01-08T15:12:25Z"
+          first: 5.639481639750852e+18
+          last: 8.276091969822207e+18
+          size: 6.389891566807761e+18
+        updated: "2006-04-25T23:55:58Z"
+      - created: "1971-07-15T07:38:29Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Sint vitae et corrupti ipsum fugit nisi.
+        generation: Fugit nisi odio vel tempore.
         meta:
-          first: 5.723273287415042e+18
-          last: 1.1069023609181236e+18
-          size: 5.157638177597977e+17
-        updated: "1975-04-23T11:49:31Z"
-      - created: "1994-01-08T15:12:25Z"
+          first: 5.639481639750852e+18
+          last: 8.276091969822207e+18
+          size: 6.389891566807761e+18
+        updated: "2006-04-25T23:55:58Z"
+      - created: "1971-07-15T07:38:29Z"
         data:
           first: 3.962019451405188e+17
           last: 8.016932918719963e+18
           size: 6.04033343035064e+18
-        generation: Sint vitae et corrupti ipsum fugit nisi.
+        generation: Fugit nisi odio vel tempore.
         meta:
-          first: 5.723273287415042e+18
-          last: 1.1069023609181236e+18
-          size: 5.157638177597977e+17
-        updated: "1975-04-23T11:49:31Z"
+          first: 5.639481639750852e+18
+          last: 8.276091969822207e+18
+          size: 6.389891566807761e+18
+        updated: "2006-04-25T23:55:58Z"
     properties:
       provisions:
         $ref: '#/definitions/DeviceProvisionSummaryCollection'
@@ -1035,20 +1035,20 @@ definitions:
   DeviceMetaSummary:
     description: DeviceMetaSummary media type (default view)
     example:
-      first: 5.723273287415042e+18
-      last: 1.1069023609181236e+18
-      size: 5.157638177597977e+17
+      first: 5.639481639750852e+18
+      last: 8.276091969822207e+18
+      size: 6.389891566807761e+18
     properties:
       first:
-        example: 5.723273287415042e+18
+        example: 5.639481639750852e+18
         format: int64
         type: integer
       last:
-        example: 1.1069023609181236e+18
+        example: 8.276091969822207e+18
         format: int64
         type: integer
       size:
-        example: 5.157638177597977e+17
+        example: 6.389891566807761e+18
         format: int64
         type: integer
     required:
@@ -1096,31 +1096,31 @@ definitions:
   DeviceProvisionSummary:
     description: DeviceProvisionSummary media type (default view)
     example:
-      created: "1994-01-08T15:12:25Z"
+      created: "1971-07-15T07:38:29Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Sint vitae et corrupti ipsum fugit nisi.
+      generation: Fugit nisi odio vel tempore.
       meta:
-        first: 5.723273287415042e+18
-        last: 1.1069023609181236e+18
-        size: 5.157638177597977e+17
-      updated: "1975-04-23T11:49:31Z"
+        first: 5.639481639750852e+18
+        last: 8.276091969822207e+18
+        size: 6.389891566807761e+18
+      updated: "2006-04-25T23:55:58Z"
     properties:
       created:
-        example: "1994-01-08T15:12:25Z"
+        example: "1971-07-15T07:38:29Z"
         format: date-time
         type: string
       data:
         $ref: '#/definitions/DeviceDataSummary'
       generation:
-        example: Sint vitae et corrupti ipsum fugit nisi.
+        example: Fugit nisi odio vel tempore.
         type: string
       meta:
         $ref: '#/definitions/DeviceMetaSummary'
       updated:
-        example: "1975-04-23T11:49:31Z"
+        example: "2006-04-25T23:55:58Z"
         format: date-time
         type: string
     required:
@@ -1136,28 +1136,28 @@ definitions:
     description: DeviceProvisionSummaryCollection is the media type for an array of
       DeviceProvisionSummary (default view)
     example:
-    - created: "1994-01-08T15:12:25Z"
+    - created: "1971-07-15T07:38:29Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Sint vitae et corrupti ipsum fugit nisi.
+      generation: Fugit nisi odio vel tempore.
       meta:
-        first: 5.723273287415042e+18
-        last: 1.1069023609181236e+18
-        size: 5.157638177597977e+17
-      updated: "1975-04-23T11:49:31Z"
-    - created: "1994-01-08T15:12:25Z"
+        first: 5.639481639750852e+18
+        last: 8.276091969822207e+18
+        size: 6.389891566807761e+18
+      updated: "2006-04-25T23:55:58Z"
+    - created: "1971-07-15T07:38:29Z"
       data:
         first: 3.962019451405188e+17
         last: 8.016932918719963e+18
         size: 6.04033343035064e+18
-      generation: Sint vitae et corrupti ipsum fugit nisi.
+      generation: Fugit nisi odio vel tempore.
       meta:
-        first: 5.723273287415042e+18
-        last: 1.1069023609181236e+18
-        size: 5.157638177597977e+17
-      updated: "1975-04-23T11:49:31Z"
+        first: 5.639481639750852e+18
+        last: 8.276091969822207e+18
+        size: 6.389891566807761e+18
+      updated: "2006-04-25T23:55:58Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'
     title: 'Mediatype identifier: application/vnd.app.device.provision.summary+json;
@@ -1167,8 +1167,8 @@ definitions:
     description: DeviceSchema media type (default view)
     example:
       active: false
-      deviceId: 8.620775420842828e+18
-      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      deviceId: 5.465972840091634e+18
+      jsonSchema: Quisquam voluptatem doloribus.
       key: Minus doloremque.
       projectId: 3.267256188525231e+18
       schemaId: 1.5887009993142717e+18
@@ -1177,11 +1177,11 @@ definitions:
         example: false
         type: boolean
       deviceId:
-        example: 8.620775420842828e+18
+        example: 5.465972840091634e+18
         format: int64
         type: integer
       jsonSchema:
-        example: Vel aut vel quisquam voluptatem doloribus.
+        example: Quisquam voluptatem doloribus.
         type: string
       key:
         example: Minus doloremque.
@@ -1208,14 +1208,14 @@ definitions:
       (default view)
     example:
     - active: false
-      deviceId: 8.620775420842828e+18
-      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      deviceId: 5.465972840091634e+18
+      jsonSchema: Quisquam voluptatem doloribus.
       key: Minus doloremque.
       projectId: 3.267256188525231e+18
       schemaId: 1.5887009993142717e+18
     - active: false
-      deviceId: 8.620775420842828e+18
-      jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+      deviceId: 5.465972840091634e+18
+      jsonSchema: Quisquam voluptatem doloribus.
       key: Minus doloremque.
       projectId: 3.267256188525231e+18
       schemaId: 1.5887009993142717e+18
@@ -1229,14 +1229,14 @@ definitions:
     example:
       schemas:
       - active: false
-        deviceId: 8.620775420842828e+18
-        jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+        deviceId: 5.465972840091634e+18
+        jsonSchema: Quisquam voluptatem doloribus.
         key: Minus doloremque.
         projectId: 3.267256188525231e+18
         schemaId: 1.5887009993142717e+18
       - active: false
-        deviceId: 8.620775420842828e+18
-        jsonSchema: Vel aut vel quisquam voluptatem doloribus.
+        deviceId: 5.465972840091634e+18
+        jsonSchema: Quisquam voluptatem doloribus.
         key: Minus doloremque.
         projectId: 3.267256188525231e+18
         schemaId: 1.5887009993142717e+18
@@ -2294,7 +2294,7 @@ definitions:
       versions:
       - data:
         - d:
-            Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+            Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2335,7 +2335,7 @@ definitions:
         example:
         - data:
           - d:
-              Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+              Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
             id: 3.7495146985014707e+18
             location:
             - 0.8794476882696538
@@ -2381,7 +2381,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+        Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
       id: 3.7495146985014707e+18
       location:
       - 0.8794476882696538
@@ -2394,7 +2394,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+          Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
         type: object
       id:
         example: 3.7495146985014707e+18
@@ -2429,12 +2429,42 @@ definitions:
     - d
     title: JSONDataRow
     type: object
+  JSONDataStatistics:
+    example:
+      end: "1997-01-05T08:59:01Z"
+      number_of_data_records: 4.791279341070292e+18
+      number_of_meta_records: 6.939366097402898e+18
+      start: "2003-03-21T08:39:07Z"
+    properties:
+      end:
+        example: "1997-01-05T08:59:01Z"
+        format: date-time
+        type: string
+      number_of_data_records:
+        example: 4.791279341070292e+18
+        format: int64
+        type: integer
+      number_of_meta_records:
+        example: 6.939366097402898e+18
+        format: int64
+        type: integer
+      start:
+        example: "2003-03-21T08:39:07Z"
+        format: date-time
+        type: string
+    required:
+    - start
+    - end
+    - number_of_data_records
+    - number_of_meta_records
+    title: JSONDataStatistics
+    type: object
   JSONDataSummaryResponse:
     description: JSONDataSummaryResponse media type (default view)
     example:
       data:
       - d:
-          Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+          Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2444,7 +2474,7 @@ definitions:
         - 1.576519638086125e+18
         time: 5.011953152089054e+18
       - d:
-          Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+          Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2454,7 +2484,7 @@ definitions:
         - 1.576519638086125e+18
         time: 5.011953152089054e+18
       - d:
-          Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+          Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2509,11 +2539,16 @@ definitions:
           name: Quia id.
           units: Aliquam error et asperiores qui quas.
         version: 3.6664198543922755e+18
+      statistics:
+        end: "1997-01-05T08:59:01Z"
+        number_of_data_records: 4.791279341070292e+18
+        number_of_meta_records: 6.939366097402898e+18
+        start: "2003-03-21T08:39:07Z"
     properties:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+            Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2523,7 +2558,7 @@ definitions:
           - 1.576519638086125e+18
           time: 5.011953152089054e+18
         - d:
-            Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+            Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2533,7 +2568,7 @@ definitions:
           - 1.576519638086125e+18
           time: 5.011953152089054e+18
         - d:
-            Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+            Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -2595,9 +2630,12 @@ definitions:
         items:
           $ref: '#/definitions/JSONDataMetaModule'
         type: array
+      statistics:
+        $ref: '#/definitions/JSONDataStatistics'
     required:
     - modules
     - data
+    - statistics
     title: 'Mediatype identifier: application/vnd.app.device.json.data.summary+json;
       view=default'
     type: object
@@ -2605,7 +2643,7 @@ definitions:
     example:
       data:
       - d:
-          Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+          Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
         id: 3.7495146985014707e+18
         location:
         - 0.8794476882696538
@@ -2645,7 +2683,7 @@ definitions:
       data:
         example:
         - d:
-            Repudiandae dignissimos.: a6b52b6d-1ae3-4b17-a706-836d075cef08
+            Repudiandae dignissimos.: 8a8ce54f-fdd1-4749-b6d5-46300f815971
           id: 3.7495146985014707e+18
           location:
           - 0.8794476882696538
@@ -4538,6 +4576,10 @@ paths:
         name: internal
         required: false
         type: boolean
+      - in: query
+        name: interval
+        required: false
+        type: integer
       - in: query
         name: page
         required: false
@@ -7621,65 +7663,6 @@ paths:
       schemes:
       - https
       summary: Download api/public/swagger/swagger.yaml
-  /tasks/check:
-    get:
-      description: Run periodic checks
-      operationId: Tasks#check
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: check Tasks
-      tags:
-      - Tasks
-  /tasks/five:
-    get:
-      description: Run periodic checks
-      operationId: Tasks#five
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: five Tasks
-      tags:
-      - Tasks
-  /tasks/refresh/{deviceId}/{fileTypeId}:
-    get:
-      description: Refresh a device by ID
-      operationId: Tasks#refresh
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: path
-        name: fileTypeId
-        required: true
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: refresh Tasks
-      tags:
-      - Tasks
   /teams/{teamId}:
     delete:
       description: |-

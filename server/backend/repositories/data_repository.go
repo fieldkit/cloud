@@ -33,6 +33,7 @@ type SummaryQueryOpts struct {
 	Resolution int
 	Page       int
 	PageSize   int
+	Interval   int64
 }
 
 func (r *DataRepository) queryMetaRecords(ctx context.Context, opts *SummaryQueryOpts) (map[int64]*data.MetaRecord, error) {
@@ -184,7 +185,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		resampled = append(resampled, d)
 	}
 
-	modulesAndData, err = metaFactory.ToModulesAndData(resampled)
+	modulesAndData, err = metaFactory.ToModulesAndData(resampled, summary)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -85,9 +86,17 @@ type DataRow struct {
 	D        map[string]interface{}
 }
 
+type DataSimpleStatistics struct {
+	Start               time.Time
+	End                 time.Time
+	NumberOfDataRecords int64
+	NumberOfMetaRecords int64
+}
+
 type ModulesAndData struct {
-	Modules []*DataMetaModule
-	Data    []*DataRow
+	Modules    []*DataMetaModule
+	Data       []*DataRow
+	Statistics *DataSimpleStatistics
 }
 
 type VersionRepository struct {

@@ -1657,6 +1657,63 @@ func (ut *JSONDataRow) Validate() (err error) {
 	return
 }
 
+// jSONDataStatistics user type.
+type jSONDataStatistics struct {
+	End                 *time.Time `form:"end,omitempty" json:"end,omitempty" yaml:"end,omitempty" xml:"end,omitempty"`
+	NumberOfDataRecords *int       `form:"number_of_data_records,omitempty" json:"number_of_data_records,omitempty" yaml:"number_of_data_records,omitempty" xml:"number_of_data_records,omitempty"`
+	NumberOfMetaRecords *int       `form:"number_of_meta_records,omitempty" json:"number_of_meta_records,omitempty" yaml:"number_of_meta_records,omitempty" xml:"number_of_meta_records,omitempty"`
+	Start               *time.Time `form:"start,omitempty" json:"start,omitempty" yaml:"start,omitempty" xml:"start,omitempty"`
+}
+
+// Validate validates the jSONDataStatistics type instance.
+func (ut *jSONDataStatistics) Validate() (err error) {
+	if ut.Start == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "start"))
+	}
+	if ut.End == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "end"))
+	}
+	if ut.NumberOfDataRecords == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "number_of_data_records"))
+	}
+	if ut.NumberOfMetaRecords == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "number_of_meta_records"))
+	}
+	return
+}
+
+// Publicize creates JSONDataStatistics from jSONDataStatistics
+func (ut *jSONDataStatistics) Publicize() *JSONDataStatistics {
+	var pub JSONDataStatistics
+	if ut.End != nil {
+		pub.End = *ut.End
+	}
+	if ut.NumberOfDataRecords != nil {
+		pub.NumberOfDataRecords = *ut.NumberOfDataRecords
+	}
+	if ut.NumberOfMetaRecords != nil {
+		pub.NumberOfMetaRecords = *ut.NumberOfMetaRecords
+	}
+	if ut.Start != nil {
+		pub.Start = *ut.Start
+	}
+	return &pub
+}
+
+// JSONDataStatistics user type.
+type JSONDataStatistics struct {
+	End                 time.Time `form:"end" json:"end" yaml:"end" xml:"end"`
+	NumberOfDataRecords int       `form:"number_of_data_records" json:"number_of_data_records" yaml:"number_of_data_records" xml:"number_of_data_records"`
+	NumberOfMetaRecords int       `form:"number_of_meta_records" json:"number_of_meta_records" yaml:"number_of_meta_records" xml:"number_of_meta_records"`
+	Start               time.Time `form:"start" json:"start" yaml:"start" xml:"start"`
+}
+
+// Validate validates the JSONDataStatistics type instance.
+func (ut *JSONDataStatistics) Validate() (err error) {
+
+	return
+}
+
 // jSONDataVersion user type.
 type jSONDataVersion struct {
 	Data []*jSONDataRow `form:"data,omitempty" json:"data,omitempty" yaml:"data,omitempty" xml:"data,omitempty"`

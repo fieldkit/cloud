@@ -49,6 +49,7 @@ var _ = Resource("jsonData", func() {
 			Param("start", Integer)
 			Param("end", Integer)
 			Param("resolution", Integer)
+			Param("interval", Integer)
 			Param("internal", Boolean)
 		})
 		Response(NotFound)
@@ -130,15 +131,26 @@ var JSONDataResponse = MediaType("application/vnd.app.device.json.data+json", fu
 	})
 })
 
+var JSONDataStatistics = Type("JSONDataStatistics", func() {
+	Attribute("start", DateTime)
+	Attribute("end", DateTime)
+	Attribute("number_of_data_records", Integer)
+	Attribute("number_of_meta_records", Integer)
+
+	Required("start", "end", "number_of_data_records", "number_of_meta_records")
+})
+
 var JSONDataSummaryResponse = MediaType("application/vnd.app.device.json.data.summary+json", func() {
 	TypeName("JSONDataSummaryResponse")
 	Attributes(func() {
 		Attribute("modules", ArrayOf(JSONDataMetaModule))
 		Attribute("data", ArrayOf(JSONDataRow))
-		Required("modules", "data")
+		Attribute("statistics", JSONDataStatistics)
+		Required("modules", "data", "statistics")
 	})
 	View("default", func() {
 		Attribute("modules")
 		Attribute("data")
+		Attribute("statistics")
 	})
 })

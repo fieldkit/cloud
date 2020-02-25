@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/goadesign/goa"
 
@@ -100,10 +101,23 @@ func JSONDataResponseType(dm []*repositories.Version) []*app.JSONDataVersion {
 	return wm
 }
 
+func JSONDataStatisticsType(dm *repositories.DataSimpleStatistics) *app.JSONDataStatistics {
+	if dm == nil {
+		return nil
+	}
+	return &app.JSONDataStatistics{
+		Start:               dm.Start,
+		End:                 dm.End,
+		NumberOfDataRecords: int(dm.NumberOfDataRecords),
+		NumberOfMetaRecords: int(dm.NumberOfMetaRecords),
+	}
+}
+
 func JSONDataSummaryResponseType(dm *repositories.ModulesAndData) *app.JSONDataSummaryResponse {
 	return &app.JSONDataSummaryResponse{
-		Modules: JSONDataMetaModuleType(dm.Modules),
-		Data:    JSONDataRowsType(dm.Data, true),
+		Modules:    JSONDataMetaModuleType(dm.Modules),
+		Data:       JSONDataRowsType(dm.Data, true),
+		Statistics: JSONDataStatisticsType(dm.Statistics),
 	}
 }
 
@@ -135,12 +149,18 @@ func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
 	}
 	if ctx.Start != nil {
 		opts.Start = int64(*ctx.Start)
+	} else {
 	}
 	if ctx.End != nil {
 		opts.End = int64(*ctx.End)
+	} else {
+		opts.End = time.Now().Unix() * 1000
 	}
 	if ctx.Resolution != nil {
 		opts.Resolution = *ctx.Resolution
+	}
+	if ctx.Interval != nil {
+		opts.Interval = int64(*ctx.Interval)
 	}
 	if ctx.Internal != nil {
 		opts.Internal = *ctx.Internal

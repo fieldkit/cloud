@@ -200,7 +200,7 @@ func (mf *MetaFactory) AllModules() map[string]*ModuleAndMetaID {
 	return modulesByID
 }
 
-func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled) (modulesAndData *ModulesAndData, err error) {
+func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled, summary *DataSummary) (modulesAndData *ModulesAndData, err error) {
 	allModules := mf.AllModules()
 
 	modules := make([]*DataMetaModule, 0)
@@ -226,6 +226,12 @@ func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled) (modulesAndData 
 	modulesAndData = &ModulesAndData{
 		Modules: modules,
 		Data:    data,
+		Statistics: &DataSimpleStatistics{
+			Start:               *summary.Start,
+			End:                 *summary.End,
+			NumberOfDataRecords: summary.NumberOfDataRecords,
+			NumberOfMetaRecords: summary.NumberOfMetaRecords,
+		},
 	}
 
 	return
