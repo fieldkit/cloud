@@ -4,6 +4,8 @@ import (
 	"context"
 
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type ModulesService struct {
@@ -17,11 +19,14 @@ func NewModulesService(ctx context.Context, options *ControllerOptions) *Modules
 }
 
 func (ms *ModulesService) Meta(ctx context.Context) (*modules.MetaResult, error) {
-	v := make(map[string]interface{})
+	r := repositories.NewModuleMetaRepository()
 
-	v["value"] = 100
+	mm, err := r.FindModuleMeta()
+	if err != nil {
+		return nil, err
+	}
 
 	return &modules.MetaResult{
-		Object: v,
+		Object: mm,
 	}, nil
 }
