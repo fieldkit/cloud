@@ -24,13 +24,3 @@ func (sc *TestService) Get(ctx context.Context, payload *test.GetPayload) error 
 func (sc *TestService) Error(ctx context.Context) error {
 	return fmt.Errorf("life is unpredictable")
 }
-
-func (sc *TestService) JSON(ctx context.Context, payload *test.JSONPayload) (*test.JSONResult, error) {
-	v := make(map[string]interface{})
-
-	v["value"] = 100
-
-	return &test.JSONResult{
-		Object: v,
-	}, nil
-}

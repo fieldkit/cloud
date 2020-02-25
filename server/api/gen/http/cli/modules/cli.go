@@ -27,7 +27,7 @@ import (
 func UsageCommands() string {
 	return `modules meta
 tasks five
-test (get|error|json)
+test (get|error)
 `
 }
 
@@ -35,7 +35,7 @@ test (get|error|json)
 func UsageExamples() string {
 	return os.Args[0] + ` modules meta` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 90913552314241906` + "\n" +
+		os.Args[0] + ` test get --id 3182965740620624665` + "\n" +
 		""
 }
 
@@ -63,9 +63,6 @@ func ParseEndpoint(
 		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
 
 		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
-
-		testJSONFlags  = flag.NewFlagSet("json", flag.ExitOnError)
-		testJSONIDFlag = testJSONFlags.String("id", "REQUIRED", "")
 	)
 	modulesFlags.Usage = modulesUsage
 	modulesMetaFlags.Usage = modulesMetaUsage
@@ -76,7 +73,6 @@ func ParseEndpoint(
 	testFlags.Usage = testUsage
 	testGetFlags.Usage = testGetUsage
 	testErrorFlags.Usage = testErrorUsage
-	testJSONFlags.Usage = testJSONUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -136,9 +132,6 @@ func ParseEndpoint(
 			case "error":
 				epf = testErrorFlags
 
-			case "json":
-				epf = testJSONFlags
-
 			}
 
 		}
@@ -184,9 +177,6 @@ func ParseEndpoint(
 			case "error":
 				endpoint = c.Error()
 				data = nil
-			case "json":
-				endpoint = c.JSON()
-				data, err = testc.BuildJSONPayload(*testJSONIDFlag)
 			}
 		}
 	}
@@ -252,7 +242,6 @@ Usage:
 COMMAND:
     get: Get implements get.
     error: Error implements error.
-    json: JSON implements json.
 
 Additional help:
     %s test COMMAND --help
@@ -265,7 +254,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 90913552314241906
+    `+os.Args[0]+` test get --id 3182965740620624665
 `, os.Args[0])
 }
 
@@ -276,16 +265,5 @@ Error implements error.
 
 Example:
     `+os.Args[0]+` test error
-`, os.Args[0])
-}
-
-func testJSONUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test json -id INT64
-
-JSON implements json.
-    -id INT64: 
-
-Example:
-    `+os.Args[0]+` test json --id 5621125840554992627
 `, os.Args[0])
 }

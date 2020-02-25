@@ -20,23 +20,4 @@ var _ = Service("test", func() {
 			GET("error")
 		})
 	})
-
-	Method("json", func() {
-		Payload(func() {
-			Attribute("id", Int64)
-		})
-
-		Result(func() {
-			Attribute("object", Any)
-			Required("object")
-		})
-
-		HTTP(func() {
-			GET("test/json/{id}")
-
-			Response(func() {
-				Body("object")
-			})
-		})
-	})
 })

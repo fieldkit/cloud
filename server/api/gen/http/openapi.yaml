@@ -63,21 +63,3 @@ paths:
           description: OK response.
       schemes:
       - http
-  /test/json/{id}:
-    get:
-      tags:
-      - test
-      summary: json test
-      operationId: test#json
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: integer
-        format: int64
-      responses:
-        "200":
-          description: OK response.
-          schema: {}
-      schemes:
-      - http

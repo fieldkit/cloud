@@ -17,7 +17,6 @@ import (
 type Endpoints struct {
 	Get   goa.Endpoint
 	Error goa.Endpoint
-	JSON  goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "test" service with endpoints.
@@ -25,7 +24,6 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Get:   NewGetEndpoint(s),
 		Error: NewErrorEndpoint(s),
-		JSON:  NewJSONEndpoint(s),
 	}
 }
 
@@ -33,7 +31,6 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.Error = m(e.Error)
-	e.JSON = m(e.JSON)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -50,14 +47,5 @@ func NewGetEndpoint(s Service) goa.Endpoint {
 func NewErrorEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		return nil, s.Error(ctx)
-	}
-}
-
-// NewJSONEndpoint returns an endpoint function that calls the method "json" of
-// service "test".
-func NewJSONEndpoint(s Service) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*JSONPayload)
-		return s.JSON(ctx, p)
 	}
 }
