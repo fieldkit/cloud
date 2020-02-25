@@ -39,5 +39,9 @@ func (c *TasksService) Five(ctx context.Context) error {
 }
 
 func (c *TasksService) RefreshDevice(ctx context.Context, payload *tasks.RefreshDevicePayload) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("refresh", "device_id", payload.DeviceID)
+
 	return nil
 }

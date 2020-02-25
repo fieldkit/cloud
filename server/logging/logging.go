@@ -15,11 +15,11 @@ func ServiceTrace(ctx context.Context) []string {
 	return []string{}
 }
 
-func WithDeviceId(ctx context.Context, deviceId string) context.Context {
-	if deviceId == "" {
+func WithDeviceID(ctx context.Context, deviceID string) context.Context {
+	if deviceID == "" {
 		return ctx
 	}
-	return context.WithValue(ctx, deviceIdKey, deviceId)
+	return context.WithValue(ctx, deviceIDKey, deviceID)
 }
 
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
@@ -31,13 +31,17 @@ func WithFacility(ctx context.Context, facility string) context.Context {
 	return PushServiceTrace(context.WithValue(ctx, facilityKey, facility), facility)
 }
 
-func WithTaskId(ctx context.Context, taskId string) context.Context {
-	return PushServiceTrace(context.WithValue(ctx, taskIdKey, taskId), taskId)
+func WithTaskID(ctx context.Context, taskID string) context.Context {
+	return PushServiceTrace(context.WithValue(ctx, taskIDKey, taskID), taskID)
 }
 
-func WithNewTaskId(ctx context.Context, g *IdGenerator) context.Context {
-	taskId := g.Generate()
-	return PushServiceTrace(context.WithValue(ctx, taskIdKey, taskId), taskId)
+func WithNewTaskID(ctx context.Context, g *IdGenerator) context.Context {
+	taskID := g.Generate()
+	return PushServiceTrace(context.WithValue(ctx, taskIDKey, taskID), taskID)
+}
+
+func WithUserID(ctx context.Context, userID string) context.Context {
+	return PushServiceTrace(context.WithValue(ctx, userIDKey, userID), userID)
 }
 
 func Logger(ctx context.Context) *zap.Logger {
@@ -46,20 +50,23 @@ func Logger(ctx context.Context) *zap.Logger {
 	}
 
 	newLogger := rootLogger
-	if ctxDeviceId, ok := ctx.Value(deviceIdKey).(string); ok {
-		newLogger = newLogger.With(zap.String(deviceIdTagName, ctxDeviceId))
+	if ctxDeviceID, ok := ctx.Value(deviceIDKey).(string); ok {
+		newLogger = newLogger.With(zap.String(deviceIDTagName, ctxDeviceID))
 	}
 	if ctxFacility, ok := ctx.Value(facilityKey).(string); ok {
 		newLogger = newLogger.With(zap.String(facilityTagName, ctxFacility))
 	}
-	if ctxTaskId, ok := ctx.Value(taskIdKey).(string); ok {
-		newLogger = newLogger.With(zap.String(taskIdTagName, ctxTaskId))
+	if ctxTaskID, ok := ctx.Value(taskIDKey).(string); ok {
+		newLogger = newLogger.With(zap.String(taskIDTagName, ctxTaskID))
 	}
 	if ctxHandler, ok := ctx.Value(handlerKey).(string); ok {
 		newLogger = newLogger.With(zap.String(handlerTagName, ctxHandler))
 	}
 	if ctxQueue, ok := ctx.Value(queueKey).(string); ok {
 		newLogger = newLogger.With(zap.String(queueTagName, ctxQueue))
+	}
+	if ctxUserID, ok := ctx.Value(userIDKey).(string); ok {
+		newLogger = newLogger.With(zap.String(userIDTagName, ctxUserID))
 	}
 	if ctxServiceTrace, ok := ctx.Value(serviceTraceKey).([]string); ok {
 		newLogger = newLogger.With(zap.String(serviceTraceTagName, strings.Join(ctxServiceTrace, " ")))

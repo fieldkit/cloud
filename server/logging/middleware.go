@@ -17,7 +17,7 @@ func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
 		return m.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			started := time.Now()
 
-			newCtx := WithNewTaskId(r.Context(), ids)
+			newCtx := WithNewTaskID(r.Context(), ids)
 			withCtx := r.WithContext(newCtx)
 
 			log := Logger(newCtx).Named("http").Sugar()

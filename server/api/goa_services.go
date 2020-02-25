@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -11,6 +12,8 @@ import (
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
+
+	"github.com/fieldkit/cloud/server/logging"
 
 	testsvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
@@ -117,5 +120,7 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return ctx, ErrInvalidTokenScopes
 	}
 
-	return ctx, nil
+	newCtx := logging.WithUserID(ctx, fmt.Sprintf("%v", claims["sub"]))
+
+	return newCtx, nil
 }

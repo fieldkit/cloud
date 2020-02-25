@@ -10,20 +10,22 @@ type correlationIdType int
 const (
 	serviceTraceKey correlationIdType = iota
 	facilityKey     correlationIdType = iota
-	taskIdKey       correlationIdType = iota
+	taskIDKey       correlationIdType = iota
+	userIDKey       correlationIdType = iota
 	handlerKey      correlationIdType = iota
 	queueKey        correlationIdType = iota
-	deviceIdKey     correlationIdType = iota
+	deviceIDKey     correlationIdType = iota
 
 	packagePrefix = "github.com/fieldkit/cloud/server/"
 
-	requestIdTagName    = "req_id"
+	reqIDTagName        = "req_id"
 	facilityTagName     = "facility"
-	taskIdTagName       = "task_id"
+	taskIDTagName       = "task_id"
 	queueTagName        = "queue"
 	handlerTagName      = "handler"
 	serviceTraceTagName = "service_trace"
-	deviceIdTagName     = "device_id"
+	deviceIDTagName     = "device_id"
+	userIDTagName       = "user_id"
 )
 
 var rootLogger *zap.Logger

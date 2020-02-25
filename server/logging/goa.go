@@ -33,7 +33,7 @@ func (a *adapter) New(data ...interface{}) goa.LogAdapter {
 
 func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 	for _, f := range *fields {
-		if f.Key == requestIdTagName {
+		if f.Key == reqIDTagName {
 			return f.String
 		}
 	}
@@ -43,7 +43,7 @@ func (a *adapter) getRequestId(fields *[]zapcore.Field) string {
 func (a *adapter) getTaskedLogger(fields *[]zapcore.Field) *zap.Logger {
 	id := a.getRequestId(fields)
 	if len(id) > 0 {
-		return a.logger.With(zap.String(taskIdTagName, id))
+		return a.logger.With(zap.String(taskIDTagName, id))
 	}
 	return a.logger
 }

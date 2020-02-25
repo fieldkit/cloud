@@ -163,7 +163,7 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 				break
 			}
 
-			messageCtx := logging.WithTaskId(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+			messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 			messageLog := Logger(messageCtx).Sugar()
 
 			jq.dispatch(messageCtx, messageLog, transport)
