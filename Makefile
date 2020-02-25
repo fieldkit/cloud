@@ -30,7 +30,7 @@ ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
 portal/src/secrets.js: portal/src/secrets.js.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkstreams
 
 all: binaries
 
@@ -51,6 +51,9 @@ $(BUILD)/ingester: $(SERVER_SOURCES)
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	cd server/tools/fktool && $(GO) build -o $@ *.go
+
+$(BUILD)/fkstreams: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+	cd server/tools/fkstreams && $(GO) build -o $@ *.go
 
 generate:
 	./tools/goa-generate.sh

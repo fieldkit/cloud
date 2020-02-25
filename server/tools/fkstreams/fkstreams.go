@@ -5,10 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
-	"sort"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -20,17 +17,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/robinpowered/go-proto/message"
-	"github.com/robinpowered/go-proto/stream"
-
 	"github.com/conservify/sqlxcache"
 
-	fk "github.com/fieldkit/cloud/server/api/client"
-	backend "github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/common"
 	data "github.com/fieldkit/cloud/server/data"
 	fktesting "github.com/fieldkit/cloud/server/tools"
-	pb "github.com/fieldkit/data-protocol"
 )
 
 type options struct {
@@ -73,7 +64,7 @@ func createAwsSession() (s *session.Session, err error) {
 }
 
 type ObjectJob struct {
-	backend.BucketAndKey
+	common.BucketAndKey
 }
 
 type ObjectDetails struct {
@@ -82,9 +73,6 @@ type ObjectDetails struct {
 	LastModified *time.Time
 	Size         int64
 	DeviceId     string
-	Firmware     string
-	Build        string
-	FileId       string
 	URL          string
 	Meta         map[string]*string
 }
@@ -108,13 +96,10 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 				continue
 			}
 
-			meta := backend.SanitizeMeta(obj.Metadata)
-			deviceId := meta[backend.FkDeviceIdHeaderName]
-			firmware := meta[backend.FkVersionHeaderName]
-			build := meta[backend.FkBuildHeaderName]
-			fileId := meta[backend.FkFileIdHeaderName]
+			meta := common.SanitizeMeta(obj.Metadata)
+			deviceId := meta[common.FkDeviceIdHeaderName]
 
-			if deviceId == nil || firmware == nil || build == nil || fileId == nil {
+			if deviceId == nil {
 				log.Printf("Incomplete Metadata: %v", obj)
 			} else {
 				od := ObjectDetails{
@@ -122,10 +107,7 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 					Key:          job.Key,
 					LastModified: obj.LastModified,
 					Size:         *obj.ContentLength,
-					Firmware:     *firmware,
-					Build:        *build,
 					DeviceId:     *deviceId,
-					FileId:       *fileId,
 					URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", job.Bucket, job.Key),
 					Meta:         meta,
 				}
@@ -138,10 +120,8 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 				stream := data.DeviceFile{
 					Time:     *od.LastModified,
 					StreamID: od.Key,
-					Firmware: od.Firmware,
 					DeviceID: od.DeviceId,
 					Size:     int64(od.Size),
-					FileID:   od.FileId,
 					URL:      od.URL,
 					Meta:     jsonMeta,
 				}
@@ -157,78 +137,6 @@ func worker(ctx context.Context, id int, svc *s3.S3, db *sqlxcache.DB, jobs <-ch
 			}
 		}
 	}
-}
-
-type DeviceStreamsByTime []*fk.DeviceFile
-
-func (a DeviceStreamsByTime) Len() int           { return len(a) }
-func (a DeviceStreamsByTime) Less(i, j int) bool { return a[i].Time.Unix() < a[j].Time.Unix() }
-func (a DeviceStreamsByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
-type FileConcatenator struct {
-	File *os.File
-}
-
-func NewFileConcatenator(file *os.File) (fc *FileConcatenator, err error) {
-	fc = &FileConcatenator{
-		File: file,
-	}
-
-	return
-}
-
-func (fc *FileConcatenator) AppendURL(session *session.Session, url string) error {
-	ids, err := backend.GetBucketAndKey(url)
-	if err != nil {
-		return err
-	}
-
-	return fc.AppendS3Object(session, ids)
-
-}
-
-func (fc *FileConcatenator) AppendS3Object(session *session.Session, object *backend.BucketAndKey) error {
-	svc := s3.New(session)
-
-	goi := &s3.GetObjectInput{
-		Bucket: aws.String(object.Bucket),
-		Key:    aws.String(object.Key),
-	}
-
-	obj, err := svc.GetObject(goi)
-	if err != nil {
-		return err
-	}
-
-	unmarshalFunc := message.UnmarshalFunc(func(b []byte) (proto.Message, error) {
-		var record pb.DataRecord
-
-		err := proto.Unmarshal(b, &record)
-		if err != nil {
-			return nil, err
-		}
-
-		buf := proto.NewBuffer(nil)
-		buf.EncodeRawBytes(b)
-
-		_, err = fc.File.Write(buf.Bytes())
-		if err != nil {
-			return nil, err
-		}
-
-		return &record, nil
-	})
-
-	_, err = stream.ReadLengthPrefixedCollection(obj.Body, unmarshalFunc)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (fc *FileConcatenator) Close() {
-	fc.File.Close()
 }
 
 func listStreams(ctx context.Context, o *options, session *session.Session, db *sqlxcache.DB) error {
@@ -255,7 +163,7 @@ func listStreams(ctx context.Context, o *options, session *session.Session, db *
 
 		for _, summary := range page.Contents {
 			job := ObjectJob{
-				BucketAndKey: backend.BucketAndKey{
+				BucketAndKey: common.BucketAndKey{
 					Bucket: *loi.Bucket,
 					Key:    *summary.Key,
 				},
@@ -275,66 +183,6 @@ func listStreams(ctx context.Context, o *options, session *session.Session, db *
 	log.Printf("%v total objects", total)
 
 	close(jobs)
-
-	return nil
-}
-
-func handleDevice(ctx context.Context, o *options, fkc *fk.Client, session *session.Session) error {
-	page := 0
-	total := 0
-
-	allTheFiles := make([]*fk.DeviceFile, 0)
-
-	for {
-		path := fk.ListDeviceDataFilesFilesPath(o.DeviceID)
-		res, err := fkc.ListDeviceLogFilesFiles(ctx, path, &page)
-		if err != nil {
-			return err
-		}
-
-		files, err := fkc.DecodeDeviceFiles(res)
-		if err != nil {
-			return fmt.Errorf("Error decoding %s: %v", path, err)
-		}
-
-		if len(files.Files) == 0 {
-			break
-		}
-
-		allTheFiles = append(allTheFiles, files.Files...)
-		total += len(files.Files)
-
-		page += 1
-	}
-
-	sort.Sort(DeviceStreamsByTime(allTheFiles))
-
-	log.Printf("Total Files: %v", total)
-
-	temporaryFile, err := ioutil.TempFile("", fmt.Sprintf("%s.fkpb", o.DeviceID))
-	if err != nil {
-		return err
-	}
-
-	fc, err := NewFileConcatenator(temporaryFile)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Creating %s", temporaryFile.Name())
-
-	defer fc.Close()
-
-	for _, file := range allTheFiles {
-		log.Printf("%v %v", o.DeviceID, file.Time)
-
-		err = fc.AppendURL(session, file.URL)
-		if err != nil {
-			return err
-		}
-	}
-
-	log.Printf("Total Files: %v", total)
 
 	return nil
 }
@@ -361,7 +209,7 @@ func main() {
 
 	log.Printf("%v", o.PostgresURL)
 
-	fkc, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
+	_, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Username, o.Password)
 	if err != nil {
 		panic(err)
 	}
@@ -383,33 +231,6 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-
-		return
-	}
-
-	if o.DeviceID != "" {
-		err := handleDevice(ctx, &o, fkc, session)
-		if err != nil {
-			panic(err)
-		}
-
-		return
-	} else {
-		res, err := fkc.ListDevicesFiles(ctx, fk.ListDevicesFilesPath())
-		if err != nil {
-			panic(err)
-		}
-
-		devices, err := fkc.DecodeDevices(res)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, device := range devices.Devices {
-			log.Printf("%v %v", device.DeviceID, device.LastFileTime)
-		}
-
-		log.Printf("Total Devices: %v", len(devices.Devices))
 
 		return
 	}

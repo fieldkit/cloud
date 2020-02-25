@@ -139,18 +139,4 @@ func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, e
 
 	return
 }
-
-func SanitizeMeta(m map[string]*string) map[string]*string {
-	ci := make(map[string]*string)
-	for key, value := range m {
-		ci[strings.ToLower(key)] = value
-	}
-	newM := make(map[string]*string)
-	for _, key := range []string{FkDeviceIdHeaderName, FkFileIdHeaderName, FkBuildHeaderName, FkFileNameHeaderName, FkVersionHeaderName} {
-		if value, ok := ci[strings.ToLower(key)]; ok {
-			newM[key] = value
-		}
-	}
-	return newM
-}
 */
