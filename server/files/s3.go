@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/fieldkit/cloud/server/common"
@@ -64,4 +65,33 @@ func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.R
 	}
 
 	return ss, err
+}
+
+func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (io.Reader, error) {
+	return a.open(ctx, a.bucketName, key)
+}
+
+func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (io.Reader, error) {
+	object, err := common.GetBucketAndKey(url)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing url: %v", err)
+	}
+
+	return a.open(ctx, object.Bucket, object.Key)
+}
+
+func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (io.Reader, error) {
+	svc := s3.New(a.session)
+
+	goi := &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	}
+
+	obj, err := svc.GetObject(goi)
+	if err != nil {
+		return nil, fmt.Errorf("error reading object %v: %v", key, err)
+	}
+
+	return obj.Body, nil
 }

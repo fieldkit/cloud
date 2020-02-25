@@ -23,6 +23,7 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
 )
@@ -160,7 +161,7 @@ func (fc *FileConcatenator) WriteAllFiles(ctx context.Context) (string, error) {
 	svc := s3.New(fc.Session)
 
 	for _, file := range files {
-		object, err := GetBucketAndKey(file.URL)
+		object, err := common.GetBucketAndKey(file.URL)
 		if err != nil {
 			return "", fmt.Errorf("error parsing URL: %v", err)
 		}

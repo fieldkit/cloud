@@ -15,6 +15,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -90,7 +91,7 @@ func (c *FirmwareController) Download(ctx *app.DownloadFirmwareContext) error {
 
 	fw := firmwares[0]
 
-	bucketAndKey, err := backend.GetBucketAndKey(fw.URL)
+	bucketAndKey, err := common.GetBucketAndKey(fw.URL)
 	if err != nil {
 		return err
 	}
@@ -324,7 +325,7 @@ func (c *FirmwareController) Delete(ctx *app.DeleteFirmwareContext) error {
 	svc := s3.New(c.options.Session)
 
 	for _, fw := range firmwares {
-		object, err := backend.GetBucketAndKey(fw.URL)
+		object, err := common.GetBucketAndKey(fw.URL)
 		if err != nil {
 			return fmt.Errorf("error parsing URL: %v", err)
 		}

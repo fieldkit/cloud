@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
 )
@@ -126,7 +126,7 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 
 	svc := s3.New(c.options.Session)
 
-	object, err := backend.GetBucketAndKey(i.URL)
+	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
 		return fmt.Errorf("Error parsing URL: %v", err)
 	}

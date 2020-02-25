@@ -18,6 +18,7 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -239,7 +240,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	svc := s3.New(ra.Session)
 
-	object, err := GetBucketAndKey(i.URL)
+	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
 		return fmt.Errorf("error parsing URL: %v", err)
 	}

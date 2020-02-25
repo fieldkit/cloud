@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 
 	"github.com/google/uuid"
+)
+
+const (
+	Path = "./ingestion"
 )
 
 type LocalFilesArchive struct {
@@ -23,13 +28,12 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader 
 
 	id := uuid.Must(uuid.NewRandom())
 
-	path := "./ingestions"
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(Path, 0755)
 	if err != nil {
 		return nil, err
 	}
 
-	fn := fmt.Sprintf("%s/%v.fkpb", path, id)
+	fn := makeFileName(id.String())
 
 	log.Infow("archiving", "content_type", meta.ContentType, "file_name", fn)
 
@@ -50,4 +54,16 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader 
 
 	return ss, nil
 
+}
+
+func (a *LocalFilesArchive) OpenByKey(ctx context.Context, key string) (io.Reader, error) {
+	return a.OpenByURL(ctx, makeFileName(key))
+}
+
+func (a *LocalFilesArchive) OpenByURL(ctx context.Context, url string) (io.Reader, error) {
+	return os.Open(url)
+}
+
+func makeFileName(key string) string {
+	return path.Join(Path, fmt.Sprintf("%v.fkpb", key))
 }
