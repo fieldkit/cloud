@@ -37,15 +37,6 @@ type SummaryQueryOpts struct {
 }
 
 func (r *DataRepository) queryMetaRecords(ctx context.Context, deviceIdBytes []byte, start, end time.Time) (map[int64]*data.MetaRecord, error) {
-	/*
-		deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
-		if err != nil {
-			return nil, err
-		}
-
-		start := time.Unix(0, opts.Start*int64(time.Millisecond))
-		end := time.Unix(0, opts.End*int64(time.Millisecond))
-	*/
 	mrs := []*data.MetaRecord{}
 	if err := r.Database.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (

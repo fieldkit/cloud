@@ -10,6 +10,10 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+const (
+	ResampledKey = "@resampled"
+)
+
 type Resampler struct {
 	summary      *DataSummary
 	metaFactory  *MetaFactory
@@ -183,7 +187,16 @@ func getResampledLocation(records []*DataRow) []float64 {
 	return nil
 }
 
+type ResampleInfo struct {
+	NumberRecords int       `json:"number_records"`
+	Start         time.Time `json:"start"`
+	End           time.Time `json:"end"`
+}
+
 func getResampledData(records []*DataRow) (map[string]interface{}, error) {
+	start := time.Time{}
+	end := time.Time{}
+
 	all := make(map[string][]float64)
 	for _, r := range records {
 		for k, v := range r.D {
@@ -191,6 +204,14 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 				all[k] = make([]float64, 0, len(records))
 			}
 			all[k] = append(all[k], float64(v.(float32)))
+		}
+
+		time := time.Unix(r.Time, 0)
+		if start.IsZero() || time.Before(start) {
+			start = time
+		}
+		if end.IsZero() || time.After(end) {
+			end = time
 		}
 	}
 
@@ -203,6 +224,12 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 		}
 
 		d[k] = mean
+	}
+
+	d[ResampledKey] = ResampleInfo{
+		NumberRecords: len(records),
+		Start:         start,
+		End:           end,
 	}
 
 	return d, nil
