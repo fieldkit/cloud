@@ -59,12 +59,20 @@ var _ = Resource("jsonData", func() {
 	})
 })
 
+var JSONDataMetaSensorRange = Type("JSONDataMetaSensorRange", func() {
+	Attribute("minimum", Number)
+	Attribute("maximum", Number)
+
+	Required("minimum", "maximum")
+})
+
 var JSONDataMetaSensor = Type("JSONDataMetaSensor", func() {
 	Attribute("name", String)
 	Attribute("key", String)
-	Attribute("units", String)
+	Attribute("unitOfMeasure", String)
+	Attribute("ranges", ArrayOf(JSONDataMetaSensorRange))
 
-	Required("name", "key", "units")
+	Required("name", "key", "unitOfMeasure", "ranges")
 })
 
 var JSONDataMetaModule = Type("JSONDataMetaModule", func() {

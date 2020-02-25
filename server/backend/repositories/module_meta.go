@@ -1,7 +1,9 @@
 package repositories
 
 import (
-	_ "fmt"
+	"fmt"
+
+	pb "github.com/fieldkit/data-protocol"
 )
 
 const (
@@ -20,7 +22,20 @@ func NewModuleMetaRepository() *ModuleMetaRepository {
 	return &ModuleMetaRepository{}
 }
 
-func (r *ModuleMetaRepository) FindModuleMeta() (mm []*ModuleMeta, err error) {
+func (r *ModuleMetaRepository) FindModuleMeta(m *pb.ModuleHeader) (mm *ModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+	for _, module := range all {
+		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
+			return module, nil
+		}
+	}
+	return nil, fmt.Errorf("missing module meta")
+}
+
+func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
 	mm = []*ModuleMeta{
 		&ModuleMeta{
 			Key: "modules.water.ph",
@@ -171,7 +186,7 @@ func (r *ModuleMetaRepository) FindModuleMeta() (mm []*ModuleMeta, err error) {
 					},
 				},
 				&SensorMeta{
-					Key:           "preassure",
+					Key:           "pressure",
 					UnitOfMeasure: "kPa",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -425,27 +440,4 @@ func (r *ModuleMetaRepository) FindModuleMeta() (mm []*ModuleMeta, err error) {
 	}
 
 	return
-}
-
-type SensorRanges struct {
-	Minimum float64 `json:"minimum"`
-	Maximum float64 `json:"maximum"`
-}
-
-type SensorMeta struct {
-	Key           string         `json:"key"`
-	UnitOfMeasure string         `json:"unit_of_measure"`
-	Ranges        []SensorRanges `json:"ranges"`
-}
-
-type ModuleMeta struct {
-	Header  ModuleHeader  `json:"header"`
-	Key     string        `json:"key"`
-	Sensors []*SensorMeta `json:"sensors"`
-}
-
-type ModuleHeader struct {
-	Manufacturer int32 `json:"manufacturer"`
-	Kind         int32 `json:"kind"`
-	Version      int32 `json:"version"`
 }

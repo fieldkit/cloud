@@ -1042,9 +1042,10 @@ func (ut *JSONDataMetaModule) Validate() (err error) {
 
 // jSONDataMetaSensor user type.
 type jSONDataMetaSensor struct {
-	Key   *string `form:"key,omitempty" json:"key,omitempty" yaml:"key,omitempty" xml:"key,omitempty"`
-	Name  *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	Units *string `form:"units,omitempty" json:"units,omitempty" yaml:"units,omitempty" xml:"units,omitempty"`
+	Key           *string                    `form:"key,omitempty" json:"key,omitempty" yaml:"key,omitempty" xml:"key,omitempty"`
+	Name          *string                    `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Ranges        []*jSONDataMetaSensorRange `form:"ranges,omitempty" json:"ranges,omitempty" yaml:"ranges,omitempty" xml:"ranges,omitempty"`
+	UnitOfMeasure *string                    `form:"unitOfMeasure,omitempty" json:"unitOfMeasure,omitempty" yaml:"unitOfMeasure,omitempty" xml:"unitOfMeasure,omitempty"`
 }
 
 // Validate validates the jSONDataMetaSensor type instance.
@@ -1055,8 +1056,18 @@ func (ut *jSONDataMetaSensor) Validate() (err error) {
 	if ut.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "key"))
 	}
-	if ut.Units == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "units"))
+	if ut.UnitOfMeasure == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "unitOfMeasure"))
+	}
+	if ut.Ranges == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "ranges"))
+	}
+	for _, e := range ut.Ranges {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }
@@ -1070,17 +1081,24 @@ func (ut *jSONDataMetaSensor) Publicize() *JSONDataMetaSensor {
 	if ut.Name != nil {
 		pub.Name = *ut.Name
 	}
-	if ut.Units != nil {
-		pub.Units = *ut.Units
+	if ut.Ranges != nil {
+		pub.Ranges = make([]*JSONDataMetaSensorRange, len(ut.Ranges))
+		for i2, elem2 := range ut.Ranges {
+			pub.Ranges[i2] = elem2.Publicize()
+		}
+	}
+	if ut.UnitOfMeasure != nil {
+		pub.UnitOfMeasure = *ut.UnitOfMeasure
 	}
 	return &pub
 }
 
 // JSONDataMetaSensor user type.
 type JSONDataMetaSensor struct {
-	Key   string `form:"key" json:"key" yaml:"key" xml:"key"`
-	Name  string `form:"name" json:"name" yaml:"name" xml:"name"`
-	Units string `form:"units" json:"units" yaml:"units" xml:"units"`
+	Key           string                     `form:"key" json:"key" yaml:"key" xml:"key"`
+	Name          string                     `form:"name" json:"name" yaml:"name" xml:"name"`
+	Ranges        []*JSONDataMetaSensorRange `form:"ranges" json:"ranges" yaml:"ranges" xml:"ranges"`
+	UnitOfMeasure string                     `form:"unitOfMeasure" json:"unitOfMeasure" yaml:"unitOfMeasure" xml:"unitOfMeasure"`
 }
 
 // Validate validates the JSONDataMetaSensor type instance.
@@ -1091,9 +1109,60 @@ func (ut *JSONDataMetaSensor) Validate() (err error) {
 	if ut.Key == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "key"))
 	}
-	if ut.Units == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "units"))
+	if ut.UnitOfMeasure == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "unitOfMeasure"))
 	}
+	if ut.Ranges == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "ranges"))
+	}
+	for _, e := range ut.Ranges {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// jSONDataMetaSensorRange user type.
+type jSONDataMetaSensorRange struct {
+	Maximum *float64 `form:"maximum,omitempty" json:"maximum,omitempty" yaml:"maximum,omitempty" xml:"maximum,omitempty"`
+	Minimum *float64 `form:"minimum,omitempty" json:"minimum,omitempty" yaml:"minimum,omitempty" xml:"minimum,omitempty"`
+}
+
+// Validate validates the jSONDataMetaSensorRange type instance.
+func (ut *jSONDataMetaSensorRange) Validate() (err error) {
+	if ut.Minimum == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "minimum"))
+	}
+	if ut.Maximum == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "maximum"))
+	}
+	return
+}
+
+// Publicize creates JSONDataMetaSensorRange from jSONDataMetaSensorRange
+func (ut *jSONDataMetaSensorRange) Publicize() *JSONDataMetaSensorRange {
+	var pub JSONDataMetaSensorRange
+	if ut.Maximum != nil {
+		pub.Maximum = *ut.Maximum
+	}
+	if ut.Minimum != nil {
+		pub.Minimum = *ut.Minimum
+	}
+	return &pub
+}
+
+// JSONDataMetaSensorRange user type.
+type JSONDataMetaSensorRange struct {
+	Maximum float64 `form:"maximum" json:"maximum" yaml:"maximum" xml:"maximum"`
+	Minimum float64 `form:"minimum" json:"minimum" yaml:"minimum" xml:"minimum"`
+}
+
+// Validate validates the JSONDataMetaSensorRange type instance.
+func (ut *JSONDataMetaSensorRange) Validate() (err error) {
+
 	return
 }
 

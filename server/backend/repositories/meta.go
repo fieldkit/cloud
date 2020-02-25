@@ -3,11 +3,11 @@ package repositories
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 
 	"github.com/iancoleman/strcase"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/errors"
 
 	pb "github.com/fieldkit/data-protocol"
 )
@@ -17,14 +17,16 @@ const (
 )
 
 type MetaFactory struct {
-	byMetaID map[int64]*VersionMeta
-	ordered  []*VersionMeta
+	modulesRepository *ModuleMetaRepository
+	byMetaID          map[int64]*VersionMeta
+	ordered           []*VersionMeta
 }
 
 func NewMetaFactory() *MetaFactory {
 	return &MetaFactory{
-		byMetaID: make(map[int64]*VersionMeta),
-		ordered:  make([]*VersionMeta, 0),
+		modulesRepository: NewModuleMetaRepository(),
+		byMetaID:          make(map[int64]*VersionMeta),
+		ordered:           make([]*VersionMeta, 0),
 	}
 }
 
@@ -47,15 +49,30 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 	modules := make([]*DataMetaModule, 0)
 
 	for _, module := range meta.Modules {
+		header := module.Header
+		extra, err := mf.modulesRepository.FindModuleMeta(header)
+		if err != nil {
+			return nil, errors.Structured("missing module meta", "manufacturer", header.Manufacturer, "kind", header.Kind)
+		}
+
 		sensors := make([]*DataMetaSensor, 0)
 		for _, sensor := range module.Sensors {
-			sensorMeta := &DataMetaSensor{
-				Number:   int(sensor.Number),
-				Name:     sensor.Name,
-				Key:      strcase.ToLowerCamel(sensor.Name),
-				Units:    sensor.UnitOfMeasure,
-				Internal: sensor.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK,
+			key := strcase.ToLowerCamel(sensor.Name)
+
+			extraSensor := extra.Sensor(sensor.Name)
+			if extraSensor == nil {
+				return nil, errors.Structured("missing sensor meta", "manufacturer", header.Manufacturer, "kind", header.Kind, "sensor", sensor.Name)
 			}
+
+			sensorMeta := &DataMetaSensor{
+				Number:        int(sensor.Number),
+				Name:          sensor.Name,
+				Key:           key,
+				UnitOfMeasure: sensor.UnitOfMeasure,
+				Internal:      sensor.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK,
+				Ranges:        extraSensor.Ranges,
+			}
+
 			sensors = append(sensors, sensorMeta)
 		}
 
@@ -101,9 +118,11 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 }
 
 func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord) (*DataRow, error) {
+	log := Logger(ctx).Sugar()
+
 	meta := mf.byMetaID[databaseRecord.Meta]
 	if meta == nil {
-		return nil, fmt.Errorf("data record (%d) with unexpected meta (%d)", databaseRecord.ID, databaseRecord.Meta)
+		return nil, errors.Structured("data record with unexpected meta", "data_record_id", databaseRecord.ID, "meta_record_id", databaseRecord.Meta)
 	}
 
 	var dataRecord pb.DataRecord
@@ -129,8 +148,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 				sensor := module.Sensors[sensorIndex]
 
 				if reading == nil {
-					log := Logger(ctx).Sugar()
-					log.Errorw("nil reading in sample", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					log.Errorw("nil sensor reading", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
 					continue
 				}
 
@@ -140,11 +158,13 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		}
 	}
 
+	location := getLocation(dataRecord.Readings.Location)
+
 	row := &DataRow{
 		ID:       databaseRecord.ID,
 		MetaIDs:  []int64{databaseRecord.Meta},
 		Time:     dataRecord.Readings.Time,
-		Location: getLocation(dataRecord.Readings.Location),
+		Location: location,
 		D:        data,
 	}
 
@@ -235,4 +255,18 @@ func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled, summary *DataSum
 	}
 
 	return
+}
+
+func getLocation(l *pb.DeviceLocation) []float64 {
+	if l == nil {
+		return nil
+	}
+	if l.Longitude > 180 || l.Longitude < -180 {
+		return nil
+	}
+	return []float64{
+		float64(l.Longitude),
+		float64(l.Latitude),
+		float64(l.Altitude),
+	}
 }

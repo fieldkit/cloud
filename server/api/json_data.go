@@ -53,10 +53,19 @@ func JSONDataMetaModuleType(dm []*repositories.DataMetaModule) []*app.JSONDataMe
 		sensors := make([]*app.JSONDataMetaSensor, len(m.Sensors))
 
 		for j, s := range m.Sensors {
+			ranges := make([]*app.JSONDataMetaSensorRange, 0)
+			for _, r := range s.Ranges {
+				ranges = append(ranges, &app.JSONDataMetaSensorRange{
+					Minimum: r.Minimum,
+					Maximum: r.Maximum,
+				})
+			}
+
 			sensors[j] = &app.JSONDataMetaSensor{
-				Name:  s.Name,
-				Key:   s.Key,
-				Units: s.Units,
+				Name:          s.Name,
+				Key:           s.Key,
+				UnitOfMeasure: s.UnitOfMeasure,
+				Ranges:        ranges,
 			}
 		}
 

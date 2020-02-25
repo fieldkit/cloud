@@ -21,24 +21,6 @@ type Resampler struct {
 	bin          *ResamplingBin
 }
 
-type Resampled struct {
-	NumberOfSamples int32
-	MetaIDs         []int64
-	Time            time.Time
-	Location        []float64
-	D               map[string]interface{}
-}
-
-func (r *Resampled) ToDataRow() *DataRow {
-	return &DataRow{
-		ID:       0,
-		MetaIDs:  r.MetaIDs,
-		Time:     r.Time.Unix(),
-		Location: r.Location,
-		D:        r.D,
-	}
-}
-
 func NewResampler(summary *DataSummary, metaFactory *MetaFactory, opts *SummaryQueryOpts) (r *Resampler, err error) {
 	// Add to ensure final record ends up in the final bin. Not sure
 	// if there's a more elegant way. Millisecond is here because
@@ -118,7 +100,7 @@ func (r *Resampler) Close(ctx context.Context) (d *Resampled, err error) {
 		D:               data,
 	}
 
-	if true {
+	if false {
 		log.Infow("record", "bin", r.bin.Number, "records", len(records), "location", location, "data", data)
 	}
 
@@ -187,20 +169,23 @@ func getResampledLocation(records []*DataRow) []float64 {
 	return nil
 }
 
-type ResampleInfo struct {
-	NumberRecords int       `json:"number_records"`
-	IDs           []int64   `json:"ids"`
-	Start         time.Time `json:"start"`
-	End           time.Time `json:"end"`
+func shouldInclude(row *DataRow) bool {
+	return true
 }
 
 func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 	start := time.Time{}
 	end := time.Time{}
 	ids := make([]int64, 0)
+	filtered := make([]int64, 0)
 
 	all := make(map[string][]float64)
 	for _, r := range records {
+		if !shouldInclude(r) {
+			filtered = append(filtered, r.ID)
+			continue
+		}
+
 		for k, v := range r.D {
 			if all[k] == nil {
 				all[k] = make([]float64, 0, len(records))
@@ -231,10 +216,11 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 	}
 
 	d[ResampledKey] = ResampleInfo{
-		NumberRecords: len(records),
-		IDs:           ids,
-		Start:         start,
-		End:           end,
+		Size:     int32(len(records)),
+		IDs:      ids,
+		Filtered: filtered,
+		Start:    start,
+		End:      end,
 	}
 
 	return d, nil
@@ -243,4 +229,31 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 func timeInBetween(start, end time.Time) time.Time {
 	d := end.Sub(start).Nanoseconds()
 	return start.Add(time.Duration(d / 2))
+}
+
+type ResampleInfo struct {
+	Size     int32     `json:"size"`
+	IDs      []int64   `json:"ids"`
+	Filtered []int64   `json:"fids"`
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+}
+
+type Resampled struct {
+	NumberOfSamples int32
+	MetaIDs         []int64
+	Time            time.Time
+	Location        []float64
+	D               map[string]interface{}
+}
+
+func (r *Resampled) ToDataRow() *DataRow {
+	return &DataRow{
+		ID:       0,
+		MetaIDs:  r.MetaIDs,
+		Time:     r.Time.Unix(),
+		Location: r.Location,
+		D:        r.D,
+		Filtered: false,
+	}
 }

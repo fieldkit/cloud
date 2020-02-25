@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -16,87 +15,6 @@ func isInternalModule(m *pb.ModuleInfo) bool {
 		return true
 	}
 	return m.Name == "random" || m.Name == "diagnostics"
-}
-
-func getLocation(l *pb.DeviceLocation) []float64 {
-	if l == nil {
-		return nil
-	}
-	if l.Longitude > 180 || l.Longitude < -180 {
-		return nil
-	}
-	return []float64{
-		float64(l.Longitude),
-		float64(l.Latitude),
-		float64(l.Altitude),
-	}
-}
-
-type Version struct {
-	Meta *VersionMeta
-	Data []*DataRow
-}
-
-type VersionMeta struct {
-	ID      int64
-	Station *DataMetaStation
-}
-
-type DataMetaSensor struct {
-	Number   int
-	Name     string
-	Key      string
-	Units    string
-	Internal bool
-}
-
-type DataMetaModule struct {
-	Position     int
-	Address      int
-	Manufacturer int
-	Kind         int
-	Version      int
-	Name         string
-	ID           string
-	Sensors      []*DataMetaSensor
-	Internal     bool
-}
-
-type DataMetaStation struct {
-	ID         string
-	Name       string
-	Firmware   *DataMetaStationFirmware
-	Modules    []*DataMetaModule
-	AllModules []*DataMetaModule
-}
-
-type DataMetaStationFirmware struct {
-	Version   string
-	Build     string
-	Number    string
-	Timestamp uint64
-	Hash      string
-}
-
-type DataRow struct {
-	ID       int64
-	MetaIDs  []int64
-	Time     int64
-	Location []float64
-	D        map[string]interface{}
-}
-
-type DataSimpleStatistics struct {
-	Start               time.Time
-	End                 time.Time
-	NumberOfDataRecords int64
-	NumberOfMetaRecords int64
-}
-
-type ModulesAndData struct {
-	Modules    []*DataMetaModule
-	Data       []*DataRow
-	Statistics *DataSimpleStatistics
 }
 
 type VersionRepository struct {
