@@ -74,16 +74,16 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			return err
 		}
 
-		o.Metrics.IngestionDevice(headers.FkDeviceId)
+		o.Metrics.IngestionDevice(headers.FkDeviceID)
 
-		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks, "user_id", userID)
+		log.Infow("receiving", "device_id", headers.FkDeviceID, "blocks", headers.FkBlocks, "user_id", userID)
 
 		fileMeta := &files.FileMeta{
-			ContentType: headers.ContentType,
-			DeviceID:    headers.FkDeviceId,
-			Generation:  headers.FkGeneration,
-			Blocks:      headers.FkBlocks,
-			Flags:       headers.FkFlags,
+			ContentType:  headers.ContentType,
+			DeviceID:     headers.FkDeviceID,
+			GenerationID: headers.FkGenerationID,
+			Blocks:       headers.FkBlocks,
+			Flags:        headers.FkFlags,
 		}
 		saved, err := o.Files.Archive(ctx, fileMeta, req.Body)
 		if err != nil {
@@ -95,15 +95,15 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 
 		ingestion := &data.Ingestion{
-			URL:        saved.URL,
-			UploadID:   saved.ID,
-			UserID:     userID,
-			DeviceID:   headers.FkDeviceId,
-			Generation: headers.FkGeneration,
-			Type:       headers.FkType,
-			Size:       int64(saved.BytesRead),
-			Blocks:     data.Int64Range(headers.FkBlocks),
-			Flags:      pq.Int64Array([]int64{}),
+			URL:          saved.URL,
+			UploadID:     saved.ID,
+			UserID:       userID,
+			DeviceID:     headers.FkDeviceID,
+			GenerationID: headers.FkGenerationID,
+			Type:         headers.FkType,
+			Size:         int64(saved.BytesRead),
+			Blocks:       data.Int64Range(headers.FkBlocks),
+			Flags:        pq.Int64Array([]int64{}),
 		}
 
 		if err := o.Database.NamedGetContext(ctx, ingestion, `
@@ -124,8 +124,9 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		o.Metrics.Ingested(int(b), saved.BytesRead)
 
-		log.Infow("saved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
-			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation, "user_id", userID)
+		log.Infow("saved", "device_id", headers.FkDeviceID, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
+			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation_id", ingestion.GenerationID, "user_id", userID,
+			"device_name", headers.FkDeviceName)
 
 		w.WriteHeader(http.StatusOK)
 
@@ -152,8 +153,9 @@ type IncomingHeaders struct {
 	MediaTypeParams map[string]string
 	XForwardedFor   string
 	FkType          string
-	FkDeviceId      []byte
-	FkGeneration    []byte
+	FkDeviceID      []byte
+	FkGenerationID  []byte
+	FkDeviceName    string
 	FkBlocks        []int64
 	FkFlags         []int64
 }
@@ -175,13 +177,13 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("invalid %s (%v)", common.ContentLengthHeaderName, contentLength)
 	}
 
-	deviceIdRaw := req.Header.Get(common.FkDeviceIdHeaderName)
-	if len(deviceIdRaw) == 0 {
+	deviceIDRaw := req.Header.Get(common.FkDeviceIdHeaderName)
+	if len(deviceIDRaw) == 0 {
 		return nil, fmt.Errorf("invalid %s (no header)", common.FkDeviceIdHeaderName)
 	}
 
-	generationRaw := req.Header.Get(common.FkGenerationHeaderName)
-	if len(generationRaw) == 0 {
+	generationIDRaw := req.Header.Get(common.FkGenerationHeaderName)
+	if len(generationIDRaw) == 0 {
 		return nil, fmt.Errorf("invalid %s (no header)", common.FkGenerationHeaderName)
 	}
 
@@ -190,12 +192,12 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("invalid %s (no header)", common.FkTypeHeaderName)
 	}
 
-	deviceId, err := data.DecodeBinaryString(deviceIdRaw)
+	deviceID, err := data.DecodeBinaryString(deviceIDRaw)
 	if err != nil {
 		return nil, fmt.Errorf("invalid %s (%v)", common.FkDeviceIdHeaderName, err)
 	}
 
-	generation, err := data.DecodeBinaryString(generationRaw)
+	generationID, err := data.DecodeBinaryString(generationIDRaw)
 	if err != nil {
 		return nil, fmt.Errorf("invalid %s (%v)", common.FkGenerationHeaderName, err)
 	}
@@ -205,6 +207,8 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("invalid %s (%v)", common.FkBlocksIdHeaderName, err)
 	}
 
+	name := req.Header.Get(common.FkDeviceNameHeaderName)
+
 	headers := &IncomingHeaders{
 		ContentType:     contentType,
 		ContentLength:   int32(contentLength),
@@ -212,8 +216,9 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		MediaTypeParams: mediaTypeParams,
 		XForwardedFor:   req.Header.Get(common.XForwardedForHeaderName),
 		FkType:          typeRaw,
-		FkDeviceId:      deviceId,
-		FkGeneration:    generation,
+		FkDeviceID:      deviceID,
+		FkGenerationID:  generationID,
+		FkDeviceName:    name,
 		FkBlocks:        blocks,
 	}
 

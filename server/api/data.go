@@ -154,9 +154,9 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 }
 
 type ProvisionSummaryRow struct {
-	Generation []byte
-	Type       string
-	Blocks     data.Int64Range
+	GenerationID []byte
+	Type         string
+	Blocks       data.Int64Range
 }
 
 type BlocksSummaryRow struct {
@@ -198,11 +198,11 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 
 	var blockSummaries = make(map[string]map[string]BlocksSummaryRow)
 	for _, p := range provisions {
-		blockSummaries[hex.EncodeToString(p.Generation)] = make(map[string]BlocksSummaryRow)
+		blockSummaries[hex.EncodeToString(p.GenerationID)] = make(map[string]BlocksSummaryRow)
 	}
 
 	for _, row := range rows {
-		g := hex.EncodeToString(row.Generation)
+		g := hex.EncodeToString(row.GenerationID)
 		blockSummaries[g][row.Type] = BlocksSummaryRow{
 			Blocks: row.Blocks,
 		}
@@ -210,7 +210,7 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 
 	provisionVms := make([]*app.DeviceProvisionSummary, len(provisions))
 	for i, p := range provisions {
-		g := hex.EncodeToString(p.Generation)
+		g := hex.EncodeToString(p.GenerationID)
 		byType := blockSummaries[g]
 		provisionVms[i] = &app.DeviceProvisionSummary{
 			Generation: g,

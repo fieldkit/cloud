@@ -18,28 +18,28 @@ import (
 )
 
 type Ingestion struct {
-	ID         int64         `db:"id"`
-	Time       time.Time     `db:"time"`
-	UploadID   string        `db:"upload_id"`
-	UserID     int32         `db:"user_id"`
-	DeviceID   []byte        `db:"device_id"`
-	Generation []byte        `db:"generation"`
-	Size       int64         `db:"size"`
-	URL        string        `db:"url"`
-	Type       string        `db:"type"`
-	Blocks     Int64Range    `db:"blocks"`
-	Flags      pq.Int64Array `db:"flags"`
-	Completed  *time.Time    `db:"completed"`
-	Attempted  *time.Time    `db:"attempted"`
-	Errors     *bool         `db:"errors"`
+	ID           int64         `db:"id"`
+	Time         time.Time     `db:"time"`
+	UploadID     string        `db:"upload_id"`
+	UserID       int32         `db:"user_id"`
+	DeviceID     []byte        `db:"device_id"`
+	GenerationID []byte        `db:"generation"`
+	Size         int64         `db:"size"`
+	URL          string        `db:"url"`
+	Type         string        `db:"type"`
+	Blocks       Int64Range    `db:"blocks"`
+	Flags        pq.Int64Array `db:"flags"`
+	Completed    *time.Time    `db:"completed"`
+	Attempted    *time.Time    `db:"attempted"`
+	Errors       *bool         `db:"errors"`
 }
 
 type Provision struct {
-	ID         int64     `db:"id"`
-	Created    time.Time `db:"created"`
-	Updated    time.Time `db:"updated"`
-	DeviceID   []byte    `db:"device_id"`
-	Generation []byte    `db:"generation"`
+	ID           int64     `db:"id"`
+	Created      time.Time `db:"created"`
+	Updated      time.Time `db:"updated"`
+	DeviceID     []byte    `db:"device_id"`
+	GenerationID []byte    `db:"generation"`
 }
 
 type Int64Range []int64

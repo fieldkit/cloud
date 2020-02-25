@@ -37,7 +37,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.R
 
 	metadata := make(map[string]*string)
 	metadata[common.FkDeviceIdHeaderName] = aws.String(hex.EncodeToString(meta.DeviceID))
-	metadata[common.FkGenerationHeaderName] = aws.String(hex.EncodeToString(meta.Generation))
+	metadata[common.FkGenerationHeaderName] = aws.String(hex.EncodeToString(meta.GenerationID))
 	metadata[common.FkBlocksIdHeaderName] = aws.String(fmt.Sprintf("%v", meta.Blocks))
 	metadata[common.FkFlagsIdHeaderName] = aws.String(fmt.Sprintf("%v", meta.Flags))
 

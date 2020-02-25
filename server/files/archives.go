@@ -12,11 +12,11 @@ type ArchivedFile struct {
 }
 
 type FileMeta struct {
-	ContentType string
-	DeviceID    []byte
-	Generation  []byte
-	Blocks      []int64
-	Flags       []int64
+	ContentType  string
+	DeviceID     []byte
+	GenerationID []byte
+	Blocks       []int64
+	Flags        []int64
 }
 
 type FileArchive interface {

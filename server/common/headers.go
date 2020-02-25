@@ -12,6 +12,7 @@ const (
 	ContentLengthHeaderName    = "Content-Length"
 	XForwardedForHeaderName    = "X-Forwarded-For"
 	FkDeviceIdHeaderName       = "Fk-DeviceId"
+	FkDeviceNameHeaderName     = "Fk-DeviceName"
 	FkGenerationHeaderName     = "Fk-Generation"
 	FkBlocksIdHeaderName       = "Fk-Blocks"
 	FkFlagsIdHeaderName        = "Fk-Flags"
