@@ -63,6 +63,10 @@ func (m *Metrics) Ingested(blocks, bytes int) {
 	m.SC.Count("api.ingestion.bytes", bytes)
 }
 
+func (m *Metrics) DataErrorsParsing() {
+	m.SC.Increment("api.data.errors.parsing")
+}
+
 func (m *Metrics) DataErrorsMissingMeta() {
 	m.SC.Increment("api.data.errors.meta")
 }

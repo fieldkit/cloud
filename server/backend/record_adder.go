@@ -6,8 +6,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/conservify/sqlxcache"
 
 	"github.com/golang/protobuf/proto"
@@ -38,7 +36,7 @@ type ParsedRecord struct {
 	DataRecord   *pb.DataRecord
 }
 
-func (ra *RecordAdder) TryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.DataRecord) (err error) {
+func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.DataRecord) (err error) {
 	err = proto.Unmarshal(sr.Data, dataRecord)
 	if err == nil {
 		return nil
@@ -185,51 +183,50 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		if pr.DataRecord.Readings != nil {
-			location, err := ra.findLocation(pr.DataRecord)
-			if err != nil {
-				return nil, err
-			}
+		if pr.DataRecord.Readings == nil {
+			log.Infow("data reading missing readings", "record", pr.DataRecord)
+			ra.Metrics.DataErrorsUnknown()
+			return fmt.Errorf("weird record"), nil
+		}
 
-			meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
-			if err != nil {
-				return nil, err
-			}
-			if meta == nil {
-				log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta, "data_record", pr.DataRecord, "error", err)
-				ra.Metrics.DataErrorsMissingMeta()
-				return fmt.Errorf("error finding meta record"), nil
-			}
+		location, err := ra.findLocation(pr.DataRecord)
+		if err != nil {
+			return nil, err
+		}
 
-			dataTime := i.Time
-			if pr.DataRecord.Readings.Time > 0 {
-				dataTime = time.Unix(int64(pr.DataRecord.Readings.Time), 0)
-			}
+		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
+		if err != nil {
+			return nil, err
+		}
+		if meta == nil {
+			log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
+			ra.Metrics.DataErrorsMissingMeta()
+			return fmt.Errorf("error finding meta record"), nil
+		}
 
-			dataRecord := data.DataRecord{
-				ProvisionID: provision.ID,
-				Time:        dataTime,
-				Number:      int64(pr.DataRecord.Readings.Reading),
-				Meta:        meta.ID,
-				Location:    location,
-			}
+		dataTime := i.Time
+		if pr.DataRecord.Readings.Time > 0 {
+			dataTime = time.Unix(int64(pr.DataRecord.Readings.Time), 0)
+		}
 
-			if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
-				spew.Dump(pr.DataRecord.Readings)
-				return nil, fmt.Errorf("error setting data json: %v", err)
-			}
+		dataRecord := data.DataRecord{
+			ProvisionID: provision.ID,
+			Time:        dataTime,
+			Number:      int64(pr.DataRecord.Readings.Reading),
+			Meta:        meta.ID,
+			Location:    location,
+		}
 
-			if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
+		if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
+			return nil, fmt.Errorf("error setting data json: %v", err)
+		}
+
+		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
 			    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
 			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
 			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
 			    RETURNING id`, dataRecord); err != nil {
-				return nil, err
-			}
-		} else {
-			log.Infow("weird", "record", pr.DataRecord)
-			ra.Metrics.DataErrorsUnknown()
-			return fmt.Errorf("weird record"), nil
+			return nil, err
 		}
 	}
 
@@ -266,6 +263,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 			err := proto.Unmarshal(b, &dataRecord)
 			if err != nil {
 				if data { // If we expected this record, return the error
+					ra.Metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing data record: %v", err)
 				}
 				unmarshalError = err
@@ -292,13 +290,15 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 			err := proto.Unmarshal(b, &signedRecord)
 			if err != nil {
 				if meta { // If we expected this record, return the error
+					ra.Metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
 				unmarshalError = err
 			} else {
 				meta = true
-				err := ra.TryParseSignedRecord(&signedRecord, &dataRecord)
+				err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
+					ra.Metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
 				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
@@ -331,7 +331,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
-	log.Infow("processing done", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
+	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
