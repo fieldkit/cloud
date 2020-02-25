@@ -63,6 +63,14 @@ func (m *Metrics) Ingested(blocks, bytes int) {
 	m.SC.Count("api.ingestion.bytes", bytes)
 }
 
+func (m *Metrics) DataErrorsMissingMeta() {
+	m.SC.Increment("api.data.errors.meta")
+}
+
+func (m *Metrics) DataErrorsUnknown() {
+	m.SC.Increment("api.data.errors.unknown")
+}
+
 func (m *Metrics) IngestionDevice(id []byte) {
 	m.SC.Unique("api.ingestion.devices", hex.EncodeToString(id))
 }

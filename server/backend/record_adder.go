@@ -16,17 +16,20 @@ import (
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type RecordAdder struct {
 	Database *sqlxcache.DB
 	Files    files.FileArchive
+	Metrics  *logging.Metrics
 }
 
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) (ra *RecordAdder) {
 	return &RecordAdder{
 		Database: db,
 		Files:    files,
+		Metrics:  metrics,
 	}
 }
 
@@ -194,6 +197,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			}
 			if meta == nil {
 				log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta, "data_record", pr.DataRecord, "error", err)
+				ra.Metrics.DataErrorsMissingMeta()
 				return fmt.Errorf("error finding meta record"), nil
 			}
 
@@ -224,6 +228,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			}
 		} else {
 			log.Infow("weird", "record", pr.DataRecord)
+			ra.Metrics.DataErrorsUnknown()
 			return fmt.Errorf("weird record"), nil
 		}
 	}

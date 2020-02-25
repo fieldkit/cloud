@@ -9,11 +9,13 @@ import (
 	"github.com/fieldkit/cloud/server/messages"
 
 	"github.com/fieldkit/cloud/server/files"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type IngestionReceivedHandler struct {
 	Database *sqlxcache.DB
 	Files    files.FileArchive
+	Metrics  *logging.Metrics
 }
 
 func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
@@ -31,7 +33,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return err
 	}
 
-	recordAdder := NewRecordAdder(h.Database, h.Files)
+	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics)
 
 	log.Infow("pending", "ingestion_id", i.ID, "file_id", i.UploadID, "file_url", i.URL, "blocks", i.Blocks, "user_id", i.UserID)
 

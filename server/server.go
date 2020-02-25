@@ -149,9 +149,15 @@ func main() {
 		panic(err)
 	}
 
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+		Prefix:  "fk.service",
+		Address: config.StatsdAddress,
+	})
+
 	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
 		Database: database,
 		Files:    files,
+		Metrics:  metrics,
 	}
 
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
@@ -184,11 +190,6 @@ func main() {
 		Emailer:    config.Emailer,
 		Domain:     config.Domain,
 	}
-
-	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
-		Prefix:  "fk.service",
-		Address: config.StatsdAddress,
-	})
 
 	err = jq.Listen(ctx, 1)
 	if err != nil {
