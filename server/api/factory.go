@@ -38,8 +38,6 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	app.MountDeviceController(service, NewDeviceController(service, controllerOptions))
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountSourceTokenController(service, NewSourceTokenController(service, controllerOptions))
-	app.MountGeoJSONController(service, NewGeoJSONController(service, controllerOptions))
-	app.MountExportController(service, NewExportController(service, controllerOptions))
 	app.MountQueryController(service, NewQueryController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
 	app.MountStationController(service, NewStationController(service, controllerOptions))

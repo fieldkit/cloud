@@ -259,7 +259,7 @@ func (b *Backend) GetUserLatestCenterOfActivity(ctx context.Context, userID int6
 	if err := b.db.SelectContext(ctx, &activities, `
 	      SELECT * FROM (
 		  SELECT source_id, end_time AS time, ST_AsBinary(centroid) AS centroid FROM fieldkit.sources_temporal_clusters UNION
-		  SELECT source_id, end_time AS time, ST_AsBinary(centroid) AS centroid FROM fieldkit.sources_spatial_clusters 
+		  SELECT source_id, end_time AS time, ST_AsBinary(centroid) AS centroid FROM fieldkit.sources_spatial_clusters
 	      ) AS q WHERE
 	      q.source_id IN (
 		  SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = $1
@@ -504,55 +504,6 @@ func (b *Backend) SetSchemaID(ctx context.Context, schema *data.Schema) (int32, 
 	}
 
 	return schemaID, nil
-}
-
-const DefaultPageSize = 100
-
-func (b *Backend) ListRecordsBySource(ctx context.Context, sourceID int, descending, includeInvisible bool, token *PagingToken) (*data.AnalysedRecordsPage, *PagingToken, error) {
-	if token == nil {
-		after := time.Now().AddDate(-10, 0, 0)
-		token = &PagingToken{
-			time: after.UnixNano(),
-			page: 0,
-		}
-	}
-
-	after := time.Unix(0, token.time)
-	pageSize := int32(DefaultPageSize)
-	before := time.Now()
-	records := []*data.AnalysedRecord{}
-	order := "ASC"
-	if descending {
-		order = "DESC"
-	}
-	if err := b.db.SelectContext(ctx, &records, fmt.Sprintf(`
-		SELECT d.id, d.schema_id, d.source_id, d.team_id, d.user_id, d.timestamp, ST_AsBinary(d.location) AS location, d.data, d.visible, d.fixed,
-		       COALESCE(ra.record_id, 0) AS record_id, COALESCE(ra.outlier, false) AS outlier, COALESCE(ra.manually_excluded, false) AS manually_excluded
-			FROM fieldkit.record AS d
-				JOIN fieldkit.source AS i ON i.id = d.source_id
-				JOIN fieldkit.expedition AS e ON e.id = i.expedition_id
-				JOIN fieldkit.project AS p ON p.id = e.project_id
-                                LEFT JOIN fieldkit.record_analysis AS ra ON ra.record_id = d.id
-			WHERE
-				(d.visible OR $6) AND i.id = $1 AND d.insertion < $2 AND (insertion >= $3) AND
-				ST_X(d.location) != 0 AND ST_Y(d.location) != 0
-                        ORDER BY timestamp %s
-                        LIMIT $4 OFFSET $5
-		`, order), sourceID, before, after, pageSize, token.page*pageSize, includeInvisible); err != nil {
-		return nil, nil, err
-	}
-
-	nextToken := &PagingToken{}
-	if int32(len(records)) < pageSize {
-		nextToken.time = before.UnixNano()
-	} else {
-		nextToken.time = token.time
-		nextToken.page = token.page + 1
-	}
-
-	return &data.AnalysedRecordsPage{
-		Records: records,
-	}, nextToken, nil
 }
 
 type ReadingSummary struct {

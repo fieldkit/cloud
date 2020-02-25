@@ -19,7 +19,7 @@ type IngestionReceivedHandler struct {
 func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("processing", "ingestion_id", m.ID, "time", m.Time, "ingestion_url", m.URL, "user_id", m.UserID)
+	log.Infow("processing", "ingestion_id", m.ID, "time", m.Time, "ingestion_url", m.URL)
 
 	ir, err := repositories.NewIngestionRepository(h.Database)
 	if err != nil {
@@ -33,7 +33,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	recordAdder := NewRecordAdder(h.Database, h.Files)
 
-	log.Infow("pending", "ingestion_id", i.ID, "file_id", i.UploadID, "file_url", i.URL, "blocks", i.Blocks)
+	log.Infow("pending", "ingestion_id", i.ID, "file_id", i.UploadID, "file_url", i.URL, "blocks", i.Blocks, "user_id", i.UserID)
 
 	err = recordAdder.WriteRecords(ctx, i)
 	if err != nil {
