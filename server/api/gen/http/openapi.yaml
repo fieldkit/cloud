@@ -23,6 +23,18 @@ paths:
           description: No Content response.
       schemes:
       - http
+  /modules/meta:
+    get:
+      tags:
+      - modules
+      summary: meta modules
+      operationId: modules#meta
+      responses:
+        "200":
+          description: OK response.
+          schema: {}
+      schemes:
+      - http
   /tasks/five:
     get:
       tags:
