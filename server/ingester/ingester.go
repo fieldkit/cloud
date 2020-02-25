@@ -116,9 +116,9 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 				b := ingestion.Blocks[1] - ingestion.Blocks[0]
 				o.Metrics.Ingested(int(b), saved.BytesRead)
 
-				log.Infow("saved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
+				log.Infow("saved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
 			} else {
-				log.Infow("unsaved", "device_id", headers.FkDeviceId, "stream_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
+				log.Infow("unsaved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
 			}
 
 			// TODO Give information.

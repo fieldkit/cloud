@@ -21,6 +21,6 @@ type FileMeta struct {
 
 type FileArchive interface {
 	Archive(ctx context.Context, meta *FileMeta, read io.Reader) (*ArchivedFile, error)
-	OpenByKey(ctx context.Context, key string) (io.Reader, error)
-	OpenByURL(ctx context.Context, url string) (io.Reader, error)
+	OpenByKey(ctx context.Context, key string) (io.ReadCloser, error)
+	OpenByURL(ctx context.Context, url string) (io.ReadCloser, error)
 }

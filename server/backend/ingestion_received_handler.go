@@ -5,21 +5,21 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/messages"
+
+	"github.com/fieldkit/cloud/server/files"
 )
 
 type IngestionReceivedHandler struct {
-	Session  *session.Session
 	Database *sqlxcache.DB
+	Files    files.FileArchive
 }
 
 func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("ingestion received", "ingestion_id", m.ID, "time", m.Time, "ingestion_url", m.URL)
+	log.Infow("processing", "ingestion_id", m.ID, "time", m.Time, "ingestion_url", m.URL)
 
 	ir, err := repositories.NewIngestionRepository(h.Database)
 	if err != nil {
@@ -31,9 +31,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return err
 	}
 
-	recordAdder := NewRecordAdder(h.Session, h.Database)
+	recordAdder := NewRecordAdder(h.Database, h.Files)
 
-	log.Infow("pending", "ingestion", i)
+	log.Infow("pending", "ingestion_id", i.ID, "file_id", i.UploadID, "file_url", i.URL, "blocks", i.Blocks)
 
 	err = recordAdder.WriteRecords(ctx, i)
 	if err != nil {
@@ -48,8 +48,6 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 			return err
 		}
 	}
-
-	log.Infow("done", "elapsed", 0)
 
 	return nil
 }

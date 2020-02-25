@@ -22,6 +22,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/health"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
@@ -150,6 +151,11 @@ func main() {
 		panic(err)
 	}
 
+	files, err := createFileArchive(ctx, awsSession, config)
+	if err != nil {
+		panic(err)
+	}
+
 	sourceModifiedHandler := &backend.SourceModifiedHandler{
 		Backend:       be,
 		Publisher:     jq,
@@ -162,7 +168,7 @@ func main() {
 
 	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
 		Database: database,
-		Session:  awsSession,
+		Files:    files,
 	}
 
 	jq.Register(messages.SourceChange{}, sourceModifiedHandler)
@@ -323,6 +329,17 @@ func main() {
 
 	if err := server.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
+	}
+}
+
+func createFileArchive(ctx context.Context, awsSession *session.Session, config Config) (archiver files.FileArchive, err error) {
+	switch config.Archiver {
+	case "default":
+		return files.NewLocalFilesArchive(), nil
+	case "aws":
+		return files.NewS3FileArchive(awsSession, config.BucketName), nil
+	default:
+		panic("unknown archiver: " + config.Archiver)
 	}
 }
 

@@ -14,10 +14,10 @@ func (a *DevNullFileArchive) Archive(ctx context.Context, meta *FileMeta, reader
 	return nil, nil
 }
 
-func (a *DevNullFileArchive) OpenByKey(ctx context.Context, key string) (io.Reader, error) {
+func (a *DevNullFileArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
 	return nil, nil
 }
 
-func (a *DevNullFileArchive) OpenByURL(ctx context.Context, url string) (io.Reader, error) {
+func (a *DevNullFileArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
 	return nil, nil
 }

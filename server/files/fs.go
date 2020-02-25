@@ -24,7 +24,7 @@ func NewLocalFilesArchive() (a *LocalFilesArchive) {
 func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 
-	countingReader := newCountingReader(reader)
+	cr := newCountingReader(reader)
 
 	id := uuid.Must(uuid.NewRandom())
 
@@ -44,23 +44,27 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader 
 
 	defer file.Close()
 
-	io.Copy(file, countingReader)
+	io.Copy(file, cr)
 
 	ss := &ArchivedFile{
 		ID:        id.String(),
 		URL:       fn,
-		BytesRead: countingReader.bytesRead,
+		BytesRead: cr.bytesRead,
 	}
 
 	return ss, nil
 
 }
 
-func (a *LocalFilesArchive) OpenByKey(ctx context.Context, key string) (io.Reader, error) {
+func (a *LocalFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
 	return a.OpenByURL(ctx, makeFileName(key))
 }
 
-func (a *LocalFilesArchive) OpenByURL(ctx context.Context, url string) (io.Reader, error) {
+func (a *LocalFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("opening", "url", url)
+
 	return os.Open(url)
 }
 

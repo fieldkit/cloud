@@ -10,27 +10,23 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-
 	"github.com/golang/protobuf/proto"
 
 	pb "github.com/fieldkit/data-protocol"
 
-	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/files"
 )
 
 type RecordAdder struct {
-	Session  *session.Session
 	Database *sqlxcache.DB
+	Files    files.FileArchive
 }
 
-func NewRecordAdder(s *session.Session, db *sqlxcache.DB) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive) (ra *RecordAdder) {
 	return &RecordAdder{
-		Session:  s,
 		Database: db,
+		Files:    files,
 	}
 }
 
@@ -238,26 +234,14 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
 	log := Logger(ctx).Sugar()
 
-	svc := s3.New(ra.Session)
-
-	object, err := common.GetBucketAndKey(i.URL)
-	if err != nil {
-		return fmt.Errorf("error parsing URL: %v", err)
-	}
-
 	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "stream_id", i.UploadID, "file_size", i.Size, "blocks", i.Blocks, "device_id", i.DeviceID, "user_id", i.UserID, "type", i.Type)
 
-	goi := &s3.GetObjectInput{
-		Bucket: aws.String(object.Bucket),
-		Key:    aws.String(object.Key),
-	}
-
-	obj, err := svc.GetObject(goi)
+	reader, err := ra.Files.OpenByURL(ctx, i.URL)
 	if err != nil {
-		return fmt.Errorf("error reading object %v: %v", object.Key, err)
+		return err
 	}
 
-	defer obj.Body.Close()
+	defer reader.Close()
 
 	meta := false
 	data := false
@@ -340,7 +324,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 		return nil, nil
 	})
 
-	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, obj.Body, unmarshalFunc)
+	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
 	log.Infow("processing done", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
 
