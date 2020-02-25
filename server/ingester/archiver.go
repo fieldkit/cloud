@@ -64,7 +64,13 @@ func (a *FileStreamArchiver) Archive(ctx context.Context, headers *IncomingHeade
 
 	id := uuid.Must(uuid.NewRandom())
 
-	fn := fmt.Sprintf("%v.fkpb", id)
+	path := "./ingestions"
+	err := os.MkdirAll(path, 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	fn := fmt.Sprintf("%s/%v.fkpb", path, id)
 
 	log.Infow("archiving", "content_type", headers.ContentType, "file_name", fn)
 
