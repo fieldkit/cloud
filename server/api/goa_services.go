@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"os"
 
+	jwt "github.com/dgrijalva/jwt-go"
+	"goa.design/goa/v3/security"
+
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
@@ -79,4 +82,40 @@ func errorHandler() func(context.Context, http.ResponseWriter, error) {
 		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
 		log.Errorw("fatal", "id", id, "message", err.Error())
 	}
+}
+
+type AuthAttempt struct {
+	Token         string
+	Scheme        *security.JWTScheme
+	Key           []byte
+	InvalidToken  error
+	InvalidScopes error
+}
+
+func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+	claims := make(jwt.MapClaims)
+	_, err := jwt.ParseWithClaims(a.Token, claims, func(t *jwt.Token) (interface{}, error) {
+		return a.Key, nil
+	})
+	if err != nil {
+		return ctx, ErrInvalidToken
+	}
+
+	if claims["scopes"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopes, ok := claims["scopes"].([]interface{})
+	if !ok {
+		return ctx, ErrInvalidTokenScopes
+	}
+
+	scopesInToken := make([]string, len(scopes))
+	for _, scp := range scopes {
+		scopesInToken = append(scopesInToken, scp.(string))
+	}
+	if err := a.Scheme.Validate(scopesInToken); err != nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+
+	return ctx, nil
 }
