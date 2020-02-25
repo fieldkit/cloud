@@ -94,49 +94,6 @@ func (mt ClusterGeometrySummaryCollection) Validate() (err error) {
 	return
 }
 
-// DeviceSummary media type (default view)
-//
-// Identifier: application/vnd.app.device+json; view=default
-type DeviceSummary struct {
-	DataSize      int                `form:"data_size" json:"data_size" yaml:"data_size" xml:"data_size"`
-	DeviceID      string             `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
-	LastFileID    string             `form:"last_file_id" json:"last_file_id" yaml:"last_file_id" xml:"last_file_id"`
-	LastFileTime  time.Time          `form:"last_file_time" json:"last_file_time" yaml:"last_file_time" xml:"last_file_time"`
-	Locations     *LocationHistory   `form:"locations" json:"locations" yaml:"locations" xml:"locations"`
-	LogsSize      int                `form:"logs_size" json:"logs_size" yaml:"logs_size" xml:"logs_size"`
-	Name          *string            `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	NumberOfFiles int                `form:"number_of_files" json:"number_of_files" yaml:"number_of_files" xml:"number_of_files"`
-	Urls          *DeviceSummaryUrls `form:"urls" json:"urls" yaml:"urls" xml:"urls"`
-}
-
-// Validate validates the DeviceSummary media type instance.
-func (mt *DeviceSummary) Validate() (err error) {
-	if mt.DeviceID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
-	}
-
-	if mt.LastFileID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "last_file_id"))
-	}
-	if mt.Urls == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
-	}
-	if mt.Locations == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "locations"))
-	}
-	if mt.Locations != nil {
-		if err2 := mt.Locations.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if mt.Urls != nil {
-		if err2 := mt.Urls.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
 // DeviceDataRecordsResponse media type (default view)
 //
 // Identifier: application/vnd.app.device.data+json; view=default
@@ -215,130 +172,6 @@ type DeviceDataSummary struct {
 // Validate validates the DeviceDataSummary media type instance.
 func (mt *DeviceDataSummary) Validate() (err error) {
 
-	return
-}
-
-// DeviceDetails media type (default view)
-//
-// Identifier: application/vnd.app.device.details+json; view=default
-type DeviceDetails struct {
-	DeviceID string                     `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
-	Files    *ConcatenatedFilesInfo     `form:"files" json:"files" yaml:"files" xml:"files"`
-	Notes    DeviceNotesEntryCollection `form:"notes,omitempty" json:"notes,omitempty" yaml:"notes,omitempty" xml:"notes,omitempty"`
-	Urls     *DeviceSummaryUrls         `form:"urls" json:"urls" yaml:"urls" xml:"urls"`
-}
-
-// Validate validates the DeviceDetails media type instance.
-func (mt *DeviceDetails) Validate() (err error) {
-	if mt.DeviceID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
-	}
-	if mt.Files == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
-	}
-	if mt.Urls == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
-	}
-	if mt.Files != nil {
-		if err2 := mt.Files.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if mt.Urls != nil {
-		if err2 := mt.Urls.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// DeviceFile media type (default view)
-//
-// Identifier: application/vnd.app.device.file+json; view=default
-type DeviceFile struct {
-	Corrupted    bool            `form:"corrupted" json:"corrupted" yaml:"corrupted" xml:"corrupted"`
-	DeviceID     string          `form:"device_id" json:"device_id" yaml:"device_id" xml:"device_id"`
-	FileID       string          `form:"file_id" json:"file_id" yaml:"file_id" xml:"file_id"`
-	FileTypeID   string          `form:"file_type_id" json:"file_type_id" yaml:"file_type_id" xml:"file_type_id"`
-	FileTypeName string          `form:"file_type_name" json:"file_type_name" yaml:"file_type_name" xml:"file_type_name"`
-	Firmware     string          `form:"firmware" json:"firmware" yaml:"firmware" xml:"firmware"`
-	ID           int             `form:"id" json:"id" yaml:"id" xml:"id"`
-	Meta         string          `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
-	Size         int             `form:"size" json:"size" yaml:"size" xml:"size"`
-	Time         time.Time       `form:"time" json:"time" yaml:"time" xml:"time"`
-	URL          string          `form:"url" json:"url" yaml:"url" xml:"url"`
-	Urls         *DeviceFileUrls `form:"urls" json:"urls" yaml:"urls" xml:"urls"`
-}
-
-// Validate validates the DeviceFile media type instance.
-func (mt *DeviceFile) Validate() (err error) {
-
-	if mt.FileID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_id"))
-	}
-	if mt.DeviceID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
-	}
-	if mt.Firmware == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "firmware"))
-	}
-	if mt.Meta == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
-	}
-	if mt.FileTypeID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_type_id"))
-	}
-	if mt.FileTypeName == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "file_type_name"))
-	}
-
-	if mt.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
-	}
-	if mt.Urls == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
-	}
-
-	if mt.Urls != nil {
-		if err2 := mt.Urls.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// DeviceFileCollection is the media type for an array of DeviceFile (default view)
-//
-// Identifier: application/vnd.app.device.file+json; type=collection; view=default
-type DeviceFileCollection []*DeviceFile
-
-// Validate validates the DeviceFileCollection media type instance.
-func (mt DeviceFileCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DeviceFiles media type (default view)
-//
-// Identifier: application/vnd.app.device.files+json; view=default
-type DeviceFiles struct {
-	Files DeviceFileCollection `form:"files" json:"files" yaml:"files" xml:"files"`
-}
-
-// Validate validates the DeviceFiles media type instance.
-func (mt *DeviceFiles) Validate() (err error) {
-	if mt.Files == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
-	}
-	if err2 := mt.Files.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
 	return
 }
 
@@ -452,20 +285,6 @@ func (mt *DeviceMetaSummary) Validate() (err error) {
 	return
 }
 
-// DeviceNotesEntry media type (default view)
-//
-// Identifier: application/vnd.app.device.notes+json; view=default
-type DeviceNotesEntry struct {
-	Name  *string   `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	Notes *string   `form:"notes,omitempty" json:"notes,omitempty" yaml:"notes,omitempty" xml:"notes,omitempty"`
-	Time  time.Time `form:"time" json:"time" yaml:"time" xml:"time"`
-}
-
-// DeviceNotesEntryCollection is the media type for an array of DeviceNotesEntry (default view)
-//
-// Identifier: application/vnd.app.device.notes+json; type=collection; view=default
-type DeviceNotesEntryCollection []*DeviceNotesEntry
-
 // DeviceProvisionSummary media type (default view)
 //
 // Identifier: application/vnd.app.device.provision.summary+json; view=default
@@ -523,23 +342,6 @@ func (mt *DeviceDataSummaryResponse) Validate() (err error) {
 	}
 	if err2 := mt.Provisions.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
-// DeviceSummaryCollection is the media type for an array of DeviceSummary (default view)
-//
-// Identifier: application/vnd.app.device+json; type=collection; view=default
-type DeviceSummaryCollection []*DeviceSummary
-
-// Validate validates the DeviceSummaryCollection media type instance.
-func (mt DeviceSummaryCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
 	}
 	return
 }
@@ -706,24 +508,6 @@ func (mt *DeviceSources) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "deviceSources"))
 	}
 	if err2 := mt.DeviceSources.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
-// Devices media type (default view)
-//
-// Identifier: application/vnd.app.devices+json; view=default
-type Devices struct {
-	Devices DeviceSummaryCollection `form:"devices" json:"devices" yaml:"devices" xml:"devices"`
-}
-
-// Validate validates the Devices media type instance.
-func (mt *Devices) Validate() (err error) {
-	if mt.Devices == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "devices"))
-	}
-	if err2 := mt.Devices.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
 	return
@@ -931,13 +715,6 @@ func (mt *FieldNotes) Validate() (err error) {
 		err = goa.MergeErrors(err, err2)
 	}
 	return
-}
-
-// FilesStatus media type (default view)
-//
-// Identifier: application/vnd.app.files.status+json; view=default
-type FilesStatus struct {
-	Queued int `form:"queued" json:"queued" yaml:"queued" xml:"queued"`
 }
 
 // FirmwareSummary media type (default view)
@@ -1178,59 +955,6 @@ func (mt *Location) Validate() (err error) {
 	}
 	if err2 := goa.ValidateFormat(goa.FormatURI, mt.Location); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.location`, mt.Location, goa.FormatURI, err2))
-	}
-	return
-}
-
-// LocationEntry media type (default view)
-//
-// Identifier: application/vnd.app.location.entry+json; view=default
-type LocationEntry struct {
-	Coordinates []float64 `form:"coordinates" json:"coordinates" yaml:"coordinates" xml:"coordinates"`
-	Places      *string   `form:"places,omitempty" json:"places,omitempty" yaml:"places,omitempty" xml:"places,omitempty"`
-	Time        time.Time `form:"time" json:"time" yaml:"time" xml:"time"`
-}
-
-// Validate validates the LocationEntry media type instance.
-func (mt *LocationEntry) Validate() (err error) {
-
-	if mt.Coordinates == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "coordinates"))
-	}
-	return
-}
-
-// LocationEntryCollection is the media type for an array of LocationEntry (default view)
-//
-// Identifier: application/vnd.app.location.entry+json; type=collection; view=default
-type LocationEntryCollection []*LocationEntry
-
-// Validate validates the LocationEntryCollection media type instance.
-func (mt LocationEntryCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// LocationHistory media type (default view)
-//
-// Identifier: application/vnd.app.location.history+json; view=default
-type LocationHistory struct {
-	Entries LocationEntryCollection `form:"entries" json:"entries" yaml:"entries" xml:"entries"`
-}
-
-// Validate validates the LocationHistory media type instance.
-func (mt *LocationHistory) Validate() (err error) {
-	if mt.Entries == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "entries"))
-	}
-	if err2 := mt.Entries.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
 	}
 	return
 }
@@ -1538,30 +1262,6 @@ func (mt SeriesDataCollection) Validate() (err error) {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
-		}
-	}
-	return
-}
-
-// MySimpleSummary media type (default view)
-//
-// Identifier: application/vnd.app.simple_summary+json; view=default
-type MySimpleSummary struct {
-	Center []float64   `form:"center" json:"center" yaml:"center" xml:"center"`
-	Urls   *MyDataUrls `form:"urls" json:"urls" yaml:"urls" xml:"urls"`
-}
-
-// Validate validates the MySimpleSummary media type instance.
-func (mt *MySimpleSummary) Validate() (err error) {
-	if mt.Urls == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "urls"))
-	}
-	if mt.Center == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "center"))
-	}
-	if mt.Urls != nil {
-		if err2 := mt.Urls.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return

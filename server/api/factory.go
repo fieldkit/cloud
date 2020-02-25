@@ -48,10 +48,6 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))
 	app.MountJSONDataController(service, NewJSONDataController(ctx, service, controllerOptions))
 	app.MountRecordsController(service, NewRecordsController(ctx, service, controllerOptions))
-	app.MountFilesController(service, NewFilesController(ctx, service, controllerOptions))
-	app.MountDeviceLogsController(service, NewDeviceLogsController(ctx, service, controllerOptions))
-	app.MountDeviceDataController(service, NewDeviceDataController(ctx, service, controllerOptions))
-	app.MountSimpleController(service, NewSimpleController(ctx, service, controllerOptions))
 
 	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
 		next.ServeHTTP(rw, req)

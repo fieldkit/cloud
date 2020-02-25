@@ -144,26 +144,9 @@ func main() {
 		panic(err)
 	}
 
-	publisher := backend.NewJobQueuePublisher(jq)
-
-	cw, err := backend.NewConcatenationWorkers(ctx, awsSession, database, publisher)
-	if err != nil {
-		panic(err)
-	}
-
 	files, err := createFileArchive(ctx, awsSession, config)
 	if err != nil {
 		panic(err)
-	}
-
-	sourceModifiedHandler := &backend.SourceModifiedHandler{
-		Backend:       be,
-		Publisher:     jq,
-		ConcatWorkers: cw,
-	}
-
-	concatenationDoneHandler := &backend.ConcatenationDoneHandler{
-		Backend: be,
 	}
 
 	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
@@ -171,19 +154,7 @@ func main() {
 		Files:    files,
 	}
 
-	jq.Register(messages.SourceChange{}, sourceModifiedHandler)
-	jq.Register(messages.ConcatenationDone{}, concatenationDoneHandler)
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
-
-	archiver, err := createArchiver(ctx, awsSession, config)
-	if err != nil {
-		panic(err)
-	}
-
-	oldIngester, err := backend.NewStreamIngester(be, archiver, publisher)
-	if err != nil {
-		panic(err)
-	}
 
 	ingesterConfig := getIngesterConfig()
 
@@ -224,7 +195,7 @@ func main() {
 		panic(err)
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, awsSession, oldIngester, publisher.JobQueue, cw, apiConfig, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, awsSession, apiConfig, metrics)
 	if err != nil {
 		panic(err)
 	}
@@ -270,11 +241,7 @@ func main() {
 	}
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/messages/ingestion" {
-			oldIngester.ServeHTTP(w, req)
-		} else if req.URL.Path == "/messages/ingestion/stream" {
-			oldIngester.ServeHTTP(w, req)
-		} else if req.URL.Path == "/ingestion" {
+		if req.URL.Path == "/ingestion" {
 			ingesterHandler.ServeHTTP(w, req)
 		} else {
 			service.Mux.ServeHTTP(w, req)
@@ -341,23 +308,6 @@ func createFileArchive(ctx context.Context, awsSession *session.Session, config 
 	default:
 		panic("unknown archiver: " + config.Archiver)
 	}
-}
-
-func createArchiver(ctx context.Context, awsSession *session.Session, config Config) (archiver backend.StreamArchiver, err error) {
-	log := logging.Logger(ctx).Sugar()
-
-	switch config.Archiver {
-	case "default":
-		archiver = &backend.FileStreamArchiver{}
-	case "aws":
-		archiver = backend.NewS3StreamArchiver(awsSession, config.BucketName)
-	default:
-		panic("unknown archiver: " + config.Archiver)
-	}
-
-	log.Infow("configuration", "archiver", config.Archiver)
-
-	return
 }
 
 func getIngesterConfig() *ingester.Config {

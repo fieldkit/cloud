@@ -1410,112 +1410,6 @@ func (ctx *UpdateSchemaDeviceContext) BadRequest() error {
 	return nil
 }
 
-// AllDeviceDataContext provides the device_data all action context.
-type AllDeviceDataContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-}
-
-// NewAllDeviceDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the device_data controller all action.
-func NewAllDeviceDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*AllDeviceDataContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AllDeviceDataContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AllDeviceDataContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// Found sends a HTTP response with status code 302.
-func (ctx *AllDeviceDataContext) Found() error {
-	ctx.ResponseData.WriteHeader(302)
-	return nil
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *AllDeviceDataContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// Busy sends a HTTP response with status code 503.
-func (ctx *AllDeviceDataContext) Busy() error {
-	ctx.ResponseData.WriteHeader(503)
-	return nil
-}
-
-// AllDeviceLogsContext provides the device_logs all action context.
-type AllDeviceLogsContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-}
-
-// NewAllDeviceLogsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the device_logs controller all action.
-func NewAllDeviceLogsContext(ctx context.Context, r *http.Request, service *goa.Service) (*AllDeviceLogsContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AllDeviceLogsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AllDeviceLogsContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// Found sends a HTTP response with status code 302.
-func (ctx *AllDeviceLogsContext) Found() error {
-	ctx.ResponseData.WriteHeader(302)
-	return nil
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *AllDeviceLogsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// Busy sends a HTTP response with status code 503.
-func (ctx *AllDeviceLogsContext) Busy() error {
-	ctx.ResponseData.WriteHeader(503)
-	return nil
-}
-
 // AddExpeditionContext provides the expedition add action context.
 type AddExpeditionContext struct {
 	context.Context
@@ -2108,431 +2002,6 @@ func (ctx *UpdateFieldNoteContext) BadRequest() error {
 	return nil
 }
 
-// CsvFilesContext provides the files csv action context.
-type CsvFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Dl     bool
-	FileID string
-}
-
-// NewCsvFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller csv action.
-func NewCsvFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*CsvFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := CsvFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDl := req.Params["dl"]
-	if len(paramDl) == 0 {
-		rctx.Dl = true
-	} else {
-		rawDl := paramDl[0]
-		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
-			rctx.Dl = dl
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
-		}
-	}
-	paramFileID := req.Params["fileId"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = rawFileID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *CsvFilesContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *CsvFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// DeviceInfoFilesContext provides the files device info action context.
-type DeviceInfoFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-}
-
-// NewDeviceInfoFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller device info action.
-func NewDeviceInfoFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeviceInfoFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := DeviceInfoFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *DeviceInfoFilesContext) OK(r *DeviceDetails) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.details+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *DeviceInfoFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// FileFilesContext provides the files file action context.
-type FileFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	FileID string
-}
-
-// NewFileFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller file action.
-func NewFileFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*FileFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := FileFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramFileID := req.Params["fileId"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = rawFileID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *FileFilesContext) OK(r *DeviceFile) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.file+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *FileFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// GetDeviceLocationHistoryFilesContext provides the files get device location history action context.
-type GetDeviceLocationHistoryFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-	Page     *int
-}
-
-// NewGetDeviceLocationHistoryFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller get device location history action.
-func NewGetDeviceLocationHistoryFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetDeviceLocationHistoryFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetDeviceLocationHistoryFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	paramPage := req.Params["page"]
-	if len(paramPage) > 0 {
-		rawPage := paramPage[0]
-		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp48 := page
-			tmp47 := &tmp48
-			rctx.Page = tmp47
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetDeviceLocationHistoryFilesContext) OK(r *LocationHistory) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.location.history+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// ListDeviceDataFilesFilesContext provides the files list device data files action context.
-type ListDeviceDataFilesFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-	Page     *int
-}
-
-// NewListDeviceDataFilesFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller list device data files action.
-func NewListDeviceDataFilesFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceDataFilesFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListDeviceDataFilesFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	paramPage := req.Params["page"]
-	if len(paramPage) > 0 {
-		rawPage := paramPage[0]
-		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp50 := page
-			tmp49 := &tmp50
-			rctx.Page = tmp49
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListDeviceDataFilesFilesContext) OK(r *DeviceFiles) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.files+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// ListDeviceLogFilesFilesContext provides the files list device log files action context.
-type ListDeviceLogFilesFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-	Page     *int
-}
-
-// NewListDeviceLogFilesFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller list device log files action.
-func NewListDeviceLogFilesFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDeviceLogFilesFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListDeviceLogFilesFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	paramPage := req.Params["page"]
-	if len(paramPage) > 0 {
-		rawPage := paramPage[0]
-		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp52 := page
-			tmp51 := &tmp52
-			rctx.Page = tmp51
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListDeviceLogFilesFilesContext) OK(r *DeviceFiles) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.files+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// ListDevicesFilesContext provides the files list devices action context.
-type ListDevicesFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewListDevicesFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller list devices action.
-func NewListDevicesFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListDevicesFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListDevicesFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListDevicesFilesContext) OK(r *Devices) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.devices+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *ListDevicesFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// RawFilesContext provides the files raw action context.
-type RawFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Dl     bool
-	FileID string
-}
-
-// NewRawFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller raw action.
-func NewRawFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*RawFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := RawFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDl := req.Params["dl"]
-	if len(paramDl) == 0 {
-		rctx.Dl = true
-	} else {
-		rawDl := paramDl[0]
-		if dl, err2 := strconv.ParseBool(rawDl); err2 == nil {
-			rctx.Dl = dl
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("dl", rawDl, "boolean"))
-		}
-	}
-	paramFileID := req.Params["fileId"]
-	if len(paramFileID) > 0 {
-		rawFileID := paramFileID[0]
-		rctx.FileID = rawFileID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *RawFilesContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *RawFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// StatusFilesContext provides the files status action context.
-type StatusFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewStatusFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller status action.
-func NewStatusFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*StatusFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := StatusFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *StatusFilesContext) OK(r *FilesStatus) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.files.status+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// UpdateDeviceInfoFilesContext provides the files update device info action context.
-type UpdateDeviceInfoFilesContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	DeviceID string
-	Payload  *UpdateDeviceInfoPayload
-}
-
-// NewUpdateDeviceInfoFilesContext parses the incoming request URL and body, performs validations and creates the
-// context used by the files controller update device info action.
-func NewUpdateDeviceInfoFilesContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateDeviceInfoFilesContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := UpdateDeviceInfoFilesContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramDeviceID := req.Params["deviceId"]
-	if len(paramDeviceID) > 0 {
-		rawDeviceID := paramDeviceID[0]
-		rctx.DeviceID = rawDeviceID
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *UpdateDeviceInfoFilesContext) OK(r *DeviceDetails) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.device.details+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateDeviceInfoFilesContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *UpdateDeviceInfoFilesContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
 // GetJSONDataContext provides the jsonData get action context.
 type GetJSONDataContext struct {
 	context.Context
@@ -2564,9 +2033,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp55 := end
-			tmp54 := &tmp55
-			rctx.End = tmp54
+			tmp47 := end
+			tmp46 := &tmp47
+			rctx.End = tmp46
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -2575,8 +2044,8 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp56 := &internal
-			rctx.Internal = tmp56
+			tmp48 := &internal
+			rctx.Internal = tmp48
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -2585,9 +2054,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp58 := page
-			tmp57 := &tmp58
-			rctx.Page = tmp57
+			tmp50 := page
+			tmp49 := &tmp50
+			rctx.Page = tmp49
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2596,9 +2065,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp60 := pageSize
-			tmp59 := &tmp60
-			rctx.PageSize = tmp59
+			tmp52 := pageSize
+			tmp51 := &tmp52
+			rctx.PageSize = tmp51
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2607,9 +2076,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp62 := start
-			tmp61 := &tmp62
-			rctx.Start = tmp61
+			tmp54 := start
+			tmp53 := &tmp54
+			rctx.Start = tmp53
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}
@@ -2662,9 +2131,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp64 := end
-			tmp63 := &tmp64
-			rctx.End = tmp63
+			tmp56 := end
+			tmp55 := &tmp56
+			rctx.End = tmp55
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -2673,8 +2142,8 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp65 := &internal
-			rctx.Internal = tmp65
+			tmp57 := &internal
+			rctx.Internal = tmp57
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -2683,9 +2152,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp67 := page
-			tmp66 := &tmp67
-			rctx.Page = tmp66
+			tmp59 := page
+			tmp58 := &tmp59
+			rctx.Page = tmp58
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2694,9 +2163,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp69 := pageSize
-			tmp68 := &tmp69
-			rctx.PageSize = tmp68
+			tmp61 := pageSize
+			tmp60 := &tmp61
+			rctx.PageSize = tmp60
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2705,9 +2174,9 @@ func NewGetLinesJSONDataContext(ctx context.Context, r *http.Request, service *g
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp71 := start
-			tmp70 := &tmp71
-			rctx.Start = tmp70
+			tmp63 := start
+			tmp62 := &tmp63
+			rctx.Start = tmp62
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}
@@ -2764,9 +2233,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp73 := end
-			tmp72 := &tmp73
-			rctx.End = tmp72
+			tmp65 := end
+			tmp64 := &tmp65
+			rctx.End = tmp64
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -2775,8 +2244,8 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp74 := &internal
-			rctx.Internal = tmp74
+			tmp66 := &internal
+			rctx.Internal = tmp66
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -2785,9 +2254,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramInterval) > 0 {
 		rawInterval := paramInterval[0]
 		if interval, err2 := strconv.Atoi(rawInterval); err2 == nil {
-			tmp76 := interval
-			tmp75 := &tmp76
-			rctx.Interval = tmp75
+			tmp68 := interval
+			tmp67 := &tmp68
+			rctx.Interval = tmp67
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("interval", rawInterval, "integer"))
 		}
@@ -2796,9 +2265,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp78 := page
-			tmp77 := &tmp78
-			rctx.Page = tmp77
+			tmp70 := page
+			tmp69 := &tmp70
+			rctx.Page = tmp69
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -2807,9 +2276,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp80 := pageSize
-			tmp79 := &tmp80
-			rctx.PageSize = tmp79
+			tmp72 := pageSize
+			tmp71 := &tmp72
+			rctx.PageSize = tmp71
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -2818,9 +2287,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramResolution) > 0 {
 		rawResolution := paramResolution[0]
 		if resolution, err2 := strconv.Atoi(rawResolution); err2 == nil {
-			tmp82 := resolution
-			tmp81 := &tmp82
-			rctx.Resolution = tmp81
+			tmp74 := resolution
+			tmp73 := &tmp74
+			rctx.Resolution = tmp73
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("resolution", rawResolution, "integer"))
 		}
@@ -2829,9 +2298,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp84 := start
-			tmp83 := &tmp84
-			rctx.Start = tmp83
+			tmp76 := start
+			tmp75 := &tmp76
+			rctx.Start = tmp75
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}
@@ -4041,115 +3510,6 @@ func (ctx *MetaRecordsContext) OK(resp []byte) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *MetaRecordsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// DownloadSimpleContext provides the simple download action context.
-type DownloadSimpleContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Token string
-}
-
-// NewDownloadSimpleContext parses the incoming request URL and body, performs validations and creates the
-// context used by the simple controller download action.
-func NewDownloadSimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*DownloadSimpleContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := DownloadSimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramToken := req.Params["token"]
-	if len(paramToken) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("token"))
-	} else {
-		rawToken := paramToken[0]
-		rctx.Token = rawToken
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *DownloadSimpleContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *DownloadSimpleContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// MyFeaturesSimpleContext provides the simple my features action context.
-type MyFeaturesSimpleContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewMyFeaturesSimpleContext parses the incoming request URL and body, performs validations and creates the
-// context used by the simple controller my features action.
-func NewMyFeaturesSimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*MyFeaturesSimpleContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := MyFeaturesSimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *MyFeaturesSimpleContext) OK(r *MapFeatures) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.map_features+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *MyFeaturesSimpleContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// MySimpleSummarySimpleContext provides the simple my simple summary action context.
-type MySimpleSummarySimpleContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewMySimpleSummarySimpleContext parses the incoming request URL and body, performs validations and creates the
-// context used by the simple controller my simple summary action.
-func NewMySimpleSummarySimpleContext(ctx context.Context, r *http.Request, service *goa.Service) (*MySimpleSummarySimpleContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := MySimpleSummarySimpleContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *MySimpleSummarySimpleContext) OK(r *MySimpleSummary) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.simple_summary+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *MySimpleSummarySimpleContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
