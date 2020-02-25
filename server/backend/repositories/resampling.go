@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ResampledKey = "@resampled"
+	ResampledKey = "_resampled"
 )
 
 type Resampler struct {
