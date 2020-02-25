@@ -54,9 +54,8 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 	})
 
 	options := &IngesterOptions{
-		Database:                 database,
-		AwsSession:               awsSession,
 		AuthenticationMiddleware: jwtMiddleware,
+		Database:                 database,
 		Files:                    files,
 		Publisher:                publisher,
 		Metrics:                  metrics,

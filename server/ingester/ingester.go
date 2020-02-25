@@ -15,8 +15,6 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common"
@@ -33,7 +31,6 @@ var (
 
 type IngesterOptions struct {
 	Database                 *sqlxcache.DB
-	AwsSession               *session.Session
 	AuthenticationMiddleware goa.Middleware
 	Files                    files.FileArchive
 	Publisher                jobs.MessagePublisher
@@ -88,7 +85,8 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			Blocks:      headers.FkBlocks,
 			Flags:       headers.FkFlags,
 		}
-		if saved, err := o.Files.Archive(ctx, fileMeta, req.Body); err != nil {
+		saved, err := o.Files.Archive(ctx, fileMeta, req.Body)
+		if err != nil {
 			return err
 		}
 
