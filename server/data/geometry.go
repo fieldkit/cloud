@@ -1,4 +1,4 @@
-package backend
+package data
 
 import (
 	"database/sql/driver"

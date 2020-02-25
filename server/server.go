@@ -195,7 +195,7 @@ func main() {
 		panic(err)
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, awsSession, apiConfig, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, jq, awsSession, apiConfig, metrics)
 	if err != nil {
 		panic(err)
 	}

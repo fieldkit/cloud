@@ -516,7 +516,7 @@ type FeatureSummary struct {
 	NumberOfFeatures int           `db:"number_of_features"`
 	StartTime        time.Time     `db:"start_time"`
 	EndTime          time.Time     `db:"end_time"`
-	Envelope         Envelope      `db:"envelope"`
+	Envelope         data.Envelope `db:"envelope"`
 	Centroid         data.Location `db:"centroid"`
 	Radius           float64       `db:"radius"`
 }
@@ -551,10 +551,10 @@ func (b *Backend) FeatureSummaryBySourceID(ctx context.Context, sourceId int) (*
 }
 
 type TemporalGeometry struct {
-	SourceID  int          `db:"source_id"`
-	ClusterID int          `db:"cluster_id"`
-	UpdatedAt time.Time    `db:"updated_at"`
-	Geometry  TemporalPath `db:"geometry"`
+	SourceID  int               `db:"source_id"`
+	ClusterID int               `db:"cluster_id"`
+	UpdatedAt time.Time         `db:"updated_at"`
+	Geometry  data.TemporalPath `db:"geometry"`
 }
 
 type GeometryClusterSummary struct {
@@ -564,7 +564,7 @@ type GeometryClusterSummary struct {
 	NumberOfFeatures int           `db:"number_of_features"`
 	StartTime        time.Time     `db:"start_time"`
 	EndTime          time.Time     `db:"end_time"`
-	Envelope         Envelope      `db:"envelope"`
+	Envelope         data.Envelope `db:"envelope"`
 	Centroid         data.Location `db:"centroid"`
 	Radius           float64       `db:"radius"`
 }

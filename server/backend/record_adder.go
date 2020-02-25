@@ -234,7 +234,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "stream_id", i.UploadID, "file_size", i.Size, "blocks", i.Blocks, "device_id", i.DeviceID, "user_id", i.UserID, "type", i.Type)
+	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "file_id", i.UploadID, "file_size", i.Size, "blocks", i.Blocks, "device_id", i.DeviceID, "user_id", i.UserID, "type", i.Type)
 
 	reader, err := ra.Files.OpenByURL(ctx, i.URL)
 	if err != nil {

@@ -29,8 +29,7 @@ type ControllerOptions struct {
 	ConsumerSecret string
 }
 
-func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, awsSession *session.Session, config *ApiConfiguration, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
-
+func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, awsSession *session.Session, config *ApiConfiguration, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("config", "config", config)
@@ -54,6 +53,7 @@ func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backe
 		Domain:     config.Domain,
 		Metrics:    metrics,
 		Config:     config,
+		Publisher:  publisher,
 	}
 
 	return
