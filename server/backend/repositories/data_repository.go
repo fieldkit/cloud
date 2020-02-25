@@ -36,15 +36,16 @@ type SummaryQueryOpts struct {
 	Interval   int64
 }
 
-func (r *DataRepository) queryMetaRecords(ctx context.Context, opts *SummaryQueryOpts) (map[int64]*data.MetaRecord, error) {
-	deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
-	if err != nil {
-		return nil, err
-	}
+func (r *DataRepository) queryMetaRecords(ctx context.Context, deviceIdBytes []byte, start, end time.Time) (map[int64]*data.MetaRecord, error) {
+	/*
+		deviceIdBytes, err := data.DecodeBinaryString(opts.DeviceID)
+		if err != nil {
+			return nil, err
+		}
 
-	start := time.Unix(0, opts.Start*int64(time.Millisecond))
-	end := time.Unix(0, opts.End*int64(time.Millisecond))
-
+		start := time.Unix(0, opts.Start*int64(time.Millisecond))
+		end := time.Unix(0, opts.End*int64(time.Millisecond))
+	*/
 	mrs := []*data.MetaRecord{}
 	if err := r.Database.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
@@ -77,8 +78,8 @@ func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpt
 		    SELECT
 				MIN(r.time) AS start,
 				MAX(r.time) AS end,
-				COUNT(*                    ) AS number_of_data_records,
-				COUNT(DISTINCT provision_id) AS number_of_meta_records
+				COUNT(*              ) AS number_of_data_records,
+				COUNT(DISTINCT r.meta) AS number_of_meta_records
 			FROM
 				fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		    WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)`, deviceIdBytes, start, end); err != nil {
@@ -109,7 +110,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		return nil, fmt.Errorf("malformed query: times")
 	}
 
-	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_ms", opts.Start, "end_ms", opts.End, "start", start, "end", end)
+	log.Infow("summarizing", "device_id", opts.DeviceID, "page_number", opts.Page, "page_size", opts.PageSize, "internal", opts.Internal, "start_ms", opts.Start, "end_ms", opts.End, "start", start, "end", end, "interval", opts.Interval)
 
 	summary, err := r.querySummary(ctx, opts)
 	if err != nil {
@@ -119,18 +120,28 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 	if summary.NumberOfDataRecords == 0 {
 		log.Infow("empty")
 		modulesAndData = &ModulesAndData{
-			Modules: make([]*DataMetaModule, 0),
-			Data:    make([]*DataRow, 0),
+			Modules:    make([]*DataMetaModule, 0),
+			Data:       make([]*DataRow, 0),
+			Statistics: nil,
 		}
 		return
 	}
 
 	log.Infow("summary", "start", summary.Start, "end", summary.End, "number_data_records", summary.NumberOfDataRecords, "number_meta", summary.NumberOfMetaRecords)
 
-	dbMetas, err := r.queryMetaRecords(ctx, opts)
+	if opts.Interval > 0 {
+		start = summary.End.Add(time.Duration(-opts.Interval) * time.Minute)
+		end = *summary.End
+	}
+
+	log.Infow("querying", "start", start, "end", end)
+
+	dbMetas, err := r.queryMetaRecords(ctx, deviceIdBytes, start, end)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Infow("querying", "number_metas", len(dbMetas))
 
 	rows, err := r.Database.QueryxContext(ctx, `
 		SELECT
@@ -148,6 +159,9 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		_, err := metaFactory.Add(dbMeta)
 		if err != nil {
 			return nil, err
+		}
+		if false {
+			log.Infow("metas", "id", dbMeta.ID)
 		}
 	}
 
@@ -168,7 +182,6 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		if err != nil {
 			return nil, err
 		}
-
 		if d != nil {
 			resampled = append(resampled, d)
 		}
@@ -178,10 +191,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 	if err != nil {
 		return nil, err
 	}
-
-	if d == nil {
-		log.Warnw("final resample was empty")
-	} else {
+	if d != nil {
 		resampled = append(resampled, d)
 	}
 

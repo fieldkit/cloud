@@ -65,9 +65,11 @@ func NewResampler(summary *DataSummary, metaFactory *MetaFactory, opts *SummaryQ
 
 func (r *Resampler) Insert(ctx context.Context, data *data.DataRecord) (d *Resampled, err error) {
 	if !r.bin.Contains(data.Time) {
-		d, err = r.Close(ctx)
-		if err != nil {
-			return nil, err
+		if len(r.bin.Records) > 0 {
+			d, err = r.Close(ctx)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		for {
@@ -112,7 +114,7 @@ func (r *Resampler) Close(ctx context.Context) (d *Resampled, err error) {
 		D:               data,
 	}
 
-	if false {
+	if true {
 		log.Infow("record", "bin", r.bin.Number, "records", len(records), "location", location, "data", data)
 	}
 
