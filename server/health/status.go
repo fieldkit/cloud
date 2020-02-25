@@ -12,6 +12,7 @@ import (
 
 type StatusResponse struct {
 	ServerName string `json:"server_name,omitempty"`
+	Tag        string `json:"tag"`
 	Name       string `json:"name"`
 }
 
@@ -23,18 +24,14 @@ func getEnv(key, fallback string) string {
 }
 
 func MakeStatusResponse(ctx context.Context) (sr *StatusResponse, err error) {
-	serverName := getEnv("FIELDKIT_SERVER_NAME", "")
-	if serverName == "" {
-		serverName = getEnv("HOSTNAME", "")
-	}
-
 	name, err := os.Hostname()
 	if err != nil {
 		return nil, err
 	}
 
 	sr = &StatusResponse{
-		ServerName: serverName,
+		ServerName: getEnv("FIELDKIT_SERVER_NAME", ""),
+		Tag:        getEnv("TAG", ""),
 		Name:       name,
 	}
 
