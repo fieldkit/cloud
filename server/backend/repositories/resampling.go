@@ -189,6 +189,7 @@ func getResampledLocation(records []*DataRow) []float64 {
 
 type ResampleInfo struct {
 	NumberRecords int       `json:"number_records"`
+	IDs           []int64   `json:"ids"`
 	Start         time.Time `json:"start"`
 	End           time.Time `json:"end"`
 }
@@ -196,6 +197,7 @@ type ResampleInfo struct {
 func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 	start := time.Time{}
 	end := time.Time{}
+	ids := make([]int64, 0)
 
 	all := make(map[string][]float64)
 	for _, r := range records {
@@ -213,6 +215,8 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 		if end.IsZero() || time.After(end) {
 			end = time
 		}
+
+		ids = append(ids, r.ID)
 	}
 
 	d := make(map[string]interface{})
@@ -228,6 +232,7 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 
 	d[ResampledKey] = ResampleInfo{
 		NumberRecords: len(records),
+		IDs:           ids,
 		Start:         start,
 		End:           end,
 	}
