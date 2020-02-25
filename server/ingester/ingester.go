@@ -40,37 +40,46 @@ type IngesterOptions struct {
 	Metrics                  *logging.Metrics
 }
 
+func getUserID(ctx context.Context) (int32, error) {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return 0, fmt.Errorf("JWT token is missing from context")
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("JWT claims error")
+	}
+
+	id := int32(claims["sub"].(float64))
+
+	return id, nil
+}
+
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	errors := ErrorHandler()
 
 	handler := errorHandling(errors, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
-		startedAt := time.Now()
-
 		log := Logger(ctx).Sugar()
 
-		token := jwt.ContextJWT(ctx)
-		if token == nil {
-			return fmt.Errorf("JWT token is missing from context")
-		}
+		startedAt := time.Now()
 
-		claims, ok := token.Claims.(jwtgo.MapClaims)
-		if !ok {
-			return fmt.Errorf("JWT claims error")
+		userID, err := getUserID(ctx)
+		if err != nil {
+			return err
 		}
-
-		userID := int32(claims["sub"].(float64))
 
 		o.Metrics.UserID(userID)
 
 		headers, err := NewIncomingHeaders(req)
 		if err != nil {
-			log.Infow("headers error", "headers", req.Header)
+			log.Warnw("malformed", "headers", req.Header)
 			return err
 		}
 
 		o.Metrics.IngestionDevice(headers.FkDeviceId)
 
-		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks)
+		log.Infow("receiving", "device_id", headers.FkDeviceId, "blocks", headers.FkBlocks, "user_id", userID)
 
 		fileMeta := &files.FileMeta{
 			ContentType: headers.ContentType,
@@ -81,53 +90,46 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 		if saved, err := o.Files.Archive(ctx, fileMeta, req.Body); err != nil {
 			return err
-		} else {
-			if saved != nil {
-				if saved.BytesRead != int(headers.ContentLength) {
-					log.Warnw("size mismatch", "expected", headers.ContentLength, "actual", saved.BytesRead)
-				}
+		}
 
-				ingestion := &data.Ingestion{
-					URL:        saved.URL,
-					UploadID:   saved.ID,
-					UserID:     userID,
-					DeviceID:   headers.FkDeviceId,
-					Generation: headers.FkGeneration,
-					Type:       headers.FkType,
-					Size:       int64(saved.BytesRead),
-					Blocks:     data.Int64Range(headers.FkBlocks),
-					Flags:      pq.Int64Array([]int64{}),
-				}
+		if saved.BytesRead != int(headers.ContentLength) {
+			log.Warnw("size mismatch", "expected", headers.ContentLength, "actual", saved.BytesRead)
+		}
 
-				if err := o.Database.NamedGetContext(ctx, ingestion, `
+		ingestion := &data.Ingestion{
+			URL:        saved.URL,
+			UploadID:   saved.ID,
+			UserID:     userID,
+			DeviceID:   headers.FkDeviceId,
+			Generation: headers.FkGeneration,
+			Type:       headers.FkType,
+			Size:       int64(saved.BytesRead),
+			Blocks:     data.Int64Range(headers.FkBlocks),
+			Flags:      pq.Int64Array([]int64{}),
+		}
+
+		if err := o.Database.NamedGetContext(ctx, ingestion, `
 				    INSERT INTO fieldkit.ingestion
 					(time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags) VALUES
 					(NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
 				    RETURNING *`, ingestion); err != nil {
-					return err
-				}
-
-				o.Publisher.Publish(ctx, &messages.IngestionReceived{
-					Time: ingestion.Time,
-					ID:   ingestion.ID,
-					URL:  saved.URL,
-				})
-
-				b := ingestion.Blocks[1] - ingestion.Blocks[0]
-				o.Metrics.Ingested(int(b), saved.BytesRead)
-
-				log.Infow("saved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead, "type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation)
-			} else {
-				log.Infow("unsaved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead)
-			}
-
-			// TODO Give information.
-			w.WriteHeader(http.StatusOK)
+			return err
 		}
 
-		_ = claims
-		_ = headers
-		_ = log
+		o.Publisher.Publish(ctx, &messages.IngestionReceived{
+			Time: ingestion.Time,
+			ID:   ingestion.ID,
+			URL:  saved.URL,
+		})
+
+		b := ingestion.Blocks[1] - ingestion.Blocks[0]
+
+		o.Metrics.Ingested(int(b), saved.BytesRead)
+
+		log.Infow("saved", "device_id", headers.FkDeviceId, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
+			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation", ingestion.Generation, "user_id", userID)
+
+		w.WriteHeader(http.StatusOK)
 
 		return nil
 	}))
@@ -138,7 +140,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		err := handler(ctx, w, req)
 		if err != nil {
 			log := Logger(ctx).Sugar()
-			log.Errorw("completed", "error", err)
+			log.Errorw("error", "error", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
