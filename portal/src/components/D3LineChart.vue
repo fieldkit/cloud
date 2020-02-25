@@ -22,17 +22,13 @@ export default {
         },
         stationData: function() {
             if (this.activeMode) {
-                if (this.chart.svg.selectAll(".data-line").empty()) {
+                if (this.chart.svg.selectAll(".data-line, .bkgd-line").empty()) {
                     this.makeLine();
                 } else {
                     let d3Chart = this;
                     this.filteredData = this.stationData.filter(d => {
-                        return d[d3Chart.selectedSensor.key];
+                        return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
                     });
-                    // this.chart.extent = d3.extent(this.filteredData, d => {
-                    //     return d[d3Chart.selectedSensor.key];
-                    // });
-
                     this.timeChanged();
                 }
             }
@@ -95,15 +91,9 @@ export default {
 
             this.lineFn = d3
                 .line()
-                .defined(d => {
-                    return !d.blankPoint;
-                })
-                .x(d => {
-                    return d3Chart.x(d.date);
-                })
-                .y(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
-                })
+                .defined(d => !d.blankPoint)
+                .x(d => d3Chart.x(d.date))
+                .y(d => d3Chart.y(d[d3Chart.selectedSensor.key]))
                 .curve(d3.curveBasis);
         },
         setStatus(status) {
@@ -112,33 +102,31 @@ export default {
         makeLine() {
             let d3Chart = this;
             this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key];
+                return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
             });
-            // this.createBlankPoints();
+            this.createBlankPoints();
 
             // Add the gradient area
             this.createGradient();
 
-            // Add the line
-            // this.line
-            //     .append("path")
-            //     .data([this.filteredData])
-            //     .attr("class", "area")
-            //     .attr("stroke-width", "3")
-            //     .attr("stroke", "url(#" + this.chart.id + "-area-gradient)")
-            //     .attr("fill", "none")
-            //     .transition()
-            //     .duration(1000)
-            //     .attr("d", this.area);
-
-            this.chart.svg.selectAll(".data-line").remove();
+            // Add the lines
+            this.chart.svg.selectAll(".data-line, .bkgd-line").remove();
+            // continuous dotted line
+            this.line
+                .append("path")
+                .attr("class", "bkgd-line")
+                .attr("stroke", "#BBBBBB")
+                .attr("stroke-dasharray", "4,4")
+                .attr("fill", "none")
+                .attr("d", this.lineFn(this.filteredData.filter(this.lineFn.defined())));
+            // data line with gaps
             this.line
                 .append("path")
                 .attr("class", "data-line")
-                .attr("d", this.lineFn(this.filteredData))
-                .attr("stroke-width", "3")
                 .attr("stroke", "url(#" + this.chart.id + "-area-gradient)")
-                .attr("fill", "none");
+                .attr("stroke-width", "3")
+                .attr("fill", "none")
+                .attr("d", this.lineFn(this.filteredData));
 
             // Add the brushing
             this.chart.svg.selectAll(".brush").remove();
@@ -200,8 +188,6 @@ export default {
             document.getElementById("loading").style.display = "none";
         },
         createBlankPoints() {
-            // TODO: relying on span between first two points is not reliable
-            // use better method for creating "blank" points
             if (this.filteredData.length > 1) {
                 const start = this.filteredData[0].date.getTime();
                 const next = this.filteredData[1].date.getTime();
@@ -246,31 +232,31 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(d3.axisBottom(this.x));
-
             this.updateChart();
         },
         sensorChange() {
             let d3Chart = this;
             this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key];
+                return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
             });
             this.updateChart();
         },
         updateChart() {
             let d3Chart = this;
-
             // update y domain with new extent
             this.y.domain(this.chart.extent);
-            // this.createBlankPoints();
+            this.createBlankPoints();
 
             this.createGradient();
 
-            // update line area
-            // this.line
-            //     .select(".area")
-            //     .transition()
-            //     .duration(1000)
-            //     .attr("d", this.area(this.filteredData));
+            // update lines
+            // continuous dotted line
+            this.line
+                .selectAll(".bkgd-line")
+                .transition()
+                .duration(1000)
+                .attr("d", this.lineFn(this.filteredData.filter(this.lineFn.defined())));
+            // data line with gaps
             this.line
                 .selectAll(".data-line")
                 .transition()
@@ -280,7 +266,7 @@ export default {
             // update dots
             let dots = this.line.selectAll(".dot").data(
                 this.filteredData.filter(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    return d[d3Chart.selectedSensor.key] === 0 || d3Chart.y(d[d3Chart.selectedSensor.key]);
                     // return !d.blankPoint;
                 })
             );

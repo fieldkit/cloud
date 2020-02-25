@@ -289,11 +289,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
-    getStationDataSummaryByDeviceId(deviceId) {
+    getStationDataSummaryByDeviceId(deviceId, start, end) {
+        if (!start) {
+            start = new Date("1/1/2019").getTime();
+        }
+        if (!end) {
+            end = new Date().getTime();
+        }
+
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url: this.baseUrl + "/data/devices/" + deviceId + "/summary",
+            url: this.baseUrl + "/data/devices/" + deviceId + "/summary/json?start=" + start + "&end=" + end,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token

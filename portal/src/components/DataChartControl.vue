@@ -368,9 +368,17 @@ export default {
                     }
                 });
             }
-            // or set the first sensor to be selected sensor
+            // or set the first sensor with a current reading,
+            // if any, to be selected sensor
             if (!this.$route.query.sensor || !this.selectedSensor) {
-                this.selectedSensor = this.displaySensors[0];
+                const withData = this.displaySensors.filter(s => {
+                    return s.currentReading;
+                });
+                if (withData && withData.length > 0) {
+                    this.selectedSensor = withData[0];
+                } else {
+                    this.selectedSensor = this.displaySensors[0];
+                }
             }
             // set chart sensors
             this.charts.forEach(c => {
