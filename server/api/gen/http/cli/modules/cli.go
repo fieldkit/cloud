@@ -25,17 +25,17 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `modules meta
-tasks five
+	return `tasks (five|refresh- device)
+modules meta
 test (get|error)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` modules meta` + "\n" +
-		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 3182965740620624665` + "\n" +
+	return os.Args[0] + ` tasks five` + "\n" +
+		os.Args[0] + ` modules meta` + "\n" +
+		os.Args[0] + ` test get --id 6377494565823219061` + "\n" +
 		""
 }
 
@@ -49,13 +49,17 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, interface{}, error) {
 	var (
-		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
-
-		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
-
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
 		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
+
+		tasksRefreshDeviceFlags        = flag.NewFlagSet("refresh- device", flag.ExitOnError)
+		tasksRefreshDeviceDeviceIDFlag = tasksRefreshDeviceFlags.String("device-id", "REQUIRED", "")
+		tasksRefreshDeviceAuthFlag     = tasksRefreshDeviceFlags.String("auth", "REQUIRED", "")
+
+		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
+
+		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
 
 		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
 
@@ -64,11 +68,12 @@ func ParseEndpoint(
 
 		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
 	)
-	modulesFlags.Usage = modulesUsage
-	modulesMetaFlags.Usage = modulesMetaUsage
-
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
+	tasksRefreshDeviceFlags.Usage = tasksRefreshDeviceUsage
+
+	modulesFlags.Usage = modulesUsage
+	modulesMetaFlags.Usage = modulesMetaUsage
 
 	testFlags.Usage = testUsage
 	testGetFlags.Usage = testGetUsage
@@ -89,10 +94,10 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
-		case "modules":
-			svcf = modulesFlags
 		case "tasks":
 			svcf = tasksFlags
+		case "modules":
+			svcf = modulesFlags
 		case "test":
 			svcf = testFlags
 		default:
@@ -110,17 +115,20 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
-		case "modules":
-			switch epn {
-			case "meta":
-				epf = modulesMetaFlags
-
-			}
-
 		case "tasks":
 			switch epn {
 			case "five":
 				epf = tasksFiveFlags
+
+			case "refresh- device":
+				epf = tasksRefreshDeviceFlags
+
+			}
+
+		case "modules":
+			switch epn {
+			case "meta":
+				epf = modulesMetaFlags
 
 			}
 
@@ -154,18 +162,21 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
-		case "modules":
-			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "meta":
-				endpoint = c.Meta()
-				data = nil
-			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
 			case "five":
 				endpoint = c.Five()
+				data = nil
+			case "refresh- device":
+				endpoint = c.RefreshDevice()
+				data, err = tasksc.BuildRefreshDevicePayload(*tasksRefreshDeviceDeviceIDFlag, *tasksRefreshDeviceAuthFlag)
+			}
+		case "modules":
+			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "meta":
+				endpoint = c.Meta()
 				data = nil
 			}
 		case "test":
@@ -185,6 +196,42 @@ func ParseEndpoint(
 	}
 
 	return endpoint, data, nil
+}
+
+// tasksUsage displays the usage of the tasks command and its subcommands.
+func tasksUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the tasks service interface.
+Usage:
+    %s [globalflags] tasks COMMAND [flags]
+
+COMMAND:
+    five: Five implements five.
+    refresh- device: RefreshDevice implements refresh device.
+
+Additional help:
+    %s tasks COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func tasksFiveUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] tasks five
+
+Five implements five.
+
+Example:
+    `+os.Args[0]+` tasks five
+`, os.Args[0])
+}
+
+func tasksRefreshDeviceUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] tasks refresh- device -device-id STRING -auth STRING
+
+RefreshDevice implements refresh device.
+    -device-id STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` tasks refresh- device --device-id "Esse nisi eos tempora." --auth "Ea aspernatur et et aut quas facere."
+`, os.Args[0])
 }
 
 // modulesUsage displays the usage of the modules command and its subcommands.
@@ -210,29 +257,6 @@ Example:
 `, os.Args[0])
 }
 
-// tasksUsage displays the usage of the tasks command and its subcommands.
-func tasksUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the tasks service interface.
-Usage:
-    %s [globalflags] tasks COMMAND [flags]
-
-COMMAND:
-    five: Five implements five.
-
-Additional help:
-    %s tasks COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func tasksFiveUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] tasks five
-
-Five implements five.
-
-Example:
-    `+os.Args[0]+` tasks five
-`, os.Args[0])
-}
-
 // testUsage displays the usage of the test command and its subcommands.
 func testUsage() {
 	fmt.Fprintf(os.Stderr, `Service is the test service interface.
@@ -254,7 +278,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 3182965740620624665
+    `+os.Args[0]+` test get --id 6377494565823219061
 `, os.Args[0])
 }
 

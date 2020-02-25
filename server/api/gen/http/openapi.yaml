@@ -35,6 +35,38 @@ paths:
           schema: {}
       schemes:
       - http
+  /tasks/devices/{deviceId}/refresh:
+    post:
+      tags:
+      - tasks
+      summary: refresh device tasks
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: tasks#refresh device
+      parameters:
+      - name: deviceId
+        in: path
+        required: true
+        type: string
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/TasksRefreshDeviceUnauthorizedResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
   /tasks/five:
     get:
       tags:
@@ -44,6 +76,10 @@ paths:
       responses:
         "204":
           description: No Content response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/TasksFiveUnauthorizedResponseBody'
       schemes:
       - http
   /test/{id}:
@@ -63,3 +99,24 @@ paths:
           description: OK response.
       schemes:
       - http
+definitions:
+  TasksFiveUnauthorizedResponseBody:
+    title: TasksFiveUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Harum ducimus a voluptatem.
+  TasksRefreshDeviceUnauthorizedResponseBody:
+    title: TasksRefreshDeviceUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Ut porro molestiae repellendus nihil dicta.
+securityDefinitions:
+  jwt_header_Authorization:
+    type: apiKey
+    description: |2-
+
+      **Security Scopes**:
+        * `api:access`: API access
+        * `api:admin`: API admin access
+    name: Authorization
+    in: header

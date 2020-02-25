@@ -6,3 +6,25 @@
 // $ goa gen github.com/fieldkit/cloud/server/api/design
 
 package client
+
+import (
+	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+)
+
+// BuildRefreshDevicePayload builds the payload for the tasks refresh device
+// endpoint from CLI flags.
+func BuildRefreshDevicePayload(tasksRefreshDeviceDeviceID string, tasksRefreshDeviceAuth string) (*tasks.RefreshDevicePayload, error) {
+	var deviceID string
+	{
+		deviceID = tasksRefreshDeviceDeviceID
+	}
+	var auth string
+	{
+		auth = tasksRefreshDeviceAuth
+	}
+	payload := &tasks.RefreshDevicePayload{
+		DeviceID: deviceID,
+		Auth:     auth,
+	}
+	return payload, nil
+}

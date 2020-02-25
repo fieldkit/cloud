@@ -6,3 +6,28 @@
 // $ goa gen github.com/fieldkit/cloud/server/api/design
 
 package client
+
+import (
+	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+)
+
+// FiveUnauthorizedResponseBody is the type of the "tasks" service "five"
+// endpoint HTTP response body for the "unauthorized" error.
+type FiveUnauthorizedResponseBody string
+
+// RefreshDeviceUnauthorizedResponseBody is the type of the "tasks" service
+// "refresh device" endpoint HTTP response body for the "unauthorized" error.
+type RefreshDeviceUnauthorizedResponseBody string
+
+// NewFiveUnauthorized builds a tasks service five endpoint unauthorized error.
+func NewFiveUnauthorized(body FiveUnauthorizedResponseBody) tasks.Unauthorized {
+	v := tasks.Unauthorized(body)
+	return v
+}
+
+// NewRefreshDeviceUnauthorized builds a tasks service refresh device endpoint
+// unauthorized error.
+func NewRefreshDeviceUnauthorized(body RefreshDeviceUnauthorizedResponseBody) tasks.Unauthorized {
+	v := tasks.Unauthorized(body)
+	return v
+}

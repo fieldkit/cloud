@@ -6,3 +6,38 @@
 // $ goa gen github.com/fieldkit/cloud/server/api/design
 
 package server
+
+import (
+	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+)
+
+// FiveUnauthorizedResponseBody is the type of the "tasks" service "five"
+// endpoint HTTP response body for the "unauthorized" error.
+type FiveUnauthorizedResponseBody string
+
+// RefreshDeviceUnauthorizedResponseBody is the type of the "tasks" service
+// "refresh device" endpoint HTTP response body for the "unauthorized" error.
+type RefreshDeviceUnauthorizedResponseBody string
+
+// NewFiveUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "five" endpoint of the "tasks" service.
+func NewFiveUnauthorizedResponseBody(res tasks.Unauthorized) FiveUnauthorizedResponseBody {
+	body := FiveUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRefreshDeviceUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "refresh device" endpoint of the "tasks" service.
+func NewRefreshDeviceUnauthorizedResponseBody(res tasks.Unauthorized) RefreshDeviceUnauthorizedResponseBody {
+	body := RefreshDeviceUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRefreshDevicePayload builds a tasks service refresh device endpoint
+// payload.
+func NewRefreshDevicePayload(deviceID string, auth string) *tasks.RefreshDevicePayload {
+	return &tasks.RefreshDevicePayload{
+		DeviceID: deviceID,
+		Auth:     auth,
+	}
+}

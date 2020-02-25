@@ -62,7 +62,8 @@ generate-v3:
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
 
 generate-v3-example:
-	cd server/api && goa example github.com/fieldkit/cloud/server/api/design
+	mkdir -p server/api/example
+	cd server/api/example && goa example github.com/fieldkit/cloud/server/api/design
 
 clean:
 	rm -rf $(BUILD)
