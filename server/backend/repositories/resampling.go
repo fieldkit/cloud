@@ -12,6 +12,7 @@ import (
 
 const (
 	ResampledKey = "_resampled"
+	FiltersKey   = "_filters"
 )
 
 type Resampler struct {
@@ -36,7 +37,7 @@ func NewResampler(summary *DataSummary, metaFactory *MetaFactory, opts *SummaryQ
 		Start:   start,
 		End:     start.Add(step),
 		Step:    step,
-		Records: make([]*DataRow, 0, 50),
+		Records: make([]*FilteredRecord, 0, 50),
 	}
 
 	r = &Resampler{
@@ -76,7 +77,9 @@ func (r *Resampler) Insert(ctx context.Context, data *data.DataRecord) (d *Resam
 		return nil, err
 	}
 
-	r.bin.Insert(row)
+	if row != nil {
+		r.bin.Insert(row)
+	}
 
 	return
 }
@@ -114,17 +117,14 @@ type ResamplingBin struct {
 	Start   time.Time
 	End     time.Time
 	Step    time.Duration
-	Records []*DataRow
+	Records []*FilteredRecord
 }
 
 func (b *ResamplingBin) MetaIDs() []int64 {
 	idsMap := make(map[int64]bool)
-	for _, record := range b.Records {
-		if len(record.MetaIDs) != 1 {
-			panic("record with invalid meta-ids collection")
-		}
-		for _, id := range record.MetaIDs {
-			idsMap[id] = true
+	for _, filteredRecord := range b.Records {
+		for _, reading := range filteredRecord.Record.Readings {
+			idsMap[reading.MetaID] = true
 		}
 	}
 	ids := make([]int64, 0)
@@ -152,75 +152,61 @@ func (b *ResamplingBin) Next() {
 	b.Number += 1
 }
 
-func (b *ResamplingBin) Insert(data *DataRow) {
-	b.Records = append(b.Records, data)
+func (b *ResamplingBin) Insert(record *FilteredRecord) {
+	b.Records = append(b.Records, record)
 }
 
 func (b *ResamplingBin) Clear() {
 	b.Records = b.Records[:0]
 }
 
-func getResampledLocation(records []*DataRow) []float64 {
+func getResampledLocation(records []*FilteredRecord) []float64 {
 	for _, r := range records {
-		if r.Location != nil && len(r.Location) > 0 {
-			return r.Location
+		if r.Record.Location != nil && len(r.Record.Location) > 0 {
+			return r.Record.Location
 		}
 	}
 	return nil
 }
 
-func shouldInclude(row *DataRow) bool {
-	return true
+type Filterings struct {
+	Records  []int64
+	Readings map[int64]string
 }
 
-func getResampledData(records []*DataRow) (map[string]interface{}, error) {
-	start := time.Time{}
-	end := time.Time{}
+func getResampledData(records []*FilteredRecord) (map[string]interface{}, error) {
+	filterLog := NewFilterLog()
 	ids := make([]int64, 0)
-	filtered := make([]int64, 0)
 
 	all := make(map[string][]float64)
 	for _, r := range records {
-		if !shouldInclude(r) {
-			filtered = append(filtered, r.ID)
-			continue
-		}
+		filterLog.Include(r)
 
-		for k, v := range r.D {
-			if all[k] == nil {
-				all[k] = make([]float64, 0, len(records))
+		for k, reading := range r.Record.Readings {
+			if !r.Filters.IsFiltered(k) {
+				if all[k] == nil {
+					all[k] = make([]float64, 0, len(records))
+				}
+				all[k] = append(all[k], reading.Value)
 			}
-			all[k] = append(all[k], float64(v.(float32)))
 		}
 
-		time := time.Unix(r.Time, 0)
-		if start.IsZero() || time.Before(start) {
-			start = time
-		}
-		if end.IsZero() || time.After(end) {
-			end = time
-		}
-
-		ids = append(ids, r.ID)
+		ids = append(ids, r.Record.ID)
 	}
 
 	d := make(map[string]interface{})
-
 	for k, v := range all {
 		mean, err := stats.Mean(v)
 		if err != nil {
 			return nil, err
 		}
-
 		d[k] = mean
 	}
 
+	d[FiltersKey] = filterLog
 	d[ResampledKey] = ResampleInfo{
-		Size:     int32(len(records)),
-		IDs:      ids,
-		Filtered: filtered,
-		Start:    start,
-		End:      end,
+		Size: int32(len(records)),
+		IDs:  ids,
 	}
 
 	return d, nil
@@ -229,31 +215,4 @@ func getResampledData(records []*DataRow) (map[string]interface{}, error) {
 func timeInBetween(start, end time.Time) time.Time {
 	d := end.Sub(start).Nanoseconds()
 	return start.Add(time.Duration(d / 2))
-}
-
-type ResampleInfo struct {
-	Size     int32     `json:"size"`
-	IDs      []int64   `json:"ids"`
-	Filtered []int64   `json:"fids"`
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-}
-
-type Resampled struct {
-	NumberOfSamples int32
-	MetaIDs         []int64
-	Time            time.Time
-	Location        []float64
-	D               map[string]interface{}
-}
-
-func (r *Resampled) ToDataRow() *DataRow {
-	return &DataRow{
-		ID:       0,
-		MetaIDs:  r.MetaIDs,
-		Time:     r.Time.Unix(),
-		Location: r.Location,
-		D:        r.D,
-		Filtered: false,
-	}
 }

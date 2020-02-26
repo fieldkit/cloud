@@ -17,6 +17,7 @@ const (
 )
 
 type MetaFactory struct {
+	filtering         *Filtering
 	modulesRepository *ModuleMetaRepository
 	byMetaID          map[int64]*VersionMeta
 	ordered           []*VersionMeta
@@ -24,6 +25,7 @@ type MetaFactory struct {
 
 func NewMetaFactory() *MetaFactory {
 	return &MetaFactory{
+		filtering:         NewFiltering(),
 		modulesRepository: NewModuleMetaRepository(),
 		byMetaID:          make(map[int64]*VersionMeta),
 		ordered:           make([]*VersionMeta, 0),
@@ -112,7 +114,7 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 	return versionMeta, nil
 }
 
-func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord) (*DataRow, error) {
+func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord) (*FilteredRecord, error) {
 	log := Logger(ctx).Sugar()
 
 	meta := mf.byMetaID[databaseRecord.Meta]
@@ -126,7 +128,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		return nil, err
 	}
 
-	data := make(map[string]interface{})
+	readings := make(map[string]*ReadingValue)
 	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
 		moduleIndex := sgIndex
 		if moduleIndex >= len(meta.Station.Modules) {
@@ -142,28 +144,41 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 				sensor := module.Sensors[sensorIndex]
 
+				// This is only happening on one single record, so far.
 				if reading == nil {
-					log.Errorw("nil sensor reading", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					if false {
+						log.Errorw("nil sensor reading", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					}
 					continue
 				}
 
 				key := strcase.ToLowerCamel(sensor.Name)
-				data[key] = reading.Value
+				readings[key] = &ReadingValue{
+					Meta:   sensor,
+					MetaID: databaseRecord.Meta,
+					Value:  float64(reading.Value),
+				}
 			}
 		}
 	}
 
-	location := getLocation(dataRecord.Readings.Location)
-
-	row := &DataRow{
-		ID:       databaseRecord.ID,
-		MetaIDs:  []int64{databaseRecord.Meta},
-		Time:     dataRecord.Readings.Time,
-		Location: location,
-		D:        data,
+	if len(readings) == 0 {
+		log.Errorw("empty record", "data_record_id", databaseRecord.ID)
+		return nil, nil
 	}
 
-	return row, nil
+	location := getLocation(dataRecord.Readings.Location)
+
+	resolved := &FullDataRow{
+		ID:       databaseRecord.ID,
+		Time:     dataRecord.Readings.Time,
+		Location: location,
+		Readings: readings,
+	}
+
+	filtered := mf.filtering.Apply(ctx, resolved)
+
+	return filtered, nil
 }
 
 func (mf *MetaFactory) CombinedMetaByIDs(ids []int64) (combined *VersionMeta, err error) {
