@@ -1,10 +1,7 @@
 package api
 
 import (
-	"bufio"
 	"context"
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -230,84 +227,4 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	return ctx.OK(&app.JSONDataResponse{
 		Versions: JSONDataResponseType(versions),
 	})
-}
-
-type JSONLine struct {
-	ID       int64                  `form:"id" json:"id" yaml:"id" xml:"id"`
-	Time     int64                  `form:"time" json:"time" yaml:"time" xml:"time"`
-	Meta     int64                  `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
-	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
-	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
-}
-
-func (c *JSONDataController) GetLines(ctx *app.GetLinesJSONDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	_ = log
-
-	p, err := NewPermissions(ctx)
-	if err != nil {
-		return err
-	}
-
-	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
-	if err != nil {
-		return err
-	}
-
-	err = p.CanViewStationByDeviceID(deviceIdBytes)
-	if err != nil {
-		return err
-	}
-
-	pageNumber := 0
-	if ctx.Page != nil {
-		pageNumber = *ctx.Page
-	}
-
-	pageSize := 200
-	if ctx.PageSize != nil {
-		pageSize = *ctx.PageSize
-	}
-
-	internal := false
-	if ctx.Internal != nil {
-		internal = *ctx.Internal
-	}
-
-	vr, err := repositories.NewVersionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	versions, err := vr.QueryDevice(ctx, ctx.DeviceID, deviceIdBytes, internal, pageNumber, pageSize)
-	if err != nil {
-		return err
-	}
-
-	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	ctx.ResponseData.WriteHeader(200)
-
-	writer := bufio.NewWriter(ctx.ResponseData)
-
-	for _, version := range versions {
-		for _, row := range version.Data {
-			line := JSONLine{
-				Time:     row.Time * 1000,
-				Location: row.Location,
-				ID:       row.ID,
-				Meta:     version.Meta.ID,
-				D:        row.D,
-			}
-			bytes, err := json.Marshal(line)
-			if err != nil {
-				return err
-			}
-			writer.WriteString(fmt.Sprintf("%s\n", string(bytes)))
-		}
-	}
-
-	writer.Flush()
-
-	return nil
 }

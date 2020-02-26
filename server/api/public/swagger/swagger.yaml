@@ -568,12 +568,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -660,7 +660,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -668,7 +668,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
         type: object
       id:
         example: 4.464267130479644e+18
@@ -694,17 +694,17 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 425af290-4106-465f-9e61-04dd11c40fce
+        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1323,6 +1323,7 @@ definitions:
       view)
     example:
     - url: Vel tempore laboriosam.
+    - url: Vel tempore laboriosam.
     items:
       $ref: '#/definitions/ImageRef'
     title: 'Mediatype identifier: application/vnd.app.imageref+json; type=collection;
@@ -1695,7 +1696,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1769,7 +1770,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+              Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1848,7 +1849,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+        Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1861,7 +1862,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
         type: object
       location:
         example:
@@ -1927,7 +1928,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1994,7 +1995,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2072,7 +2073,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2145,7 +2146,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: c140a064-c9f8-4c70-a13d-744b457ebc8b
+            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2220,16 +2221,6 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
-    - blocks:
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      id: 4.988714780383636e+18
-      size: 7.809307306314839e+18
-      time: "1999-04-12T14:13:09Z"
-      type: Est rem.
-      upload_id: In debitis qui velit aut.
-      url: Quibusdam est rem quisquam.
     - blocks:
       - 1.28057798377931e+18
       - 1.28057798377931e+18
@@ -3584,54 +3575,6 @@ paths:
       - jwt:
         - api:access
       summary: get jsonData
-      tags:
-      - jsonData
-  /data/devices/{deviceId}/data/lines:
-    get:
-      description: |-
-        Retrieve data
-
-        Required security scopes:
-          * `api:access`
-      operationId: jsonData#get lines
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: query
-        name: end
-        required: false
-        type: integer
-      - in: query
-        name: internal
-        required: false
-        type: boolean
-      - in: query
-        name: page
-        required: false
-        type: integer
-      - in: query
-        name: pageSize
-        required: false
-        type: integer
-      - in: query
-        name: start
-        required: false
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get lines jsonData
       tags:
       - jsonData
   /data/devices/{deviceId}/summary:

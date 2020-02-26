@@ -26,20 +26,6 @@ var _ = Resource("jsonData", func() {
 		})
 	})
 
-	Action("get lines", func() {
-		Routing(GET("data/devices/:deviceId/data/lines"))
-		Description("Retrieve data")
-		Params(func() {
-			Param("page", Integer)
-			Param("pageSize", Integer)
-			Param("start", Integer)
-			Param("end", Integer)
-			Param("internal", Boolean)
-		})
-		Response(NotFound)
-		Response(OK)
-	})
-
 	Action("summary", func() {
 		Routing(GET("data/devices/:deviceId/summary/json"))
 		Description("Retrieve summarized data")
