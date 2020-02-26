@@ -2,7 +2,6 @@ package files
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -28,7 +27,7 @@ func NewS3FileArchive(session *session.Session, bucketName string) *S3FileArchiv
 	}
 }
 
-func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
+func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	id := uuid.Must(uuid.NewRandom())
 
 	log := Logger(ctx).Sugar()
@@ -36,19 +35,18 @@ func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.R
 	uploader := s3manager.NewUploader(a.session)
 
 	metadata := make(map[string]*string)
-	metadata[common.FkDeviceIdHeaderName] = aws.String(hex.EncodeToString(meta.DeviceID))
-	metadata[common.FkGenerationHeaderName] = aws.String(hex.EncodeToString(meta.GenerationID))
-	metadata[common.FkBlocksIdHeaderName] = aws.String(fmt.Sprintf("%v", meta.Blocks))
-	metadata[common.FkFlagsIdHeaderName] = aws.String(fmt.Sprintf("%v", meta.Flags))
+	for key, value := range meta {
+		metadata[key] = aws.String(value)
+	}
 
-	countingReader := newCountingReader(reader)
+	cr := newCountingReader(reader)
 
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
-		ContentType: aws.String(meta.ContentType),
+		ContentType: aws.String(contentType),
 		Bucket:      aws.String(a.bucketName),
 		Key:         aws.String(id.String()),
-		Body:        countingReader,
+		Body:        cr,
 		Metadata:    metadata,
 		Tagging:     nil,
 	})
@@ -56,12 +54,12 @@ func (a *S3FileArchive) Archive(ctx context.Context, meta *FileMeta, reader io.R
 		return nil, err
 	}
 
-	log.Infow("saved", "url", r.Location, "bytes_read", countingReader.bytesRead)
+	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)
 
 	ss := &ArchivedFile{
 		ID:        id.String(),
 		URL:       r.Location,
-		BytesRead: countingReader.bytesRead,
+		BytesRead: cr.bytesRead,
 	}
 
 	return ss, err

@@ -2,6 +2,7 @@ package ingester
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"mime"
 	"net/http"
@@ -78,14 +79,13 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		log.Infow("receiving", "device_id", headers.FkDeviceID, "blocks", headers.FkBlocks, "user_id", userID)
 
-		fileMeta := &files.FileMeta{
-			ContentType:  headers.ContentType,
-			DeviceID:     headers.FkDeviceID,
-			GenerationID: headers.FkGenerationID,
-			Blocks:       headers.FkBlocks,
-			Flags:        headers.FkFlags,
-		}
-		saved, err := o.Files.Archive(ctx, fileMeta, req.Body)
+		metaMap := make(map[string]string)
+		metaMap[common.FkDeviceIdHeaderName] = hex.EncodeToString(headers.FkDeviceID)
+		metaMap[common.FkGenerationHeaderName] = hex.EncodeToString(headers.FkGenerationID)
+		metaMap[common.FkBlocksIdHeaderName] = fmt.Sprintf("%v", headers.FkBlocks)
+		metaMap[common.FkFlagsIdHeaderName] = fmt.Sprintf("%v", headers.FkFlags)
+
+		saved, err := o.Files.Archive(ctx, headers.ContentType, metaMap, req.Body)
 		if err != nil {
 			return err
 		}

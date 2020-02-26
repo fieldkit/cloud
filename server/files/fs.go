@@ -21,7 +21,7 @@ func NewLocalFilesArchive() (a *LocalFilesArchive) {
 	return &LocalFilesArchive{}
 }
 
-func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader io.Reader) (*ArchivedFile, error) {
+func (a *LocalFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 
 	cr := newCountingReader(reader)
@@ -35,7 +35,7 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, meta *FileMeta, reader 
 
 	fn := makeFileName(id.String())
 
-	log.Infow("archiving", "content_type", meta.ContentType, "file_name", fn)
+	log.Infow("archiving", "content_type", contentType, "file_name", fn)
 
 	file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
