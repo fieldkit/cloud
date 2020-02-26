@@ -1,9 +1,11 @@
 package repositories
 
 import (
-	"fmt"
+	"strings"
 
 	pb "github.com/fieldkit/data-protocol"
+
+	"github.com/fieldkit/cloud/server/errors"
 )
 
 const (
@@ -35,7 +37,7 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *pb.ModuleHeader) (mm *ModuleMet
 			return module, nil
 		}
 	}
-	return nil, fmt.Errorf("missing module meta")
+	return nil, errors.Structured("missing module meta", "manufacturer", m.Manufacturer, "kind", m.Kind)
 }
 
 func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm *SensorMeta, err error) {
@@ -43,16 +45,23 @@ func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm
 	if err != nil {
 		return nil, err
 	}
+
+	// Very old firmware keys. We should sanitize these earlier in the process.
+	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
+
 	for _, module := range all {
 		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
 			for _, s := range module.Sensors {
 				if s.Key == sensor {
 					return s, nil
 				}
+				if s.Key == weNeedToCleanThisUp {
+					return s, nil
+				}
 			}
 		}
 	}
-	return nil, fmt.Errorf("missing sensor meta")
+	return nil, errors.Structured("missing sensor meta", "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
 func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
