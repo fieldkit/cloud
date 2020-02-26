@@ -13,6 +13,9 @@ const (
 	ConservifyDistance     = 0x03
 	ConservifyRandom       = 0xa0
 	ConservifyDiagnostics  = 0xa1
+
+	MaximumWindSpeed = 500    // km/hr world record is 371
+	MaximumRain      = 1000.0 // mm
 )
 
 type ModuleMetaRepository struct {
@@ -95,21 +98,25 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "tds",
 					UnitOfMeasure: "",
-					Ranges: []SensorRanges{
-						SensorRanges{
-							Minimum: 0.0,
-							Maximum: 0.0,
-						},
+					Ranges:        []SensorRanges{
+						/*
+							SensorRanges{
+								Minimum: 0.0,
+								Maximum: 0.0,
+							},
+						*/
 					},
 				},
 				&SensorMeta{
 					Key:           "salinity",
 					UnitOfMeasure: "",
-					Ranges: []SensorRanges{
-						SensorRanges{
-							Minimum: 0.0,
-							Maximum: 0.0,
-						},
+					Ranges:        []SensorRanges{
+						/*
+							SensorRanges{
+								Minimum: 0.0,
+								Maximum: 0.0,
+							},
+						*/
 					},
 				},
 			},
@@ -207,7 +214,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					UnitOfMeasure: "kPa",
 					Ranges: []SensorRanges{
 						SensorRanges{
-							Minimum: 0.0,
+							Minimum: 1.0,
 							Maximum: 200000.0,
 						},
 					},
@@ -228,7 +235,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 100.0, // TODO Arbitrary
+							Maximum: MaximumRain,
 						},
 					},
 				},
@@ -238,7 +245,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 0.0,
+							Maximum: MaximumWindSpeed,
 						},
 					},
 				},
@@ -255,11 +262,13 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "wind_dir_mv",
 					UnitOfMeasure: "mV",
-					Ranges: []SensorRanges{
-						SensorRanges{
-							Minimum: 0.0,
-							Maximum: 0.0,
-						},
+					Ranges:        []SensorRanges{
+						/*
+							SensorRanges{
+								Minimum: 0.0,
+								Maximum: 0.0,
+							},
+						*/
 					},
 				},
 				&SensorMeta{
@@ -268,7 +277,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 0.0,
+							Maximum: MaximumWindSpeed,
 						},
 					},
 				},
@@ -288,7 +297,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 0.0,
+							Maximum: MaximumWindSpeed,
 						},
 					},
 				},
@@ -308,7 +317,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 0.0,
+							Maximum: MaximumWindSpeed,
 						},
 					},
 				},
@@ -328,7 +337,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 100.0, // TODO Arbitrary
+							Maximum: MaximumRain,
 						},
 					},
 				},
@@ -338,7 +347,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 100.0, // TODO Arbitrary
+							Maximum: MaximumRain,
 						},
 					},
 				},
