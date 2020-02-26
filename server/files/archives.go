@@ -23,4 +23,5 @@ type FileArchive interface {
 	Archive(ctx context.Context, contentType string, meta map[string]string, read io.Reader) (*ArchivedFile, error)
 	OpenByKey(ctx context.Context, key string) (io.ReadCloser, error)
 	OpenByURL(ctx context.Context, url string) (io.ReadCloser, error)
+	Info(ctx context.Context, key string) (meta map[string]string, err error)
 }

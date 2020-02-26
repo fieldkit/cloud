@@ -94,47 +94,26 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (io.ReadCl
 	return obj.Body, nil
 }
 
-/*
-func (fr *FileRepository) Info(ctx context.Context, key string) (fi *FileInfo, err error) {
+func (a *S3FileArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
 	hoi := &s3.HeadObjectInput{
-		Bucket: aws.String(fr.Bucket),
+		Bucket: aws.String(a.bucketName),
 		Key:    aws.String(key),
 	}
 
-	svc := s3.New(fr.Session)
+	svc := s3.New(a.session)
 
 	obj, err := svc.HeadObject(hoi)
 	if err != nil {
-		if aerr, ok := err.(awserr.RequestFailure); ok {
-			switch aerr.StatusCode() {
-			case 404:
-				return nil, nil
-			}
-		}
-
 		return nil, fmt.Errorf("Error calling HeadObject(%v): %v", key, err)
 	}
 
-	meta := SanitizeMeta(obj.Metadata)
-	deviceID := ""
-	if value, ok := meta[FkDeviceIdHeaderName]; ok {
-		deviceID = *value
-	}
-	fileTypeID := ""
-	if value, ok := meta[FkFileIdHeaderName]; ok {
-		fileTypeID = *value
-	}
+	maybeMap := common.SanitizeMeta(obj.Metadata)
 
-	fi = &FileInfo{
-		Key:          key,
-		DeviceID:     deviceID,
-		FileTypeID:   fileTypeID,
-		URL:          fmt.Sprintf("https://%s.s3.amazonaws.com/%s", fr.Bucket, key),
-		LastModified: *obj.LastModified,
-		Size:         *obj.ContentLength,
-		Meta:         meta,
+	meta = make(map[string]string)
+
+	for key, value := range maybeMap {
+		meta[key] = *value
 	}
 
 	return
 }
-*/

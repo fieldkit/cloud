@@ -68,6 +68,10 @@ func (a *LocalFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadC
 	return os.Open(url)
 }
 
+func (a *LocalFilesArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+	return nil, nil
+}
+
 func makeFileName(key string) string {
 	return path.Join(Path, fmt.Sprintf("%v.fkpb", key))
 }
