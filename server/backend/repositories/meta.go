@@ -164,7 +164,11 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	}
 
 	if len(readings) == 0 {
-		log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
+		if len(dataRecord.Readings.SensorGroups) == 1 {
+			verboseLog.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
+		} else {
+			log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
+		}
 		return nil, nil
 	}
 
