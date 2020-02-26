@@ -38,77 +38,77 @@ type ModuleHeader struct {
 }
 
 type Version struct {
-	Meta *VersionMeta
-	Data []*DataRow
+	Meta *VersionMeta `json:"meta"`
+	Data []*DataRow   `json:"data"`
 }
 
 type VersionMeta struct {
-	ID      int64
-	Station *DataMetaStation
+	ID      int64            `json:"id"`
+	Station *DataMetaStation `json:"station"`
 }
 
 type DataMetaSensor struct {
-	Number        int
-	Name          string
-	Key           string
-	UnitOfMeasure string
-	Internal      bool
-	Ranges        []SensorRanges
+	Number        int            `json:"number"`
+	Name          string         `json:"name"`
+	Key           string         `json:"key"`
+	UnitOfMeasure string         `json:"unit_of_measure"`
+	Internal      bool           `json:"internal"`
+	Ranges        []SensorRanges `json:"ranges"`
 }
 
 type DataMetaModule struct {
-	Position     int
-	Address      int
-	Manufacturer int
-	Kind         int
-	Version      int
-	Name         string
-	ID           string
-	Sensors      []*DataMetaSensor
-	Internal     bool
+	Position     int               `json:"position"`
+	Address      int               `json:"address"`
+	Manufacturer int               `json:"manufacturer"`
+	Kind         int               `json:"kind"`
+	Version      int               `json:"version"`
+	Name         string            `json:"name"`
+	ID           string            `json:"id"`
+	Sensors      []*DataMetaSensor `json:"sensors"`
+	Internal     bool              `json:"internal"`
 }
 
 type DataMetaStation struct {
-	ID         string
-	Name       string
-	Firmware   *DataMetaStationFirmware
-	Modules    []*DataMetaModule
-	AllModules []*DataMetaModule
+	ID         string                   `json:"id"`
+	Name       string                   `json:"name"`
+	Firmware   *DataMetaStationFirmware `json:"firmware"`
+	Modules    []*DataMetaModule        `json:"modules"`
+	AllModules []*DataMetaModule        `json:"all_modules"`
 }
 
 type DataMetaStationFirmware struct {
-	Version   string
-	Build     string
-	Number    string
-	Timestamp uint64
-	Hash      string
+	Version   string `json:"version"`
+	Build     string `json:"build"`
+	Number    string `json:"number"`
+	Timestamp uint64 `json:"timestamp"`
+	Hash      string `json:"hash"`
 }
 
 type DataRow struct {
-	ID       int64
-	Time     int64
-	MetaIDs  []int64
-	Location []float64
-	Filtered []string
-	D        map[string]interface{}
+	ID       int64                  `json:"id"`
+	Time     int64                  `json:"time"`
+	MetaIDs  []int64                `json:"meta_ids"`
+	Location []float64              `json:"location"`
+	Filtered []string               `json:"filtered"`
+	D        map[string]interface{} `json:"d"`
 }
 
 type ReadingValue struct {
-	MetaID int64
-	Meta   *DataMetaSensor
-	Value  float64
+	MetaID int64           `json:"meta_id"`
+	Meta   *DataMetaSensor `json:"meta"`
+	Value  float64         `json:"value"`
 }
 
 type ResolvedRecord struct {
-	ID       int64
-	Time     int64
-	Location []float64
-	Readings map[string]*ReadingValue
+	ID       int64                    `json:"id"`
+	Time     int64                    `json:"time"`
+	Location []float64                `json:"location"`
+	Readings map[string]*ReadingValue `json:"readings"`
 }
 
 type MatchedFilters struct {
-	Record   []string
-	Readings map[string][]string
+	Record   []string            `json:"record"`
+	Readings map[string][]string `json:"readings"`
 }
 
 type RecordsByFilter = map[string][]int64
@@ -179,8 +179,8 @@ func (mf *MatchedFilters) IsFiltered(sensor string) bool {
 }
 
 type FilteredRecord struct {
-	Record  *ResolvedRecord
-	Filters *MatchedFilters
+	Record  *ResolvedRecord `json:"record"`
+	Filters *MatchedFilters `json:"filters"`
 }
 
 func (full *ResolvedRecord) ToDataRow() *DataRow {
