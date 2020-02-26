@@ -114,12 +114,13 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 	return versionMeta, nil
 }
 
-func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord) (*FilteredRecord, error) {
-	log := Logger(ctx).Sugar()
+func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) (*FilteredRecord, error) {
+	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
+	verboseLog := OnlyLogIf(log, verbose)
 
 	meta := mf.byMetaID[databaseRecord.Meta]
 	if meta == nil {
-		return nil, errors.Structured("data record with unexpected meta", "data_record_id", databaseRecord.ID, "meta_record_id", databaseRecord.Meta)
+		return nil, errors.Structured("data record with unexpected meta", "meta_record_id", databaseRecord.Meta)
 	}
 
 	var dataRecord pb.DataRecord
@@ -131,7 +132,8 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	readings := make(map[string]*ReadingValue)
 	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
 		moduleIndex := sgIndex
-		if moduleIndex >= len(meta.Station.Modules) {
+		if moduleIndex >= len(meta.Station.AllModules) {
+			verboseLog.Infow("skip", "module_index", moduleIndex, "number_module_metas", len(meta.Station.AllModules))
 			continue
 		}
 
@@ -139,6 +141,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		if !module.Internal {
 			for sensorIndex, reading := range sensorGroup.Readings {
 				if sensorIndex >= len(module.Sensors) {
+					verboseLog.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
 					continue
 				}
 
@@ -146,9 +149,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 				// This is only happening on one single record, so far.
 				if reading == nil {
-					if false {
-						log.Errorw("nil sensor reading", "data_record_id", databaseRecord.ID, "sensor_index", sensorIndex, "sensor_name", sensor.Name)
-					}
+					verboseLog.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
 					continue
 				}
 
@@ -163,7 +164,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	}
 
 	if len(readings) == 0 {
-		log.Errorw("empty record", "data_record_id", databaseRecord.ID)
+		log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
 		return nil, nil
 	}
 

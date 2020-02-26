@@ -125,7 +125,7 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 		}
 	}
 
-	filtered, err := metaFactory.Resolve(ctx, dbDatas[0])
+	filtered, err := metaFactory.Resolve(ctx, dbDatas[0], true)
 	if err != nil {
 		return err
 	}

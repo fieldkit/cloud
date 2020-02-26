@@ -72,7 +72,7 @@ func (r *Resampler) Insert(ctx context.Context, data *data.DataRecord) (d *Resam
 		}
 	}
 
-	row, err := r.metaFactory.Resolve(ctx, data)
+	row, err := r.metaFactory.Resolve(ctx, data, false)
 	if err != nil {
 		return nil, err
 	}

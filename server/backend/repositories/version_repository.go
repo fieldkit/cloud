@@ -78,7 +78,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				return nil, err
 			}
 
-			row, err := mf.Resolve(ctx, d)
+			row, err := mf.Resolve(ctx, d, false)
 			if err != nil {
 				return nil, err
 			}
