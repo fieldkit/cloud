@@ -20,6 +20,7 @@ func NewFiltering() (f *Filtering) {
 			&TimeFilter{
 				Epoch: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
 			},
+			&MissingWeatherSensorFilter{},
 			&SensorRangeFilter{},
 			&EmptyFilter{},
 		},
@@ -83,6 +84,29 @@ func (f *EmptyFilter) Name() string {
 
 func (f *EmptyFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
 	if len(row.Readings) == 0 {
+		filters.AddRecord(f.Name())
+	}
+}
+
+type MissingWeatherSensorFilter struct {
+}
+
+func (f *MissingWeatherSensorFilter) Name() string {
+	return "no-sensor"
+}
+
+func (f *MissingWeatherSensorFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
+	pressure, ok := row.Readings["pressure"]
+	if !ok {
+		return
+	}
+
+	temperature1, ok := row.Readings["temperature1"]
+	if !ok {
+		return
+	}
+
+	if pressure.Value == 0 && temperature1.Value == -45 {
 		filters.AddRecord(f.Name())
 	}
 }
