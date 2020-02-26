@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
 	goahttp "goa.design/goa/v3/http"
-	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
 
 	"github.com/fieldkit/cloud/server/logging"
@@ -26,8 +24,6 @@ import (
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Handler {
-	debug := false
-
 	testSvc := NewTestSevice(ctx, options)
 	testEndpoints := test.NewEndpoints(testSvc)
 
@@ -50,14 +46,6 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	tasksServer := taskssvr.New(tasksEndpoints, mux, dec, enc, eh, nil)
 	testServer := testsvr.New(testEndpoints, mux, dec, enc, eh, nil)
 	modulesServer := modulessvr.New(modulesEndpoints, mux, dec, enc, eh, nil)
-	if debug {
-		servers := goahttp.Servers{
-			tasksServer,
-			testServer,
-			modulesServer,
-		}
-		servers.Use(httpmdlwr.Debug(mux, os.Stdout))
-	}
 
 	taskssvr.Mount(mux, tasksServer)
 	testsvr.Mount(mux, testServer)

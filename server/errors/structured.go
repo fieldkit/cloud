@@ -8,7 +8,7 @@ import (
 )
 
 type StructuredError struct {
-	error
+	source error
 	fields []zapcore.Field
 }
 
@@ -26,16 +26,39 @@ func Structured(causeOrMessage interface{}, raw ...interface{}) *StructuredError
 		key := raw[i*2].(string)
 		fields[i] = zap.Any(key, raw[i*2+1])
 	}
+
 	return &StructuredError{
-		error:  actualCause,
+		source: actualCause,
 		fields: fields,
 	}
 }
 
-func (se *StructuredError) Cause() error {
-	return se.error
+func (e StructuredError) Error() string {
+	return e.source.Error()
 }
 
-func (se *StructuredError) Fields() []zapcore.Field {
-	return se.fields
+func (e StructuredError) Cause() error {
+	return e.source
+}
+
+func (e StructuredError) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	for _, f := range e.fields {
+		f.AddTo(enc)
+	}
+	ToField(e.source).AddTo(enc)
+	return nil
+}
+
+func ToField(err error) zap.Field {
+	return ToNamedField("cause", err)
+}
+
+func ToNamedField(key string, err error) zap.Field {
+	if err == nil {
+		return zap.Skip()
+	}
+	if e, ok := err.(zapcore.ObjectMarshaler); ok {
+		return zap.Object(key, e)
+	}
+	return zap.NamedError(key, err)
 }

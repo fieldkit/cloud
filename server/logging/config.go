@@ -92,13 +92,7 @@ func Configure(production bool, name string) (*zap.SugaredLogger, error) {
 		return nil, err
 	}
 
-	rootLogger = logger.WithOptions(
-		zap.WrapCore(
-			func(core zapcore.Core) zapcore.Core {
-				return NewStructuredErrorsCore(core)
-			},
-		),
-	).Named("fk").Named(name)
+	rootLogger = logger.Named("fk").Named(name)
 
 	zap.RedirectStdLog(rootLogger)
 
