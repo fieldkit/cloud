@@ -591,7 +591,7 @@ export default {
                 if (this.stationData[0].date < this.initialRange[0]) {
                     this.initialRange[0] = this.stationData[0].date;
                 }
-                if (this.stationData[1].date > this.initialRange[1]) {
+                if (this.stationData[this.stationData.length - 1].date > this.initialRange[1]) {
                     this.initialRange[1] = this.stationData[this.stationData.length - 1].date;
                 }
             }
