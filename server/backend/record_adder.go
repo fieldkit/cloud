@@ -152,12 +152,17 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 	return dr
 }
 
-func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
+type AddedRecord struct {
+	Meta *data.MetaRecord
+	Data *data.DataRecord
+}
+
+func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (added *AddedRecord, warning error, fatal error) {
 	log := Logger(ctx).Sugar()
 
 	provision, err := ra.findProvision(ctx, i)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if pr.SignedRecord != nil {
@@ -173,35 +178,39 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := metaRecord.SetData(pr.DataRecord); err != nil {
-			return nil, fmt.Errorf("error setting meta json: %v", err)
+			return nil, nil, fmt.Errorf("error setting meta json: %v", err)
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &metaRecord, `
 		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
 		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
                     RETURNING *`, metaRecord); err != nil {
-			return nil, err
+			return nil, nil, err
+		}
+
+		added = &AddedRecord{
+			Meta: &metaRecord,
 		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Readings == nil {
 			log.Infow("data reading missing readings", "record", pr.DataRecord)
 			ra.Metrics.DataErrorsUnknown()
-			return fmt.Errorf("weird record"), nil
+			return nil, fmt.Errorf("weird record"), nil
 		}
 
 		location, err := ra.findLocation(pr.DataRecord)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		if meta == nil {
 			log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
 			ra.Metrics.DataErrorsMissingMeta()
-			return fmt.Errorf("error finding meta record"), nil
+			return nil, fmt.Errorf("error finding meta record"), nil
 		}
 
 		dataTime := i.Time
@@ -218,7 +227,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
-			return nil, fmt.Errorf("error setting data json: %v", err)
+			return nil, nil, fmt.Errorf("error setting data json: %v", err)
 		}
 
 		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
@@ -226,11 +235,33 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
 			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
 			    RETURNING id`, dataRecord); err != nil {
-			return nil, err
+			return nil, nil, err
+		}
+
+		added = &AddedRecord{
+			Data: &dataRecord,
 		}
 	}
 
-	return nil, nil
+	return
+}
+
+type newRecordStatistics struct {
+	start time.Time
+	end   time.Time
+}
+
+func (s *newRecordStatistics) include(added *AddedRecord) {
+	if added == nil || added.Data == nil {
+		return
+	}
+
+	if s.start.IsZero() || added.Data.Time.Before(s.start) {
+		s.start = added.Data.Time
+	}
+	if s.end.IsZero() || added.Data.Time.After(s.end) {
+		s.end = added.Data.Time
+	}
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
@@ -244,6 +275,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 	}
 
 	defer reader.Close()
+
+	statistics := newRecordStatistics{}
 
 	meta := false
 	data := false
@@ -269,7 +302,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 				unmarshalError = err
 			} else {
 				data = true
-				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
+				added, warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
 				if fatal != nil {
 					return nil, fatal
 				}
@@ -283,6 +316,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 						records = 0
 					}
 				}
+
+				statistics.include(added)
 			}
 		}
 
@@ -301,7 +336,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 					ra.Metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
-				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
+
+				added, warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 				})
@@ -318,6 +354,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 						records = 0
 					}
 				}
+
+				statistics.include(added)
 			}
 		}
 
@@ -331,7 +369,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
-	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records)
+	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records, "start", statistics.start, "end", statistics.end)
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
