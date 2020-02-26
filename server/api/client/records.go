@@ -50,6 +50,41 @@ func (c *Client) NewDataRecordsRequest(ctx context.Context, path string) (*http.
 	return req, nil
 }
 
+// FilteredRecordsPath computes a request path to the filtered action of records.
+func FilteredRecordsPath(recordID int) string {
+	param0 := strconv.Itoa(recordID)
+
+	return fmt.Sprintf("/records/data/%s/filtered", param0)
+}
+
+// FilteredRecords makes a request to the filtered action endpoint of the records resource
+func (c *Client) FilteredRecords(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewFilteredRecordsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewFilteredRecordsRequest create the request corresponding to the filtered action endpoint of the records resource.
+func (c *Client) NewFilteredRecordsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // MetaRecordsPath computes a request path to the meta action of records.
 func MetaRecordsPath(recordID int) string {
 	param0 := strconv.Itoa(recordID)
@@ -68,6 +103,41 @@ func (c *Client) MetaRecords(ctx context.Context, path string) (*http.Response, 
 
 // NewMetaRecordsRequest create the request corresponding to the meta action endpoint of the records resource.
 func (c *Client) NewMetaRecordsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// ResolvedRecordsPath computes a request path to the resolved action of records.
+func ResolvedRecordsPath(recordID int) string {
+	param0 := strconv.Itoa(recordID)
+
+	return fmt.Sprintf("/records/data/%s/resolved", param0)
+}
+
+// ResolvedRecords makes a request to the resolved action endpoint of the records resource
+func (c *Client) ResolvedRecords(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewResolvedRecordsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewResolvedRecordsRequest create the request corresponding to the resolved action endpoint of the records resource.
+func (c *Client) NewResolvedRecordsRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

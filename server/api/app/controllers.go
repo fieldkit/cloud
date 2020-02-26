@@ -3434,7 +3434,9 @@ func unmarshalUpdateProjectPayload(ctx context.Context, service *goa.Service, re
 type RecordsController interface {
 	goa.Muxer
 	Data(*DataRecordsContext) error
+	Filtered(*FilteredRecordsContext) error
 	Meta(*MetaRecordsContext) error
+	Resolved(*ResolvedRecordsContext) error
 }
 
 // MountRecordsController "mounts" a Records resource controller on the given service.
@@ -3442,7 +3444,9 @@ func MountRecordsController(service *goa.Service, ctrl RecordsController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/records/data/:recordId", ctrl.MuxHandler("preflight", handleRecordsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/records/data/:recordId/filtered", ctrl.MuxHandler("preflight", handleRecordsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/records/meta/:recordId", ctrl.MuxHandler("preflight", handleRecordsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/records/data/:recordId/resolved", ctrl.MuxHandler("preflight", handleRecordsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3467,6 +3471,23 @@ func MountRecordsController(service *goa.Service, ctrl RecordsController) {
 			return err
 		}
 		// Build the context
+		rctx, err := NewFilteredRecordsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Filtered(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleRecordsOrigin(h)
+	service.Mux.Handle("GET", "/records/data/:recordId/filtered", ctrl.MuxHandler("filtered", h, nil))
+	service.LogInfo("mount", "ctrl", "Records", "action", "Filtered", "route", "GET /records/data/:recordId/filtered", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
 		rctx, err := NewMetaRecordsContext(ctx, req, service)
 		if err != nil {
 			return err
@@ -3477,6 +3498,23 @@ func MountRecordsController(service *goa.Service, ctrl RecordsController) {
 	h = handleRecordsOrigin(h)
 	service.Mux.Handle("GET", "/records/meta/:recordId", ctrl.MuxHandler("meta", h, nil))
 	service.LogInfo("mount", "ctrl", "Records", "action", "Meta", "route", "GET /records/meta/:recordId", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewResolvedRecordsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Resolved(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleRecordsOrigin(h)
+	service.Mux.Handle("GET", "/records/data/:recordId/resolved", ctrl.MuxHandler("resolved", h, nil))
+	service.LogInfo("mount", "ctrl", "Records", "action", "Resolved", "route", "GET /records/data/:recordId/resolved", "security", "jwt")
 }
 
 // handleRecordsOrigin applies the CORS response headers corresponding to the origin.

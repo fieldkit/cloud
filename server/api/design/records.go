@@ -27,4 +27,22 @@ var _ = Resource("records", func() {
 		Response(NotFound)
 		Response(OK)
 	})
+
+	Action("resolved", func() {
+		Routing(GET("records/data/:recordId/resolved"))
+		Params(func() {
+			Param("recordId", Integer)
+		})
+		Response(NotFound)
+		Response(OK)
+	})
+
+	Action("filtered", func() {
+		Routing(GET("records/data/:recordId/filtered"))
+		Params(func() {
+			Param("recordId", Integer)
+		})
+		Response(NotFound)
+		Response(OK)
+	})
 })

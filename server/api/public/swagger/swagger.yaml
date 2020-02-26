@@ -466,6 +466,30 @@ definitions:
       radius: 0.4603722702388496
       sourceId: 4.1582373515693286e+18
       startTime: "1979-05-05T06:47:15Z"
+    - centroid:
+      - 0.971106110822299
+      - 0.971106110822299
+      endTime: "2008-11-15T07:56:15Z"
+      envelope:
+      - - 0.19400784342420005
+      - - 0.19400784342420005
+      id: 3.184908010070753e+18
+      numberOfFeatures: 2.1994298230879575e+18
+      radius: 0.4603722702388496
+      sourceId: 4.1582373515693286e+18
+      startTime: "1979-05-05T06:47:15Z"
+    - centroid:
+      - 0.971106110822299
+      - 0.971106110822299
+      endTime: "2008-11-15T07:56:15Z"
+      envelope:
+      - - 0.19400784342420005
+      - - 0.19400784342420005
+      id: 3.184908010070753e+18
+      numberOfFeatures: 2.1994298230879575e+18
+      radius: 0.4603722702388496
+      sourceId: 4.1582373515693286e+18
+      startTime: "1979-05-05T06:47:15Z"
     items:
       $ref: '#/definitions/ClusterSummary'
     title: 'Mediatype identifier: application/vnd.app.geometry_cluster_summary+json;
@@ -568,12 +592,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+          Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+          Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -660,7 +684,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+        Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -668,7 +692,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+          Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
         type: object
       id:
         example: 4.464267130479644e+18
@@ -694,17 +718,17 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+        Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+        Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 1f09c339-d60a-4e3b-ae4d-659e040b4797
+        Cumque nihil.: e16399ce-fe3e-4897-8ea5-9f3ad304e8a8
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1696,7 +1720,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+            Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1770,7 +1794,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+              Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1849,7 +1873,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+        Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1862,7 +1886,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+          Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
         type: object
       location:
         example:
@@ -1928,7 +1952,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+          Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1995,7 +2019,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+            Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2073,7 +2097,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+          Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2146,7 +2170,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3232295b-3836-42e7-90af-969b4788511a
+            Perspiciatis quasi error voluptatem et.: 6e9cc330-cbf5-419f-93b7-4d1a168fdae3
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2495,8 +2519,6 @@ definitions:
     description: ReadingSummaryCollection is the media type for an array of ReadingSummary
       (default view)
     example:
-    - name: Nostrum deserunt et et.
-    - name: Nostrum deserunt et et.
     - name: Nostrum deserunt et et.
     items:
       $ref: '#/definitions/ReadingSummary'
@@ -5407,6 +5429,58 @@ paths:
       - jwt:
         - api:access
       summary: data records
+      tags:
+      - records
+  /records/data/{recordId}/filtered:
+    get:
+      description: |-
+        Required security scopes:
+          * `api:access`
+      operationId: records#filtered
+      parameters:
+      - in: path
+        name: recordId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: filtered records
+      tags:
+      - records
+  /records/data/{recordId}/resolved:
+    get:
+      description: |-
+        Required security scopes:
+          * `api:access`
+      operationId: records#resolved
+      parameters:
+      - in: path
+        name: recordId
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: resolved records
       tags:
       - records
   /records/meta/{recordId}:
