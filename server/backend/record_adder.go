@@ -213,7 +213,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			ProvisionID: provision.ID,
 			Time:        dataTime,
 			Number:      int64(pr.DataRecord.Readings.Reading),
-			Meta:        meta.ID,
+			MetaID:      meta.ID,
 			Location:    location,
 		}
 

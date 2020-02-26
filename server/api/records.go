@@ -113,7 +113,7 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 	}
 
 	dbMetas := make([]*data.MetaRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &dbMetas, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, dbDatas[0].Meta); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &dbMetas, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, dbDatas[0].MetaID); err != nil {
 		return err
 	}
 

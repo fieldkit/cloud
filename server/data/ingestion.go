@@ -133,7 +133,7 @@ type DataRecord struct {
 	ProvisionID int64          `db:"provision_id" json:"provision_id"`
 	Time        time.Time      `db:"time" json:"time"`
 	Number      int64          `db:"number" json:"number"`
-	Meta        int64          `db:"meta" json:"meta"`
+	MetaID      int64          `db:"meta" json:"meta"`
 	Location    *Location      `db:"location" json:"location"`
 	Data        types.JSONText `db:"raw" json:"raw"`
 }

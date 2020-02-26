@@ -290,7 +290,7 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 			ID:       int(r.ID),
 			Time:     r.Time,
 			Record:   int(r.Number),
-			Meta:     int(r.Meta),
+			Meta:     int(r.MetaID),
 			Location: coordinates,
 			Data:     data,
 		}

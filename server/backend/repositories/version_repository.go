@@ -54,7 +54,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 
 	byMeta := make(map[int64][]*data.DataRecord)
 	for _, dbDataRecord := range page.Data {
-		metaID := dbDataRecord.Meta
+		metaID := dbDataRecord.MetaID
 		_, err := mf.Add(page.Meta[metaID])
 		if err != nil {
 			return nil, err

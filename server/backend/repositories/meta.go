@@ -118,9 +118,9 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
 	verboseLog := OnlyLogIf(log, verbose)
 
-	meta := mf.byMetaID[databaseRecord.Meta]
+	meta := mf.byMetaID[databaseRecord.MetaID]
 	if meta == nil {
-		return nil, errors.Structured("data record with unexpected meta", "meta_record_id", databaseRecord.Meta)
+		return nil, errors.Structured("data record with unexpected meta", "meta_record_id", databaseRecord.MetaID)
 	}
 
 	var dataRecord pb.DataRecord
@@ -156,7 +156,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 				key := strcase.ToLowerCamel(sensor.Name)
 				readings[key] = &ReadingValue{
 					Meta:   sensor,
-					MetaID: databaseRecord.Meta,
+					MetaID: databaseRecord.MetaID,
 					Value:  float64(reading.Value),
 				}
 			}
