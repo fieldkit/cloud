@@ -20,8 +20,11 @@ func NewFiltering() (f *Filtering) {
 			&TimeFilter{
 				Epoch: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
 			},
-			&MissingWeatherSensorFilter{},
 			&SensorRangeFilter{},
+			&MissingWeatherSensorFilter{},
+			&MultipleFilteredReadingsFilter{
+				Threshold: 3,
+			},
 			&EmptyFilter{},
 		},
 	}
@@ -107,6 +110,20 @@ func (f *MissingWeatherSensorFilter) Apply(ctx context.Context, row *FullDataRow
 	}
 
 	if pressure.Value == 0 && temperature1.Value == -45 {
+		filters.AddRecord(f.Name())
+	}
+}
+
+type MultipleFilteredReadingsFilter struct {
+	Threshold int
+}
+
+func (f *MultipleFilteredReadingsFilter) Name() string {
+	return "multiple"
+}
+
+func (f *MultipleFilteredReadingsFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
+	if filters.NumberOfReadingsFiltered() >= f.Threshold {
 		filters.AddRecord(f.Name())
 	}
 }

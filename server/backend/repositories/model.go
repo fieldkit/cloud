@@ -156,6 +156,10 @@ func (mf *MatchedFilters) AddReading(sensor, name string) {
 	mf.Readings[sensor] = append(mf.Readings[sensor], name)
 }
 
+func (mf *MatchedFilters) NumberOfReadingsFiltered() int {
+	return len(mf.Readings)
+}
+
 func (mf *MatchedFilters) IsFiltered(sensor string) bool {
 	if len(mf.Record) > 0 {
 		return true
