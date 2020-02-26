@@ -92,3 +92,11 @@ func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 		t.Send("http.req.time")
 	})
 }
+
+func (m *Metrics) RecordsViewed(records int) {
+	m.SC.Count("api.data.records.viewed", records)
+}
+
+func (m *Metrics) ReadingsViewed(readings int) {
+	m.SC.Count("api.data.readings.viewed", readings)
+}

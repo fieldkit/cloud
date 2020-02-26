@@ -176,6 +176,13 @@ func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
 		return err
 	}
 
+	readings := 0
+	for _, d := range modulesAndData.Data {
+		readings += len(d.D)
+	}
+	c.options.Metrics.RecordsViewed(len(modulesAndData.Data))
+	c.options.Metrics.ReadingsViewed(readings)
+
 	return ctx.OK(JSONDataSummaryResponseType(modulesAndData))
 }
 
@@ -223,6 +230,17 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 	if err != nil {
 		return err
 	}
+
+	records := 0
+	readings := 0
+	for _, version := range versions {
+		records += len(version.Data)
+		for _, d := range version.Data {
+			readings += len(d.D)
+		}
+	}
+	c.options.Metrics.RecordsViewed(records)
+	c.options.Metrics.ReadingsViewed(readings)
 
 	return ctx.OK(&app.JSONDataResponse{
 		Versions: JSONDataResponseType(versions),
