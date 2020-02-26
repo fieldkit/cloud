@@ -7,7 +7,7 @@ import (
 
 type Filter interface {
 	Name() string
-	Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters)
+	Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters)
 }
 
 type Filtering struct {
@@ -29,7 +29,7 @@ func NewFiltering() (f *Filtering) {
 	}
 }
 
-func (f *Filtering) Apply(ctx context.Context, record *FullDataRow) *FilteredRecord {
+func (f *Filtering) Apply(ctx context.Context, record *ResolvedRecord) *FilteredRecord {
 	filters := &MatchedFilters{
 		Record:   make([]string, 0),
 		Readings: make(map[string][]string),
@@ -53,8 +53,8 @@ func (f *TimeFilter) Name() string {
 	return "time"
 }
 
-func (f *TimeFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
-	if row.Time < f.Epoch.Unix() {
+func (f *TimeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+	if record.Time < f.Epoch.Unix() {
 		filters.AddRecord(f.Name())
 	}
 }
@@ -66,8 +66,8 @@ func (f *SensorRangeFilter) Name() string {
 	return "range"
 }
 
-func (f *SensorRangeFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
-	for key, reading := range row.Readings {
+func (f *SensorRangeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+	for key, reading := range record.Readings {
 		for _, r := range reading.Meta.Ranges {
 			if r.Minimum == r.Maximum {
 				if reading.Value == r.Minimum {
@@ -90,8 +90,8 @@ func (f *EmptyFilter) Name() string {
 	return "empty"
 }
 
-func (f *EmptyFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
-	if len(row.Readings) == 0 {
+func (f *EmptyFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+	if len(record.Readings) == 0 {
 		filters.AddRecord(f.Name())
 	}
 }
@@ -104,7 +104,7 @@ func (f *MultipleFilteredReadingsFilter) Name() string {
 	return "multiple"
 }
 
-func (f *MultipleFilteredReadingsFilter) Apply(ctx context.Context, row *FullDataRow, filters *MatchedFilters) {
+func (f *MultipleFilteredReadingsFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
 	if filters.NumberOfReadingsFiltered() >= f.Threshold {
 		filters.AddRecord(f.Name())
 	}

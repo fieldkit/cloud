@@ -169,7 +169,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 	location := getLocation(dataRecord.Readings.Location)
 
-	resolved := &FullDataRow{
+	resolved := &ResolvedRecord{
 		ID:       databaseRecord.ID,
 		Time:     dataRecord.Readings.Time,
 		Location: location,

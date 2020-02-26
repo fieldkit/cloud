@@ -93,7 +93,7 @@ type DataRow struct {
 	D        map[string]interface{}
 }
 
-type FullDataRow struct {
+type ResolvedRecord struct {
 	ID       int64
 	Time     int64
 	Location []float64
@@ -173,7 +173,7 @@ func (mf *MatchedFilters) IsFiltered(sensor string) bool {
 }
 
 type FilteredRecord struct {
-	Record  *FullDataRow
+	Record  *ResolvedRecord
 	Filters *MatchedFilters
 }
 
@@ -183,7 +183,7 @@ type ReadingValue struct {
 	Value  float64
 }
 
-func (full *FullDataRow) ToDataRow() *DataRow {
+func (full *ResolvedRecord) ToDataRow() *DataRow {
 	data := make(map[string]interface{})
 	metaIDs := make([]int64, 0)
 
