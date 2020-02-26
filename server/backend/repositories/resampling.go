@@ -87,24 +87,26 @@ func (r *Resampler) Insert(ctx context.Context, data *data.DataRecord) (d *Resam
 func (r *Resampler) Close(ctx context.Context) (d *Resampled, err error) {
 	log := Logger(ctx).Sugar()
 
-	records := r.bin.Records
+	records := FilteredRecordCollection{
+		records: r.bin.Records,
+	}
 	metaIDs := r.bin.MetaIDs()
-	location := getResampledLocation(records)
-	data, err := getResampledData(records)
+	location := records.firstLocation()
+	data, err := records.mean()
 	if err != nil {
 		return nil, err
 	}
 
 	d = &Resampled{
 		Time:            r.bin.Time(),
-		NumberOfSamples: int32(len(records)),
+		NumberOfSamples: int32(len(r.bin.Records)),
 		MetaIDs:         metaIDs,
 		Location:        location,
 		D:               data,
 	}
 
 	if false {
-		log.Infow("record", "bin", r.bin.Number, "records", len(records), "location", location, "data", data)
+		log.Infow("record", "bin", r.bin.Number, "records", len(r.bin.Records), "location", location, "data", data)
 	}
 
 	r.bin.Clear()
@@ -160,8 +162,12 @@ func (b *ResamplingBin) Clear() {
 	b.Records = b.Records[:0]
 }
 
-func getResampledLocation(records []*FilteredRecord) []float64 {
-	for _, r := range records {
+type FilteredRecordCollection struct {
+	records []*FilteredRecord
+}
+
+func (c *FilteredRecordCollection) firstLocation() []float64 {
+	for _, r := range c.records {
 		if r.Record.Location != nil && len(r.Record.Location) > 0 {
 			return r.Record.Location
 		}
@@ -169,23 +175,18 @@ func getResampledLocation(records []*FilteredRecord) []float64 {
 	return nil
 }
 
-type Filterings struct {
-	Records  []int64
-	Readings map[int64]string
-}
-
-func getResampledData(records []*FilteredRecord) (map[string]interface{}, error) {
-	filterLog := NewFilterLog()
+func (c *FilteredRecordCollection) mean() (map[string]interface{}, error) {
+	filterAuditLog := NewFilterAuditLog()
+	all := make(map[string][]float64)
 	ids := make([]int64, 0)
 
-	all := make(map[string][]float64)
-	for _, r := range records {
-		filterLog.Include(r)
+	for _, r := range c.records {
+		filterAuditLog.Include(r)
 
 		for k, reading := range r.Record.Readings {
 			if !r.Filters.IsFiltered(k) {
 				if all[k] == nil {
-					all[k] = make([]float64, 0, len(records))
+					all[k] = make([]float64, 0, len(c.records))
 				}
 				all[k] = append(all[k], reading.Value)
 			}
@@ -203,9 +204,9 @@ func getResampledData(records []*FilteredRecord) (map[string]interface{}, error)
 		d[k] = mean
 	}
 
-	d[FiltersKey] = filterLog
+	d[FiltersKey] = filterAuditLog
 	d[ResampledKey] = ResampleInfo{
-		Size: int32(len(records)),
+		Size: int32(len(c.records)),
 		IDs:  ids,
 	}
 

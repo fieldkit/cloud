@@ -93,6 +93,12 @@ type DataRow struct {
 	D        map[string]interface{}
 }
 
+type ReadingValue struct {
+	MetaID int64
+	Meta   *DataMetaSensor
+	Value  float64
+}
+
 type ResolvedRecord struct {
 	ID       int64
 	Time     int64
@@ -107,19 +113,19 @@ type MatchedFilters struct {
 
 type RecordsByFilter = map[string][]int64
 
-type FilterLog struct {
+type FilterAuditLog struct {
 	Records  RecordsByFilter            `json:"records"`
 	Readings map[string]RecordsByFilter `json:"readings"`
 }
 
-func NewFilterLog() *FilterLog {
-	return &FilterLog{
+func NewFilterAuditLog() *FilterAuditLog {
+	return &FilterAuditLog{
 		Records:  make(map[string][]int64),
 		Readings: make(map[string]RecordsByFilter),
 	}
 }
 
-func (fl *FilterLog) Include(fr *FilteredRecord) {
+func (fl *FilterAuditLog) Include(fr *FilteredRecord) {
 	id := fr.Record.ID
 
 	for _, filter := range fr.Filters.Record {
@@ -175,12 +181,6 @@ func (mf *MatchedFilters) IsFiltered(sensor string) bool {
 type FilteredRecord struct {
 	Record  *ResolvedRecord
 	Filters *MatchedFilters
-}
-
-type ReadingValue struct {
-	MetaID int64
-	Meta   *DataMetaSensor
-	Value  float64
 }
 
 func (full *ResolvedRecord) ToDataRow() *DataRow {
