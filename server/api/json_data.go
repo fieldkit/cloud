@@ -37,7 +37,6 @@ func JSONDataRowsType(dm []*repositories.DataRow, includeMetas bool) []*app.JSON
 			}
 		}
 		wm[i] = &app.JSONDataRow{
-			ID:       int64(r.ID),
 			Time:     int64(r.Time * 1000),
 			Location: r.Location,
 			D:        r.D,

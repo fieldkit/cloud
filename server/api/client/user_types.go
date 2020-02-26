@@ -1341,7 +1341,6 @@ func (ut *JSONDataMetaStationFirmware) Validate() (err error) {
 // jSONDataRow user type.
 type jSONDataRow struct {
 	D        map[string]interface{} `form:"d,omitempty" json:"d,omitempty" yaml:"d,omitempty" xml:"d,omitempty"`
-	ID       *int                   `form:"id,omitempty" json:"id,omitempty" yaml:"id,omitempty" xml:"id,omitempty"`
 	Location []float64              `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
 	Metas    []int                  `form:"metas,omitempty" json:"metas,omitempty" yaml:"metas,omitempty" xml:"metas,omitempty"`
 	Time     *int                   `form:"time,omitempty" json:"time,omitempty" yaml:"time,omitempty" xml:"time,omitempty"`
@@ -1349,9 +1348,6 @@ type jSONDataRow struct {
 
 // Validate validates the jSONDataRow type instance.
 func (ut *jSONDataRow) Validate() (err error) {
-	if ut.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
-	}
 	if ut.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "time"))
 	}
@@ -1370,9 +1366,6 @@ func (ut *jSONDataRow) Publicize() *JSONDataRow {
 	if ut.D != nil {
 		pub.D = ut.D
 	}
-	if ut.ID != nil {
-		pub.ID = *ut.ID
-	}
 	if ut.Location != nil {
 		pub.Location = ut.Location
 	}
@@ -1388,7 +1381,6 @@ func (ut *jSONDataRow) Publicize() *JSONDataRow {
 // JSONDataRow user type.
 type JSONDataRow struct {
 	D        map[string]interface{} `form:"d" json:"d" yaml:"d" xml:"d"`
-	ID       int                    `form:"id" json:"id" yaml:"id" xml:"id"`
 	Location []float64              `form:"location" json:"location" yaml:"location" xml:"location"`
 	Metas    []int                  `form:"metas,omitempty" json:"metas,omitempty" yaml:"metas,omitempty" xml:"metas,omitempty"`
 	Time     int                    `form:"time" json:"time" yaml:"time" xml:"time"`
