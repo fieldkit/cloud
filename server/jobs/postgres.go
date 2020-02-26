@@ -19,6 +19,7 @@ import (
 
 type PgJobQueue struct {
 	db       *sqlxcache.DB
+	metrics  *logging.Metrics
 	name     string
 	listener *pq.Listener
 	handlers map[reflect.Type]*HandlerRegistration
@@ -30,7 +31,7 @@ var (
 	ids = logging.NewIdGenerator()
 )
 
-func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name string) (*PgJobQueue, error) {
+func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, metrics *logging.Metrics, url string, name string) (*PgJobQueue, error) {
 	onProblem := func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			Logger(nil).Sugar().Errorw("problem", "error", err, "queue", name)
@@ -41,9 +42,10 @@ func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, url string, name strin
 
 	jq := &PgJobQueue{
 		handlers: make(map[reflect.Type]*HandlerRegistration),
-		name:     name,
 		db:       db,
+		metrics:  metrics,
 		listener: listener,
+		name:     name,
 		control:  make(chan bool),
 	}
 
@@ -55,6 +57,8 @@ func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	jq.metrics.MessagePublished()
 
 	messageType := reflect.TypeOf(message)
 	if messageType.Kind() == reflect.Ptr {
@@ -116,6 +120,10 @@ func (jq *PgJobQueue) Stop() error {
 }
 
 func (jq *PgJobQueue) dispatch(ctx context.Context, log *zap.SugaredLogger, tm *TransportMessage) {
+	timer := jq.metrics.HandleMessage()
+
+	defer timer.Send()
+
 	for messageType, registration := range jq.handlers {
 		if messageType.Name() == tm.Type && messageType.PkgPath() == tm.Package {
 			message := reflect.New(messageType).Interface()
@@ -160,7 +168,7 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 			err := json.Unmarshal([]byte(n.Extra), transport)
 			if err != nil {
 				log.Errorf("error processing JSON: %v", err)
-				break
+				return
 			}
 
 			messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
@@ -177,6 +185,7 @@ func (jq *PgJobQueue) waitForNotification(concurrency int) {
 				jq.wg.Done()
 				return
 			}
+
 			break
 		case <-time.After(90 * time.Second):
 			go func() {

@@ -13,16 +13,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type S3FileArchive struct {
 	session    *session.Session
+	metrics    *logging.Metrics
 	bucketName string
 }
 
-func NewS3FileArchive(session *session.Session, bucketName string) *S3FileArchive {
+func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucketName string) *S3FileArchive {
 	return &S3FileArchive{
 		session:    session,
+		metrics:    metrics,
 		bucketName: bucketName,
 	}
 }
@@ -33,6 +36,10 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 	log := Logger(ctx).Sugar()
 
 	uploader := s3manager.NewUploader(a.session)
+
+	timer := a.metrics.FileUpload()
+
+	defer timer.Send()
 
 	metadata := make(map[string]*string)
 	for key, value := range meta {

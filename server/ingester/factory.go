@@ -28,7 +28,12 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		panic(err)
 	}
 
-	files, err := createFileArchive(ctx, config, awsSession)
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+		Prefix:  "fk.ingester",
+		Address: config.StatsdAddress,
+	})
+
+	files, err := createFileArchive(ctx, config, awsSession, metrics)
 	if err != nil {
 		panic(err)
 	}
@@ -43,15 +48,10 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		panic(err)
 	}
 
-	publisher, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
+	publisher, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
 	if err != nil {
 		panic(err)
 	}
-
-	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
-		Prefix:  "fk.ingester",
-		Address: config.StatsdAddress,
-	})
 
 	options := &IngesterOptions{
 		AuthenticationMiddleware: jwtMiddleware,
@@ -86,19 +86,13 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
-func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session) (archive files.FileArchive, err error) {
-	log := logging.Logger(ctx).Sugar()
-
+func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
 	switch config.Archiver {
 	case "default":
-		archive = files.NewLocalFilesArchive()
+		return files.NewLocalFilesArchive(), nil
 	case "aws":
-		archive = files.NewS3FileArchive(awsSession, config.BucketName)
+		return files.NewS3FileArchive(awsSession, metrics, config.BucketName), nil
 	default:
 		panic("Unknown archiver: " + config.Archiver)
 	}
-
-	log.Infow("configuration", "archiver", config.Archiver)
-
-	return
 }

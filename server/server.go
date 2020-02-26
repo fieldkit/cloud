@@ -139,20 +139,20 @@ func main() {
 		panic(err)
 	}
 
-	jq, err := jobs.NewPqJobQueue(ctx, database, config.PostgresURL, "messages")
-	if err != nil {
-		panic(err)
-	}
-
-	files, err := createFileArchive(ctx, awsSession, config)
-	if err != nil {
-		panic(err)
-	}
-
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
 		Prefix:  "fk.service",
 		Address: config.StatsdAddress,
 	})
+
+	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
+	if err != nil {
+		panic(err)
+	}
+
+	files, err := createFileArchive(ctx, config, awsSession, metrics)
+	if err != nil {
+		panic(err)
+	}
 
 	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
 		Database: database,
@@ -300,12 +300,12 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, awsSession *session.Session, config Config) (archiver files.FileArchive, err error) {
+func createFileArchive(ctx context.Context, config Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
 	switch config.Archiver {
 	case "default":
 		return files.NewLocalFilesArchive(), nil
 	case "aws":
-		return files.NewS3FileArchive(awsSession, config.BucketName), nil
+		return files.NewS3FileArchive(awsSession, metrics, config.BucketName), nil
 	default:
 		panic("unknown archiver: " + config.Archiver)
 	}

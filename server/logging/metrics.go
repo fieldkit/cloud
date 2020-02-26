@@ -71,6 +71,44 @@ func (m *Metrics) DataErrorsMissingMeta() {
 	m.SC.Increment("api.data.errors.meta")
 }
 
+func (m *Metrics) MessagePublished() {
+	m.SC.Increment("messages.published")
+}
+
+type Timing struct {
+	sc         *statsd.Client
+	timer      statsd.Timing
+	timingKey  string
+	counterKey string
+}
+
+func (t *Timing) Send() {
+	t.timer.Send(t.timingKey)
+	t.sc.Increment(t.counterKey)
+}
+
+func (m *Metrics) FileUpload() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:         m.SC,
+		timer:      timer,
+		timingKey:  "files.uploading.time",
+		counterKey: "files.uploaded",
+	}
+}
+
+func (m *Metrics) HandleMessage() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:         m.SC,
+		timer:      timer,
+		timingKey:  "messages.handling.time",
+		counterKey: "messages.processed",
+	}
+}
+
 func (m *Metrics) DataErrorsUnknown() {
 	m.SC.Increment("api.data.errors.unknown")
 }
