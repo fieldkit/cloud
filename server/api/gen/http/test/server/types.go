@@ -52,8 +52,9 @@ func NewGetPayload(id int64) *test.GetPayload {
 }
 
 // NewEmailPayload builds a test service email endpoint payload.
-func NewEmailPayload(auth string) *test.EmailPayload {
+func NewEmailPayload(address string, auth string) *test.EmailPayload {
 	return &test.EmailPayload{
-		Auth: auth,
+		Address: address,
+		Auth:    auth,
 	}
 }

@@ -33,12 +33,12 @@ func (sc *TestService) Error(ctx context.Context) error {
 func (sc *TestService) Email(ctx context.Context, payload *test.EmailPayload) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("sending test email")
+	log.Infow("sending test email", "address", payload.Address)
 
 	user := &data.User{
 		ID:    0,
 		Name:  data.Name("Bernie Sanders"),
-		Email: "jacob@conservify.org",
+		Email: payload.Address,
 	}
 
 	token, err := data.NewValidationToken(user.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))

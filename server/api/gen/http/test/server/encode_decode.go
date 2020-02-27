@@ -133,9 +133,14 @@ func EncodeEmailResponse(encoder func(context.Context, http.ResponseWriter) goah
 func DecodeEmailRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			auth string
-			err  error
+			address string
+			auth    string
+			err     error
 		)
+		address = r.URL.Query().Get("address")
+		if address == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("address", "query string"))
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -143,7 +148,7 @@ func DecodeEmailRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 		if err != nil {
 			return nil, err
 		}
-		payload := NewEmailPayload(auth)
+		payload := NewEmailPayload(address, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

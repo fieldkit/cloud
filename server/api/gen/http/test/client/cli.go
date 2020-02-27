@@ -32,13 +32,18 @@ func BuildGetPayload(testGetID string) (*test.GetPayload, error) {
 
 // BuildEmailPayload builds the payload for the test email endpoint from CLI
 // flags.
-func BuildEmailPayload(testEmailAuth string) (*test.EmailPayload, error) {
+func BuildEmailPayload(testEmailAddress string, testEmailAuth string) (*test.EmailPayload, error) {
+	var address string
+	{
+		address = testEmailAddress
+	}
 	var auth string
 	{
 		auth = testEmailAuth
 	}
 	payload := &test.EmailPayload{
-		Auth: auth,
+		Address: address,
+		Auth:    auth,
 	}
 	return payload, nil
 }

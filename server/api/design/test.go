@@ -28,14 +28,15 @@ var _ = Service("test", func() {
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
+			Attribute("address")
+			Required("auth", "address")
 		})
 
 		Result(Empty)
 
 		HTTP(func() {
 			GET("test/email")
-
+			Param("address")
 			Header("auth:Authorization", String, "authentication token", func() {
 				Pattern("^Bearer [^ ]+$")
 			})

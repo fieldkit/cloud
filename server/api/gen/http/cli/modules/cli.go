@@ -34,7 +34,7 @@ modules meta
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 3853225884848678956` + "\n" +
+		os.Args[0] + ` test get --id 6377494565823219061` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		""
 }
@@ -64,8 +64,9 @@ func ParseEndpoint(
 
 		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
 
-		testEmailFlags    = flag.NewFlagSet("email", flag.ExitOnError)
-		testEmailAuthFlag = testEmailFlags.String("auth", "REQUIRED", "")
+		testEmailFlags       = flag.NewFlagSet("email", flag.ExitOnError)
+		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
+		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
 
 		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
 
@@ -190,7 +191,7 @@ func ParseEndpoint(
 				data = nil
 			case "email":
 				endpoint = c.Email()
-				data, err = testc.BuildEmailPayload(*testEmailAuthFlag)
+				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
 			}
 		case "modules":
 			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -240,7 +241,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Ea aspernatur et et aut quas facere." --auth "Magnam aut nihil doloremque."
+    `+os.Args[0]+` tasks refresh- device --device-id "Magnam aut nihil doloremque." --auth "Perspiciatis dicta."
 `, os.Args[0])
 }
 
@@ -266,7 +267,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 3853225884848678956
+    `+os.Args[0]+` test get --id 6377494565823219061
 `, os.Args[0])
 }
 
@@ -281,13 +282,14 @@ Example:
 }
 
 func testEmailUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test email -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] test email -address STRING -auth STRING
 
 Email implements email.
+    -address STRING: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --auth "Ut porro molestiae repellendus nihil dicta."
+    `+os.Args[0]+` test email --address "Ea maiores ea vitae eos." --auth "Repellat quos veritatis quis omnis itaque."
 `, os.Args[0])
 }
 

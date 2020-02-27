@@ -167,6 +167,9 @@ func EncodeEmailRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		values.Add("address", p.Address)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

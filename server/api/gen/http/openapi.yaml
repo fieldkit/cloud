@@ -103,6 +103,10 @@ paths:
           * `api:access`
       operationId: test#email
       parameters:
+      - name: address
+        in: query
+        required: true
+        type: string
       - name: Authorization
         in: header
         description: authentication token
@@ -140,27 +144,27 @@ definitions:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quibusdam aliquid et sed et.
+    example: Nisi consequatur recusandae eum magni modi.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Saepe quibusdam exercitationem.
+    example: Aliquid et quia.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Beatae et magnam ab soluta ipsam sunt.
+    example: Consectetur dolorem quia.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Aliquid et quia.
+    example: Ipsum voluptas.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Nisi consequatur recusandae eum magni modi.
+    example: Beatae et magnam ab soluta ipsam sunt.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

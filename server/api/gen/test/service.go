@@ -46,7 +46,8 @@ type GetPayload struct {
 
 // EmailPayload is the payload type of the test service email method.
 type EmailPayload struct {
-	Auth string
+	Auth    string
+	Address string
 }
 
 // credentials are invalid
