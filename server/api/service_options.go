@@ -30,10 +30,6 @@ type ControllerOptions struct {
 }
 
 func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, awsSession *session.Session, config *ApiConfiguration, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("config", "config", config)
-
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err

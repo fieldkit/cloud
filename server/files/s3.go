@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/errors"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -22,12 +23,18 @@ type S3FileArchive struct {
 	bucketName string
 }
 
-func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucketName string) *S3FileArchive {
-	return &S3FileArchive{
+func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucketName string) (files *S3FileArchive, err error) {
+	if bucketName == "" {
+		return nil, fmt.Errorf("empty bucket name")
+	}
+
+	files = &S3FileArchive{
 		session:    session,
 		metrics:    metrics,
 		bucketName: bucketName,
 	}
+
+	return
 }
 
 func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
@@ -58,7 +65,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 		Tagging:     nil,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Structured("aws error", err)
 	}
 
 	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)

@@ -94,11 +94,11 @@ func main() {
 
 	if config.Help {
 		flag.Usage()
-		envconfig.Usage("fieldkit", &config)
+		envconfig.Usage("server", &config)
 		os.Exit(0)
 	}
 
-	if err := envconfig.Process("fieldkit", &config); err != nil {
+	if err := envconfig.Process("FIELDKIT", &config); err != nil {
 		panic(err)
 	}
 
@@ -118,9 +118,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Infow("starting")
-
-	log.Infow("hostnames", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain)
+	log.Infow("starting", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "bucket_name", config.BucketName)
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
@@ -305,7 +303,7 @@ func createFileArchive(ctx context.Context, config Config, awsSession *session.S
 	case "default":
 		return files.NewLocalFilesArchive(), nil
 	case "aws":
-		return files.NewS3FileArchive(awsSession, metrics, config.BucketName), nil
+		return files.NewS3FileArchive(awsSession, metrics, config.BucketName)
 	default:
 		panic("unknown archiver: " + config.Archiver)
 	}
@@ -314,7 +312,7 @@ func createFileArchive(ctx context.Context, config Config, awsSession *session.S
 func getIngesterConfig() *ingester.Config {
 	var config ingester.Config
 
-	err := envconfig.Process("fieldkit", &config)
+	err := envconfig.Process("FIELDKIT", &config)
 	if err != nil {
 		panic(err)
 	}

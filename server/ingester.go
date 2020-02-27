@@ -24,7 +24,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Info("starting")
+	log.Info("starting", "bucket_name", config.BucketName)
 
 	ingesterHandler, ingesterOptions := ingester.NewIngester(ctx, config)
 	notFoundHandler := http.NotFoundHandler()
@@ -65,11 +65,11 @@ func getConfig() *ingester.Config {
 
 	if config.Help {
 		flag.Usage()
-		envconfig.Usage("fieldkit", &config)
+		envconfig.Usage("ingester", &config)
 		os.Exit(0)
 	}
 
-	err := envconfig.Process("fieldkit", &config)
+	err := envconfig.Process("FIELDKIT", &config)
 	if err != nil {
 		panic(err)
 	}
