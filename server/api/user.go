@@ -148,7 +148,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 		return err
 	}
 
-	ctx.ResponseData.Header().Set("Location", "https://"+c.options.Domain+"/admin/signin")
+	ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"/")
 	return ctx.Found()
 }
 

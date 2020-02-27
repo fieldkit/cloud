@@ -19,6 +19,7 @@ type ApiConfiguration struct {
 	SessionKey    string
 	Emailer       string
 	Domain        string
+	PortalDomain  string
 	EmailOverride string
 }
 

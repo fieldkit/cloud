@@ -15,15 +15,16 @@ import (
 )
 
 type ControllerOptions struct {
-	Config     *ApiConfiguration
-	Session    *session.Session
-	Database   *sqlxcache.DB
-	Backend    *backend.Backend
-	JWTHMACKey []byte
-	Emailer    email.Emailer
-	Domain     string
-	Metrics    *logging.Metrics
-	Publisher  jobs.MessagePublisher
+	Config       *ApiConfiguration
+	Session      *session.Session
+	Database     *sqlxcache.DB
+	Backend      *backend.Backend
+	JWTHMACKey   []byte
+	Emailer      email.Emailer
+	Domain       string
+	PortalDomain string
+	Metrics      *logging.Metrics
+	Publisher    jobs.MessagePublisher
 	// Twitter
 	ConsumerKey    string
 	ConsumerSecret string
@@ -41,15 +42,16 @@ func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backe
 	}
 
 	controllerOptions = &ControllerOptions{
-		Session:    awsSession,
-		Database:   database,
-		Backend:    be,
-		Emailer:    emailer,
-		JWTHMACKey: jwtHMACKey,
-		Domain:     config.Domain,
-		Metrics:    metrics,
-		Config:     config,
-		Publisher:  publisher,
+		Session:      awsSession,
+		Database:     database,
+		Backend:      be,
+		Emailer:      emailer,
+		JWTHMACKey:   jwtHMACKey,
+		Domain:       config.Domain,
+		PortalDomain: config.PortalDomain,
+		Metrics:      metrics,
+		Config:       config,
+		Publisher:    publisher,
 	}
 
 	return

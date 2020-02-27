@@ -189,6 +189,7 @@ func main() {
 		SessionKey:    config.SessionKey,
 		Emailer:       config.Emailer,
 		Domain:        config.Domain,
+		PortalDomain:  config.PortalDomain,
 		EmailOverride: config.EmailOverride,
 	}
 
