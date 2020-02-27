@@ -107,6 +107,10 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 		return err
 	}
 
+	c.options.metrics.UserAdded()
+
+	c.options.metrics.EmailVerificationSent()
+
 	return ctx.OK(UserType(user))
 }
 
@@ -126,6 +130,8 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 }
 
 func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
+	log := Logger(ctx).Sugar()
+
 	validationToken := &data.ValidationToken{}
 	if err := validationToken.Token.UnmarshalText([]byte(ctx.Token)); err != nil {
 		return err
@@ -133,9 +139,9 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 
 	err := c.options.Database.GetContext(ctx, validationToken, "SELECT * FROM fieldkit.validation_token WHERE token = $1", validationToken.Token)
 	if err == sql.ErrNoRows {
+		log.Infow("invalid", "token", ctx.Token)
 		return ctx.Unauthorized()
 	}
-
 	if err != nil {
 		return err
 	}
@@ -148,7 +154,12 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 		return err
 	}
 
+	log.Infow("verified", "token", ctx.Token)
+
+	c.options.metrics.UserValidated()
+
 	ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"/")
+
 	return ctx.Found()
 }
 

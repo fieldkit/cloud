@@ -109,6 +109,18 @@ func (m *Metrics) HandleMessage() *Timing {
 	}
 }
 
+func (m *Metrics) UserValidated() {
+	m.SC.Increment("api.users.validated")
+}
+
+func (m *Metrics) UserAdded() {
+	m.SC.Increment("api.users.added")
+}
+
+func (m *Metrics) EmailVerificationSent() {
+	m.SC.Increment("emails.verification")
+}
+
 func (m *Metrics) DataErrorsUnknown() {
 	m.SC.Increment("api.data.errors.unknown")
 }
