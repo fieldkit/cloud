@@ -10,37 +10,41 @@ import (
 )
 
 type AWSSESEmailer struct {
-	templates   *EmailTemplates
-	client      *ses.SES
 	source      string
 	domain      string
 	sourceEmail *string
+	override    []*string
+	templates   *EmailTemplates
+	sesc        *ses.SES
 }
 
-func NewAWSSESEmailer(client *ses.SES, source, domain string) (e *AWSSESEmailer, err error) {
+func NewAWSSESEmailer(sesc *ses.SES, source, domain string, override []*string) (e *AWSSESEmailer, err error) {
 	templates, err := NewEmailTemplates()
 	if err != nil {
 		return nil, err
 	}
 
 	e = &AWSSESEmailer{
-		templates:   templates,
-		sourceEmail: aws.String(source + "@" + domain),
-		client:      client,
 		source:      source,
 		domain:      domain,
+		sourceEmail: aws.String(source + "@" + domain),
+		override:    override,
+		templates:   templates,
+		sesc:        sesc,
 	}
 
 	return
 }
 
 func (a AWSSESEmailer) send(subject, body string, addresses []*string) error {
+	destination := addresses
+	if a.override != nil {
+		destination = a.override
+	}
+
 	sendEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
-			ToAddresses: []*string{
-				aws.String("jacob@conservify.org"),
-				aws.String("shah@conservify.org"),
-			},
+			ToAddresses: destination,
 		},
 		Message: &ses.Message{
 			Body: &ses.Body{
@@ -61,7 +65,7 @@ func (a AWSSESEmailer) send(subject, body string, addresses []*string) error {
 		},
 	}
 
-	if _, err := a.client.SendEmail(sendEmailInput); err != nil {
+	if _, err := a.sesc.SendEmail(sendEmailInput); err != nil {
 		return err
 	}
 

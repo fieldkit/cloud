@@ -41,6 +41,7 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
 	Emailer               string `split_words:"true" default:"default" required:"true"`
+	EmailOverride         string `split_words:"true" default:""`
 	Archiver              string `split_words:"true" default:"default" required:"true"`
 	PortalRoot            string `split_words:"true"`
 	OcrPortalRoot         string `split_words:"true"`
@@ -55,6 +56,7 @@ type Config struct {
 	AwsSecret             string `split_words:"true" default:""`
 	StatsdAddress         string `split_words:"true" default:""`
 	Production            bool   `envconfig:"production"`
+	LoggingFull           bool   `envconfig:"logging_full"`
 
 	Help bool
 }
@@ -114,11 +116,11 @@ func main() {
 		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
 	}
 
-	logging.Configure(config.Production, "service")
+	logging.Configure(config.LoggingFull, "service")
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Infow("starting", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "bucket_name", config.BucketName)
+	log.Infow("config", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "bucket_name", config.BucketName, "email_override", config.EmailOverride)
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
@@ -181,12 +183,13 @@ func main() {
 	}
 
 	apiConfig := &api.ApiConfiguration{
-		BucketName: config.BucketName,
-		ApiHost:    config.ApiHost,
-		ApiDomain:  config.ApiDomain,
-		SessionKey: config.SessionKey,
-		Emailer:    config.Emailer,
-		Domain:     config.Domain,
+		BucketName:    config.BucketName,
+		ApiHost:       config.ApiHost,
+		ApiDomain:     config.ApiDomain,
+		SessionKey:    config.SessionKey,
+		Emailer:       config.Emailer,
+		Domain:        config.Domain,
+		EmailOverride: config.EmailOverride,
 	}
 
 	err = jq.Listen(ctx, 1)

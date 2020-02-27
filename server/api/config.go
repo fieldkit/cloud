@@ -13,12 +13,13 @@ import (
 )
 
 type ApiConfiguration struct {
-	BucketName string
-	ApiDomain  string
-	ApiHost    string
-	SessionKey string
-	Emailer    string
-	Domain     string
+	BucketName    string
+	ApiDomain     string
+	ApiHost       string
+	SessionKey    string
+	Emailer       string
+	Domain        string
+	EmailOverride string
 }
 
 func (ac *ApiConfiguration) MakeApiUrl(f string, args ...interface{}) string {
@@ -40,11 +41,17 @@ func (ac *ApiConfiguration) NewJWTMiddleware() (goa.Middleware, error) {
 }
 
 func createEmailer(awsSession *session.Session, config *ApiConfiguration) (emailer email.Emailer, err error) {
+	var overrides []*string
+	if len(config.EmailOverride) > 0 {
+		overrides = []*string{
+			&config.EmailOverride,
+		}
+	}
 	switch config.Emailer {
 	case "default":
-		return email.NewNoopEmailer("admin", config.Domain)
+		return email.NewNoopEmailer("admin", config.Domain, overrides)
 	case "aws":
-		return email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
+		return email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain, overrides)
 	default:
 		panic("invalid emailer")
 	}

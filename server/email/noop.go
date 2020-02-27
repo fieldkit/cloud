@@ -11,9 +11,10 @@ type noopEmailer struct {
 	templates *EmailTemplates
 	source    string
 	domain    string
+	override  []*string
 }
 
-func NewNoopEmailer(source, domain string) (e Emailer, err error) {
+func NewNoopEmailer(source, domain string, override []*string) (e Emailer, err error) {
 	templates, err := NewEmailTemplates()
 	if err != nil {
 		return nil, err
@@ -23,6 +24,7 @@ func NewNoopEmailer(source, domain string) (e Emailer, err error) {
 		templates: templates,
 		source:    source,
 		domain:    domain,
+		override:  override,
 	}
 
 	return
@@ -48,6 +50,10 @@ func (e noopEmailer) SendValidationToken(person *data.User, validationToken *dat
 	bodyBuffer := bytes.NewBuffer([]byte{})
 	if err := e.templates.Validation.BodyText.Execute(bodyBuffer, options); err != nil {
 		return err
+	}
+
+	if e.override != nil {
+		fmt.Printf("Override: %v", e.override)
 	}
 
 	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", person.Email, subjectBuffer.String(), bodyBuffer.String())
