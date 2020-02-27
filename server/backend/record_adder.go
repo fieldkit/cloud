@@ -18,6 +18,7 @@ import (
 )
 
 type RecordAdder struct {
+	verbose    bool
 	database   *sqlxcache.DB
 	files      files.FileArchive
 	metrics    *logging.Metrics
@@ -29,8 +30,9 @@ type ParsedRecord struct {
 	DataRecord   *pb.DataRecord
 }
 
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, verbose bool) (ra *RecordAdder) {
 	return &RecordAdder{
+		verbose:    verbose,
 		database:   db,
 		files:      files,
 		metrics:    metrics,
@@ -155,8 +157,8 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
-	log := Logger(ctx).Sugar()
-	verboseLog := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar().With("ingestion_id", i.ID)
+	verboseLog := logging.OnlyLogIf(log, ra.verbose)
 
 	provision, err := ra.findProvision(ctx, i)
 	if err != nil {

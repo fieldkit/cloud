@@ -11,10 +11,3 @@ import (
 func Logger(ctx context.Context) *zap.Logger {
 	return logging.Logger(ctx).Named("repos")
 }
-
-func OnlyLogIf(logger *zap.SugaredLogger, verbose bool) *zap.SugaredLogger {
-	if !verbose {
-		return zap.NewNop().Sugar()
-	}
-	return logger
-}

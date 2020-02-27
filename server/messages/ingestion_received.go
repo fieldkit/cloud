@@ -3,7 +3,8 @@ package messages
 import "time"
 
 type IngestionReceived struct {
-	Time time.Time
-	ID   int64
-	URL  string
+	Time    time.Time
+	ID      int64
+	URL     string
+	Verbose bool
 }

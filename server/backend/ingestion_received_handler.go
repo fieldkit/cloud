@@ -33,7 +33,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return err
 	}
 
-	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics)
+	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics, m.Verbose)
 
 	log.Infow("pending", "ingestion_id", i.ID, "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks, "user_id", i.UserID)
 

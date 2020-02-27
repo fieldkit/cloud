@@ -8,6 +8,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/errors"
+	"github.com/fieldkit/cloud/server/logging"
 
 	pb "github.com/fieldkit/data-protocol"
 )
@@ -116,7 +117,7 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 
 func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) (*FilteredRecord, error) {
 	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
-	verboseLog := OnlyLogIf(log, verbose)
+	verboseLog := logging.OnlyLogIf(log, verbose)
 
 	meta := mf.byMetaID[databaseRecord.MetaID]
 	if meta == nil {

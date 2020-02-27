@@ -8,6 +8,13 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+func OnlyLogIf(logger *zap.SugaredLogger, verbose bool) *zap.SugaredLogger {
+	if !verbose {
+		return zap.NewNop().Sugar()
+	}
+	return logger
+}
+
 func ServiceTrace(ctx context.Context) []string {
 	if ctxServiceTrace, ok := ctx.Value(serviceTraceKey).([]string); ok {
 		return ctxServiceTrace
