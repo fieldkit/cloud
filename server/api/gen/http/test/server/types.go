@@ -11,9 +11,49 @@ import (
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 )
 
+// GetUnauthorizedResponseBody is the type of the "test" service "get" endpoint
+// HTTP response body for the "unauthorized" error.
+type GetUnauthorizedResponseBody string
+
+// ErrorUnauthorizedResponseBody is the type of the "test" service "error"
+// endpoint HTTP response body for the "unauthorized" error.
+type ErrorUnauthorizedResponseBody string
+
+// EmailUnauthorizedResponseBody is the type of the "test" service "email"
+// endpoint HTTP response body for the "unauthorized" error.
+type EmailUnauthorizedResponseBody string
+
+// NewGetUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "test" service.
+func NewGetUnauthorizedResponseBody(res test.Unauthorized) GetUnauthorizedResponseBody {
+	body := GetUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewErrorUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "error" endpoint of the "test" service.
+func NewErrorUnauthorizedResponseBody(res test.Unauthorized) ErrorUnauthorizedResponseBody {
+	body := ErrorUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewEmailUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "email" endpoint of the "test" service.
+func NewEmailUnauthorizedResponseBody(res test.Unauthorized) EmailUnauthorizedResponseBody {
+	body := EmailUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewGetPayload builds a test service get endpoint payload.
 func NewGetPayload(id int64) *test.GetPayload {
 	return &test.GetPayload{
 		ID: &id,
+	}
+}
+
+// NewEmailPayload builds a test service email endpoint payload.
+func NewEmailPayload(auth string) *test.EmailPayload {
+	return &test.EmailPayload{
+		Auth: auth,
 	}
 }

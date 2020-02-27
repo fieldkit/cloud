@@ -48,6 +48,9 @@ func (c *Client) BuildGetRequest(ctx context.Context, v interface{}) (*http.Requ
 // DecodeGetResponse returns a decoder for responses returned by the test get
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
+// DecodeGetResponse may return the following errors:
+//	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
 func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -65,6 +68,16 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body GetUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "get", err)
+			}
+			return nil, NewGetUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("test", "get", resp.StatusCode, string(body))
@@ -90,6 +103,9 @@ func (c *Client) BuildErrorRequest(ctx context.Context, v interface{}) (*http.Re
 // DecodeErrorResponse returns a decoder for responses returned by the test
 // error endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeErrorResponse may return the following errors:
+//	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
 func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -107,9 +123,90 @@ func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 		switch resp.StatusCode {
 		case http.StatusNoContent:
 			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body ErrorUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "error", err)
+			}
+			return nil, NewErrorUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("test", "error", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildEmailRequest instantiates a HTTP request object with method and path
+// set to call the "test" service "email" endpoint
+func (c *Client) BuildEmailRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: EmailTestPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("test", "email", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeEmailRequest returns an encoder for requests sent to the test email
+// server.
+func EncodeEmailRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*test.EmailPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("test", "email", "*test.EmailPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeEmailResponse returns a decoder for responses returned by the test
+// email endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeEmailResponse may return the following errors:
+//	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeEmailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body EmailUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "email", err)
+			}
+			return nil, NewEmailUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("test", "email", resp.StatusCode, string(body))
 		}
 	}
 }

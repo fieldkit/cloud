@@ -27,16 +27,6 @@ func NewTasksService(ctx context.Context, options *ControllerOptions) *TasksServ
 	}
 }
 
-func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  ErrInvalidToken,
-		InvalidScopes: ErrInvalidTokenScopes,
-	})
-}
-
 func (c *TasksService) Five(ctx context.Context) error {
 	return nil
 }
@@ -67,4 +57,14 @@ func (c *TasksService) RefreshDevice(ctx context.Context, payload *tasks.Refresh
 	}
 
 	return nil
+}
+
+func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
+	return Authenticate(ctx, AuthAttempt{
+		Token:         token,
+		Scheme:        scheme,
+		Key:           s.options.JWTHMACKey,
+		InvalidToken:  ErrInvalidToken,
+		InvalidScopes: ErrInvalidTokenScopes,
+	})
 }

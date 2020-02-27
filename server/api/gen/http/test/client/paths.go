@@ -18,5 +18,10 @@ func GetTestPath(id int64) string {
 
 // ErrorTestPath returns the URL path to the test service error HTTP endpoint.
 func ErrorTestPath() string {
-	return "/error"
+	return "/test/error"
+}
+
+// EmailTestPath returns the URL path to the test service email HTTP endpoint.
+func EmailTestPath() string {
+	return "/test/email"
 }

@@ -12,17 +12,6 @@ produces:
 - application/xml
 - application/gob
 paths:
-  /error:
-    get:
-      tags:
-      - test
-      summary: error test
-      operationId: test#error
-      responses:
-        "204":
-          description: No Content response.
-      schemes:
-      - http
   /modules/meta:
     get:
       tags:
@@ -97,6 +86,53 @@ paths:
       responses:
         "200":
           description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/TestGetUnauthorizedResponseBody'
+      schemes:
+      - http
+  /test/email:
+    get:
+      tags:
+      - test
+      summary: email test
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: test#email
+      parameters:
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/TestEmailUnauthorizedResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
+  /test/error:
+    get:
+      tags:
+      - test
+      summary: error test
+      operationId: test#error
+      responses:
+        "204":
+          description: No Content response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/TestErrorUnauthorizedResponseBody'
       schemes:
       - http
 definitions:
@@ -104,12 +140,27 @@ definitions:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Harum ducimus a voluptatem.
+    example: Quibusdam aliquid et sed et.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Ut porro molestiae repellendus nihil dicta.
+    example: Saepe quibusdam exercitationem.
+  TestEmailUnauthorizedResponseBody:
+    title: TestEmailUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Beatae et magnam ab soluta ipsam sunt.
+  TestErrorUnauthorizedResponseBody:
+    title: TestErrorUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Aliquid et quia.
+  TestGetUnauthorizedResponseBody:
+    title: TestGetUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Nisi consequatur recusandae eum magni modi.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

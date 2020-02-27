@@ -9,6 +9,8 @@ package test
 
 import (
 	"context"
+
+	"goa.design/goa/v3/security"
 )
 
 // Service is the test service interface.
@@ -17,6 +19,14 @@ type Service interface {
 	Get(context.Context, *GetPayload) (err error)
 	// Error implements error.
 	Error(context.Context) (err error)
+	// Email implements email.
+	Email(context.Context, *EmailPayload) (err error)
+}
+
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// JWTAuth implements the authorization logic for the JWT security scheme.
+	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -27,9 +37,27 @@ const ServiceName = "test"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"get", "error"}
+var MethodNames = [3]string{"get", "error", "email"}
 
 // GetPayload is the payload type of the test service get method.
 type GetPayload struct {
 	ID *int64
+}
+
+// EmailPayload is the payload type of the test service email method.
+type EmailPayload struct {
+	Auth string
+}
+
+// credentials are invalid
+type Unauthorized string
+
+// Error returns an error description.
+func (e Unauthorized) Error() string {
+	return "credentials are invalid"
+}
+
+// ErrorName returns "unauthorized".
+func (e Unauthorized) ErrorName() string {
+	return "unauthorized"
 }

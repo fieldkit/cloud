@@ -26,16 +26,16 @@ import (
 //
 func UsageCommands() string {
 	return `tasks (five|refresh- device)
+test (get|error|email)
 modules meta
-test (get|error)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` tasks five` + "\n" +
+		os.Args[0] + ` test get --id 3853225884848678956` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
-		os.Args[0] + ` test get --id 6377494565823219061` + "\n" +
 		""
 }
 
@@ -57,27 +57,31 @@ func ParseEndpoint(
 		tasksRefreshDeviceDeviceIDFlag = tasksRefreshDeviceFlags.String("device-id", "REQUIRED", "")
 		tasksRefreshDeviceAuthFlag     = tasksRefreshDeviceFlags.String("auth", "REQUIRED", "")
 
-		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
-
-		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
-
 		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
 
 		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
 		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
 
 		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
+
+		testEmailFlags    = flag.NewFlagSet("email", flag.ExitOnError)
+		testEmailAuthFlag = testEmailFlags.String("auth", "REQUIRED", "")
+
+		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
+
+		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
 	)
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
 	tasksRefreshDeviceFlags.Usage = tasksRefreshDeviceUsage
 
-	modulesFlags.Usage = modulesUsage
-	modulesMetaFlags.Usage = modulesMetaUsage
-
 	testFlags.Usage = testUsage
 	testGetFlags.Usage = testGetUsage
 	testErrorFlags.Usage = testErrorUsage
+	testEmailFlags.Usage = testEmailUsage
+
+	modulesFlags.Usage = modulesUsage
+	modulesMetaFlags.Usage = modulesMetaUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -96,10 +100,10 @@ func ParseEndpoint(
 		switch svcn {
 		case "tasks":
 			svcf = tasksFlags
-		case "modules":
-			svcf = modulesFlags
 		case "test":
 			svcf = testFlags
+		case "modules":
+			svcf = modulesFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -125,13 +129,6 @@ func ParseEndpoint(
 
 			}
 
-		case "modules":
-			switch epn {
-			case "meta":
-				epf = modulesMetaFlags
-
-			}
-
 		case "test":
 			switch epn {
 			case "get":
@@ -139,6 +136,16 @@ func ParseEndpoint(
 
 			case "error":
 				epf = testErrorFlags
+
+			case "email":
+				epf = testEmailFlags
+
+			}
+
+		case "modules":
+			switch epn {
+			case "meta":
+				epf = modulesMetaFlags
 
 			}
 
@@ -172,13 +179,6 @@ func ParseEndpoint(
 				endpoint = c.RefreshDevice()
 				data, err = tasksc.BuildRefreshDevicePayload(*tasksRefreshDeviceDeviceIDFlag, *tasksRefreshDeviceAuthFlag)
 			}
-		case "modules":
-			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "meta":
-				endpoint = c.Meta()
-				data = nil
-			}
 		case "test":
 			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -187,6 +187,16 @@ func ParseEndpoint(
 				data, err = testc.BuildGetPayload(*testGetIDFlag)
 			case "error":
 				endpoint = c.Error()
+				data = nil
+			case "email":
+				endpoint = c.Email()
+				data, err = testc.BuildEmailPayload(*testEmailAuthFlag)
+			}
+		case "modules":
+			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "meta":
+				endpoint = c.Meta()
 				data = nil
 			}
 		}
@@ -230,7 +240,54 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Esse nisi eos tempora." --auth "Ea aspernatur et et aut quas facere."
+    `+os.Args[0]+` tasks refresh- device --device-id "Ea aspernatur et et aut quas facere." --auth "Magnam aut nihil doloremque."
+`, os.Args[0])
+}
+
+// testUsage displays the usage of the test command and its subcommands.
+func testUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the test service interface.
+Usage:
+    %s [globalflags] test COMMAND [flags]
+
+COMMAND:
+    get: Get implements get.
+    error: Error implements error.
+    email: Email implements email.
+
+Additional help:
+    %s test COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func testGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test get -id INT64
+
+Get implements get.
+    -id INT64: 
+
+Example:
+    `+os.Args[0]+` test get --id 3853225884848678956
+`, os.Args[0])
+}
+
+func testErrorUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test error
+
+Error implements error.
+
+Example:
+    `+os.Args[0]+` test error
+`, os.Args[0])
+}
+
+func testEmailUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test email -auth STRING
+
+Email implements email.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` test email --auth "Ut porro molestiae repellendus nihil dicta."
 `, os.Args[0])
 }
 
@@ -254,40 +311,5 @@ Meta implements meta.
 
 Example:
     `+os.Args[0]+` modules meta
-`, os.Args[0])
-}
-
-// testUsage displays the usage of the test command and its subcommands.
-func testUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the test service interface.
-Usage:
-    %s [globalflags] test COMMAND [flags]
-
-COMMAND:
-    get: Get implements get.
-    error: Error implements error.
-
-Additional help:
-    %s test COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func testGetUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test get -id INT64
-
-Get implements get.
-    -id INT64: 
-
-Example:
-    `+os.Args[0]+` test get --id 6377494565823219061
-`, os.Args[0])
-}
-
-func testErrorUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test error
-
-Error implements error.
-
-Example:
-    `+os.Args[0]+` test error
 `, os.Args[0])
 }
