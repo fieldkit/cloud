@@ -18,22 +18,24 @@ import (
 )
 
 type RecordAdder struct {
-	Database *sqlxcache.DB
-	Files    files.FileArchive
-	Metrics  *logging.Metrics
-}
-
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) (ra *RecordAdder) {
-	return &RecordAdder{
-		Database: db,
-		Files:    files,
-		Metrics:  metrics,
-	}
+	database   *sqlxcache.DB
+	files      files.FileArchive
+	metrics    *logging.Metrics
+	statistics *newRecordStatistics
 }
 
 type ParsedRecord struct {
 	SignedRecord *pb.SignedRecord
 	DataRecord   *pb.DataRecord
+}
+
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) (ra *RecordAdder) {
+	return &RecordAdder{
+		database:   db,
+		files:      files,
+		metrics:    metrics,
+		statistics: &newRecordStatistics{},
+	}
 }
 
 func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.DataRecord) (err error) {
@@ -64,7 +66,7 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 	// TODO Verify we have a valid generation.
 
 	provisions := []*data.Provision{}
-	if err := ra.Database.SelectContext(ctx, &provisions, `SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2`, i.DeviceID, i.GenerationID); err != nil {
+	if err := ra.database.SelectContext(ctx, &provisions, `SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2`, i.DeviceID, i.GenerationID); err != nil {
 		return nil, err
 	}
 
@@ -79,7 +81,7 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 		GenerationID: i.GenerationID,
 	}
 
-	if err := ra.Database.NamedGetContext(ctx, &provision.ID, `
+	if err := ra.database.NamedGetContext(ctx, &provision.ID, `
 		    INSERT INTO fieldkit.provision (device_id, generation, created, updated)
 		    VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
 		    DO UPDATE SET updated = NOW() RETURNING id`, provision); err != nil {
@@ -91,7 +93,7 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 
 func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
 	records := []*data.MetaRecord{}
-	if err := ra.Database.SelectContext(ctx, &records, `SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2`, provisionId, number); err != nil {
+	if err := ra.database.SelectContext(ctx, &records, `SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2`, provisionId, number); err != nil {
 		return nil, err
 	}
 
@@ -152,17 +154,13 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 	return dr
 }
 
-type AddedRecord struct {
-	Meta *data.MetaRecord
-	Data *data.DataRecord
-}
-
-func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (added *AddedRecord, warning error, fatal error) {
+func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
+	verboseLog := Logger(ctx).Sugar()
 
 	provision, err := ra.findProvision(ctx, i)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if pr.SignedRecord != nil {
@@ -178,44 +176,41 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := metaRecord.SetData(pr.DataRecord); err != nil {
-			return nil, nil, fmt.Errorf("error setting meta json: %v", err)
+			return nil, fmt.Errorf("error setting meta json: %v", err)
 		}
 
-		if err := ra.Database.NamedGetContext(ctx, &metaRecord, `
+		if err := ra.database.NamedGetContext(ctx, &metaRecord, `
 		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
 		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
                     RETURNING *`, metaRecord); err != nil {
-			return nil, nil, err
-		}
-
-		added = &AddedRecord{
-			Meta: &metaRecord,
+			return nil, err
 		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Readings == nil {
-			log.Infow("data reading missing readings", "record", pr.DataRecord)
-			ra.Metrics.DataErrorsUnknown()
-			return nil, fmt.Errorf("weird record"), nil
+			verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
+			ra.metrics.DataErrorsUnknown()
+			return fmt.Errorf("weird record"), nil
 		}
 
 		location, err := ra.findLocation(pr.DataRecord)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		if meta == nil {
-			log.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
-			ra.Metrics.DataErrorsMissingMeta()
-			return nil, fmt.Errorf("error finding meta record"), nil
+			verboseLog.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
+			ra.metrics.DataErrorsMissingMeta()
+			return fmt.Errorf("error finding meta record"), nil
 		}
 
 		dataTime := i.Time
 		if pr.DataRecord.Readings.Time > 0 {
 			dataTime = time.Unix(int64(pr.DataRecord.Readings.Time), 0)
+			ra.statistics.addTime(dataTime)
 		}
 
 		dataRecord := data.DataRecord{
@@ -227,41 +222,19 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
-			return nil, nil, fmt.Errorf("error setting data json: %v", err)
+			return nil, fmt.Errorf("error setting data json: %v", err)
 		}
 
-		if err := ra.Database.NamedGetContext(ctx, &dataRecord, `
+		if err := ra.database.NamedGetContext(ctx, &dataRecord, `
 			    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
 			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
 			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
 			    RETURNING id`, dataRecord); err != nil {
-			return nil, nil, err
-		}
-
-		added = &AddedRecord{
-			Data: &dataRecord,
+			return nil, err
 		}
 	}
 
 	return
-}
-
-type newRecordStatistics struct {
-	start time.Time
-	end   time.Time
-}
-
-func (s *newRecordStatistics) include(added *AddedRecord) {
-	if added == nil || added.Data == nil {
-		return
-	}
-
-	if s.start.IsZero() || added.Data.Time.Before(s.start) {
-		s.start = added.Data.Time
-	}
-	if s.end.IsZero() || added.Data.Time.After(s.end) {
-		s.end = added.Data.Time
-	}
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
@@ -269,14 +242,12 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "file_id", i.UploadID, "file_size", i.Size, "blocks", i.Blocks, "device_id", i.DeviceID, "user_id", i.UserID, "type", i.Type)
 
-	reader, err := ra.Files.OpenByURL(ctx, i.URL)
+	reader, err := ra.files.OpenByURL(ctx, i.URL)
 	if err != nil {
 		return err
 	}
 
 	defer reader.Close()
-
-	statistics := newRecordStatistics{}
 
 	meta := false
 	data := false
@@ -296,13 +267,13 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 			err := proto.Unmarshal(b, &dataRecord)
 			if err != nil {
 				if data { // If we expected this record, return the error
-					ra.Metrics.DataErrorsParsing()
+					ra.metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing data record: %v", err)
 				}
 				unmarshalError = err
 			} else {
 				data = true
-				added, warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
+				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
 				if fatal != nil {
 					return nil, fatal
 				}
@@ -316,8 +287,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 						records = 0
 					}
 				}
-
-				statistics.include(added)
 			}
 		}
 
@@ -325,7 +294,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 			err := proto.Unmarshal(b, &signedRecord)
 			if err != nil {
 				if meta { // If we expected this record, return the error
-					ra.Metrics.DataErrorsParsing()
+					ra.metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
 				unmarshalError = err
@@ -333,11 +302,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 				meta = true
 				err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
-					ra.Metrics.DataErrorsParsing()
+					ra.metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
 				}
 
-				added, warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
+				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 				})
@@ -354,8 +323,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 						records = 0
 					}
 				}
-
-				statistics.include(added)
 			}
 		}
 
@@ -369,7 +336,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
-	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors, "record_run", records, "start", statistics.start, "end", statistics.end)
+	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors,
+		"record_run", records, "start_human", prettyTime(ra.statistics.start), "end_human", prettyTime(ra.statistics.end))
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
@@ -378,4 +346,25 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 	}
 
 	return nil
+}
+
+func prettyTime(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.String()
+}
+
+type newRecordStatistics struct {
+	start time.Time
+	end   time.Time
+}
+
+func (s *newRecordStatistics) addTime(t time.Time) {
+	if s.start.IsZero() || t.Before(s.start) {
+		s.start = t
+	}
+	if s.end.IsZero() || t.After(s.end) {
+		s.end = t
+	}
 }
