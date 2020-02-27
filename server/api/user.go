@@ -140,7 +140,8 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	err := c.options.Database.GetContext(ctx, validationToken, "SELECT * FROM fieldkit.validation_token WHERE token = $1", validationToken.Token)
 	if err == sql.ErrNoRows {
 		log.Infow("invalid", "token", ctx.Token)
-		return ctx.Unauthorized()
+		ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"?bad_token=true")
+		return nil
 	}
 	if err != nil {
 		return err
