@@ -107,9 +107,9 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 		return err
 	}
 
-	c.options.metrics.UserAdded()
+	c.options.Metrics.UserAdded()
 
-	c.options.metrics.EmailVerificationSent()
+	c.options.Metrics.EmailVerificationSent()
 
 	return ctx.OK(UserType(user))
 }
@@ -156,7 +156,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 
 	log.Infow("verified", "token", ctx.Token)
 
-	c.options.metrics.UserValidated()
+	c.options.Metrics.UserValidated()
 
 	ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"/")
 
