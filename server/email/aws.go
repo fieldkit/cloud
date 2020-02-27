@@ -2,8 +2,6 @@ package email
 
 import (
 	"bytes"
-	"fmt"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -12,19 +10,28 @@ import (
 )
 
 type AWSSESEmailer struct {
+	templates   *EmailTemplates
 	client      *ses.SES
 	source      string
 	domain      string
 	sourceEmail *string
 }
 
-func NewAWSSESEmailer(client *ses.SES, source, domain string) *AWSSESEmailer {
-	return &AWSSESEmailer{
+func NewAWSSESEmailer(client *ses.SES, source, domain string) (e *AWSSESEmailer, err error) {
+	templates, err := NewEmailTemplates()
+	if err != nil {
+		return nil, err
+	}
+
+	e = &AWSSESEmailer{
+		templates:   templates,
+		sourceEmail: aws.String(source + "@" + domain),
 		client:      client,
 		source:      source,
 		domain:      domain,
-		sourceEmail: aws.String(source + "@" + domain),
 	}
+
+	return
 }
 
 func (a AWSSESEmailer) send(subject, body string, addresses []*string) error {
@@ -61,28 +68,6 @@ func (a AWSSESEmailer) send(subject, body string, addresses []*string) error {
 	return nil
 }
 
-func (a AWSSESEmailer) SendSourceOfflineWarning(source *data.Source, age time.Duration) error {
-	subject := fmt.Sprintf("FieldKit: Device %s is offline.", source.Name)
-	body := fmt.Sprintf("Your device named '%s' is offline. The last reading from the device was %v ago.", source.Name, age)
-	toAddresses := []*string{
-		aws.String("jacob@conservify.org"),
-		aws.String("shah@conservify.org"),
-	}
-
-	return a.send(subject, body, toAddresses)
-}
-
-func (a AWSSESEmailer) SendSourceOnlineWarning(source *data.Source, age time.Duration) error {
-	subject := fmt.Sprintf("FieldKit: Device %s is back online.", source.Name)
-	body := fmt.Sprintf("Your device named '%s' is online. The last reading from the device was %v ago.", source.Name, age)
-	toAddresses := []*string{
-		aws.String("jacob@conservify.org"),
-		aws.String("shah@conservify.org"),
-	}
-
-	return a.send(subject, body, toAddresses)
-}
-
 func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {
 	options := &templateOptions{
 		ValidationToken: validationToken,
@@ -91,12 +76,12 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 	}
 
 	subjectBuffer := bytes.NewBuffer([]byte{})
-	if err := subjectTemplate.Execute(subjectBuffer, person); err != nil {
+	if err := a.templates.Validation.Subject.Execute(subjectBuffer, person); err != nil {
 		return err
 	}
 
 	bodyTextBuffer := bytes.NewBuffer([]byte{})
-	if err := bodyTextTemplate.Execute(bodyTextBuffer, options); err != nil {
+	if err := a.templates.Validation.BodyText.Execute(bodyTextBuffer, options); err != nil {
 		return err
 	}
 
@@ -105,14 +90,4 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 	}
 
 	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
-}
-
-func (a AWSSESEmailer) SendInvitation(email string) error {
-	subject := fmt.Sprintf("You are invited to a FieldKit project!")
-	body := fmt.Sprintf("Soon this will be a real invitation, but for now, just consider yourself invited.")
-	toAddresses := []*string{
-		aws.String(email),
-	}
-
-	return a.send(subject, body, toAddresses)
 }

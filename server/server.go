@@ -54,7 +54,7 @@ type Config struct {
 	AwsId                 string `split_words:"true" default:""`
 	AwsSecret             string `split_words:"true" default:""`
 	StatsdAddress         string `split_words:"true" default:""`
-	ProductionLogging     bool   `envconfig:"production_logging"`
+	Production            bool   `envconfig:"production"`
 
 	Help bool
 }
@@ -114,7 +114,7 @@ func main() {
 		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
 	}
 
-	logging.Configure(config.ProductionLogging, "service")
+	logging.Configure(config.Production, "service")
 
 	log := logging.Logger(ctx).Sugar()
 

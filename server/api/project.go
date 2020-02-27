@@ -254,9 +254,11 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 	}
 
 	// send email
-	if err := c.options.Emailer.SendInvitation(ctx.Payload.Email); err != nil {
-		return err
-	}
+	/*
+		if err := c.options.Emailer.SendInvitation(ctx.Payload.Email); err != nil {
+			return err
+		}
+	*/
 
 	// save in project_invite table
 	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID, ctx.Payload.Email, time.Now()); err != nil {

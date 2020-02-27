@@ -42,11 +42,10 @@ func (ac *ApiConfiguration) NewJWTMiddleware() (goa.Middleware, error) {
 func createEmailer(awsSession *session.Session, config *ApiConfiguration) (emailer email.Emailer, err error) {
 	switch config.Emailer {
 	case "default":
-		emailer = email.NewEmailer("admin", config.Domain)
+		return email.NewNoopEmailer("admin", config.Domain)
 	case "aws":
-		emailer = email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
+		return email.NewAWSSESEmailer(ses.New(awsSession), "admin", config.Domain)
 	default:
 		panic("invalid emailer")
 	}
-	return
 }
