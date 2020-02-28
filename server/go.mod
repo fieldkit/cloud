@@ -26,7 +26,7 @@ require (
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
 	github.com/fieldkit/data-protocol v0.0.0-20200123020042-8ddcca534acd
 	github.com/go-ini/ini v1.26.0
-	github.com/go-kit/kit v0.0.0-20190326234956-40f35b54ddf5
+	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.4.0
 	github.com/go-stack/stack v1.8.0
 	github.com/goadesign/goa v1.4.0
@@ -75,10 +75,11 @@ require (
 	github.com/xeipuuv/gojsonschema v0.0.0-20170324002221-702b404897d4
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
-	go.uber.org/atomic v1.3.1
-	go.uber.org/multierr v0.0.0-20180122172545-ddea229ff1df
-	go.uber.org/zap v1.8.0
+	go.uber.org/atomic v1.4.0
+	go.uber.org/multierr v1.1.0
+	go.uber.org/zap v1.10.0
 	goa.design/goa/v3 v3.0.10
+	goa.design/plugins/v3 v3.0.10
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
 	golang.org/x/net v0.0.0-20190916140828-c8589233b77d

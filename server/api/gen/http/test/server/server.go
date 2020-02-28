@@ -10,10 +10,12 @@ package server
 import (
 	"context"
 	"net/http"
+	"regexp"
 
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/plugins/v3/cors"
 )
 
 // Server lists the test service endpoint HTTP handlers.
@@ -22,6 +24,7 @@ type Server struct {
 	Get    http.Handler
 	Error  http.Handler
 	Email  http.Handler
+	CORS   http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -60,10 +63,14 @@ func New(
 			{"Get", "GET", "/test/{id}"},
 			{"Error", "GET", "/test/error"},
 			{"Email", "GET", "/test/email"},
+			{"CORS", "OPTIONS", "/test/{id}"},
+			{"CORS", "OPTIONS", "/test/error"},
+			{"CORS", "OPTIONS", "/test/email"},
 		},
 		Get:   NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		Error: NewErrorHandler(e.Error, mux, decoder, encoder, errhandler, formatter),
 		Email: NewEmailHandler(e.Email, mux, decoder, encoder, errhandler, formatter),
+		CORS:  NewCORSHandler(),
 	}
 }
 
@@ -75,6 +82,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.Error = m(s.Error)
 	s.Email = m(s.Email)
+	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the test endpoints.
@@ -82,12 +90,13 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountErrorHandler(mux, h.Error)
 	MountEmailHandler(mux, h.Email)
+	MountCORSHandler(mux, h.CORS)
 }
 
 // MountGetHandler configures the mux to serve the "test" service "get"
 // endpoint.
 func MountGetHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := handleTestOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -140,7 +149,7 @@ func NewGetHandler(
 // MountErrorHandler configures the mux to serve the "test" service "error"
 // endpoint.
 func MountErrorHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := handleTestOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -186,7 +195,7 @@ func NewErrorHandler(
 // MountEmailHandler configures the mux to serve the "test" service "email"
 // endpoint.
 func MountEmailHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := handleTestOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -233,5 +242,163 @@ func NewEmailHandler(
 		if err := encodeResponse(ctx, w, res); err != nil {
 			errhandler(ctx, w, err)
 		}
+	})
+}
+
+// MountCORSHandler configures the mux to serve the CORS endpoints for the
+// service test.
+func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
+	h = handleTestOrigin(h)
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("OPTIONS", "/test/{id}", f)
+	mux.Handle("OPTIONS", "/test/error", f)
+	mux.Handle("OPTIONS", "/test/email", f)
+}
+
+// NewCORSHandler creates a HTTP handler which returns a simple 200 response.
+func NewCORSHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	})
+}
+
+// handleTestOrigin applies the CORS response headers corresponding to the
+// origin for the service test.
+func handleTestOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	origHndlr := h.(http.HandlerFunc)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOriginRegexp(origin, spec0) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOriginRegexp(origin, spec1) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOriginRegexp(origin, spec2) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://*.fieldkit.org:8080") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://fieldkit.org:8080") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://fkdev.org") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		origHndlr(w, r)
+		return
 	})
 }

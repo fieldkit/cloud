@@ -48,4 +48,6 @@ var _ = Service("test", func() {
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 	})
+
+	commonOptions()
 })

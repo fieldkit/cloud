@@ -44,4 +44,6 @@ var _ = Service("tasks", func() {
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 	})
+
+	commonOptions()
 })
