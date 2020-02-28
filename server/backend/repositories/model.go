@@ -14,12 +14,14 @@ type SensorMeta struct {
 	Key           string         `json:"key"`
 	UnitOfMeasure string         `json:"unit_of_measure"`
 	Ranges        []SensorRanges `json:"ranges"`
+	Internal      bool           `json:"internal"`
 }
 
 type ModuleMeta struct {
-	Header  ModuleHeader  `json:"header"`
-	Key     string        `json:"key"`
-	Sensors []*SensorMeta `json:"sensors"`
+	Header   ModuleHeader  `json:"header"`
+	Key      string        `json:"key"`
+	Internal bool          `json:"internal"`
+	Sensors  []*SensorMeta `json:"sensors"`
 }
 
 func (mm *ModuleMeta) Sensor(key string) *SensorMeta {

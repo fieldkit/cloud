@@ -424,6 +424,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				Kind:         ConservifyDiagnostics,
 				Version:      0x1,
 			},
+			Internal: true,
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "battery_charge",
@@ -479,6 +480,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				Kind:         ConservifyRandom,
 				Version:      0x1,
 			},
+			Internal: true,
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "random_0",
