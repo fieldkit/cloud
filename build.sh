@@ -82,12 +82,15 @@ done
 
 cp /etc/ssl/certs/ca-certificates.crt build
 
+echo export GIT_HASH=`git rev-parse HEAD` > build/static.env
+
 echo '.DS_Store
 Dockerfile' > build/.dockerignore
 
 echo 'FROM scratch
 COPY . /
 ADD ca-certificates.crt /etc/ssl/certs/
+ADD static.env /etc/static.env
 EXPOSE 80
 ENTRYPOINT ["/server"]' > build/Dockerfile
 

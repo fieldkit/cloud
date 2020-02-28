@@ -10,10 +10,15 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
+type GitStatus struct {
+	Hash string `json:"hash,omitempty"`
+}
+
 type StatusResponse struct {
-	ServerName string `json:"server_name,omitempty"`
-	Tag        string `json:"tag"`
-	Name       string `json:"name"`
+	ServerName string    `json:"server_name,omitempty"`
+	Tag        string    `json:"tag"`
+	Name       string    `json:"name"`
+	Git        GitStatus `json:"git"`
 }
 
 func getEnv(key, fallback string) string {
@@ -30,6 +35,9 @@ func MakeStatusResponse(ctx context.Context) (sr *StatusResponse, err error) {
 	}
 
 	sr = &StatusResponse{
+		Git: GitStatus{
+			Hash: getEnv("GIT_HASH", ""),
+		},
 		ServerName: getEnv("FIELDKIT_SERVER_NAME", ""),
 		Tag:        getEnv("TAG", ""),
 		Name:       name,
