@@ -18,6 +18,7 @@ which docker
 which go
 docker ps -a
 go version
+make clean
 make
 """
             }
