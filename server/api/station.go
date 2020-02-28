@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -194,6 +195,9 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 	station.SetStatus(ctx.Payload.StatusJSON)
 
 	if err := c.options.Database.NamedGetContext(ctx, station, "UPDATE fieldkit.station SET name = :name, status_json = :status_json WHERE id = :id RETURNING *", station); err != nil {
+		if err == sql.ErrNoRows {
+			return ctx.NotFound()
+		}
 		return err
 	}
 

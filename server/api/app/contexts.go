@@ -4079,6 +4079,12 @@ func (ctx *UpdateStationContext) BadRequest() error {
 	return nil
 }
 
+// NotFound sends a HTTP response with status code 404.
+func (ctx *UpdateStationContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // AddStationLogContext provides the stationLog add action context.
 type AddStationLogContext struct {
 	context.Context

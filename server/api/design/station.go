@@ -144,6 +144,7 @@ var _ = Resource("station", func() {
 			Required("stationId")
 		})
 		Payload(UpdateStationPayload)
+		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Station)
