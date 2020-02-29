@@ -134,7 +134,7 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 	incomingETag := stripQuotes(ctx.IfNoneMatch)
 	compiled := ctx.FkCompiled
 
-	log.Infow("Device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag, "compiled", compiled)
+	log.Infow("device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag, "compiled", compiled)
 
 	firmwares := []*data.DeviceFirmware{}
 	query := "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1"
@@ -148,7 +148,7 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 	fw := firmwares[0]
 
-	log.Infow("Firmware", "time", fw.Time, "url", fw.URL, "etag", fw.ETag, "incoming_etag", incomingETag)
+	log.Infow("firmware", "time", fw.Time, "url", fw.URL, "etag", fw.ETag, "incoming_etag", incomingETag)
 
 	if incomingETag == fw.ETag {
 		return ctx.NotModified()
@@ -156,7 +156,7 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 	if compiled != nil {
 		if isOutgoingFirmwareOlderThanIncoming(*compiled, fw) {
-			log.Infow("Refusing to apply firmware compiled before device firmware", "incoming", compiled, "outgoing", fw.Time)
+			log.Infow("refusing to apply firmware compiled before device firmware", "incoming", compiled, "outgoing", fw.Time)
 			return ctx.NotFound()
 		}
 	}
@@ -188,7 +188,7 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 	log := Logger(ctx).Sugar()
-	log.Infow("Device", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID)
+	log.Infow("device", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID)
 
 	device, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.Payload.DeviceID))
 	if err != nil {
@@ -236,7 +236,7 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 		return err
 	}
 
-	log.Infow("Firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "profile", ctx.Payload.Profile, "meta", metaMap)
+	log.Infow("firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "profile", ctx.Payload.Profile, "meta", metaMap)
 
 	firmware := data.Firmware{
 		Time:    time.Now(),
@@ -297,7 +297,7 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 func (c *FirmwareController) ListDevice(ctx *app.ListDeviceFirmwareContext) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("Device", "device_id", ctx.DeviceID)
+	log.Infow("device", "device_id", ctx.DeviceID)
 
 	firmwares := []*data.Firmware{}
 	if err := c.options.Database.SelectContext(ctx, &firmwares,
