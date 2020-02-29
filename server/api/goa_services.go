@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	goa "goa.design/goa/v3/pkg"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
@@ -23,6 +25,20 @@ import (
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
 )
 
+func LogErrors() func(goa.Endpoint) goa.Endpoint {
+	return func(e goa.Endpoint) goa.Endpoint {
+		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+			response, err = e(ctx, request)
+			if err != nil {
+				id := newErrorID()
+				log := logging.Logger(ctx).Sugar()
+				log.Errorw("error", "error", err, "error_id", id)
+			}
+			return response, err
+		}
+	}
+}
+
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Handler {
 	testSvc := NewTestSevice(ctx, options)
 	testEndpoints := test.NewEndpoints(testSvc)
@@ -32,6 +48,12 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 
 	modulesSvc := NewModulesService(ctx, options)
 	modulesEndpoints := modules.NewEndpoints(modulesSvc)
+
+	logErrors := LogErrors()
+
+	modulesEndpoints.Use(logErrors)
+	tasksEndpoints.Use(logErrors)
+	testEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
