@@ -41,6 +41,8 @@ type IngesterOptions struct {
 }
 
 func getUserID(ctx context.Context) (int32, error) {
+	log := Logger(ctx).Sugar()
+
 	token := jwt.ContextJWT(ctx)
 	if token == nil {
 		return 0, fmt.Errorf("JWT token is missing from context")
@@ -53,6 +55,8 @@ func getUserID(ctx context.Context) (int32, error) {
 
 	id := int32(claims["sub"].(float64))
 
+	log.Infow("scopes", "scopes", claims["scopes"], "user_id", id)
+
 	return id, nil
 }
 
@@ -60,14 +64,19 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	errorHandler := goahelpers.ErrorHandler(true)
 
 	handler := errorHandling(errorHandler, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
-		log := Logger(ctx).Sugar()
-
 		startedAt := time.Now()
 
 		userID, err := getUserID(ctx)
 		if err != nil {
 			return err
 		}
+
+		if req.Method == http.MethodGet {
+			w.WriteHeader(http.StatusOK)
+			return nil
+		}
+
+		log := Logger(ctx).Sugar().With("user_id", userID)
 
 		o.Metrics.UserID(userID)
 
@@ -234,7 +243,6 @@ func errorHandling(middleware goa.Middleware, next goa.Handler) goa.Handler {
 
 func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
 	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
-		ctx = goa.WithRequiredScopes(ctx, []string{"api:access"})
 		return middleware(next)(ctx, res, req)
 	}
 }
