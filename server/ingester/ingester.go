@@ -20,7 +20,9 @@ import (
 
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/errors"
 	"github.com/fieldkit/cloud/server/files"
+	"github.com/fieldkit/cloud/server/goahelpers"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
@@ -55,9 +57,9 @@ func getUserID(ctx context.Context) (int32, error) {
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
-	errors := ErrorHandler()
+	errorHandler := goahelpers.ErrorHandler(true)
 
-	handler := errorHandling(errors, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	handler := errorHandling(errorHandler, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		log := Logger(ctx).Sugar()
 
 		startedAt := time.Now()
@@ -71,8 +73,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		headers, err := NewIncomingHeaders(req)
 		if err != nil {
-			log.Warnw("malformed", "headers", req.Header)
-			return err
+			return errors.Structured(err, "headers", req.Header)
 		}
 
 		o.Metrics.IngestionDevice(headers.FkDeviceID)

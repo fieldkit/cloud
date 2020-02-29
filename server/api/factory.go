@@ -10,6 +10,7 @@ import (
 	"github.com/goadesign/goa/middleware/gzip"
 
 	"github.com/fieldkit/cloud/server/api/app"
+	"github.com/fieldkit/cloud/server/goahelpers"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -23,7 +24,7 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	service.WithLogger(logging.NewGoaAdapter(logging.Logger(ctx)))
 
 	service.Use(gzip.Middleware(6))
-	service.Use(ErrorHandler(service, true))
+	service.Use(goahelpers.ErrorHandler(true))
 	service.Use(middleware.Recover())
 
 	app.UseJWTMiddleware(service, jwtMiddleware)
