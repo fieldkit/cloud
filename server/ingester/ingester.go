@@ -136,7 +136,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		log.Infow("saved", "device_id", headers.FkDeviceID, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
 			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation_id", ingestion.GenerationID, "user_id", userID,
-			"device_name", headers.FkDeviceName)
+			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
 
 		w.WriteHeader(http.StatusOK)
 
