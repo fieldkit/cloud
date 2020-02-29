@@ -33,7 +33,10 @@ func ErrorHandler(verbose bool) goa.Middleware {
 			if err, ok := cause.(goa.ServiceError); ok {
 				status = err.ResponseStatus()
 				responseBody = err
-				goa.ContextResponse(ctx).ErrorCode = err.Token()
+				goaContext := goa.ContextResponse(ctx)
+				if goaContext != nil {
+					goaContext.ErrorCode = err.Token()
+				}
 				rw.Header().Set("Content-Type", goa.ErrorMediaIdentifier)
 			} else {
 				responseBody = e.Error()
