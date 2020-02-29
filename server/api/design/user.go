@@ -68,6 +68,17 @@ var Users = MediaType("application/vnd.app.users+json", func() {
 	})
 })
 
+var TransmissionToken = MediaType("application/vnd.app.user.transmission.token+json", func() {
+	TypeName("TransmissionToken")
+	Attributes(func() {
+		Attribute("token", String)
+		Required("token")
+	})
+	View("default", func() {
+		Attribute("token")
+	})
+})
+
 var _ = Resource("user", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
@@ -215,6 +226,13 @@ var _ = Resource("user", func() {
 		})
 		Response(OK, func() {
 			Media("image/png")
+		})
+	})
+
+	Action("transmission token", func() {
+		Routing(GET("/user/transmission-token"))
+		Response(OK, func() {
+			Media(TransmissionToken)
 		})
 	})
 })

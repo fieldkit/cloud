@@ -30,8 +30,9 @@ func NewJWTSecurity() *goa.JWTSecurity {
 		Name:     "Authorization",
 		TokenURL: "",
 		Scopes: map[string]string{
-			"api:access": "API access",
-			"api:admin":  "API admin access",
+			"api:access":    "API access",
+			"api:admin":     "API admin access",
+			"api:ingestion": "Ingestion access",
 		},
 	}
 	return &def

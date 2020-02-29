@@ -1597,6 +1597,21 @@ func (mt *User) Validate() (err error) {
 	return
 }
 
+// TransmissionToken media type (default view)
+//
+// Identifier: application/vnd.app.user.transmission.token+json; view=default
+type TransmissionToken struct {
+	Token string `form:"token" json:"token" yaml:"token" xml:"token"`
+}
+
+// Validate validates the TransmissionToken media type instance.
+func (mt *TransmissionToken) Validate() (err error) {
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+	return
+}
+
 // UserCollection is the media type for an array of User (default view)
 //
 // Identifier: application/vnd.app.user+json; type=collection; view=default

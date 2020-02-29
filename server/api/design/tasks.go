@@ -7,6 +7,7 @@ import (
 var JWTAuth = JWTSecurity("jwt", func() {
 	Scope("api:access", "API access")
 	Scope("api:admin", "API admin access")
+	Scope("api:ingestion", "Ingestion access")
 })
 
 var _ = Service("tasks", func() {

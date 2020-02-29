@@ -399,6 +399,40 @@ func (c *Client) NewSaveCurrentUserImageUserRequest(ctx context.Context, path st
 	return req, nil
 }
 
+// TransmissionTokenUserPath computes a request path to the transmission token action of user.
+func TransmissionTokenUserPath() string {
+
+	return fmt.Sprintf("/user/transmission-token")
+}
+
+// TransmissionTokenUser makes a request to the transmission token action endpoint of the user resource
+func (c *Client) TransmissionTokenUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewTransmissionTokenUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewTransmissionTokenUserRequest create the request corresponding to the transmission token action endpoint of the user resource.
+func (c *Client) NewTransmissionTokenUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // UpdateUserPath computes a request path to the update action of user.
 func UpdateUserPath(userID int) string {
 	param0 := strconv.Itoa(userID)

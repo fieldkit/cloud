@@ -52,7 +52,7 @@ func NewRefreshDeviceEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin"},
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
 			RequiredScopes: []string{"api:access"},
 		}
 		ctx, err = authJWTFn(ctx, p.Auth, &sc)

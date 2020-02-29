@@ -5222,6 +5222,33 @@ func (ctx *SaveCurrentUserImageUserContext) BadRequest() error {
 	return nil
 }
 
+// TransmissionTokenUserContext provides the user transmission token action context.
+type TransmissionTokenUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewTransmissionTokenUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller transmission token action.
+func NewTransmissionTokenUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*TransmissionTokenUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := TransmissionTokenUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *TransmissionTokenUserContext) OK(r *TransmissionToken) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user.transmission.token+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // UpdateUserContext provides the user update action context.
 type UpdateUserContext struct {
 	context.Context

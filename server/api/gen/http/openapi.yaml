@@ -173,5 +173,6 @@ securityDefinitions:
       **Security Scopes**:
         * `api:access`: API access
         * `api:admin`: API admin access
+        * `api:ingestion`: Ingestion access
     name: Authorization
     in: header

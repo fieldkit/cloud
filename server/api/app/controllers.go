@@ -5712,6 +5712,7 @@ type UserController interface {
 	Logout(*LogoutUserContext) error
 	Refresh(*RefreshUserContext) error
 	SaveCurrentUserImage(*SaveCurrentUserImageUserContext) error
+	TransmissionToken(*TransmissionTokenUserContext) error
 	Update(*UpdateUserContext) error
 	Validate(*ValidateUserContext) error
 }
@@ -5729,6 +5730,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/user/transmission-token", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/validate", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -5931,6 +5933,23 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/user/media", ctrl.MuxHandler("save current user image", h, nil))
 	service.LogInfo("mount", "ctrl", "User", "action", "SaveCurrentUserImage", "route", "POST /user/media", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewTransmissionTokenUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.TransmissionToken(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/user/transmission-token", ctrl.MuxHandler("transmission token", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "TransmissionToken", "route", "GET /user/transmission-token", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -3,10 +3,10 @@ consumes:
 definitions:
   AddAdministratorPayload:
     example:
-      userId: 8.610176902796946e+18
+      userId: 4.3866891592095995e+18
     properties:
       userId:
-        example: 8.610176902796946e+18
+        example: 4.3866891592095995e+18
         format: int64
         type: integer
     required:
@@ -15,14 +15,14 @@ definitions:
     type: object
   AddDeviceSourcePayload:
     example:
-      key: Esse sapiente.
-      name: Neque itaque tempora voluptatem sed unde vel.
+      key: Neque itaque tempora voluptatem sed unde vel.
+      name: Aut consequuntur quasi tempore facere tempora.
     properties:
       key:
-        example: Esse sapiente.
+        example: Neque itaque tempora voluptatem sed unde vel.
         type: string
       name:
-        example: Neque itaque tempora voluptatem sed unde vel.
+        example: Aut consequuntur quasi tempore facere tempora.
         type: string
     required:
     - name
@@ -31,18 +31,18 @@ definitions:
     type: object
   AddExpeditionPayload:
     example:
-      description: Est expedita et quae omnis.
-      name: Molestiae rerum ut officiis vitae.
-      slug: bnqpv56hnk
+      description: Expedita et quae omnis voluptas molestiae.
+      name: Ut officiis vitae velit quaerat dolor.
+      slug: pv56hnkydd
     properties:
       description:
-        example: Est expedita et quae omnis.
+        example: Expedita et quae omnis voluptas molestiae.
         type: string
       name:
-        example: Molestiae rerum ut officiis vitae.
+        example: Ut officiis vitae velit quaerat dolor.
         type: string
       slug:
-        example: bnqpv56hnk
+        example: pv56hnkydd
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
@@ -54,25 +54,25 @@ definitions:
     type: object
   AddFieldNotePayload:
     example:
-      category_id: 2.6743573036799e+18
-      created: "1995-10-06T13:03:49Z"
-      media_id: 1.3983250519153526e+18
-      note: Vel ut quod ad quisquam nihil.
+      category_id: 3.3029034505576556e+18
+      created: "1972-09-12T18:32:03Z"
+      media_id: 1.3977007052052915e+18
+      note: Ad quisquam nihil.
     properties:
       category_id:
-        example: 2.6743573036799e+18
+        example: 3.3029034505576556e+18
         format: int64
         type: integer
       created:
-        example: "1995-10-06T13:03:49Z"
+        example: "1972-09-12T18:32:03Z"
         format: date-time
         type: string
       media_id:
-        example: 1.3983250519153526e+18
+        example: 1.3977007052052915e+18
         format: int64
         type: integer
       note:
-        example: Vel ut quod ad quisquam nihil.
+        example: Ad quisquam nihil.
         type: string
     required:
     - created
@@ -80,26 +80,26 @@ definitions:
     type: object
   AddFirmwarePayload:
     example:
-      etag: Quo qui laboriosam voluptatum.
-      meta: Odio voluptatibus omnis recusandae omnis perferendis illo.
-      module: Officia dolores facere veritatis quod voluptas.
-      profile: Sit id officia ipsa quam consectetur rerum.
-      url: Ducimus assumenda quod nesciunt.
+      etag: Odio voluptatibus omnis recusandae omnis perferendis illo.
+      meta: Officia dolores facere veritatis quod voluptas.
+      module: Sit id officia ipsa quam consectetur rerum.
+      profile: Ducimus assumenda quod nesciunt.
+      url: Omnis ut.
     properties:
       etag:
-        example: Quo qui laboriosam voluptatum.
-        type: string
-      meta:
         example: Odio voluptatibus omnis recusandae omnis perferendis illo.
         type: string
-      module:
+      meta:
         example: Officia dolores facere veritatis quod voluptas.
         type: string
-      profile:
+      module:
         example: Sit id officia ipsa quam consectetur rerum.
         type: string
-      url:
+      profile:
         example: Ducimus assumenda quod nesciunt.
+        type: string
+      url:
+        example: Omnis ut.
         type: string
     required:
     - etag
@@ -324,14 +324,14 @@ definitions:
   BadRequestResponse:
     description: BadRequestResponse media type (default view)
     example:
-      key: Corrupti laudantium nam.
-      message: Consectetur molestiae.
+      key: Consectetur molestiae.
+      message: Quo qui laboriosam voluptatum.
     properties:
       key:
-        example: Corrupti laudantium nam.
+        example: Consectetur molestiae.
         type: string
       message:
-        example: Consectetur molestiae.
+        example: Quo qui laboriosam voluptatum.
         type: string
     required:
     - key
@@ -568,12 +568,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+          Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+          Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -660,7 +660,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+        Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -668,7 +668,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+          Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
         type: object
       id:
         example: 4.464267130479644e+18
@@ -694,17 +694,17 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+        Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+        Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 6e8d7c51-f300-446b-a712-ffb0df5a57ab
+        Cumque nihil.: 67e133d7-1140-408e-ad46-db4d23964bb5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1696,7 +1696,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+            Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1770,7 +1770,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+              Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1849,7 +1849,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+        Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1862,7 +1862,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+          Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
         type: object
       location:
         example:
@@ -1928,7 +1928,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+          Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1995,7 +1995,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+            Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2073,7 +2073,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+          Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2146,7 +2146,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 3419fe2a-b7c6-4611-96fc-2b025b9b2db6
+            Perspiciatis quasi error voluptatem et.: a5f3a2b1-8ce5-403d-90aa-728c6dcb4d34
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -3124,6 +3124,19 @@ definitions:
     - teams
     title: 'Mediatype identifier: application/vnd.app.teams+json; view=default'
     type: object
+  TransmissionToken:
+    description: TransmissionToken media type (default view)
+    example:
+      token: Aliquid et corrupti.
+    properties:
+      token:
+        example: Aliquid et corrupti.
+        type: string
+    required:
+    - token
+    title: 'Mediatype identifier: application/vnd.app.user.transmission.token+json;
+      view=default'
+    type: object
   TwitterAccountSource:
     description: TwitterAccountSource media type (default view)
     example:
@@ -3207,15 +3220,15 @@ definitions:
     type: object
   UpdateDeviceFirmwarePayload:
     example:
-      deviceId: 3.0177860661815076e+18
-      firmwareId: 4.837974976786693e+18
+      deviceId: 8.422794061518835e+18
+      firmwareId: 2.2147543032785178e+18
     properties:
       deviceId:
-        example: 3.0177860661815076e+18
+        example: 8.422794061518835e+18
         format: int64
         type: integer
       firmwareId:
-        example: 4.837974976786693e+18
+        example: 2.2147543032785178e+18
         format: int64
         type: integer
     required:
@@ -3225,19 +3238,19 @@ definitions:
     type: object
   UpdateDeviceSourceLocationPayload:
     example:
-      key: Alias voluptates repellendus aut.
-      latitude: 0.08047937576567925
-      longitude: 0.8004524062038395
+      key: Id quia reprehenderit voluptates consequatur.
+      latitude: 0.38852947006465716
+      longitude: 0.16000171215705872
     properties:
       key:
-        example: Alias voluptates repellendus aut.
+        example: Id quia reprehenderit voluptates consequatur.
         type: string
       latitude:
-        example: 0.08047937576567925
+        example: 0.38852947006465716
         format: double
         type: number
       longitude:
-        example: 0.8004524062038395
+        example: 0.16000171215705872
         format: double
         type: number
     required:
@@ -3248,14 +3261,14 @@ definitions:
     type: object
   UpdateDeviceSourcePayload:
     example:
-      key: Aut consequuntur quasi tempore facere tempora.
-      name: Eveniet alias fuga.
+      key: Eveniet alias fuga.
+      name: Alias voluptates repellendus aut.
     properties:
       key:
-        example: Aut consequuntur quasi tempore facere tempora.
+        example: Eveniet alias fuga.
         type: string
       name:
-        example: Eveniet alias fuga.
+        example: Alias voluptates repellendus aut.
         type: string
     required:
     - name
@@ -3264,18 +3277,18 @@ definitions:
     type: object
   UpdateDeviceSourceSchemaPayload:
     example:
-      active: true
-      jsonSchema: Voluptates consequatur sed itaque dignissimos suscipit.
-      key: Quae eum voluptatibus magnam non nobis nostrum.
+      active: false
+      jsonSchema: Voluptatem quae eum voluptatibus.
+      key: Non nobis nostrum id.
     properties:
       active:
-        example: true
+        example: false
         type: boolean
       jsonSchema:
-        example: Voluptates consequatur sed itaque dignissimos suscipit.
+        example: Voluptatem quae eum voluptatibus.
         type: string
       key:
-        example: Quae eum voluptatibus magnam non nobis nostrum.
+        example: Non nobis nostrum id.
         type: string
     required:
     - key
@@ -6722,6 +6735,27 @@ paths:
       summary: list current project
       tags:
       - project
+  /user/transmission-token:
+    get:
+      description: |-
+        Required security scopes:
+          * `api:access`
+      operationId: user#transmission token
+      produces:
+      - application/vnd.app.user.transmission.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TransmissionToken'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: transmission token user
+      tags:
+      - user
   /users:
     get:
       description: |-
@@ -6948,6 +6982,7 @@ securityDefinitions:
       **Security Scopes**:
         * `api:access`: API access
         * `api:admin`: API admin access
+        * `api:ingestion`: Ingestion access
     in: header
     name: Authorization
     type: apiKey

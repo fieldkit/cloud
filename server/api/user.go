@@ -431,3 +431,46 @@ func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
 
 	return ctx.OK(nil)
 }
+
+func NewTransmissionToken(now time.Time, user *data.User) *jwtgo.Token {
+	scopes := []string{"api:transmission"}
+
+	token := jwtgo.New(jwtgo.SigningMethodHS512)
+	token.Claims = jwtgo.MapClaims{
+		"iat":    now.Unix(),
+		"exp":    now.Add(time.Hour * 24 * 365).Unix(),
+		"sub":    user.ID,
+		"email":  user.Email,
+		"scopes": scopes,
+	}
+
+	return token
+}
+
+func (c *UserController) TransmissionToken(ctx *app.TransmissionTokenUserContext) error {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context") // internal error
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return fmt.Errorf("JWT claims error") // internal error
+	}
+
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"]); err != nil {
+		return err
+	}
+
+	now := time.Now()
+	transmissionToken := NewTransmissionToken(now, user)
+	signedToken, err := transmissionToken.SignedString(c.options.JWTHMACKey)
+	if err != nil {
+		return fmt.Errorf("failed to sign token: %s", err) // internal error
+	}
+
+	return ctx.OK(&app.TransmissionToken{
+		Token: signedToken,
+	})
+}

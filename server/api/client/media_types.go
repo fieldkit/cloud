@@ -2123,6 +2123,28 @@ func (c *Client) DecodeUser(resp *http.Response) (*User, error) {
 	return &decoded, err
 }
 
+// TransmissionToken media type (default view)
+//
+// Identifier: application/vnd.app.user.transmission.token+json; view=default
+type TransmissionToken struct {
+	Token string `form:"token" json:"token" yaml:"token" xml:"token"`
+}
+
+// Validate validates the TransmissionToken media type instance.
+func (mt *TransmissionToken) Validate() (err error) {
+	if mt.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "token"))
+	}
+	return
+}
+
+// DecodeTransmissionToken decodes the TransmissionToken instance encoded in resp body.
+func (c *Client) DecodeTransmissionToken(resp *http.Response) (*TransmissionToken, error) {
+	var decoded TransmissionToken
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // UserCollection is the media type for an array of User (default view)
 //
 // Identifier: application/vnd.app.user+json; type=collection; view=default
