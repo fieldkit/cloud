@@ -63,7 +63,7 @@ func getUserID(ctx context.Context) (int32, error) {
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	errorHandler := goahelpers.ErrorHandler(true)
 
-	handler := errorHandling(errorHandler, authentication(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	handler := useMiddleware(errorHandler, useMiddleware(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		startedAt := time.Now()
 
 		userID, err := getUserID(ctx)
@@ -235,13 +235,7 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	return headers, nil
 }
 
-func errorHandling(middleware goa.Middleware, next goa.Handler) goa.Handler {
-	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
-		return middleware(next)(ctx, res, req)
-	}
-}
-
-func authentication(middleware goa.Middleware, next goa.Handler) goa.Handler {
+func useMiddleware(middleware goa.Middleware, next goa.Handler) goa.Handler {
 	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
 		return middleware(next)(ctx, res, req)
 	}
