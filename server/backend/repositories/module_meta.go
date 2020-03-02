@@ -76,6 +76,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "ph",
+					FirmwareKey:   "ph",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -96,6 +97,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "ec",
+					FirmwareKey:   "ec",
 					UnitOfMeasure: "μS/cm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -106,6 +108,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "tds",
+					FirmwareKey:   "tds",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{
 						/*
@@ -118,6 +121,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "salinity",
+					FirmwareKey:   "salinity",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{
 						/*
@@ -140,6 +144,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "do",
+					FirmwareKey:   "do",
 					UnitOfMeasure: "mg/L",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -160,6 +165,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "orp",
+					FirmwareKey:   "orp",
 					UnitOfMeasure: "mV",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -180,6 +186,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "temp",
+					FirmwareKey:   "temp",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -200,6 +207,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "humidity",
+					FirmwareKey:   "humidity",
 					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -209,7 +217,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "temperature_1",
+					Key:           "temperature1",
+					FirmwareKey:   "temperature_1",
 					UnitOfMeasure: "C",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -220,6 +229,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "pressure",
+					FirmwareKey:   "pressure",
 					UnitOfMeasure: "kPa",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -229,7 +239,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "temperature_2",
+					Key:           "temperature2",
+					FirmwareKey:   "temperature_2",
 					UnitOfMeasure: "C",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -240,6 +251,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "rain",
+					FirmwareKey:   "rain",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -249,7 +261,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_speed",
+					Key:           "windSpeed",
+					FirmwareKey:   "wind_speed",
 					UnitOfMeasure: "km/hr",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -259,7 +272,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_dir",
+					Key:           "windDir",
+					FirmwareKey:   "wind_dir",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -269,7 +283,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_dir_mv",
+					Key:           "windDirMv",
+					FirmwareKey:   "wind_dir_mv",
 					UnitOfMeasure: "mV",
 					Ranges:        []SensorRanges{
 						/*
@@ -281,7 +296,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_hr_max_speed",
+					Key:           "windHrMaxSpeed",
+					FirmwareKey:   "wind_hr_max_speed",
 					UnitOfMeasure: "km/hr",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -291,7 +307,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_hr_max_dir",
+					Key:           "windHrMaxDir",
+					FirmwareKey:   "wind_hr_max_dir",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -301,7 +318,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_10m_max_speed",
+					Key:           "wind10mMaxSpeed",
+					FirmwareKey:   "wind_10m_max_speed",
 					UnitOfMeasure: "km/hr",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -311,7 +329,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_10m_max_dir",
+					Key:           "wind10mMaxDir",
+					FirmwareKey:   "wind_10m_max_dir",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -321,7 +340,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_2m_avg_speed",
+					Key:           "wind2mAvgSpeed",
+					FirmwareKey:   "wind_2m_avg_speed",
 					UnitOfMeasure: "km/hr",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -331,7 +351,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "wind_2m_avg_dir",
+					Key:           "wind2mAvgDir",
+					FirmwareKey:   "wind_2m_avg_dir",
 					UnitOfMeasure: "",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -341,7 +362,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "rain_this_hour",
+					Key:           "rainThisHour",
+					FirmwareKey:   "rain_this_hour",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -351,7 +373,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "rain_prev_hour",
+					Key:           "rainPrevHour",
+					FirmwareKey:   "rain_prev_hour",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -372,6 +395,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "distance",
+					FirmwareKey:   "distance",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -381,7 +405,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "distance_0",
+					Key:           "distance0",
+					FirmwareKey:   "distance_0",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -391,7 +416,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "distance_1",
+					Key:           "distance1",
+					FirmwareKey:   "distance_1",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -401,7 +427,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "distance_2",
+					Key:           "distance2",
+					FirmwareKey:   "distance_2",
 					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
@@ -412,6 +439,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "calibration",
+					FirmwareKey:   "calibration",
 					UnitOfMeasure: "mm",
 					Ranges:        []SensorRanges{},
 				},
@@ -427,47 +455,56 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Internal: true,
 			Sensors: []*SensorMeta{
 				&SensorMeta{
-					Key:           "battery_charge",
+					Key:           "batteryCharge",
+					FirmwareKey:   "battery_charge",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "battery_voltage",
+					Key:           "batteryVoltage",
+					FirmwareKey:   "battery_voltage",
 					UnitOfMeasure: "V",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "battery_vbus",
+					Key:           "batteryVbus",
+					FirmwareKey:   "battery_vbus",
 					UnitOfMeasure: "V",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "battery_vs",
+					Key:           "batteryVs",
+					FirmwareKey:   "battery_vs",
 					UnitOfMeasure: "mv",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "battery_ma",
+					Key:           "batteryMa",
+					FirmwareKey:   "battery_ma",
 					UnitOfMeasure: "ma",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "battery_power",
+					Key:           "batteryPower",
+					FirmwareKey:   "battery_power",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "free_memory",
+					Key:           "freeMemory",
+					FirmwareKey:   "free_memory",
 					UnitOfMeasure: "bytes",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
 					Key:           "uptime",
+					FirmwareKey:   "uptime",
 					UnitOfMeasure: "ms",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
 					Key:           "temperature",
+					FirmwareKey:   "temperature",
 					UnitOfMeasure: "C",
 					Ranges:        []SensorRanges{},
 				},
@@ -483,52 +520,62 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Internal: true,
 			Sensors: []*SensorMeta{
 				&SensorMeta{
-					Key:           "random_0",
+					Key:           "random0",
+					FirmwareKey:   "random_0",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_1",
+					Key:           "random1",
+					FirmwareKey:   "random_0",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_2",
+					Key:           "random2",
+					FirmwareKey:   "random_2",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_3",
+					Key:           "random3",
+					FirmwareKey:   "random_3",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_4",
+					Key:           "random4",
+					FirmwareKey:   "random_4",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_5",
+					Key:           "random5",
+					FirmwareKey:   "random_5",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_6",
+					Key:           "random6",
+					FirmwareKey:   "random_6",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_7",
+					Key:           "random7",
+					FirmwareKey:   "random_7",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_8",
+					Key:           "random8",
+					FirmwareKey:   "random_8",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
-					Key:           "random_9",
+					Key:           "random9",
+					FirmwareKey:   "random_9",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
