@@ -52,7 +52,7 @@ func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm
 	for _, module := range all {
 		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
 			for _, s := range module.Sensors {
-				if s.Key == sensor {
+				if s.Key == sensor || s.FirmwareKey == sensor {
 					return s, nil
 				}
 				if s.Key == weNeedToCleanThisUp {
