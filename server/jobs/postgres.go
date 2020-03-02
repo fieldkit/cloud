@@ -55,7 +55,7 @@ func NewPqJobQueue(ctx context.Context, db *sqlxcache.DB, metrics *logging.Metri
 func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
 	body, err := json.Marshal(message)
 	if err != nil {
-		return err
+		return fmt.Errorf("json marshal: %v", err)
 	}
 
 	jq.metrics.MessagePublished()
@@ -75,10 +75,14 @@ func (jq *PgJobQueue) Publish(ctx context.Context, message interface{}) error {
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {
-		return err
+		return fmt.Errorf("json marshal: %v", err)
 	}
 
 	_, err = jq.db.ExecContext(ctx, `SELECT pg_notify($1, $2)`, jq.name, bytes)
+	if err != nil {
+		return fmt.Errorf("postgres: %v", err)
+	}
+
 	return err
 }
 

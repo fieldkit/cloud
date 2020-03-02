@@ -124,12 +124,6 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			return err
 		}
 
-		o.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time: ingestion.Time,
-			ID:   ingestion.ID,
-			URL:  saved.URL,
-		})
-
 		b := ingestion.Blocks[1] - ingestion.Blocks[0]
 
 		o.Metrics.Ingested(int(b), saved.BytesRead)
@@ -137,6 +131,14 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		log.Infow("saved", "device_id", headers.FkDeviceID, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
 			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation_id", ingestion.GenerationID, "user_id", userID,
 			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
+
+		if err := o.Publisher.Publish(ctx, &messages.IngestionReceived{
+			Time: ingestion.Time,
+			ID:   ingestion.ID,
+			URL:  saved.URL,
+		}); err != nil {
+			log.Warnw("publishing", "err", err)
+		}
 
 		w.WriteHeader(http.StatusOK)
 
