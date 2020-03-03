@@ -88,9 +88,10 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 	}
 
 	c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-		Time: i.Time,
-		ID:   i.ID,
-		URL:  i.URL,
+		Time:    i.Time,
+		ID:      i.ID,
+		URL:     i.URL,
+		Verbose: true,
 	})
 
 	return ctx.OK([]byte("queued"))
