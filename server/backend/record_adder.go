@@ -157,7 +157,7 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
-	log := Logger(ctx).Sugar().With("ingestion_id", i.ID)
+	log := Logger(ctx).Sugar()
 	verboseLog := logging.OnlyLogIf(log, ra.verbose)
 
 	provision, err := ra.findProvision(ctx, i)
