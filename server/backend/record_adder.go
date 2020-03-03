@@ -239,14 +239,20 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 	return
 }
 
-func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) error {
+type WriteInfo struct {
+	TotalRecords int64
+	MetaErrors   int64
+	DataErrors   int64
+}
+
+func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (info *WriteInfo, err error) {
 	log := Logger(ctx).Sugar().With("ingestion_id", i.ID, "device_id", i.DeviceID, "user_id", i.UserID, "blocks", i.Blocks)
 
 	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "file_id", i.UploadID, "file_size", i.Size, "type", i.Type)
 
 	reader, err := ra.files.OpenByURL(ctx, i.URL)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer reader.Close()
@@ -254,16 +260,19 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 	meta := false
 	data := false
 
-	data_processed := 0
-	data_errors := 0
-	meta_processed := 0
-	meta_errors := 0
+	totalRecords := 0
+	dataProcessed := 0
+	dataErrors := 0
+	metaProcessed := 0
+	metaErrors := 0
 	records := 0
 
 	unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var unmarshalError error
 		var dataRecord pb.DataRecord
 		var signedRecord pb.SignedRecord
+
+		totalRecords += 1
 
 		if data || (!data && !meta) {
 			err := proto.Unmarshal(b, &dataRecord)
@@ -280,10 +289,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 					return nil, fatal
 				}
 				if warning == nil {
-					data_processed += 1
+					dataProcessed += 1
 					records += 1
 				} else {
-					data_errors += 1
+					dataErrors += 1
 					if records > 0 {
 						log.Infow("processed", "record_run", records)
 						records = 0
@@ -316,10 +325,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 					return nil, fatal
 				}
 				if warning == nil {
-					meta_processed += 1
+					metaProcessed += 1
 					records += 1
 				} else {
-					meta_errors += 1
+					metaErrors += 1
 					if records > 0 {
 						log.Infow("processed", "record_run", records)
 						records = 0
@@ -338,16 +347,22 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) erro
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
-	log.Infow("processed", "meta_processed", meta_processed, "data_processed", data_processed, "meta_errors", meta_errors, "data_errors", data_errors,
+	log.Infow("processed", "meta_processed", metaProcessed, "data_processed", dataProcessed, "meta_errors", metaErrors, "data_errors", dataErrors,
 		"record_run", records, "start_human", prettyTime(ra.statistics.start), "end_human", prettyTime(ra.statistics.end))
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
 		log.Errorw("error", "error", newErr)
-		return newErr
+		return nil, newErr
 	}
 
-	return nil
+	info = &WriteInfo{
+		TotalRecords: int64(totalRecords),
+		MetaErrors:   int64(metaErrors),
+		DataErrors:   int64(dataErrors),
+	}
+
+	return
 }
 
 func prettyTime(t time.Time) string {

@@ -39,15 +39,15 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
-	err = recordAdder.WriteRecords(ctx, i)
+	info, err := recordAdder.WriteRecords(ctx, i)
 	if err != nil {
 		log.Errorw("error", "error", err)
-		err := ir.MarkProcessedHasErrors(ctx, i.ID)
+		err := ir.MarkProcessedHasOtherErrors(ctx, i.ID)
 		if err != nil {
 			return err
 		}
 	} else {
-		err := ir.MarkProcessedDone(ctx, i.ID)
+		err := ir.MarkProcessedDone(ctx, i.ID, info.TotalRecords, info.MetaErrors, info.DataErrors)
 		if err != nil {
 			return err
 		}

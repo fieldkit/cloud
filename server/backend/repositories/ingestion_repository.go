@@ -43,15 +43,15 @@ func (r *IngestionRepository) QueryAll(ctx context.Context) (all []*data.Ingesti
 	return pending, nil
 }
 
-func (r *IngestionRepository) MarkProcessedHasErrors(ctx context.Context, id int64) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET errors = true, attempted = NOW() WHERE id = $1`, id); err != nil {
+func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, id int64) error {
+	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET other_errors = true, attempted = NOW() WHERE id = $1`, id); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id int64) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET errors = false, completed = NOW() WHERE id = $1`, id); err != nil {
+func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id, totalRecords, metaErrors, dataErrors int64) error {
+	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET total_records = $1, meta_errors = $2, data_errors = $3, completed = NOW() WHERE id = $4`, totalRecords, metaErrors, dataErrors, id); err != nil {
 		return err
 	}
 	return nil
