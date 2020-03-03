@@ -59,7 +59,7 @@ func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error
 
 			extraSensor, err := mf.modulesRepository.FindSensor(header, sensor.Name)
 			if err != nil {
-				return nil, err
+				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 			}
 
 			sensorMeta := &DataMetaSensor{
