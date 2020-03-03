@@ -33,9 +33,11 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return err
 	}
 
+	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
+
 	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics, m.Verbose)
 
-	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks, "user_id", i.UserID)
+	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
 	err = recordAdder.WriteRecords(ctx, i)
 	if err != nil {
