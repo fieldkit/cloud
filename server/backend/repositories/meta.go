@@ -130,6 +130,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		return nil, err
 	}
 
+	numberOfNonVirtualModulesWithData := 0
 	readings := make(map[string]*ReadingValue)
 	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
 		moduleIndex := sgIndex
@@ -140,6 +141,10 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 		module := meta.Station.AllModules[moduleIndex]
 		if !module.Internal {
+			if len(sensorGroup.Readings) > 0 {
+				numberOfNonVirtualModulesWithData += 1
+			}
+
 			for sensorIndex, reading := range sensorGroup.Readings {
 				if sensorIndex >= len(module.Sensors) {
 					verboseLog.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
@@ -165,10 +170,10 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	}
 
 	if len(readings) == 0 {
-		if len(dataRecord.Readings.SensorGroups) == 1 {
-			verboseLog.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
+		if numberOfNonVirtualModulesWithData == 0 {
+			verboseLog.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
 		} else {
-			log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups))
+			log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
 		}
 		return nil, nil
 	}
