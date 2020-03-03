@@ -527,7 +527,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 				&SensorMeta{
 					Key:           "random1",
-					FirmwareKey:   "random_0",
+					FirmwareKey:   "random_1",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{},
 				},
