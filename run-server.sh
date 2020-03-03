@@ -8,10 +8,6 @@ export FIELDKIT_API_DOMAIN=127.0.0.1:8080
 export FIELDKIT_API_HOST=http://127.0.0.1:8080
 export FIELDKIT_HTTP_SCHEME=http
 
-if [ -f aws.env ]; then
-    source aws.env
-fi
-
 set -xe
 
 make server
