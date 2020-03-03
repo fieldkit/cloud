@@ -38,6 +38,8 @@ func (mf *MetaFactory) InOrder() []*VersionMeta {
 }
 
 func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord) (*VersionMeta, error) {
+	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
+
 	if mf.byMetaID[databaseRecord.ID] != nil {
 		return mf.byMetaID[databaseRecord.ID], nil
 	}
@@ -50,6 +52,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 
 	allModules := make([]*DataMetaModule, 0)
 	modules := make([]*DataMetaModule, 0)
+	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
 		header := module.Header
@@ -86,12 +89,21 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 			Sensors:      sensors,
 		}
 
-		if !moduleMeta.Internal {
-			modules = append(modules, moduleMeta)
+		if len(moduleMeta.Sensors) > 0 {
+			if !moduleMeta.Internal {
+				modules = append(modules, moduleMeta)
+			}
+		} else {
+			numberEmptyModules += 1
 		}
 
 		allModules = append(allModules, moduleMeta)
 	}
+
+	if numberEmptyModules > 0 {
+		log.Warnw("empty", "number_empty_modules", numberEmptyModules)
+	}
+
 	versionMeta := &VersionMeta{
 		ID: databaseRecord.ID,
 		Station: &DataMetaStation{
