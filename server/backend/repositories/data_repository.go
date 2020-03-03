@@ -136,7 +136,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 
 	rows, err := r.Database.QueryxContext(ctx, `
 		SELECT
-			r.id, r.provision_id, r.time, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw
+			r.id, r.provision_id, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw
 		FROM
             fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
