@@ -55,7 +55,7 @@ func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm
 				if s.Key == sensor || s.FirmwareKey == sensor {
 					return s, nil
 				}
-				if s.Key == weNeedToCleanThisUp {
+				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
 					return s, nil
 				}
 			}
