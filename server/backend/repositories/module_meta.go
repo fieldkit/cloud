@@ -385,6 +385,100 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 			},
 		},
+		// This is from a very old version of the Weather firmware, we need to find a way to phase this out.
+		&ModuleMeta{
+			Key: "modules.weather",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWeather,
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "humidity",
+					FirmwareKey:   "humidity",
+					UnitOfMeasure: "%",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 100.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "temperature1",
+					FirmwareKey:   "temperature_1",
+					UnitOfMeasure: "C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -100.0,
+							Maximum: 200.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "pressure",
+					FirmwareKey:   "pressure",
+					UnitOfMeasure: "kPa",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 1.0,
+							Maximum: 200000.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "temperature2",
+					FirmwareKey:   "temperature_2",
+					UnitOfMeasure: "C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -100.0,
+							Maximum: 200.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "rain",
+					FirmwareKey:   "rain",
+					UnitOfMeasure: "mm",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: MaximumRain,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "wind",
+					FirmwareKey:   "wind",
+					UnitOfMeasure: "km/hr",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: MaximumWindSpeed,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "windDir",
+					FirmwareKey:   "wind_dir",
+					UnitOfMeasure: "",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 360.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "windMv",
+					FirmwareKey:   "wind_mv",
+					UnitOfMeasure: "mV",
+					Ranges:        []SensorRanges{},
+				},
+			},
+		},
 		&ModuleMeta{
 			Key: "modules.distance",
 			Header: ModuleHeader{

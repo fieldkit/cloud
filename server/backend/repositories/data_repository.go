@@ -151,9 +151,6 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		if err != nil {
 			return nil, err
 		}
-		if false {
-			log.Infow("metas", "id", dbMeta.ID)
-		}
 	}
 
 	resampler, err := NewResampler(summary, metaFactory, opts)
