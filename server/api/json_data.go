@@ -9,6 +9,7 @@ import (
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type JSONDataController struct {
@@ -176,12 +177,7 @@ func (c *JSONDataController) Summary(ctx *app.SummaryJSONDataContext) error {
 		return err
 	}
 
-	readings := 0
-	for _, d := range modulesAndData.Data {
-		readings += len(d.D)
-	}
-	c.options.Metrics.RecordsViewed(len(modulesAndData.Data))
-	c.options.Metrics.ReadingsViewed(readings)
+	publishSummaryMetrics(c.options.Metrics, modulesAndData)
 
 	return ctx.OK(JSONDataSummaryResponseType(modulesAndData))
 }
@@ -231,18 +227,46 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 		return err
 	}
 
-	records := 0
-	readings := 0
-	for _, version := range versions {
-		records += len(version.Data)
-		for _, d := range version.Data {
-			readings += len(d.D)
-		}
-	}
-	c.options.Metrics.RecordsViewed(records)
-	c.options.Metrics.ReadingsViewed(readings)
+	publishVersionsMetrics(c.options.Metrics, versions)
 
 	return ctx.OK(&app.JSONDataResponse{
 		Versions: JSONDataResponseType(versions),
 	})
+}
+
+func publishSummaryMetrics(metrics *logging.Metrics, modulesAndData *repositories.ModulesAndData) {
+	readings := 0
+	for _, d := range modulesAndData.Data {
+		readings += len(d.D)
+		if false {
+			for key, value := range d.D {
+				_ = key
+				_ = value
+			}
+		}
+	}
+
+	metrics.RecordsViewed(len(modulesAndData.Data))
+	metrics.ReadingsViewed(readings)
+}
+
+func publishVersionsMetrics(metrics *logging.Metrics, versions []*repositories.Version) {
+	records := 0
+	readings := 0
+
+	for _, version := range versions {
+		records += len(version.Data)
+		for _, d := range version.Data {
+			readings += len(d.D)
+			if false {
+				for key, value := range d.D {
+					_ = key
+					_ = value
+				}
+			}
+		}
+	}
+
+	metrics.RecordsViewed(records)
+	metrics.ReadingsViewed(readings)
 }
