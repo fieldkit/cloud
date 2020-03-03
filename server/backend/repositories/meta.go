@@ -37,7 +37,7 @@ func (mf *MetaFactory) InOrder() []*VersionMeta {
 	return mf.ordered
 }
 
-func (mf *MetaFactory) Add(databaseRecord *data.MetaRecord) (*VersionMeta, error) {
+func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord) (*VersionMeta, error) {
 	if mf.byMetaID[databaseRecord.ID] != nil {
 		return mf.byMetaID[databaseRecord.ID], nil
 	}

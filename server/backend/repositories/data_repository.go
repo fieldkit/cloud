@@ -147,7 +147,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 
 	metaFactory := NewMetaFactory()
 	for _, dbMeta := range dbMetas {
-		_, err := metaFactory.Add(dbMeta)
+		_, err := metaFactory.Add(ctx, dbMeta)
 		if err != nil {
 			return nil, err
 		}
