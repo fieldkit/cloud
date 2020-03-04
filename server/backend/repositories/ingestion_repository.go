@@ -44,7 +44,7 @@ func (r *IngestionRepository) QueryAll(ctx context.Context) (all []*data.Ingesti
 }
 
 func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, id int64) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET other_errors = true, attempted = NOW() WHERE id = $1`, id); err != nil {
+	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET other_errors = 1, attempted = NOW() WHERE id = $1`, id); err != nil {
 		return err
 	}
 	return nil
