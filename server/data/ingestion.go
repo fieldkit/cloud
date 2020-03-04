@@ -32,6 +32,9 @@ type Ingestion struct {
 	Completed    *time.Time    `db:"completed"`
 	Attempted    *time.Time    `db:"attempted"`
 	Errors       *bool         `db:"errors"`
+	OtherErrors  *int64        `db:"other_errors"`
+	MetaErrors   *int64        `db:"meta_errors"`
+	DataErrors   *int64        `db:"data_errors"`
 }
 
 type Provision struct {
