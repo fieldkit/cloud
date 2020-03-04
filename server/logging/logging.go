@@ -12,7 +12,7 @@ func OnlyLogIf(logger *zap.SugaredLogger, verbose bool) *zap.SugaredLogger {
 	if !verbose {
 		return zap.NewNop().Sugar()
 	}
-	return logger
+	return logger.With("verbose", true)
 }
 
 func ServiceTrace(ctx context.Context) []string {
