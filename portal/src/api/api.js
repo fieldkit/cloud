@@ -289,6 +289,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getModulesMeta() {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/modules/meta",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            }
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStationDataSummaryByDeviceId(deviceId, start, end) {
         if (!start) {
             start = new Date("1/1/2019").getTime();

@@ -7,29 +7,25 @@ import * as d3 from "d3";
 
 export default {
     name: "D3LineChart",
-    props: ["chart", "stationData", "layout", "selectedSensor"],
+    props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false,
-            drawn: false
+            activeMode: false
         };
     },
     watch: {
-        selectedSensor: function() {
-            if (this.drawn && this.activeMode) {
-                this.sensorChange();
+        chart: function() {
+            // make a copy of chart.data because
+            // we will add blank points
+            this.chartData = this.chart.data.slice();
+
+            if (!this.line) {
+                this.init();
             }
-        },
-        stationData: function() {
+
             if (this.activeMode) {
                 if (this.chart.svg.selectAll(".data-line, .bkgd-line").empty()) {
                     this.makeLine();
-                } else {
-                    let d3Chart = this;
-                    this.filteredData = this.stationData.filter(d => {
-                        return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
-                    });
-                    this.timeChanged();
                 }
             }
         }
@@ -56,11 +52,6 @@ export default {
                 .extent([[0, 0], [this.layout.width, this.layout.height - this.layout.marginBottom]])
                 .on("end", this.brushed);
 
-            // this.colors = d3
-            //     .scaleSequential()
-            //     .domain(this.chart.extent)
-            //     .interpolator(d3.interpolatePlasma);
-
             let d3Chart = this;
             // Area gradient fill
             this.area = d3
@@ -70,7 +61,7 @@ export default {
                 })
                 .y0(this.layout.height - (this.layout.marginBottom + this.layout.marginTop))
                 .y1(d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    return d3Chart.y(d3Chart.y(d[d3Chart.chart.sensor.key]));
                 })
                 .curve(d3.curveBasis);
 
@@ -81,6 +72,7 @@ export default {
                     this.layout.marginLeft,
                     this.layout.width - (this.layout.marginRight + this.layout.marginLeft)
                 ]);
+
             this.y = d3
                 .scaleLinear()
                 .domain(this.chart.extent)
@@ -93,23 +85,28 @@ export default {
                 .line()
                 .defined(d => !d.blankPoint)
                 .x(d => d3Chart.x(d.date))
-                .y(d => d3Chart.y(d[d3Chart.selectedSensor.key]))
+                .y(d => d3Chart.y(d[d3Chart.chart.sensor.key]))
                 .curve(d3.curveBasis);
         },
         setStatus(status) {
             this.activeMode = status;
         },
+        dataChanged() {
+            this.chartData = this.chart.data.slice();
+            if (this.activeMode) {
+                this.updateChart();
+            }
+        },
         makeLine() {
             let d3Chart = this;
-            this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
-            });
+
+            // create blank points for dotted line
             this.createBlankPoints();
 
-            // Add the gradient area
+            // add the gradient area
             this.createGradient();
 
-            // Add the lines
+            // add the lines
             this.chart.svg.selectAll(".data-line, .bkgd-line").remove();
             // continuous dotted line
             this.line
@@ -118,7 +115,7 @@ export default {
                 .attr("stroke", "#BBBBBB")
                 .attr("stroke-dasharray", "4,4")
                 .attr("fill", "none")
-                .attr("d", this.lineFn(this.filteredData.filter(this.lineFn.defined())));
+                .attr("d", this.lineFn(this.chartData.filter(this.lineFn.defined())));
             // data line with gaps
             this.line
                 .append("path")
@@ -126,9 +123,9 @@ export default {
                 .attr("stroke", "url(#" + this.chart.id + "-area-gradient)")
                 .attr("stroke-width", "3")
                 .attr("fill", "none")
-                .attr("d", this.lineFn(this.filteredData));
+                .attr("d", this.lineFn(this.chartData));
 
-            // Add the brushing
+            // add the brushing
             this.chart.svg.selectAll(".brush").remove();
             this.chart.svg
                 .append("g")
@@ -136,12 +133,12 @@ export default {
                 .attr("data-panel", this.chart.panelID)
                 .call(this.brush);
 
-            // Add dots
+            // add dots
             this.chart.svg.selectAll(".dot").remove();
             this.line
                 .selectAll(".circles")
                 .data(
-                    this.filteredData.filter(d => {
+                    this.chartData.filter(d => {
                         return !d.blankPoint;
                     })
                 )
@@ -152,17 +149,17 @@ export default {
                     return d3Chart.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]));
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]));
             // tooltip will be added back
 
             this.xAxis = d3.axisBottom(this.x).ticks(10);
             this.yAxis = d3.axisLeft(this.y).ticks(6);
 
             this.chart.svg.selectAll(".x-axis").remove();
-            //Add x axis
+            // add x axis
             this.xAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "x-axis")
@@ -177,36 +174,36 @@ export default {
                 .call(this.xAxis);
 
             this.chart.svg.selectAll(".y-axis").remove();
-            //Add y axis
+            // add y axis
             this.yAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "y-axis")
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            this.drawn = true;
-            document.getElementById("loading").style.display = "none";
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
         },
         createBlankPoints() {
-            if (this.filteredData.length > 1) {
-                const start = this.filteredData[0].date.getTime();
-                const next = this.filteredData[1].date.getTime();
-                const last = this.filteredData[this.filteredData.length - 1].date.getTime();
+            if (this.chartData.length > 1) {
+                const start = this.chartData[0].date.getTime();
+                const next = this.chartData[1].date.getTime();
+                const last = this.chartData[this.chartData.length - 1].date.getTime();
+                // TODO: this interval might be too small
                 const interval = next - start;
                 for (let i = start; i < last; i += interval) {
-                    const point = this.filteredData.find(d => {
+                    const point = this.chartData.find(d => {
                         return d.date.getTime() >= i - interval && d.date.getTime() <= i;
                     });
                     if (!point) {
                         // insert "blank" point
-                        this.filteredData.push({
+                        this.chartData.push({
                             date: new Date(i),
                             blankPoint: true
                         });
                     }
                 }
             }
-            this.filteredData.sort(function(a, b) {
+            this.chartData.sort(function(a, b) {
                 return a.date - b.date;
             });
         },
@@ -218,35 +215,20 @@ export default {
             let xRange = d3.event.selection;
             this.chart.start = this.x.invert(xRange[0]);
             this.chart.end = this.x.invert(xRange[1]);
-            // Remove the grey brush area after selection
+            // remove the grey brush area after selection
             this.chart.svg.select(".brush").call(this.brush.move, null);
-            this.timeChanged();
+            // initiate chain of events to get new data
             this.$emit("timeZoomed", { start: this.chart.start, end: this.chart.end });
-        },
-        timeChanged() {
-            // update x scale
-            this.x.domain([this.chart.start, this.chart.end]);
-
-            // Update x axis and line position
-            this.xAxisGroup
-                .transition()
-                .duration(1000)
-                .call(d3.axisBottom(this.x));
-            this.updateChart();
-        },
-        sensorChange() {
-            let d3Chart = this;
-            this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key] === 0 || d[d3Chart.selectedSensor.key];
-            });
-            this.updateChart();
         },
         updateChart() {
             let d3Chart = this;
-            // update y domain with new extent
+            // update x scale
+            this.x.domain([this.chart.start, this.chart.end]);
+            // update y scale
             this.y.domain(this.chart.extent);
+            // create blank points for dotted line
             this.createBlankPoints();
-
+            // update the gradient
             this.createGradient();
 
             // update lines
@@ -255,22 +237,20 @@ export default {
                 .selectAll(".bkgd-line")
                 .transition()
                 .duration(1000)
-                .attr("d", this.lineFn(this.filteredData.filter(this.lineFn.defined())));
+                .attr("d", this.lineFn(this.chartData.filter(this.lineFn.defined())));
             // data line with gaps
             this.line
                 .selectAll(".data-line")
                 .transition()
                 .duration(1000)
-                .attr("d", this.lineFn(this.filteredData));
+                .attr("d", this.lineFn(this.chartData));
 
             // update dots
             let dots = this.line.selectAll(".dot").data(
-                this.filteredData.filter(d => {
-                    return d[d3Chart.selectedSensor.key] === 0 || d3Chart.y(d[d3Chart.selectedSensor.key]);
-                    // return !d.blankPoint;
+                this.chartData.filter(d => {
+                    return !d.blankPoint;
                 })
             );
-
             // add any new dots
             dots.enter()
                 .append("circle")
@@ -279,30 +259,36 @@ export default {
                     return d3Chart.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]));
-
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]));
             // updating any existing dots
             dots.transition()
                 .duration(1000)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.selectedSensor.key]))
+                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]))
                 .attr("cx", d => {
                     return d3Chart.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.selectedSensor.key]);
+                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
                 });
-
             // remove any extra dots
             dots.exit().remove();
+
+            // update x axis
+            this.xAxisGroup
+                .transition()
+                .duration(1000)
+                .call(d3.axisBottom(this.x));
 
             // update y axis
             this.yAxisGroup
                 .transition()
                 .duration(1000)
                 .call(d3.axisLeft(this.y));
+
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
         },
         createGradient() {
             // Add the gradient area

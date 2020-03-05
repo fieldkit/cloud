@@ -6,23 +6,18 @@
 import * as d3 from "d3";
 
 const binCount = 16;
+const MIN_WIDTH = 800 / 16;
 
 export default {
     name: "D3HistoChart",
-    props: ["chart", "stationData", "layout", "selectedSensor"],
+    props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false,
-            drawn: false
+            activeMode: false
         };
     },
     watch: {
-        selectedSensor: function() {
-            if (this.drawn && this.activeMode) {
-                this.sensorChange();
-            }
-        },
-        stationData: function() {
+        chart: function() {
             if (this.activeMode) {
                 this.makeHistogram();
             }
@@ -31,6 +26,11 @@ export default {
     methods: {
         setStatus(status) {
             this.activeMode = status;
+        },
+        dataChanged() {
+            if (this.activeMode) {
+                this.makeHistogram();
+            }
         },
         prepareHistogram() {
             let d3Chart = this;
@@ -53,13 +53,13 @@ export default {
             this.histogram = d3
                 .histogram()
                 .value(d => {
-                    return d[d3Chart.selectedSensor.key];
+                    return d[d3Chart.chart.sensor.key];
                 })
                 .domain(this.xHist.domain())
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(this.stationData);
+            let bins = this.histogram(this.chart.data);
 
             // set y scale
             this.yHist = d3
@@ -86,11 +86,6 @@ export default {
 
             let bins = this.prepareHistogram();
 
-            // this.colors = d3
-            //     .scaleSequential()
-            //     .domain(this.chart.extent)
-            //     .interpolator(d3.interpolatePlasma);
-
             // append the bar rectangles
             this.chart.svg.selectAll(".histobar").remove();
             this.chart.svg
@@ -103,7 +98,8 @@ export default {
                     return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return w <= 0 ? MIN_WIDTH : w;
                 })
                 .style("fill", d => d3Chart.chart.colors(d.x0))
                 .transition()
@@ -140,31 +136,10 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            this.drawn = true;
-            document.getElementById("loading").style.display = "none";
-        },
-        timeChanged() {
-            let bins = this.prepareHistogram();
-            this.updateHistogram(bins);
-        },
-        sensorChange() {
-            let d3Chart = this;
-            this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            // define extent for this sensor
-            // this.chart.extent = d3.extent(this.stationData, d => {
-            //     return d[d3Chart.selectedSensor.key];
-            // });
-            let bins = this.prepareHistogram();
-            this.updateHistogram(bins);
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
         },
         updateHistogram(bins) {
             let d3Chart = this;
-            // this.colors = d3
-            //     .scaleSequential()
-            //     .domain(this.chart.extent)
-            //     .interpolator(d3.interpolatePlasma);
 
             let bars = this.chart.svg.selectAll(".histobar").data(bins);
 
@@ -176,7 +151,8 @@ export default {
                     return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return w <= 0 ? MIN_WIDTH : w;
                 })
                 .style("fill", d => d3Chart.chart.colors(d.x0))
                 .attr("height", d => {
@@ -196,7 +172,8 @@ export default {
                     return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return w <= 0 ? MIN_WIDTH : w;
                 })
                 .attr("height", d => {
                     return d.length == 0

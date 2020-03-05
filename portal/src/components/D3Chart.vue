@@ -1,5 +1,5 @@
 <template>
-    <div :id="id">
+    <div :id="chart.id">
         <svg
             :view-box.camel="viewBox"
             preserveAspectRatio="xMidYMid meet"
@@ -11,28 +11,9 @@
                 <g ref="d3Stage"></g>
             </g>
         </svg>
-        <D3LineChart
-            :chart="chart"
-            :stationData="stationData"
-            :layout="layout"
-            :selectedSensor="selectedSensor"
-            ref="d3LineChart"
-            @timeZoomed="onTimeZoom"
-        />
-        <D3HistoChart
-            :chart="chart"
-            :stationData="stationData"
-            :layout="layout"
-            :selectedSensor="selectedSensor"
-            ref="d3HistoChart"
-        />
-        <D3RangeChart
-            :chart="chart"
-            :stationData="stationData"
-            :layout="layout"
-            :selectedSensor="selectedSensor"
-            ref="d3RangeChart"
-        />
+        <D3LineChart :chart="chart" :layout="layout" ref="d3LineChart" @timeZoomed="onTimeZoom" />
+        <D3HistoChart :chart="chart" :layout="layout" ref="d3HistoChart" />
+        <D3RangeChart :chart="chart" :layout="layout" ref="d3RangeChart" />
     </div>
 </template>
 
@@ -49,17 +30,10 @@ export default {
         D3HistoChart,
         D3RangeChart
     },
-    props: ["id", "station", "stationData", "selectedSensor", "chartType", "parent"],
+    props: ["chartParam", "station"],
     data: () => {
         return {
-            chart: {
-                svg: Object,
-                extent: [],
-                colors: {},
-                panelID: "",
-                start: 0,
-                end: 0
-            },
+            chart: {},
             layout: {
                 width: 1050,
                 height: 350,
@@ -70,39 +44,7 @@ export default {
             }
         };
     },
-    watch: {
-        chartType: function() {
-            this.chartTypeChange();
-        },
-        selectedSensor: function() {
-            let d3Chart = this;
-            let filtered = this.stationData.filter(d => {
-                return d.date >= this.chart.start && d.date <= this.chart.end;
-            });
-            // set the extent to the filtered data
-            this.chart.extent = d3.extent(filtered, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            let fullRange = d3.extent(this.stationData, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            // but still set the colors based on the full range
-            this.chart.colors = d3
-                .scaleSequential()
-                .domain(fullRange)
-                .interpolator(d3.interpolatePlasma);
-        },
-        stationData: function() {
-            let d3Chart = this;
-            this.chart.extent = d3.extent(this.stationData, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            this.chart.colors = d3
-                .scaleSequential()
-                .domain(this.chart.extent)
-                .interpolator(d3.interpolatePlasma);
-        }
-    },
+    watch: {},
     computed: {
         outerWidth: function() {
             return this.layout.width + this.layout.marginLeft + this.layout.marginRight;
@@ -119,52 +61,16 @@ export default {
             };
         }
     },
+    mounted() {
+        this.chart = this.chartParam;
+        this.chart.svg = d3.select(this.$refs.d3Stage);
+        this.chart.colors = this.chartParam.sensor.colorScale;
+        this.chart.panelID = this.station.device_id;
+        this.activateChart();
+    },
     methods: {
-        initChild(range) {
-            this.chart.id = "child-" + this.id;
-            this.chart.start = range.start;
-            this.chart.end = range.end;
-            this.initChart();
-            this.initSVG();
-            switch (this.chartType) {
-                case "Line":
-                    this.$refs.d3LineChart.makeLine();
-                    break;
-                case "Histogram":
-                    this.$refs.d3HistoChart.makeHistogram();
-                    break;
-                case "Range":
-                    this.$refs.d3RangeChart.makeRange();
-                    break;
-                default:
-                    this.$refs.d3LineChart.makeLine();
-                    break;
-            }
-        },
-        initSVG() {
-            this.chart.svg = d3.select(this.$refs.d3Stage);
-            this.$refs.d3LineChart.init();
-        },
-        initChart() {
-            let d3Chart = this;
-            this.chart.panelID = this.station.device_id;
-
-            let fullRange = d3.extent(this.stationData, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            this.chart.colors = d3
-                .scaleSequential()
-                .domain(fullRange)
-                .interpolator(d3.interpolatePlasma);
-
-            let filtered = this.stationData.filter(d => {
-                return d.date >= this.chart.start && d.date <= this.chart.end;
-            });
-            this.chart.extent = d3.extent(filtered, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-
-            switch (this.chartType) {
+        activateChart() {
+            switch (this.chart.type) {
                 case "Line":
                     this.$refs.d3LineChart.setStatus(true);
                     break;
@@ -185,61 +91,40 @@ export default {
         setTimeRange(range) {
             this.chart.start = range.start;
             this.chart.end = range.end;
-            let d3Chart = this;
-            let filtered = this.stationData.filter(d => {
-                return d.date >= this.chart.start && d.date <= this.chart.end;
-            });
-            // set the extent to the filtered data
-            this.chart.extent = d3.extent(filtered, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            let fullRange = d3.extent(this.stationData, d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            // but still set the colors based on the full range
-            this.chart.colors = d3
-                .scaleSequential()
-                .domain(fullRange)
-                .interpolator(d3.interpolatePlasma);
-            switch (this.chartType) {
-                case "Line":
-                    this.$refs.d3LineChart.timeChanged();
-                    break;
-                case "Histogram":
-                    this.$refs.d3HistoChart.timeChanged();
-                    break;
-                case "Range":
-                    this.$refs.d3RangeChart.timeChanged();
-                    break;
-            }
         },
         onTimeZoom(range) {
-            this.$emit("timeZoomed", { range: range, parent: this.parent, id: this.id });
+            this.$emit("timeZoomed", { range: range, parent: this.chart.parent, id: this.chart.id });
         },
-        chartTypeChange() {
+        updateData(data, extent, colorScale) {
+            this.chart.data = data;
+            this.chart.extent = extent;
+            this.chart.colors = colorScale;
+            this.$refs.d3LineChart.dataChanged();
+            this.$refs.d3HistoChart.dataChanged();
+            this.$refs.d3RangeChart.dataChanged();
+        },
+        updateChartType() {
             this.$refs.d3LineChart.setStatus(false);
             this.$refs.d3HistoChart.setStatus(false);
             this.$refs.d3RangeChart.setStatus(false);
             // clear this svg and start fresh
             this.chart.svg.html(null);
-            this.initSVG();
-            switch (this.chartType) {
+            this.activateChart();
+            switch (this.chart.type) {
                 case "Line":
-                    this.$refs.d3LineChart.setStatus(true);
+                    this.$refs.d3LineChart.init();
                     this.$refs.d3LineChart.makeLine();
                     break;
                 case "Histogram":
-                    this.$refs.d3HistoChart.setStatus(true);
                     this.$refs.d3HistoChart.makeHistogram();
                     break;
                 case "Range":
-                    this.$refs.d3RangeChart.setStatus(true);
                     this.$refs.d3RangeChart.makeRange();
                     break;
             }
         },
         zoomOut() {
-            this.$emit("zoomOut", { parent: this.parent, id: this.id });
+            this.$emit("zoomOut", { parent: this.chart.parent, id: this.chart.id });
         }
     }
 };
