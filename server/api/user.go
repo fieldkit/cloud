@@ -324,10 +324,15 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 		return fmt.Errorf("JWT claims error") // internal error
 	}
 
+	log := Logger(ctx).Sugar()
+
 	user := &data.User{}
 	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"]); err != nil {
+		log.Infow("user", "user_id", claims["sub"])
 		return err
 	}
+
+	log.Infow("user", "user_id", claims["sub"], "email", user.Email)
 
 	return ctx.OK(UserType(user))
 }
