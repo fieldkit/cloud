@@ -12,6 +12,7 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/logging"
@@ -62,6 +63,14 @@ func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 	}
 
 	return
+}
+
+func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*data.Station, error) {
+	r, err := repositories.NewStationRepository(ra.database)
+	if err != nil {
+		return nil, err
+	}
+	return r.TryQueryStationByDeviceID(ctx, i.DeviceID)
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
@@ -250,6 +259,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 
 	log.Infow("file", "file_url", i.URL, "file_stamp", i.Time, "file_id", i.UploadID, "file_size", i.Size, "type", i.Type)
 
+	station, err := ra.tryFindStation(ctx, i)
+	if err != nil {
+		return nil, err
+	}
+
 	reader, err := ra.files.OpenByURL(ctx, i.URL)
 	if err != nil {
 		return nil, err
@@ -347,8 +361,19 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 
 	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
 
-	log.Infow("processed", "meta_processed", metaProcessed, "data_processed", dataProcessed, "meta_errors", metaErrors, "data_errors", dataErrors,
-		"record_run", records, "start_human", prettyTime(ra.statistics.start), "end_human", prettyTime(ra.statistics.end))
+	withInfo := log.With("meta_processed", metaProcessed,
+		"data_processed", dataProcessed,
+		"meta_errors", metaErrors,
+		"data_errors", dataErrors,
+		"record_run", records,
+		"start_human", prettyTime(ra.statistics.start),
+		"end_human", prettyTime(ra.statistics.end))
+
+	if station != nil {
+		withInfo = withInfo.With("station_name", station.Name)
+	}
+
+	withInfo.Infow("processed")
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
