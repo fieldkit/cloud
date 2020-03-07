@@ -406,26 +406,43 @@ export default {
             chart.sensor = selected;
             chart.sensorOption = selected.key;
             this.urlQuery[chart.id + "sensor"] = selected.key;
-
             const filteredData = this.stationSummary.filter(d => {
                 return d[chart.sensor.key] === 0 || d[chart.sensor.key];
             });
             const extent = d3.extent(filteredData, d => {
                 return d[chart.sensor.key];
             });
-            this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+            const chartTime = this.$refs[chart.ref][0].getTimeRange();
+
+            // set up some time range checks to see if we need to refetch data
+            const summaryStart = this.stationSummary[0].date;
+            const summaryEnd = this.stationSummary[this.stationSummary.length - 1].date;
+            const summaryStartMatch = chart.start.getTime() == summaryStart.getTime();
+            const summaryEndMatch = chart.end.getTime() == summaryEnd.getTime();
+            const changeTime = !summaryStartMatch || !summaryEndMatch;
 
             // if it is the parent chart and they are linked, change all
             if (chart.parent && this.linkedCharts) {
                 this.charts.forEach(c => {
-                    if (!c.parent) {
-                        c.sensor = selected;
-                        c.sensorOption = selected.key;
-                        this.urlQuery[c.id + "sensor"] = selected.key;
+                    c.sensor = selected;
+                    c.sensorOption = selected.key;
+                    this.urlQuery[c.id + "sensor"] = selected.key;
+                    if (!changeTime) {
                         this.$refs[c.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
                     }
                 });
+                if (changeTime) {
+                    this.showLoading();
+                    this.$emit("timeChanged", chartTime);
+                }
             } else {
+                // otherwise, change this one, including time if needed
+                if (!changeTime) {
+                    this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+                } else {
+                    this.showLoading(chart.id);
+                    this.$emit("chartTimeChanged", chartTime, chart.id);
+                }
                 this.unlinkCharts();
             }
             this.updateRoute();
@@ -518,6 +535,11 @@ export default {
             }
         },
         updateAll(data) {
+            this.stationSummary = data;
+            const range = {
+                start: data[0].date,
+                end: data[data.length - 1].date
+            };
             // respond to a global time change event
             this.charts.forEach(c => {
                 const filteredData = data.filter(d => {
@@ -526,10 +548,15 @@ export default {
                 const extent = d3.extent(filteredData, d => {
                     return d[c.sensor.key];
                 });
+                this.$refs[c.ref][0].setTimeRange(range);
                 this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
             });
         },
         updateChartData(data, chartId) {
+            const range = {
+                start: data[0].date,
+                end: data[data.length - 1].date
+            };
             // only update url for the chart that emitted this zoom
             const chart = this.charts.find(c => {
                 return c.id == chartId;
@@ -540,6 +567,7 @@ export default {
                     return c.id == chartId;
                 });
                 if (pendingIndex > -1) {
+                    document.getElementById("main-loading").style.display = "none";
                     const pendingChart = this.pending.splice(pendingIndex, 1)[0];
                     const filteredData = data.filter(d => {
                         return d[pendingChart.sensor.key] === 0 || d[pendingChart.sensor.key];
@@ -547,11 +575,13 @@ export default {
                     const extent = d3.extent(filteredData, d => {
                         return d[pendingChart.sensor.key];
                     });
+                    pendingChart.start = range.start;
+                    pendingChart.end = range.end;
                     pendingChart.data = filteredData;
                     pendingChart.extent = extent;
                     this.charts.push(pendingChart);
-                    document.getElementById("main-loading").style.display = "none";
                     if (this.charts.length == 1) {
+                        // just for sensor summary in lower right corner
                         this.$emit("switchedSensor", pendingChart.sensor);
                     }
                 }
@@ -562,6 +592,7 @@ export default {
                 const extent = d3.extent(filteredData, d => {
                     return d[chart.sensor.key];
                 });
+                this.$refs[chart.ref][0].setTimeRange(range);
                 this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
                 this.unlinkCharts();
             }
