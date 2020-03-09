@@ -7,15 +7,23 @@
                 <router-link :to="{ name: 'stations' }">
                     <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
                 </router-link>
-                <div id="station-name">{{ this.station ? this.station.name : "" }}</div>
+                <div>
+                    <div id="station-name">
+                        {{ this.station ? this.station.name : "" }}
+                    </div>
+                    <div class="small-label">{{ this.station ? getSyncedDate() : "" }}</div>
+                    <div class="block-label">Data visualization</div>
+                </div>
                 <DataChartControl
                     ref="dataChartControl"
                     :combinedStationInfo="combinedStationInfo"
                     :station="station"
                     :noStation="noStation"
                     :labels="labels"
+                    :totalTime="stationTimeRange"
                     @switchedSensor="onSensorSwitch"
                     @timeChanged="onTimeChange"
+                    @chartTimeChanged="onChartTimeChange"
                 />
                 <div id="lower-container">
                     <NotesList
@@ -48,6 +56,7 @@
 
 <script>
 import _ from "lodash";
+import * as d3 from "d3";
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
@@ -55,6 +64,7 @@ import DataChartControl from "../components/DataChartControl";
 import NotesList from "../components/NotesList";
 import SensorSummary from "../components/SensorSummary";
 import * as tempStations from "../assets/ancientGoose.json";
+import * as utils from "../utilities";
 
 export default {
     name: "DataView",
@@ -68,11 +78,11 @@ export default {
     props: ["stationParam", "id"],
     data: () => {
         return {
-            requestPage: 0,
             user: {},
             noStation: false,
             station: null,
             stationId: null,
+            stationTimeRange: [],
             stationData: [],
             stations: [],
             projects: [],
@@ -105,7 +115,11 @@ export default {
                 wind2mAvgSpeed: "Wind Average Speed (2 min)",
                 wind2mAvgDir: "Wind Average Direction (2 min)",
                 rainThisHour: "Rain This Hour",
-                rainPrevHour: "Rain Previous Hour"
+                rainPrevHour: "Rain Previous Hour",
+                distance0: "Distance 0",
+                distance1: "Distance 1",
+                distance2: "Distance 2",
+                calibration: "Calibration"
             }
         };
     },
@@ -140,9 +154,10 @@ export default {
                         this.projects = projects.projects;
                     }
                 });
-                this.fetchSummary().then(result => {
-                    this.handleInitialDataSummary(result);
-                });
+                this.api
+                    .getModulesMeta()
+                    .then(this.processModulesMeta)
+                    .then(this.initiateDataRetrieval);
             })
             .catch(() => {
                 this.failedAuth = true;
@@ -168,11 +183,51 @@ export default {
             }
         },
 
+        processModulesMeta(meta) {
+            // temp color function for sensors without ranges
+            const black = function() {
+                return "#000000";
+            };
+
+            meta.forEach(m => {
+                // m.key
+                m.sensors.forEach(s => {
+                    let colors;
+                    if (s.ranges.length > 0) {
+                        colors = d3
+                            .scaleSequential()
+                            .domain([s.ranges[0].minimum, s.ranges[0].maximum])
+                            .interpolator(d3.interpolatePlasma);
+                    } else {
+                        colors = d3
+                            .scaleSequential()
+                            .domain([0, 1])
+                            .interpolator(black);
+                    }
+                    this.sensors.push({
+                        colorScale: colors,
+                        unit: s.unit_of_measure,
+                        key: s.key,
+                        name: null
+                    });
+                });
+            });
+            return;
+        },
+
+        initiateDataRetrieval() {
+            this.fetchSummary().then(result => {
+                this.handleInitialDataSummary(result);
+            });
+        },
+
         handleInitialDataSummary(result) {
+            this.stationData = [];
             if (!result) {
-                this.sensors = [];
-                this.stationData = [];
-                this.combinedStationInfo = { sensors: this.sensors, stationData: this.stationData };
+                this.combinedStationInfo = {
+                    sensors: [],
+                    stationData: this.stationData
+                };
                 return;
             }
             const processedData = this.processData(result);
@@ -182,46 +237,22 @@ export default {
             processed.sort(function(a, b) {
                 return a.date.getTime() - b.date.getTime();
             });
-            // get most recent reading for each sensor
-
-            // TODO: when the window loads with a specific time range,
-            // these might not be most recent
-
-            sensors = _.uniqBy(sensors, "key");
-            const numSensors = sensors.length;
-            let numReadings = 0;
+            this.stationTimeRange[0] = processed[0].date;
+            this.stationTimeRange[1] = processed[processed.length - 1].date;
+            this.timeRange = { start: this.stationTimeRange[0], end: this.stationTimeRange[1] };
+            this.stationData = processed;
+            this.combinedStationInfo = { sensors: sensors, stationData: processed };
             if (processed.length > 0) {
-                for (let i = processed.length - 1; i > 0; i--) {
-                    let recent = processed[i];
-                    sensors.forEach(s => {
-                        if (!s.currentReading && recent[s.key]) {
-                            numReadings += 1;
-                            s.currentReading = recent[s.key];
-                            if (numReadings == numSensors) {
-                                i == 0;
-                            }
-                        }
-                    });
-                }
-
                 // resize div to fit sections
                 document.getElementById("lower-container").style["min-width"] = "1100px";
             }
-            this.sensors = sensors;
-            this.stationData = processed;
-            this.combinedStationInfo = { sensors: sensors, stationData: processed };
         },
 
         processData(result) {
             let processed = [];
-            let sensors = [];
-            // TODO: handle possible changes to sensors
-            result.modules.forEach(m => {
-                if (m.sensors) {
-                    m.sensors.forEach(s => {
-                        sensors.push(s);
-                    });
-                }
+            const resultSensors = _.flatten(_.map(result.modules, "sensors"));
+            const sensors = _.intersectionBy(this.sensors, resultSensors, s => {
+                return s.key;
             });
             result.data.forEach(d => {
                 // Only including ones with sensor readings
@@ -239,7 +270,7 @@ export default {
         handleSummary(result) {
             const processedData = this.processData(result);
             this.stationData = processedData.data;
-            this.$refs.dataChartControl.updateData(this.stationData);
+            this.$refs.dataChartControl.updateAll(this.stationData);
         },
 
         goBack() {
@@ -259,6 +290,24 @@ export default {
             });
         },
 
+        onChartTimeChange(range, chartId) {
+            const start = range.start.getTime();
+            const end = range.end.getTime();
+            // TODO: perhaps don't rely on parent chart having this id:
+            if (chartId == "chart-1") {
+                // change time range for SensorSummary
+                this.timeRange = range;
+            }
+            this.fetchSummary(start, end).then(result => {
+                const processedData = this.processData(result);
+                this.$refs.dataChartControl.updateChartData(processedData.data, chartId);
+            });
+        },
+
+        getSyncedDate() {
+            return "Last synced " + utils.getUpdatedDate(this.station);
+        },
+
         getStationFromRoute() {
             this.stationId = this.$route.params.id;
             this.station = null;
@@ -274,9 +323,7 @@ export default {
             this.selectedSensor = null;
             this.noStation = false;
             document.getElementById("lower-container").style["min-width"] = "700px";
-            this.fetchSummary().then(result => {
-                this.handleInitialDataSummary(result);
-            });
+            this.initiateDataRetrieval();
         }
     }
 };
@@ -312,7 +359,20 @@ export default {
 }
 #station-name {
     font-size: 24px;
+    line-height: 24px;
     font-weight: bold;
-    margin: 20px 0;
+    margin: 20px 10px 0 0;
+    display: inline-block;
+}
+.small-label {
+    font-weight: normal;
+    font-size: 12px;
+    display: inline-block;
+}
+.block-label {
+    margin-top: 5px;
+    font-weight: normal;
+    font-size: 14px;
+    display: block;
 }
 </style>

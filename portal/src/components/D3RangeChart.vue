@@ -5,26 +5,20 @@
 <script>
 import * as d3 from "d3";
 
-const HOUR = 1000 * 60 * 60;
-const DAY = 1000 * 60 * 60 * 24;
+// const HOUR = 1000 * 60 * 60;
+// const DAY = 1000 * 60 * 60 * 24;
 const MIN_HEIGHT = 2;
 
 export default {
     name: "D3RangeChart",
-    props: ["chart", "stationData", "layout", "selectedSensor"],
+    props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false,
-            drawn: false
+            activeMode: false
         };
     },
     watch: {
-        selectedSensor: function() {
-            if (this.drawn && this.activeMode) {
-                this.sensorChange();
-            }
-        },
-        stationData: function() {
+        chart: function() {
             if (this.activeMode) {
                 this.makeRange();
             }
@@ -34,12 +28,12 @@ export default {
         setStatus(status) {
             this.activeMode = status;
         },
+        dataChanged() {
+            if (this.activeMode) {
+                this.makeRange();
+            }
+        },
         prepareRange() {
-            // this.colors = d3
-            //     .scaleSequential()
-            //     .domain(this.chart.extent)
-            //     .interpolator(d3.interpolatePlasma);
-
             // set x scale
             this.xHist = d3
                 .scaleTime()
@@ -49,11 +43,11 @@ export default {
                     this.layout.width - this.layout.marginLeft - this.layout.marginRight
                 ]);
 
-            let interval = DAY;
-            this.timeRange = this.chart.end - this.chart.start;
-            if (this.timeRange < DAY) {
-                interval = HOUR;
-            }
+            // let interval = DAY;
+            // this.timeRange = this.chart.end - this.chart.start;
+            // if (this.timeRange < DAY) {
+            //     interval = HOUR;
+            // }
 
             // use this formula to create thresholds, so that bars will have the same width
             // and none of them will end outside the chart area
@@ -71,7 +65,7 @@ export default {
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(this.stationData);
+            let bins = this.histogram(this.chart.data);
 
             // set y scale
             this.yHist = d3
@@ -83,7 +77,8 @@ export default {
                 ]);
 
             // set axes
-            this.xAxis = d3.axisBottom(this.xHist).ticks(Math.min(16, this.timeRange / interval));
+            this.xAxis = d3.axisBottom(this.xHist).ticks(10);
+            // this.xAxis = d3.axisBottom(this.xHist).ticks(Math.min(16, this.timeRange / interval));
             this.yAxis = d3.axisLeft(this.yHist).ticks(6);
 
             return bins;
@@ -92,57 +87,8 @@ export default {
             let d3Chart = this;
             let bins = this.prepareRange();
 
-            // color gradient for each bin
-            bins.forEach((bin, i) => {
-                let gradient = this.chart.svg
-                    .append("defs")
-                    .attr("class", "range-gradient")
-                    .append("linearGradient")
-                    .attr("id", "grad-" + i)
-                    .attr("x1", "0%")
-                    .attr("x2", "0%")
-                    .attr("y1", "0%")
-                    .attr("y2", "100%");
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "0%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.max(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "50%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.median(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "100%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.min(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-            });
+            this.chart.svg.selectAll(".range-gradient").remove();
+            this.createGradient(bins);
 
             // append the bar rectangles
             this.chart.svg.selectAll(".rangebar").remove();
@@ -154,11 +100,12 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
-                    const r = mx
-                        ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                        : "translate(0,0)";
+                    const r =
+                        mx || mx === 0
+                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
+                            : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -171,7 +118,7 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
@@ -201,80 +148,13 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            this.drawn = true;
-            document.getElementById("loading").style.display = "none";
-        },
-        timeChanged() {
-            let bins = this.prepareRange();
-            this.updateRange(bins);
-        },
-        sensorChange() {
-            let d3Chart = this;
-            this.filteredData = this.stationData.filter(d => {
-                return d[d3Chart.selectedSensor.key];
-            });
-            // define extent for this sensor
-            // this.chart.extent = d3.extent(this.stationData, d => {
-            //     return d[d3Chart.selectedSensor.key];
-            // });
-            let bins = this.prepareRange();
-            this.updateRange(bins);
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
         },
         updateRange(bins) {
             let d3Chart = this;
 
             this.chart.svg.selectAll(".range-gradient").remove();
-            // color gradient for each bin
-            bins.forEach((bin, i) => {
-                let gradient = this.chart.svg
-                    .append("defs")
-                    .attr("class", "range-gradient")
-                    .append("linearGradient")
-                    .attr("id", "grad-" + i)
-                    .attr("x1", "0%")
-                    .attr("x2", "0%")
-                    .attr("y1", "0%")
-                    .attr("y2", "100%");
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "0%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.max(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "50%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.median(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-
-                gradient
-                    .append("stop")
-                    .attr("offset", "100%")
-                    .style(
-                        "stop-color",
-                        this.chart.colors(
-                            d3.min(bin, d => {
-                                return d[d3Chart.selectedSensor.key];
-                            })
-                        )
-                    )
-                    .style("stop-opacity", 1);
-            });
+            this.createGradient(bins);
 
             let bars = this.chart.svg.selectAll(".rangebar").data(bins);
 
@@ -284,11 +164,12 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
-                    const r = mx
-                        ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                        : "translate(0,0)";
+                    const r =
+                        mx || mx === 0
+                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
+                            : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -299,7 +180,7 @@ export default {
                 })
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
@@ -310,11 +191,12 @@ export default {
             bars.attr("height", 0)
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
-                    const r = mx
-                        ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                        : "translate(0,0)";
+                    const r =
+                        mx || mx === 0
+                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
+                            : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -327,7 +209,7 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.selectedSensor.key];
+                        return b[d3Chart.chart.sensor.key];
                     });
                     const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
@@ -348,6 +230,60 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(this.yAxis);
+        },
+        createGradient(bins) {
+            let d3Chart = this;
+            // color gradient for each bin
+            bins.forEach((bin, i) => {
+                let gradient = this.chart.svg
+                    .append("defs")
+                    .attr("class", "range-gradient")
+                    .append("linearGradient")
+                    .attr("id", "grad-" + i)
+                    .attr("x1", "0%")
+                    .attr("x2", "0%")
+                    .attr("y1", "0%")
+                    .attr("y2", "100%");
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "0%")
+                    .style(
+                        "stop-color",
+                        this.chart.colors(
+                            d3.max(bin, d => {
+                                return d[d3Chart.chart.sensor.key];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "50%")
+                    .style(
+                        "stop-color",
+                        this.chart.colors(
+                            d3.median(bin, d => {
+                                return d[d3Chart.chart.sensor.key];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+
+                gradient
+                    .append("stop")
+                    .attr("offset", "100%")
+                    .style(
+                        "stop-color",
+                        this.chart.colors(
+                            d3.min(bin, d => {
+                                return d[d3Chart.chart.sensor.key];
+                            })
+                        )
+                    )
+                    .style("stop-opacity", 1);
+            });
         }
     }
 };

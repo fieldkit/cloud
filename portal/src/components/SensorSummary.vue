@@ -96,7 +96,7 @@ export default {
             let extent = d3.extent(data, d => {
                 return d[sensorSummary.selectedSensor.key];
             });
-            if (!extent || !extent[0]) {
+            if (!extent || (!extent[0] && extent[0] != 0)) {
                 return { min: "--", max: "--", median: "--" };
             }
             let median = d3.median(data, d => {
