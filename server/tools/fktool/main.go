@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,11 +15,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	_ "github.com/google/uuid"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	fk "github.com/fieldkit/cloud/server/api/client"
@@ -143,8 +148,7 @@ func createAwsSession() (s *session.Session, err error) {
 
 	for _, config := range configs {
 		sessionOptions := session.Options{
-			Profile: "fieldkit",
-			Config:  config,
+			Config: config,
 		}
 		session, err := session.NewSessionWithOptions(sessionOptions)
 		if err == nil {
@@ -155,10 +159,51 @@ func createAwsSession() (s *session.Session, err error) {
 	return nil, fmt.Errorf("error creating AWS session: %v", err)
 }
 
-func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, filename string, dryRun bool) error {
-	id, err := uuid.NewRandom()
+func getFileHash(filename string) (string, error) {
+	f, err := os.Open(filename)
 	if err != nil {
-		return fmt.Errorf("error creating UUID: %v", err)
+		return "", err
+	}
+	defer f.Close()
+
+	hasher := sha256.New()
+
+	if _, err := io.Copy(hasher, f); err != nil {
+		return "", err
+	}
+
+	h := hex.EncodeToString(hasher.Sum(nil))
+
+	return h, nil
+}
+
+func hasFile(session *session.Session, id string) (bool, error) {
+	hoi := &s3.HeadObjectInput{
+		Bucket: aws.String("conservify-firmware"),
+		Key:    aws.String(id),
+	}
+
+	svc := s3.New(session)
+
+	_, err := svc.HeadObject(hoi)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "NotFound": // TODO Make this s3.ErrCodeNoSuchKey eventually.
+				return false, nil
+			}
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, filename string, dryRun bool) error {
+	id, err := getFileHash(filename)
+	if err != nil {
+		return fmt.Errorf("error getting file hash: %v", filename)
 	}
 
 	file, err := os.Open(filename)
@@ -182,25 +227,35 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOv
 
 	url := ""
 
-	if !dryRun {
+	exists, err := hasFile(session, id)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		log.Printf("object already uploaded")
+	} else {
 		log.Printf("uploading %s...", filename)
 
-		r, err := uploader.Upload(&s3manager.UploadInput{
-			ACL:         nil,
-			ContentType: aws.String("application/octet-stream"),
-			Bucket:      aws.String("conservify-firmware"),
-			Key:         aws.String(id.String()),
-			Body:        file,
-			Metadata:    metadata.Map,
-			Tagging:     nil,
-		})
-		if err != nil {
-			return fmt.Errorf("error uploading firmware: %v", err)
+		if !dryRun {
+
+			r, err := uploader.Upload(&s3manager.UploadInput{
+				ACL:         nil,
+				ContentType: aws.String("application/octet-stream"),
+				Bucket:      aws.String("conservify-firmware"),
+				Key:         aws.String(id),
+				Body:        file,
+				Metadata:    metadata.Map,
+				Tagging:     nil,
+			})
+			if err != nil {
+				return fmt.Errorf("error uploading firmware: %v", err)
+			}
+
+			log.Printf("uploaded %s", r.Location)
+
+			url = r.Location
 		}
-
-		log.Printf("uploaded %s", r.Location)
-
-		url = r.Location
 	}
 
 	log.Printf("creating database entry...")

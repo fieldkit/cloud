@@ -8,7 +8,7 @@ require (
 	github.com/ajg/form v1.5.1
 	github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
 	github.com/aws/aws-lambda-go v0.0.0-20180413184133-ea03c2814414
-	github.com/aws/aws-sdk-go v0.0.0-20170317202926-5b99715ae294
+	github.com/aws/aws-sdk-go v1.29.20
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cenkalti/backoff v0.0.0-20170309153948-3db60c813733
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
@@ -43,7 +43,7 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
-	github.com/jmespath/go-jmespath v0.0.0-20160803190731-bd40a432e4c7
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jmoiron/sqlx v0.0.0-20171020205521-3379e5993990
 	github.com/kelseyhightower/envconfig v0.0.0-20170206223400-8bf4bbfc795e
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
@@ -61,7 +61,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/paulmach/go.geo v0.0.0-20170321183534-b160a6efed6c
 	github.com/paulmach/go.geojson v0.0.0-20170327170536-40612a87147b
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v0.0.0-20180103174451-36e9d2ebbde5
 	github.com/segmentio/ksuid v1.0.1
@@ -82,7 +82,7 @@ require (
 	goa.design/plugins/v3 v3.0.10
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
-	golang.org/x/net v0.0.0-20190916140828-c8589233b77d
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
