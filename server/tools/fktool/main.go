@@ -219,10 +219,12 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOv
 	}
 
 	if !dryRun {
-		_, err = c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
+		r, err := c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
 		if err != nil {
 			return fmt.Errorf("error adding firmware: %v", err)
 		}
+
+		log.Printf("added: %v", r)
 	}
 
 	log.Printf("done!")

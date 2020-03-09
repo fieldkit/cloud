@@ -188,6 +188,7 @@ func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
 
 func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 	log := Logger(ctx).Sugar()
+
 	log.Infow("device", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID)
 
 	device, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.Payload.DeviceID))
@@ -222,7 +223,7 @@ func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
 		return err
 	}
 
-	log.Infow("Update firmware", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID, "module", firmware.Module, "profile", firmware.Profile, "url", firmware.URL)
+	log.Infow("update firmware", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID, "module", firmware.Module, "profile", firmware.Profile, "url", firmware.URL)
 
 	return ctx.OK([]byte("OK"))
 }
@@ -236,7 +237,7 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 		return err
 	}
 
-	log.Infow("firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "profile", ctx.Payload.Profile, "meta", metaMap)
+	log.Infow("add firmware", "etag", ctx.Payload.Etag, "url", ctx.Payload.URL, "module", ctx.Payload.Module, "profile", ctx.Payload.Profile, "meta", metaMap)
 
 	firmware := data.Firmware{
 		Time:    time.Now(),
