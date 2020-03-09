@@ -49,7 +49,6 @@ type options struct {
 
 	FirmwareDirectory string
 	FirmwareFile      string
-	FirmwareMeta      string
 
 	DryRun bool
 }
@@ -127,21 +126,6 @@ func getMetaFromEnvironment(moduleOverride, profileOverride string, file string)
 	metadata.Map["Build-Profile"] = aws.String(profile)
 
 	return
-}
-
-func uploadAllFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, directory string, dryRun bool) error {
-	files, err := filepath.Glob(directory + "/*.bin")
-	if err != nil {
-		return err
-	}
-	for _, filename := range files {
-		log.Printf("processing %s...", filename)
-		err := uploadFirmware(ctx, c, moduleOverride, profileOverride, filename, dryRun)
-		if err != nil {
-			log.Printf("error: %v", err)
-		}
-	}
-	return nil
 }
 
 func createAwsSession() (s *session.Session, err error) {
@@ -271,9 +255,7 @@ func main() {
 	flag.StringVar(&o.Module, "module", "", "override module")
 	flag.StringVar(&o.Profile, "profile", "", "override profile")
 
-	flag.StringVar(&o.FirmwareDirectory, "firmware-directory", "", "firmware directory")
 	flag.StringVar(&o.FirmwareFile, "firmware-file", "", "firmware file")
-	flag.StringVar(&o.FirmwareMeta, "firmware-meta", "", "firmware meta")
 
 	flag.BoolVar(&o.DryRun, "dry", false, "dry run")
 
@@ -284,35 +266,28 @@ func main() {
 		log.Fatalf("%v", err)
 	}
 
-	log.Printf("Authenticated as %s (%s)", o.Email, o.Host)
+	log.Printf("authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
 		err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
 		if err != nil {
-			log.Fatalf("Error adding firmware: %v", err)
-		}
-	}
-
-	if o.FirmwareDirectory != "" {
-		err := uploadAllFirmware(ctx, c, o.Module, o.Profile, o.FirmwareDirectory, o.DryRun)
-		if err != nil {
-			log.Fatalf("Error adding firmware: %v", err)
+			log.Fatalf("error adding firmware: %v", err)
 		}
 	}
 
 	if o.DeviceId != "" && o.DeviceName != "" {
 		device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName, o.DeviceId, "")
 		if err != nil {
-			log.Fatalf("Error creating device: %v", err)
+			log.Fatalf("error creating device: %v", err)
 		}
 
-		log.Printf("Associated %v", device)
+		log.Printf("associated %v", device)
 
 		if o.Latitude != 0 && o.Longitude != 0 {
-			log.Printf("Setting location %v,%v", o.Longitude, o.Latitude)
+			log.Printf("setting location %v,%v", o.Longitude, o.Latitude)
 			err := fktesting.UpdateLocation(ctx, c, device, o.Longitude, o.Latitude)
 			if err != nil {
-				log.Fatalf("Error updating location: %v", err)
+				log.Fatalf("error updating location: %v", err)
 			}
 		}
 	}
@@ -320,18 +295,18 @@ func main() {
 	if o.FirmwareID > 0 {
 		device, err := fktesting.FindExistingDevice(ctx, c, o.Project, o.DeviceId, true)
 		if err != nil {
-			log.Fatalf("Error creating device: %v", err)
+			log.Fatalf("error creating device: %v", err)
 		}
 
 		if device == nil {
-			log.Fatalf("Unable to find device")
+			log.Fatalf("unable to find device")
 		}
 
 		if device != nil {
-			log.Printf("Updating firmware %v", o.FirmwareID)
+			log.Printf("updating firmware %v", o.FirmwareID)
 			err := fktesting.UpdateFirmware(ctx, c, device.ID, o.FirmwareID)
 			if err != nil {
-				log.Fatalf("Error updating firmware: %v", err)
+				log.Fatalf("error updating firmware: %v", err)
 			}
 		}
 	}
