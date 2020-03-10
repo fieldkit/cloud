@@ -122,7 +122,8 @@ func main() {
 	log := logging.Logger(ctx).Sugar()
 
 	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
-		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).With("email_override", config.EmailOverride).Infow("config")
+		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).With("email_override", config.EmailOverride).
+		Infow("config")
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
