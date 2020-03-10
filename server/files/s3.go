@@ -65,7 +65,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 		Tagging:     nil,
 	})
 	if err != nil {
-		return nil, errors.Structured("aws error", err)
+		return nil, errors.Structured("aws error", "error", err)
 	}
 
 	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)
