@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -11,6 +12,10 @@ type BucketAndKey struct {
 }
 
 func GetBucketAndKey(s3Url string) (*BucketAndKey, error) {
+	if len(s3Url) == 0 {
+		return nil, fmt.Errorf("bucket and key: url is required")
+	}
+
 	u, err := url.Parse(s3Url)
 	if err != nil {
 		return nil, err

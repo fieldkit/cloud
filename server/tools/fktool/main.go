@@ -177,9 +177,11 @@ func getFileHash(filename string) (string, error) {
 	return h, nil
 }
 
-func hasFile(session *session.Session, id string) (bool, error) {
+func hasFile(session *session.Session, id string) (string, error) {
+	bucket := "conservify-firmware"
+
 	hoi := &s3.HeadObjectInput{
-		Bucket: aws.String("conservify-firmware"),
+		Bucket: aws.String(bucket),
 		Key:    aws.String(id),
 	}
 
@@ -190,14 +192,14 @@ func hasFile(session *session.Session, id string) (bool, error) {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case "NotFound": // TODO Make this s3.ErrCodeNoSuchKey eventually.
-				return false, nil
+				return "", nil
 			}
 		}
 
-		return false, err
+		return "", err
 	}
 
-	return true, nil
+	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, id), nil
 }
 
 func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, filename string, dryRun bool) error {
@@ -227,18 +229,18 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOv
 
 	url := ""
 
-	exists, err := hasFile(session, id)
+	existingUrl, err := hasFile(session, id)
 	if err != nil {
 		return err
 	}
 
-	if exists {
+	if existingUrl != "" {
 		log.Printf("object already uploaded")
+		url = existingUrl
 	} else {
 		log.Printf("uploading %s...", filename)
 
 		if !dryRun {
-
 			r, err := uploader.Upload(&s3manager.UploadInput{
 				ACL:         nil,
 				ContentType: aws.String("application/octet-stream"),
