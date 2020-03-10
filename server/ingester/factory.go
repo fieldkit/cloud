@@ -92,6 +92,9 @@ func createFileArchive(ctx context.Context, config *Config, awsSession *session.
 	case "default":
 		return files.NewLocalFilesArchive(), nil
 	case "aws":
+		if config.StreamsBucketName == "" {
+			return nil, fmt.Errorf("streams bucket is required")
+		}
 		return files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
 	default:
 		return nil, fmt.Errorf("unknown archiver: " + config.Archiver)
