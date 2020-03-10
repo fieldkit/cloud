@@ -370,7 +370,7 @@ func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserC
 		return err
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session)
+	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 	saved, err := mr.Save(ctx, ctx.RequestData)
 	if err != nil {
 		return err
@@ -396,7 +396,7 @@ func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserCon
 	}
 
 	if user.MediaURL != nil {
-		mr := repositories.NewMediaRepository(c.options.Session)
+		mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 
 		lm, err := mr.LoadByURL(ctx, *user.MediaURL)
 		if err != nil {
@@ -420,7 +420,7 @@ func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
 	}
 
 	if user.MediaURL != nil {
-		mr := repositories.NewMediaRepository(c.options.Session)
+		mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 
 		lm, err := mr.LoadByURL(ctx, *user.MediaURL)
 		if err != nil {

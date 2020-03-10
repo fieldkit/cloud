@@ -25,12 +25,13 @@ type ControllerOptions struct {
 	PortalDomain string
 	Metrics      *logging.Metrics
 	Publisher    jobs.MessagePublisher
+	Buckets      *BucketNames
 	// Twitter
 	ConsumerKey    string
 	ConsumerSecret string
 }
 
-func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, awsSession *session.Session, config *ApiConfiguration, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
+func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, awsSession *session.Session, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err
@@ -52,6 +53,7 @@ func CreateServiceOptions(ctx context.Context, database *sqlxcache.DB, be *backe
 		Metrics:      metrics,
 		Config:       config,
 		Publisher:    publisher,
+		Buckets:      config.Buckets,
 	}
 
 	return

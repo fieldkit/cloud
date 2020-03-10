@@ -51,7 +51,8 @@ type Config struct {
 	ApiDomain             string `split_words:"true" default:""`
 	PortalDomain          string `split_words:"true" default:""`
 	ApiHost               string `split_words:"true" default:""`
-	BucketName            string `split_words:"true" default:"fk-streams" required:"true"`
+	MediaBucketName       string `split_words:"true" default:""`
+	StreamsBucketName     string `split_words:"true" default:""`
 	AwsId                 string `split_words:"true" default:""`
 	AwsSecret             string `split_words:"true" default:""`
 	StatsdAddress         string `split_words:"true" default:""`
@@ -120,7 +121,8 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Infow("config", "api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "bucket_name", config.BucketName, "email_override", config.EmailOverride)
+	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
+		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).With("email_override", config.EmailOverride).Infow("config")
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
@@ -183,7 +185,6 @@ func main() {
 	}
 
 	apiConfig := &api.ApiConfiguration{
-		BucketName:    config.BucketName,
 		ApiHost:       config.ApiHost,
 		ApiDomain:     config.ApiDomain,
 		SessionKey:    config.SessionKey,
@@ -191,6 +192,10 @@ func main() {
 		Domain:        config.Domain,
 		PortalDomain:  config.PortalDomain,
 		EmailOverride: config.EmailOverride,
+		Buckets: &api.BucketNames{
+			Media:   config.MediaBucketName,
+			Streams: config.StreamsBucketName,
+		},
 	}
 
 	err = jq.Listen(ctx, 1)
@@ -198,7 +203,7 @@ func main() {
 		panic(err)
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, database, be, jq, awsSession, apiConfig, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, awsSession, metrics)
 	if err != nil {
 		panic(err)
 	}
@@ -307,7 +312,7 @@ func createFileArchive(ctx context.Context, config Config, awsSession *session.S
 	case "default":
 		return files.NewLocalFilesArchive(), nil
 	case "aws":
-		return files.NewS3FileArchive(awsSession, metrics, config.BucketName)
+		return files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
 	default:
 		panic("unknown archiver: " + config.Archiver)
 	}

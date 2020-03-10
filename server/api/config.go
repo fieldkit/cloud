@@ -12,8 +12,12 @@ import (
 	"github.com/fieldkit/cloud/server/email"
 )
 
+type BucketNames struct {
+	Media   string
+	Streams string
+}
+
 type ApiConfiguration struct {
-	BucketName    string
 	ApiDomain     string
 	ApiHost       string
 	SessionKey    string
@@ -21,6 +25,7 @@ type ApiConfiguration struct {
 	Domain        string
 	PortalDomain  string
 	EmailOverride string
+	Buckets       *BucketNames
 }
 
 func (ac *ApiConfiguration) MakeApiUrl(f string, args ...interface{}) string {

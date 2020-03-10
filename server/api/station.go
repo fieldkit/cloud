@@ -362,7 +362,7 @@ func (c *StationController) Photo(ctx *app.PhotoStationContext) error {
 		return SendData(ctx.ResponseData, defaultPhotoContentType, defaultPhoto)
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session)
+	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 
 	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
 	if err != nil {

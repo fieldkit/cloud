@@ -209,7 +209,7 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 		return err
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session)
+	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 	saved, err := mr.Save(ctx, ctx.RequestData)
 	if err != nil {
 		return err
@@ -230,7 +230,7 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 	}
 
 	if project.MediaURL != nil {
-		mr := repositories.NewMediaRepository(c.options.Session)
+		mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 
 		lm, err := mr.LoadByURL(ctx, *project.MediaURL)
 		if err != nil {
@@ -333,7 +333,7 @@ func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
 		return err
 	}
 	if project.MediaURL != nil {
-		mr := repositories.NewMediaRepository(c.options.Session)
+		mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
 
 		err := mr.DeleteByURL(ctx, *project.MediaURL)
 		if err != nil {

@@ -44,9 +44,9 @@ type MediaRepository struct {
 	session    *session.Session
 }
 
-func NewMediaRepository(session *session.Session) (r *MediaRepository) {
+func NewMediaRepository(session *session.Session, bucketName string) (r *MediaRepository) {
 	return &MediaRepository{
-		bucketName: "fk-media",
+		bucketName: bucketName,
 		session:    session,
 	}
 }

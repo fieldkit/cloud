@@ -8,8 +8,8 @@ type Config struct {
 	AwsId             string `split_words:"true" default:""`
 	AwsSecret         string `split_words:"true" default:""`
 	Archiver          string `split_words:"true" default:"default" required:"true"`
-	BucketName        string `split_words:"true" default:"fk-streams" required:"true"`
 	SessionKey        string `split_words:"true"`
 	StatsdAddress     string `split_words:"true" default:""`
+	StreamsBucketName string `split_words:"true" default:""`
 	Help              bool
 }

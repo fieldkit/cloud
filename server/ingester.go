@@ -24,7 +24,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.Info("starting", "bucket_name", config.BucketName)
+	log.With("streams_bucket_name", config.StreamsBucketName).Info("config")
 
 	ingesterHandler, ingesterOptions := ingester.NewIngester(ctx, config)
 	notFoundHandler := http.NotFoundHandler()
