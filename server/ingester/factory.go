@@ -3,6 +3,7 @@ package ingester
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
