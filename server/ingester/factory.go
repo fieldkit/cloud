@@ -93,6 +93,6 @@ func createFileArchive(ctx context.Context, config *Config, awsSession *session.
 	case "aws":
 		return files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
 	default:
-		panic("Unknown archiver: " + config.Archiver)
+		return nil, fmt.Errorf("unknown archiver: " + config.Archiver)
 	}
 }
