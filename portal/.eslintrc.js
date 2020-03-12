@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     env: {
-        node: true
+        node: true,
     },
     extends: ["plugin:vue/essential", "@vue/prettier"],
     rules: {
@@ -11,12 +11,17 @@ module.exports = {
             "warn",
             {
                 "#": "prettier config in here :)",
-                printWidth: 110,
-                tabWidth: 4
-            }
-        ]
+                printWidth: 140,
+                tabWidth: 4,
+                trailingComma: "es5",
+                semi: true,
+                singleQuote: false,
+                htmlWhitespaceSensitivity: "ignore",
+                endOfLine: "lf",
+            },
+        ],
     },
     parserOptions: {
-        parser: "babel-eslint"
-    }
+        parser: "babel-eslint",
+    },
 };
