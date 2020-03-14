@@ -5,7 +5,7 @@
                 <g ref="d3Stage"></g>
             </g>
         </svg>
-        <D3LineChart :chart="chart" :layout="layout" ref="d3LineChart" @timeZoomed="onTimeZoom" />
+        <D3LineChart :chart="chart" :layout="layout" ref="d3LineChart" :summary="stationSummary" @timeZoomed="onTimeZoom" />
         <D3HistoChart :chart="chart" :layout="layout" ref="d3HistoChart" />
         <D3RangeChart :chart="chart" :layout="layout" ref="d3RangeChart" />
     </div>
@@ -24,7 +24,7 @@ export default {
         D3HistoChart,
         D3RangeChart,
     },
-    props: ["chartParam", "station"],
+    props: ["chartParam", "station", "stationSummary"],
     data: () => {
         return {
             chart: {},
@@ -85,6 +85,12 @@ export default {
         setTimeRange(range) {
             this.chart.start = range.start;
             this.chart.end = range.end;
+        },
+        getRequestedTime() {
+            return this.$refs.d3LineChart.getRequestedTime();
+        },
+        setRequestedTime(range) {
+            this.$refs.d3LineChart.setRequestedTime(range);
         },
         onTimeZoom(range) {
             this.$emit("timeZoomed", { range: range, parent: this.chart.parent, id: this.chart.id });

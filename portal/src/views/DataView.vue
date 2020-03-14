@@ -268,8 +268,7 @@ export default {
 
         handleSummary(result) {
             const processedData = this.processData(result);
-            this.stationData = processedData.data;
-            this.$refs.dataChartControl.updateAll(this.stationData);
+            this.$refs.dataChartControl.updateAll(processedData.data);
         },
 
         goBack() {

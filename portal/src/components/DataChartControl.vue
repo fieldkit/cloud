@@ -71,6 +71,7 @@
                     :ref="chart.ref"
                     :chartParam="chart"
                     :station="station"
+                    :stationSummary="stationSummary"
                     @timeZoomed="onTimeZoomed"
                     @unlinkCharts="unlinkCharts"
                     @zoomOut="setTimeRangeByDays"
@@ -227,6 +228,11 @@ export default {
                 end: this.charts[0].end,
                 extent: this.charts[0].extent,
             };
+            const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
+            if (requested) {
+                newChart.requestedStart = requested[0];
+                newChart.requestedEnd = requested[1];
+            }
             this.charts.push(newChart);
             this.urlQuery.numCharts = this.charts.length;
             this.urlQuery[newChart.id + "type"] = newChart.type;
@@ -321,12 +327,17 @@ export default {
             if (this.linkedCharts) {
                 // now re-linked, reset all to parent
                 const parentTime = this.$refs[this.charts[0].ref][0].getTimeRange();
+                const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
                 this.charts.forEach((c, i) => {
                     if (i > 0) {
                         c.type = this.charts[0].type;
                         c.sensor = this.charts[0].sensor;
                         c.sensorOption = this.charts[0].sensorOption;
                         this.$refs[c.ref][0].setTimeRange(parentTime);
+                        if (requested) {
+                            const requestedRange = { start: requested[0], end: requested[1] };
+                            this.$refs[c.ref][0].setRequestedTime(requestedRange);
+                        }
                         this.$refs[c.ref][0].updateChartType();
                         this.$refs[c.ref][0].updateData(this.charts[0].data, this.charts[0].extent, this.charts[0].sensor.colorScale);
                         this.urlQuery[c.id + "type"] = this.charts[0].type;
@@ -478,6 +489,7 @@ export default {
             this.charts.forEach(c => {
                 if (this.$refs[c.ref]) {
                     this.$refs[c.ref][0].setTimeRange(range);
+                    this.$refs[c.ref][0].setRequestedTime(range);
                     this.urlQuery[c.id + "start"] = range.start.getTime();
                     this.urlQuery[c.id + "end"] = range.end.getTime();
                 }
@@ -504,11 +516,14 @@ export default {
             }
         },
         updateAll(data) {
-            const range = {
-                start: data[0].date,
-                end: data[data.length - 1].date
-            };
             this.currentSummary = data;
+            const range =
+                data.length == 0
+                    ? this.$refs[this.charts[0].ref][0].getTimeRange()
+                    : {
+                          start: data[0].date,
+                          end: data[data.length - 1].date,
+                      };
             // respond to a global time change event
             this.charts.forEach(c => {
                 const filteredData = data.filter(d => {
@@ -522,10 +537,6 @@ export default {
             });
         },
         updateChartData(data, chartId) {
-            const range = {
-                start: data[0].date,
-                end: data[data.length - 1].date
-            };
             // only update url for the chart that emitted this zoom
             const chart = this.charts.find(c => {
                 return c.id == chartId;
@@ -537,6 +548,13 @@ export default {
                 });
                 if (pendingIndex > -1) {
                     const pendingChart = this.pending.splice(pendingIndex, 1)[0];
+                    const range =
+                        data.length == 0
+                            ? { start: pendingChart.start, end: pendingChart.end }
+                            : {
+                                  start: data[0].date,
+                                  end: data[data.length - 1].date,
+                              };
                     const filteredData = data.filter(d => {
                         return d[pendingChart.sensor.key] === 0 || d[pendingChart.sensor.key];
                     });
@@ -554,6 +572,13 @@ export default {
                     }
                 }
             } else {
+                const range =
+                    data.length == 0
+                        ? { start: chart.start, end: chart.end }
+                        : {
+                              start: data[0].date,
+                              end: data[data.length - 1].date,
+                          };
                 const filteredData = data.filter(d => {
                     return d[chart.sensor.key] === 0 || d[chart.sensor.key];
                 });
