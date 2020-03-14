@@ -99,6 +99,7 @@ export default {
             charts: [],
             pending: [],
             stationSummary: [],
+            currentSummary: [],
             linkedCharts: true,
             urlQuery: {},
             prevQuery: {},
@@ -143,6 +144,7 @@ export default {
         combinedStationInfo() {
             if (this.combinedStationInfo.stationData) {
                 this.stationSummary = this.combinedStationInfo.stationData;
+                this.currentSummary = this.combinedStationInfo.stationData;
                 this.stationSensors = this.combinedStationInfo.sensors;
                 if (this.stationSummary.length > 0) {
                     this.initCharts();
@@ -370,20 +372,17 @@ export default {
             const chart = this.charts.find(c => {
                 return c.id == id;
             });
-            chart.sensor = selected;
-            chart.sensorOption = selected.key;
-            this.urlQuery[chart.id + "sensor"] = selected.key;
-            const filteredData = this.stationSummary.filter(d => {
-                return d[chart.sensor.key] === 0 || d[chart.sensor.key];
+            const filteredData = this.currentSummary.filter(d => {
+                return d[selected.key] === 0 || d[selected.key];
             });
             const extent = d3.extent(filteredData, d => {
-                return d[chart.sensor.key];
+                return d[selected.key];
             });
             const chartTime = this.$refs[chart.ref][0].getTimeRange();
 
             // set up some time range checks to see if we need to refetch data
-            const summaryStart = this.stationSummary[0].date;
-            const summaryEnd = this.stationSummary[this.stationSummary.length - 1].date;
+            const summaryStart = this.currentSummary[0].date;
+            const summaryEnd = this.currentSummary[this.currentSummary.length - 1].date;
             const summaryStartMatch = chart.start.getTime() == summaryStart.getTime();
             const summaryEndMatch = chart.end.getTime() == summaryEnd.getTime();
             const changeTime = !summaryStartMatch || !summaryEndMatch;
@@ -395,7 +394,7 @@ export default {
                     c.sensorOption = selected.key;
                     this.urlQuery[c.id + "sensor"] = selected.key;
                     if (!changeTime) {
-                        this.$refs[c.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+                        this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
                     }
                 });
                 if (changeTime) {
@@ -404,6 +403,9 @@ export default {
                 }
             } else {
                 // otherwise, change this one, including time if needed
+                chart.sensor = selected;
+                chart.sensorOption = selected.key;
+                this.urlQuery[chart.id + "sensor"] = selected.key;
                 if (!changeTime) {
                     this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
                 } else {
@@ -502,11 +504,11 @@ export default {
             }
         },
         updateAll(data) {
-            this.stationSummary = data;
             const range = {
                 start: data[0].date,
                 end: data[data.length - 1].date
             };
+            this.currentSummary = data;
             // respond to a global time change event
             this.charts.forEach(c => {
                 const filteredData = data.filter(d => {
@@ -584,6 +586,7 @@ export default {
         refresh(data) {
             // refresh window (back or forward browser button pressed)
             this.stationSummary = data;
+            this.currentSummary = data;
             this.charts = [];
             this.pending = [];
             if (this.stationSummary.length > 0) {
@@ -600,6 +603,7 @@ export default {
             this.pending = [];
             this.stationSensors = [];
             this.stationSummary = [];
+            this.currentSummary = [];
             this.linkedCharts = true;
             this.urlQuery = {};
             this.prevQuery = {};
