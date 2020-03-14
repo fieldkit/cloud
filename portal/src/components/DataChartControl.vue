@@ -202,8 +202,8 @@ export default {
                 extent: extent,
             };
             if (timeCheck.addChart) {
-                this.charts.push(newChart);
                 document.getElementById("main-loading").style.display = "none";
+                this.charts.push(newChart);
             } else {
                 this.pending.push(newChart);
             }
@@ -291,6 +291,7 @@ export default {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
                     this.$emit("chartTimeChanged", { start: start, end: end }, chartId);
+                    document.getElementById("main-loading").style.display = "none";
                 }
             }
             return { addChart: addChart, range: [start, end] };
@@ -533,7 +534,6 @@ export default {
                     return c.id == chartId;
                 });
                 if (pendingIndex > -1) {
-                    document.getElementById("main-loading").style.display = "none";
                     const pendingChart = this.pending.splice(pendingIndex, 1)[0];
                     const filteredData = data.filter(d => {
                         return d[pendingChart.sensor.key] === 0 || d[pendingChart.sensor.key];
@@ -614,14 +614,14 @@ export default {
 <style scoped>
 #main-loading,
 .loading {
-    width: 1050px;
-    height: 100%;
+    width: 1115px;
+    height: 590px;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
     position: absolute;
 }
 #main-loading {
-    width: 100%;
+    margin-top: 20px;
 }
 #data-chart-container {
     float: left;
