@@ -35,22 +35,14 @@
                 <div class="spacer"></div>
             </div>
 
-            <div
-                v-for="(chart, chartIndex) in pending"
-                v-bind:key="chart.id"
-                :class="chartIndex > 0 ? 'top-border' : ''"
-            >
+            <div v-for="(chart, chartIndex) in pending" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
                 <div :id="chart.id + '-loading'" class="loading">
                     <img alt="" src="../assets/progress.gif" />
                 </div>
             </div>
 
             <!-- all data charts and their drop-down menus -->
-            <div
-                v-for="(chart, chartIndex) in charts"
-                v-bind:key="chart.id"
-                :class="chartIndex > 0 ? 'top-border' : ''"
-            >
+            <div v-for="(chart, chartIndex) in charts" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
                 <div :id="chart.id + '-loading'" class="loading">
                     <img alt="" src="../assets/progress.gif" />
                 </div>
@@ -60,32 +52,19 @@
                 </div>
                 <div class="sensor-selection-dropdown">
                     <select v-model="chart.sensorOption" v-on:change="chartSensorChanged" :data-id="chart.id">
-                        <option
-                            v-for="sensor in stationSensors"
-                            v-bind:value="sensor.key"
-                            v-bind:key="sensor.key"
-                        >
+                        <option v-for="sensor in stationSensors" v-bind:value="sensor.key" v-bind:key="sensor.key">
                             {{ labels[sensor.key] ? labels[sensor.key] : sensor.key }}
                         </option>
                     </select>
                 </div>
                 <div class="chart-type">
                     <select v-model="chart.type" v-on:change="chartTypeChanged" :data-id="chart.id">
-                        <option
-                            v-for="option in chartOptions"
-                            v-bind:value="option.value"
-                            v-bind:key="option.value"
-                        >
+                        <option v-for="option in chartOptions" v-bind:value="option.value" v-bind:key="option.value">
                             {{ option.text }}
                         </option>
                     </select>
                     <div class="remove-chart" v-if="chartIndex > 0">
-                        <img
-                            alt="Remove"
-                            src="../assets/close.png"
-                            :data-id="chart.id"
-                            v-on:click="removeChart"
-                        />
+                        <img alt="Remove" src="../assets/close.png" :data-id="chart.id" v-on:click="removeChart" />
                     </div>
                 </div>
                 <D3Chart
@@ -112,7 +91,7 @@ const DAY = 1000 * 60 * 60 * 24;
 export default {
     name: "DataChartControl",
     components: {
-        D3Chart
+        D3Chart,
     },
     data: () => {
         return {
@@ -123,44 +102,40 @@ export default {
             linkedCharts: true,
             urlQuery: {},
             prevQuery: {},
-            chartOptions: [
-                { text: "Line", value: "Line" },
-                { text: "Histogram", value: "Histogram" },
-                { text: "Range", value: "Range" }
-            ],
+            chartOptions: [{ text: "Line", value: "Line" }, { text: "Histogram", value: "Histogram" }, { text: "Range", value: "Range" }],
             stationSensors: [],
             timeButtons: [
                 {
                     active: false,
                     label: "Day",
-                    value: 1
+                    value: 1,
                 },
                 {
                     active: false,
                     label: "Week",
-                    value: 7
+                    value: 7,
                 },
                 {
                     active: false,
                     label: "2 Weeks",
-                    value: 14
+                    value: 14,
                 },
                 {
                     active: false,
                     label: "Month",
-                    value: 31
+                    value: 31,
                 },
                 {
                     active: false,
                     label: "Year",
-                    value: 365
+                    value: 365,
                 },
                 {
                     active: false,
                     label: "All",
-                    value: 0
-                }
-            ]
+                    value: 0,
+                },
+            ],
         };
     },
     props: ["combinedStationInfo", "station", "labels", "noStation", "totalTime"],
@@ -176,7 +151,7 @@ export default {
                     this.hideLoading();
                 }
             }
-        }
+        },
     },
     mounted() {
         const keys = Object.keys(this.$route.query);
@@ -224,7 +199,7 @@ export default {
                 data: filteredData,
                 start: timeCheck.range[0],
                 end: timeCheck.range[1],
-                extent: extent
+                extent: extent,
             };
             if (timeCheck.addChart) {
                 this.charts.push(newChart);
@@ -248,7 +223,7 @@ export default {
                 data: this.charts[0].data,
                 start: this.charts[0].start,
                 end: this.charts[0].end,
-                extent: this.charts[0].extent
+                extent: this.charts[0].extent,
             };
             this.charts.push(newChart);
             this.urlQuery.numCharts = this.charts.length;
@@ -274,9 +249,7 @@ export default {
             return id;
         },
         findSensorForChart(chartId) {
-            const sensorKey = this.$route.query[chartId + "sensor"]
-                ? this.$route.query[chartId + "sensor"]
-                : this.getSensorWithData();
+            const sensorKey = this.$route.query[chartId + "sensor"] ? this.$route.query[chartId + "sensor"] : this.getSensorWithData();
             const sensor = this.stationSensors.find(s => {
                 return s.key == sensorKey;
             });
@@ -314,10 +287,7 @@ export default {
                 start = new Date(parseInt(this.$route.query[chartId + "start"]));
                 end = new Date(parseInt(this.$route.query[chartId + "end"]));
                 // fetch data if needed by triggering a time change
-                if (
-                    start.getTime() != this.totalTime[0].getTime() ||
-                    end.getTime() != this.totalTime[1].getTime()
-                ) {
+                if (start.getTime() != this.totalTime[0].getTime() || end.getTime() != this.totalTime[1].getTime()) {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
                     this.$emit("chartTimeChanged", { start: start, end: end }, chartId);
@@ -355,11 +325,7 @@ export default {
                         c.sensorOption = this.charts[0].sensorOption;
                         this.$refs[c.ref][0].setTimeRange(parentTime);
                         this.$refs[c.ref][0].updateChartType();
-                        this.$refs[c.ref][0].updateData(
-                            this.charts[0].data,
-                            this.charts[0].extent,
-                            this.charts[0].sensor.colorScale
-                        );
+                        this.$refs[c.ref][0].updateData(this.charts[0].data, this.charts[0].extent, this.charts[0].sensor.colorScale);
                         this.urlQuery[c.id + "type"] = this.charts[0].type;
                         this.urlQuery[c.id + "sensor"] = this.charts[0].sensor.key;
                         this.urlQuery[c.id + "start"] = parentTime.start.getTime();
@@ -457,7 +423,7 @@ export default {
             const endDate = this.totalTime[1];
             let range = {
                 start: new Date(endDate.getTime() - days * DAY),
-                end: endDate
+                end: endDate,
             };
             if (days == 0) {
                 range.start = this.totalTime[0];
@@ -640,8 +606,8 @@ export default {
         },
         getSyncedDate() {
             return "Last synced " + utils.getUpdatedDate(this.station);
-        }
-    }
+        },
+    },
 };
 </script>
 

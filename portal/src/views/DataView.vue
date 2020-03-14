@@ -5,7 +5,10 @@
         <div id="data-view-background" class="main-panel" v-show="isAuthenticated">
             <div id="data-container">
                 <router-link :to="{ name: 'stations' }">
-                    <div class="map-link"><span class="small-arrow">&lt;</span> Stations Map</div>
+                    <div class="map-link">
+                        <span class="small-arrow">&lt;</span>
+                        Stations Map
+                    </div>
                 </router-link>
                 <div>
                     <div id="station-name">
@@ -26,11 +29,7 @@
                     @chartTimeChanged="onChartTimeChange"
                 />
                 <div id="lower-container">
-                    <NotesList
-                        :station="station"
-                        :selectedSensor="selectedSensor"
-                        :isAuthenticated="isAuthenticated"
-                    />
+                    <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" />
                     <SensorSummary
                         ref="sensorSummary"
                         :sensors="sensors"
@@ -73,7 +72,7 @@ export default {
         SidebarNav,
         DataChartControl,
         NotesList,
-        SensorSummary
+        SensorSummary,
     },
     props: ["stationParam", "id"],
     data: () => {
@@ -119,8 +118,8 @@ export default {
                 distance0: "Distance 0",
                 distance1: "Distance 1",
                 distance2: "Distance 2",
-                calibration: "Calibration"
-            }
+                calibration: "Calibration",
+            },
         };
     },
     async beforeCreate() {
@@ -208,7 +207,7 @@ export default {
                         colorScale: colors,
                         unit: s.unit_of_measure,
                         key: s.key,
-                        name: null
+                        name: null,
                     });
                 });
             });
@@ -226,7 +225,7 @@ export default {
             if (!result) {
                 this.combinedStationInfo = {
                     sensors: [],
-                    stationData: this.stationData
+                    stationData: this.stationData,
                 };
                 return;
             }
@@ -324,8 +323,8 @@ export default {
             this.noStation = false;
             document.getElementById("lower-container").style["min-width"] = "700px";
             this.initiateDataRetrieval();
-        }
-    }
+        },
+    },
 };
 </script>
 

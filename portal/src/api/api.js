@@ -19,8 +19,8 @@ class FKApi {
             headers: { "Content-Type": "application/json" },
             data: {
                 email: email,
-                password: password
-            }
+                password: password,
+            },
         }).then(this._handleLoginResponse.bind(this));
     }
 
@@ -49,8 +49,8 @@ class FKApi {
             url: this.baseUrl + "/stations/@/" + id,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -61,8 +61,8 @@ class FKApi {
             url: this.baseUrl + "/stations",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -73,8 +73,8 @@ class FKApi {
             url: this.baseUrl + "/user",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -85,8 +85,8 @@ class FKApi {
             url: this.baseUrl + "/users/project/" + projectId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -104,9 +104,9 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.projectId + "/invite",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
-            data: { email: data.email }
+            data: { email: data.email },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -117,8 +117,8 @@ class FKApi {
             url: this.baseUrl + "/projects/" + projectId + "/stations",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -129,8 +129,8 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -141,8 +141,8 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -153,9 +153,9 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.projectId + "/members/" + data.userId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
-            data: { email: data.email }
+            data: { email: data.email },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -166,9 +166,9 @@ class FKApi {
             url: this.baseUrl + "/user/media",
             headers: {
                 "Content-Type": data.type,
-                Authorization: token
+                Authorization: token,
             },
-            data: data.image
+            data: data.image,
         }).then(this._handleResponse.bind(this));
     }
 
@@ -179,9 +179,9 @@ class FKApi {
             url: this.baseUrl + "/users/" + data.id,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
-            data: data
+            data: data,
         }).then(this._handleResponse.bind(this));
     }
 
@@ -192,8 +192,8 @@ class FKApi {
             url: this.baseUrl + "/user/projects",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -204,8 +204,8 @@ class FKApi {
             url: this.baseUrl + "/projects/" + id,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -216,13 +216,13 @@ class FKApi {
             url: this.baseUrl + "/projects",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
             data: {
                 name: "Default FieldKit Project",
                 description: "Any FieldKit stations you add, start life here.",
-                slug: "default-proj-" + Date.now()
-            }
+                slug: "default-proj-" + Date.now(),
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -233,9 +233,9 @@ class FKApi {
             url: this.baseUrl + "/projects",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
-            data: data
+            data: data,
         }).then(this._handleResponse.bind(this));
     }
 
@@ -246,9 +246,9 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.id,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
+                Authorization: token,
             },
-            data: data
+            data: data,
         }).then(this._handleResponse.bind(this));
     }
 
@@ -259,9 +259,9 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.id + "/media",
             headers: {
                 "Content-Type": data.type,
-                Authorization: token
+                Authorization: token,
             },
-            data: data.image
+            data: data.image,
         }).then(this._handleResponse.bind(this));
     }
 
@@ -272,8 +272,8 @@ class FKApi {
             url: this.baseUrl + "/projects/" + data.projectId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -284,8 +284,8 @@ class FKApi {
             url: this.baseUrl + "/stations/" + data.stationId + "/field-notes/" + data.fieldNoteId,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -296,8 +296,8 @@ class FKApi {
             url: this.baseUrl + "/modules/meta",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -315,8 +315,8 @@ class FKApi {
             url: this.baseUrl + "/data/devices/" + deviceId + "/summary/json?start=" + start + "&end=" + end,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -327,8 +327,8 @@ class FKApi {
             url: this.baseUrl + "/data/devices/" + deviceId + "/data",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -336,18 +336,11 @@ class FKApi {
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url:
-                this.baseUrl +
-                "/data/devices/" +
-                deviceId +
-                "/data/json?page=" +
-                page +
-                "&pageSize=" +
-                pageSize,
+            url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 
@@ -358,8 +351,8 @@ class FKApi {
             url: this.baseUrl + "/stations/" + station.id + "/field-notes",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: token
-            }
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 

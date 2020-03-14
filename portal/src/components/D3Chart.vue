@@ -1,12 +1,6 @@
 <template>
     <div :id="chart.id">
-        <svg
-            :view-box.camel="viewBox"
-            preserveAspectRatio="xMidYMid meet"
-            :width="outerWidth"
-            :height="outerHeight"
-            @dblclick="zoomOut"
-        >
+        <svg :view-box.camel="viewBox" preserveAspectRatio="xMidYMid meet" :width="outerWidth" :height="outerHeight" @dblclick="zoomOut">
             <g :style="stageStyle">
                 <g ref="d3Stage"></g>
             </g>
@@ -28,7 +22,7 @@ export default {
     components: {
         D3LineChart,
         D3HistoChart,
-        D3RangeChart
+        D3RangeChart,
     },
     props: ["chartParam", "station"],
     data: () => {
@@ -40,8 +34,8 @@ export default {
                 marginTop: 5,
                 marginRight: 0,
                 marginBottom: 0,
-                marginLeft: 50
-            }
+                marginLeft: 50,
+            },
         };
     },
     watch: {},
@@ -57,9 +51,9 @@ export default {
         },
         stageStyle: function() {
             return {
-                transform: "translate(" + this.layout.marginLeft + "px," + this.layout.marginTop + "px)"
+                transform: "translate(" + this.layout.marginLeft + "px," + this.layout.marginTop + "px)",
             };
-        }
+        },
     },
     mounted() {
         this.chart = this.chartParam;
@@ -125,8 +119,8 @@ export default {
         },
         zoomOut() {
             this.$emit("zoomOut", { parent: this.chart.parent, id: this.chart.id });
-        }
-    }
+        },
+    },
 };
 </script>
 

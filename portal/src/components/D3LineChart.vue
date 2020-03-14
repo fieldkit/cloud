@@ -10,7 +10,7 @@ export default {
     props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false
+            activeMode: false,
         };
     },
     watch: {
@@ -68,18 +68,12 @@ export default {
             this.x = d3
                 .scaleTime()
                 .domain([this.chart.start, this.chart.end])
-                .range([
-                    this.layout.marginLeft,
-                    this.layout.width - (this.layout.marginRight + this.layout.marginLeft)
-                ]);
+                .range([this.layout.marginLeft, this.layout.width - (this.layout.marginRight + this.layout.marginLeft)]);
 
             this.y = d3
                 .scaleLinear()
                 .domain(this.chart.extent)
-                .range([
-                    this.layout.height - (this.layout.marginBottom + this.layout.marginTop),
-                    this.layout.marginTop
-                ]);
+                .range([this.layout.height - (this.layout.marginBottom + this.layout.marginTop), this.layout.marginTop]);
 
             this.lineFn = d3
                 .line()
@@ -163,14 +157,7 @@ export default {
             this.xAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "x-axis")
-                .attr(
-                    "transform",
-                    "translate(" +
-                        0 +
-                        "," +
-                        (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) +
-                        ")"
-                )
+                .attr("transform", "translate(" + 0 + "," + (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) + ")")
                 .call(this.xAxis);
 
             this.chart.svg.selectAll(".y-axis").remove();
@@ -198,7 +185,7 @@ export default {
                         // insert "blank" point
                         this.chartData.push({
                             date: new Date(i),
-                            blankPoint: true
+                            blankPoint: true,
                         });
                     }
                 }
@@ -306,32 +293,24 @@ export default {
                     { offset: "0%", color: this.chart.colors(this.chart.extent[0]) },
                     {
                         offset: "20%",
-                        color: this.chart.colors(
-                            this.chart.extent[0] + 0.2 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
+                        color: this.chart.colors(this.chart.extent[0] + 0.2 * (this.chart.extent[1] - this.chart.extent[0])),
                     },
                     {
                         offset: "40%",
-                        color: this.chart.colors(
-                            this.chart.extent[0] + 0.4 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
+                        color: this.chart.colors(this.chart.extent[0] + 0.4 * (this.chart.extent[1] - this.chart.extent[0])),
                     },
                     {
                         offset: "60%",
-                        color: this.chart.colors(
-                            this.chart.extent[0] + 0.6 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
+                        color: this.chart.colors(this.chart.extent[0] + 0.6 * (this.chart.extent[1] - this.chart.extent[0])),
                     },
                     {
                         offset: "80%",
-                        color: this.chart.colors(
-                            this.chart.extent[0] + 0.8 * (this.chart.extent[1] - this.chart.extent[0])
-                        )
+                        color: this.chart.colors(this.chart.extent[0] + 0.8 * (this.chart.extent[1] - this.chart.extent[0])),
                     },
                     {
                         offset: "100%",
-                        color: this.chart.colors(this.chart.extent[1])
-                    }
+                        color: this.chart.colors(this.chart.extent[1]),
+                    },
                 ])
                 .enter()
                 .append("stop")
@@ -341,8 +320,8 @@ export default {
                 .attr("stop-color", d => {
                     return d.color;
                 });
-        }
-    }
+        },
+    },
 };
 </script>
 
