@@ -253,14 +253,6 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		return err
 	}
 
-	// send email
-	/*
-		if err := c.options.Emailer.SendInvitation(ctx.Payload.Email); err != nil {
-			return err
-		}
-	*/
-
-	// save in project_invite table
 	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID, ctx.Payload.Email, time.Now()); err != nil {
 		return err
 	}
@@ -278,7 +270,6 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 		return err
 	}
 
-	// delete invite as well
 	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
@@ -297,7 +288,7 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)", ctx.ProjectID, ctx.StationID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", ctx.ProjectID, ctx.StationID); err != nil {
 		return err
 	}
 
