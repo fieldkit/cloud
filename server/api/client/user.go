@@ -52,6 +52,48 @@ func (c *Client) NewAddUserRequest(ctx context.Context, path string, payload *Ad
 	return req, nil
 }
 
+// ChangePasswordUserPath computes a request path to the change password action of user.
+func ChangePasswordUserPath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s/password", param0)
+}
+
+// Update a user password
+func (c *Client) ChangePasswordUser(ctx context.Context, path string, payload *UpdateUserPasswordPayload) (*http.Response, error) {
+	req, err := c.NewChangePasswordUserRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewChangePasswordUserRequest create the request corresponding to the change password action endpoint of the user resource.
+func (c *Client) NewChangePasswordUserRequest(ctx context.Context, path string, payload *UpdateUserPasswordPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PATCH", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // GetCurrentUserPath computes a request path to the get current action of user.
 func GetCurrentUserPath() string {
 

@@ -4853,6 +4853,44 @@ func (ctx *AddUserContext) Unauthorized() error {
 	return nil
 }
 
+// ChangePasswordUserContext provides the user change password action context.
+type ChangePasswordUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID  int
+	Payload *UpdateUserPasswordPayload
+}
+
+// NewChangePasswordUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller change password action.
+func NewChangePasswordUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ChangePasswordUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ChangePasswordUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["userId"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ChangePasswordUserContext) OK(r *User) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // GetCurrentUserContext provides the user get current action context.
 type GetCurrentUserContext struct {
 	context.Context

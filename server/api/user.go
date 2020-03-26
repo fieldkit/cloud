@@ -129,6 +129,53 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
+func (c *UserController) ChangePassword(ctx *app.ChangePasswordUserContext) error {
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context") // internal error
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return fmt.Errorf("JWT claims error") // internal error
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("password", "authorized_user_id", claims["sub"], "user_id", ctx.UserID)
+
+	user := &data.User{}
+	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"])
+	if err == sql.ErrNoRows {
+		return data.IncorrectPasswordError
+	}
+	if err != nil {
+		return err
+	}
+
+	if user.ID != int32(ctx.UserID) {
+		return fmt.Errorf("invalid user id")
+	}
+
+	err = user.CheckPassword(ctx.Payload.OldPassword)
+	if err == data.IncorrectPasswordError {
+		return data.IncorrectPasswordError
+	}
+	if err != nil {
+		return err
+	}
+
+	if err := user.SetPassword(ctx.Payload.NewPassword); err != nil {
+		return err
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *", user); err != nil {
+		return err
+	}
+
+	return ctx.OK(UserType(user))
+}
+
 func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	log := Logger(ctx).Sugar()
 

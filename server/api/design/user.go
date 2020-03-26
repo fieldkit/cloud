@@ -28,10 +28,22 @@ var UpdateUserPayload = Type("UpdateUserPayload", func() {
 	Required("name", "email", "bio")
 })
 
+var UpdateUserPasswordPayload = Type("UpdateUserPasswordPayload", func() {
+	Attribute("oldPassword", String, func() {
+		MinLength(10)
+	})
+	Attribute("newPassword", String, func() {
+		MinLength(10)
+	})
+	Required("oldPassword", "newPassword")
+})
+
 var LoginPayload = Type("LoginPayload", func() {
 	Reference(AddUserPayload)
 	Attribute("email")
-	Attribute("password")
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
 	Required("email", "password")
 })
 
@@ -157,6 +169,19 @@ var _ = Resource("user", func() {
 			Required("userId")
 		})
 		Payload(UpdateUserPayload)
+		Response(OK, func() {
+			Media(User)
+		})
+	})
+
+	Action("change password", func() {
+		Routing(PATCH("users/:userId/password"))
+		Description("Update a user password")
+		Params(func() {
+			Param("userId", Integer)
+			Required("userId")
+		})
+		Payload(UpdateUserPasswordPayload)
 		Response(OK, func() {
 			Media(User)
 		})

@@ -1967,6 +1967,68 @@ type UpdateTwitterAccountSourcePayload struct {
 	UserID *int    `form:"userId,omitempty" json:"userId,omitempty" yaml:"userId,omitempty" xml:"userId,omitempty"`
 }
 
+// updateUserPasswordPayload user type.
+type updateUserPasswordPayload struct {
+	NewPassword *string `form:"newPassword,omitempty" json:"newPassword,omitempty" yaml:"newPassword,omitempty" xml:"newPassword,omitempty"`
+	OldPassword *string `form:"oldPassword,omitempty" json:"oldPassword,omitempty" yaml:"oldPassword,omitempty" xml:"oldPassword,omitempty"`
+}
+
+// Validate validates the updateUserPasswordPayload type instance.
+func (ut *updateUserPasswordPayload) Validate() (err error) {
+	if ut.OldPassword == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "oldPassword"))
+	}
+	if ut.NewPassword == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "newPassword"))
+	}
+	if ut.NewPassword != nil {
+		if utf8.RuneCountInString(*ut.NewPassword) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.newPassword`, *ut.NewPassword, utf8.RuneCountInString(*ut.NewPassword), 10, true))
+		}
+	}
+	if ut.OldPassword != nil {
+		if utf8.RuneCountInString(*ut.OldPassword) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.oldPassword`, *ut.OldPassword, utf8.RuneCountInString(*ut.OldPassword), 10, true))
+		}
+	}
+	return
+}
+
+// Publicize creates UpdateUserPasswordPayload from updateUserPasswordPayload
+func (ut *updateUserPasswordPayload) Publicize() *UpdateUserPasswordPayload {
+	var pub UpdateUserPasswordPayload
+	if ut.NewPassword != nil {
+		pub.NewPassword = *ut.NewPassword
+	}
+	if ut.OldPassword != nil {
+		pub.OldPassword = *ut.OldPassword
+	}
+	return &pub
+}
+
+// UpdateUserPasswordPayload user type.
+type UpdateUserPasswordPayload struct {
+	NewPassword string `form:"newPassword" json:"newPassword" yaml:"newPassword" xml:"newPassword"`
+	OldPassword string `form:"oldPassword" json:"oldPassword" yaml:"oldPassword" xml:"oldPassword"`
+}
+
+// Validate validates the UpdateUserPasswordPayload type instance.
+func (ut *UpdateUserPasswordPayload) Validate() (err error) {
+	if ut.OldPassword == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "oldPassword"))
+	}
+	if ut.NewPassword == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "newPassword"))
+	}
+	if utf8.RuneCountInString(ut.NewPassword) < 10 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.newPassword`, ut.NewPassword, utf8.RuneCountInString(ut.NewPassword), 10, true))
+	}
+	if utf8.RuneCountInString(ut.OldPassword) < 10 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.oldPassword`, ut.OldPassword, utf8.RuneCountInString(ut.OldPassword), 10, true))
+	}
+	return
+}
+
 // updateUserPayload user type.
 type updateUserPayload struct {
 	Bio   *string `form:"bio,omitempty" json:"bio,omitempty" yaml:"bio,omitempty" xml:"bio,omitempty"`
