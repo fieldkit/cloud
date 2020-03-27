@@ -5711,6 +5711,8 @@ type UserController interface {
 	ListByProject(*ListByProjectUserContext) error
 	Login(*LoginUserContext) error
 	Logout(*LogoutUserContext) error
+	Recovery(*RecoveryUserContext) error
+	RecoveryLookup(*RecoveryLookupUserContext) error
 	Refresh(*RefreshUserContext) error
 	SaveCurrentUserImage(*SaveCurrentUserImageUserContext) error
 	TransmissionToken(*TransmissionTokenUserContext) error
@@ -5731,6 +5733,8 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/users/project/:projectId", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/user/recovery", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/user/recovery/lookup", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/transmission-token", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/validate", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
@@ -5919,6 +5923,50 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/logout", ctrl.MuxHandler("logout", h, nil))
 	service.LogInfo("mount", "ctrl", "User", "action", "Logout", "route", "POST /logout", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewRecoveryUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*RecoveryPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Recovery(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/user/recovery", ctrl.MuxHandler("recovery", h, unmarshalRecoveryUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "Recovery", "route", "POST /user/recovery")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewRecoveryLookupUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*RecoveryLookupPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.RecoveryLookup(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/user/recovery/lookup", ctrl.MuxHandler("recovery lookup", h, unmarshalRecoveryLookupUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "RecoveryLookup", "route", "POST /user/recovery/lookup")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -6209,6 +6257,36 @@ func unmarshalChangePasswordUserPayload(ctx context.Context, service *goa.Servic
 // unmarshalLoginUserPayload unmarshals the request body into the context request data Payload field.
 func unmarshalLoginUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &loginPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalRecoveryUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalRecoveryUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &recoveryPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalRecoveryLookupUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalRecoveryLookupUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &recoveryLookupPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

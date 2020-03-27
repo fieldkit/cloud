@@ -47,6 +47,19 @@ var LoginPayload = Type("LoginPayload", func() {
 	Required("email", "password")
 })
 
+var RecoveryLookupPayload = Type("RecoveryLookupPayload", func() {
+	Attribute("email", String)
+	Required("email")
+})
+
+var RecoveryPayload = Type("RecoveryPayload", func() {
+	Attribute("token", String)
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
+	Required("token", "password")
+})
+
 var User = MediaType("application/vnd.app.user+json", func() {
 	TypeName("User")
 	Reference(AddUserPayload)
@@ -108,6 +121,24 @@ var _ = Resource("user", func() {
 		})
 		Response(Unauthorized, ErrorMedia)
 		Response(BadRequest)
+	})
+
+	Action("recovery lookup", func() {
+		Routing(POST("user/recovery/lookup"))
+		NoSecurity()
+		Payload(RecoveryLookupPayload)
+		Response(Unauthorized)
+		Response(OK, func() {
+		})
+	})
+
+	Action("recovery", func() {
+		Routing(POST("user/recovery"))
+		NoSecurity()
+		Payload(RecoveryPayload)
+		Response(Unauthorized)
+		Response(OK, func() {
+		})
 	})
 
 	Action("logout", func() {

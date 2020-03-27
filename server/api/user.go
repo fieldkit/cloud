@@ -313,9 +313,88 @@ func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
 	return ctx.NoContent()
 }
 
-func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
-	now := time.Now()
+func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) error {
+	log := Logger(ctx).Sugar()
 
+	user := &data.User{}
+	err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE email = $1", ctx.Payload.Email)
+	if err == sql.ErrNoRows {
+		log.Infow("recovery, no user")
+		return ctx.OK([]byte("{}"))
+	}
+	if err != nil {
+		log.Errorw("recovery", "error", err)
+		return ctx.OK([]byte("{}"))
+	}
+
+	now := time.Now().UTC()
+	recoveryToken, err := data.NewRecoveryToken(user.ID, 20, now.Add(time.Duration(1)*time.Hour))
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.recovery_token WHERE user_id = $1", user.ID); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", recoveryToken); err != nil {
+		return err
+	}
+
+	if err := c.options.Emailer.SendRecoveryToken(user, recoveryToken); err != nil {
+		return err
+	}
+
+	return ctx.OK([]byte("{}"))
+}
+
+func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
+	log := Logger(ctx).Sugar()
+
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(ctx.Payload.Token)); err != nil {
+		return err
+	}
+
+	log.Infow("recovery", "token_raw", ctx.Payload.Token, "token", token)
+
+	recoveryToken := &data.RecoveryToken{}
+	err := c.options.Database.GetContext(ctx, recoveryToken, "SELECT * FROM fieldkit.recovery_token WHERE token = $1", token)
+	if err == sql.ErrNoRows {
+		log.Infow("recovery, token bad")
+		return ctx.Unauthorized()
+	}
+	if err != nil {
+		return err
+	}
+
+	now := time.Now().UTC()
+	if now.After(recoveryToken.Expires) {
+		log.Infow("recovery, token expired", "token_expires", recoveryToken.Expires, "now", now)
+		return ctx.Unauthorized()
+	}
+
+	user := &data.User{}
+	err = c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", recoveryToken.UserID)
+	if err == sql.ErrNoRows {
+		return ctx.OK([]byte("{}"))
+	}
+	if err != nil {
+		return err
+	}
+
+	if err := user.SetPassword(ctx.Payload.Password); err != nil {
+		return err
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *", user); err != nil {
+		return err
+	}
+
+	return ctx.OK([]byte("{}"))
+}
+
+func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	c.options.Metrics.AuthRefreshTry()
 
 	token := data.Token{}
@@ -328,11 +407,11 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized()
 	}
-
 	if err != nil {
 		return err
 	}
 
+	now := time.Now().UTC()
 	if now.After(refreshToken.Expires) {
 		return ctx.Unauthorized()
 	}
@@ -515,7 +594,7 @@ func (c *UserController) TransmissionToken(ctx *app.TransmissionTokenUserContext
 		return err
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	transmissionToken := NewTransmissionToken(now, user)
 	signedToken, err := transmissionToken.SignedString(c.options.JWTHMACKey)
 	if err != nil {

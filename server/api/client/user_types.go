@@ -1578,6 +1578,95 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// recoveryLookupPayload user type.
+type recoveryLookupPayload struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`
+}
+
+// Validate validates the recoveryLookupPayload type instance.
+func (ut *recoveryLookupPayload) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	return
+}
+
+// Publicize creates RecoveryLookupPayload from recoveryLookupPayload
+func (ut *recoveryLookupPayload) Publicize() *RecoveryLookupPayload {
+	var pub RecoveryLookupPayload
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	return &pub
+}
+
+// RecoveryLookupPayload user type.
+type RecoveryLookupPayload struct {
+	Email string `form:"email" json:"email" yaml:"email" xml:"email"`
+}
+
+// Validate validates the RecoveryLookupPayload type instance.
+func (ut *RecoveryLookupPayload) Validate() (err error) {
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	return
+}
+
+// recoveryPayload user type.
+type recoveryPayload struct {
+	Password *string `form:"password,omitempty" json:"password,omitempty" yaml:"password,omitempty" xml:"password,omitempty"`
+	Token    *string `form:"token,omitempty" json:"token,omitempty" yaml:"token,omitempty" xml:"token,omitempty"`
+}
+
+// Validate validates the recoveryPayload type instance.
+func (ut *recoveryPayload) Validate() (err error) {
+	if ut.Token == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "token"))
+	}
+	if ut.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
+	}
+	if ut.Password != nil {
+		if utf8.RuneCountInString(*ut.Password) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 10, true))
+		}
+	}
+	return
+}
+
+// Publicize creates RecoveryPayload from recoveryPayload
+func (ut *recoveryPayload) Publicize() *RecoveryPayload {
+	var pub RecoveryPayload
+	if ut.Password != nil {
+		pub.Password = *ut.Password
+	}
+	if ut.Token != nil {
+		pub.Token = *ut.Token
+	}
+	return &pub
+}
+
+// RecoveryPayload user type.
+type RecoveryPayload struct {
+	Password string `form:"password" json:"password" yaml:"password" xml:"password"`
+	Token    string `form:"token" json:"token" yaml:"token" xml:"token"`
+}
+
+// Validate validates the RecoveryPayload type instance.
+func (ut *RecoveryPayload) Validate() (err error) {
+	if ut.Token == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "token"))
+	}
+	if ut.Password == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
+	}
+	if utf8.RuneCountInString(ut.Password) < 10 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.password`, ut.Password, utf8.RuneCountInString(ut.Password), 10, true))
+	}
+	return
+}
+
 // removeUserPayload user type.
 type removeUserPayload struct {
 	Email *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`

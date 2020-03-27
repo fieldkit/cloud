@@ -366,6 +366,78 @@ func (c *Client) NewLogoutUserRequest(ctx context.Context, path string) (*http.R
 	return req, nil
 }
 
+// RecoveryUserPath computes a request path to the recovery action of user.
+func RecoveryUserPath() string {
+
+	return fmt.Sprintf("/user/recovery")
+}
+
+// RecoveryUser makes a request to the recovery action endpoint of the user resource
+func (c *Client) RecoveryUser(ctx context.Context, path string, payload *RecoveryPayload) (*http.Response, error) {
+	req, err := c.NewRecoveryUserRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRecoveryUserRequest create the request corresponding to the recovery action endpoint of the user resource.
+func (c *Client) NewRecoveryUserRequest(ctx context.Context, path string, payload *RecoveryPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	return req, nil
+}
+
+// RecoveryLookupUserPath computes a request path to the recovery lookup action of user.
+func RecoveryLookupUserPath() string {
+
+	return fmt.Sprintf("/user/recovery/lookup")
+}
+
+// RecoveryLookupUser makes a request to the recovery lookup action endpoint of the user resource
+func (c *Client) RecoveryLookupUser(ctx context.Context, path string, payload *RecoveryLookupPayload) (*http.Response, error) {
+	req, err := c.NewRecoveryLookupUserRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewRecoveryLookupUserRequest create the request corresponding to the recovery lookup action endpoint of the user resource.
+func (c *Client) NewRecoveryLookupUserRequest(ctx context.Context, path string, payload *RecoveryLookupPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	return req, nil
+}
+
 // RefreshUserPayload is the user refresh action payload.
 type RefreshUserPayload struct {
 	RefreshToken string `form:"refresh_token" json:"refresh_token" yaml:"refresh_token" xml:"refresh_token"`

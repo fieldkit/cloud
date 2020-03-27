@@ -95,3 +95,27 @@ func (a *AWSSESEmailer) SendValidationToken(person *data.User, validationToken *
 
 	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
 }
+
+func (a *AWSSESEmailer) SendRecoveryToken(person *data.User, recoveryToken *data.RecoveryToken) error {
+	options := &templateOptions{
+		RecoveryToken: recoveryToken,
+		Source:        a.source,
+		Domain:        a.domain,
+	}
+
+	subjectBuffer := bytes.NewBuffer([]byte{})
+	if err := a.templates.Recovery.Subject.Execute(subjectBuffer, person); err != nil {
+		return err
+	}
+
+	bodyTextBuffer := bytes.NewBuffer([]byte{})
+	if err := a.templates.Recovery.BodyText.Execute(bodyTextBuffer, options); err != nil {
+		return err
+	}
+
+	toAddresses := []*string{
+		aws.String(person.Email),
+	}
+
+	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
+}

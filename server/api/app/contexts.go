@@ -5160,6 +5160,78 @@ func (ctx *LogoutUserContext) BadRequest() error {
 	return nil
 }
 
+// RecoveryUserContext provides the user recovery action context.
+type RecoveryUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *RecoveryPayload
+}
+
+// NewRecoveryUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller recovery action.
+func NewRecoveryUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*RecoveryUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := RecoveryUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *RecoveryUserContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *RecoveryUserContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// RecoveryLookupUserContext provides the user recovery lookup action context.
+type RecoveryLookupUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *RecoveryLookupPayload
+}
+
+// NewRecoveryLookupUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller recovery lookup action.
+func NewRecoveryLookupUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*RecoveryLookupUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := RecoveryLookupUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *RecoveryLookupUserContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *RecoveryLookupUserContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
 // RefreshUserContext provides the user refresh action context.
 type RefreshUserContext struct {
 	context.Context

@@ -7,6 +7,7 @@ import (
 
 type EmailTemplates struct {
 	Validation *EmailTemplate
+	Recovery   *EmailTemplate
 }
 
 func NewEmailTemplates() (e *EmailTemplates, err error) {
@@ -15,8 +16,14 @@ func NewEmailTemplates() (e *EmailTemplates, err error) {
 		return nil, err
 	}
 
+	recovery, err := NewRecoveryEmailTemplate()
+	if err != nil {
+		return nil, err
+	}
+
 	e = &EmailTemplates{
 		Validation: validation,
+		Recovery:   recovery,
 	}
 
 	return
@@ -45,6 +52,38 @@ https://api.{{.Domain}}/validate?token={{.ValidationToken.Token}}`
 		<div style="font-weight: bold">https://api.{{.Domain}}/validate?token={{.ValidationToken.Token}}</div>
 	<div>
 </div>`
+
+	subject, err := text.New("subject").Parse(subjectText)
+	if err != nil {
+		return nil, err
+	}
+
+	bodyText, err := text.New("body").Parse(bodyTextText)
+	if err != nil {
+		return nil, err
+	}
+
+	bodyHTML, err := html.New("body").Parse(bodyHTMLText)
+	if err != nil {
+		return nil, err
+	}
+
+	et = &EmailTemplate{
+		Subject:  subject,
+		BodyText: bodyText,
+		BodyHTML: bodyHTML,
+	}
+
+	return
+}
+
+func NewRecoveryEmailTemplate() (et *EmailTemplate, err error) {
+	subjectText := `Recovery your Fieldkit account`
+
+	bodyTextText := `To recovery your Fieldkit account, navigate to:
+https://api.{{.Domain}}/recover?token={{.RecoveryToken.Token}}`
+
+	bodyHTMLText := bodyTextText
 
 	subject, err := text.New("subject").Parse(subjectText)
 	if err != nil {

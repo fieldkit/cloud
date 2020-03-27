@@ -113,3 +113,22 @@ func NewRefreshToken(userID int32, length int, expires time.Time) (*RefreshToken
 		Expires: expires,
 	}, nil
 }
+
+type RecoveryToken struct {
+	Token   Token     `db:"token" json:"token"`
+	UserID  int32     `db:"user_id" json:"user_id"`
+	Expires time.Time `db:"expires" json:"expires"`
+}
+
+func NewRecoveryToken(userID int32, length int, expires time.Time) (*RecoveryToken, error) {
+	token, err := NewToken(length)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RecoveryToken{
+		UserID:  userID,
+		Token:   token,
+		Expires: expires,
+	}, nil
+}
