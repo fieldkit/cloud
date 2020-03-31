@@ -20,8 +20,13 @@
                 <div class="image-container">
                     <div id="image-heading">Profile picture</div>
                     <img src="../assets/Profile_Image.png" v-if="!user.media_url && !previewImage" />
-                    <img alt="User image" :src="baseUrl + '/user/' + user.id + '/media'" v-if="user.media_url && !previewImage" />
-                    <img :src="previewImage" class="uploading-image" v-if="!user.media_url || previewImage" />
+                    <img
+                        alt="User image"
+                        :src="baseUrl + '/user/' + user.id + '/media'"
+                        v-if="user.media_url && !previewImage"
+                        class="user-image"
+                    />
+                    <img :src="previewImage" class="user-image" v-if="!user.media_url || previewImage" />
                     <br />
                     <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
                 </div>
@@ -280,6 +285,10 @@ export default {
     width: 98%;
     margin: 15px 0 30px 15px;
     float: left;
+}
+.user-image {
+    max-width: 400px;
+    max-height: 400px;
 }
 .view-user {
     margin: 20px 40px;
