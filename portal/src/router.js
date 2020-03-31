@@ -16,53 +16,53 @@ export default new Router({
             path: "/",
             alias: "/login",
             name: "login",
-            component: Login
+            component: Login,
         },
         {
             path: "/dashboard/user",
             name: "user",
-            component: UserView
+            component: UserView,
         },
         {
             path: "/dashboard/",
             name: "projects",
-            component: ProjectsView
+            component: ProjectsView,
         },
         {
             path: "/dashboard/projects/:id",
             name: "viewProject",
             component: ProjectsView,
-            props: true
+            props: true,
         },
         {
             path: "/dashboard/projects/:id/edit",
             name: "editProject",
             component: ProjectsView,
-            props: true
+            props: true,
         },
         {
             path: "/dashboard/stations",
             name: "stations",
             component: StationsView,
-            props: true
+            props: true,
         },
         {
             path: "/dashboard/stations/:id",
             name: "viewStation",
             component: StationsView,
-            props: true
+            props: true,
         },
         {
             path: "/dashboard/data",
             name: "data",
             component: DataView,
-            props: true
+            props: true,
         },
         {
             path: "/dashboard/data/:id",
             name: "viewData",
             component: DataView,
-            props: true
-        }
-    ]
+            props: true,
+        },
+    ],
 });
