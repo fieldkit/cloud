@@ -5,6 +5,7 @@ import DataView from "./views/DataView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
+import ResetPasswordView from "./views/ResetPasswordView.vue";
 
 Vue.use(Router);
 
@@ -22,6 +23,11 @@ export default new Router({
             path: "/dashboard/user",
             name: "user",
             component: UserView,
+        },
+        {
+            path: "/dashboard/user/reset",
+            name: "reset",
+            component: ResetPasswordView,
         },
         {
             path: "/dashboard/",

@@ -16,31 +16,86 @@
                 <div id="close-form-btn" v-on:click="closeForm">
                     <img alt="Close" src="../assets/close.png" />
                 </div>
-                <div class="input-label">Name:</div>
-                <input v-model="user.name" placeholder="Name" class="text-input wide-text-input" />
-                <div class="input-label">Email:</div>
-                <input v-model="user.email" placeholder="Email" class="text-input wide-text-input" />
-                <div class="input-label">Bio:</div>
-                <input v-model="user.bio" placeholder="Bio" class="text-input wide-text-input" />
+                <div id="account-heading">My Account</div>
+                <div class="image-container">
+                    <div id="image-heading">Profile picture</div>
+                    <img src="../assets/Profile_Image.png" v-if="!user.media_url && !previewImage" />
+                    <img alt="User image" :src="baseUrl + '/user/' + user.id + '/media'" v-if="user.media_url && !previewImage" />
+                    <img :src="previewImage" class="uploading-image" v-if="!user.media_url || previewImage" />
+                    <br />
+                    <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
+                </div>
+                <div class="input-container">
+                    <input v-model="user.name" class="inputText" type="text" required="" />
+                    <span class="floating-label">Name</span>
+                </div>
+                <div class="input-container">
+                    <input v-model="user.email" type="text" class="inputText" required="" />
+                    <span class="floating-label">Email</span>
+                </div>
+                <div class="input-container">
+                    <input v-model="user.bio" type="text" class="inputText" required="" />
+                    <span class="floating-label">Short Description</span>
+                </div>
                 <div id="public-checkbox-container">
                     <input type="checkbox" id="checkbox" v-model="publicProfile" />
                     <label for="checkbox">Make my profile public</label>
                     <img alt="Info" src="../assets/info.png" />
                 </div>
-                <div class="image-container">
-                    <img
-                        alt="User image"
-                        :src="baseUrl + '/user/' + user.id + '/media'"
-                        v-if="user.media_url && !previewImage"
-                    />
-                    <img :src="previewImage" class="uploading-image" v-if="!user.media_url || previewImage" />
-                    <br />
-                    {{
-                        this.user.media_url ? "Update your profile image: " : "Add an image to your profile: "
-                    }}
-                    <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
-                </div>
                 <button class="save-btn" v-on:click="submitUpdate">Update</button>
+
+                <div class="password-change">
+                    <div class="inner-password-change">
+                        <div class="password-change-heading">Change password</div>
+                        <div class="input-container">
+                            <input v-model="oldPassword" secure="true" type="password" class="inputText" required="" />
+                            <span class="floating-label">Current password</span>
+                        </div>
+                        <div class="input-container">
+                            <input
+                                v-model="newPassword"
+                                secure="true"
+                                type="password"
+                                class="inputText"
+                                required=""
+                                @blur="checkPassword"
+                            />
+                            <span class="floating-label">New password</span>
+                        </div>
+                        <span class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</span>
+                        <span class="validation-error" id="password-too-short" v-if="passwordTooShort">
+                            Password must be at least 10 characters.
+                        </span>
+                        <div class="input-container">
+                            <input
+                                v-model="confirmPassword"
+                                secure="true"
+                                type="password"
+                                class="inputText"
+                                required=""
+                                @blur="checkConfirmPassword"
+                            />
+                            <span class="floating-label">Confirm new password</span>
+                        </div>
+                        <span class="validation-error" v-if="passwordsNotMatch">
+                            Passwords do not match.
+                        </span>
+                    </div>
+                    <button class="save-btn" v-on:click="submitPasswordChange">Change password</button>
+
+                    <div class="forgot-link-container">
+                        <div class="forgot-link" v-if="!showReset && !resetSent" v-on:click="showResetPassword">Forgot your password?</div>
+                        <div class="input-container" v-if="showReset">
+                            <div class="reset-instructions">
+                                Enter your email address and password reset instructions will be sent to you.
+                            </div>
+                            <input v-model="resetEmail" type="text" class="inputText" required="" />
+                            <span class="floating-label">Email</span>
+                        </div>
+                        <button class="save-btn" v-if="showReset" v-on:click="sendResetEmail">Submit</button>
+                        <div class="reset-sent" v-if="resetSent">Password reset email sent!</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="loading" v-if="loading">
@@ -68,7 +123,7 @@ export default {
     name: "UserView",
     components: {
         HeaderBar,
-        SidebarNav
+        SidebarNav,
     },
     props: ["id"],
     data: () => {
@@ -76,14 +131,23 @@ export default {
             baseUrl: API_HOST,
             user: { username: "" },
             publicProfile: true,
-            previewImage: null,
+            previewImage: "",
             projects: [],
             stations: [],
             acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
             isEditing: false,
             isAuthenticated: false,
             failedAuth: false,
-            loading: false
+            loading: false,
+            oldPassword: "",
+            newPassword: "",
+            noPassword: false,
+            passwordTooShort: false,
+            confirmPassword: "",
+            passwordsNotMatch: false,
+            showReset: false,
+            resetSent: false,
+            resetEmail: "",
         };
     },
     async beforeCreate() {
@@ -116,6 +180,42 @@ export default {
         },
         editUser() {
             this.isEditing = true;
+        },
+        checkPassword() {
+            this.noPassword = false;
+            this.passwordTooShort = false;
+            this.noPassword = !this.newPassword || this.newPassword.length == 0;
+            if (this.noPassword) {
+                return;
+            }
+            this.passwordTooShort = this.newPassword.length < 10;
+        },
+        checkConfirmPassword() {
+            this.passwordsNotMatch = this.newPassword != this.confirmPassword;
+        },
+        submitPasswordChange() {
+            if (this.oldPassword && this.checkConfirmPassword) {
+                this.loading = true;
+                const data = {
+                    userId: this.user.id,
+                    oldPassword: this.oldPassword,
+                    newPassword: this.newPassword,
+                };
+                this.api.updatePassword(data).then(result => {
+                    // TODO: indicate success
+                    this.isEditing = false;
+                    this.loading = false;
+                });
+            }
+        },
+        showResetPassword() {
+            this.showReset = true;
+        },
+        sendResetEmail() {
+            this.api.sendResetPasswordEmail(this.resetEmail).then(result => {
+                this.showReset = false;
+                this.resetSent = true;
+            });
         },
         submitUpdate() {
             this.loading = true;
@@ -159,12 +259,28 @@ export default {
         },
         closeForm() {
             this.isEditing = false;
-        }
-    }
+        },
+    },
 };
 </script>
 
 <style scoped>
+#account-heading {
+    font-weight: bold;
+    font-size: 24px;
+    float: left;
+    margin: 15px 0 0 15px;
+}
+#close-form-btn {
+    float: right;
+    margin-top: 15px;
+    cursor: pointer;
+}
+.image-container {
+    width: 98%;
+    margin: 15px 0 30px 15px;
+    float: left;
+}
 .view-user {
     margin: 20px 40px;
 }
@@ -197,29 +313,50 @@ export default {
 }
 
 #user-form-container {
+    float: left;
     width: 700px;
     padding: 0 15px 15px 15px;
     margin: 60px;
     border: 1px solid rgb(215, 220, 225);
 }
-.input-label {
-    width: 60px;
-    text-align: right;
+
+.input-container {
     float: left;
-    clear: both;
-    margin: 0 12px 30px 0;
+    margin: 10px 0 0 15px;
+    width: 99%;
 }
-.wide-text-input {
-    float: left;
-    width: 600px;
+input:focus ~ .floating-label,
+input:not(:focus):valid ~ .floating-label {
+    top: -48px;
+    font-size: 12px;
+    opacity: 1;
+}
+input:invalid {
+    box-shadow: none;
+}
+.inputText {
+    color: #2c3e50;
+    font-size: 14px;
+    width: inherit;
     border: none;
     border-bottom: 2px solid rgb(235, 235, 235);
     font-size: 15px;
     padding-bottom: 4px;
 }
+.inputText:focus {
+    border-bottom: 2px solid #52b5e4;
+}
+.floating-label {
+    color: rgb(85, 85, 85);
+    position: relative;
+    top: -24px;
+    pointer-events: none;
+    transition: 0.2s ease all;
+}
+
 #public-checkbox-container {
     float: left;
-    margin: 0 0 0 30px;
+    margin: 0 0 15px 15px;
     width: 98%;
 }
 #public-checkbox-container input {
@@ -234,27 +371,50 @@ export default {
     float: left;
     margin: 2px 5px;
 }
-.image-container {
-    width: 98%;
-    margin: 15px 0 0 30px;
+
+.password-change-heading {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 20px 15px;
+}
+.password-change {
+    margin: 40px 0;
+}
+.inner-password-change {
     float: left;
 }
 
 .save-btn {
     width: 300px;
     height: 50px;
-    font-size: 18px;
     color: white;
+    font-size: 18px;
+    font-weight: bold;
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
-    margin: 15px 0 20px 30px;
+    margin: 10px 0 20px 15px;
     cursor: pointer;
 }
 
-#close-form-btn {
-    float: right;
-    margin-top: 15px;
+.validation-error {
+    float: left;
+    color: #c42c44;
+    display: block;
+    font-size: 14px;
+    margin: -20px 0 5px 15px;
+}
+.forgot-link {
+    margin: 15px 0 0 15px;
+    text-decoration: underline;
     cursor: pointer;
+}
+.reset-instructions {
+    margin: 15px 0 18px 0;
+}
+.reset-sent {
+    margin: 15px 0 0 15px;
+    font-size: 18px;
+    color: #3f8530;
 }
 </style>

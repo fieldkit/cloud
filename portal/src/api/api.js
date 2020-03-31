@@ -42,6 +42,40 @@ class FKApi {
         }
     }
 
+    updatePassword(data) {
+        const token = this.token.getToken();
+        return axios({
+            method: "PATCH",
+            url: this.baseUrl + "/users/" + data.userId + "/password",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+            data: { newPassword: data.newPassword, oldPassword: data.oldPassword },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    sendResetPasswordEmail(email) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/user/recovery/lookup",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+            data: { email: email },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    resetPassword(data) {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/user/recovery",
+            data: { password: data.password, token: data.token },
+        }).then(this._handleResponse.bind(this));
+    }
+
     getStation(id) {
         const token = this.token.getToken();
         return axios({
