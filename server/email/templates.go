@@ -81,7 +81,7 @@ func NewRecoveryEmailTemplate() (et *EmailTemplate, err error) {
 	subjectText := `Recovery your Fieldkit account`
 
 	bodyTextText := `To recovery your Fieldkit account, navigate to:
-https://api.{{.Domain}}/recover?token={{.RecoveryToken.Token}}`
+https://portal.{{.Domain}}/dashboard/user/reset?token={{.RecoveryToken.Token}}`
 
 	bodyHTMLText := bodyTextText
 
