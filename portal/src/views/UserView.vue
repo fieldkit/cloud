@@ -206,7 +206,7 @@ export default {
                     oldPassword: this.oldPassword,
                     newPassword: this.newPassword,
                 };
-                this.api.updatePassword(data).then(result => {
+                this.api.updatePassword(data).then(() => {
                     // TODO: indicate success
                     this.isEditing = false;
                     this.loading = false;
@@ -217,7 +217,7 @@ export default {
             this.showReset = true;
         },
         sendResetEmail() {
-            this.api.sendResetPasswordEmail(this.resetEmail).then(result => {
+            this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
                 this.showReset = false;
                 this.resetSent = true;
             });
