@@ -188,7 +188,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	if err == sql.ErrNoRows {
 		log.Infow("invalid", "token", ctx.Token)
 		ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"?bad_token=true")
-		return nil
+		return ctx.Found()
 	}
 	if err != nil {
 		return err
@@ -207,7 +207,6 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	c.options.Metrics.UserValidated()
 
 	ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"/")
-
 	return ctx.Found()
 }
 
