@@ -4,7 +4,7 @@
             v-bind:style="{
                 maxWidth: '30%',
                 marginTop: '50px',
-                marginBottom: '80px'
+                marginBottom: '80px',
             }"
             alt="Fieldkit Logo"
             src="../assets/FieldKit_Logo_White.png"
@@ -20,8 +20,8 @@ import LoginForm from "../components/LoginForm.vue";
 export default {
     name: "Login",
     components: {
-        LoginForm
-    }
+        LoginForm,
+    },
 };
 </script>
 
