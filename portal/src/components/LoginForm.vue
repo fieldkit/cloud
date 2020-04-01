@@ -18,7 +18,9 @@
                     <span class="floating-label">Name</span>
                 </div>
                 <div class="validation-error" id="no-name" v-if="noName">Name is a required field.</div>
-                <div class="validation-error" id="name-too-long" v-if="nameTooLong">Name must be less than 256 letters.</div>
+                <div class="validation-error" id="name-too-long" v-if="nameTooLong">
+                    Name must be less than 256 letters.
+                </div>
                 <div class="validation-error" id="name-has-space" v-if="nameHasSpace">Name must not contain spaces.</div>
             </div>
             <div class="outer-input-container">
@@ -38,7 +40,9 @@
                     <span class="floating-label">Email</span>
                 </div>
                 <div class="validation-error" id="no-email" v-if="noEmail">Email is a required field.</div>
-                <div class="validation-error" id="email-not-valid" v-if="emailNotValid">Must be a valid email address.</div>
+                <div class="validation-error" id="email-not-valid" v-if="emailNotValid">
+                    Must be a valid email address.
+                </div>
             </div>
             <div class="outer-input-container">
                 <div class="input-container">
@@ -56,7 +60,9 @@
                     <span class="floating-label">Password</span>
                 </div>
                 <div class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</div>
-                <div class="validation-error" id="password-too-short" v-if="passwordTooShort">Password must be at least 10 characters.</div>
+                <div class="validation-error" id="password-too-short" v-if="passwordTooShort">
+                    Password must be at least 10 characters.
+                </div>
             </div>
             <div class="outer-input-container" v-if="!isLoggingIn">
                 <div class="input-container">
@@ -73,12 +79,14 @@
                     />
                     <span class="floating-label">Confirm Password</span>
                 </div>
-                <div class="validation-error" id="passwords-not-match" v-if="passwordsNotMatch">Your passwords do not match.</div>
+                <div class="validation-error" id="passwords-not-match" v-if="passwordsNotMatch">
+                    Your passwords do not match.
+                </div>
             </div>
-            <div>
-                <button v-on:click="submit" ref="submit">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
+            <button v-on:click="submit" ref="submit">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
+            <div class="create-link" v-on:click="toggleForm">
+                {{ isLoggingIn ? "Create an Account" : "Back to Log In" }}
             </div>
-            <div class="create-link" v-on:click="toggleForm">{{ isLoggingIn ? "Create an Account" : "Back to Log In" }}</div>
         </div>
         <div id="notification" v-if="accountCreated || accountFailed">
             <div v-if="accountCreated">
