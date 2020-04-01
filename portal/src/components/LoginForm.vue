@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="login-form" v-if="!accountCreated && !accountFailed">
+        <div id="login-form" v-if="!accountCreated && !accountFailed && !showReset">
             <h1>{{ isLoggingIn ? "Log In to Your Account" : "Create an Account" }}</h1>
             <div class="outer-input-container" v-if="!isLoggingIn">
                 <div class="input-container">
@@ -87,7 +87,23 @@
             <div class="create-link" v-on:click="toggleForm">
                 {{ isLoggingIn ? "Create an Account" : "Back to Log In" }}
             </div>
+            <div class="forgot-link" v-if="isLoggingIn" v-on:click="showResetPassword">Forgot your password?</div>
         </div>
+
+        <div id="forgot-link-container" v-if="showReset">
+            <div class="outer-input-container" v-if="!resetSent">
+                <div class="input-container">
+                    <div class="reset-instructions">
+                        Enter your email address below, and password reset instructions will be sent to you.
+                    </div>
+                    <input v-model="resetEmail" type="text" class="inputText" required="" />
+                    <span class="floating-label">Email</span>
+                </div>
+            </div>
+            <button class="save-btn" v-on:click="sendResetEmail" v-if="!resetSent">Submit</button>
+            <div class="reset-sent" v-if="resetSent">Password reset email sent!</div>
+        </div>
+
         <div id="notification" v-if="accountCreated || accountFailed">
             <div v-if="accountCreated">
                 <p class="success">Success! Your account was created.</p>
@@ -127,14 +143,19 @@ export default {
             passwordsNotMatch: false,
             accountCreated: false,
             accountFailed: false,
+            showReset: false,
+            resetSent: false,
+            resetEmail: "",
         };
+    },
+    async beforeCreate() {
+        this.api = new FKApi();
     },
     methods: {
         async login() {
             try {
-                const api = new FKApi();
-                const auth = await api.login(this.email.toLowerCase(), this.password);
-                const isAuthenticated = await api.authenticated();
+                const auth = await this.api.login(this.email.toLowerCase(), this.password);
+                const isAuthenticated = await this.api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
                     this.$router.push({ name: "projects" });
@@ -155,8 +176,8 @@ export default {
                     confirmPassword: this.confirmPassword,
                 };
 
-                const api = new FKApi();
-                api.register(user)
+                this.api
+                    .register(user)
                     .then(() => {
                         this.accountCreated = true;
                     })
@@ -223,6 +244,14 @@ export default {
                 this.register();
             }
         },
+        showResetPassword() {
+            this.showReset = true;
+        },
+        sendResetEmail() {
+            this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
+                this.resetSent = true;
+            });
+        },
     },
 };
 </script>
@@ -230,7 +259,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #login-form,
-#notification {
+#notification,
+#forgot-link-container {
     width: 30%;
     background-color: white;
     display: inline-block;
@@ -304,5 +334,17 @@ li {
 .contact-link {
     cursor: pointer;
     text-decoration: underline;
+}
+.forgot-link {
+    margin: 15px 0 0 0;
+    cursor: pointer;
+}
+.reset-instructions {
+    margin: 15px 0 18px 0;
+}
+.reset-sent {
+    margin: 15px 0 0 0;
+    font-size: 18px;
+    color: #3f8530;
 }
 </style>
