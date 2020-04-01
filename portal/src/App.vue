@@ -43,4 +43,32 @@ a {
     padding-bottom: 40px;
     border-bottom: 2px solid rgb(235, 235, 235);
 }
+input:focus ~ .floating-label,
+input:not(:focus):valid ~ .floating-label {
+    top: -48px;
+    font-size: 12px;
+    opacity: 1;
+}
+input:invalid {
+    box-shadow: none;
+}
+.inputText {
+    color: #2c3e50;
+    font-size: 14px;
+    width: inherit;
+    border: none;
+    border-bottom: 2px solid rgb(235, 235, 235);
+    font-size: 15px;
+    padding-bottom: 4px;
+}
+.inputText:focus {
+    border-bottom: 2px solid #52b5e4;
+}
+.floating-label {
+    color: rgb(85, 85, 85);
+    position: relative;
+    top: -24px;
+    pointer-events: none;
+    transition: 0.2s ease all;
+}
 </style>

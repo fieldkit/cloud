@@ -1,38 +1,99 @@
 <template>
-    <div id="LoginForm">
-        <h1>Log In to Your Account</h1>
-        <input
-            id="email-field"
-            placeholder="Email"
-            keyboardType="email"
-            autocorrect="false"
-            autocapitalizationType="none"
-            v-model="email"
-            @keyup.enter="$refs.password.focus"
-            @blur="checkEmail"
-        />
-        <span class="validation-error" id="no-email" v-if="noEmail">Email is a required field.</span>
-        <span class="validation-error" id="email-not-valid" v-if="emailNotValid"
-            >Must be a valid email address.</span
-        >
-        <br />
-        <br />
-        <input
-            name="password"
-            placeholder="Password"
-            secure="true"
-            ref="password"
-            type="password"
-            v-model="password"
-            @keyup.enter="login"
-            @blur="checkPassword"
-        />
-        <span class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</span>
-        <span class="validation-error" id="password-too-short" v-if="passwordTooShort"
-            >Password must be at least 10 characters.</span
-        >
-        <br />
-        <button v-on:click="login" ref="submit">Log In</button>
+    <div>
+        <div id="login-form" v-if="!accountCreated && !accountFailed">
+            <h1>{{ isLoggingIn ? "Log In to Your Account" : "Create an Account" }}</h1>
+            <div class="outer-input-container" v-if="!isLoggingIn">
+                <div class="input-container">
+                    <input
+                        id="name-field"
+                        keyboardType="name"
+                        autocorrect="false"
+                        autocapitalizationType="none"
+                        class="inputText"
+                        required=""
+                        v-model="name"
+                        @keyup.enter="$refs.email.focus"
+                        @blur="checkName"
+                    />
+                    <span class="floating-label">Name</span>
+                </div>
+                <div class="validation-error" id="no-name" v-if="noName">Name is a required field.</div>
+                <div class="validation-error" id="name-too-long" v-if="nameTooLong">Name must be less than 256 letters.</div>
+                <div class="validation-error" id="name-has-space" v-if="nameHasSpace">Name must not contain spaces.</div>
+            </div>
+            <div class="outer-input-container">
+                <div class="input-container">
+                    <input
+                        id="email-field"
+                        ref="email"
+                        class="inputText"
+                        required=""
+                        keyboardType="email"
+                        autocorrect="false"
+                        autocapitalizationType="none"
+                        v-model="email"
+                        @keyup.enter="$refs.password.focus"
+                        @blur="checkEmail"
+                    />
+                    <span class="floating-label">Email</span>
+                </div>
+                <div class="validation-error" id="no-email" v-if="noEmail">Email is a required field.</div>
+                <div class="validation-error" id="email-not-valid" v-if="emailNotValid">Must be a valid email address.</div>
+            </div>
+            <div class="outer-input-container">
+                <div class="input-container">
+                    <input
+                        name="password"
+                        class="inputText"
+                        required=""
+                        secure="true"
+                        ref="password"
+                        type="password"
+                        v-model="password"
+                        @keyup.enter="isLoggingIn ? submit() : $refs.confirmPassword.focus()"
+                        @blur="checkPassword"
+                    />
+                    <span class="floating-label">Password</span>
+                </div>
+                <div class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</div>
+                <div class="validation-error" id="password-too-short" v-if="passwordTooShort">Password must be at least 10 characters.</div>
+            </div>
+            <div class="outer-input-container" v-if="!isLoggingIn">
+                <div class="input-container">
+                    <input
+                        name="confirmPassword"
+                        class="inputText"
+                        required=""
+                        secure="true"
+                        ref="confirmPassword"
+                        type="password"
+                        v-model="confirmPassword"
+                        @keyup.enter="submit"
+                        @blur="checkConfirmPassword"
+                    />
+                    <span class="floating-label">Confirm Password</span>
+                </div>
+                <div class="validation-error" id="passwords-not-match" v-if="passwordsNotMatch">Your passwords do not match.</div>
+            </div>
+            <div>
+                <button v-on:click="submit" ref="submit">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
+            </div>
+            <div class="create-link" v-on:click="toggleForm">{{ isLoggingIn ? "Create an Account" : "Back to Log In" }}</div>
+        </div>
+        <div id="notification" v-if="accountCreated || accountFailed">
+            <div v-if="accountCreated">
+                <p class="success">Success! Your account was created.</p>
+                <p>Check your email to validate your account.</p>
+            </div>
+            <div v-if="accountFailed">
+                <p class="error">Unfortunately we were unable to create your account.</p>
+                <p>
+                    Please
+                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
+                    if you would like assistance.
+                </p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -45,16 +106,23 @@ export default {
         return {
             email: "",
             password: "",
-            user: {},
+            name: "",
             emailNotValid: false,
             noEmail: false,
             noPassword: false,
-            passwordTooShort: false
+            passwordTooShort: false,
+            isLoggingIn: true,
+            noName: false,
+            nameTooLong: false,
+            nameHasSpace: false,
+            confirmPassword: "",
+            passwordsNotMatch: false,
+            accountCreated: false,
+            accountFailed: false,
         };
     },
     methods: {
-        async login(event) {
-            event.preventDefault();
+        async login() {
             try {
                 const api = new FKApi();
                 const auth = await api.login(this.email.toLowerCase(), this.password);
@@ -63,15 +131,35 @@ export default {
                     this.userToken = auth;
                     this.$router.push({ name: "projects" });
                 } else {
-                    alert(
-                        "Unfortunately we were unable to log you in. Please check your credentials and try again."
-                    );
+                    alert("Unfortunately we were unable to log you in. Please check your credentials and try again.");
                 }
             } catch (error) {
-                alert(
-                    "Unfortunately we were unable to log you in. Please check your credentials and try again."
-                );
+                alert("Unfortunately we were unable to log you in. Please check your credentials and try again.");
             }
+        },
+
+        async register() {
+            if (this.checkConfirmPassword) {
+                const user = {
+                    name: this.name,
+                    email: this.email,
+                    password: this.password,
+                    confirmPassword: this.confirmPassword,
+                };
+
+                const api = new FKApi();
+                api.register(user)
+                    .then(() => {
+                        this.accountCreated = true;
+                    })
+                    .catch(() => {
+                        this.accountFailed = true;
+                    });
+            }
+        },
+
+        toggleForm() {
+            this.isLoggingIn = !this.isLoggingIn;
         },
 
         checkEmail() {
@@ -96,18 +184,57 @@ export default {
                 return;
             }
             this.passwordTooShort = this.password.length < 10;
-        }
-    }
+        },
+
+        checkConfirmPassword() {
+            this.passwordsNotMatch = this.password != this.confirmPassword;
+            return this.passwordsNotMatch;
+        },
+
+        checkName() {
+            this.noName = !this.name || this.name.length == 0;
+            if (this.noName) {
+                return;
+            }
+            let matches = this.name.match(/\s/g);
+            this.nameHasSpace = matches && matches.length > 0;
+            this.nameTooLong = this.name.length > 255;
+        },
+
+        submit(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            if (!this.email || !this.password) {
+                this.alert("Please provide both an email address and password.");
+                return;
+            }
+            if (this.isLoggingIn) {
+                this.login();
+            } else {
+                this.register();
+            }
+        },
+    },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#login-form,
+#notification {
+    width: 30%;
+    background-color: white;
+    display: inline-block;
+    text-align: center;
+    padding-bottom: 60px;
+    padding-top: 20px;
+}
 h1 {
     font-weight: lighter;
 }
 button {
-    margin-top: 50px;
+    margin-top: 20px;
     width: 70%;
     height: 50px;
     background-color: #ce596b;
@@ -116,12 +243,24 @@ button {
     font-size: 18px;
     border-radius: 5px;
 }
+.outer-input-container {
+    height: 65px;
+    width: 70%;
+    margin: auto;
+}
+.input-container {
+    float: left;
+    margin: 5px 0 0 0;
+    width: 100%;
+    text-align: left;
+}
 input {
     border: 0;
     border-bottom: 1px solid gray;
     outline: 0;
-    height: 30px;
-    width: 70%;
+    font-size: 18px;
+}
+.floating-label {
     font-size: 18px;
 }
 ul {
@@ -132,16 +271,30 @@ li {
     display: inline-block;
     margin: 0 10px;
 }
-div {
-    width: 30%;
-    background-color: white;
-    display: inline-block;
-    text-align: center;
-    padding-bottom: 60px;
-    padding-top: 20px;
-}
 .validation-error {
+    float: left;
     color: #c42c44;
     display: block;
+    font-size: 14px;
+    margin: -20px 0 0 0;
+}
+.create-link {
+    cursor: pointer;
+    margin: 40px 0 0 0;
+}
+.success {
+    margin: 15px 0 0 0;
+    font-size: 18px;
+    color: #3f8530;
+}
+.error {
+    margin: 15px 0 0 0;
+    font-size: 18px;
+    color: #c42c44;
+    padding: 10px;
+}
+.contact-link {
+    cursor: pointer;
+    text-decoration: underline;
 }
 </style>

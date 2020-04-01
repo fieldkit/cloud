@@ -42,6 +42,14 @@ class FKApi {
         }
     }
 
+    register(user) {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/users",
+            data: user,
+        }).then(this._handleResponse.bind(this));
+    }
+
     updatePassword(data) {
         const token = this.token.getToken();
         return axios({
