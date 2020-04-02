@@ -136,9 +136,7 @@ export default {
             this.$refs.d3LineChart.dataChanged();
             this.$refs.d3HistoChart.dataChanged();
             this.$refs.d3RangeChart.dataChanged();
-
-            // update the scrubber position
-            this.scrubberUI.call(this.scrubberFn.move, [this.requestedStart, this.requestedEnd].map(this.scrubberX));
+            this.updateScrubber();
         },
         updateChartType() {
             this.$refs.d3LineChart.setStatus(false);
@@ -219,7 +217,7 @@ export default {
             this.scrubberSVG
                 .append("path")
                 .data([this.scrubberData])
-                .attr("class", "area")
+                .attr("class", "background-area")
                 .attr("fill", "rgb(220, 222, 223)")
                 .attr("d", this.area);
             // add the clip-path
@@ -236,9 +234,8 @@ export default {
             this.scrubberSVG
                 .append("path")
                 .data([this.scrubberData])
-                .attr("id", "selected-scrubber")
+                .attr("class", "selected-scrubber")
                 .attr("clip-path", "url(#scrubber-clip" + this.chart.id + ")")
-                .attr("class", "area")
                 .attr("fill", "rgb(45, 158, 204)")
                 .attr("d", this.area);
             // add the brushing
@@ -309,6 +306,35 @@ export default {
             if (d3.event.type == "end" && d3.event.sourceEvent) {
                 this.onTimeZoom({ start: start, end: end });
             }
+        },
+        updateScrubber() {
+            let d3Chart = this;
+            this.scrubberData = this.summary.filter(d => {
+                return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
+            });
+            this.scrubberExtent = d3.extent(this.scrubberData, d => {
+                return d[d3Chart.chart.sensor.key];
+            });
+            this.scrubberY = d3
+                .scaleLinear()
+                .domain(this.scrubberExtent)
+                .range([this.scrubberHeight - (this.layout.marginBottom + this.layout.marginTop), this.layout.marginTop]);
+
+            // update the gray background
+            this.scrubberSVG
+                .selectAll(".background-area")
+                .data([this.scrubberData])
+                .transition()
+                .attr("d", this.area);
+            // updated the clipped selected area
+            this.scrubberSVG
+                .selectAll(".selected-scrubber")
+                .data([this.scrubberData])
+                .transition()
+                .attr("d", this.area);
+
+            // update the scrubber position
+            this.scrubberUI.call(this.scrubberFn.move, [this.requestedStart, this.requestedEnd].map(this.scrubberX));
         },
     },
 };
