@@ -71,7 +71,7 @@
                     :ref="chart.ref"
                     :chartParam="chart"
                     :station="station"
-                    :stationSummary="stationSummary"
+                    :summary="stationSummary"
                     @timeZoomed="onTimeZoomed"
                     @unlinkCharts="unlinkCharts"
                     @zoomOut="setTimeRangeByDays"
