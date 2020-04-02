@@ -18,17 +18,10 @@
                         <div v-for="project in projects" v-bind:key="project.id" class="project-container">
                             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                                 <div v-if="project.media_url" class="custom-project-image-container">
-                                    <img
-                                        alt="Fieldkit Project"
-                                        :src="getImageUrl(project)"
-                                        class="custom-project-image"
-                                    />
+                                    <img alt="Fieldkit Project" :src="getImageUrl(project)" class="custom-project-image" />
                                 </div>
                                 <div v-else>
-                                    <img
-                                        alt="Default Fieldkit Project"
-                                        src="../assets/fieldkit_project.png"
-                                    />
+                                    <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
                                 </div>
                                 <div class="project-name">{{ project.name }}</div>
                                 <div class="project-description">{{ project.description }}</div>
@@ -41,11 +34,7 @@
                 </div>
                 <!-- add or update a project -->
                 <div v-show="addingOrUpdating">
-                    <ProjectForm
-                        :project="activeProject"
-                        @closeProjectForm="closeProjectForm"
-                        @updating="onProjectUpdate"
-                    />
+                    <ProjectForm :project="activeProject" @closeProjectForm="closeProjectForm" @updating="onProjectUpdate" />
                 </div>
                 <!-- display one project -->
                 <ProjectSummary
@@ -84,7 +73,7 @@ export default {
         HeaderBar,
         ProjectForm,
         ProjectSummary,
-        SidebarNav
+        SidebarNav,
     },
     props: ["id"],
     watch: {
@@ -104,7 +93,7 @@ export default {
             } else {
                 this.viewAllProjects();
             }
-        }
+        },
     },
     data: () => {
         return {
@@ -119,7 +108,7 @@ export default {
             viewingAll: false,
             addingOrUpdating: false,
             failedAuth: false,
-            loading: true
+            loading: true,
         };
     },
     async beforeCreate() {
@@ -231,8 +220,8 @@ export default {
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
-        }
-    }
+        },
+    },
 };
 </script>
 
