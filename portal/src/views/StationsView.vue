@@ -8,11 +8,11 @@
                 :map-options="{
                     style: 'mapbox://styles/mapbox/light-v10',
                     center: coordinates,
-                    zoom: 14
+                    zoom: 14,
                 }"
                 :nav-control="{
                     show: true,
-                    position: 'bottom-left'
+                    position: 'bottom-left',
                 }"
                 @map-init="mapInitialized"
             />
@@ -39,7 +39,7 @@ export default {
         Mapbox,
         HeaderBar,
         SidebarNav,
-        StationSummary
+        StationSummary,
     },
     props: ["id"],
     data: () => {
@@ -47,12 +47,12 @@ export default {
             user: {},
             projects: [],
             stations: {
-                stations: []
+                stations: [],
             },
             activeStation: null,
             isAuthenticated: false,
             coordinates: [-96, 37.8],
-            mapboxToken: MAPBOX_ACCESS_TOKEN
+            mapboxToken: MAPBOX_ACCESS_TOKEN,
         };
     },
     watch: {
@@ -131,10 +131,7 @@ export default {
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
                 return (
-                    s.status_json.latitude &&
-                    s.status_json.longitude &&
-                    s.status_json.latitude != 1000 &&
-                    s.status_json.longitude != 1000
+                    s.status_json.latitude && s.status_json.longitude && s.status_json.latitude != 1000 && s.status_json.longitude != 1000
                 );
             });
             mappable.forEach(s => {
@@ -142,7 +139,7 @@ export default {
                 if (mappable.length == 1) {
                     this.map.setCenter({
                         lat: coordinates[0],
-                        lng: coordinates[1]
+                        lng: coordinates[1],
                     });
                 } else {
                     if (s.status_json.latitude > latMax) {
@@ -162,12 +159,12 @@ export default {
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [coordinates[1], coordinates[0]]
+                        coordinates: [coordinates[1], coordinates[0]],
                     },
                     properties: {
                         title: s.name,
-                        icon: "marker"
-                    }
+                        icon: "marker",
+                    },
                 });
             });
             // sort by latitude
@@ -204,8 +201,8 @@ export default {
                     type: "geojson",
                     data: {
                         type: "FeatureCollection",
-                        features: stationFeatures
-                    }
+                        features: stationFeatures,
+                    },
                 },
                 layout: {
                     "icon-image": "{icon}-15",
@@ -213,8 +210,8 @@ export default {
                     "text-field": "{title}",
                     "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                     "text-offset": [0, 0.75],
-                    "text-anchor": "top"
-                }
+                    "text-anchor": "top",
+                },
                 // paint: {
                 //     "text-color": "#0000ff"
                 // }
@@ -224,12 +221,12 @@ export default {
                 let bounds = [
                     {
                         lat: latMin,
-                        lng: longMin
+                        lng: longMin,
                     },
                     {
                         lat: latMax,
-                        lng: longMax
-                    }
+                        lng: longMax,
+                    },
                 ];
                 this.map.fitBounds(bounds, { duration: 0 });
                 // fitBounds is cropped too close: zoom out
@@ -261,8 +258,8 @@ export default {
             if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
                 this.$router.push({ name: "viewStation", params: { id: station.id } });
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

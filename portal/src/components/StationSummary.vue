@@ -17,12 +17,7 @@
         </div>
         <div class="station-container" v-if="station">
             <div class="left">
-                <img
-                    style="width: 124px; height: 100px;"
-                    alt="Station image"
-                    :src="stationSmallPhoto"
-                    class="station-element"
-                />
+                <img style="width: 124px; height: 100px;" alt="Station image" :src="stationSmallPhoto" class="station-element" />
             </div>
             <div class="left">
                 <div id="station-name" class="station-element">{{ station.name }}</div>
@@ -84,14 +79,14 @@ export default {
     name: "StationSummary",
     data: () => {
         return {
-            viewingSummary: false
+            viewingSummary: false,
         };
     },
     props: ["station", "isAuthenticated"],
     computed: {
         stationSmallPhoto: function() {
             return API_HOST + this.station.photos.small;
-        }
+        },
     },
     methods: {
         viewSummary() {
@@ -160,8 +155,8 @@ export default {
             if (this.$route.name != "stations") {
                 this.$router.push({ name: "stations" });
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
