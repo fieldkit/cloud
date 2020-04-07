@@ -1,6 +1,6 @@
 <template>
     <div id="station-summary-container" v-if="viewingSummary">
-        <div v-if="this.station" id="close-form-btn" v-on:click="closeSummary">
+        <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
         <div v-if="!isAuthenticated" class="no-stations-message">
@@ -12,10 +12,10 @@
                 to view stations.
             </p>
         </div>
-        <div v-if="isAuthenticated && !this.station" class="no-stations-message">
+        <div v-if="isAuthenticated && !station" class="no-stations-message">
             <p>No stations added yet.</p>
         </div>
-        <div class="station-container" v-if="this.station">
+        <div class="station-container" v-if="station">
             <div class="left">
                 <img
                     style="width: 124px; height: 100px;"
@@ -25,15 +25,15 @@
                 />
             </div>
             <div class="left">
-                <div id="station-name" class="station-element">{{ this.station.name }}</div>
+                <div id="station-name" class="station-element">{{ station.name }}</div>
                 <div class="station-element">Last Synced {{ getSyncedDate() }}</div>
                 <div class="station-element">
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
-                    <span>{{ this.station.status_json.batteryLevel }}%</span>
+                    <span>{{ station.status_json.batteryLevel }}%</span>
                 </div>
                 <div>
                     <img
-                        v-for="module in this.station.status_json.moduleObjects"
+                        v-for="module in station.status_json.moduleObjects"
                         v-bind:key="module.id"
                         alt="Module icon"
                         class="small-space"
@@ -45,12 +45,12 @@
             <div id="location-container" class="section">
                 <div>{{ this.station.status_json.locationName }}</div>
                 <div class="left">
-                    {{ this.getLat() || "--" }}
+                    {{ getLat() || "--" }}
                     <br />
                     Latitude
                 </div>
                 <div class="right">
-                    {{ this.getLong() || "--" }}
+                    {{ getLong() || "--" }}
                     <br />
                     Longitude
                 </div>
@@ -58,7 +58,7 @@
             <div class="spacer"></div>
             <div id="readings-container" class="section">
                 <div id="readings-label">Latest Reading</div>
-                <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
+                <div v-for="module in station.status_json.moduleObjects" v-bind:key="module.id">
                     <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
                         <div class="left">{{ sensor.name }}</div>
                         <div class="right">

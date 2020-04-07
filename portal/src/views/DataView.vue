@@ -12,9 +12,9 @@
                 </router-link>
                 <div>
                     <div id="station-name">
-                        {{ this.station ? this.station.name : "" }}
+                        {{ station ? station.name : "" }}
                     </div>
-                    <div class="small-label">{{ this.station ? getSyncedDate() : "" }}</div>
+                    <div class="small-label">{{ station ? getSyncedDate() : "" }}</div>
                     <div class="block-label">Data visualization</div>
                 </div>
                 <DataChartControl
