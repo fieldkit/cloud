@@ -500,7 +500,9 @@ export default {
             this.updateRoute();
         },
         showLoading(chartId) {
-            document.getElementById("main-loading").style.display = "block";
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "block";
+            }
             if (chartId) {
                 document.getElementById(chartId + "-loading").style.display = "block";
             } else {
