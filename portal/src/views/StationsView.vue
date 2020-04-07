@@ -6,7 +6,7 @@
             <mapbox
                 :access-token="mapboxToken"
                 :map-options="{
-                    style: 'mapbox://styles/mapbox/light-v10',
+                    style: 'mapbox://styles/mapbox/outdoors-v11',
                     center: coordinates,
                     zoom: 14,
                 }"
