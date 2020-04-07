@@ -4,6 +4,7 @@
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
+                class="stations-map"
                 :access-token="mapboxToken"
                 :map-options="{
                     style: 'mapbox://styles/mapbox/outdoors-v11',

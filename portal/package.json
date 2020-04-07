@@ -6,6 +6,7 @@
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
+        "test:unit": "vue-cli-service test:unit",
         "build-webpack": "webpack --config build/webpack.dev.js"
     },
     "dependencies": {
@@ -21,8 +22,10 @@
     "devDependencies": {
         "@vue/cli-plugin-babel": "^3.10.0",
         "@vue/cli-plugin-eslint": "^3.10.0",
+        "@vue/cli-plugin-unit-jest": "^4.3.0",
         "@vue/cli-service": "^3.10.0",
         "@vue/eslint-config-prettier": "^5.0.0",
+        "@vue/test-utils": "1.0.0-beta.31",
         "babel-eslint": "^10.0.1",
         "css-loader": "^3.2.0",
         "eslint": "^5.16.0",
