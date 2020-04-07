@@ -38,13 +38,24 @@
             </div>
             <div class="spacer"></div>
             <div id="location-container" class="section">
-                <div>{{ this.station.status_json.locationName }}</div>
+                <div class="location-item" v-if="placeName">
+                    <img alt="location-icon" src="../assets/icon-location.png" />
+                    {{ station.status_json.locationName ? station.status_json.locationName : placeName }}
+                </div>
+                <div class="location-item" v-if="nativeLand.length > 0">
+                    <img alt="location-icon" src="../assets/icon-location.png" />
+                    Native Land:
+                    <span v-for="(n, i) in nativeLand" v-bind:key="n.url" class="note-container">
+                        <a :href="n.url" class="native-land-link" target="_blank">{{ n.name }}</a>
+                        <span>{{ i == nativeLand.length - 1 ? "" : ", " }}</span>
+                    </span>
+                </div>
                 <div class="left">
                     {{ getLat() || "--" }}
                     <br />
                     Latitude
                 </div>
-                <div class="right">
+                <div class="left">
                     {{ getLong() || "--" }}
                     <br />
                     Longitude
@@ -82,7 +93,7 @@ export default {
             viewingSummary: false,
         };
     },
-    props: ["station", "isAuthenticated"],
+    props: ["station", "isAuthenticated", "placeName", "nativeLand"],
     computed: {
         stationSmallPhoto: function() {
             return API_HOST + this.station.photos.small;
@@ -196,6 +207,18 @@ export default {
     border-bottom: 1px solid rgb(215, 220, 225);
     height: 1px;
 }
+.location-item {
+    margin: 10px;
+    width: 100%;
+}
+.location-item img {
+    float: left;
+    margin: 2px 5px 0 0;
+}
+.native-land-link {
+    font-weight: bold;
+    text-decoration: underline;
+}
 .left {
     float: left;
 }
@@ -214,9 +237,6 @@ export default {
 }
 .small-space {
     margin: 3px;
-}
-#location-container {
-    width: 50%;
 }
 #location-container .left {
     margin-left: 10px;

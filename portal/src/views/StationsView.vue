@@ -19,6 +19,8 @@
             <StationSummary
                 :isAuthenticated="isAuthenticated"
                 :station="activeStation"
+                :placeName="placeName"
+                :nativeLand="nativeLand"
                 ref="stationSummary"
             />
         </div>
@@ -26,6 +28,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import FKApi from "../api/api";
 import Mapbox from "mapbox-gl-vue";
 import { MAPBOX_ACCESS_TOKEN } from "../secrets";
@@ -50,6 +53,8 @@ export default {
                 stations: [],
             },
             activeStation: null,
+            placeName: "",
+            nativeLand: [],
             isAuthenticated: false,
             coordinates: [-96, 37.8],
             mapboxToken: MAPBOX_ACCESS_TOKEN,
@@ -60,15 +65,16 @@ export default {
             if (to.name == "stations") {
                 this.$refs.stationSummary.closeSummary();
             }
-        }
+        },
     },
     async beforeCreate() {
-        const api = new FKApi();
-        api.getCurrentUser()
+        this.api = new FKApi();
+        this.api
+            .getCurrentUser()
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                api.getStations().then(stations => {
+                this.api.getStations().then(stations => {
                     this.stations = stations && stations.stations ? stations.stations : [];
                     if (this.map) {
                         this.initStations();
@@ -79,11 +85,10 @@ export default {
                         let station = this.stations.find(s => {
                             return s.id == this.id;
                         });
-                        this.activeStation = station;
-                        this.$refs.stationSummary.viewSummary();
+                        this.showSummary(station, true);
                     }
                 });
-                api.getProjects().then(projects => {
+                this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
@@ -242,16 +247,35 @@ export default {
                 const station = stationsView.stations.find(s => {
                     return s.name == name;
                 });
-                stationsView.activeStation = station;
-                stationsView.$refs.stationSummary.viewSummary();
-                stationsView.updateStationRoute(station);
+                stationsView.showSummary(station);
             });
         },
 
-        showSummary(station) {
+        getPlaceName() {
+            const longLatMapbox = this.activeStation.status_json.longitude + "," + this.activeStation.status_json.latitude;
+            return this.api.getPlaceName(longLatMapbox).then(result => {
+                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
+            });
+        },
+
+        getNativeLand() {
+            const latLongNative = this.activeStation.status_json.latitude + "," + this.activeStation.status_json.longitude;
+            return this.api.getNativeLand(latLongNative);
+        },
+
+        showSummary(station, preserveRoute) {
             this.activeStation = station;
-            this.$refs.stationSummary.viewSummary();
-            this.updateStationRoute(station);
+            this.getPlaceName()
+                .then(this.getNativeLand)
+                .then(result => {
+                    this.nativeLand = _.map(_.flatten(_.map(result, "properties")), r => {
+                        return { name: r.Name, url: r.description };
+                    });
+                    this.$refs.stationSummary.viewSummary();
+                    if (!preserveRoute) {
+                        this.updateStationRoute(station);
+                    }
+                });
         },
 
         updateStationRoute(station) {
