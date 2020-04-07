@@ -1,9 +1,9 @@
 <template>
     <div id="data-chart-container">
-        <div v-if="this.noStation" class="no-data-message">
+        <div v-if="this.noStation" class="size-20">
             <p>No station found.</p>
         </div>
-        <div v-if="this.station && this.foundNoData" class="no-data-message">
+        <div v-if="this.station && this.foundNoData" class="size-20">
             <p>No data from {{ station.name }} has been uploaded yet.</p>
         </div>
 
@@ -13,7 +13,7 @@
 
         <div class="white-bkgd" v-if="this.station">
             <!-- compare and time window buttons -->
-            <div id="chart-controls">
+            <div id="chart-controls" v-if="!this.foundNoData">
                 <div id="control-btn-container">
                     <div class="control-btn" v-on:click="addChildChart">
                         <img alt="" src="../assets/Compare_icon.png" />
@@ -149,11 +149,11 @@ export default {
                 this.stationSensors = this.combinedStationInfo.sensors;
                 if (this.stationSummary.length > 0) {
                     this.initCharts();
-                } else {
-                    this.foundNoData = true;
-                    this.hideLoading();
+                    return;
                 }
             }
+            this.foundNoData = true;
+            this.hideLoading();
         },
     },
     mounted() {
@@ -500,6 +500,7 @@ export default {
             this.updateRoute();
         },
         showLoading(chartId) {
+            document.getElementById("main-loading").style.display = "block";
             if (chartId) {
                 document.getElementById(chartId + "-loading").style.display = "block";
             } else {
@@ -510,6 +511,7 @@ export default {
             }
         },
         hideLoading() {
+            document.getElementById("main-loading").style.display = "none";
             const loadings = document.getElementsByClassName("loading");
             for (let i = 0; i < loadings.length; i++) {
                 loadings[i].style.display = "none";
@@ -656,7 +658,7 @@ export default {
     float: left;
     margin-right: 20px;
 }
-.no-data-message {
+.size-20 {
     font-size: 20px;
 }
 .synced {

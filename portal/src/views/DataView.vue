@@ -215,9 +215,13 @@ export default {
         },
 
         initiateDataRetrieval() {
-            this.fetchSummary().then(result => {
-                this.handleInitialDataSummary(result);
-            });
+            this.fetchSummary()
+                .then(result => {
+                    this.handleInitialDataSummary(result);
+                })
+                .catch(e => {
+                    this.combinedStationInfo = [];
+                });
         },
 
         handleInitialDataSummary(result) {
