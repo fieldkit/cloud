@@ -120,7 +120,7 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         updateHistogram(bins) {
             let d3Chart = this;
@@ -176,8 +176,14 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(this.yAxis);
-        }
-    }
+        },
+        hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
+        },
+    },
 };
 </script>
 

@@ -157,7 +157,7 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         createBlankPoints() {
             if (this.chartData.length > 1) {
@@ -265,7 +265,7 @@ export default {
                 .duration(1000)
                 .call(d3.axisLeft(this.y));
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         createGradient() {
             // Add the gradient area
@@ -310,6 +310,12 @@ export default {
                 .attr("stop-color", d => {
                     return d.color;
                 });
+        },
+        hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
         },
     },
 };

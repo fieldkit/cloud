@@ -132,7 +132,7 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         updateRange(bins) {
             let d3Chart = this;
@@ -262,8 +262,14 @@ export default {
                     )
                     .style("stop-opacity", 1);
             });
-        }
-    }
+        },
+        hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
+        },
+    },
 };
 </script>
 

@@ -513,7 +513,9 @@ export default {
             }
         },
         hideLoading() {
-            document.getElementById("main-loading").style.display = "none";
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
             const loadings = document.getElementsByClassName("loading");
             for (let i = 0; i < loadings.length; i++) {
                 loadings[i].style.display = "none";
