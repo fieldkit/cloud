@@ -110,4 +110,103 @@ describe("DataChartControl.vue", () => {
         expect(wrapper.vm.$route.query["chart-1sensor"]).toBe(sensorsFixture[0].key);
         wrapper.destroy();
     });
+
+    it("Adds a chart when the user clicks Compare", async () => {
+        const range = [new Date("1/2/20"), new Date("2/13/20")];
+        const wrapper = mount(DataChartControl, {
+            mocks: {
+                $route,
+                $router,
+            },
+            propsData: {
+                station: { name: "FieldKit 1" },
+                totalTime: range,
+                labels: labelsFixture,
+            },
+        });
+        wrapper.setProps({
+            combinedStationInfo: { stationData: stationSummaryFixture, sensors: sensorsFixture },
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll(".d3Chart").length).toEqual(1);
+        wrapper.find(".compare-btn").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll(".d3Chart").length).toEqual(2);
+        wrapper.destroy();
+    });
+
+    it("Updates the URL when user adds a chart", async () => {
+        const range = [new Date("1/2/20"), new Date("2/13/20")];
+        const router = new VueRouter({ routes, mode: "abstract" });
+        const wrapper = mount(DataChartControl, {
+            localVue,
+            router,
+            propsData: {
+                station: { name: "FieldKit 1" },
+                totalTime: range,
+                labels: labelsFixture,
+            },
+        });
+        expect(wrapper.vm.$route.query.numCharts).toBeUndefined();
+        wrapper.setProps({
+            combinedStationInfo: { stationData: stationSummaryFixture, sensors: sensorsFixture },
+        });
+        await wrapper.vm.$nextTick();
+        wrapper.find(".compare-btn").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.query.numCharts).toEqual(2);
+        wrapper.destroy();
+    });
+
+    it("Removes a chart when the user clicks remove button", async () => {
+        const range = [new Date("1/2/20"), new Date("2/13/20")];
+        const wrapper = mount(DataChartControl, {
+            mocks: {
+                $route,
+                $router,
+            },
+            propsData: {
+                station: { name: "FieldKit 1" },
+                totalTime: range,
+                labels: labelsFixture,
+            },
+        });
+        wrapper.setProps({
+            combinedStationInfo: { stationData: stationSummaryFixture, sensors: sensorsFixture },
+        });
+        await wrapper.vm.$nextTick();
+        wrapper.find(".compare-btn").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll(".d3Chart").length).toEqual(2);
+        wrapper.find(".remove-chart > img").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll(".d3Chart").length).toEqual(1);
+        wrapper.destroy();
+    });
+
+    it("Updates the URL when user removes a chart", async () => {
+        const range = [new Date("1/2/20"), new Date("2/13/20")];
+        const router = new VueRouter({ routes, mode: "abstract" });
+        const wrapper = mount(DataChartControl, {
+            localVue,
+            router,
+            propsData: {
+                station: { name: "FieldKit 1" },
+                totalTime: range,
+                labels: labelsFixture,
+            },
+        });
+        wrapper.setProps({
+            combinedStationInfo: { stationData: stationSummaryFixture, sensors: sensorsFixture },
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.query.numCharts).toBeUndefined();
+        wrapper.find(".compare-btn").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.query.numCharts).toEqual(2);
+        wrapper.find(".remove-chart > img").trigger("click");
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$route.query.numCharts).toEqual(1);
+        wrapper.destroy();
+    });
 });

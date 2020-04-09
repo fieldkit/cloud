@@ -14,8 +14,8 @@
         <div class="white-bkgd" v-if="this.station">
             <!-- compare and time window buttons -->
             <div id="chart-controls" v-if="!this.foundNoData">
-                <div id="control-btn-container">
-                    <div class="control-btn" v-on:click="addChildChart">
+                <div id="compare-btn-container">
+                    <div class="compare-btn" v-on:click="addChildChart">
                         <img alt="" src="../assets/Compare_icon.png" />
                         <span>Compare</span>
                     </div>
@@ -68,6 +68,7 @@
                     </div>
                 </div>
                 <D3Chart
+                    class="d3Chart"
                     :ref="chart.ref"
                     :chartParam="chart"
                     :station="station"
@@ -301,7 +302,9 @@ export default {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
                     this.$emit("chartTimeChanged", { start: start, end: end }, chartId);
-                    document.getElementById("main-loading").style.display = "none";
+                    if (document.getElementById("main-loading")) {
+                        document.getElementById("main-loading").style.display = "none";
+                    }
                 }
             }
             return { addChart: addChart, range: [start, end] };
@@ -682,14 +685,14 @@ export default {
     float: left;
     clear: both;
 }
-#control-btn-container {
+#compare-btn-container {
     float: left;
 }
 #time-control-container {
     float: right;
     margin-right: 10px;
 }
-.control-btn {
+.compare-btn {
     font-size: 12px;
     float: left;
     padding: 5px 10px;
@@ -699,7 +702,7 @@ export default {
     border-radius: 4px;
     cursor: pointer;
 }
-.control-btn img {
+.compare-btn img {
     vertical-align: middle;
     margin-right: 10px;
 }
