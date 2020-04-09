@@ -205,7 +205,9 @@ export default {
                 extent: extent,
             };
             if (timeCheck.addChart) {
-                document.getElementById("main-loading").style.display = "none";
+                if (document.getElementById("main-loading")) {
+                    document.getElementById("main-loading").style.display = "none";
+                }
                 this.charts.push(newChart);
             } else {
                 this.pending.push(newChart);

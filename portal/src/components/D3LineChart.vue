@@ -315,7 +315,9 @@ export default {
             if (document.getElementById("main-loading")) {
                 document.getElementById("main-loading").style.display = "none";
             }
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            if (document.getElementById(this.chart.id + "-loading")) {
+                document.getElementById(this.chart.id + "-loading").style.display = "none";
+            }
         },
     },
 };
