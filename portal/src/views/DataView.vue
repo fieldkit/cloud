@@ -219,7 +219,7 @@ export default {
                 .then(result => {
                     this.handleInitialDataSummary(result);
                 })
-                .catch(e => {
+                .catch(() => {
                     this.combinedStationInfo = [];
                 });
         },
