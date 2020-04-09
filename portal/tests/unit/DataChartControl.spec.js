@@ -23,6 +23,7 @@ const $router = {
     push: jest.fn(),
 };
 
+const range = [new Date("1/2/20"), new Date("2/13/20")];
 const DAY = 1000 * 60 * 60 * 24;
 
 beforeEach(() => {
@@ -45,7 +46,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Requests one day of data when user selects day", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         // new start is one day before the end date:
         const newStart = new Date(range[1].getTime() - DAY);
         const wrapper = mount(DataChartControl, {
@@ -67,7 +67,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Updates the URL when user selects day", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         // new start is one day before the end date:
         const newStart = new Date(range[1].getTime() - DAY);
         const router = new VueRouter({ routes, mode: "abstract" });
@@ -88,7 +87,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Updates the URL when user selects sensor", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         const router = new VueRouter({ routes, mode: "abstract" });
         const wrapper = mount(DataChartControl, {
             localVue,
@@ -112,7 +110,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Adds a chart when the user clicks Compare", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         const wrapper = mount(DataChartControl, {
             mocks: {
                 $route,
@@ -136,7 +133,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Updates the URL when user adds a chart", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         const router = new VueRouter({ routes, mode: "abstract" });
         const wrapper = mount(DataChartControl, {
             localVue,
@@ -159,7 +155,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Removes a chart when the user clicks remove button", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         const wrapper = mount(DataChartControl, {
             mocks: {
                 $route,
@@ -185,7 +180,6 @@ describe("DataChartControl.vue", () => {
     });
 
     it("Updates the URL when user removes a chart", async () => {
-        const range = [new Date("1/2/20"), new Date("2/13/20")];
         const router = new VueRouter({ routes, mode: "abstract" });
         const wrapper = mount(DataChartControl, {
             localVue,
@@ -208,5 +202,27 @@ describe("DataChartControl.vue", () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.$route.query.numCharts).toEqual(1);
         wrapper.destroy();
+    });
+
+    it("Starts with the correct number of charts based on the URL", async () => {
+        const $route = {
+            query: { numCharts: 2 },
+        };
+        const wrapper = mount(DataChartControl, {
+            mocks: {
+                $route,
+                $router,
+            },
+            propsData: {
+                station: { name: "FieldKit 1" },
+                totalTime: range,
+                labels: labelsFixture,
+            },
+        });
+        wrapper.setProps({
+            combinedStationInfo: { stationData: stationSummaryFixture, sensors: sensorsFixture },
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll(".d3Chart").length).toEqual($route.query.numCharts);
     });
 });
