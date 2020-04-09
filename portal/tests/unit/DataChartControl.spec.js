@@ -15,9 +15,6 @@ const routes = [
         component: DataChartControl,
     },
 ];
-const router = new VueRouter({
-    routes,
-});
 // and some tests use custom mocks for $route and $router
 const $route = {
     query: {},
@@ -28,15 +25,13 @@ const $router = {
 
 const DAY = 1000 * 60 * 60 * 24;
 
-let wrapper = null;
-
-afterEach(() => {
-    wrapper.destroy();
+beforeEach(() => {
+    jest.resetAllMocks();
 });
 
 describe("DataChartControl.vue", () => {
     it("Renders chart container if a station exists", async () => {
-        wrapper = mount(DataChartControl, {
+        const wrapper = mount(DataChartControl, {
             mocks: {
                 $route,
             },
@@ -46,13 +41,14 @@ describe("DataChartControl.vue", () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find("#data-chart-container").isVisible()).toBe(true);
+        wrapper.destroy();
     });
 
     it("Requests one day of data when user selects day", async () => {
         const range = [new Date("1/2/20"), new Date("2/13/20")];
         // new start is one day before the end date:
         const newStart = new Date(range[1].getTime() - DAY);
-        wrapper = mount(DataChartControl, {
+        const wrapper = mount(DataChartControl, {
             mocks: {
                 $route,
                 $router,
@@ -67,12 +63,14 @@ describe("DataChartControl.vue", () => {
         await wrapper.vm.$nextTick();
         // this emitted event triggers an api query for the specified range
         expect(wrapper.emitted().timeChanged[0][0].start).toEqual(newStart);
+        wrapper.destroy();
     });
 
     it("Updates the URL when user selects day", async () => {
         const range = [new Date("1/2/20"), new Date("2/13/20")];
         // new start is one day before the end date:
         const newStart = new Date(range[1].getTime() - DAY);
+        const router = new VueRouter({ routes, mode: "abstract" });
         const wrapper = mount(DataChartControl, {
             localVue,
             router,
@@ -86,11 +84,13 @@ describe("DataChartControl.vue", () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.$route.query.start).toBe(newStart.getTime());
         expect(wrapper.vm.$route.query.end).toBe(range[1].getTime());
+        wrapper.destroy();
     });
 
     it("Updates the URL when user selects sensor", async () => {
         const range = [new Date("1/2/20"), new Date("2/13/20")];
-        wrapper = mount(DataChartControl, {
+        const router = new VueRouter({ routes, mode: "abstract" });
+        const wrapper = mount(DataChartControl, {
             localVue,
             router,
             propsData: {
@@ -108,5 +108,6 @@ describe("DataChartControl.vue", () => {
         wrapper.find(".sensor-selection-dropdown > select").trigger("change");
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.$route.query["chart-1sensor"]).toBe(sensorsFixture[0].key);
+        wrapper.destroy();
     });
 });
