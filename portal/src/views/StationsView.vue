@@ -1,6 +1,12 @@
 <template>
     <div>
-        <SidebarNav viewing="stations" :stations="stations" :projects="projects" @showStation="showSummary" />
+        <SidebarNav
+            viewing="stations"
+            :isAuthenticated="isAuthenticated"
+            :stations="stations"
+            :projects="projects"
+            @showStation="showSummary"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
@@ -24,7 +30,7 @@
                 :nativeLand="nativeLand"
                 ref="stationSummary"
             />
-            <div v-show="isAuthenticated && showNotice" id="no-stations">
+            <div v-if="isAuthenticated && showNotice" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
                     <img alt="Close" src="../assets/close.png" />
                 </div>
@@ -39,6 +45,15 @@
                 <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
                     <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
                 </a>
+            </div>
+            <div v-if="!isAuthenticated" id="no-auth">
+                <p>
+                    Please
+                    <router-link :to="{ name: 'login' }" class="show-link">
+                        log in
+                    </router-link>
+                    to view stations.
+                </p>
             </div>
         </div>
     </div>
@@ -317,6 +332,18 @@ export default {
     width: 100%;
     height: 100vh;
 }
+#no-auth {
+    font-size: 20px;
+    background-color: #ffffff;
+    width: 400px;
+    position: absolute;
+    top: 40px;
+    left: 260px;
+    padding: 0 15px 15px 15px;
+    margin: 60px;
+    border: 1px solid rgb(215, 220, 225);
+    z-index: 2;
+}
 #no-stations {
     background-color: #ffffff;
     width: 360px;
@@ -344,5 +371,8 @@ export default {
     top: 10px;
     right: 10px;
     cursor: pointer;
+}
+.show-link {
+    text-decoration: underline;
 }
 </style>

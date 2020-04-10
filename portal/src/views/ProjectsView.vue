@@ -1,6 +1,12 @@
 <template>
     <div>
-        <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
+        <SidebarNav
+            :isAuthenticated="isAuthenticated"
+            viewing="projects"
+            :projects="projects"
+            :stations="stations"
+            @showStation="showStation"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />

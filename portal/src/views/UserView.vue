@@ -1,6 +1,12 @@
 <template>
     <div>
-        <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
+        <SidebarNav
+            :isAuthenticated="isAuthenticated"
+            viewing="projects"
+            :projects="projects"
+            :stations="stations"
+            @showStation="showStation"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
         <div class="main-panel" v-show="!loading && isAuthenticated">
             <div class="view-user" v-if="!isEditing">

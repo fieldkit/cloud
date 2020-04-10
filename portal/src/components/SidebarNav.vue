@@ -37,7 +37,7 @@
                             {{ station.name }}
                         </div>
                     </div>
-                    <div v-if="stations.length == 0" class="station-link">
+                    <div v-if="isAuthenticated && stations.length == 0" class="station-link">
                         No stations added
                     </div>
                 </div>
@@ -70,7 +70,7 @@ export default {
             viewingData: false,
         };
     },
-    props: ["viewing", "stations", "projects"],
+    props: ["viewing", "isAuthenticated", "stations", "projects"],
     mounted() {
         switch (this.viewing) {
             case "projects":

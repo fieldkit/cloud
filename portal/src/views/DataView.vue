@@ -1,6 +1,12 @@
 <template>
     <div>
-        <SidebarNav viewing="data" :stations="stations" :projects="projects" @showStation="showStation" />
+        <SidebarNav
+            :isAuthenticated="isAuthenticated"
+            viewing="data"
+            :stations="stations"
+            :projects="projects"
+            @showStation="showStation"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <div id="data-view-background" class="main-panel" v-show="isAuthenticated">
             <div id="data-container">

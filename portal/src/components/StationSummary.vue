@@ -3,15 +3,6 @@
         <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
-        <div v-if="!isAuthenticated" class="size-20">
-            <p>
-                Please
-                <router-link :to="{ name: 'login' }" class="show-link">
-                    log in
-                </router-link>
-                to view stations.
-            </p>
-        </div>
         <div class="station-container" v-if="station">
             <div class="left">
                 <img style="width: 124px; height: 100px;" alt="Station image" :src="stationSmallPhoto" class="station-element" />
@@ -179,12 +170,6 @@ export default {
     margin: 60px;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
-}
-.size-20 {
-    font-size: 20px;
-}
-.show-link {
-    text-decoration: underline;
 }
 .station-container {
     padding: 10px;
