@@ -32,7 +32,7 @@ a {
     width: auto;
     text-align: left;
     overflow: hidden;
-    color: rgb(41, 61, 81);
+    color: #2c3e50;
 }
 .main-panel h1 {
     font-size: 38px;

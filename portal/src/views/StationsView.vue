@@ -46,7 +46,7 @@
                     <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
                 </a>
             </div>
-            <div v-if="!isAuthenticated" id="no-auth">
+            <div v-if="failedAuth" id="no-auth">
                 <p>
                     Please
                     <router-link :to="{ name: 'login' }" class="show-link">
@@ -87,6 +87,7 @@ export default {
             placeName: "",
             nativeLand: [],
             isAuthenticated: false,
+            failedAuth: false,
             coordinates: [-96, 37.8],
             mapboxToken: MAPBOX_ACCESS_TOKEN,
         };
@@ -129,6 +130,7 @@ export default {
                 });
             })
             .catch(() => {
+                this.failedAuth = true;
                 // handle non-logged in state
                 if (this.map) {
                     this.initStations();
