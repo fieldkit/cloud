@@ -17,10 +17,7 @@
                         </div>
                     </router-link>
                     <div v-for="project in projects" v-bind:key="project.id">
-                        <router-link
-                            :to="{ name: 'viewProject', params: { id: project.id } }"
-                            class="project-link"
-                        >
+                        <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="project-link">
                             {{ project.name }}
                         </router-link>
                     </div>
@@ -39,6 +36,9 @@
                         <div class="station-link" v-on:click="showStation" :data-id="station.id">
                             {{ station.name }}
                         </div>
+                    </div>
+                    <div v-if="stations.length == 0" class="station-link">
+                        No stations added
                     </div>
                 </div>
 
@@ -67,7 +67,7 @@ export default {
         return {
             viewingProjects: false,
             viewingStations: false,
-            viewingData: false
+            viewingData: false,
         };
     },
     props: ["viewing", "stations", "projects"],
@@ -93,8 +93,8 @@ export default {
                 return s.id == id;
             });
             this.$emit("showStation", station);
-        }
-    }
+        },
+    },
 };
 </script>
 
