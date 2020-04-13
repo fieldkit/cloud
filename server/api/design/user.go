@@ -82,10 +82,25 @@ var User = MediaType("application/vnd.app.user+json", func() {
 	})
 })
 
-var Users = MediaType("application/vnd.app.users+json", func() {
-	TypeName("Users")
+var ProjectUser = MediaType("application/vnd.app.project.user+json", func() {
+	TypeName("ProjectUser")
 	Attributes(func() {
-		Attribute("users", CollectionOf(User))
+		Attribute("user", User)
+		Attribute("role", String)
+		Attribute("membership", String)
+		Required("user", "role", "membership")
+	})
+	View("default", func() {
+		Attribute("user")
+		Attribute("role")
+		Attribute("membership")
+	})
+})
+
+var ProjectUsers = MediaType("application/vnd.app.users+json", func() {
+	TypeName("ProjectUsers")
+	Attributes(func() {
+		Attribute("users", CollectionOf(ProjectUser))
 		Required("users")
 	})
 	View("default", func() {
@@ -238,19 +253,11 @@ var _ = Resource("user", func() {
 		})
 	})
 
-	Action("list", func() {
-		Routing(GET("users"))
-		Description("List users")
-		Response(OK, func() {
-			Media(Users)
-		})
-	})
-
 	Action("list by project", func() {
 		Routing(GET("users/project/:projectId"))
 		Description("List users by project")
 		Response(OK, func() {
-			Media(Users)
+			Media(ProjectUsers)
 		})
 	})
 

@@ -227,40 +227,6 @@ func (c *Client) NewGetUserImageUserRequest(ctx context.Context, path string) (*
 	return req, nil
 }
 
-// ListUserPath computes a request path to the list action of user.
-func ListUserPath() string {
-
-	return fmt.Sprintf("/users")
-}
-
-// List users
-func (c *Client) ListUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewListUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewListUserRequest create the request corresponding to the list action endpoint of the user resource.
-func (c *Client) NewListUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
-	return req, nil
-}
-
 // ListByProjectUserPath computes a request path to the list by project action of user.
 func ListByProjectUserPath(projectID string) string {
 	param0 := projectID

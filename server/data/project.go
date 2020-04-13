@@ -18,3 +18,29 @@ type Project struct {
 	MediaURL         *string    `db:"media_url"`
 	MediaContentType *string    `db:"media_content_type"`
 }
+
+type ProjectInvite struct {
+	ID           int32      `db:"id,omitempty"`
+	UserID       int32      `db:"user_id"`
+	ProjectID    int32      `db:"project_id"`
+	InvitedEmail string     `db:"invited_email"`
+	InvitedTime  time.Time  `db:"invited_time"`
+	AcceptedTime *time.Time `db:"accepted_time"`
+	RejectedTime *time.Time `db:"rejected_time"`
+}
+
+type ProjectUser struct {
+	User
+	UserID    int32 `db:"user_id"`
+	ProjectID int32 `db:"project_id"`
+	Role      int32 `db:"role"`
+}
+
+func (u *ProjectUser) RoleName() string {
+	for _, role := range Roles {
+		if role.ID == u.Role {
+			return role.Name
+		}
+	}
+	return "Unknown"
+}

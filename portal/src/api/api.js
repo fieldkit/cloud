@@ -192,7 +192,7 @@ class FKApi {
         const token = this.token.getToken();
         return axios({
             method: "DELETE",
-            url: this.baseUrl + "/projects/" + data.projectId + "/members/" + data.userId,
+            url: this.baseUrl + "/projects/" + data.projectId + "/members",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,

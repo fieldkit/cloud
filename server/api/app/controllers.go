@@ -2964,7 +2964,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/:projectId/members/:userId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/:projectId/members", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -3166,8 +3166,8 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
-	service.Mux.Handle("DELETE", "/projects/:projectId/members/:userId", ctrl.MuxHandler("remove user", h, unmarshalRemoveUserProjectPayload))
-	service.LogInfo("mount", "ctrl", "Project", "action", "RemoveUser", "route", "DELETE /projects/:projectId/members/:userId", "security", "jwt")
+	service.Mux.Handle("DELETE", "/projects/:projectId/members", ctrl.MuxHandler("remove user", h, unmarshalRemoveUserProjectPayload))
+	service.LogInfo("mount", "ctrl", "Project", "action", "RemoveUser", "route", "DELETE /projects/:projectId/members", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -5707,7 +5707,6 @@ type UserController interface {
 	GetCurrentUserImage(*GetCurrentUserImageUserContext) error
 	GetID(*GetIDUserContext) error
 	GetUserImage(*GetUserImageUserContext) error
-	List(*ListUserContext) error
 	ListByProject(*ListByProjectUserContext) error
 	Login(*LoginUserContext) error
 	Logout(*LogoutUserContext) error
@@ -5850,23 +5849,6 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("GET", "/user/:userId/media", ctrl.MuxHandler("get user image", h, nil))
 	service.LogInfo("mount", "ctrl", "User", "action", "GetUserImage", "route", "GET /user/:userId/media")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewListUserContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.List(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleUserOrigin(h)
-	service.Mux.Handle("GET", "/users", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "User", "action", "List", "route", "GET /users", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

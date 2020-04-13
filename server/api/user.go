@@ -35,13 +35,35 @@ func UserType(user *data.User) *app.User {
 	return userType
 }
 
-func UsersType(users []*data.User) *app.Users {
-	usersCollection := make([]*app.User, len(users))
-	for i, user := range users {
-		usersCollection[i] = UserType(user)
+func ProjectUserType(user *data.ProjectUser) *app.ProjectUser {
+	return &app.ProjectUser{
+		User:       UserType(&user.User),
+		Role:       user.RoleName(),
+		Membership: data.MembershipAccepted,
+	}
+}
+
+func ProjectUsersType(users []*data.ProjectUser, invites []*data.ProjectInvite) *app.ProjectUsers {
+	usersCollection := make([]*app.ProjectUser, 0, len(users)+len(invites))
+	for _, user := range users {
+		usersCollection = append(usersCollection, ProjectUserType(user))
+	}
+	for _, invite := range invites {
+		membership := data.MembershipPending
+		if invite.RejectedTime != nil {
+			membership = data.MembershipRejected
+		}
+		usersCollection = append(usersCollection, &app.ProjectUser{
+			User: &app.User{
+				Name:  invite.InvitedEmail,
+				Email: invite.InvitedEmail,
+			},
+			Role:       data.MemberRole.Name,
+			Membership: membership,
+		})
 	}
 
-	return &app.Users{
+	return &app.ProjectUsers{
 		Users: usersCollection,
 	}
 }
@@ -473,22 +495,18 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
-func (c *UserController) List(ctx *app.ListUserContext) error {
-	users := []*data.User{}
-	if err := c.options.Database.SelectContext(ctx, &users, "SELECT * FROM fieldkit.user"); err != nil {
-		return err
-	}
-
-	return ctx.OK(UsersType(users))
-}
-
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
-	users := []*data.User{}
-	if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1", ctx.ProjectID); err != nil {
+	users := []*data.ProjectUser{}
+	if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.*, pu.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id", ctx.ProjectID); err != nil {
 		return err
 	}
 
-	return ctx.OK(UsersType(users))
+	invites := []*data.ProjectInvite{}
+	if err := c.options.Database.SelectContext(ctx, &invites, "SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND accepted_time IS NULL ORDER BY invited_time", ctx.ProjectID); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectUsersType(users, invites))
 }
 
 func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {

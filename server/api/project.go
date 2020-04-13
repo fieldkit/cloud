@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -183,7 +184,7 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	}
 
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1", p.UserID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1 ORDER BY p.name", p.UserID); err != nil {
 		return err
 	}
 
@@ -240,6 +241,17 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		return err
 	}
 
+	if err := p.CanModifyProject(int32(ctx.ProjectID)); err != nil {
+		return err
+	}
+
+	invite := &data.ProjectInvite{}
+	if err := c.options.Database.GetContext(ctx, invite, "SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	}
+
 	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID, ctx.Payload.Email, time.Now()); err != nil {
 		return err
 	}
@@ -248,16 +260,20 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 }
 
 func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error {
-	_, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx)
 	if err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2", ctx.ProjectID, ctx.UserID); err != nil {
+	if err := p.CanModifyProject(int32(ctx.ProjectID)); err != nil {
 		return err
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $2)", ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
 

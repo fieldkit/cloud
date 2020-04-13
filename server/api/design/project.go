@@ -190,13 +190,12 @@ var _ = Resource("project", func() {
 	})
 
 	Action("remove user", func() {
-		Routing(DELETE("/projects/:projectId/members/:userId"))
+		Routing(DELETE("/projects/:projectId/members"))
 		Description("Remove a user from project")
 		Payload(RemoveUserPayload)
 		Params(func() {
 			Param("projectId", Integer)
-			Param("userId", Integer)
-			Required("projectId", "userId")
+			Required("projectId")
 		})
 		Response(BadRequest)
 		Response(OK, func() {

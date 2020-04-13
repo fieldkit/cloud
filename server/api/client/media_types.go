@@ -1298,6 +1298,65 @@ func (c *Client) DecodeProject(resp *http.Response) (*Project, error) {
 	return &decoded, err
 }
 
+// ProjectUser media type (default view)
+//
+// Identifier: application/vnd.app.project.user+json; view=default
+type ProjectUser struct {
+	Membership string `form:"membership" json:"membership" yaml:"membership" xml:"membership"`
+	Role       string `form:"role" json:"role" yaml:"role" xml:"role"`
+	User       *User  `form:"user" json:"user" yaml:"user" xml:"user"`
+}
+
+// Validate validates the ProjectUser media type instance.
+func (mt *ProjectUser) Validate() (err error) {
+	if mt.User == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "user"))
+	}
+	if mt.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	if mt.Membership == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "membership"))
+	}
+	if mt.User != nil {
+		if err2 := mt.User.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeProjectUser decodes the ProjectUser instance encoded in resp body.
+func (c *Client) DecodeProjectUser(resp *http.Response) (*ProjectUser, error) {
+	var decoded ProjectUser
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// ProjectUserCollection is the media type for an array of ProjectUser (default view)
+//
+// Identifier: application/vnd.app.project.user+json; type=collection; view=default
+type ProjectUserCollection []*ProjectUser
+
+// Validate validates the ProjectUserCollection media type instance.
+func (mt ProjectUserCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeProjectUserCollection decodes the ProjectUserCollection instance encoded in resp body.
+func (c *Client) DecodeProjectUserCollection(resp *http.Response) (ProjectUserCollection, error) {
+	var decoded ProjectUserCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // ProjectCollection is the media type for an array of Project (default view)
 //
 // Identifier: application/vnd.app.project+json; type=collection; view=default
@@ -2147,39 +2206,15 @@ func (c *Client) DecodeTransmissionToken(resp *http.Response) (*TransmissionToke
 	return &decoded, err
 }
 
-// UserCollection is the media type for an array of User (default view)
-//
-// Identifier: application/vnd.app.user+json; type=collection; view=default
-type UserCollection []*User
-
-// Validate validates the UserCollection media type instance.
-func (mt UserCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DecodeUserCollection decodes the UserCollection instance encoded in resp body.
-func (c *Client) DecodeUserCollection(resp *http.Response) (UserCollection, error) {
-	var decoded UserCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
-// Users media type (default view)
+// ProjectUsers media type (default view)
 //
 // Identifier: application/vnd.app.users+json; view=default
-type Users struct {
-	Users UserCollection `form:"users" json:"users" yaml:"users" xml:"users"`
+type ProjectUsers struct {
+	Users ProjectUserCollection `form:"users" json:"users" yaml:"users" xml:"users"`
 }
 
-// Validate validates the Users media type instance.
-func (mt *Users) Validate() (err error) {
+// Validate validates the ProjectUsers media type instance.
+func (mt *ProjectUsers) Validate() (err error) {
 	if mt.Users == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "users"))
 	}
@@ -2189,9 +2224,9 @@ func (mt *Users) Validate() (err error) {
 	return
 }
 
-// DecodeUsers decodes the Users instance encoded in resp body.
-func (c *Client) DecodeUsers(resp *http.Response) (*Users, error) {
-	var decoded Users
+// DecodeProjectUsers decodes the ProjectUsers instance encoded in resp body.
+func (c *Client) DecodeProjectUsers(resp *http.Response) (*ProjectUsers, error) {
+	var decoded ProjectUsers
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

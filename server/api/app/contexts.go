@@ -3016,7 +3016,6 @@ type RemoveUserProjectContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	ProjectID int
-	UserID    int
 	Payload   *RemoveUserPayload
 }
 
@@ -3036,15 +3035,6 @@ func NewRemoveUserProjectContext(ctx context.Context, r *http.Request, service *
 			rctx.ProjectID = projectID
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
-		}
-	}
-	paramUserID := req.Params["userId"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
-			rctx.UserID = userID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -5029,33 +5019,6 @@ func (ctx *GetUserImageUserContext) OK(resp []byte) error {
 	return err
 }
 
-// ListUserContext provides the user list action context.
-type ListUserContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewListUserContext parses the incoming request URL and body, performs validations and creates the
-// context used by the user controller list action.
-func NewListUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListUserContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ListUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ListUserContext) OK(r *Users) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.users+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
 // ListByProjectUserContext provides the user list by project action context.
 type ListByProjectUserContext struct {
 	context.Context
@@ -5082,7 +5045,7 @@ func NewListByProjectUserContext(ctx context.Context, r *http.Request, service *
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListByProjectUserContext) OK(r *Users) error {
+func (ctx *ListByProjectUserContext) OK(r *ProjectUsers) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.users+json")
 	}

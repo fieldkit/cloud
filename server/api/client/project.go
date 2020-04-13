@@ -370,11 +370,10 @@ func (c *Client) NewRemoveStationProjectRequest(ctx context.Context, path string
 }
 
 // RemoveUserProjectPath computes a request path to the remove user action of project.
-func RemoveUserProjectPath(projectID int, userID int) string {
+func RemoveUserProjectPath(projectID int) string {
 	param0 := strconv.Itoa(projectID)
-	param1 := strconv.Itoa(userID)
 
-	return fmt.Sprintf("/projects/%s/members/%s", param0, param1)
+	return fmt.Sprintf("/projects/%s/members", param0)
 }
 
 // Remove a user from project

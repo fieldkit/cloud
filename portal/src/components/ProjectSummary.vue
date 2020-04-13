@@ -94,18 +94,18 @@
                         </div>
                         <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
                             <div class="cell">
-                                {{ user.name }}
+                                {{ user.user.name }}
                                 <br />
-                                <span class="email">{{ user.email }}</span>
+                                <span class="email">{{ user.user.email }}</span>
                             </div>
                             <div class="cell">{{ user.role }}</div>
-                            <div class="cell">{{ user.status }}</div>
+                            <div class="cell">{{ user.membership }}</div>
                             <div class="cell">
                                 <img
                                     alt="Remove user"
                                     src="../assets/close.png"
                                     class="remove-btn"
-                                    :data-user="user.id"
+                                    :data-user="user.user.id"
                                     v-on:click="removeUser"
                                 />
                             </div>
@@ -174,12 +174,7 @@ export default {
         },
         users() {
             if (this.users) {
-                this.projectUsers = this.users.map(u => {
-                    // temp: put in role and status
-                    u.role = "Admin";
-                    u.status = "Active";
-                    return u;
-                });
+                this.projectUsers = this.users;
             }
         },
     },
@@ -255,11 +250,13 @@ export default {
             if (valid) {
                 this.$emit("inviteUser", { email: this.inviteEmail, projectId: this.project.id });
                 this.projectUsers.push({
-                    id: "pending-" + Date.now(),
-                    name: "New member",
-                    email: this.inviteEmail,
-                    role: "",
-                    status: "Pending",
+                    user: {
+                        id: "pending-" + Date.now(),
+                        name: this.inviteEmail,
+                        email: this.inviteEmail,
+                    },
+                    role: "Member",
+                    membership: "Pending",
                 });
                 this.inviteEmail = "";
             }
@@ -268,18 +265,11 @@ export default {
             let id = event.target.getAttribute("data-user");
             if (confirm("Are you sure you want to remove this team member?")) {
                 const index = this.projectUsers.findIndex(u => {
-                    return u.id == id;
+                    return u.user.id == id;
                 });
-                // remove pending-, if newly added member
-                if (id.indexOf("pending-") == 0) {
-                    id = id.split("pending-")[1];
-                    // and make in range for type integer
-                    id = parseInt(id / 1000000);
-                }
                 const params = {
                     projectId: this.project.id,
-                    userId: id,
-                    email: this.projectUsers[index].email,
+                    email: this.projectUsers[index].user.email,
                 };
                 this.$emit("removeUser", params);
                 // also remove from projectUsers

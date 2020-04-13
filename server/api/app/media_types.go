@@ -975,6 +975,51 @@ func (mt *Project) Validate() (err error) {
 	return
 }
 
+// ProjectUser media type (default view)
+//
+// Identifier: application/vnd.app.project.user+json; view=default
+type ProjectUser struct {
+	Membership string `form:"membership" json:"membership" yaml:"membership" xml:"membership"`
+	Role       string `form:"role" json:"role" yaml:"role" xml:"role"`
+	User       *User  `form:"user" json:"user" yaml:"user" xml:"user"`
+}
+
+// Validate validates the ProjectUser media type instance.
+func (mt *ProjectUser) Validate() (err error) {
+	if mt.User == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "user"))
+	}
+	if mt.Role == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "role"))
+	}
+	if mt.Membership == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "membership"))
+	}
+	if mt.User != nil {
+		if err2 := mt.User.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ProjectUserCollection is the media type for an array of ProjectUser (default view)
+//
+// Identifier: application/vnd.app.project.user+json; type=collection; view=default
+type ProjectUserCollection []*ProjectUser
+
+// Validate validates the ProjectUserCollection media type instance.
+func (mt ProjectUserCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ProjectCollection is the media type for an array of Project (default view)
 //
 // Identifier: application/vnd.app.project+json; type=collection; view=default
@@ -1614,32 +1659,15 @@ func (mt *TransmissionToken) Validate() (err error) {
 	return
 }
 
-// UserCollection is the media type for an array of User (default view)
-//
-// Identifier: application/vnd.app.user+json; type=collection; view=default
-type UserCollection []*User
-
-// Validate validates the UserCollection media type instance.
-func (mt UserCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// Users media type (default view)
+// ProjectUsers media type (default view)
 //
 // Identifier: application/vnd.app.users+json; view=default
-type Users struct {
-	Users UserCollection `form:"users" json:"users" yaml:"users" xml:"users"`
+type ProjectUsers struct {
+	Users ProjectUserCollection `form:"users" json:"users" yaml:"users" xml:"users"`
 }
 
-// Validate validates the Users media type instance.
-func (mt *Users) Validate() (err error) {
+// Validate validates the ProjectUsers media type instance.
+func (mt *ProjectUsers) Validate() (err error) {
 	if mt.Users == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "users"))
 	}
