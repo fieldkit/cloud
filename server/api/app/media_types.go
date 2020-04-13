@@ -1236,6 +1236,7 @@ type Station struct {
 	Name        string                 `form:"name" json:"name" yaml:"name" xml:"name"`
 	OwnerID     int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
 	Photos      *StationPhotos         `form:"photos" json:"photos" yaml:"photos" xml:"photos"`
+	ReadOnly    bool                   `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
 	StatusJSON  map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
 }
 
@@ -1258,6 +1259,7 @@ func (mt *Station) Validate() (err error) {
 	if mt.Photos == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "photos"))
 	}
+
 	if err2 := mt.Images.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}

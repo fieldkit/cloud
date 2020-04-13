@@ -81,7 +81,8 @@ var Station = MediaType("application/vnd.app.station+json", func() {
 		Attribute("status_json", HashOf(String, Any))
 		Attribute("images", CollectionOf(ImageRef))
 		Attribute("photos", StationPhotos)
-		Required("id", "name", "owner_id", "device_id", "status_json", "images", "photos")
+		Attribute("read_only", Boolean)
+		Required("id", "name", "owner_id", "device_id", "status_json", "images", "photos", "read_only")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -92,6 +93,7 @@ var Station = MediaType("application/vnd.app.station+json", func() {
 		Attribute("status_json")
 		Attribute("images")
 		Attribute("photos")
+		Attribute("read_only")
 	})
 })
 

@@ -7,6 +7,8 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 
 	"github.com/goadesign/goa/middleware/security/jwt"
+
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type Permissions struct {
@@ -29,6 +31,10 @@ func NewPermissions(ctx context.Context) (p *Permissions, err error) {
 	}
 
 	return
+}
+
+func (p *Permissions) IsStationReadOnly(station *data.Station) bool {
+	return station.OwnerID != p.UserID
 }
 
 func (p *Permissions) CanModifyStationByStationID(stationId int32) error {

@@ -572,12 +572,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+          Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+          Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -664,7 +664,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+        Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -672,7 +672,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+          Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
         type: object
       id:
         example: 4.464267130479644e+18
@@ -698,12 +698,12 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+        Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 2064d620-92dd-4b35-a39e-ee7b1782c9c1
+        Cumque nihil.: 72a64220-84de-4ab2-a0b1-d50c36baed73
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1313,6 +1313,8 @@ definitions:
       view)
     example:
     - url: Vel tempore laboriosam.
+    - url: Vel tempore laboriosam.
+    - url: Vel tempore laboriosam.
     items:
       $ref: '#/definitions/ImageRef'
     title: 'Mediatype identifier: application/vnd.app.imageref+json; type=collection;
@@ -1685,7 +1687,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+            Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1759,7 +1761,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+              Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1838,7 +1840,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+        Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1851,7 +1853,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+          Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
         type: object
       location:
         example:
@@ -1917,7 +1919,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+          Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1984,7 +1986,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+            Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2062,7 +2064,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+          Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2135,7 +2137,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: d90c892a-ee36-43d2-8076-9d1715912f8d
+            Perspiciatis quasi error voluptatem et.: d3f90a17-22f4-4fd6-9b26-2549b4fc4457
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2210,26 +2212,6 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
-    - blocks:
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      id: 4.988714780383636e+18
-      size: 7.809307306314839e+18
-      time: "1999-04-12T14:13:09Z"
-      type: Est rem.
-      upload_id: In debitis qui velit aut.
-      url: Quibusdam est rem quisquam.
-    - blocks:
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      - 1.28057798377931e+18
-      id: 4.988714780383636e+18
-      size: 7.809307306314839e+18
-      time: "1999-04-12T14:13:09Z"
-      type: Est rem.
-      upload_id: In debitis qui velit aut.
-      url: Quibusdam est rem quisquam.
     - blocks:
       - 1.28057798377931e+18
       - 1.28057798377931e+18
@@ -2845,8 +2827,9 @@ definitions:
       owner_id: 2.0987624006025498e+18
       photos:
         small: Ut consequatur ea repudiandae veritatis delectus sit.
+      read_only: false
       status_json:
-        Ad et corporis et quasi laborum.: 0.650024501739601
+        Et corporis et quasi laborum et quia.: 6.375365862717534e+18
     properties:
       device_id:
         example: Consequatur dolorum.
@@ -2868,10 +2851,13 @@ definitions:
         type: integer
       photos:
         $ref: '#/definitions/StationPhotos'
+      read_only:
+        example: false
+        type: boolean
       status_json:
         additionalProperties: true
         example:
-          Ad et corporis et quasi laborum.: 0.650024501739601
+          Et corporis et quasi laborum et quia.: 6.375365862717534e+18
         type: object
     required:
     - id
@@ -2881,6 +2867,7 @@ definitions:
     - status_json
     - images
     - photos
+    - read_only
     title: 'Mediatype identifier: application/vnd.app.station+json; view=default'
     type: object
   StationCollection:
@@ -2916,8 +2903,9 @@ definitions:
       owner_id: 2.0987624006025498e+18
       photos:
         small: Ut consequatur ea repudiandae veritatis delectus sit.
+      read_only: false
       status_json:
-        Ad et corporis et quasi laborum.: 0.650024501739601
+        Et corporis et quasi laborum et quia.: 6.375365862717534e+18
     items:
       $ref: '#/definitions/Station'
     title: 'Mediatype identifier: application/vnd.app.station+json; type=collection;
@@ -2997,8 +2985,9 @@ definitions:
         owner_id: 2.0987624006025498e+18
         photos:
           small: Ut consequatur ea repudiandae veritatis delectus sit.
+        read_only: false
         status_json:
-          Ad et corporis et quasi laborum.: 0.650024501739601
+          Et corporis et quasi laborum et quia.: 6.375365862717534e+18
       - device_id: Consequatur dolorum.
         id: 8.004287662218134e+18
         images:
@@ -3028,8 +3017,9 @@ definitions:
         owner_id: 2.0987624006025498e+18
         photos:
           small: Ut consequatur ea repudiandae veritatis delectus sit.
+        read_only: false
         status_json:
-          Ad et corporis et quasi laborum.: 0.650024501739601
+          Et corporis et quasi laborum et quia.: 6.375365862717534e+18
     properties:
       stations:
         $ref: '#/definitions/StationCollection'

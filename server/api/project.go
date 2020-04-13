@@ -1,12 +1,9 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -63,14 +60,9 @@ func NewProjectController(service *goa.Service, options *ControllerOptions) *Pro
 }
 
 func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context") // internal error
-	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return fmt.Errorf("JWT claims error") // internal error
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
 	}
 
 	goal := ""
@@ -109,7 +101,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_user (project_id, user_id) VALUES ($1, $2)", project.ID, claims["sub"]); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_user (project_id, user_id) VALUES ($1, $2)", project.ID, p.UserID); err != nil {
 		return err
 	}
 
@@ -185,18 +177,13 @@ func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 }
 
 func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) error {
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context") // internal error
-	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return fmt.Errorf("JWT claims error") // internal error
+	p, err := NewPermissions(ctx)
+	if err != nil {
+		return err
 	}
 
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS u ON u.project_id = p.id WHERE u.user_id = $1", p.UserID); err != nil {
 		return err
 	}
 
