@@ -12,28 +12,21 @@ import (
 )
 
 func ProjectType(project *data.Project) *app.Project {
-	projectType := &app.Project{
-		ID:          int(project.ID),
-		Name:        project.Name,
-		Slug:        project.Slug,
-		Description: project.Description,
-		Goal:        project.Goal,
-		Location:    project.Location,
-		Tags:        project.Tags,
-		Private:     project.Private,
-		StartTime:   project.StartTime,
-		EndTime:     project.EndTime,
+	return &app.Project{
+		ID:               int(project.ID),
+		Name:             project.Name,
+		Slug:             project.Slug,
+		Description:      project.Description,
+		Goal:             project.Goal,
+		Location:         project.Location,
+		Tags:             project.Tags,
+		Private:          project.Private,
+		StartTime:        project.StartTime,
+		EndTime:          project.EndTime,
+		ReadOnly:         false,
+		MediaURL:         project.MediaURL,
+		MediaContentType: project.MediaContentType,
 	}
-
-	if project.MediaURL != nil {
-		projectType.MediaURL = project.MediaURL
-	}
-
-	if project.MediaContentType != nil {
-		projectType.MediaContentType = project.MediaContentType
-	}
-
-	return projectType
 }
 
 func ProjectsType(projects []*data.Project) *app.Projects {

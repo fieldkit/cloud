@@ -1255,6 +1255,7 @@ type Project struct {
 	MediaURL         *string    `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
 	Name             string     `form:"name" json:"name" yaml:"name" xml:"name"`
 	Private          bool       `form:"private" json:"private" yaml:"private" xml:"private"`
+	ReadOnly         bool       `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
 	Slug             string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
 	StartTime        *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
 	Tags             string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
@@ -1282,6 +1283,7 @@ func (mt *Project) Validate() (err error) {
 	if mt.Tags == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tags"))
 	}
+
 	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
 	}
