@@ -5,11 +5,7 @@
         </div>
         <div v-for="station in stations" :key="station.id" class="station-container">
             <div class="left">
-                <img
-                    alt="Station image"
-                    src="../assets/placeholder_station_thumbnail.png"
-                    class="station-element"
-                />
+                <img alt="Station image" src="../assets/placeholder_station_thumbnail.png" class="station-element" />
             </div>
             <div class="right">
                 <div id="station-name" class="station-element">{{ station.name }}</div>
@@ -33,7 +29,7 @@
 </template>
 
 <script>
-import * as utils from "../utilities"
+import * as utils from "../utilities";
 
 export default {
     name: "StationsList",
@@ -44,7 +40,6 @@ export default {
     mounted() {
         if (this.stations && this.stations.length > 0) {
             this.stations.forEach(s => {
-                // console.log(s.name, s.device_id)
                 this.$set(s, "synced", utils.getUpdatedDate(s));
             });
         }
@@ -84,8 +79,8 @@ export default {
                 img = "ocean.png";
             }
             return images("./" + img);
-        }
-    }
+        },
+    },
 };
 </script>
 
