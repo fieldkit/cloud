@@ -16,11 +16,13 @@
                 <div class="project-element">{{ this.project.location }}</div>
                 <div class="left project-element">
                     <div class="left" v-if="displayStartDate">
-                        <span class="date-label">Start Date</span> <br />
+                        <span class="date-label">Start Date</span>
+                        <br />
                         {{ this.displayStartDate }}
                     </div>
                     <div class="left end-date" v-if="displayEndDate">
-                        <span class="date-label">End Date</span> <br />
+                        <span class="date-label">End Date</span>
+                        <br />
                         {{ this.displayEndDate }}
                     </div>
                 </div>
@@ -29,16 +31,8 @@
             <div class="section">
                 <div class="section-control" v-on:click="toggleStations">
                     <div class="toggle-image-container">
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/right.png"
-                            v-if="!viewingStations"
-                        />
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/down.png"
-                            v-if="viewingStations"
-                        />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingStations" />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingStations" />
                     </div>
                     <div class="section-heading" v-if="projectStations.length != 0">
                         FieldKit Stations ({{ this.projectStations.length }})
@@ -49,11 +43,7 @@
                     <div class="station-dropdown">
                         Add a station:
                         <select v-model="stationOption" v-on:change="stationSelected">
-                            <option
-                                v-for="station in userStations"
-                                v-bind:value="station.id"
-                                v-bind:key="station.id"
-                            >
+                            <option v-for="station in userStations" v-bind:value="station.id" v-bind:key="station.id">
                                 {{ station.name }}
                             </option>
                         </select>
@@ -62,14 +52,10 @@
                         <div v-for="station in projectStations" v-bind:key="station.id">
                             <div class="station-cell">
                                 <div class="delete-link">
-                                    <img
-                                        alt="Info"
-                                        src="../assets/Delete.png"
-                                        :data-id="station.id"
-                                        v-on:click="deleteStation"
-                                    />
+                                    <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
                                 </div>
-                                <span class="station-name">{{ station.name }}</span> <br />
+                                <span class="station-name">{{ station.name }}</span>
+                                <br />
                                 Last seen {{ getUpdatedDate(station) }}
                             </div>
                         </div>
@@ -80,16 +66,8 @@
             <div class="section">
                 <div class="section-control" v-on:click="toggleActivity">
                     <div class="toggle-image-container">
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/right.png"
-                            v-if="!viewingActivity"
-                        />
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/down.png"
-                            v-if="viewingActivity"
-                        />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingActivity" />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingActivity" />
                     </div>
                     <div class="section-heading">Recent Activity</div>
                 </div>
@@ -101,16 +79,8 @@
             <div class="section">
                 <div class="section-control" v-on:click="toggleTeam">
                     <div class="toggle-image-container">
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/right.png"
-                            v-if="!viewingTeam"
-                        />
-                        <img
-                            alt="Toggle FieldKit Stations section"
-                            src="../assets/down.png"
-                            v-if="viewingTeam"
-                        />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingTeam" />
+                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingTeam" />
                     </div>
                     <div class="section-heading">Team</div>
                 </div>
@@ -124,7 +94,8 @@
                         </div>
                         <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
                             <div class="cell">
-                                {{ user.name }} <br />
+                                {{ user.name }}
+                                <br />
                                 <span class="email">{{ user.email }}</span>
                             </div>
                             <div class="cell">{{ user.role }}</div>
@@ -191,7 +162,7 @@ export default {
             inviteEmail: "",
             noEmail: false,
             emailNotValid: false,
-            stationOption: ""
+            stationOption: "",
         };
     },
     props: ["project", "userStations", "users"],
@@ -210,7 +181,7 @@ export default {
                     return u;
                 });
             }
-        }
+        },
     },
     methods: {
         viewSummary() {
@@ -248,7 +219,7 @@ export default {
             const api = new FKApi();
             const params = {
                 projectId: this.project.id,
-                stationId: this.stationOption
+                stationId: this.stationOption,
             };
             api.addStationToProject(params).then(() => {
                 this.fetchStations();
@@ -260,7 +231,7 @@ export default {
                 const api = new FKApi();
                 const params = {
                     projectId: this.project.id,
-                    stationId: stationId
+                    stationId: stationId,
                 };
                 api.removeStationFromProject(params).then(() => {
                     this.fetchStations();
@@ -288,7 +259,7 @@ export default {
                     name: "New member",
                     email: this.inviteEmail,
                     role: "",
-                    status: "Pending"
+                    status: "Pending",
                 });
                 this.inviteEmail = "";
             }
@@ -308,7 +279,7 @@ export default {
                 const params = {
                     projectId: this.project.id,
                     userId: id,
-                    email: this.projectUsers[index].email
+                    email: this.projectUsers[index].email,
                 };
                 this.$emit("removeUser", params);
                 // also remove from projectUsers
@@ -344,8 +315,8 @@ export default {
         },
         closeSummary() {
             this.viewingSummary = false;
-        }
-    }
+        },
+    },
 };
 </script>
 
