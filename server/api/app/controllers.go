@@ -5710,6 +5710,7 @@ type UserController interface {
 	ListByProject(*ListByProjectUserContext) error
 	Login(*LoginUserContext) error
 	Logout(*LogoutUserContext) error
+	ProjectRoles(*ProjectRolesUserContext) error
 	Recovery(*RecoveryUserContext) error
 	RecoveryLookup(*RecoveryLookupUserContext) error
 	Refresh(*RefreshUserContext) error
@@ -5732,6 +5733,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/users/project/:projectId", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/login", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/logout", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/projects/roles", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/recovery", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/recovery/lookup", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
@@ -5905,6 +5907,22 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/logout", ctrl.MuxHandler("logout", h, nil))
 	service.LogInfo("mount", "ctrl", "User", "action", "Logout", "route", "POST /logout", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewProjectRolesUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ProjectRoles(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/projects/roles", ctrl.MuxHandler("project roles", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "ProjectRoles", "route", "GET /projects/roles")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

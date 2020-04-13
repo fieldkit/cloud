@@ -82,6 +82,19 @@ var User = MediaType("application/vnd.app.user+json", func() {
 	})
 })
 
+var ProjectRole = MediaType("application/vnd.app.project.role+json", func() {
+	TypeName("ProjectRole")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("name", String)
+		Required("id", "name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+	})
+})
+
 var ProjectUser = MediaType("application/vnd.app.project.user+json", func() {
 	TypeName("ProjectUser")
 	Attributes(func() {
@@ -296,6 +309,14 @@ var _ = Resource("user", func() {
 		Routing(GET("/user/transmission-token"))
 		Response(OK, func() {
 			Media(TransmissionToken)
+		})
+	})
+
+	Action("project roles", func() {
+		NoSecurity()
+		Routing(GET("/projects/roles"))
+		Response(OK, func() {
+			Media(CollectionOf(ProjectRole))
 		})
 	})
 })

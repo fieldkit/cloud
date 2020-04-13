@@ -977,6 +977,40 @@ func (mt *Project) Validate() (err error) {
 	return
 }
 
+// ProjectRole media type (default view)
+//
+// Identifier: application/vnd.app.project.role+json; view=default
+type ProjectRole struct {
+	ID   int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the ProjectRole media type instance.
+func (mt *ProjectRole) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// ProjectRoleCollection is the media type for an array of ProjectRole (default view)
+//
+// Identifier: application/vnd.app.project.role+json; type=collection; view=default
+type ProjectRoleCollection []*ProjectRole
+
+// Validate validates the ProjectRoleCollection media type instance.
+func (mt ProjectRoleCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ProjectUser media type (default view)
 //
 // Identifier: application/vnd.app.project.user+json; view=default

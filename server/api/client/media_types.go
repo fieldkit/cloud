@@ -1300,6 +1300,54 @@ func (c *Client) DecodeProject(resp *http.Response) (*Project, error) {
 	return &decoded, err
 }
 
+// ProjectRole media type (default view)
+//
+// Identifier: application/vnd.app.project.role+json; view=default
+type ProjectRole struct {
+	ID   int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the ProjectRole media type instance.
+func (mt *ProjectRole) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// DecodeProjectRole decodes the ProjectRole instance encoded in resp body.
+func (c *Client) DecodeProjectRole(resp *http.Response) (*ProjectRole, error) {
+	var decoded ProjectRole
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// ProjectRoleCollection is the media type for an array of ProjectRole (default view)
+//
+// Identifier: application/vnd.app.project.role+json; type=collection; view=default
+type ProjectRoleCollection []*ProjectRole
+
+// Validate validates the ProjectRoleCollection media type instance.
+func (mt ProjectRoleCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeProjectRoleCollection decodes the ProjectRoleCollection instance encoded in resp body.
+func (c *Client) DecodeProjectRoleCollection(resp *http.Response) (ProjectRoleCollection, error) {
+	var decoded ProjectRoleCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // ProjectUser media type (default view)
 //
 // Identifier: application/vnd.app.project.user+json; view=default

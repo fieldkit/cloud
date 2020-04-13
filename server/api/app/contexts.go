@@ -5123,6 +5123,36 @@ func (ctx *LogoutUserContext) BadRequest() error {
 	return nil
 }
 
+// ProjectRolesUserContext provides the user project roles action context.
+type ProjectRolesUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewProjectRolesUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller project roles action.
+func NewProjectRolesUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProjectRolesUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ProjectRolesUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ProjectRolesUserContext) OK(r ProjectRoleCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project.role+json; type=collection")
+	}
+	if r == nil {
+		r = ProjectRoleCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // RecoveryUserContext provides the user recovery action context.
 type RecoveryUserContext struct {
 	context.Context

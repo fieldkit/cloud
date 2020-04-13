@@ -332,6 +332,35 @@ func (c *Client) NewLogoutUserRequest(ctx context.Context, path string) (*http.R
 	return req, nil
 }
 
+// ProjectRolesUserPath computes a request path to the project roles action of user.
+func ProjectRolesUserPath() string {
+
+	return fmt.Sprintf("/projects/roles")
+}
+
+// ProjectRolesUser makes a request to the project roles action endpoint of the user resource
+func (c *Client) ProjectRolesUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewProjectRolesUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewProjectRolesUserRequest create the request corresponding to the project roles action endpoint of the user resource.
+func (c *Client) NewProjectRolesUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // RecoveryUserPath computes a request path to the recovery action of user.
 func RecoveryUserPath() string {
 

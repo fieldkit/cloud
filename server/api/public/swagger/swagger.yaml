@@ -580,12 +580,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 9c4f676e-9049-4a44-a373-3b5a38d448ae
+          Cumque nihil.: 0f62609c-e952-4ea4-b2c2-040e75565068
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 9c4f676e-9049-4a44-a373-3b5a38d448ae
+          Cumque nihil.: 0f62609c-e952-4ea4-b2c2-040e75565068
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -672,7 +672,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 9c4f676e-9049-4a44-a373-3b5a38d448ae
+        Cumque nihil.: 0f62609c-e952-4ea4-b2c2-040e75565068
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -680,7 +680,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 9c4f676e-9049-4a44-a373-3b5a38d448ae
+          Cumque nihil.: 0f62609c-e952-4ea4-b2c2-040e75565068
         type: object
       id:
         example: 4.464267130479644e+18
@@ -706,7 +706,7 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 9c4f676e-9049-4a44-a373-3b5a38d448ae
+        Cumque nihil.: 0f62609c-e952-4ea4-b2c2-040e75565068
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1283,6 +1283,8 @@ definitions:
       view)
     example:
     - url: Vel tempore laboriosam.
+    - url: Vel tempore laboriosam.
+    - url: Vel tempore laboriosam.
     items:
       $ref: '#/definitions/ImageRef'
     title: 'Mediatype identifier: application/vnd.app.imageref+json; type=collection;
@@ -1655,7 +1657,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+            Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1729,7 +1731,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+              Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1808,7 +1810,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+        Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1821,7 +1823,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+          Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
         type: object
       location:
         example:
@@ -1887,7 +1889,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+          Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1954,7 +1956,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+            Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2032,7 +2034,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+          Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2105,7 +2107,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 2b856ed4-f07e-4ef4-a0cf-3364fc67559d
+            Perspiciatis quasi error voluptatem et.: 94d4b37f-2ac2-4209-9605-ee74891a078b
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2176,22 +2178,6 @@ definitions:
     description: LastUploadCollection is the media type for an array of LastUpload
       (default view)
     example:
-    - blocks:
-      - 6.070880357414472e+18
-      id: 8.742818193707424e+18
-      size: 2.7293126761903585e+18
-      time: "1971-11-11T18:09:31Z"
-      type: Accusantium voluptas eaque qui.
-      upload_id: Voluptatem placeat.
-      url: Dolores praesentium itaque impedit aliquam.
-    - blocks:
-      - 6.070880357414472e+18
-      id: 8.742818193707424e+18
-      size: 2.7293126761903585e+18
-      time: "1971-11-11T18:09:31Z"
-      type: Accusantium voluptas eaque qui.
-      upload_id: Voluptatem placeat.
-      url: Dolores praesentium itaque impedit aliquam.
     - blocks:
       - 6.070880357414472e+18
       id: 8.742818193707424e+18
@@ -2409,24 +2395,57 @@ definitions:
     title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
       view=default'
     type: array
+  ProjectRole:
+    description: ProjectRole media type (default view)
+    example:
+      id: 1.2555150612128553e+18
+      name: Assumenda ut minima.
+    properties:
+      id:
+        example: 1.2555150612128553e+18
+        format: int64
+        type: integer
+      name:
+        example: Assumenda ut minima.
+        type: string
+    required:
+    - id
+    - name
+    title: 'Mediatype identifier: application/vnd.app.project.role+json; view=default'
+    type: object
+  ProjectRoleCollection:
+    description: ProjectRoleCollection is the media type for an array of ProjectRole
+      (default view)
+    example:
+    - id: 1.2555150612128553e+18
+      name: Assumenda ut minima.
+    - id: 1.2555150612128553e+18
+      name: Assumenda ut minima.
+    - id: 1.2555150612128553e+18
+      name: Assumenda ut minima.
+    items:
+      $ref: '#/definitions/ProjectRole'
+    title: 'Mediatype identifier: application/vnd.app.project.role+json; type=collection;
+      view=default'
+    type: array
   ProjectUser:
     description: ProjectUser media type (default view)
     example:
-      membership: Qui assumenda ut minima quaerat.
-      role: Dicta consectetur nostrum deserunt et et.
+      membership: Dicta consectetur nostrum deserunt et et.
+      role: Animi quisquam amet.
       user:
-        bio: Animi quisquam amet.
-        email: myrtice_gutmann@greenholt.org
-        id: 1.5341427243771873e+18
-        media_content_type: Nulla rerum aliquam rerum esse.
+        bio: Vero ut aliquid.
+        email: adella_pouros@nicolas.org
+        id: 1.4115510825130394e+18
+        media_content_type: Rerum esse.
         media_url: Mollitia quaerat occaecati est.
         name: y9p8qr0lxt
     properties:
       membership:
-        example: Qui assumenda ut minima quaerat.
+        example: Dicta consectetur nostrum deserunt et et.
         type: string
       role:
-        example: Dicta consectetur nostrum deserunt et et.
+        example: Animi quisquam amet.
         type: string
       user:
         $ref: '#/definitions/User'
@@ -2440,31 +2459,31 @@ definitions:
     description: ProjectUserCollection is the media type for an array of ProjectUser
       (default view)
     example:
-    - membership: Qui assumenda ut minima quaerat.
-      role: Dicta consectetur nostrum deserunt et et.
+    - membership: Dicta consectetur nostrum deserunt et et.
+      role: Animi quisquam amet.
       user:
-        bio: Animi quisquam amet.
-        email: myrtice_gutmann@greenholt.org
-        id: 1.5341427243771873e+18
-        media_content_type: Nulla rerum aliquam rerum esse.
+        bio: Vero ut aliquid.
+        email: adella_pouros@nicolas.org
+        id: 1.4115510825130394e+18
+        media_content_type: Rerum esse.
         media_url: Mollitia quaerat occaecati est.
         name: y9p8qr0lxt
-    - membership: Qui assumenda ut minima quaerat.
-      role: Dicta consectetur nostrum deserunt et et.
+    - membership: Dicta consectetur nostrum deserunt et et.
+      role: Animi quisquam amet.
       user:
-        bio: Animi quisquam amet.
-        email: myrtice_gutmann@greenholt.org
-        id: 1.5341427243771873e+18
-        media_content_type: Nulla rerum aliquam rerum esse.
+        bio: Vero ut aliquid.
+        email: adella_pouros@nicolas.org
+        id: 1.4115510825130394e+18
+        media_content_type: Rerum esse.
         media_url: Mollitia quaerat occaecati est.
         name: y9p8qr0lxt
-    - membership: Qui assumenda ut minima quaerat.
-      role: Dicta consectetur nostrum deserunt et et.
+    - membership: Dicta consectetur nostrum deserunt et et.
+      role: Animi quisquam amet.
       user:
-        bio: Animi quisquam amet.
-        email: myrtice_gutmann@greenholt.org
-        id: 1.5341427243771873e+18
-        media_content_type: Nulla rerum aliquam rerum esse.
+        bio: Vero ut aliquid.
+        email: adella_pouros@nicolas.org
+        id: 1.4115510825130394e+18
+        media_content_type: Rerum esse.
         media_url: Mollitia quaerat occaecati est.
         name: y9p8qr0lxt
     items:
@@ -2476,13 +2495,13 @@ definitions:
     description: ProjectUsers media type (default view)
     example:
       users:
-      - membership: Qui assumenda ut minima quaerat.
-        role: Dicta consectetur nostrum deserunt et et.
+      - membership: Dicta consectetur nostrum deserunt et et.
+        role: Animi quisquam amet.
         user:
-          bio: Animi quisquam amet.
-          email: myrtice_gutmann@greenholt.org
-          id: 1.5341427243771873e+18
-          media_content_type: Nulla rerum aliquam rerum esse.
+          bio: Vero ut aliquid.
+          email: adella_pouros@nicolas.org
+          id: 1.4115510825130394e+18
+          media_content_type: Rerum esse.
           media_url: Mollitia quaerat occaecati est.
           name: y9p8qr0lxt
     properties:
@@ -2548,9 +2567,9 @@ definitions:
       series:
       - name: Qui velit aut hic quibusdam est rem.
         rows:
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -2637,20 +2656,20 @@ definitions:
     example:
       name: Qui velit aut hic quibusdam est rem.
       rows:
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
     properties:
       name:
         example: Qui velit aut hic quibusdam est rem.
         type: string
       rows:
         example:
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-        - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
+        - c4938d46-a0d8-4901-ab1d-41003cfa39db
         items:
-          example: 4f16d50a-6f1e-4d08-a349-f6f791820b7d
+          example: c4938d46-a0d8-4901-ab1d-41003cfa39db
         type: array
     required:
     - name
@@ -2663,9 +2682,9 @@ definitions:
     example:
     - name: Qui velit aut hic quibusdam est rem.
       rows:
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
-      - 4f16d50a-6f1e-4d08-a349-f6f791820b7d
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
+      - c4938d46-a0d8-4901-ab1d-41003cfa39db
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -3528,26 +3547,26 @@ definitions:
   User:
     description: User media type (default view)
     example:
-      bio: Animi quisquam amet.
-      email: myrtice_gutmann@greenholt.org
-      id: 1.5341427243771873e+18
-      media_content_type: Nulla rerum aliquam rerum esse.
+      bio: Vero ut aliquid.
+      email: adella_pouros@nicolas.org
+      id: 1.4115510825130394e+18
+      media_content_type: Rerum esse.
       media_url: Mollitia quaerat occaecati est.
       name: y9p8qr0lxt
     properties:
       bio:
-        example: Animi quisquam amet.
+        example: Vero ut aliquid.
         type: string
       email:
-        example: myrtice_gutmann@greenholt.org
+        example: adella_pouros@nicolas.org
         format: email
         type: string
       id:
-        example: 1.5341427243771873e+18
+        example: 1.4115510825130394e+18
         format: int64
         type: integer
       media_content_type:
-        example: Nulla rerum aliquam rerum esse.
+        example: Rerum esse.
         type: string
       media_url:
         example: Mollitia quaerat occaecati est.
@@ -5505,6 +5524,21 @@ paths:
       summary: add station project
       tags:
       - project
+  /projects/roles:
+    get:
+      operationId: user#project roles
+      produces:
+      - application/vnd.app.project.role+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ProjectRoleCollection'
+      schemes:
+      - https
+      summary: project roles user
+      tags:
+      - user
   /records/data/{recordId}:
     get:
       description: |-

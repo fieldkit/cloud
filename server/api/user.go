@@ -624,3 +624,14 @@ func (c *UserController) TransmissionToken(ctx *app.TransmissionTokenUserContext
 		Token: signedToken,
 	})
 }
+
+func (c *UserController) ProjectRoles(ctx *app.ProjectRolesUserContext) error {
+	roles := make([]*app.ProjectRole, 0)
+	for _, role := range data.Roles {
+		roles = append(roles, &app.ProjectRole{
+			ID:   int(role.ID),
+			Name: role.Name,
+		})
+	}
+	return ctx.OK(roles)
+}
