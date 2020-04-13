@@ -83,7 +83,7 @@
                     Your passwords do not match.
                 </div>
             </div>
-            <button v-on:click="submit" ref="submit">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
+            <button v-on:click="submit" ref="submit" class="submit-btn">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
             <div class="create-link" v-on:click="toggleForm">
                 {{ isLoggingIn ? "Create an Account" : "Back to Log In" }}
             </div>
@@ -100,7 +100,14 @@
                     <span class="floating-label">Email</span>
                 </div>
             </div>
-            <button class="save-btn" v-on:click="sendResetEmail" v-if="!resetSent">Submit</button>
+            <button
+                :class="sendingReset ? 'disabled' : 'submit-btn'"
+                v-on:click="sendResetEmail"
+                v-if="!resetSent"
+                :disabled="sendingReset"
+            >
+                Submit
+            </button>
             <div class="reset-sent" v-if="resetSent">Password reset email sent!</div>
         </div>
 
@@ -146,6 +153,7 @@ export default {
             showReset: false,
             resetSent: false,
             resetEmail: "",
+            sendingReset: false,
         };
     },
     async beforeCreate() {
@@ -248,6 +256,7 @@ export default {
             this.showReset = true;
         },
         sendResetEmail() {
+            this.sendingReset = true;
             this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
                 this.resetSent = true;
             });
@@ -271,7 +280,7 @@ export default {
 h1 {
     font-weight: lighter;
 }
-button {
+.submit-btn {
     margin-top: 20px;
     width: 70%;
     height: 50px;
@@ -280,6 +289,11 @@ button {
     color: white;
     font-size: 18px;
     border-radius: 5px;
+}
+.disabled {
+    margin-top: 20px;
+    width: 70%;
+    height: 50px;
 }
 .outer-input-container {
     height: 65px;
