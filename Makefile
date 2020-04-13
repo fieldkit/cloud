@@ -71,8 +71,8 @@ clean:
 schema-production:
 	@mkdir -p schema-production
 	@rm -f schema-production/*.sql
-	@rm active-schema
-	@ln -sf schema-production/active-schema
+	@rm -f active-schema
+	@ln -sf schema-production active-schema
 	@echo "CREATE USER fk;" > schema-production/0.sql
 	@echo "CREATE USER server;" >> schema-production/0.sql
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
