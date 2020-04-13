@@ -24,6 +24,7 @@
                 @map-init="mapInitialized"
             />
             <StationSummary
+                v-if="activeStation"
                 :isAuthenticated="isAuthenticated"
                 :station="activeStation"
                 :placeName="placeName"
@@ -106,28 +107,28 @@ export default {
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                this.api.getStations().then(s => {
-                    this.stations = s.stations;
-                    if (this.stations.length == 0) {
-                        this.showNotice = true;
-                    }
-                    if (this.map) {
-                        this.initStations();
-                    } else {
-                        this.waitingForMap = true;
-                    }
-                    if (this.id) {
-                        let station = this.stations.find(s => {
-                            return s.id == this.id;
-                        });
-                        this.showSummary(station, true);
-                    }
-                });
-                this.api.getProjects().then(projects => {
-                    if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
-                    }
-                });
+
+                return Promise.all([
+                    this.api.getStation(this.id).then(station => {
+                        return this.showSummary(station, true);
+                    }),
+                    this.api.getStations().then(s => {
+                        this.stations = s.stations;
+                        if (this.stations.length == 0) {
+                            this.showNotice = true;
+                        }
+                        if (this.map) {
+                            this.initStations();
+                        } else {
+                            this.waitingForMap = true;
+                        }
+                    }),
+                    this.api.getProjects().then(projects => {
+                        if (projects && projects.projects.length > 0) {
+                            this.projects = projects.projects;
+                        }
+                    }),
+                ]);
             })
             .catch(() => {
                 this.failedAuth = true;

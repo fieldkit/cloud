@@ -54,7 +54,11 @@
                                 <div class="delete-link">
                                     <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
                                 </div>
-                                <span class="station-name">{{ station.name }}</span>
+                                <span class="station-name">
+                                    <div class="station-link" v-on:click="showStation(station)">
+                                        {{ station.name }}
+                                    </div>
+                                </span>
                                 <br />
                                 Last seen {{ getUpdatedDate(station) }}
                             </div>
@@ -305,6 +309,9 @@ export default {
         },
         closeSummary() {
             this.viewingSummary = false;
+        },
+        showStation(station) {
+            this.$emit("showStation", station);
         },
     },
 };

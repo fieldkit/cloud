@@ -50,6 +50,7 @@
                     ref="projectSummary"
                     @inviteUser="sendInvite"
                     @removeUser="removeUser"
+                    @showStation="showStation"
                 />
             </div>
         </div>
