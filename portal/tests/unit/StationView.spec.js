@@ -6,5 +6,6 @@ describe("StationsView.vue", () => {
         const wrapper = shallowMount(StationsView);
         const map = wrapper.find(".stations-map");
         expect(map.isVisible()).toBe(true);
+        wrapper.destroy(); // prevent warnings
     });
 });

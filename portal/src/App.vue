@@ -28,6 +28,9 @@ a {
     text-decoration: none;
     color: inherit;
 }
+button {
+    cursor: pointer;
+}
 .main-panel {
     width: auto;
     text-align: left;
@@ -70,5 +73,13 @@ input:invalid {
     top: -24px;
     pointer-events: none;
     transition: 0.2s ease all;
+}
+.disabled {
+    background-color: rgb(210, 210, 210);
+    cursor: not-allowed;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
 }
 </style>
