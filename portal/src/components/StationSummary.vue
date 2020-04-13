@@ -1,39 +1,25 @@
 <template>
     <div id="station-summary-container" v-if="viewingSummary">
-        <div v-if="this.station" id="close-form-btn" v-on:click="closeSummary">
+        <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
-        <div v-if="!isAuthenticated" class="no-stations-message">
-            <p>
-                Please
-                <router-link :to="{ name: 'login' }" class="show-link">
-                    log in
-                </router-link>
-                to view stations.
-            </p>
-        </div>
-        <div v-if="isAuthenticated && !this.station" class="no-stations-message">
-            <p>No stations added yet.</p>
-        </div>
-        <div class="station-container" v-if="this.station">
+        <div class="station-container" v-if="station">
             <div class="left">
-                <img
-                    style="width: 124px; height: 100px;"
-                    alt="Station image"
-                    :src="stationSmallPhoto"
-                    class="station-element"
-                />
+                <img style="width: 124px; height: 100px;" alt="Station image" :src="stationSmallPhoto" class="station-element" />
             </div>
             <div class="left">
-                <div id="station-name" class="station-element">{{ this.station.name }}</div>
-                <div class="station-element">Last Synced {{ getSyncedDate() }}</div>
+                <div id="station-name" class="station-element">{{ station.name }}</div>
+                <div class="station-element">
+                    Last Synced
+                    <span class="small-light">{{ getSyncedDate() }}</span>
+                </div>
                 <div class="station-element">
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
-                    <span>{{ this.station.status_json.batteryLevel }}%</span>
+                    <span class="small-light">{{ station.status_json.batteryLevel }}%</span>
                 </div>
                 <div>
                     <img
-                        v-for="module in this.station.status_json.moduleObjects"
+                        v-for="module in station.status_json.moduleObjects"
                         v-bind:key="module.id"
                         alt="Module icon"
                         class="small-space"
@@ -43,14 +29,25 @@
             </div>
             <div class="spacer"></div>
             <div id="location-container" class="section">
-                <div>{{ this.station.status_json.locationName }}</div>
+                <div class="location-item" v-if="placeName">
+                    <img alt="location-icon" src="../assets/icon-location.png" />
+                    {{ station.status_json.locationName ? station.status_json.locationName : placeName }}
+                </div>
+                <div class="location-item" v-if="nativeLand.length > 0">
+                    <img alt="location-icon" src="../assets/icon-location.png" />
+                    Native Land:
+                    <span v-for="(n, i) in nativeLand" v-bind:key="n.url" class="note-container">
+                        <a :href="n.url" class="native-land-link" target="_blank">{{ n.name }}</a>
+                        <span>{{ i == nativeLand.length - 1 ? "" : ", " }}</span>
+                    </span>
+                </div>
                 <div class="left">
-                    {{ this.getLat() || "--" }}
+                    {{ getLat() || "--" }}
                     <br />
                     Latitude
                 </div>
-                <div class="right">
-                    {{ this.getLong() || "--" }}
+                <div class="left">
+                    {{ getLong() || "--" }}
                     <br />
                     Longitude
                 </div>
@@ -58,10 +55,17 @@
             <div class="spacer"></div>
             <div id="readings-container" class="section">
                 <div id="readings-label">Latest Reading</div>
-                <div v-for="module in this.station.status_json.moduleObjects" v-bind:key="module.id">
-                    <div v-for="sensor in module.sensorObjects" v-bind:key="sensor.id" class="reading">
-                        <div class="left">{{ sensor.name }}</div>
-                        <div class="right">
+                <div v-for="(module, moduleIndex) in station.status_json.moduleObjects" v-bind:key="module.id">
+                    <div
+                        v-for="(sensor, sensorIndex) in module.sensorObjects"
+                        v-bind:key="sensor.id"
+                        :class="(moduleIndex + sensorIndex) % 2 == 0 ? 'left-reading' : 'right-reading'"
+                    >
+                        <div class="left sensor-name">{{ sensor.name }}</div>
+                        <div class="right sensor-unit">
+                            {{ sensor.unit }}
+                        </div>
+                        <div class="right sensor-reading">
                             {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
                         </div>
                     </div>
@@ -69,7 +73,7 @@
             </div>
             <router-link :to="{ name: 'viewData', params: { id: station.id } }">
                 <div id="view-data-btn" class="section">
-                    View Data
+                    Explore Data
                 </div>
             </router-link>
         </div>
@@ -84,14 +88,14 @@ export default {
     name: "StationSummary",
     data: () => {
         return {
-            viewingSummary: false
+            viewingSummary: false,
         };
     },
-    props: ["station", "isAuthenticated"],
+    props: ["station", "isAuthenticated", "placeName", "nativeLand"],
     computed: {
         stationSmallPhoto: function() {
             return API_HOST + this.station.photos.small;
-        }
+        },
     },
     methods: {
         viewSummary() {
@@ -103,7 +107,7 @@ export default {
         },
 
         getBatteryImg() {
-            const images = require.context("../assets/battery/", false, /\.png$/);
+            const imgPath = require.context("../assets/battery/", false, /\.png$/);
             const battery = this.station.status_json.batteryLevel;
             let img = "";
             if (battery == 0) {
@@ -119,24 +123,43 @@ export default {
             } else {
                 img = "100.png";
             }
-            return images("./" + img);
+            return imgPath("./" + img);
         },
 
         getModuleImg(module) {
-            let images = require.context("../assets/", false, /\.png$/);
-            let img = "placeholder.png";
-            // Note: this is not a trustworthy way of figuring out what icons to show,
-            // as the user could rename their module anything
-            if (module.name.indexOf("Water") > -1) {
-                img = "water.png";
+            let imgPath = require.context("../assets/", false, /\.png$/);
+            let img = "";
+            console.log("module.name", module.name);
+            switch (module.name) {
+                case "modules.distance":
+                    img = "Icon_Distance_Module.png";
+                    break;
+                case "modules.weather":
+                    img = "Icon_Weather_Module.png ";
+                    break;
+                case "modules.water.ec":
+                    img = "Icon_WaterConductivity_Module.png";
+                    break;
+                case "modules.water.ph":
+                    img = "Icon_WaterpH_Module.png";
+                    break;
+                case "modules.water.do":
+                    img = "Icon_DissolvedOxygen_Module.png";
+                    break;
+                case "modules.water.temp":
+                    img = "Icon_WaterTemp_Module.png";
+                    break;
+                case "modules.water.orp":
+                    img = "Icon_Water_Module.png";
+                    break;
+                case "modules.water.unknown":
+                    img = "Icon_Water_Module.png";
+                    break;
+                default:
+                    img = "Icon_Generic_Module.png";
+                    break;
             }
-            if (module.name.indexOf("Weather") > -1) {
-                img = "weather.png";
-            }
-            if (module.name.indexOf("Ocean") > -1) {
-                img = "ocean.png";
-            }
-            return images("./" + img);
+            return imgPath("./" + img);
         },
 
         getLat() {
@@ -160,32 +183,25 @@ export default {
             if (this.$route.name != "stations") {
                 this.$router.push({ name: "stations" });
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
 <style scoped>
 #station-summary-container {
     background-color: #ffffff;
-    width: 400px;
+    width: 350px;
     position: absolute;
-    top: 40px;
-    left: 260px;
-    padding: 0 15px 15px 15px;
+    top: 145px;
+    left: 300px;
+    padding: 0 20px 20px 10px;
     margin: 60px;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
 }
-.no-stations-message {
-    font-size: 20px;
-}
-.show-link {
-    text-decoration: underline;
-}
 .station-container {
-    padding: 10px;
-    margin: 20px 0;
+    margin: 20px 0 0 0;
     font-size: 14px;
     font-weight: lighter;
     overflow: hidden;
@@ -197,9 +213,25 @@ export default {
 .spacer {
     float: left;
     width: 100%;
-    margin: 20px 0;
-    border-bottom: 1px solid rgb(215, 220, 225);
+    margin: 5px 0 10px 10px;
+    border-bottom: 1px solid #f1eeee;
     height: 1px;
+}
+.small-light {
+    font-size: 12px;
+    color: #6a6d71;
+}
+.location-item {
+    margin: 10px;
+    width: 100%;
+}
+.location-item img {
+    float: left;
+    margin: 2px 5px 0 0;
+}
+.native-land-link {
+    font-weight: bold;
+    text-decoration: underline;
 }
 .left {
     float: left;
@@ -216,41 +248,62 @@ export default {
 }
 #battery {
     margin-right: 5px;
+    width: 20px;
+    height: 11px;
 }
 .small-space {
     margin: 3px;
-}
-#location-container {
-    width: 50%;
 }
 #location-container .left {
     margin-left: 10px;
 }
 #readings-label {
-    margin-bottom: 10px;
+    margin: 0 0 10px 10px;
 }
-.reading {
+.left-reading,
+.right-reading {
     width: 40%;
-    float: left;
-    margin: 5px 10px 5px 0;
+    margin: 8px 0;
     padding: 5px 10px;
-    background-color: rgb(233, 233, 233);
-    border: 1px solid rgb(200, 200, 200);
+    background-color: #f4f5f7;
+    border-radius: 2px;
+}
+.left-reading {
+    float: left;
+    margin-left: 10px;
+}
+.right-reading {
+    float: right;
+    margin-right: 3px;
+}
+.sensor-name {
+    font-size: 11px;
+    line-height: 20px;
+}
+.sensor-reading {
+    font-size: 16px;
+}
+.sensor-unit {
+    font-size: 10px;
+    margin: 6px 0 0 4px;
 }
 #view-data-btn {
     width: 90%;
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
     text-align: center;
     padding: 10px;
-    margin: 20px 0;
-    background-color: rgb(243, 243, 243);
+    margin: 30px 0 0 10px;
+    background-color: #ce596b;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
 }
 #close-form-btn {
-    float: right;
-    margin-top: 15px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     cursor: pointer;
 }
 </style>

@@ -1,31 +1,66 @@
 <template>
     <div>
-        <SidebarNav viewing="stations" :stations="stations" :projects="projects" @showStation="showSummary" />
+        <SidebarNav
+            viewing="stations"
+            :isAuthenticated="isAuthenticated"
+            :stations="stations"
+            :projects="projects"
+            @showStation="showSummary"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel">
             <mapbox
+                class="stations-map"
                 :access-token="mapboxToken"
                 :map-options="{
-                    style: 'mapbox://styles/mapbox/light-v10',
+                    style: 'mapbox://styles/mapbox/outdoors-v11',
                     center: coordinates,
-                    zoom: 14
+                    zoom: 14,
                 }"
                 :nav-control="{
                     show: true,
-                    position: 'bottom-left'
+                    position: 'bottom-left',
                 }"
                 @map-init="mapInitialized"
             />
             <StationSummary
                 :isAuthenticated="isAuthenticated"
                 :station="activeStation"
+                :placeName="placeName"
+                :nativeLand="nativeLand"
                 ref="stationSummary"
             />
+            <div v-if="isAuthenticated && showNotice" id="no-stations">
+                <div id="close-notice-btn" v-on:click="closeNotice">
+                    <img alt="Close" src="../assets/close.png" />
+                </div>
+                <p class="heading">Add a New Station</p>
+                <p class="text">
+                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
+                    your account.
+                </p>
+                <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
+                    <img alt="App store" src="../assets/appstore.png" class="app-btn" />
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
+                    <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
+                </a>
+            </div>
+            <div v-if="failedAuth" id="no-auth">
+                <p>
+                    Please
+                    <router-link :to="{ name: 'login' }" class="show-link">
+                        log in
+                    </router-link>
+                    to view stations.
+                </p>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import _ from "lodash";
 import FKApi from "../api/api";
 import Mapbox from "mapbox-gl-vue";
 import { MAPBOX_ACCESS_TOKEN } from "../secrets";
@@ -39,20 +74,22 @@ export default {
         Mapbox,
         HeaderBar,
         SidebarNav,
-        StationSummary
+        StationSummary,
     },
     props: ["id"],
     data: () => {
         return {
             user: {},
             projects: [],
-            stations: {
-                stations: []
-            },
+            stations: [],
             activeStation: null,
+            showNotice: false,
+            placeName: "",
+            nativeLand: [],
             isAuthenticated: false,
+            failedAuth: false,
             coordinates: [-96, 37.8],
-            mapboxToken: MAPBOX_ACCESS_TOKEN
+            mapboxToken: MAPBOX_ACCESS_TOKEN,
         };
     },
     watch: {
@@ -60,16 +97,20 @@ export default {
             if (to.name == "stations") {
                 this.$refs.stationSummary.closeSummary();
             }
-        }
+        },
     },
     async beforeCreate() {
-        const api = new FKApi();
-        api.getCurrentUser()
+        this.api = new FKApi();
+        this.api
+            .getCurrentUser()
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                api.getStations().then(stations => {
-                    this.stations = stations && stations.stations ? stations.stations : [];
+                this.api.getStations().then(s => {
+                    this.stations = s.stations;
+                    if (this.stations.length == 0) {
+                        this.showNotice = true;
+                    }
                     if (this.map) {
                         this.initStations();
                     } else {
@@ -79,17 +120,17 @@ export default {
                         let station = this.stations.find(s => {
                             return s.id == this.id;
                         });
-                        this.activeStation = station;
-                        this.$refs.stationSummary.viewSummary();
+                        this.showSummary(station, true);
                     }
                 });
-                api.getProjects().then(projects => {
+                this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
                 });
             })
             .catch(() => {
+                this.failedAuth = true;
                 // handle non-logged in state
                 if (this.map) {
                     this.initStations();
@@ -118,7 +159,6 @@ export default {
             if (this.stations && this.stations.length > 0) {
                 this.updateMap();
             } else {
-                this.$refs.stationSummary.viewSummary();
                 this.map.setZoom(6);
             }
         },
@@ -131,10 +171,7 @@ export default {
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
                 return (
-                    s.status_json.latitude &&
-                    s.status_json.longitude &&
-                    s.status_json.latitude != 1000 &&
-                    s.status_json.longitude != 1000
+                    s.status_json.latitude && s.status_json.longitude && s.status_json.latitude != 1000 && s.status_json.longitude != 1000
                 );
             });
             mappable.forEach(s => {
@@ -142,7 +179,7 @@ export default {
                 if (mappable.length == 1) {
                     this.map.setCenter({
                         lat: coordinates[0],
-                        lng: coordinates[1]
+                        lng: coordinates[1],
                     });
                 } else {
                     if (s.status_json.latitude > latMax) {
@@ -162,12 +199,12 @@ export default {
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [coordinates[1], coordinates[0]]
+                        coordinates: [coordinates[1], coordinates[0]],
                     },
                     properties: {
                         title: s.name,
-                        icon: "marker"
-                    }
+                        icon: "marker",
+                    },
                 });
             });
             // sort by latitude
@@ -204,8 +241,8 @@ export default {
                     type: "geojson",
                     data: {
                         type: "FeatureCollection",
-                        features: stationFeatures
-                    }
+                        features: stationFeatures,
+                    },
                 },
                 layout: {
                     "icon-image": "{icon}-15",
@@ -213,8 +250,8 @@ export default {
                     "text-field": "{title}",
                     "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                     "text-offset": [0, 0.75],
-                    "text-anchor": "top"
-                }
+                    "text-anchor": "top",
+                },
                 // paint: {
                 //     "text-color": "#0000ff"
                 // }
@@ -224,12 +261,12 @@ export default {
                 let bounds = [
                     {
                         lat: latMin,
-                        lng: longMin
+                        lng: longMin,
                     },
                     {
                         lat: latMax,
-                        lng: longMax
-                    }
+                        lng: longMax,
+                    },
                 ];
                 this.map.fitBounds(bounds, { duration: 0 });
                 // fitBounds is cropped too close: zoom out
@@ -245,24 +282,47 @@ export default {
                 const station = stationsView.stations.find(s => {
                     return s.name == name;
                 });
-                stationsView.activeStation = station;
-                stationsView.$refs.stationSummary.viewSummary();
-                stationsView.updateStationRoute(station);
+                stationsView.showSummary(station);
             });
         },
 
-        showSummary(station) {
+        getPlaceName() {
+            const longLatMapbox = this.activeStation.status_json.longitude + "," + this.activeStation.status_json.latitude;
+            return this.api.getPlaceName(longLatMapbox).then(result => {
+                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
+            });
+        },
+
+        getNativeLand() {
+            const latLongNative = this.activeStation.status_json.latitude + "," + this.activeStation.status_json.longitude;
+            return this.api.getNativeLand(latLongNative);
+        },
+
+        showSummary(station, preserveRoute) {
             this.activeStation = station;
-            this.$refs.stationSummary.viewSummary();
-            this.updateStationRoute(station);
+            this.getPlaceName()
+                .then(this.getNativeLand)
+                .then(result => {
+                    this.nativeLand = _.map(_.flatten(_.map(result, "properties")), r => {
+                        return { name: r.Name, url: r.description };
+                    });
+                    this.$refs.stationSummary.viewSummary();
+                    if (!preserveRoute) {
+                        this.updateStationRoute(station);
+                    }
+                });
         },
 
         updateStationRoute(station) {
             if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
                 this.$router.push({ name: "viewStation", params: { id: station.id } });
             }
-        }
-    }
+        },
+
+        closeNotice() {
+            this.showNotice = false;
+        },
+    },
 };
 </script>
 
@@ -273,5 +333,48 @@ export default {
 #map {
     width: 100%;
     height: 100vh;
+}
+#no-auth {
+    font-size: 20px;
+    background-color: #ffffff;
+    width: 400px;
+    position: absolute;
+    top: 40px;
+    left: 260px;
+    padding: 0 15px 15px 15px;
+    margin: 60px;
+    border: 1px solid rgb(215, 220, 225);
+    z-index: 2;
+}
+#no-stations {
+    background-color: #ffffff;
+    width: 360px;
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    padding: 75px 60px 75px 60px;
+    margin: 135px 0 0 -120px;
+    text-align: center;
+    border: 1px solid rgb(215, 220, 225);
+    z-index: 2;
+}
+#no-stations .heading {
+    font-size: 18px;
+    font-weight: bold;
+}
+#no-stations .text {
+    font-size: 14px;
+}
+#no-stations .app-btn {
+    margin: 20px 14px;
+}
+#close-notice-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+.show-link {
+    text-decoration: underline;
 }
 </style>

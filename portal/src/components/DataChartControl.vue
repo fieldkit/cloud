@@ -1,9 +1,9 @@
 <template>
     <div id="data-chart-container">
-        <div v-if="this.noStation" class="no-data-message">
+        <div v-if="this.noStation" class="size-20">
             <p>No station found.</p>
         </div>
-        <div v-if="this.station && this.foundNoData" class="no-data-message">
+        <div v-if="this.station && this.foundNoData" class="size-20">
             <p>No data from {{ station.name }} has been uploaded yet.</p>
         </div>
 
@@ -13,9 +13,9 @@
 
         <div class="white-bkgd" v-if="this.station">
             <!-- compare and time window buttons -->
-            <div id="chart-controls">
-                <div id="control-btn-container">
-                    <div class="control-btn" v-on:click="addChildChart">
+            <div id="chart-controls" v-if="!this.foundNoData">
+                <div id="compare-btn-container">
+                    <div class="compare-btn" v-on:click="addChildChart">
                         <img alt="" src="../assets/Compare_icon.png" />
                         <span>Compare</span>
                     </div>
@@ -68,10 +68,11 @@
                     </div>
                 </div>
                 <D3Chart
+                    class="d3Chart"
                     :ref="chart.ref"
                     :chartParam="chart"
                     :station="station"
-                    :stationSummary="stationSummary"
+                    :summary="stationSummary"
                     @timeZoomed="onTimeZoomed"
                     @unlinkCharts="unlinkCharts"
                     @zoomOut="setTimeRangeByDays"
@@ -149,11 +150,11 @@ export default {
                 this.stationSensors = this.combinedStationInfo.sensors;
                 if (this.stationSummary.length > 0) {
                     this.initCharts();
-                } else {
-                    this.foundNoData = true;
-                    this.hideLoading();
+                    return;
                 }
             }
+            this.foundNoData = true;
+            this.hideLoading();
         },
     },
     mounted() {
@@ -205,7 +206,9 @@ export default {
                 extent: extent,
             };
             if (timeCheck.addChart) {
-                document.getElementById("main-loading").style.display = "none";
+                if (document.getElementById("main-loading")) {
+                    document.getElementById("main-loading").style.display = "none";
+                }
                 this.charts.push(newChart);
             } else {
                 this.pending.push(newChart);
@@ -299,7 +302,9 @@ export default {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
                     this.$emit("chartTimeChanged", { start: start, end: end }, chartId);
-                    document.getElementById("main-loading").style.display = "none";
+                    if (document.getElementById("main-loading")) {
+                        document.getElementById("main-loading").style.display = "none";
+                    }
                 }
             }
             return { addChart: addChart, range: [start, end] };
@@ -500,6 +505,9 @@ export default {
             this.updateRoute();
         },
         showLoading(chartId) {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "block";
+            }
             if (chartId) {
                 document.getElementById(chartId + "-loading").style.display = "block";
             } else {
@@ -510,6 +518,9 @@ export default {
             }
         },
         hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
             const loadings = document.getElementsByClassName("loading");
             for (let i = 0; i < loadings.length; i++) {
                 loadings[i].style.display = "none";
@@ -656,7 +667,7 @@ export default {
     float: left;
     margin-right: 20px;
 }
-.no-data-message {
+.size-20 {
     font-size: 20px;
 }
 .synced {
@@ -674,14 +685,14 @@ export default {
     float: left;
     clear: both;
 }
-#control-btn-container {
+#compare-btn-container {
     float: left;
 }
 #time-control-container {
     float: right;
     margin-right: 10px;
 }
-.control-btn {
+.compare-btn {
     font-size: 12px;
     float: left;
     padding: 5px 10px;
@@ -691,7 +702,7 @@ export default {
     border-radius: 4px;
     cursor: pointer;
 }
-.control-btn img {
+.compare-btn img {
     vertical-align: middle;
     margin-right: 10px;
 }

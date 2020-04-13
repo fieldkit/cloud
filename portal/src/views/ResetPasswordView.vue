@@ -119,10 +119,10 @@ export default {
                 };
                 this.api
                     .resetPassword(data)
-                    .then(result => {
+                    .then(() => {
                         this.resetSuccess = true;
                     })
-                    .catch(e => {
+                    .catch(() => {
                         this.failedReset = true;
                     });
             }

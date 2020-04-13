@@ -1,6 +1,6 @@
 import axios from "axios";
 import TokenStorage from "./tokens";
-import { API_HOST } from "../secrets";
+import { API_HOST, MAPBOX_ACCESS_TOKEN } from "../secrets";
 
 class FKApi {
     constructor() {
@@ -40,6 +40,14 @@ class FKApi {
             // console.log("Error:", err);
             throw new Error("Log In Failed");
         }
+    }
+
+    register(user) {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/users",
+            data: user,
+        }).then(this._handleResponse.bind(this));
     }
 
     updatePassword(data) {
@@ -386,6 +394,26 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getPlaceName(longLat) {
+        return axios({
+            method: "GET",
+            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/" + longLat + ".json?types=place&access_token=" + MAPBOX_ACCESS_TOKEN,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getNativeLand(location) {
+        return axios({
+            method: "GET",
+            url: "https://native-land.ca/api/index.php?maps=territories&position=" + location,
+            headers: {
+                "Content-Type": "application/json",
             },
         }).then(this._handleResponse.bind(this));
     }

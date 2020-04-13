@@ -1,6 +1,12 @@
 <template>
     <div>
-        <SidebarNav viewing="data" :stations="stations" :projects="projects" @showStation="showStation" />
+        <SidebarNav
+            :isAuthenticated="isAuthenticated"
+            viewing="data"
+            :stations="stations"
+            :projects="projects"
+            @showStation="showStation"
+        />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <div id="data-view-background" class="main-panel" v-show="isAuthenticated">
             <div id="data-container">
@@ -12,9 +18,9 @@
                 </router-link>
                 <div>
                     <div id="station-name">
-                        {{ this.station ? this.station.name : "" }}
+                        {{ station ? station.name : "" }}
                     </div>
-                    <div class="small-label">{{ this.station ? getSyncedDate() : "" }}</div>
+                    <div class="small-label">{{ station ? getSyncedDate() : "" }}</div>
                     <div class="block-label">Data visualization</div>
                 </div>
                 <DataChartControl
@@ -215,9 +221,13 @@ export default {
         },
 
         initiateDataRetrieval() {
-            this.fetchSummary().then(result => {
-                this.handleInitialDataSummary(result);
-            });
+            this.fetchSummary()
+                .then(result => {
+                    this.handleInitialDataSummary(result);
+                })
+                .catch(() => {
+                    this.combinedStationInfo = [];
+                });
         },
 
         handleInitialDataSummary(result) {

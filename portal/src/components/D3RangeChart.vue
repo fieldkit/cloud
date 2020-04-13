@@ -14,7 +14,7 @@ export default {
     props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false
+            activeMode: false,
         };
     },
     watch: {
@@ -22,7 +22,7 @@ export default {
             if (this.activeMode) {
                 this.makeRange();
             }
-        }
+        },
     },
     methods: {
         setStatus(status) {
@@ -38,10 +38,7 @@ export default {
             this.xHist = d3
                 .scaleTime()
                 .domain([this.chart.start, this.chart.end])
-                .range([
-                    this.layout.marginLeft,
-                    this.layout.width - this.layout.marginLeft - this.layout.marginRight
-                ]);
+                .range([this.layout.marginLeft, this.layout.width - this.layout.marginLeft - this.layout.marginRight]);
 
             // let interval = DAY;
             // this.timeRange = this.chart.end - this.chart.start;
@@ -71,10 +68,7 @@ export default {
             this.yHist = d3
                 .scaleLinear()
                 .domain(this.chart.extent)
-                .range([
-                    this.layout.height - this.layout.marginBottom - this.layout.marginTop,
-                    this.layout.marginTop
-                ]);
+                .range([this.layout.height - this.layout.marginBottom - this.layout.marginTop, this.layout.marginTop]);
 
             // set axes
             this.xAxis = d3.axisBottom(this.xHist).ticks(10);
@@ -102,10 +96,7 @@ export default {
                     const mx = d3.max(d, b => {
                         return b[d3Chart.chart.sensor.key];
                     });
-                    const r =
-                        mx || mx === 0
-                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                            : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -130,14 +121,7 @@ export default {
             this.xAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "x-axis")
-                .attr(
-                    "transform",
-                    "translate(" +
-                        0 +
-                        "," +
-                        (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) +
-                        ")"
-                )
+                .attr("transform", "translate(" + 0 + "," + (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) + ")")
                 .call(this.xAxis);
 
             this.chart.svg.selectAll(".y-axis").remove();
@@ -148,7 +132,7 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         updateRange(bins) {
             let d3Chart = this;
@@ -166,10 +150,7 @@ export default {
                     const mx = d3.max(d, b => {
                         return b[d3Chart.chart.sensor.key];
                     });
-                    const r =
-                        mx || mx === 0
-                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                            : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -193,10 +174,7 @@ export default {
                     const mx = d3.max(d, b => {
                         return b[d3Chart.chart.sensor.key];
                     });
-                    const r =
-                        mx || mx === 0
-                            ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")"
-                            : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
@@ -284,8 +262,14 @@ export default {
                     )
                     .style("stop-opacity", 1);
             });
-        }
-    }
+        },
+        hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
+        },
+    },
 };
 </script>
 

@@ -13,7 +13,7 @@ export default {
     props: ["chart", "layout"],
     data: () => {
         return {
-            activeMode: false
+            activeMode: false,
         };
     },
     watch: {
@@ -21,7 +21,7 @@ export default {
             if (this.activeMode) {
                 this.makeHistogram();
             }
-        }
+        },
     },
     methods: {
         setStatus(status) {
@@ -38,10 +38,7 @@ export default {
             this.xHist = d3
                 .scaleLinear()
                 .domain(this.chart.extent)
-                .range([
-                    this.layout.marginLeft,
-                    this.layout.width - this.layout.marginRight - this.layout.marginLeft
-                ]);
+                .range([this.layout.marginLeft, this.layout.width - this.layout.marginRight - this.layout.marginLeft]);
 
             // use this formula to create thresholds, so that bars will have the same width
             // and none of them will end outside the chart area
@@ -68,12 +65,9 @@ export default {
                     0,
                     d3.max(bins, d => {
                         return d.length;
-                    })
+                    }),
                 ])
-                .range([
-                    this.layout.height - this.layout.marginTop - this.layout.marginBottom,
-                    this.layout.marginTop
-                ]);
+                .range([this.layout.height - this.layout.marginTop - this.layout.marginBottom, this.layout.marginTop]);
 
             // set axes
             this.xAxis = d3.axisBottom(this.xHist).ticks(binCount);
@@ -107,10 +101,7 @@ export default {
                 .attr("height", d => {
                     return d.length == 0
                         ? 0
-                        : d3Chart.layout.height -
-                              d3Chart.yHist(d.length) -
-                              d3Chart.layout.marginBottom -
-                              d3Chart.layout.marginTop;
+                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
                 });
 
             this.chart.svg.selectAll(".x-axis").remove();
@@ -118,14 +109,7 @@ export default {
             this.xAxisGroup = this.chart.svg
                 .append("g")
                 .attr("class", "x-axis")
-                .attr(
-                    "transform",
-                    "translate(" +
-                        0 +
-                        "," +
-                        (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) +
-                        ")"
-                )
+                .attr("transform", "translate(" + 0 + "," + (this.layout.height - (this.layout.marginBottom + this.layout.marginTop)) + ")")
                 .call(this.xAxis);
 
             this.chart.svg.selectAll(".y-axis").remove();
@@ -136,7 +120,7 @@ export default {
                 .attr("transform", "translate(" + this.layout.marginLeft + ",0)")
                 .call(this.yAxis);
 
-            document.getElementById(this.chart.id + "-loading").style.display = "none";
+            this.hideLoading();
         },
         updateHistogram(bins) {
             let d3Chart = this;
@@ -158,10 +142,7 @@ export default {
                 .attr("height", d => {
                     return d.length == 0
                         ? 0
-                        : d3Chart.layout.height -
-                              d3Chart.yHist(d.length) -
-                              d3Chart.layout.marginBottom -
-                              d3Chart.layout.marginTop;
+                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
                 });
 
             // updating any existing bars
@@ -178,10 +159,7 @@ export default {
                 .attr("height", d => {
                     return d.length == 0
                         ? 0
-                        : d3Chart.layout.height -
-                              d3Chart.yHist(d.length) -
-                              d3Chart.layout.marginBottom -
-                              d3Chart.layout.marginTop;
+                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
                 });
 
             // remove any extra bars
@@ -198,8 +176,14 @@ export default {
                 .transition()
                 .duration(1000)
                 .call(this.yAxis);
-        }
-    }
+        },
+        hideLoading() {
+            if (document.getElementById("main-loading")) {
+                document.getElementById("main-loading").style.display = "none";
+            }
+            document.getElementById(this.chart.id + "-loading").style.display = "none";
+        },
+    },
 };
 </script>
 
