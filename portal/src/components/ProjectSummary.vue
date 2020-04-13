@@ -291,7 +291,7 @@ export default {
             }
         },
         getImageUrl(project) {
-            return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
+            return this.baseUrl + "/projects/" + project.id + "/media";
         },
         updateDisplayDates() {
             this.displayStartDate = "";
