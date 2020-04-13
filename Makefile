@@ -17,7 +17,7 @@ DOCKER_TAG ?= master
 SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
 TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
 
-default: setup binaries
+default: setup binaries tests
 
 setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
 
@@ -32,10 +32,16 @@ portal/src/secrets.js: portal/src/secrets.js.template
 
 binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkstreams
 
-all: binaries
+portal/node_modules:
+	cd portal && npm install
 
-tests:
-	cd legacy && yarn run flow
+tests: portal/node_modules
+	cd portal && vue-cli-service test:unit
+
+dev-portal: portal/node_modules
+	cd portal && npm run serve
+
+all: binaries
 
 server: $(BUILD)/server
 
