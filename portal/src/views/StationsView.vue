@@ -109,8 +109,12 @@ export default {
                 this.isAuthenticated = true;
 
                 return Promise.all([
-                    this.api.getStation(this.id).then(station => {
-                        return this.showSummary(station, true);
+                    Promise.resolve().then(() => {
+                        if (this.id) {
+                            return this.api.getStation(this.id).then(station => {
+                                return this.showSummary(station, true);
+                            });
+                        }
                     }),
                     this.api.getStations().then(s => {
                         this.stations = s.stations;
