@@ -54,10 +54,8 @@
                                 <div class="delete-link">
                                     <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
                                 </div>
-                                <span class="station-name">
-                                    <div class="station-link" v-on:click="showStation(station)">
-                                        {{ station.name }}
-                                    </div>
+                                <span class="station-name" v-on:click="showStation(station)">
+                                    {{ station.name }}
                                 </span>
                                 <br />
                                 Last seen {{ getUpdatedDate(station) }}
@@ -427,6 +425,7 @@ export default {
 }
 .station-name {
     font-weight: bold;
+    cursor: pointer;
 }
 .delete-link {
     float: right;
