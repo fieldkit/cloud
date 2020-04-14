@@ -1,490 +1,93 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-  SELECT * FROM
-               (
-                 SELECT
-                   DISTINCT ON (dsl.location)
-                     dsl.*,
-                   ROW_NUMBER() OVER (
-                     PARTITION BY device_id
-                     ORDER BY dsl.timestamp
-                   ) AS c
-                   FROM
-                       fieldkit.device_stream_location AS dsl
-               ) AS q
-   WHERE q.c < 20
-   LIMIT 500
+SELECT u.id AS user_id, u.name AS user, u.email AS email, p.id AS project_id, p.name AS project_name
+         FROM fieldkit.user AS u
+	LEFT JOIN fieldkit.project_user AS pu ON (pu.user_id = u.id)
+	LEFT JOIN fieldkit.project AS p ON (p.id = pu.project_id)
+	ORDER BY user_id, project_id
 
 #+END_SRC
 
 #+RESULTS:
-|    id | device_id                        | timestamp           | location                                           |  c |
-|-------+----------------------------------+---------------------+----------------------------------------------------+----|
-| 74157 | 0004a30b001ce557                 | 2019-02-04 14:51:27 | 0101000020E6100000CEC47421562D50C04087F9F202EC03C0 |  6 |
-| 74156 | 0004a30b001ce557                 | 2019-02-04 14:50:53 | 0101000020E6100000C6850321592D50C034F5BA4560EC03C0 |  5 |
-| 71325 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:08:29 | 0101000020E6100000776682E15C2D50C0BC95253ACBEC03C0 | 16 |
-| 71320 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:05:53 | 0101000020E61000002B172AFF5A2D50C0CDCCCCCCCCEC03C0 | 11 |
-| 74154 | 0004a30b001ce557                 | 2019-02-04 14:49:45 | 0101000020E61000002E3883BF5F2D50C0062FFA0AD2EC03C0 |  3 |
-| 71321 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:06:23 | 0101000020E61000006C06B8205B2D50C022E010AAD4EC03C0 | 12 |
-| 71314 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 06:58:52 | 0101000020E610000019C6DD205A2D50C0882AFC19DEEC03C0 |  5 |
-| 74155 | 0004a30b001ce557                 | 2019-02-04 14:50:19 | 0101000020E61000005376FA415D2D50C0836DC493DDEC03C0 |  4 |
-| 71323 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:07:23 | 0101000020E61000002426A8E15B2D50C0882AFC19DEEC03C0 | 14 |
-| 71327 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:09:37 | 0101000020E61000005A677C5F5C2D50C0B05582C5E1EC03C0 | 18 |
-| 74162 | 0004a30b001ce557                 | 2019-02-04 14:54:48 | 0101000020E610000023D8B8FE5D2D50C0E9B7AF03E7EC03C0 | 11 |
-| 71319 | 5b92ac9650534e5020312e31141312ff | 2019-02-06 07:05:23 | 0101000020E6100000A986FD9E582D50C011E335AFEAEC03C0 | 10 |
-| 74158 | 0004a30b001ce557                 | 2019-02-04 14:52:36 | 0101000020E6100000A6B6D4415E2D50C0FAEE5696E8EC03C0 |  7 |
-| 74151 | 0004a30b001ce557                 | 2019-02-04 14:58:16 | 0101000020E610000023D8B8FE5D2D50C04A4563EDEFEC03C0 | 17 |
-| 74161 | 0004a30b001ce557                 | 2019-02-04 14:54:10 | 0101000020E6100000FFE7305F5E2D50C083A7902BF5EC03C0 | 10 |
-| 74163 | 0004a30b001ce557                 | 2019-02-04 14:55:17 | 0101000020E610000023D8B8FE5D2D50C0A515DF50F8EC03C0 | 12 |
-| 74153 | 0004a30b001ce557                 | 2019-02-04 14:49:10 | 0101000020E6100000F8A8BF5E612D50C0F46BEBA7FFEC03C0 |  2 |
-| 74160 | 0004a30b001ce557                 | 2019-02-04 14:53:40 | 0101000020E610000065C746205E2D50C07767EDB60BED03C0 |  9 |
-| 74167 | 0004a30b001ce557                 | 2019-02-04 14:57:39 | 0101000020E6100000761893FE5E2D50C0F4A5B73F17ED03C0 | 16 |
-| 74168 | 0004a30b001ce557                 | 2019-02-04 14:58:45 | 0101000020E610000081785DBF602D50C0111D024702ED03C0 | 18 |
-| 74169 | 0004a30b001ce557                 | 2019-02-04 14:59:15 | 0101000020E6100000702711E15F2D50C04A7F2F8507ED03C0 | 19 |
-| 74152 | 0004a30b001ce557                 | 2019-02-04 14:48:40 | 0101000020E610000081785DBF602D50C04A7F2F8507ED03C0 |  1 |
-| 74165 | 0004a30b001ce557                 | 2019-02-04 14:56:17 | 0101000020E6100000E6577380602D50C03E3F8C101EED03C0 | 14 |
-| 74166 | 0004a30b001ce557                 | 2019-02-04 14:57:09 | 0101000020E610000041D7BE805E2D50C0A489778027ED03C0 | 15 |
-| 74159 | 0004a30b001ce557                 | 2019-02-04 14:53:10 | 0101000020E6100000941799805F2D50C09FCC3FFA26ED03C0 |  8 |
-| 74164 | 0004a30b001ce557                 | 2019-02-04 14:55:47 | 0101000020E61000008CD82780622D50C0938C9C853DED03C0 | 13 |
-| 67521 | 0004a30b001ca8c6                 | 2019-02-01 14:44:27 | 0101000020E610000019C6DD205A5050C036C82423670106C0 |  3 |
-| 67520 | 0004a30b001ca8c6                 | 2019-02-01 14:43:57 | 0101000020E6100000859675FF585050C0E12879758E0106C0 |  2 |
-| 38284 | 0004a30b001d0370                 | 2019-02-01 10:11:54 | 0101000020E6100000F1660DDE575050C0A7E8482EFF0106C0 |  6 |
-| 38283 | 0004a30b001d0370                 | 2019-02-01 10:11:20 | 0101000020E610000021054F21575050C0C4995FCD010206C0 |  5 |
-| 38282 | 0004a30b001d0370                 | 2019-02-01 10:10:45 | 0101000020E61000007A36AB3E575050C00876FC17080206C0 |  4 |
-| 38279 | 0004a30b001d0370                 | 2019-02-01 10:09:11 | 0101000020E6100000BB253960575050C0520FD1E80E0206C0 |  1 |
-| 38288 | 0004a30b001d0370                 | 2019-02-01 10:14:09 | 0101000020E61000000E661360585050C041D829560D0206C0 | 10 |
-| 38293 | 0004a30b001d0370                 | 2019-02-01 10:17:33 | 0101000020E61000005055A181585050C0469561DC0D0206C0 | 15 |
-| 38287 | 0004a30b001d0370                 | 2019-02-01 10:13:36 | 0101000020E610000074452921585050C0520FD1E80E0206C0 |  9 |
-| 38294 | 0004a30b001d0370                 | 2019-02-01 10:18:07 | 0101000020E61000000E661360585050C0520FD1E80E0206C0 | 16 |
-| 38280 | 0004a30b001d0370                 | 2019-02-01 10:09:45 | 0101000020E61000007A36AB3E575050C0793A5794120206C0 |  2 |
-| 67529 | 0004a30b001ca8c6                 | 2019-02-01 14:48:57 | 0101000020E610000019C6DD205A5050C05D8940F50F0206C0 | 11 |
-| 38297 | 0004a30b001d0370                 | 2019-02-01 10:19:49 | 0101000020E61000000E661360585050C0793A5794120206C0 | 19 |
-| 38285 | 0004a30b001d0370                 | 2019-02-01 10:12:28 | 0101000020E610000020B75F3E595050C0793A5794120206C0 |  7 |
-| 38281 | 0004a30b001d0370                 | 2019-02-01 10:10:15 | 0101000020E610000074452921585050C0A72215C6160206C0 |  3 |
-| 40372 | 0004a30b001ca8c6                 | 2019-02-01 14:50:11 | 0101000020E610000000000080575050C000000080270206C0 | 14 |
-| 67532 | 0004a30b001ca8c6                 | 2019-02-01 14:50:27 | 0101000020E61000005646239F575050C0965F0663440206C0 | 15 |
-| 67536 | 0004a30b001ca8c6                 | 2019-02-01 14:52:28 | 0101000020E6100000FD14C781575050C0B2101D02470206C0 | 19 |
-| 67526 | 0004a30b001ca8c6                 | 2019-02-01 14:46:57 | 0101000020E610000021054F21575050C09B560A815C0206C0 |  8 |
-| 67527 | 0004a30b001ca8c6                 | 2019-02-01 14:47:27 | 0101000020E61000008DD5E6FF555050C0B24AE9995E0206C0 |  9 |
-| 67528 | 0004a30b001ca8c6                 | 2019-02-01 14:48:27 | 0101000020E6100000DF15C1FF565050C0B80721205F0206C0 | 10 |
-| 67531 | 0004a30b001ca8c6                 | 2019-02-01 14:49:57 | 0101000020E6100000BB253960575050C0D4B837BF610206C0 | 13 |
-| 67525 | 0004a30b001ca8c6                 | 2019-02-01 14:46:27 | 0101000020E61000007A36AB3E575050C0622EA9DA6E0206C0 |  7 |
-| 67530 | 0004a30b001ca8c6                 | 2019-02-01 14:49:27 | 0101000020E6100000F1660DDE575050C0B284B531760206C0 | 12 |
-| 67519 | 0004a30b001ca8c6                 | 2019-02-01 14:42:43 | 0101000020E6100000CD76853E585050C00D5531957E0206C0 |  1 |
-| 67523 | 0004a30b001ca8c6                 | 2019-02-01 14:45:27 | 0101000020E6100000AAD4EC81565050C0B77BB94F8E0206C0 |  5 |
-| 67533 | 0004a30b001ca8c6                 | 2019-02-01 14:50:57 | 0101000020E610000021054F21575050C0EA20AF07930206C0 | 16 |
-| 67534 | 0004a30b001ca8c6                 | 2019-02-01 14:51:27 | 0101000020E6100000DF15C1FF565050C078962023A00206C0 | 17 |
-| 67524 | 0004a30b001ca8c6                 | 2019-02-01 14:45:57 | 0101000020E6100000DF15C1FF565050C0DFE00B93A90206C0 |  6 |
-| 67522 | 0004a30b001ca8c6                 | 2019-02-01 14:44:57 | 0101000020E610000027F6D03E565050C03F6EBF7CB20206C0 |  4 |
-| 67535 | 0004a30b001ca8c6                 | 2019-02-01 14:51:57 | 0101000020E610000069E55E60565050C0B6D782DE1B0306C0 | 18 |
-| 12443 | 0004a30b001d027c                 | 2019-02-02 14:22:24 | 0101000020E6100000CB9D9960383650C0931D1B81787D08C0 |  2 |
-| 12444 | 0004a30b001d027c                 | 2019-02-02 14:22:54 | 0101000020E61000004A0D6D00363650C05917B7D1007E08C0 |  3 |
-|     9 | c26ddebc50534e5020312e31130e12ff | 2019-02-02 13:21:26 | 0101000020E61000005B5EB9DE363650C06A4E5E64027E08C0 |  2 |
-| 12447 | 0004a30b001d027c                 | 2019-02-02 14:24:34 | 0101000020E6100000D3DC0A61353650C0817C09151C7E08C0 |  9 |
-| 12445 | 0004a30b001d027c                 | 2019-02-02 14:23:26 | 0101000020E6100000F7CC9200353650C04D11E0F42E7E08C0 |  5 |
-| 12448 | 0004a30b001d027c                 | 2019-02-02 14:25:09 | 0101000020E610000050FEEE1D353650C0A22424D2367E08C0 | 11 |
-| 12450 | 0004a30b001d027c                 | 2019-02-02 14:26:18 | 0101000020E61000006DFDF49F353650C0AE9E93DE377E08C0 | 15 |
-| 12446 | 0004a30b001d027c                 | 2019-02-02 14:24:00 | 0101000020E6100000629D2ADF333650C0BF0F0709517E08C0 |  7 |
-| 12449 | 0004a30b001d027c                 | 2019-02-02 14:25:43 | 0101000020E61000001BBD1AA0343650C0CA897615527E08C0 | 13 |
-|     2 | 0004a30b0022ee27                 | 2019-02-26 12:00:07 | 0101000020E6100000D9CD8C7E34B552C0EB5223F4330525C0 |  2 |
-|     5 | 0004a30b0022ee27                 | 2019-02-26 12:01:37 | 0101000020E610000050FEEE1D35B552C04FB0FF3A370525C0 |  5 |
-|     4 | 0004a30b0022ee27                 | 2019-02-26 12:01:07 | 0101000020E6100000F7CC920035B552C05A2A6F47380525C0 |  4 |
-|     3 | 0004a30b0022ee27                 | 2019-02-26 12:00:37 | 0101000020E6100000F7CC920035B552C01FF818AC380525C0 |  3 |
-|     6 | 0004a30b0022ee27                 | 2019-02-26 12:02:07 | 0101000020E61000005CACA8C134B552C0FAB9A1293B0525C0 |  6 |
-|     1 | 0004a30b0022ee27                 | 2019-02-26 11:59:24 | 0101000020E61000006DFDF49F35B552C077DB85E63A0525C0 |  1 |
+| user_id | user             | email                            | project_id | project_name             |
+|---------+------------------+----------------------------------+------------+--------------------------|
+|       2 | Jacob Lewallen   | jacob@conservify.org             |          1 | Demo Project             |
+|       3 | Shah Selbe       | shah@conservify.org              |          3 | Default FieldKit Project |
+|       4 | Libbey White     | libbey@conservify.org            |          5 | Default FieldKit Project |
+|       4 | Libbey White     | libbey@conservify.org            |          9 | Test project             |
+|       5 | Bradley Gawthrop | bradley@conservify.org           |            |                          |
+|       6 | Kristi Cervania  | kristi@conservify.org            |            |                          |
+|       7 | Susan Allen      | susan@susanallen.me              |          4 | Default FieldKit Project |
+|       7 | Susan Allen      | susan@susanallen.me              |          8 | Susan Test Project       |
+|       8 | Graeme Rae       | graemerae@gmail.com              |          2 | Default FieldKit Project |
+|       9 | Lauren McElroy   | lauren@conservify.org            |            |                          |
+|      10 | Jer Throp        | jer@conservify.org               |          6 | Default FieldKit Project |
+|      11 | Ricky            | ricky@adventurescientists.org    |            |                          |
+|      12 | Max Littlefield  | Max@adventurescientists.org      |            |                          |
+|      13 | Kristi           | cervaniakris@gmail.com           |            |                          |
+|      16 | Michelle Todhack | michelle@adventurescientists.org |            |                          |
+|      21 | Paulo            | paolivas@fiu.edu                 |          7 | FIU FieldKit Test        |
+|      22 | testsusan        | suedonym85+1@gmail.com           |         10 | Default FieldKit Project |
+|      25 | sudantest        | suedonym85@gmail.com             |         11 | Default FieldKit Project |
+|      26 | Demo             | demo@conservify.org              |          1 | Demo Project             |
+|      26 | Demo             | demo@conservify.org              |         12 | Default FieldKit Project |
+|      27 | Ari              | ahkoeppel@gmail.com              |         13 | Default FieldKit Project |
+|      28 | RobertH          | robertherrera042@gmail.com       |            |                          |
+|      29 | MatthewStockard  | matthewc.stockard@gmail.com      |            |                          |
+|      30 | nick mian        | nickmian@gmail.com               |            |                          |
+|      31 | Gary Ananian     | gary@kernriverconservancy.org    |         14 | Default FieldKit Project |
+|      32 | Marvin           | marvinroesinger1992@gmail.com    |            |                          |
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-  SELECT
-    s.id, s.device_id, s.timestamp, ST_AsText(s.location) AS location,
-    ARRAY(SELECT name FROM fieldkit.countries c WHERE ST_Contains(c.geom, location)) AS places
-    FROM fieldkit.device_stream_location AS s
-   ORDER BY s.timestamp DESC
+SELECT s.id AS station_id, s.name AS station_name, o.id AS owner_id, o.name AS owner, p.id AS project_id, p.name AS project_name
+		 FROM fieldkit.station AS s
+    LEFT JOIN fieldkit.user AS o ON (s.owner_id = o.id)
+	LEFT JOIN fieldkit.project_station AS ps ON (ps.station_id = s.id)
+	LEFT JOIN fieldkit.project AS p ON (p.id = ps.project_id)
+	 ORDER BY station_id, project_id
 
 #+END_SRC
 
 #+RESULTS:
-|   id | device_id                        | timestamp           | location                                   | places   |
-|------+----------------------------------+---------------------+--------------------------------------------+----------|
-| 6933 | 0004a30b001d027c                 | 2019-03-07 00:00:31 | POINT(-64.84716796875 -3.06156992912292)   | {Brazil} |
-| 5532 | 0004a30b001d027c                 | 2019-03-05 16:09:40 | POINT(-64.8472671508789 -3.06152200698853) | {Brazil} |
-| 3991 | 0004a30b001d027c                 | 2019-03-04 18:49:15 | POINT(-64.8471603393555 -3.06153702735901) | {Brazil} |
-| 3472 | 0004a30b001d027c                 | 2019-03-02 20:00:27 | POINT(-64.8471755981445 -3.06169700622559) | {Brazil} |
-| 3261 | 0004a30b001d027c                 | 2019-03-02 14:00:37 | POINT(-64.8471755981445 -3.06163191795349) | {Brazil} |
-| 2861 | 0004a30b001d027c                 | 2019-03-01 02:00:12 | POINT(-64.8471221923828 -3.06160497665405) | {Brazil} |
-| 2321 | 0004a30b001d027c                 | 2019-02-28 06:00:17 | POINT(-64.8470993041992 -3.06174492835999) | {Brazil} |
-| 1998 | 0004a30b001d027c                 | 2019-02-27 10:00:19 | POINT(-64.8471984863281 -3.06158208847046) | {Brazil} |
-| 1598 | 0004a30b001d027c                 | 2019-02-26 06:00:17 | POINT(-64.8470230102539 -3.061842918396)   | {Brazil} |
-| 1593 | 0004a30b001d027c                 | 2019-02-25 06:00:08 | POINT(-64.8470306396484 -3.06183004379272) | {Brazil} |
-| 1126 | 0004a30b001d027c                 | 2019-02-14 21:00:18 | POINT(-64.8470840454102 -3.0616250038147)  | {Brazil} |
-| 1122 | 0004a30b001d027c                 | 2019-02-08 14:00:43 | POINT(-64.847038269043 -3.06166005134583)  | {Brazil} |
-| 1121 | 0004a30b001d027c                 | 2019-02-08 07:10:43 | POINT(-64.8471527099609 -3.06155705451965) | {Brazil} |
-|  910 | 0004a30b001d027c                 | 2019-02-06 16:44:54 | POINT(-64.8470458984375 -3.06178498268127) | {Brazil} |
-|  860 | 0004a30b001d027c                 | 2019-02-05 22:00:16 | POINT(-64.8471374511719 -3.06164693832397) | {Brazil} |
-|  859 | 0004a30b001d027c                 | 2019-02-05 09:00:46 | POINT(-64.8471450805664 -3.06158995628357) | {Brazil} |
-|  676 | 0004a30b001d027c                 | 2019-02-04 02:00:20 | POINT(-64.8471298217773 -3.06165194511414) | {Brazil} |
-|    1 | c26ddebc50534e5020312e31130e12ff | 2019-02-03 20:54:57 | POINT(0.28999999165535 0.166666999459267)  | {}       |
-|  640 | 0004a30b001d027c                 | 2019-02-03 07:00:24 | POINT(-64.8471450805664 -3.06159806251526) | {Brazil} |
-|  471 | 0004a30b001d027c                 | 2019-02-02 18:00:23 | POINT(-64.847053527832 -3.06163001060486)  | {Brazil} |
+| station_id | station_name           | owner_id | owner           | project_id | project_name       |
+|------------+------------------------+----------+-----------------+------------+--------------------|
+|          1 | Ambitious Stingray 65  |        2 | Jacob Lewallen  |            |                    |
+|          2 | Admired Goose 81       |       10 | Jer Throp       |            |                    |
+|          3 | Nice-nice Lizard 98    |        6 | Kristi Cervania |            |                    |
+|          5 | swift fieldkit         |        8 | Graeme Rae      |            |                    |
+|          6 | Bewitched Husky 17     |        2 | Jacob Lewallen  |            |                    |
+|          7 | Scholarly Eagle 59     |       12 | Max Littlefield |            |                    |
+|          8 | Unusual Goat 80        |       12 | Max Littlefield |            |                    |
+|          9 | Extroverted Dolphin 12 |       12 | Max Littlefield |            |                    |
+|         10 | Superb Kangaroo 63     |       12 | Max Littlefield |            |                    |
+|         11 | Fuzzy Chicken 8        |        7 | Susan Allen     |          8 | Susan Test Project |
+|         12 | Jolly Penguin 81       |        2 | Jacob Lewallen  |          1 | Demo Project       |
+|         13 | Athletic Quail 73      |        3 | Shah Selbe      |            |                    |
+|         14 | Loud Dog 19            |       21 | Paulo           |          7 | FIU FieldKit Test  |
+|         15 | Massive Panda          |       21 | Paulo           |          7 | FIU FieldKit Test  |
+|         16 | Formal Mayfly 65       |        3 | Shah Selbe      |            |                    |
+|         17 | Gifted Sloth 44        |        2 | Jacob Lewallen  |            |                    |
+|         18 | Notable Dog 27         |       27 | Ari             |            |                    |
+|         19 | Chatty Mayfly 85       |       31 | Gary Ananian    |            |                    |
+|         20 | Highland Park Selbe    |        3 | Shah Selbe      |            |                    |
+|         21 | Handy Dragonfly 25     |        3 | Shah Selbe      |            |                    |
+|         22 | Joyous Rat 3           |        2 | Jacob Lewallen  |            |                    |
 
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-  SELECT * FROM fieldkit.device_stream LIMIT 10
+UPDATE fieldkit.project SET name = 'Demo Project' WHERE id = 1;
+INSERT INTO fieldkit.project_station (project_id, station_id) VALUES (1, 12) ON CONFLICT DO NOTHING;
+INSERT INTO fieldkit.project_user (project_id, user_id) VALUES (1, 26) ON CONFLICT DO NOTHING;
 
 #+END_SRC
 
 #+RESULTS:
-| id | time                       | stream_id                            | firmware                                 | device_id        |  size | file_id | url                                                                      | meta                                                                                                                                                                                                                                                                                                                                                                           | children |
-|----+----------------------------+--------------------------------------+------------------------------------------+------------------+-------+---------+--------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------|
-|  1 | 2018-08-25 19:54:49.393487 | 673f58dc-3de2-4a3a-94de-4d5a120bc723 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |   612 |       4 | https://fk-streams.s3.amazonaws.com/673f58dc-3de2-4a3a-94de-4d5a120bc723 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":612,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"4","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}   |          |
-|  2 | 2018-08-25 19:54:50.912552 | c7ebd906-d305-43b0-88be-2eaa3a454730 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 | 11119 |       2 | https://fk-streams.s3.amazonaws.com/c7ebd906-d305-43b0-88be-2eaa3a454730 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":11119,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""} |          |
-|  3 | 2018-08-25 19:55:03.032389 | 6e65fd7e-08df-4d01-8130-77503b1953f1 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |   278 |       4 | https://fk-streams.s3.amazonaws.com/6e65fd7e-08df-4d01-8130-77503b1953f1 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":278,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"4","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}   |          |
-|  4 | 2018-08-25 19:55:04.137407 | fb7d47ae-3de8-4cac-9211-53d66d0afa0e | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |  2166 |       2 | https://fk-streams.s3.amazonaws.com/fb7d47ae-3de8-4cac-9211-53d66d0afa0e | {"ContentType":"application/vnd.fk.data+binary","ContentLength":2166,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}  |          |
-|  5 | 2018-08-25 19:55:07.280033 | 407328c0-02f9-4f09-bfdc-e921025b9785 | 01850b8798bb8e75741e45a84436fc54181c2556 | 0004a30b001ce3ce |   153 |       4 | https://fk-streams.s3.amazonaws.com/407328c0-02f9-4f09-bfdc-e921025b9785 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":153,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"01850b8798bb8e75741e45a84436fc54181c2556","FkBuild":"","FkDeviceId":"0004a30b001ce3ce","FkFileId":"4","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"","FkUploadName":""}             |          |
-|  6 | 2018-08-25 19:55:08.940922 | b478236c-e628-4d40-92b0-1b91e7cd314a | 01850b8798bb8e75741e45a84436fc54181c2556 | 0004a30b001ce3ce | 10355 |       2 | https://fk-streams.s3.amazonaws.com/b478236c-e628-4d40-92b0-1b91e7cd314a | {"ContentType":"application/vnd.fk.data+binary","ContentLength":10355,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"01850b8798bb8e75741e45a84436fc54181c2556","FkBuild":"","FkDeviceId":"0004a30b001ce3ce","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"","FkUploadName":""}           |          |
-|  7 | 2018-08-25 19:55:38.303101 | ecc46ab1-f9af-4bb9-833a-8d1b20e69dca | 4b057bf2912f25600a3b1943607c31e2685e0d27 | 0004a30b001d1c5e |  3678 |       4 | https://fk-streams.s3.amazonaws.com/ecc46ab1-f9af-4bb9-833a-8d1b20e69dca | {"ContentType":"application/vnd.fk.data+binary","ContentLength":3678,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"4b057bf2912f25600a3b1943607c31e2685e0d27","FkBuild":"","FkDeviceId":"0004a30b001d1c5e","FkFileId":"4","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1534763815","FkUploadName":""}  |          |
-|  8 | 2018-08-25 19:55:39.923511 | b7631c3c-7be9-4acb-a30b-0915373b02c3 | 4b057bf2912f25600a3b1943607c31e2685e0d27 | 0004a30b001d1c5e | 23309 |       2 | https://fk-streams.s3.amazonaws.com/b7631c3c-7be9-4acb-a30b-0915373b02c3 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":23309,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"4b057bf2912f25600a3b1943607c31e2685e0d27","FkBuild":"","FkDeviceId":"0004a30b001d1c5e","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1534763815","FkUploadName":""} |          |
-|  9 | 2018-08-25 20:00:08.708546 | 9fe4997c-d726-4f83-9418-6bf5e885bac4 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |   363 |       4 | https://fk-streams.s3.amazonaws.com/9fe4997c-d726-4f83-9418-6bf5e885bac4 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":363,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"4","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}   |          |
-| 10 | 2018-08-25 20:00:10.054802 | 504e32b6-dcd4-4d74-8ff0-3b14cb18b0e8 | 6aa3f7440e60597cfb73fe5aca560e94b64dcfac | 0004a30b001cc468 |  6543 |       2 | https://fk-streams.s3.amazonaws.com/504e32b6-dcd4-4d74-8ff0-3b14cb18b0e8 | {"ContentType":"application/vnd.fk.data+binary","ContentLength":6543,"MediaType":"application/vnd.fk.data+binary","MediaTypeParams":{},"FkProcessing":"","FkVersion":"6aa3f7440e60597cfb73fe5aca560e94b64dcfac","FkBuild":"","FkDeviceId":"0004a30b001cc468","FkFileId":"2","FkFileOffset":"","FkFileVersion":"","FkFileName":"","FkCompiled":"1535201664","FkUploadName":""}  |          |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-  SELECT s.device_id,
-         (SELECT stream_id FROM fieldkit.device_stream AS s2 WHERE (s2.device_id = s.device_id) ORDER BY s2.time DESC LIMIT 1) AS last_stream_id,
-         (SELECT n.name FROM fieldkit.device_notes AS n WHERE (n.device_id = s.device_id) AND (n.name IS NOT NULL) ORDER BY n.time DESC LIMIT 1) AS name,
-         MAX(s.time) AS last_stream_time,
-         COUNT(s.*) AS number_of_files,
-         COALESCE(SUM(s.size) FILTER (WHERE s.file_id != '4'), 0) AS logs_size,
-         COALESCE(SUM(s.size) FILTER (WHERE s.file_id  = '4'), 0) AS data_size
-    FROM fieldkit.device_stream AS s
-   WHERE s.device_id != ''
-   GROUP BY s.device_id
-   ORDER BY last_stream_time DESC
-
-#+END_SRC
-
-#+RESULTS:
-| device_id                        | last_stream_id                       | name          | last_stream_time           | number_of_files | logs_size | data_size |
-|----------------------------------+--------------------------------------+---------------+----------------------------+-----------------+-----------+-----------|
-| 0004a30b001d027c                 | 50cde428-5b19-4841-b70c-0f98380bbc61 |               | 2019-05-01 10:27:23.12153  |             416 |  50172297 |   4093736 |
-| 0004a30b0023473f                 | 09686ffb-d8e0-4f63-bf11-5bb570f63a1b | Jacob's FkNat | 2019-04-30 14:55:12.898277 |               4 |  37599552 |   5799125 |
-| 0004a30b00232b40                 | 9a230ae8-723b-444b-b776-e2ed6e2278d0 |               | 2019-04-25 21:21:05.777113 |               5 |   5480184 |     51676 |
-| 0004a30b00234a26                 | a34f0c79-b04f-47d9-a00c-ff4b6daf4e35 |               | 2019-04-22 17:26:51.347836 |               4 |  12976325 |   1855703 |
-| 0004a30b0022ee5f                 | 8f50876c-8e37-46a5-8eee-457b83bf2f02 |               | 2019-04-22 17:24:00.885224 |               4 |   4480390 |     97024 |
-| 0004a30b00232ce9                 | 0a090e27-1d18-461d-a270-6a4d4da0226e |               | 2019-04-22 17:21:13.251412 |               5 |  12964071 |   1819869 |
-| 0004a30b0023490e                 | d483f838-3bda-4f1a-9362-b5a19efb7dac |               | 2019-04-22 17:17:44.887412 |               4 |   1186776 |   1583627 |
-| 0004a30b0023473e                 | 9bb9fbf0-bc30-48a2-a791-961d4ae045a4 |               | 2019-04-22 17:17:17.559278 |               2 |   1970549 |     25103 |
-| 0004a30b0022d4fb                 | 366b5c8f-be14-41c8-b504-bdf7a868e398 |               | 2019-04-22 17:14:23.289236 |              11 |  11470172 |    809149 |
-| 0004a30b00232a85                 | 0942a376-33e5-4728-8032-802e218bb775 |               | 2019-04-22 17:11:01.326136 |               8 |   6171131 |    403754 |
-| 0004a30b0023125f                 | 0227e55a-920e-4ac5-87cb-57aa4a5dc0d5 |               | 2019-04-18 19:07:07.442797 |               4 |     15988 |      4336 |
-| 0004a30b0022f153                 | 342cc7f8-8093-482c-a6c1-f0339f0709aa |               | 2019-04-16 02:14:16.695357 |              19 |    207320 |      8471 |
-| 0004a30b00234b5c                 | 77a717d8-039e-4832-8642-44c99ab26ab7 |               | 2019-04-16 02:14:15.086985 |              56 |    847307 |     46722 |
-| 0004a30b002360eb                 | 00464d5d-fb1d-47a8-855e-7b45abc596a3 |               | 2019-04-16 02:14:14.152618 |               1 |         0 |      3837 |
-| 0004a30b0023316e                 | 8eeb005a-3101-40a6-8b0a-9fe3e6d5a44f |               | 2019-04-16 02:14:02.545548 |               1 |         0 |    301171 |
-| 0004a30b0022f42b                 | 33fdfca1-d86f-4aea-aded-ca427eb41ea9 |               | 2019-04-16 02:13:42.623639 |               1 |         0 |    510302 |
-| 0004a30b00230d5c                 | cc5a2d51-ece9-49ab-a0fc-46027ebddc86 |               | 2019-04-16 02:13:40.350041 |               1 |         0 |      4546 |
-| 0004a30b00230bfc                 | b33f21e7-2348-441c-85c7-00521e353c28 |               | 2019-04-12 16:01:12.780766 |               4 |    473970 |     25462 |
-| 0004a30b0022eef0                 | 4e2942e3-6b8d-4906-9829-07b3de06681e |               | 2019-04-10 18:24:32.715499 |               4 |   9936108 |    857063 |
-| 0004a30b002363d8                 | 5d214bb6-1836-43b9-9710-70e1d15fa038 |               | 2019-04-09 21:04:19.220767 |               2 |   4709392 |    248016 |
-| 0004a30b0022d6ae                 | 9286367e-ee21-4ffe-b892-6e71c9c1182c |               | 2019-04-09 18:37:13.019682 |               4 |     65669 |      4832 |
-| 0004a30b0022ee27                 | da1722e2-ebca-407b-9725-8e3e3b716764 |               | 2019-03-30 15:16:04.946267 |               2 |     31409 |      9584 |
-| c26ddebc50534e5020312e31130e12ff | e9e629fe-087c-4956-afac-fbb1d4fb74c8 |               | 2019-03-13 10:52:44.877218 |             342 |   6705271 |  12003465 |
-| 0004a30b001d0370                 | 3d51b815-032d-4254-a021-762f1774acc5 |               | 2019-03-11 02:10:09.712897 |             134 |   2694549 |     93464 |
-| 0004a30b001ca8c6                 | 36d2b86a-b87a-497b-a9af-0215986ee458 |               | 2019-02-26 11:28:49.713994 |               6 |  23922252 |   1386824 |
-| 5b92ac9650534e5020312e31141312ff | 34b7d575-b71c-4147-ab19-7864d84b4c67 |               | 2019-02-26 11:14:16.08935  |               7 |  13724374 |    195805 |
-| 0004a30b001ce557                 | fe9bebfe-e34a-4e1e-9563-94e4372eee39 |               | 2019-02-26 11:11:08.734505 |              25 |   1066654 |    630305 |
-| 0004a30b001ca95a                 | 2c5f0e0a-da0c-4e24-94a1-56f8538f9634 |               | 2019-02-22 18:15:12.223802 |             146 |   1231629 |     89938 |
-| 0004a30b001ca6eb                 | 48cbbb3a-95bf-40fa-8fdc-f1a0286e3ae2 |               | 2019-02-21 20:04:17.332241 |             604 |   8800523 |    753133 |
-| 0004a30b001ca714                 | ace07ef9-c71a-42d2-a623-c225df0b76da |               | 2019-02-21 20:01:13.411994 |              57 |    372560 |     48248 |
-| 0004a30b00234d52                 | e1d431f2-fec2-42a8-b76a-eb5d9fbce2dd |               | 2019-02-15 20:01:52.647042 |              27 |    368594 |      6126 |
-| 0004a30b0023318b                 | 53ca1849-5f52-40d1-8470-5506e1e25b58 |               | 2019-02-15 19:10:05.366293 |              53 |    791761 |     11110 |
-| 0004a30b0022d47e                 | 589cb839-c1e5-42b0-9a02-5f2e9722b95a |               | 2019-02-15 19:04:19.332925 |              24 |    158961 |      5987 |
-| 0004a30b0022eee8                 | 9068febf-6e11-4bee-950b-dcab3086f978 |               | 2019-02-15 16:10:05.764026 |              34 |    518908 |      7026 |
-| 0004a30b00236150                 | 6b65c2d8-6214-4982-9389-bb66e57b1026 |               | 2019-02-15 15:17:41.315702 |               4 |      8285 |       858 |
-| 0004a30b00230ca9                 | 1c8ed40b-474a-4770-905a-8154194d6365 |               | 2019-02-15 09:10:06.864646 |              23 |    304682 |      5088 |
-| 0004a30b001cc6fb                 | 98fdc894-3562-4cdc-b44f-8dbedec39201 |               | 2019-02-10 23:06:08.635897 |               6 |    193170 |     22662 |
-| 0004a30b001cc4e1                 | 5937a876-e84a-456b-b014-f452f8646cda |               | 2019-02-09 20:08:12.429076 |            3261 |  54570874 |   3627719 |
-| 0004a30b001d0182                 | 7aaa4d90-3e8f-4801-bbff-3e1ae5e294f3 |               | 2019-02-09 18:57:15.54252  |             403 |   1528449 |     59681 |
-| 0004a30b001d0367                 | e943ad7b-337c-4358-b784-378e9ff85d25 |               | 2019-02-07 21:01:16.79944  |               7 |     13645 |     28606 |
-| 0004a30b001ce62a                 | ef829433-854a-4b81-bbc5-bc83c1077851 |               | 2019-02-07 21:01:12.961458 |            1159 |  31002190 |   4425149 |
-| 0004a30b001ca8c3                 | 9c5f3c8c-a375-4f91-b979-a554004ba80e |               | 2019-02-07 16:09:37.620208 |            1589 |  26156585 |    552676 |
-| 0004a30b001d0188                 | 69bac1f2-2096-457d-89c8-035a2e049187 |               | 2019-02-02 20:39:22.083427 |             949 |  12078770 |    604409 |
-| 0004a30b001ce389                 | 37e13e5f-64cb-438b-a506-a0b252fe3721 |               | 2019-01-10 00:12:00.585393 |              36 |    123686 |      9944 |
-| 0004a30b001d1c5b                 | 6788fedc-a0e9-4bed-b6b7-8d19060372dd |               | 2018-12-21 20:25:39.980452 |           17239 | 172442086 |  13321324 |
-| 74e5d679524b5051202020592e340cff | 08ec483c-be57-452b-b16d-21e9d7f6ab73 |               | 2018-12-11 23:55:15.290866 |              23 |    198748 |     16684 |
-| 0004a30b001ce3a0                 | 00390d67-0a6a-4a90-bd35-1d1978f8646e |               | 2018-12-05 00:42:26.479355 |           12641 |  74325728 |   3891700 |
-| 0004a30b001ce3eb                 | 250bc64d-4b66-423a-bd42-371e36a9e007 |               | 2018-11-28 00:15:14.817946 |               4 |     13332 |      1661 |
-| 0004a30b001cc719                 | 715dcfba-eae6-454d-91fe-8c73066cd573 |               | 2018-11-27 23:43:08.068725 |               4 |     43655 |      4151 |
-| b5e14dfd524b5051202020592f340cff | f758c937-5e2d-48c5-bb34-03c5e12d5bb9 |               | 2018-11-27 23:10:06.379582 |              10 |     96200 |      5828 |
-| 6b5eb0d8524b5051202020592f100cff | 1ae38cb0-6b77-4ab6-aa0f-b6c8b4b42f9b |               | 2018-11-27 21:13:26.025143 |               2 |      5830 |      1137 |
-| a6f00d91524b5051202020592f220cff | 46b3f421-31d5-495f-abf4-bfee9341cb1e |               | 2018-11-27 21:04:04.847007 |               5 |     17047 |      1543 |
-| 0004a30b001ce523                 | d178dd47-e4c5-4639-9cc1-e1b019480740 |               | 2018-11-27 19:53:52.488659 |            1888 |  52488206 |   5820874 |
-| 0004a30b001ce2e2                 | 69deb5b2-56a6-4253-9e05-47861cb7adb3 |               | 2018-11-27 19:39:43.683909 |             216 |   4644126 |    242344 |
-| 0004a30b001ca939                 | d30cfafd-cb2e-4794-8fd4-25ee2eba5322 |               | 2018-11-27 19:15:02.494456 |               2 |      4778 |       501 |
-| fccec1cc50534e5020312e31131b12ff | 5e046f90-d652-4286-b9e6-0f83172bae5d |               | 2018-11-27 19:13:05.006377 |               2 |      4621 |       525 |
-| 0004a30b001d0146                 | 7c568246-34ac-4447-bdc6-5f11c4e04328 |               | 2018-11-27 19:09:25.933314 |               4 |      5525 |       495 |
-| 74769b85524b5051202020592f330cff | 2ee208f8-09cc-4796-9765-f84076a77455 |               | 2018-11-27 18:58:57.330148 |               3 |      7882 |      1014 |
-| 0004a30b001cd2a5                 | ba2966e3-ea76-438d-b994-3caa32d217fc |               | 2018-10-31 18:44:17.279674 |              14 |    182235 |     17685 |
-| 0000000000000000                 | 0b0fd659-543e-43f7-bdf4-d863a38b28e2 |               | 2018-10-30 21:10:56.622247 |              48 |   4042172 |    514667 |
-| 0004a30b001d1c5e                 | ec3f64e5-e0d0-4f3a-8970-20d3618d7793 |               | 2018-10-26 18:05:27.668093 |           50469 | 728820459 |  64993701 |
-| 0004a30b001cc717                 | 4e632058-1429-4787-bdb6-53c9abedcbf7 |               | 2018-10-22 22:12:58.944375 |             177 |  47508510 |   4548384 |
-| 2f80495a524b5051202020592f1d0cff | 50bb4ca1-f463-407a-b461-0d543a616e25 |               | 2018-10-19 17:09:23.123941 |               5 |   1708196 |     54002 |
-| 0004a30b001ca8c4                 | 958fe249-cf82-4982-a5b2-9e86c0f76de6 |               | 2018-10-19 12:23:47.377241 |            1281 |  13368953 |    288117 |
-| 0004a30b001ca840                 | 7b298900-a5fb-4080-900d-0815f4ca5c70 |               | 2018-10-08 16:24:44.638004 |           10610 |  92451533 |   1635282 |
-| 0004a30b001cd2c5                 | cd3c609e-e0bc-401f-8c03-d6f86a07b398 |               | 2018-09-27 14:31:10.588653 |            3599 | 319605893 |   3117256 |
-| 0004a30b001ce4d4                 | f3798fc3-9275-4740-a022-1a7afccbe8de |               | 2018-09-14 23:20:04.968085 |            6542 |  23182810 |    564319 |
-| bd3b8c5e524b5051202020592f2a0cff | dfb327ae-66ed-45f6-894b-9954a30d3fc9 |               | 2018-09-14 23:19:44.731108 |            6093 | 134420489 |   2101922 |
-| 0004a30b001cd42e                 | 71a7f59e-fa1c-42dc-874a-fae5de24ca24 |               | 2018-09-06 17:58:21.945348 |              13 |     96627 |      2221 |
-| 0004a30b001ce3ce                 | c877f520-4a82-4879-96d2-5be26693150f |               | 2018-08-31 22:51:28.403091 |            1618 |  12023497 |    384089 |
-| 0004a30b001cc468                 | 448c70c5-1b58-41e8-909d-30209cb23345 |               | 2018-08-28 15:20:07.289764 |            7360 |  25573869 |   1452532 |
-| 0004a30b001d00ff                 | c6112dce-2a2a-44ea-907e-1b51a9e34b15 |               | 2018-08-16 22:30:04        |             723 |   1865788 |     70726 |
-| 9cff749754324e5120204a37380c06ff | f6468ee8-cdd6-4758-b25e-1088b0ad3faa |               | 2018-08-08 22:52:01        |               2 |      3935 |       387 |
-| ec47516c54324e5120204a37381206ff | 6147bbb3-2911-488b-ba47-9f78d9d24c68 |               | 2018-08-01 19:49:40        |              28 |     96290 |      6413 |
-| 0004a30b001c8448                 | f8f7f9de-8776-40d9-84a0-984369578fb7 |               | 2018-08-01 18:45:08        |               8 |     35741 |      3467 |
-| 0004a30b001ce3a4                 | f9ace5bc-9b79-4f0b-a81a-4ddc526d8f87 |               | 2018-07-21 17:03:57        |              30 |    406476 |     28126 |
-| 0004a30b001ce54a                 | b6c1383e-9c4e-44b5-8713-dc0bea05abcf |               | 2018-07-20 01:20:38        |             136 |   2928136 |      7968 |
-| 0004a30b001ce59f                 | 52286fb2-33cf-4398-8bb9-46547a4cd651 |               | 2018-07-20 00:43:31        |             193 |   6793079 |    721199 |
-| 0004a30b001ce645                 | e8c76b9c-8ee9-487c-a1ee-b667d6daa83e |               | 2018-07-20 00:28:29        |               4 |    307280 |     19656 |
-| 0004a30b001cc480                 | 7e2cc491-ba81-4d5f-aa5a-fe6ffd1e310c |               | 2018-07-19 23:30:39        |              87 |   1554520 |      2783 |
-| 0004a30b001d00e2                 | 9618c8f0-bfdc-4172-bb46-f1e22751c3cc |               | 2018-07-19 23:27:15        |             187 |   4906410 |    206493 |
-| 0004a30b001d1c60                 | 2ecfa816-2b7f-4448-a120-a7ccf12e5195 |               | 2018-07-19 23:24:23        |               4 |     12057 |      1925 |
-| 0004a30b001ca95f                 | 367f1c32-d16a-4c1e-962c-c731f4a67611 |               | 2018-07-19 22:52:03        |              11 |    174841 |     32227 |
-
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-  SELECT
-    DISTINCT ON (dsl.location)
-    dsl.device_id,
-    dsl.timestamp,
-    dsl.location
-  FROM
-  fieldkit.device_stream_location AS dsl JOIN fieldkit.device_owners AS dvo ON (dvo.device_id = dsl.device_id) LIMIT 10
-
-#+END_SRC
-
-#+RESULTS:
-| device_id        | timestamp           | location                                           |
-|------------------+---------------------+----------------------------------------------------|
-| 0004a30b00232b9b | 2001-12-31 01:36:03 | 0101000020E6100000000000E0BA7C4640000000E0BA7C4640 |
-| 0004a30b00232b9b | 2019-01-22 20:54:54 | 0101000020E610000000000060CD925D40000000004B084140 |
-| 0004a30b00232b9b | 2019-06-01 12:04:18 | 0101000020E610000000000060689620C0000000C049084140 |
-| 0004a30b00232b9b | 2019-06-02 17:24:08 | 0101000020E610000000000040FE4B57C00000004071714640 |
-| 0004a30b00232b9b | 2019-06-02 17:24:22 | 0101000020E610000000000060E84B57C000000020C8714640 |
-| 0004a30b00232b9b | 2019-06-02 17:23:22 | 0101000020E610000000000040564C57C0000000E064704640 |
-| 0004a30b00232b9b | 2019-06-02 17:23:00 | 0101000020E6100000000000209B4C57C0000000606E704640 |
-| 0004a30b00232b9b | 2019-06-02 17:22:58 | 0101000020E610000000000000A14C57C00000008072704640 |
-| 0004a30b00232b9b | 2019-06-02 17:23:39 | 0101000020E6100000000000E0394C57C000000060BF704640 |
-| 0004a30b00232b9b | 2019-06-02 17:22:48 | 0101000020E610000000000020BE4C57C0000000C088704640 |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-SELECT * FROM fieldkit.device WHERE key = '0004a30b00232b9b';
-
-#+END_SRC
-
-#+RESULTS:
-| source_id | key              | token                                                    |
-|-----------+------------------+----------------------------------------------------------|
-|        81 | 0004a30b00232b9b | \x314d63305a4c786142716b5a46676847304a74574e4754664a3353 |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-SELECT updated_at FROM fieldkit.fk_update_dsl_summary(81);
-SELECT updated_at FROM fieldkit.fk_update_dsl_temporal_geometries(81);
-SELECT updated_at FROM fieldkit.fk_update_dsl_temporal_clusters(81);
-SELECT updated_at FROM fieldkit.fk_update_dsl_spatial_clusters(81);
-
-#+END_SRC
-
-#+RESULTS:
-| updated_at                 |
-|----------------------------|
-| 2019-06-13 23:40:42.678318 |
-| updated_at                 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| 2019-06-13 23:40:47.971544 |
-| updated_at                 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| 2019-06-13 23:40:52.664075 |
-| updated_at                 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-| 2019-06-13 23:40:57.605171 |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = 0 OR 0 == 0
-
-#+END_SRC
-
-#+RESULTS:
-| id | expedition_id | name                             | team_id | user_id | active | visible | source_id | key                              | token                                                    |
-|----+---------------+----------------------------------+---------+---------+--------+---------+-----------+----------------------------------+----------------------------------------------------------|
-|  4 |             2 | atlas-1                          |         |         | f      | t       |         4 | 0004a30b001d1c5e                 | \x307a4a7a4f33753943644d377079634958686a66714a4567577953 |
-|  2 |             2 | nat-1                            |         |         | f      | t       |         2 | cbb0e36b54324e5120204a37381f06ff | \x307a4a76574d776b4d76746766494968435953316b57574159616b |
-|  3 |             2 | nat-2                            |         |         | f      | t       |         3 | 3856141154324e5120202037242c13ff | \x307a4a7a374534703438373051416b594862715632626e72677a4a |
-|  1 |             2 | fkn-congo                        |         |         | f      | t       |         1 | 0004a30b001cc71e                 | \x31317075425446415252656f71394d317757624a30646b54447743 |
-|  6 |             2 | weather-shah                     |         |         | f      | t       |         6 | 0004a30b001cd2c5                 | \x313136636a4c796e4b4458424d3736714c54764a43377672647130 |
-|  7 |             2 | weather-1                        |         |         | f      | t       |         7 | 0004a30b001ca901                 | \x307a5963734155395a626e4e464d6a536d7441556466764e673736 |
-|  8 |             2 | fk-nat-2                         |         |         | f      | t       |         8 | 0004a30b001cc717                 | \x3134626835356865674961534e4935427049334248365753613874 |
-| 11 |             2 | fkn-natgeo                       |         |         | f      | t       |        11 | 0004a30b001ce536                 | \x3134794937575a30696177483361687259744d4a38504a34575145 |
-|  5 |             2 | fkn-jacob                        |         |         | f      | t       |         5 | 0004a30b001c8d6e                 | \x31304568316f53594c696668555648393469415954306a37577772 |
-| 12 |             2 | fkn-shah                         |         |         | f      | t       |        12 | 0004a30b001ce3ce                 | \x3134797642556849545477766c77786e457050397664676a665876 |
-| 13 |             2 | core-test-1                      |         |         | f      | t       |        13 | 0004a30b001cc468                 | \x31386876745a6f51624b564f466a4259343749455762444c615165 |
-| 14 |             2 | jacob-test-2                     |         |         | f      | t       |        14 | 0004a30b001d00ff                 | \x31386b744244455a6d68593668556c7958516d6d79676770767776 |
-| 18 |             2 | test-1                           |         |         | f      | t       |        18 | 0004a30b001ce3a0                 | \x314331786e6b5072566a6775384f6e62423169547846546f577248 |
-| 19 |             3 | 0004a30b001cd2a5                 |         |         | f      | t       |        19 | 0004a30b001cd2a5                 | \x314d627a44727a6c7436575743434562435533453262664f304e71 |
-| 20 |             3 | 0004a30b001d027c                 |         |         | f      | t       |        20 | 0004a30b001d027c                 | \x314d627a446d77494e366c7146333052546734346c523057716248 |
-| 21 |             3 | 0004a30b001ce3a4                 |         |         | f      | t       |        21 | 0004a30b001ce3a4                 | \x314d627a446e316344777653623462534e44614965525646307046 |
-| 22 |             3 | 0004a30b001cc4e1                 |         |         | f      | t       |        22 | 0004a30b001cc4e1                 | \x314d627a447430786b384a6b51326c5a76316544304d724c684859 |
-| 23 |             3 | 0004a30b001d0188                 |         |         | f      | t       |        23 | 0004a30b001d0188                 | \x314d627a446d70716e57434a6b41555359314143775650424d3075 |
-| 24 |             3 | 0000000000000000                 |         |         | f      | t       |        24 | 0000000000000000                 | \x314d627a44725a7a4f69544f395055747372715175635363543666 |
-| 25 |             3 | bd3b8c5e524b5051202020592f2a0cff |         |         | f      | t       |        25 | bd3b8c5e524b5051202020592f2a0cff | \x314d627a447151464c696d786552564c5a79584d704c796242344e |
-| 26 |             3 | 5b92ac9650534e5020312e31141312ff |         |         | f      | t       |        26 | 5b92ac9650534e5020312e31141312ff | \x314d627a4471696936304734774d335952396c784b597a4552454d |
-| 27 |             3 | 0004a30b001ca840                 |         |         | f      | t       |        27 | 0004a30b001ca840                 | \x314d627a446d5a5252346e495443376d35684947584e6e514b6458 |
-| 28 |             3 | 0004a30b0023125f                 |         |         | f      | t       |        28 | 0004a30b0023125f                 | \x314d627a446e5353725958506c763265774373424c724543674876 |
-| 29 |             3 | 0004a30b00232a85                 |         |         | f      | t       |        29 | 0004a30b00232a85                 | \x314d627a447130497155556a524e3764535961564e537734505436 |
-| 30 |             3 | 74769b85524b5051202020592f330cff |         |         | f      | t       |        30 | 74769b85524b5051202020592f330cff | \x314d627a446f5a33763061615071634862476c77514845574e5234 |
-| 31 |             3 | c26ddebc50534e5020312e31130e12ff |         |         | f      | t       |        31 | c26ddebc50534e5020312e31130e12ff | \x314d627a4473327175536268434e38623145555748577162506e39 |
-| 32 |             3 | 0004a30b00232e59                 |         |         | f      | t       |        32 | 0004a30b00232e59                 | \x314d627a44735743457534567a4e6e7541375a58616d6343576877 |
-| 33 |             3 | 0004a30b0023490e                 |         |         | f      | t       |        33 | 0004a30b0023490e                 | \x314d627a44706d766367654665767778394338414e3378506b5879 |
-| 34 |             3 | 0004a30b0022ee27                 |         |         | f      | t       |        34 | 0004a30b0022ee27                 | \x314d627a4474456b54305772484c634d64744e6d376f76376c6a35 |
-| 35 |             3 | 0004a30b00234a26                 |         |         | f      | t       |        35 | 0004a30b00234a26                 | \x314d627a446d6330384c73393738785776504d4c3754764d4a4b39 |
-| 36 |             3 | 0004a30b00234b5c                 |         |         | f      | t       |        36 | 0004a30b00234b5c                 | \x314d627a44704969626a6a536247707532504b3756717963523173 |
-| 37 |             3 | 0004a30b00232aa9                 |         |         | f      | t       |        37 | 0004a30b00232aa9                 | \x314d627a4471555a444c4c314b6a4265746c6f5445354354726344 |
-| 38 |             3 | 0004a30b001ca8c4                 |         |         | f      | t       |        38 | 0004a30b001ca8c4                 | \x314d627a446f373467757a653771504a32704163796c7966757631 |
-| 39 |             3 | 0004a30b001d0370                 |         |         | f      | t       |        39 | 0004a30b001d0370                 | \x314d627a446f7550533050616f51686b357a6875456e4b305a6a32 |
-| 40 |             3 | 0004a30b001ce557                 |         |         | f      | t       |        40 | 0004a30b001ce557                 | \x314d627a446e7a41486d4142667354594f4a7a4553613345485a67 |
-| 41 |             3 | 0004a30b001ca8c6                 |         |         | f      | t       |        41 | 0004a30b001ca8c6                 | \x314d627a446e4d51627231364e3133434c36426a6e367362526474 |
-| 42 |             3 | 0004a30b001ce523                 |         |         | f      | t       |        42 | 0004a30b001ce523                 | \x314d627a44734c6952566e47776f315a423342346c456331623548 |
-| 43 |             3 | 0004a30b00232ce9                 |         |         | f      | t       |        43 | 0004a30b00232ce9                 | \x314d627a44744770727639535a3348306146694f79795155565078 |
-| 44 |             3 | 0004a30b001ce62a                 |         |         | f      | t       |        44 | 0004a30b001ce62a                 | \x314d627a4473385437377244623238365372357563774c65777537 |
-| 45 |             3 | 0004a30b0023473e                 |         |         | f      | t       |        45 | 0004a30b0023473e                 | \x314d627a447065447249746f754a74414c3137654e583979537134 |
-| 46 |             3 | 0004a30b0022d65b                 |         |         | f      | t       |        46 | 0004a30b0022d65b                 | \x314d627a446c6d4a444c3859394836584f4d714e48456164717954 |
-| 47 |             3 | 0004a30b001ce4d4                 |         |         | f      | t       |        47 | 0004a30b001ce4d4                 | \x314d627a446f6648476b6a6856417a30685a416e7235375969434e |
-| 48 |             3 | 0004a30b00232d67                 |         |         | f      | t       |        48 | 0004a30b00232d67                 | \x314d627a44726f614252396c4e43786f7846754f724230416f495a |
-| 49 |             3 | 0004a30b0023473f                 |         |         | f      | t       |        49 | 0004a30b0023473f                 | \x314d627a446d38665748434259473349344b6a4570734448646170 |
-| 50 |             3 | 0004a30b001ce54a                 |         |         | f      | t       |        50 | 0004a30b001ce54a                 | \x314d627a4471306e4a76504377326e744d64373576456c5a6a684d |
-| 51 |             3 | 0004a30b0023308d                 |         |         | f      | t       |        51 | 0004a30b0023308d                 | \x314d627a446d523164386831504a4e536c62774a4e326438705648 |
-| 52 |             3 | 0004a30b0022f40a                 |         |         | f      | t       |        52 | 0004a30b0022f40a                 | \x314d627a44726d784b7937526d455a7a506d3652495342614f7645 |
-| 53 |             3 | 0004a30b00230bfc                 |         |         | f      | t       |        53 | 0004a30b00230bfc                 | \x314d627a446f5131356134786e3057386c396e746f376469335673 |
-| 54 |             3 | 0004a30b001ce2e2                 |         |         | f      | t       |        54 | 0004a30b001ce2e2                 | \x314d627a447042654c6857536a336e613178797476304f45424279 |
-| 55 |             3 | 0004a30b00230e1d                 |         |         | f      | t       |        55 | 0004a30b00230e1d                 | \x314d627a4470377a314566414e4548356f456c666e566e4d4a7567 |
-| 56 |             3 | 0004a30b0022eef0                 |         |         | f      | t       |        56 | 0004a30b0022eef0                 | \x314d627a446d4e71773466416432754941616d316f5a766e5a5146 |
-| 57 |             3 | 0004a30b0022f153                 |         |         | f      | t       |        57 | 0004a30b0022f153                 | \x314d627a44706c6b364f5735795a54393867414f38556672676c53 |
-| 58 |             3 | 0004a30b0022eee8                 |         |         | f      | t       |        58 | 0004a30b0022eee8                 | \x314d627a446d7131654e376a65564a35714258726b6f303379694d |
-| 59 |             3 | 0004a30b0023318b                 |         |         | f      | t       |        59 | 0004a30b0023318b                 | \x314d627a4474357062506f39737131657842663359325048745636 |
-| 60 |             3 | 0004a30b0022d47e                 |         |         | f      | t       |        60 | 0004a30b0022d47e                 | \x314d627a44726c336d7564784d3844634465635569704a644a5770 |
-| 61 |             3 | 0004a30b00230ca9                 |         |         | f      | t       |        61 | 0004a30b00230ca9                 | \x314d627a447138474f504c514b4169556e6b464c62356a71714b67 |
-| 62 |             3 | 0004a30b00230f2c                 |         |         | f      | t       |        62 | 0004a30b00230f2c                 | \x314d627a447359466c5a504359634c4255685a7654354437496353 |
-| 63 |             3 | 0004a30b00230e58                 |         |         | f      | t       |        63 | 0004a30b00230e58                 | \x314d627a44716a49393654674c34524e446c524e7875526f386336 |
-| 64 |             3 | 2f80495a524b5051202020592f1d0cff |         |         | f      | t       |        64 | 2f80495a524b5051202020592f1d0cff | \x314d627a446e49313832434f37654a416f78346461375831383756 |
-| 65 |             3 | 0004a30b0022ee5f                 |         |         | f      | t       |        65 | 0004a30b0022ee5f                 | \x314d627a447079516f4c4561735436654b6f434d457343374d6f75 |
-| 66 |             3 | 0004a30b00232c8c                 |         |         | f      | t       |        66 | 0004a30b00232c8c                 | \x314d627a446d684c68734544313433324d7679454e6a4759746266 |
-| 67 |             3 | 0004a30b0022d4fb                 |         |         | f      | t       |        67 | 0004a30b0022d4fb                 | \x314d627a4472436172717650764a6e365241484b555852307a7176 |
-| 68 |             3 | 0004a30b0022d544                 |         |         | f      | t       |        68 | 0004a30b0022d544                 | \x314d627a446d5171734c36744c6b37354e6f5736416c5372375751 |
-| 69 |             3 | 0004a30b0022bd1a                 |         |         | f      | t       |        69 | 0004a30b0022bd1a                 | \x314d627a447133536d6a6339513877616d79444b4a48565167645a |
-| 70 |             3 | 0004a30b001ca6eb                 |         |         | f      | t       |        70 | 0004a30b001ca6eb                 | \x314d627a4473694a715248724935624d3153767a73766144316b54 |
-| 71 |             3 | 0004a30b00232ef3                 |         |         | f      | t       |        71 | 0004a30b00232ef3                 | \x314d627a446d41644130765a773058454e52464d324d43484b3064 |
-| 72 |             3 | 0004a30b00234d52                 |         |         | f      | t       |        72 | 0004a30b00234d52                 | \x314d627a44734d56516a57737342797350734a736f79327a514353 |
-| 73 |             3 | 0004a30b00230d5c                 |         |         | f      | t       |        73 | 0004a30b00230d5c                 | \x314d627a44703747796f504f6e4b6137566d7579486d5078656a4b |
-| 74 |             3 | 0004a30b001ca8c3                 |         |         | f      | t       |        74 | 0004a30b001ca8c3                 | \x314d627a446e355165395a414b4d78686548793449755872416973 |
-| 75 |             3 | 0004a30b002363d8                 |         |         | f      | t       |        75 | 0004a30b002363d8                 | \x314d627a44727844436338663753536a37726c517148385a4a6668 |
-| 76 |             3 | 0004a30b0022f378                 |         |         | f      | t       |        76 | 0004a30b0022f378                 | \x314d627a4473557951334e484543374756395467506b556f463458 |
-| 77 |             3 | 0004a30b0022d6ae                 |         |         | f      | t       |        77 | 0004a30b0022d6ae                 | \x314d627a44714a465161494e305431796553444f74623851705865 |
-| 78 |             3 | 0004a30b0022ef02                 |         |         | f      | t       |        78 | 0004a30b0022ef02                 | \x314d627a4473565a5341566131726f4a6b45464f5331337961506d |
-| 79 |             3 | 0004a30b001d0182                 |         |         | f      | t       |        79 | 0004a30b001d0182                 | \x314d627a4470314749424f6b4b7962624b78323255487634496230 |
-| 80 |             3 | 0004a30b0022d630                 |         |         | f      | t       |        80 | 0004a30b0022d630                 | \x314d627a446d5867694a3954685a4571476e475755455a33486d43 |
-| 81 |             3 | 0004a30b00232b9b                 |         |         | f      | t       |        81 | 0004a30b00232b9b                 | \x314d63305a4c786142716b5a46676847304a74574e4754664a3353 |
-
+| UPDATE 1   |
+|------------|
+| INSERT 0 0 |
+| INSERT 0 0 |
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
@@ -496,216 +99,3 @@ SELECT ST_Buffer(ST_GeomFromText('POINT(1 1)'), 10) ~ ST_MakeBox2D(ST_MakePoint(
 | contains |
 |----------|
 | t        |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-SELECT * FROM (
-  SELECT source_id, end_time, centroid FROM fieldkit.sources_temporal_clusters UNION
-  SELECT source_id, end_time, centroid FROM fieldkit.sources_spatial_clusters
-) AS q WHERE
-q.source_id IN (
-  SELECT s.id FROM fieldkit.source AS s WHERE s.user_id = 2
-)
-ORDER BY end_time DESC
-
-#+END_SRC
-
-#+RESULTS:
-| source_id | end_time            | centroid                                           |
-|-----------+---------------------+----------------------------------------------------|
-|        25 | 2081-10-18 18:39:55 | 0101000020E610000008D851F2E2995DC04C7032F712F94040 |
-|        25 | 2019-06-06 03:52:06 | 0101000020E6100000A5D337B43C5157C070B53154DF7C4640 |
-|        25 | 2019-06-06 03:13:45 | 0101000020E6100000000000103C5157C0000000A03E7D4640 |
-|        25 | 2019-06-05 17:36:01 | 0101000020E610000009EE2358845257C007F11D64FA7B4640 |
-|        25 | 2019-06-05 16:37:00 | 0101000020E610000097969696E15157C064646404DB7C4640 |
-|        25 | 2019-06-05 16:01:55 | 0101000020E6100000666666D6525157C09A999999D87D4640 |
-|        25 | 2019-06-05 15:52:18 | 0101000020E610000078917E7D2C5157C07B56D7C8097E4640 |
-|        25 | 2019-06-05 15:46:04 | 0101000020E6100000242424340F5157C0C1C0C080457E4640 |
-|        25 | 2019-06-05 14:44:13 | 0101000020E6100000840F3EB8695157C0279B6C42277D4640 |
-|        25 | 2019-06-05 14:30:43 | 0101000020E6100000ABAAAAD63E5157C0ABAA2A0B777D4640 |
-|        25 | 2019-06-05 12:17:04 | 0101000020E6100000000000A0295157C000000020907C4640 |
-|        25 | 2019-06-05 11:47:08 | 0101000020E610000000000078045157C000000000A47C4640 |
-|        25 | 2019-06-05 11:33:42 | 0101000020E6100000000000D84C5157C0000000D8C47C4640 |
-|        25 | 2019-06-05 11:20:00 | 0101000020E610000000000070285157C000000018A47C4640 |
-|        25 | 2019-06-05 11:14:08 | 0101000020E6100000E02ADAD95E5157C0B76DDBD6357D4640 |
-|        25 | 2019-06-05 07:49:00 | 0101000020E61000006EDBB6051B5157C0B76DDBD2D27C4640 |
-|        25 | 2019-06-05 07:39:00 | 0101000020E6100000000000600A5157C000000060C57C4640 |
-|        25 | 2019-06-05 06:54:00 | 0101000020E6100000ABAAAA6A5E5157C0555555B5EA7C4640 |
-|        25 | 2019-06-05 04:02:00 | 0101000020E6100000E9A28B6E385157C02FBAE8928C7C4640 |
-|        25 | 2019-06-05 03:53:07 | 0101000020E6100000000000A83B5157C0000000209A7C4640 |
-|        25 | 2019-06-04 22:00:31 | 0101000020E6100000F9097176D65157C0EC1D5323607C4640 |
-|        25 | 2019-06-04 17:57:00 | 0101000020E610000000000058715257C000000020FB7B4640 |
-|        25 | 2019-06-04 14:25:26 | 0101000020E610000000008083F05157C00000805B507C4640 |
-|        25 | 2019-06-04 05:03:00 | 0101000020E6100000222222E2305157C089888888147D4640 |
-|        25 | 2019-06-04 05:02:22 | 0101000020E6100000C5577CE5015157C0C5577C65907D4640 |
-|        25 | 2019-06-04 03:59:25 | 0101000020E610000000000040365157C03BB113FB3A7E4640 |
-|        25 | 2019-06-04 01:51:16 | 0101000020E6100000000000004E5157C0ABAAAAAAF57D4640 |
-|        25 | 2019-06-03 23:38:09 | 0101000020E6100000922449D21B5157C0B76DDB36927D4640 |
-|        25 | 2019-06-03 22:26:48 | 0101000020E6100000000000005F5157C0000000A0FB7C4640 |
-|        25 | 2019-06-03 16:16:13 | 0101000020E6100000000000F0FE5057C0000000505E7D4640 |
-|        25 | 2019-06-03 15:34:54 | 0101000020E610000000000024645157C00000003C9A7D4640 |
-|        25 | 2019-06-03 15:09:59 | 0101000020E6100000000000F0555157C0000000D8937D4640 |
-|        25 | 2019-06-03 13:42:04 | 0101000020E6100000866118A6825157C0C3300C83277D4640 |
-|        25 | 2019-06-03 12:01:26 | 0101000020E610000087F21A6AE35057C03694D7F0797C4640 |
-|        25 | 2019-06-03 11:33:14 | 0101000020E6100000DBB66DBB765157C025499204767D4640 |
-|        25 | 2019-06-03 10:05:13 | 0101000020E6100000DBB66DDB655157C0B76DDB76037D4640 |
-|        25 | 2019-06-03 07:24:42 | 0101000020E6100000000000C0265157C055555515257D4640 |
-|        25 | 2019-06-03 00:39:34 | 0101000020E610000086601D8DBB4F57C0E77D8A4B69754640 |
-|        25 | 2019-06-03 00:20:08 | 0101000020E6100000A4703DEA704D57C0000000F017714640 |
-|        25 | 2019-06-02 20:26:00 | 0101000020E610000076622736C2995DC03BB113CB7EF94040 |
-|        25 | 2019-06-02 20:15:43 | 0101000020E610000095524AA9E2995DC00000001042F94040 |
-|        25 | 2019-06-02 19:54:09 | 0101000020E61000008A7CD60DE1995DC08A7CD6ED2EF94040 |
-|        25 | 2019-06-02 18:01:18 | 0101000020E6100000175D74B1D9995DC0BAE8A26B02F94040 |
-|        25 | 2019-06-02 17:48:58 | 0101000020E610000071C30DB7E1945DC029A59452ACFD4040 |
-|        25 | 2019-06-02 17:12:30 | 0101000020E6100000220D31C4CC925DC0DC5F2E4648084140 |
-|        25 | 2019-06-02 13:41:27 | 0101000020E610000000000080D5925DC00000006834084140 |
-|        25 | 2019-06-02 05:56:24 | 0101000020E610000020F8811FBB925DC0C10FFC602A084140 |
-|        25 | 2019-06-02 02:10:34 | 0101000020E610000000000020D1925DC0000000E072084140 |
-|        25 | 2019-06-02 01:47:00 | 0101000020E610000049922409DC925DC00000002021084140 |
-|        25 | 2019-06-02 01:11:43 | 0101000020E610000000000020A2925DC0C7711CC71B084140 |
-|        25 | 2019-06-02 00:36:54 | 0101000020E610000000000080DF925DC00000004042084140 |
-|        25 | 2019-06-01 19:04:18 | 0101000020E610000000000060689620C0000000C049084140 |
-|        25 | 2019-06-01 00:25:39 | 0101000020E610000046175DD4A4925DC08C2EBA080C084140 |
-|        25 | 2019-06-01 00:12:14 | 0101000020E6100000188661782D915DC0188661F87B044140 |
-|        25 | 2019-01-23 04:54:54 | 0101000020E610000000000060CD925D40000000004B084140 |
-|        25 | 2001-12-31 09:36:03 | 0101000020E6100000000000E0BA7C4640000000E0BA7C4640 |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-DELETE FROM fieldkit.sources_temporal_geometries g WHERE ST_NumPoints(g.geometry) < 2;
-#+END_SRC
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-SELECT ST_NumPoints(g.geometry) FROM fieldkit.sources_temporal_geometries g;
-#+END_SRC
-
-#+RESULTS:
-| st_numpoints |
-|--------------|
-|           42 |
-|            7 |
-|           15 |
-|            6 |
-|           38 |
-|            3 |
-|           22 |
-|           26 |
-|           43 |
-|            4 |
-|           12 |
-|           19 |
-|            6 |
-|            7 |
-|           12 |
-|           20 |
-|            9 |
-|           68 |
-|            2 |
-|            2 |
-|            2 |
-|           42 |
-|          263 |
-|           38 |
-|           81 |
-|           49 |
-|           14 |
-|           23 |
-|           26 |
-|            2 |
-|            2 |
-|            2 |
-|           28 |
-|            9 |
-|           50 |
-|            6 |
-|          346 |
-|           26 |
-|           67 |
-|            9 |
-|           71 |
-|          189 |
-|            9 |
-|           50 |
-|           72 |
-|           54 |
-|          202 |
-|           30 |
-|            2 |
-|          402 |
-|           48 |
-|           71 |
-|            9 |
-|           57 |
-|           13 |
-|           23 |
-|          429 |
-|           46 |
-|           96 |
-|           57 |
-|            3 |
-|           12 |
-|            8 |
-|            2 |
-|           28 |
-|          224 |
-|           10 |
-|           27 |
-|           24 |
-|           38 |
-|          111 |
-|           48 |
-|            4 |
-|           45 |
-|           32 |
-|            1 |
-|           19 |
-|           21 |
-|           19 |
-|          441 |
-|           18 |
-|            2 |
-|            3 |
-|            4 |
-|           22 |
-|           16 |
-|           11 |
-|            2 |
-|           53 |
-|            3 |
-|            8 |
-|            1 |
-|            4 |
-|            7 |
-|            8 |
-|           22 |
-|           59 |
-|           93 |
-|            4 |
-|            2 |
-|            1 |
-|            9 |
-|           93 |
-|            1 |
-|            1 |
-
-#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
-
-UPDATE fieldkit.sources_temporal_geometries SET geometry = PostGIS_DropBBox(geometry) WHERE NOT (Box2D(ST_AsBinary(geometry)) = Box2D(geometry));
-
-UPDATE fieldkit.sources_temporal_geometries SET geometry = PostGIS_AddBBox(geometry) WHERE NOT PostGIS_HasBBOX(geometry);
-
-#+END_SRC
-
-#+RESULTS:
-|   |
-
-
-/*
-
-Archive process
-
-INSERT INTO fieldkit.archive_history (old_device_id, new_device_id) VALUES ('\x506c024d5335353334202020ff182138', '\x506c024d5335353334202020ff182138202001');
-
-UPDATE fieldkit.provision SET device_id = '\x506c024d5335353334202020ff182138202001' WHERE device_id = '\x506c024d5335353334202020ff182138';
-UPDATE fieldkit.ingestion SET device_id = '\x506c024d5335353334202020ff182138202001' WHERE device_id = '\x506c024d5335353334202020ff182138';
-
-*/
