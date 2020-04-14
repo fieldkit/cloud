@@ -362,7 +362,7 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 		return err
 	}
 
-	log.Infow("recovery", "token", recoveryToken)
+	log.Infow("recovery", "token", recoveryToken.Token)
 
 	if err := c.options.Emailer.SendRecoveryToken(user, recoveryToken); err != nil {
 		return err
