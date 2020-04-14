@@ -78,7 +78,7 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	err = p.CanModifyStationByStationID(ctx.StationID)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	err = p.CanModifyStationByStationID(ctx.StationID)
 	if err != nil {
 		return err
 	}
@@ -179,7 +179,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	err = p.CanModifyStationByStationID(ctx.StationID)
 	if err != nil {
 		return err
 	}
@@ -240,7 +240,7 @@ func (c *FieldNoteController) Delete(ctx *app.DeleteFieldNoteContext) error {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(int32(ctx.StationID))
+	err = p.CanModifyStationByStationID(ctx.StationID)
 	if err != nil {
 		return err
 	}

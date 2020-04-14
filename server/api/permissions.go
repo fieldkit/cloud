@@ -37,11 +37,11 @@ func (p *Permissions) IsStationReadOnly(station *data.Station) bool {
 	return station.OwnerID != p.UserID
 }
 
-func (p *Permissions) CanModifyStationByStationID(stationId int32) error {
+func (p *Permissions) CanModifyStationByStationID(stationId int) error {
 	return nil
 }
 
-func (p *Permissions) CanViewStationByStationID(stationId int32) error {
+func (p *Permissions) CanViewStationByStationID(stationId int) error {
 	return nil
 }
 
@@ -53,6 +53,10 @@ func (p *Permissions) CanViewStationByDeviceID(deviceId []byte) error {
 	return nil
 }
 
-func (p *Permissions) CanModifyProject(projectId int32) error {
+func (p *Permissions) CanModifyProject(projectId int) error {
+	return nil
+}
+
+func (p *Permissions) CanViewProject(projectId int) error {
 	return nil
 }

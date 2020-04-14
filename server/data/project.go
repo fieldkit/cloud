@@ -30,17 +30,34 @@ type ProjectInvite struct {
 }
 
 type ProjectUser struct {
-	User
 	UserID    int32 `db:"user_id"`
 	ProjectID int32 `db:"project_id"`
 	Role      int32 `db:"role"`
 }
 
-func (u *ProjectUser) RoleName() string {
+type ProjectUserAndUser struct {
+	ProjectUser
+	User
+}
+
+type ProjectUserAndProject struct {
+	ProjectUser
+	Project
+}
+
+func (u *ProjectUser) LookupRole() *Role {
 	for _, role := range Roles {
 		if role.ID == u.Role {
-			return role.Name
+			return role
 		}
 	}
-	return "Unknown"
+	return nil
+}
+
+func (u *ProjectUser) RoleName() string {
+	role := u.LookupRole()
+	if role == nil {
+		return "Unknown"
+	}
+	return role.Name
 }

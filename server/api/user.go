@@ -35,7 +35,7 @@ func UserType(user *data.User) *app.User {
 	return userType
 }
 
-func ProjectUserType(user *data.ProjectUser) *app.ProjectUser {
+func ProjectUserType(user *data.ProjectUserAndUser) *app.ProjectUser {
 	return &app.ProjectUser{
 		User:       UserType(&user.User),
 		Role:       user.RoleName(),
@@ -43,7 +43,7 @@ func ProjectUserType(user *data.ProjectUser) *app.ProjectUser {
 	}
 }
 
-func ProjectUsersType(users []*data.ProjectUser, invites []*data.ProjectInvite) *app.ProjectUsers {
+func ProjectUsersType(users []*data.ProjectUserAndUser, invites []*data.ProjectInvite) *app.ProjectUsers {
 	usersCollection := make([]*app.ProjectUser, 0, len(users)+len(invites))
 	for _, user := range users {
 		usersCollection = append(usersCollection, ProjectUserType(user))
@@ -496,8 +496,8 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 }
 
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
-	users := []*data.ProjectUser{}
-	if err := c.options.Database.SelectContext(ctx, &users, "SELECT u.*, pu.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id", ctx.ProjectID); err != nil {
+	users := []*data.ProjectUserAndUser{}
+	if err := c.options.Database.SelectContext(ctx, &users, "SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id", ctx.ProjectID); err != nil {
 		return err
 	}
 
