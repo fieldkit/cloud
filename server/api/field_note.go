@@ -73,7 +73,7 @@ func NewFieldNoteController(service *goa.Service, options *ControllerOptions) *F
 }
 
 func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 }
 
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -174,7 +174,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 }
 
 func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -235,7 +235,7 @@ func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 }
 
 func (c *FieldNoteController) Delete(ctx *app.DeleteFieldNoteContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

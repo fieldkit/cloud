@@ -510,7 +510,7 @@ func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error 
 }
 
 func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -530,7 +530,7 @@ func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserC
 }
 
 func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

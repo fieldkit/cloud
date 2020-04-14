@@ -60,7 +60,7 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 }
 
 func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 }
 
 func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ type BlocksSummaryRow struct {
 }
 
 func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -236,7 +236,7 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 }
 
 func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

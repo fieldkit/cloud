@@ -123,7 +123,7 @@ func NewStationController(service *goa.Service, options *ControllerOptions) *Sta
 func (c *StationController) Add(ctx *app.AddStationContext) error {
 	log := Logger(ctx).Sugar()
 
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 }
 
 func (c *StationController) Update(ctx *app.UpdateStationContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -219,7 +219,7 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 }
 
 func (c *StationController) Get(ctx *app.GetStationContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -254,7 +254,7 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 }
 
 func (c *StationController) ListProject(ctx *app.ListProjectStationContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -284,7 +284,7 @@ func (c *StationController) ListProject(ctx *app.ListProjectStationContext) erro
 }
 
 func (c *StationController) List(ctx *app.ListStationContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 }
 
 func (c *StationController) Delete(ctx *app.DeleteStationContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

@@ -12,10 +12,15 @@ import (
 )
 
 type Permissions struct {
-	UserID int32
+	options *ControllerOptions
+	UserID  int32
 }
 
-func NewPermissions(ctx context.Context) (p *Permissions, err error) {
+type ProjectPermissions struct {
+	Project *data.Project
+}
+
+func NewPermissions(ctx context.Context, options *ControllerOptions) (p *Permissions, err error) {
 	token := jwt.ContextJWT(ctx)
 	if token == nil {
 		return nil, fmt.Errorf("JWT token is missing from context")
@@ -27,7 +32,8 @@ func NewPermissions(ctx context.Context) (p *Permissions, err error) {
 	}
 
 	p = &Permissions{
-		UserID: int32(claims["sub"].(float64)),
+		options: options,
+		UserID:  int32(claims["sub"].(float64)),
 	}
 
 	return
@@ -59,4 +65,8 @@ func (p *Permissions) CanModifyProject(projectId int) error {
 
 func (p *Permissions) CanViewProject(projectId int) error {
 	return nil
+}
+
+func (p *Permissions) ForProject(id int) (permissions *ProjectPermissions, err error) {
+	return
 }

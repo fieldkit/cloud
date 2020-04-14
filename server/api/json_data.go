@@ -187,7 +187,7 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 
 	log.Infow("json", "device_id", ctx.DeviceID)
 
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

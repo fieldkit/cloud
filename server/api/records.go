@@ -36,7 +36,7 @@ func writeJSON(responseData *goa.ResponseData, obj interface{}) error {
 }
 
 func (c *RecordsController) Data(ctx *app.DataRecordsContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (c *RecordsController) Data(ctx *app.DataRecordsContext) error {
 }
 
 func (c *RecordsController) Meta(ctx *app.MetaRecordsContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *RecordsController) Meta(ctx *app.MetaRecordsContext) error {
 }
 
 func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}

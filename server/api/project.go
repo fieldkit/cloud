@@ -65,7 +65,7 @@ func NewProjectController(service *goa.Service, options *ControllerOptions) *Pro
 }
 
 func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 }
 
 func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 }
 
 func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -213,7 +213,7 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 }
 
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -237,7 +237,7 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -271,7 +271,7 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 }
 
 func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -295,7 +295,7 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 }
 
 func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 }
 
 func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -334,7 +334,7 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 }
 
 func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
@@ -352,7 +352,7 @@ func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) 
 }
 
 func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
-	p, err := NewPermissions(ctx)
+	p, err := NewPermissions(ctx, c.options)
 	if err != nil {
 		return err
 	}
