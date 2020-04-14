@@ -1,12 +1,21 @@
 <template>
-    <div>
-        <SidebarNav viewing="projects" :projects="projects" :stations="stations" @showStation="showStation" />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
-        <div class="main-panel">
-            <div id="user-form-container">
-                <div class="password-change" v-if="!resetSuccess && !failedReset">
-                    <div class="inner-password-change">
-                        <div class="password-change-heading">Reset password</div>
+    <div id="login-container">
+        <img
+            v-bind:style="{
+                width: '210px',
+                marginTop: '150px',
+                marginBottom: '86px',
+            }"
+            alt="Fieldkit Logo"
+            src="../assets/FieldKit_Logo_White.png"
+        />
+        <br />
+        <div id="user-form-container">
+            <div class="password-change" v-if="!resetSuccess && !failedReset">
+                <div class="inner-password-change">
+                    <div class="password-change-heading">Reset password</div>
+
+                    <div class="outer-input-container">
                         <div class="input-container">
                             <input
                                 v-model="newPassword"
@@ -22,7 +31,10 @@
                         <span class="validation-error" id="password-too-short" v-if="passwordTooShort">
                             Password must be at least 10 characters.
                         </span>
-                        <div class="input-container">
+                    </div>
+
+                    <div class="outer-input-container">
+                        <div class="input-container middle-container">
                             <input
                                 v-model="confirmPassword"
                                 secure="true"
@@ -37,10 +49,26 @@
                             Passwords do not match.
                         </span>
                     </div>
-                    <button class="save-btn" v-on:click="submitPasswordReset">Reset password</button>
                 </div>
-                <div class="success" v-if="resetSuccess">Password was reset!</div>
-                <div class="reset-error" v-if="failedReset">Unfortunately we were unable to reset your password.</div>
+                <button class="save-btn" v-on:click="submitPasswordReset">Reset password</button>
+            </div>
+            <div v-if="resetSuccess">
+                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                <p class="success">Password Reset</p>
+
+                <router-link :to="{ name: 'login' }" class="create-link">
+                    Go to Log In
+                </router-link>
+            </div>
+            <div v-if="failedReset">
+                <img alt="Unsuccessful" src="../assets/Icon_Warning_error.png" width="57px" />
+                <p class="error">Password Not Reset</p>
+                <div class="notification-text">Unfortunately we were unable to reset your password.</div>
+                <p>
+                    Please
+                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
+                    if you would like assistance.
+                </p>
             </div>
         </div>
     </div>
@@ -48,24 +76,13 @@
 
 <script>
 import FKApi from "../api/api";
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
-import { API_HOST } from "../secrets";
 
 export default {
-    name: "UserView",
-    components: {
-        HeaderBar,
-        SidebarNav,
-    },
+    name: "ResetPasswordView",
+    components: {},
     props: [],
     data: () => {
         return {
-            baseUrl: API_HOST,
-            user: { username: "" },
-            projects: [],
-            stations: [],
-            isAuthenticated: false,
             resetToken: "",
             newPassword: "",
             noPassword: false,
@@ -78,26 +95,8 @@ export default {
     },
     async beforeCreate() {
         this.api = new FKApi();
-        this.api.getCurrentUser().then(user => {
-            this.user = user;
-            this.isAuthenticated = true;
-            this.api.getProjects().then(projects => {
-                if (projects && projects.projects.length > 0) {
-                    this.projects = projects.projects;
-                }
-            });
-            this.api.getStations().then(s => {
-                this.stations = s.stations;
-            });
-        });
     },
     methods: {
-        goBack() {
-            window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
-        },
-        showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
-        },
         checkPassword() {
             this.noPassword = false;
             this.passwordTooShort = false;
@@ -132,69 +131,60 @@ export default {
 </script>
 
 <style scoped>
+#login-container {
+    width: 100%;
+    min-height: 100%;
+    background-image: linear-gradient(#52b5e4, #1b80c9);
+}
 #user-form-container {
-    float: left;
-    width: 700px;
-    padding: 0 15px 15px 15px;
-    margin: 60px;
-    border: 1px solid rgb(215, 220, 225);
+    width: 460px;
+    background-color: white;
+    display: inline-block;
+    text-align: center;
+    padding-bottom: 60px;
+    padding-top: 78px;
 }
-
+.outer-input-container {
+    width: 300px;
+    margin: auto;
+}
 .input-container {
-    float: left;
-    margin: 10px 0 0 15px;
-    width: 99%;
+    margin: auto;
+    width: 100%;
+    text-align: left;
 }
-input:focus ~ .floating-label,
-input:not(:focus):valid ~ .floating-label {
-    top: -48px;
-    font-size: 12px;
-    opacity: 1;
+.middle-container {
+    margin-top: 22px;
 }
-input:invalid {
-    box-shadow: none;
-}
-.inputText {
-    color: #2c3e50;
-    font-size: 14px;
-    width: inherit;
-    border: none;
-    border-bottom: 2px solid rgb(235, 235, 235);
-    font-size: 15px;
-    padding-bottom: 4px;
-}
-.inputText:focus {
-    border-bottom: 2px solid #52b5e4;
+input {
+    background: none;
+    border: 0;
+    border-bottom: 2px solid #d8dce0;
+    outline: 0;
+    font-size: 18px;
+    padding-bottom: 2px;
 }
 .floating-label {
-    color: rgb(85, 85, 85);
-    position: relative;
-    top: -24px;
-    pointer-events: none;
-    transition: 0.2s ease all;
-}
-.password-change-heading {
     font-size: 16px;
+    color: #6a6d71;
+}
+
+.password-change-heading {
+    font-size: 24px;
     font-weight: 500;
-    margin: 0 0 20px 15px;
-}
-.password-change {
-    margin: 40px 0;
-}
-.inner-password-change {
-    float: left;
+    margin-bottom: 50px;
 }
 
 .save-btn {
     width: 300px;
-    height: 50px;
+    height: 45px;
     color: white;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
-    margin: 10px 0 20px 15px;
+    margin: 40px 0 20px 0;
     cursor: pointer;
 }
 
@@ -203,16 +193,19 @@ input:invalid {
     color: #c42c44;
     display: block;
     font-size: 14px;
-    margin: -20px 0 5px 15px;
+    margin: -20px 0 0 0;
 }
-.success {
-    margin: 15px 0 0 15px;
-    font-size: 18px;
-    color: #3f8530;
+.success,
+.error {
+    margin: 25px 0 25px 0;
+    font-size: 24px;
 }
-.reset-error {
-    margin: 15px 0 0 15px;
-    font-size: 18px;
-    color: #c42c44;
+.notification-text {
+    width: 300px;
+    margin: 0 auto 40px auto;
+}
+.contact-link {
+    cursor: pointer;
+    text-decoration: underline;
 }
 </style>

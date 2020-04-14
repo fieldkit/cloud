@@ -129,7 +129,6 @@ export default {
         getModuleImg(module) {
             let imgPath = require.context("../assets/", false, /\.png$/);
             let img = "";
-            console.log("module.name", module.name);
             switch (module.name) {
                 case "modules.distance":
                     img = "Icon_Distance_Module.png";
