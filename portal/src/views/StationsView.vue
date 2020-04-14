@@ -118,9 +118,6 @@ export default {
                     }),
                     this.api.getStations().then(s => {
                         this.stations = s.stations;
-                        if (this.stations.length == 0) {
-                            this.showNotice = true;
-                        }
                         if (this.map) {
                             this.initStations();
                         } else {
@@ -134,7 +131,19 @@ export default {
                     }),
                 ]);
             })
-            .catch(() => {
+            .then(() => {
+                if (this.stations.length == 0 && !this.id) {
+                    this.showNotice = true;
+                }
+            })
+            .catch(e => {
+                // NOTE: This isn't necessarily true, we should be
+                // checking for actual authentication error status codes
+                // in the Api code and then raising some kind of event to
+                // indicate they aren't authenticated. Added this message
+                // because I saw this happen even though I was logged in
+                // and was curious why but couldn't see.
+                console.log("error", e);
                 this.failedAuth = true;
                 // handle non-logged in state
                 if (this.map) {
