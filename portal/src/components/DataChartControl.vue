@@ -722,7 +722,7 @@ export default {
     float: left;
     width: 1070px;
     margin: 0 0 20px 10px;
-    border-top: 1px solid rgba(230, 230, 230);
+    border-top: 1px solid rgb(230, 230, 230);
 }
 .sensor-selection-dropdown {
     float: left;

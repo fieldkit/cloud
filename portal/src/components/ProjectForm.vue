@@ -10,12 +10,7 @@
         <div class="image-container">
             <img alt="Project image" :src="imageUrl" class="custom-image" v-if="hasImage && !previewImage" />
             <img :src="previewImage" class="custom-image" v-if="!hasImage || previewImage" />
-            <img
-                alt="Add project image"
-                src="../assets/add_image.png"
-                class="custom-image"
-                v-if="!hasImage && !previewImage"
-            />
+            <img alt="Add project image" src="../assets/add_image.png" class="custom-image" v-if="!hasImage && !previewImage" />
             <br />
             {{ this.hasImage ? "Update your project image: " : "Add an image to your project: " }}
             <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
@@ -23,11 +18,7 @@
         <input v-model="location" placeholder="Location" class="text-input wide-text-input" />
         <div id="start-date">
             <input v-model="displayStartDate" placeholder="Start Date" class="text-input" />
-            <v-date-picker
-                v-model="startDate"
-                @input="updateDisplayDates"
-                :popover="{ placement: 'bottom', visibility: 'click' }"
-            >
+            <v-date-picker v-model="startDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
                 </button>
@@ -35,11 +26,7 @@
         </div>
         <div id="end-date">
             <input v-model="displayEndDate" placeholder="End Date" class="text-input" />
-            <v-date-picker
-                v-model="endDate"
-                @input="updateDisplayDates"
-                :popover="{ placement: 'bottom', visibility: 'click' }"
-            >
+            <v-date-picker v-model="endDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
                 </button>
@@ -90,7 +77,7 @@ export default {
             imageUrl: "",
             baseUrl: Config.API_HOST,
             previewImage: null,
-            acceptedImageTypes: ["jpg", "jpeg", "png", "gif"]
+            acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
         };
     },
     watch: {
@@ -119,7 +106,7 @@ export default {
                 this.formHeading = "New Project";
                 this.resetFields();
             }
-        }
+        },
     },
     methods: {
         createParams() {
@@ -132,7 +119,7 @@ export default {
                 private: this.publicProject,
                 slug: "proj-" + Date.now(),
                 start_time: this.startDate,
-                tags: this.tags
+                tags: this.tags,
             };
             if (this.project) {
                 data.id = this.project.id;
@@ -149,12 +136,12 @@ export default {
                     let params = {
                         type: this.imageType,
                         image: this.sendingImage,
-                        id: project.id
+                        id: project.id,
                     };
                     api.uploadProjectImage(params).then(() => {
                         this.$router.push({
                             name: "viewProject",
-                            params: { id: project.id }
+                            params: { id: project.id },
                         });
                     });
                 });
@@ -162,7 +149,7 @@ export default {
                 api.addProject(data).then(project => {
                     this.$router.push({
                         name: "viewProject",
-                        params: { id: project.id }
+                        params: { id: project.id },
                     });
                 });
             }
@@ -175,13 +162,13 @@ export default {
                 let params = {
                     type: this.imageType,
                     image: this.sendingImage,
-                    id: this.project.id
+                    id: this.project.id,
                 };
                 api.uploadProjectImage(params).then(() => {
                     api.updateProject(data).then(project => {
                         this.$router.push({
                             name: "viewProject",
-                            params: { id: project.id }
+                            params: { id: project.id },
                         });
                     });
                 });
@@ -189,7 +176,7 @@ export default {
                 api.updateProject(data).then(project => {
                     this.$router.push({
                         name: "viewProject",
-                        params: { id: project.id }
+                        params: { id: project.id },
                     });
                 });
             }
@@ -198,7 +185,7 @@ export default {
             if (window.confirm("Are you sure you want to delete this project?")) {
                 const api = new FKApi();
                 const params = {
-                    projectId: this.project.id
+                    projectId: this.project.id,
                 };
                 api.deleteProject(params).then(() => {
                     this.$router.push({ name: "projects" });
@@ -256,8 +243,8 @@ export default {
         },
         closeForm() {
             this.$emit("closeProjectForm");
-        }
-    }
+        },
+    },
 };
 </script>
 
