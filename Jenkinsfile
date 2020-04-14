@@ -14,6 +14,7 @@ timestamps {
 # Permissions errors:
 # docker exec -u 0:0 docker_jenkins_1 chmod 777 /var/run/docker.sock
 
+export PATH=$PATH:node_modules/.bin
 which docker
 which go
 docker ps -a
