@@ -4,7 +4,10 @@
             "device_id": "fb51dcff5335353334202020ff182a38",
             "id": 159,
             "name": "Ancient Goose 81",
-            "owner_id": 2,
+            "owner": {
+                "id": 6,
+                "name": "John Doe"
+            },
             "status_json": {
                 "available_memory": "100.00",
                 "battery_image": "~/images/Icon_Battery_0.png",

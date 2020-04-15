@@ -16,12 +16,14 @@ import (
 
 type ProjectPermissions interface {
 	Permissions
+	Project() *data.Project
 	CanView() error
 	CanModify() error
 }
 
 type StationPermissions interface {
 	Permissions
+	Station() *data.Station
 	CanView() error
 	CanModify() error
 	IsReadOnly() bool
@@ -110,8 +112,8 @@ func (p *defaultPermissions) ForProjectByID(id int) (permissions ProjectPermissi
 
 	permissions = &projectPermissions{
 		defaultPermissions: *p,
-		Project:            project,
-		ProjectUser:        projectUser,
+		project:            project,
+		projectUser:        projectUser,
 	}
 
 	return
@@ -129,7 +131,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
-		Station:            station,
+		station:            station,
 	}
 
 	return
@@ -147,7 +149,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
-		Station:            station,
+		station:            station,
 	}
 
 	return
@@ -160,7 +162,7 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
-		Station:            station,
+		station:            station,
 	}
 
 	return
@@ -168,7 +170,11 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 
 type stationPermissions struct {
 	defaultPermissions
-	Station *data.Station
+	station *data.Station
+}
+
+func (p *stationPermissions) Station() *data.Station {
+	return p.station
 }
 
 func (p *stationPermissions) CanView() error {
@@ -176,20 +182,24 @@ func (p *stationPermissions) CanView() error {
 }
 
 func (p *stationPermissions) CanModify() error {
-	if p.Station.OwnerID != p.UserID() {
+	if p.station.OwnerID != p.UserID() {
 		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
 	}
 	return nil
 }
 
 func (p *stationPermissions) IsReadOnly() bool {
-	return p.Station.OwnerID != p.UserID()
+	return p.station.OwnerID != p.UserID()
 }
 
 type projectPermissions struct {
 	defaultPermissions
-	Project     *data.Project
-	ProjectUser *data.ProjectUser
+	project     *data.Project
+	projectUser *data.ProjectUser
+}
+
+func (p *projectPermissions) Project() *data.Project {
+	return p.project
 }
 
 func (p *projectPermissions) CanView() error {
@@ -197,11 +207,11 @@ func (p *projectPermissions) CanView() error {
 }
 
 func (p *projectPermissions) CanModify() error {
-	if p.ProjectUser == nil {
+	if p.projectUser == nil {
 		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
 	}
 
-	role := p.ProjectUser.LookupRole()
+	role := p.projectUser.LookupRole()
 	if role.IsProjectReadOnly() {
 		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
 	}

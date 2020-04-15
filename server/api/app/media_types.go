@@ -1315,7 +1315,7 @@ type Station struct {
 	Images      ImageRefCollection     `form:"images" json:"images" yaml:"images" xml:"images"`
 	LastUploads LastUploadCollection   `form:"last_uploads,omitempty" json:"last_uploads,omitempty" yaml:"last_uploads,omitempty" xml:"last_uploads,omitempty"`
 	Name        string                 `form:"name" json:"name" yaml:"name" xml:"name"`
-	OwnerID     int                    `form:"owner_id" json:"owner_id" yaml:"owner_id" xml:"owner_id"`
+	Owner       *StationOwner          `form:"owner" json:"owner" yaml:"owner" xml:"owner"`
 	Photos      *StationPhotos         `form:"photos" json:"photos" yaml:"photos" xml:"photos"`
 	ReadOnly    bool                   `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
 	StatusJSON  map[string]interface{} `form:"status_json" json:"status_json" yaml:"status_json" xml:"status_json"`
@@ -1327,7 +1327,9 @@ func (mt *Station) Validate() (err error) {
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
-
+	if mt.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "owner"))
+	}
 	if mt.DeviceID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "device_id"))
 	}
@@ -1347,10 +1349,32 @@ func (mt *Station) Validate() (err error) {
 	if err2 := mt.LastUploads.Validate(); err2 != nil {
 		err = goa.MergeErrors(err, err2)
 	}
+	if mt.Owner != nil {
+		if err2 := mt.Owner.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	if mt.Photos != nil {
 		if err2 := mt.Photos.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// StationOwner media type (default view)
+//
+// Identifier: application/vnd.app.station.owner+json; view=default
+type StationOwner struct {
+	ID   int    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name string `form:"name" json:"name" yaml:"name" xml:"name"`
+}
+
+// Validate validates the StationOwner media type instance.
+func (mt *StationOwner) Validate() (err error) {
+
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
 	return
 }

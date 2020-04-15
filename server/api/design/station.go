@@ -69,25 +69,38 @@ var StationPhotos = MediaType("application/vnd.app.station.photos+json", func() 
 	})
 })
 
+var StationOwner = MediaType("application/vnd.app.station.owner+json", func() {
+	TypeName("StationOwner")
+	Attributes(func() {
+		Attribute("id", Integer)
+		Attribute("name", String)
+		Required("id", "name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+	})
+})
+
 var Station = MediaType("application/vnd.app.station+json", func() {
 	TypeName("Station")
 	Reference(AddStationPayload)
 	Attributes(func() {
 		Attribute("id", Integer)
 		Attribute("name")
-		Attribute("owner_id", Integer)
+		Attribute("owner", StationOwner)
 		Attribute("device_id", String)
 		Attribute("last_uploads", CollectionOf(LastUpload))
 		Attribute("status_json", HashOf(String, Any))
 		Attribute("images", CollectionOf(ImageRef))
 		Attribute("photos", StationPhotos)
 		Attribute("read_only", Boolean)
-		Required("id", "name", "owner_id", "device_id", "status_json", "images", "photos", "read_only")
+		Required("id", "name", "owner", "device_id", "status_json", "images", "photos", "read_only")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
-		Attribute("owner_id")
+		Attribute("owner")
 		Attribute("device_id")
 		Attribute("last_uploads")
 		Attribute("status_json")

@@ -15,7 +15,7 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-func StationType(p Permissions, station *data.Station, ingestions []*data.Ingestion, noteMedia []*data.FieldNoteMediaForStation) (*app.Station, error) {
+func StationType(p Permissions, station *data.Station, owner *data.User, ingestions []*data.Ingestion, noteMedia []*data.FieldNoteMediaForStation) (*app.Station, error) {
 	status, err := station.GetStatus()
 	if err != nil {
 		return nil, err
@@ -49,8 +49,11 @@ func StationType(p Permissions, station *data.Station, ingestions []*data.Ingest
 	}
 
 	return &app.Station{
-		ID:          int(station.ID),
-		OwnerID:     int(station.OwnerID),
+		ID: int(station.ID),
+		Owner: &app.StationOwner{
+			ID:   int(owner.ID),
+			Name: owner.Name,
+		},
 		DeviceID:    hex.EncodeToString(station.DeviceID),
 		Name:        station.Name,
 		LastUploads: lastUploads,
@@ -86,9 +89,18 @@ func sortMediaByStation(all []*data.FieldNoteMediaForStation) map[int32][]*data.
 	return m
 }
 
-func StationsType(p Permissions, stations []*data.Station, ingestions []*data.Ingestion, noteMedia []*data.FieldNoteMediaForStation) (*app.Stations, error) {
+func sortUsersByID(all []*data.User) map[int32]*data.User {
+	m := make(map[int32]*data.User)
+	for _, row := range all {
+		m[row.ID] = row
+	}
+	return m
+}
+
+func StationsType(p Permissions, stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, noteMedia []*data.FieldNoteMediaForStation) (*app.Stations, error) {
 	stationsCollection := make([]*app.Station, len(stations))
 
+	ownersByID := sortUsersByID(owners)
 	noteMediaByStation := sortMediaByStation(noteMedia)
 	ingestionsByStation := sortByStation(ingestions)
 	for i, station := range stations {
@@ -101,7 +113,8 @@ func StationsType(p Permissions, stations []*data.Station, ingestions []*data.In
 		if noteMediaByStation == nil {
 			noteMediaByStation = make([]*data.FieldNoteMediaForStation, 0)
 		}
-		appStation, err := StationType(p, station, ingestionsByStation, noteMediaByStation)
+		owner := ownersByID[station.OwnerID]
+		appStation, err := StationType(p, station, owner, ingestionsByStation, noteMediaByStation)
 		if err != nil {
 			return nil, err
 		}
@@ -140,6 +153,11 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 
 	log.Infow("adding station", "device_id", ctx.Payload.DeviceID)
 
+	owner := &data.User{}
+	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", p.UserID()); err != nil {
+		return err
+	}
+
 	stations := []*data.Station{}
 	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE device_id = $1", deviceId); err != nil {
 		return err
@@ -147,6 +165,7 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 
 	if len(stations) > 0 {
 		existing := stations[0]
+
 		if existing.OwnerID != p.UserID() {
 			return ctx.BadRequest(&app.BadRequestResponse{
 				Key:     "stationAlreadyRegistered",
@@ -154,10 +173,11 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 			})
 		}
 
-		svm, err := StationType(p, existing, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
+		svm, err := StationType(p, existing, owner, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
 		if err != nil {
 			return err
 		}
+
 		return ctx.OK(svm)
 	}
 
@@ -173,10 +193,11 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(p, station, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
+	svm, err := StationType(p, station, owner, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
 	if err != nil {
 		return err
 	}
+
 	return ctx.OK(svm)
 }
 
@@ -204,6 +225,11 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		return err
 	}
 
+	owner := &data.User{}
+	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", p.Station().OwnerID); err != nil {
+		return err
+	}
+
 	ingestions := []*data.Ingestion{}
 	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
 		return err
@@ -216,7 +242,7 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(p, station, ingestions, noteMedia)
+	svm, err := StationType(p, station, owner, ingestions, noteMedia)
 	if err != nil {
 		return err
 	}
@@ -238,6 +264,11 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
+	owner := &data.User{}
+	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", station.OwnerID); err != nil {
+		return err
+	}
+
 	ingestions := []*data.Ingestion{}
 	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
 		return err
@@ -250,7 +281,7 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	svm, err := StationType(p, station, ingestions, noteMedia)
+	svm, err := StationType(p, station, owner, ingestions, noteMedia)
 	if err != nil {
 		return err
 	}
@@ -264,7 +295,15 @@ func (c *StationController) ListProject(ctx *app.ListProjectStationContext) erro
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)", ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, `
+		SELECT * FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)`, ctx.ProjectID); err != nil {
+		return err
+	}
+
+	owners := []*data.User{}
+	if err := c.options.Database.SelectContext(ctx, &owners, `
+		SELECT * FROM fieldkit.user WHERE id IN (SELECT owner_id FROM fieldkit.station
+		WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1))`, ctx.ProjectID); err != nil {
 		return err
 	}
 
@@ -282,7 +321,7 @@ func (c *StationController) ListProject(ctx *app.ListProjectStationContext) erro
 		return err
 	}
 
-	stationsWm, err := StationsType(p, stations, ingestions, noteMedia)
+	stationsWm, err := StationsType(p, stations, owners, ingestions, noteMedia)
 	if err != nil {
 		return err
 	}
@@ -297,12 +336,18 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE owner_id = $1", p.UserID()); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, `SELECT * FROM fieldkit.station WHERE owner_id = $1`, p.UserID()); err != nil {
+		return err
+	}
+
+	owners := []*data.User{}
+	if err := c.options.Database.SelectContext(ctx, &owners, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
 		return err
 	}
 
 	ingestions := []*data.Ingestion{}
-	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC", p.UserID()); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &ingestions, `
+		SELECT * FROM fieldkit.ingestion WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC`, p.UserID()); err != nil {
 		return err
 	}
 
@@ -313,7 +358,7 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 		return err
 	}
 
-	stationsWm, err := StationsType(p, stations, ingestions, noteMedia)
+	stationsWm, err := StationsType(p, stations, owners, ingestions, noteMedia)
 	if err != nil {
 		return err
 	}

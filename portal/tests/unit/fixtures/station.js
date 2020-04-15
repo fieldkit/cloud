@@ -896,7 +896,10 @@ export default {
         },
     ],
     name: "Nice-nice Lizard 98",
-    owner_id: 6,
+    owner: {
+        id: 6,
+        name: "John Doe",
+    },
     photos: { small: "/stations/154/photo" },
     status_json: {
         batteryLevel: 100,
