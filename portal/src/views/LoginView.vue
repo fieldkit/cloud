@@ -2,9 +2,9 @@
     <div id="login-container">
         <img
             v-bind:style="{
-                maxWidth: '30%',
-                marginTop: '50px',
-                marginBottom: '80px',
+                width: '210px',
+                marginTop: '150px',
+                marginBottom: '86px',
             }"
             alt="Fieldkit Logo"
             src="../assets/FieldKit_Logo_White.png"

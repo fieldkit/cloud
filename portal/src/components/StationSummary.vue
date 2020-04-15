@@ -59,14 +59,14 @@
                     <div
                         v-for="(sensor, sensorIndex) in module.sensorObjects"
                         v-bind:key="sensor.id"
-                        :class="(moduleIndex + sensorIndex) % 2 == 0 ? 'left-reading' : 'right-reading'"
+                        :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
                     >
-                        <div class="left sensor-name">{{ sensor.name }}</div>
+                        <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
                         <div class="right sensor-unit">
                             {{ sensor.unit }}
                         </div>
                         <div class="right sensor-reading">
-                            {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
+                            {{ sensor.currentReading || sensor.currentReading == 0 ? sensor.currentReading.toFixed(1) : "ncR" }}
                         </div>
                     </div>
                 </div>
@@ -88,6 +88,8 @@ export default {
     name: "StationSummary",
     data: () => {
         return {
+            moduleSensorCounter: 0,
+            modulesSensors: {},
             viewingSummary: false,
         };
     },
@@ -100,6 +102,20 @@ export default {
     methods: {
         viewSummary() {
             this.viewingSummary = true;
+        },
+
+        getCounter(moduleIndex, sensorIndex) {
+            if (this.modulesSensors[moduleIndex]) {
+                if (!this.modulesSensors[moduleIndex][sensorIndex]) {
+                    this.moduleSensorCounter += 1;
+                    this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
+                }
+            } else {
+                this.moduleSensorCounter += 1;
+                this.modulesSensors[moduleIndex] = {};
+                this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
+            }
+            return this.modulesSensors[moduleIndex][sensorIndex];
         },
 
         getSyncedDate() {
@@ -126,10 +142,14 @@ export default {
             return imgPath("./" + img);
         },
 
+        getSensorName(module, sensor) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
+        },
+
         getModuleImg(module) {
             let imgPath = require.context("../assets/", false, /\.png$/);
             let img = "";
-            console.log("module.name", module.name);
             switch (module.name) {
                 case "modules.distance":
                     img = "Icon_Distance_Module.png";

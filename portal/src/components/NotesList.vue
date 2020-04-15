@@ -15,7 +15,8 @@
                 <img alt="Field Note image" :src="getImageUrl(note)" class="field-note-image" />
             </div>
             <div class="content-line">
-                <span class="title">{{ note.title }} </span>{{ note.note }}
+                <span class="title">{{ note.title }}</span>
+                {{ note.note }}
             </div>
         </div>
         <div v-if="this.notes.length == 0">
@@ -34,7 +35,7 @@ const categoryLabels = {
     studyObjective: "Study Objective: ",
     locationPurpose: "Location Purpose: ",
     siteCriteria: "Site Criteria: ",
-    siteDescription: "Site Description: "
+    siteDescription: "Site Description: ",
 };
 
 export default {
@@ -45,12 +46,12 @@ export default {
             if (this.station) {
                 this.getFieldNotes();
             }
-        }
+        },
     },
     data: () => {
         return {
             baseUrl: API_HOST,
-            notes: []
+            notes: [],
         };
     },
     methods: {
@@ -78,7 +79,7 @@ export default {
                 const api = new FKApi();
                 const params = {
                     stationId: this.station.id,
-                    fieldNoteId: fieldNoteId
+                    fieldNoteId: fieldNoteId,
                 };
                 api.deleteFieldNote(params).then(() => {
                     const index = this.notes.findIndex(n => {
@@ -89,8 +90,8 @@ export default {
                     }
                 });
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

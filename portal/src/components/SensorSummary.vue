@@ -4,13 +4,16 @@
         <div class="sensor-summary-block" v-for="block in this.blocks" v-bind:key="block.label">
             <div class="block-heading">{{ block.label }}</div>
             <div class="block-reading">
-                <span class="left">Low</span><span class="right">{{ block.stats.min }}</span>
+                <span class="left">Low</span>
+                <span class="right">{{ block.stats.min }}</span>
             </div>
             <div class="block-reading">
-                <span class="left">Median</span><span class="right">{{ block.stats.median }}</span>
+                <span class="left">Median</span>
+                <span class="right">{{ block.stats.median }}</span>
             </div>
             <div class="block-reading">
-                <span class="left">High</span><span class="right">{{ block.stats.max }}</span>
+                <span class="left">High</span>
+                <span class="right">{{ block.stats.max }}</span>
             </div>
         </div>
     </div>
@@ -79,9 +82,9 @@ export default {
                 { label: "CURRENT VIEW", stats: this.current },
                 { label: "LAST 7 DAYS", stats: this.week },
                 { label: "LAST 30 DAYS", stats: this.month },
-                { label: "OVERALL", stats: this.overall }
+                { label: "OVERALL", stats: this.overall },
             ];
-        }
+        },
     },
     data: () => {
         return {};
@@ -103,8 +106,8 @@ export default {
                 return d[sensorSummary.selectedSensor.key];
             });
             return { min: extent[0].toFixed(2), max: extent[1].toFixed(2), median: median.toFixed(2) };
-        }
-    }
+        },
+    },
 };
 </script>
 

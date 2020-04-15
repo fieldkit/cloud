@@ -1,7 +1,7 @@
 <template>
     <div>
         <div id="login-form" v-if="!accountCreated && !accountFailed && !showReset">
-            <h1>{{ isLoggingIn ? "Log In to Your Account" : "Create an Account" }}</h1>
+            <h1>{{ isLoggingIn ? "Log In to Your Account" : "Create Your Account" }}</h1>
             <div class="outer-input-container" v-if="!isLoggingIn">
                 <div class="input-container">
                     <input
@@ -24,7 +24,8 @@
                 <div class="validation-error" id="name-has-space" v-if="nameHasSpace">Name must not contain spaces.</div>
             </div>
             <div class="outer-input-container">
-                <div class="input-container">
+                <div :class="'input-container ' + (isLoggingIn ? '' : ' middle-container')">
+                    <img v-if="isLoggingIn" alt="Email" src="../assets/Icon_Email_login.png" class="email-img" />
                     <input
                         id="email-field"
                         ref="email"
@@ -45,7 +46,8 @@
                 </div>
             </div>
             <div class="outer-input-container">
-                <div class="input-container">
+                <div class="input-container middle-container">
+                    <img v-if="isLoggingIn" alt="Password" src="../assets/Icon_Password_login.png" class="password-img" />
                     <input
                         name="password"
                         class="inputText"
@@ -63,9 +65,12 @@
                 <div class="validation-error" id="password-too-short" v-if="passwordTooShort">
                     Password must be at least 10 characters.
                 </div>
+                <div class="reset-link" v-if="isLoggingIn && !passwordTooShort && !noPassword" v-on:click="showResetPassword">
+                    Reset password
+                </div>
             </div>
             <div class="outer-input-container" v-if="!isLoggingIn">
-                <div class="input-container">
+                <div class="input-container middle-container">
                     <input
                         name="confirmPassword"
                         class="inputText"
@@ -82,47 +87,68 @@
                 <div class="validation-error" id="passwords-not-match" v-if="passwordsNotMatch">
                     Your passwords do not match.
                 </div>
+                <div class="policy-terms-container">
+                    By creating an account you agree to our
+                    <span class="bold">Privacy Policy</span>
+                    and
+                    <span class="bold">Terms of Use.</span>
+                </div>
             </div>
-            <button v-on:click="submit" ref="submit" class="submit-btn">{{ isLoggingIn ? "Log In" : "Sign Up" }}</button>
+            <button v-on:click="submit" ref="submit" class="submit-btn">{{ isLoggingIn ? "Log In" : "Create Account" }}</button>
             <div class="create-link" v-on:click="toggleForm">
                 {{ isLoggingIn ? "Create an Account" : "Back to Log In" }}
             </div>
-            <div class="forgot-link" v-if="isLoggingIn" v-on:click="showResetPassword">Forgot your password?</div>
         </div>
 
-        <div id="forgot-link-container" v-if="showReset">
-            <div class="outer-input-container" v-if="!resetSent">
-                <div class="input-container">
-                    <div class="reset-instructions">
-                        Enter your email address below, and password reset instructions will be sent to you.
+        <div id="reset-container" v-if="showReset">
+            <div v-if="!resetSent && !resendingReset">
+                <div class="reset-heading">Password Reset</div>
+                <div class="outer-input-container">
+                    <div class="input-container">
+                        <div class="reset-instructions">
+                            Enter your email address below, and password reset instructions will be sent.
+                        </div>
+                        <input v-model="resetEmail" type="text" class="inputText" required="" />
+                        <span class="floating-label">Email</span>
                     </div>
-                    <input v-model="resetEmail" type="text" class="inputText" required="" />
-                    <span class="floating-label">Email</span>
+                </div>
+                <button :class="sendingReset ? 'disabled' : 'submit-btn'" v-on:click="sendResetEmail" :disabled="sendingReset">
+                    Submit
+                </button>
+                <div class="create-link" v-on:click="returnToLogin">
+                    Go back to Log In
                 </div>
             </div>
-            <button
-                :class="sendingReset ? 'disabled' : 'submit-btn'"
-                v-on:click="sendResetEmail"
-                v-if="!resetSent"
-                :disabled="sendingReset"
-            >
-                Submit
-            </button>
-            <div class="reset-sent" v-if="resetSent">Password reset email sent!</div>
+            <div v-if="resetSent && !resendingReset">
+                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                <p class="reset-heading">Password Reset Email Sent</p>
+                <div class="notification-text">Check your inbox for the email with a link to reset your password.</div>
+                <button v-on:click="resendReset" class="resubmit-btn">Resend Email</button>
+                <div class="create-link" v-on:click="returnToLogin">
+                    Go back to Log In
+                </div>
+            </div>
+            <div class="resending" v-if="!resetSent && resendingReset">
+                <img alt="Resending" src="../assets/Icon_Syncing2.png" width="57px" />
+                <p class="reset-heading">Resending</p>
+            </div>
         </div>
 
         <div id="notification" v-if="accountCreated || accountFailed">
             <div v-if="accountCreated">
-                <p class="success">Success! Your account was created.</p>
-                <p>Check your email to validate your account.</p>
+                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                <p class="success">Account Created</p>
+                <div class="notification-text">We sent you an account validation email.</div>
+                <div class="create-link" v-on:click="returnToLogin">
+                    Go back to Log In
+                </div>
             </div>
-            <div v-if="accountFailed">
-                <p class="error">Unfortunately we were unable to create your account.</p>
-                <p>
-                    Please
-                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
-                    if you would like assistance.
-                </p>
+            <div v-if="accountFailed" class="notification-container">
+                <img alt="Unsuccessful" src="../assets/Icon_Warning_error.png" width="57px" />
+                <p class="error">A Problem Occurred</p>
+                <p>Unfortunately we were unable to create your account at this time.</p>
+                <p class="notification-text">Contact us to get assistance.</p>
+                <p><a href="https://www.fieldkit.org/contact/" target="_blank" class="contact-link">Contact us</a></p>
             </div>
         </div>
     </div>
@@ -154,6 +180,7 @@ export default {
             resetSent: false,
             resetEmail: "",
             sendingReset: false,
+            resendingReset: false,
         };
     },
     async beforeCreate() {
@@ -197,6 +224,14 @@ export default {
 
         toggleForm() {
             this.isLoggingIn = !this.isLoggingIn;
+        },
+
+        returnToLogin() {
+            this.showReset = false;
+            this.resetSent = false;
+            this.accountCreated = false;
+            this.accountFailed = false;
+            this.isLoggingIn = true;
         },
 
         checkEmail() {
@@ -252,14 +287,27 @@ export default {
                 this.register();
             }
         },
+
         showResetPassword() {
             this.showReset = true;
+            this.resetSent = false;
+            this.sendingReset = false;
+            this.resendingReset = false;
         },
+
         sendResetEmail() {
             this.sendingReset = true;
             this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
                 this.resetSent = true;
+                this.sendingReset = false;
+                this.resendingReset = false;
             });
+        },
+
+        resendReset() {
+            this.resetSent = false;
+            this.resendingReset = true;
+            setTimeout(this.sendResetEmail, 500);
         },
     },
 };
@@ -269,51 +317,77 @@ export default {
 <style scoped>
 #login-form,
 #notification,
-#forgot-link-container {
-    width: 30%;
+#reset-container {
+    width: 460px;
     background-color: white;
     display: inline-block;
     text-align: center;
     padding-bottom: 60px;
     padding-top: 20px;
 }
-h1 {
-    font-weight: lighter;
+#notification {
+    padding-top: 58px;
 }
-.submit-btn {
-    margin-top: 20px;
-    width: 70%;
-    height: 50px;
+#reset-container {
+    padding-top: 78px;
+}
+h1 {
+    font-weight: 500;
+    font-size: 24px;
+    margin-bottom: 55px;
+}
+.bold {
+    font-weight: bold;
+}
+.submit-btn,
+.resubmit-btn {
+    margin-top: 50px;
+    width: 300px;
+    height: 45px;
     background-color: #ce596b;
     border: none;
     color: white;
     font-size: 18px;
+    font-weight: 600;
     border-radius: 5px;
+}
+.resubmit-btn {
+    margin-top: 0;
 }
 .disabled {
     margin-top: 20px;
-    width: 70%;
+    width: 300px;
     height: 50px;
 }
 .outer-input-container {
-    height: 65px;
-    width: 70%;
+    width: 300px;
     margin: auto;
 }
 .input-container {
-    float: left;
-    margin: 5px 0 0 0;
+    margin: auto;
     width: 100%;
     text-align: left;
 }
+.middle-container {
+    margin-top: 22px;
+}
 input {
+    background: none;
     border: 0;
-    border-bottom: 1px solid gray;
+    border-bottom: 2px solid #d8dce0;
     outline: 0;
     font-size: 18px;
+    padding-bottom: 2px;
 }
 .floating-label {
-    font-size: 18px;
+    font-size: 16px;
+    color: #6a6d71;
+}
+.email-img,
+.password-img {
+    width: 20px;
+    float: right;
+    margin-bottom: -18px;
 }
 ul {
     list-style-type: none;
@@ -330,35 +404,48 @@ li {
     font-size: 14px;
     margin: -20px 0 0 0;
 }
+.policy-terms-container {
+    font-size: 13px;
+    line-height: 16px;
+    text-align: left;
+}
 .create-link {
     cursor: pointer;
-    margin: 40px 0 0 0;
+    margin: 30px 0 0 0;
+    font-size: 14px;
+    font-weight: 500;
 }
-.success {
-    margin: 15px 0 0 0;
-    font-size: 18px;
-    color: #3f8530;
-}
+.success,
 .error {
-    margin: 15px 0 0 0;
-    font-size: 18px;
-    color: #c42c44;
-    padding: 10px;
+    margin: 25px 0 25px 0;
+    font-size: 24px;
+}
+.notification-container {
+    width: 300px;
+    margin: auto;
+}
+.notification-text {
+    width: 300px;
+    margin: 0 auto 80px auto;
 }
 .contact-link {
     cursor: pointer;
-    text-decoration: underline;
+    font-size: 14px;
 }
-.forgot-link {
-    margin: 15px 0 0 0;
+.reset-heading {
+    font-size: 24px;
+    font-weight: 500;
+}
+.reset-link {
+    float: right;
+    margin: -16px 0 0 0;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
 }
 .reset-instructions {
-    margin: 15px 0 18px 0;
-}
-.reset-sent {
-    margin: 15px 0 0 0;
-    font-size: 18px;
-    color: #3f8530;
+    font-size: 16px;
+    text-align: center;
+    margin: 15px 0 54px 0;
 }
 </style>

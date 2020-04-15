@@ -15,12 +15,7 @@
                     Log in
                 </router-link>
             </div>
-            <img
-                alt="User image"
-                :src="userImage"
-                class="user-image"
-                v-if="isAuthenticated && user.media_url"
-            />
+            <img alt="User image" :src="userImage" class="user-image" v-if="isAuthenticated && user.media_url" />
         </div>
     </div>
 </template>
@@ -35,13 +30,13 @@ export default {
     data: () => {
         return {
             baseUrl: API_HOST,
-            userImage: null
+            userImage: null,
         };
     },
     watch: {
         user() {
             this.userImage = this.baseUrl + "/user/" + this.user.id + "/media";
-        }
+        },
     },
     methods: {
         logout() {
@@ -64,8 +59,8 @@ export default {
                 narrow.style.display = "none";
             }
             this.$emit("sidebarToggled");
-        }
-    }
+        },
+    },
 };
 </script>
 
