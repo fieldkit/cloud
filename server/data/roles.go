@@ -17,11 +17,6 @@ var (
 		Name:            "Owner",
 		readOnlyProject: false,
 	}
-	AdministratorRole = &Role{
-		ID:              2,
-		Name:            "Admin",
-		readOnlyProject: false,
-	}
 	PublicRole = &Role{
 		// NOTE This is never persisted.
 		Name:            "Public",
@@ -30,7 +25,7 @@ var (
 	Roles = []*Role{
 		MemberRole,
 		OwnerRole,
-		AdministratorRole,
+		PublicRole,
 	}
 )
 

@@ -510,7 +510,7 @@ func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error 
 }
 
 func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return err
 	}
@@ -522,7 +522,7 @@ func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserC
 	}
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID()); err != nil {
 		return err
 	}
 
@@ -530,7 +530,7 @@ func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserC
 }
 
 func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return err
 	}

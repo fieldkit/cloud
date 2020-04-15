@@ -73,13 +73,12 @@ func NewFieldNoteController(service *goa.Service, options *ControllerOptions) *F
 }
 
 func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(ctx.StationID)
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -91,7 +90,7 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 
 	fieldNoteMedia := &data.FieldNoteMedia{
 		Created:     time.Now(),
-		UserID:      p.UserID,
+		UserID:      p.UserID(),
 		ContentType: saved.MimeType,
 		URL:         saved.URL,
 	}
@@ -124,13 +123,12 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 }
 
 func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(ctx.StationID)
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -143,7 +141,7 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 	fieldNote := &data.FieldNote{
 		StationID:  int32(ctx.StationID),
 		Created:    ctx.Payload.Created,
-		UserID:     p.UserID,
+		UserID:     p.UserID(),
 		CategoryID: int32(categoryId),
 	}
 
@@ -174,13 +172,12 @@ func (c *FieldNoteController) Add(ctx *app.AddFieldNoteContext) error {
 }
 
 func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(ctx.StationID)
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -194,7 +191,7 @@ func (c *FieldNoteController) Update(ctx *app.UpdateFieldNoteContext) error {
 		ID:         int32(ctx.FieldNoteID),
 		StationID:  int32(ctx.StationID),
 		Created:    ctx.Payload.Created,
-		UserID:     p.UserID,
+		UserID:     p.UserID(),
 		CategoryID: int32(categoryId),
 	}
 
@@ -235,13 +232,12 @@ func (c *FieldNoteController) Get(ctx *app.GetFieldNoteContext) error {
 }
 
 func (c *FieldNoteController) Delete(ctx *app.DeleteFieldNoteContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyStationByStationID(ctx.StationID)
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 

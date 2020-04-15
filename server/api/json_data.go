@@ -187,18 +187,17 @@ func (c *JSONDataController) Get(ctx *app.GetJSONDataContext) error {
 
 	log.Infow("json", "device_id", ctx.DeviceID)
 
-	p, err := NewPermissions(ctx, c.options)
-	if err != nil {
-		return err
-	}
-
 	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(deviceIdBytes)
 	if err != nil {
+		return err
+	}
+
+	if err := p.CanView(); err != nil {
 		return err
 	}
 

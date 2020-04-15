@@ -65,7 +65,7 @@ func NewProjectController(service *goa.Service, options *ControllerOptions) *Pro
 }
 
 func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		EndTime:     ctx.Payload.EndTime,
 	}
 
-	role := data.AdministratorRole
+	role := data.OwnerRole
 
 	if err := c.options.Database.NamedGetContext(ctx, project, `
 		INSERT INTO fieldkit.project (name, slug, description, goal, location, tags, private, start_time, end_time) VALUES
@@ -110,7 +110,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)", project.ID, p.UserID, role.ID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)", project.ID, p.UserID(), role.ID); err != nil {
 		return err
 	}
 
@@ -118,12 +118,12 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 }
 
 func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	if err := p.CanModifyProject(ctx.ProjectID); err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -199,13 +199,13 @@ func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 }
 
 func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return err
 	}
 
 	projects := []*data.ProjectUserAndProject{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name", p.UserID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name", p.UserID()); err != nil {
 		return err
 	}
 
@@ -213,12 +213,12 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 }
 
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	if err := p.CanModifyProject(ctx.ProjectID); err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -233,22 +233,22 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, data.AdministratorRole))
+	return ctx.OK(ProjectType(project, data.OwnerRole))
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
+	if err != nil {
+		return err
+	}
+
+	err = p.CanView()
 	if err != nil {
 		return err
 	}
 
 	project := &data.Project{}
 	if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
-		return err
-	}
-
-	err = p.CanViewProject(ctx.ProjectID)
-	if err != nil {
 		return err
 	}
 
@@ -271,12 +271,12 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 }
 
 func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	if err := p.CanModifyProject(ctx.ProjectID); err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -287,7 +287,7 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		}
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID, ctx.Payload.Email, time.Now()); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID(), ctx.Payload.Email, time.Now()); err != nil {
 		return err
 	}
 
@@ -295,12 +295,12 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 }
 
 func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	if err := p.CanModifyProject(ctx.ProjectID); err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -316,12 +316,12 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 }
 
 func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyProject(ctx.ProjectID)
+	err = p.CanModify()
 	if err != nil {
 		return err
 	}
@@ -334,12 +334,12 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 }
 
 func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyProject(ctx.ProjectID)
+	err = p.CanModify()
 	if err != nil {
 		return err
 	}
@@ -352,13 +352,12 @@ func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) 
 }
 
 func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
-	p, err := NewPermissions(ctx, c.options)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanModifyProject(ctx.ProjectID)
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 

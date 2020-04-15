@@ -60,11 +60,6 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 }
 
 func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) error {
-	p, err := NewPermissions(ctx, c.options)
-	if err != nil {
-		return err
-	}
-
 	log := Logger(ctx).Sugar()
 
 	ir, err := repositories.NewIngestionRepository(c.options.Database)
@@ -82,8 +77,12 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 		return ctx.NotFound()
 	}
 
-	err = p.CanModifyStationByDeviceID(i.DeviceID)
+	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
 	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -98,11 +97,6 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 }
 
 func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
-	p, err := NewPermissions(ctx, c.options)
-	if err != nil {
-		return err
-	}
-
 	log := Logger(ctx).Sugar()
 
 	ir, err := repositories.NewIngestionRepository(c.options.Database)
@@ -120,8 +114,12 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 		return ctx.NotFound()
 	}
 
-	err = p.CanModifyStationByDeviceID(i.DeviceID)
+	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
 	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -166,24 +164,21 @@ type BlocksSummaryRow struct {
 }
 
 func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error {
-	p, err := NewPermissions(ctx, c.options)
-	if err != nil {
-		return err
-	}
+	log := Logger(ctx).Sugar()
 
 	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(deviceIdBytes)
 	if err != nil {
 		return err
 	}
 
-	log := Logger(ctx).Sugar()
-
-	_ = log
+	if err := p.CanView(); err != nil {
+		return err
+	}
 
 	log.Infow("summary", "device_id", deviceIdBytes)
 
@@ -236,18 +231,17 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 }
 
 func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
-	p, err := NewPermissions(ctx, c.options)
-	if err != nil {
-		return err
-	}
-
 	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
 	if err != nil {
 		return err
 	}
 
-	err = p.CanViewStationByDeviceID(deviceIdBytes)
+	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(deviceIdBytes)
 	if err != nil {
+		return err
+	}
+
+	if err := p.CanView(); err != nil {
 		return err
 	}
 
