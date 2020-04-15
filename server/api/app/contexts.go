@@ -5325,6 +5325,47 @@ func (ctx *SaveCurrentUserImageUserContext) BadRequest() error {
 	return nil
 }
 
+// SendValidationUserContext provides the user send validation action context.
+type SendValidationUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID int
+}
+
+// NewSendValidationUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller send validation action.
+func NewSendValidationUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*SendValidationUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SendValidationUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["userId"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *SendValidationUserContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *SendValidationUserContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
 // TransmissionTokenUserContext provides the user transmission token action context.
 type TransmissionTokenUserContext struct {
 	context.Context

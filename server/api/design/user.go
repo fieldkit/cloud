@@ -192,6 +192,17 @@ var _ = Resource("user", func() {
 		Response(Unauthorized)
 	})
 
+	Action("send validation", func() {
+		Routing(POST("users/:userId/validate-email"))
+		NoSecurity()
+		Params(func() {
+			Param("userId", Integer)
+			Required("userId")
+		})
+		Response(Unauthorized)
+		Response(NoContent)
+	})
+
 	Action("validate", func() {
 		Routing(GET("validate"))
 		Description("Validate a user's email address.")

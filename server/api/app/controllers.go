@@ -5715,6 +5715,7 @@ type UserController interface {
 	RecoveryLookup(*RecoveryLookupUserContext) error
 	Refresh(*RefreshUserContext) error
 	SaveCurrentUserImage(*SaveCurrentUserImageUserContext) error
+	SendValidation(*SendValidationUserContext) error
 	TransmissionToken(*TransmissionTokenUserContext) error
 	Update(*UpdateUserContext) error
 	Validate(*ValidateUserContext) error
@@ -5737,6 +5738,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	service.Mux.Handle("OPTIONS", "/user/recovery", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/recovery/lookup", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/refresh", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/users/:userId/validate-email", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/transmission-token", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/validate", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
@@ -6006,6 +6008,22 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/user/media", ctrl.MuxHandler("save current user image", h, nil))
 	service.LogInfo("mount", "ctrl", "User", "action", "SaveCurrentUserImage", "route", "POST /user/media", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSendValidationUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.SendValidation(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/users/:userId/validate-email", ctrl.MuxHandler("send validation", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "SendValidation", "route", "POST /users/:userId/validate-email")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

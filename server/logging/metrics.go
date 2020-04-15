@@ -121,6 +121,10 @@ func (m *Metrics) EmailVerificationSent() {
 	m.SC.Increment("emails.verification")
 }
 
+func (m *Metrics) EmailRecoverPasswordSent() {
+	m.SC.Increment("emails.password.recover")
+}
+
 func (m *Metrics) DataErrorsUnknown() {
 	m.SC.Increment("api.data.errors.unknown")
 }

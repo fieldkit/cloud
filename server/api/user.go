@@ -101,6 +101,8 @@ func NewUserController(service *goa.Service, options *ControllerOptions) *UserCo
 }
 
 func (c *UserController) Add(ctx *app.AddUserContext) error {
+	log := Logger(ctx).Sugar()
+
 	user := &data.User{
 		Name:     data.Name(ctx.Payload.Name),
 		Email:    ctx.Payload.Email,
@@ -128,6 +130,8 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	if err := c.options.Emailer.SendValidationToken(user, validationToken); err != nil {
 		return err
 	}
+
+	log.Infow("validation", "token", validationToken.Token)
 
 	c.options.Metrics.UserAdded()
 
@@ -198,6 +202,41 @@ func (c *UserController) ChangePassword(ctx *app.ChangePasswordUserContext) erro
 	return ctx.OK(UserType(user))
 }
 
+func (c *UserController) SendValidation(ctx *app.SendValidationUserContext) error {
+	log := Logger(ctx).Sugar()
+
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", ctx.UserID); err != nil {
+		return err
+	}
+
+	// TODO Rate limit the number of these we can send?
+	if !user.Valid {
+		validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
+		if err != nil {
+			return err
+		}
+
+		if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.validation_token WHERE user_id = $1", user.ID); err != nil {
+			return err
+		}
+
+		if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", validationToken); err != nil {
+			return err
+		}
+
+		if err := c.options.Emailer.SendValidationToken(user, validationToken); err != nil {
+			return err
+		}
+
+		log.Infow("validation", "token", validationToken.Token)
+
+		c.options.Metrics.EmailVerificationSent()
+	}
+
+	return ctx.NoContent()
+}
+
 func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	log := Logger(ctx).Sugar()
 
@@ -229,6 +268,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 	c.options.Metrics.UserValidated()
 
 	ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"/")
+
 	return ctx.Found()
 }
 
@@ -349,6 +389,7 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 	}
 
 	now := time.Now().UTC()
+
 	recoveryToken, err := data.NewRecoveryToken(user.ID, 20, now.Add(time.Duration(1)*time.Hour))
 	if err != nil {
 		return err
@@ -362,11 +403,13 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 		return err
 	}
 
-	log.Infow("recovery", "token", recoveryToken.Token)
-
 	if err := c.options.Emailer.SendRecoveryToken(user, recoveryToken); err != nil {
 		return err
 	}
+
+	log.Infow("recovery", "token", recoveryToken.Token)
+
+	c.options.Metrics.EmailRecoverPasswordSent()
 
 	return ctx.OK([]byte("{}"))
 }
@@ -410,7 +453,7 @@ func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password, valid = true WHERE id = :id RETURNING *", user); err != nil {
 		return err
 	}
 

@@ -508,6 +508,36 @@ func (c *Client) NewSaveCurrentUserImageUserRequest(ctx context.Context, path st
 	return req, nil
 }
 
+// SendValidationUserPath computes a request path to the send validation action of user.
+func SendValidationUserPath(userID int) string {
+	param0 := strconv.Itoa(userID)
+
+	return fmt.Sprintf("/users/%s/validate-email", param0)
+}
+
+// SendValidationUser makes a request to the send validation action endpoint of the user resource
+func (c *Client) SendValidationUser(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewSendValidationUserRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSendValidationUserRequest create the request corresponding to the send validation action endpoint of the user resource.
+func (c *Client) NewSendValidationUserRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // TransmissionTokenUserPath computes a request path to the transmission token action of user.
 func TransmissionTokenUserPath() string {
 
