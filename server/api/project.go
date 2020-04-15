@@ -321,8 +321,7 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 		return err
 	}
 
-	err = p.CanModify()
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 
@@ -339,8 +338,7 @@ func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) 
 		return err
 	}
 
-	err = p.CanModify()
-	if err != nil {
+	if err := p.CanModify(); err != nil {
 		return err
 	}
 

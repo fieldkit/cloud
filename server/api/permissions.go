@@ -208,12 +208,12 @@ func (p *projectPermissions) CanView() error {
 
 func (p *projectPermissions) CanModify() error {
 	if p.projectUser == nil {
-		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
+		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized (public)"))
 	}
 
 	role := p.projectUser.LookupRole()
 	if role.IsProjectReadOnly() {
-		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
+		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized (%s)", role.Name))
 	}
 
 	return nil
