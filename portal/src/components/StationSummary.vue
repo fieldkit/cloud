@@ -66,7 +66,7 @@
                             {{ sensor.unit }}
                         </div>
                         <div class="right sensor-reading">
-                            {{ sensor.currentReading ? sensor.currentReading.toFixed(1) : "ncR" }}
+                            {{ sensor.currentReading || sensor.currentReading == 0 ? sensor.currentReading.toFixed(1) : "ncR" }}
                         </div>
                     </div>
                 </div>
