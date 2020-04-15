@@ -143,15 +143,12 @@
                     Go back to Log In
                 </div>
             </div>
-            <div v-if="accountFailed">
+            <div v-if="accountFailed" class="notification-container">
                 <img alt="Unsuccessful" src="../assets/Icon_Warning_error.png" width="57px" />
-                <p class="error">Account Not Created</p>
-                <p class="notification-text">Unfortunately we were unable to create your account.</p>
-                <p>
-                    Please
-                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
-                    if you would like assistance.
-                </p>
+                <p class="error">A Problem Occurred</p>
+                <p>Unfortunately we were unable to create your account at this time.</p>
+                <p class="notification-text">Contact us to get assistance.</p>
+                <p><a href="https://www.fieldkit.org/contact/" target="_blank" class="contact-link">Contact us</a></p>
             </div>
         </div>
     </div>
@@ -423,13 +420,17 @@ li {
     margin: 25px 0 25px 0;
     font-size: 24px;
 }
+.notification-container {
+    width: 300px;
+    margin: auto;
+}
 .notification-text {
     width: 300px;
     margin: 0 auto 80px auto;
 }
 .contact-link {
     cursor: pointer;
-    text-decoration: underline;
+    font-size: 14px;
 }
 .reset-heading {
     font-size: 24px;
