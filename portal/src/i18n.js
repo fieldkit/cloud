@@ -13,7 +13,6 @@ function loadLocaleMessages() {
             messages[locale] = locales(key);
         }
     });
-    console.log("messages", messages, "locales keys", locales.keys());
     return messages;
 }
 
