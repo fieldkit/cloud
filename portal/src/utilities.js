@@ -56,3 +56,15 @@ export function convertBytesToLabel(bytes) {
 export function unixNow() {
     return Math.round(new Date().getTime() / 1000);
 }
+
+export function convertOldFirmwareResponse(module) {
+    // compensate for old firmware
+    if (module.name.indexOf("modules") != 0) {
+        module.name = "modules." + module.name;
+        if (module.name == "modules.water") {
+            // this is dicey, but temporary...
+            module.name += "." + module.sensorObjects[0].name;
+        }
+    }
+    return module.name;
+}

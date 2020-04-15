@@ -61,7 +61,7 @@
                         v-bind:key="sensor.id"
                         :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
                     >
-                        <div class="left sensor-name">{{ sensor.name }}</div>
+                        <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
                         <div class="right sensor-unit">
                             {{ sensor.unit }}
                         </div>
@@ -140,6 +140,11 @@ export default {
                 img = "100.png";
             }
             return imgPath("./" + img);
+        },
+
+        getSensorName(module, sensor) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
         },
 
         getModuleImg(module) {
