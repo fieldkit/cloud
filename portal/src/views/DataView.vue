@@ -20,7 +20,6 @@
                     <div id="station-name">
                         {{ station ? station.name : "" }}
                     </div>
-                    <div class="small-label">{{ station ? getSyncedDate() : "" }}</div>
                     <div class="block-label">Data visualization</div>
                 </div>
                 <DataChartControl
@@ -30,9 +29,11 @@
                     :noStation="noStation"
                     :labels="labels"
                     :totalTime="stationTimeRange"
+                    :treeSelectOptions="treeSelectOptions"
                     @switchedSensor="onSensorSwitch"
                     @timeChanged="onTimeChange"
                     @chartTimeChanged="onChartTimeChange"
+                    @stationChanged="getStationFromSelect"
                 />
                 <div id="lower-container">
                     <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" />
@@ -97,6 +98,7 @@ export default {
             isAuthenticated: false,
             failedAuth: false,
             timeRange: null,
+            treeSelectOptions: [],
             // temporary label system
             labels: {
                 ph: "pH",
@@ -153,16 +155,17 @@ export default {
                 this.isAuthenticated = true;
                 this.api.getStations().then(s => {
                     this.stations = s.stations;
+                    this.api
+                        .getModulesMeta()
+                        .then(this.processModulesMeta)
+                        .then(this.initTreeSelect)
+                        .then(this.initiateDataRetrieval);
                 });
                 this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
                 });
-                this.api
-                    .getModulesMeta()
-                    .then(this.processModulesMeta)
-                    .then(this.initiateDataRetrieval);
             })
             .catch(() => {
                 this.failedAuth = true;
@@ -213,6 +216,7 @@ export default {
                         colorScale: colors,
                         unit: s.unit_of_measure,
                         key: s.key,
+                        firmwareKey: s.firmware_key,
                         name: null,
                     });
                 });
@@ -285,6 +289,48 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
 
+        initTreeSelect() {
+            this.treeSelectOptions = [];
+            let counterId = 0;
+            this.stations.forEach(s => {
+                let modules = [];
+                if (s.status_json.moduleObjects) {
+                    s.status_json.moduleObjects.forEach(m => {
+                        let sensors = [];
+                        m.sensorObjects.forEach(sensor => {
+                            let dataViewSensor = this.sensors.find(sr => {
+                                return sr.firmwareKey == sensor.name;
+                            });
+                            const sensorLabel = this.labels[dataViewSensor.key] ? this.labels[dataViewSensor.key] : sensor.name;
+                            sensors.push({
+                                id: s.name + dataViewSensor.key,
+                                label: sensorLabel,
+                                customLabel: s.name + " : " + sensorLabel,
+                                key: dataViewSensor.key,
+                                stationId: s.id,
+                            });
+                        });
+                        counterId += 1;
+                        modules.push({
+                            id: counterId,
+                            label: this.getModuleName(m),
+                            customLabel: s.name + " : " + this.getModuleName(m),
+                            stationId: s.id,
+                            children: sensors,
+                        });
+                    });
+                    counterId += 1;
+                    this.treeSelectOptions.push({
+                        id: counterId,
+                        label: s.name,
+                        customLabel: s.name,
+                        stationId: s.id,
+                        children: modules,
+                    });
+                }
+            });
+        },
+
         onSensorSwitch(sensor) {
             this.selectedSensor = sensor;
         },
@@ -312,8 +358,17 @@ export default {
             });
         },
 
-        getSyncedDate() {
-            return "Last synced " + utils.getUpdatedDate(this.station);
+        getModuleName(module) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".name");
+        },
+
+        getStationFromSelect(id) {
+            this.stationId = id;
+            this.api.getStation(this.stationId).then(station => {
+                this.station = station;
+                this.showStation();
+            });
         },
 
         getStationFromRoute() {

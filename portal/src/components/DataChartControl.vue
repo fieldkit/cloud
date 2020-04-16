@@ -51,11 +51,16 @@
                     <img v-if="!linkedCharts" class="open-link-icon" src="../assets/open_link.png" />
                 </div>
                 <div class="sensor-selection-dropdown">
-                    <select v-model="chart.sensorOption" v-on:change="chartSensorChanged" :data-id="chart.id">
-                        <option v-for="sensor in stationSensors" v-bind:value="sensor.key" v-bind:key="sensor.key">
-                            {{ labels[sensor.key] ? labels[sensor.key] : sensor.key }}
-                        </option>
-                    </select>
+                    <treeselect
+                        :id="chart.id + 'treeselect'"
+                        v-model="chart.treeSelectValue"
+                        :showCount="true"
+                        :options="treeSelectOptions"
+                        :instanceId="chart.id"
+                        @select="onTreeSelect"
+                    >
+                        <div slot="value-label" slot-scope="{ node }">{{ node.raw.customLabel }}</div>
+                    </treeselect>
                 </div>
                 <div class="chart-type">
                     <select v-model="chart.type" v-on:change="chartTypeChanged" :data-id="chart.id">
@@ -87,6 +92,8 @@ import _ from "lodash";
 import * as d3 from "d3";
 import * as utils from "../utilities";
 import D3Chart from "./D3Chart";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 const DAY = 1000 * 60 * 60 * 24;
 
@@ -94,6 +101,7 @@ export default {
     name: "DataChartControl",
     components: {
         D3Chart,
+        Treeselect,
     },
     data: () => {
         return {
@@ -141,7 +149,7 @@ export default {
             ],
         };
     },
-    props: ["combinedStationInfo", "station", "labels", "noStation", "totalTime"],
+    props: ["combinedStationInfo", "station", "labels", "noStation", "totalTime", "treeSelectOptions"],
     watch: {
         combinedStationInfo() {
             if (this.combinedStationInfo.stationData) {
@@ -197,7 +205,7 @@ export default {
                 id: chartId,
                 ref: "d3Chart" + id,
                 sensor: sensor,
-                sensorOption: sensor.key,
+                treeSelectValue: this.station.name + sensor.key,
                 type: type,
                 parent: id == 1,
                 data: filteredData,
@@ -223,7 +231,7 @@ export default {
                 id: "chart-" + id,
                 ref: "d3Chart" + id,
                 sensor: this.charts[0].sensor,
-                sensorOption: this.charts[0].sensorOption,
+                treeSelectValue: this.charts[0].treeSelectValue,
                 type: this.charts[0].type,
                 parent: false,
                 data: this.charts[0].data,
@@ -337,7 +345,7 @@ export default {
                     if (i > 0) {
                         c.type = this.charts[0].type;
                         c.sensor = this.charts[0].sensor;
-                        c.sensorOption = this.charts[0].sensorOption;
+                        c.treeSelectValue = this.charts[0].treeSelectValue;
                         this.$refs[c.ref][0].setTimeRange(parentTime);
                         if (requested) {
                             const requestedRange = { start: requested[0], end: requested[1] };
@@ -381,13 +389,10 @@ export default {
             }
             this.updateRoute();
         },
-        chartSensorChanged(event) {
+        chartSensorChanged(treeSelectParams) {
             // the sensor type on a single chart instance has changed
-            const selected = this.stationSensors[event.target.selectedIndex];
-            const id = event.target.getAttribute("data-id");
-            const chart = this.charts.find(c => {
-                return c.id == id;
-            });
+            const selected = treeSelectParams.sensor;
+            let chart = treeSelectParams.chart;
             const filteredData = this.currentSummary.filter(d => {
                 return d[selected.key] === 0 || d[selected.key];
             });
@@ -407,7 +412,8 @@ export default {
             if (chart.parent && this.linkedCharts) {
                 this.charts.forEach(c => {
                     c.sensor = selected;
-                    c.sensorOption = selected.key;
+                    // TODO:
+                    // c.treeSelectValue = c.station.name + selected.key;
                     this.urlQuery[c.id + "sensor"] = selected.key;
                     if (!changeTime) {
                         this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
@@ -420,7 +426,8 @@ export default {
             } else {
                 // otherwise, change this one, including time if needed
                 chart.sensor = selected;
-                chart.sensorOption = selected.key;
+                // TODO:
+                // chart.treeSelectValue = chart.station.name + selected.key;
                 this.urlQuery[chart.id + "sensor"] = selected.key;
                 if (!changeTime) {
                     this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
@@ -503,6 +510,34 @@ export default {
             this.urlQuery.start = range.start.getTime();
             this.urlQuery.end = range.end.getTime();
             this.updateRoute();
+        },
+        onTreeSelect(selection, instanceId) {
+            const chart = this.charts.find(c => {
+                return c.id == instanceId;
+            });
+            let query = {};
+            if (selection.key) {
+                query[chart.id + "sensor"] = selection.key;
+                if (selection.stationId == this.station.id) {
+                    // trigger update internally
+                    const sensor = this.stationSensors.find(s => {
+                        return s.key == selection.key;
+                    });
+                    const params = {
+                        chart: chart,
+                        sensor: sensor,
+                    };
+                    this.chartSensorChanged(params);
+                }
+            }
+
+            // vue throws uncaught expression: Object if the same route is pushed again
+            if (!_.isEqual(this.urlQuery, query)) {
+                this.$router.push({ name: "viewData", params: { id: selection.stationId }, query: query });
+            }
+            if (selection.stationId != this.station.id) {
+                this.$emit("stationChanged", selection.stationId);
+            }
         },
         showLoading(chartId) {
             if (document.getElementById("main-loading")) {
@@ -727,6 +762,8 @@ export default {
 .sensor-selection-dropdown {
     float: left;
     clear: both;
+    width: 350px;
+    font-size: 14px;
     margin-bottom: 10px;
     margin-left: 10px;
 }
