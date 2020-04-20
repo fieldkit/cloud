@@ -272,7 +272,7 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 	}
 
 	if err := c.options.Database.SelectContext(ctx, &firmwares,
-		`SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.Module, ctx.Profile, pageSize, page*pageSize); err != nil {
+		`SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) AND f.available ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.Module, ctx.Profile, pageSize, page*pageSize); err != nil {
 		return err
 	}
 
