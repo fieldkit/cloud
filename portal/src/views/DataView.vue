@@ -247,23 +247,18 @@ export default {
         initTreeSelect() {
             this.treeSelectOptions = [];
             let counterId = 0;
-            console.log("stations", this.stations.length);
             this.stations.forEach(s => {
                 let modules = [];
                 if (s.status_json.moduleObjects) {
                     s.status_json.moduleObjects.forEach(m => {
-                        console.log("station moduleObject", m.name);
                         let sensors = [];
                         let addModule = true;
                         m.sensorObjects.forEach(sensor => {
-                            console.log("station sensorObject", sensor.name);
                             let dataViewSensor = this.allSensors.find(sr => {
                                 return sr.firmwareKey == sensor.name;
                             });
                             if (dataViewSensor) {
-                                console.log("found dataViewSensor", dataViewSensor);
                                 const sensorLabel = this.getSensorName(m, sensor);
-                                console.log("and label", sensorLabel);
                                 sensors.push({
                                     id: s.name + dataViewSensor.key,
                                     label: sensorLabel,
@@ -287,7 +282,6 @@ export default {
                             });
                         }
                     });
-                    console.log("modules added", modules, "for", s.name);
                     counterId += 1;
                     this.treeSelectOptions.push({
                         id: counterId,
