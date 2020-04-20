@@ -237,14 +237,16 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
-	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
-	if err != nil {
-		return err
-	}
+	if false {
+		p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
+		if err != nil {
+			return err
+		}
 
-	err = p.CanView()
-	if err != nil {
-		return err
+		err = p.CanView()
+		if err != nil {
+			return err
+		}
 	}
 
 	project := &data.Project{}
