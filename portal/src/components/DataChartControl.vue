@@ -1,19 +1,16 @@
 <template>
     <div id="data-chart-container">
-        <div v-if="this.noStation" class="size-20">
+        <div v-if="noStation" class="size-20">
             <p>No station found.</p>
-        </div>
-        <div v-if="this.station && this.foundNoData" class="size-20">
-            <p>No data from {{ station.name }} has been uploaded yet.</p>
         </div>
 
         <div id="main-loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
 
-        <div class="white-bkgd" v-if="this.station">
+        <div class="white-bkgd" v-if="!noStation">
             <!-- compare and time window buttons -->
-            <div id="chart-controls" v-if="!this.foundNoData">
+            <div id="chart-controls">
                 <div id="compare-btn-container">
                     <div class="compare-btn" v-on:click="addChildChart">
                         <img alt="" src="../assets/Compare_icon.png" />
@@ -41,47 +38,62 @@
                 </div>
             </div>
 
+            <div v-for="(chart, chartIndex) in noDataCharts" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
+                <div class="no-data">
+                    <p>No data from {{ chart.station.name }} has been uploaded yet.</p>
+                </div>
+            </div>
+
             <!-- all data charts and their drop-down menus -->
             <div v-for="(chart, chartIndex) in charts" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
-                <div :id="chart.id + '-loading'" class="loading">
+                <div class="no-data" v-if="chart.noData">
+                    <p>No data from {{ chart.station.name }} has been uploaded yet.</p>
+                </div>
+                <template v-if="!chart.noData">
+                    <div :id="chart.id + '-loading'" class="loading">
+                        <img alt="" src="../assets/progress.gif" />
+                    </div>
+                    <div v-if="chartIndex > 0" v-on:click="toggleLinkage">
+                        <img v-if="linkedCharts" class="link-icon" src="../assets/link.png" />
+                        <img v-if="!linkedCharts" class="open-link-icon" src="../assets/open_link.png" />
+                    </div>
+                    <div class="sensor-selection-dropdown">
+                        <treeselect
+                            :id="chart.id + 'treeselect'"
+                            v-model="chart.treeSelectValue"
+                            :showCount="true"
+                            :options="treeSelectOptions"
+                            :instanceId="chart.id"
+                            open-direction="bottom"
+                            @select="onTreeSelect"
+                        >
+                            <div slot="value-label" slot-scope="{ node }">{{ node.raw.customLabel }}</div>
+                        </treeselect>
+                    </div>
+                    <div class="chart-type">
+                        <select v-model="chart.type" v-on:change="chartTypeChanged" :data-id="chart.id">
+                            <option v-for="option in chartOptions" v-bind:value="option.value" v-bind:key="option.value">
+                                {{ option.text }}
+                            </option>
+                        </select>
+                        <div class="remove-chart" v-if="chartIndex > 0">
+                            <img alt="Remove" src="../assets/close.png" :data-id="chart.id" v-on:click="removeChart" />
+                        </div>
+                    </div>
+                    <D3Chart
+                        class="d3Chart"
+                        :ref="chart.ref"
+                        :chartParam="chart"
+                        @timeZoomed="onTimeZoomed"
+                        @unlinkCharts="unlinkCharts"
+                        @zoomOut="setTimeRangeByDays"
+                    />
+                </template>
+            </div>
+            <div v-for="(pre, preIndex) in preloading" v-bind:key="pre.id" :class="preIndex > 0 ? 'top-border' : ''">
+                <div :id="pre.id + '-loading'" class="loading">
                     <img alt="" src="../assets/progress.gif" />
                 </div>
-                <div v-if="chartIndex > 0" v-on:click="toggleLinkage">
-                    <img v-if="linkedCharts" class="link-icon" src="../assets/link.png" />
-                    <img v-if="!linkedCharts" class="open-link-icon" src="../assets/open_link.png" />
-                </div>
-                <div class="sensor-selection-dropdown">
-                    <treeselect
-                        :id="chart.id + 'treeselect'"
-                        v-model="chart.treeSelectValue"
-                        :showCount="true"
-                        :options="treeSelectOptions"
-                        :instanceId="chart.id"
-                        @select="onTreeSelect"
-                    >
-                        <div slot="value-label" slot-scope="{ node }">{{ node.raw.customLabel }}</div>
-                    </treeselect>
-                </div>
-                <div class="chart-type">
-                    <select v-model="chart.type" v-on:change="chartTypeChanged" :data-id="chart.id">
-                        <option v-for="option in chartOptions" v-bind:value="option.value" v-bind:key="option.value">
-                            {{ option.text }}
-                        </option>
-                    </select>
-                    <div class="remove-chart" v-if="chartIndex > 0">
-                        <img alt="Remove" src="../assets/close.png" :data-id="chart.id" v-on:click="removeChart" />
-                    </div>
-                </div>
-                <D3Chart
-                    class="d3Chart"
-                    :ref="chart.ref"
-                    :chartParam="chart"
-                    :station="station"
-                    :summary="stationSummary"
-                    @timeZoomed="onTimeZoomed"
-                    @unlinkCharts="unlinkCharts"
-                    @zoomOut="setTimeRangeByDays"
-                />
             </div>
         </div>
     </div>
@@ -90,7 +102,6 @@
 <script>
 import _ from "lodash";
 import * as d3 from "d3";
-import * as utils from "../utilities";
 import D3Chart from "./D3Chart";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -105,16 +116,15 @@ export default {
     },
     data: () => {
         return {
-            foundNoData: false,
+            noStation: false,
             charts: [],
             pending: [],
-            stationSummary: [],
-            currentSummary: [],
-            linkedCharts: true,
+            preloading: [],
+            noDataCharts: [],
+            linkedCharts: false,
             urlQuery: {},
             prevQuery: {},
             chartOptions: [{ text: "Line", value: "Line" }, { text: "Histogram", value: "Histogram" }, { text: "Range", value: "Range" }],
-            stationSensors: [],
             timeButtons: [
                 {
                     active: false,
@@ -149,69 +159,99 @@ export default {
             ],
         };
     },
-    props: ["combinedStationInfo", "station", "labels", "noStation", "totalTime", "treeSelectOptions"],
-    watch: {
-        combinedStationInfo() {
-            if (this.combinedStationInfo.stationData) {
-                this.stationSummary = this.combinedStationInfo.stationData;
-                this.currentSummary = this.combinedStationInfo.stationData;
-                this.stationSensors = this.combinedStationInfo.sensors;
-                if (this.stationSummary.length > 0) {
-                    this.initCharts();
-                    return;
+    props: ["treeSelectOptions"],
+    methods: {
+        initialize() {
+            const params = Object.keys(this.$route.query);
+            let stationParams = [];
+            let chartParams = {};
+            params.forEach(p => {
+                if (p.indexOf("start") > -1 || p.indexOf("end") > -1) {
+                    this.$route.query[p] = parseInt(this.$route.query[p]);
                 }
+                if (p.indexOf("station") > 0) {
+                    this.preloading.push({ id: p });
+                }
+                if (p != "stationId") {
+                    this.urlQuery[p] = this.$route.query[p];
+                    this.prevQuery[p] = this.$route.query[p];
+                }
+
+                if (p == "stationId") {
+                    stationParams.push(p);
+                    chartParams[p] = "chart-1";
+                } else if (p.indexOf("station") > -1) {
+                    stationParams.push(p);
+                    const chartId = p.split("station")[0];
+                    chartParams[p] = chartId;
+                }
+            });
+            if (stationParams.length > 0) {
+                stationParams.forEach(p => {
+                    this.$emit("stationAdded", this.$route.query[p], chartParams[p]);
+                });
+            } else {
+                this.noStationFound();
             }
-            this.foundNoData = true;
+        },
+        noStationFound() {
+            this.noStation = true;
             this.hideLoading();
         },
-    },
-    mounted() {
-        const keys = Object.keys(this.$route.query);
-        keys.forEach(k => {
-            if (k.indexOf("start") > -1 || k.indexOf("end") > -1) {
-                this.$route.query[k] = parseInt(this.$route.query[k]);
-            }
-            this.urlQuery[k] = this.$route.query[k];
-            this.prevQuery[k] = this.$route.query[k];
-        });
-    },
-    methods: {
-        initCharts() {
-            if (this.$route.query.numCharts) {
-                for (let i = 0; i < this.$route.query.numCharts; i++) {
-                    // unlinked by default when adding via params
-                    this.linkedCharts = false;
-                    this.addChartFromParams();
-                }
-            } else {
-                // only one chart
-                this.linkedCharts = true;
-                this.addChartFromParams();
+        noInitialDataFound(station, chartId) {
+            const id = chartId.split("chart-")[1];
+            const newChart = {
+                id: chartId,
+                ref: "d3Chart" + id,
+                station: station,
+                treeSelectValue: station.name,
+            };
+            this.noDataCharts.push(newChart);
+            this.hideLoading();
+        },
+        noDataFound(station, chartId) {
+            const chart = this.charts.find(c => {
+                return c.id == chartId;
+            });
+            chart.station = station;
+            chart.noData = true;
+        },
+        initializeChart(data, deviceId, chartId) {
+            if (data[deviceId].data) {
+                this.urlQuery[chartId + "station"] = data[deviceId].station.id.toString();
+                this.addChartFromParams(data, deviceId, chartId);
             }
         },
-        addChartFromParams() {
-            const id = this.makeChartId();
-            const chartId = "chart-" + id;
-            const timeCheck = this.checkTimeWindowForChart(chartId);
-            const sensor = this.findSensorForChart(chartId);
-            const type = this.$route.query[chartId + "type"] ? this.$route.query[chartId + "type"] : "Line";
-            const extent = d3.extent(this.stationSummary, d => {
+        addChartFromParams(data, deviceId, chartId) {
+            const id = chartId.split("chart-")[1];
+            const chartData = data[deviceId].data;
+            const totalTime = data[deviceId].timeRange;
+            const timeCheck = this.checkTimeWindowForChart(chartId, totalTime, deviceId);
+            const sensor = this.findSensorForChart(chartId, chartData, data[deviceId].sensors);
+            const type = this.getChartType(chartId);
+            const extent = d3.extent(chartData, d => {
                 return d[sensor.key];
             });
-            const filteredData = this.stationSummary.filter(d => {
+            const filteredData = chartData.filter(d => {
                 return d[sensor.key] === 0 || d[sensor.key];
             });
             const newChart = {
                 id: chartId,
                 ref: "d3Chart" + id,
                 sensor: sensor,
-                treeSelectValue: this.station.name + sensor.key,
+                treeSelectValue: data[deviceId].station.name + sensor.key,
                 type: type,
                 parent: id == 1,
                 data: filteredData,
                 start: timeCheck.range[0],
                 end: timeCheck.range[1],
                 extent: extent,
+                sensors: data[deviceId].sensors,
+                station: data[deviceId].station,
+                overall: chartData,
+                current: chartData,
+                totalTime: totalTime,
+                noData: false,
             };
             if (timeCheck.addChart) {
                 if (document.getElementById("main-loading")) {
@@ -221,31 +261,29 @@ export default {
             } else {
                 this.pending.push(newChart);
             }
-            if (this.charts.length == 1) {
-                this.$emit("switchedSensor", newChart.sensor);
+            if (document.getElementById(chartId + "station-loading")) {
+                document.getElementById(chartId + "station-loading").style.display = "none";
             }
+            this.updateRoute();
+
+            // if (this.charts.length == 1) {
+            //     this.$emit("switchedSensor", newChart.sensor);
+            // }
         },
         addChildChart() {
             const id = this.makeChartId();
-            const newChart = {
-                id: "chart-" + id,
-                ref: "d3Chart" + id,
-                sensor: this.charts[0].sensor,
-                treeSelectValue: this.charts[0].treeSelectValue,
-                type: this.charts[0].type,
-                parent: false,
-                data: this.charts[0].data,
-                start: this.charts[0].start,
-                end: this.charts[0].end,
-                extent: this.charts[0].extent,
-            };
+            let newChart = {};
+            _.assign(newChart, this.charts[0]);
+            newChart.id = "chart-" + id;
+            newChart.ref = "d3Chart" + id;
+            newChart.parent = false;
             const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
             if (requested) {
                 newChart.requestedStart = requested[0];
                 newChart.requestedEnd = requested[1];
             }
             this.charts.push(newChart);
-            this.urlQuery.numCharts = this.charts.length;
+            this.urlQuery[newChart.id + "station"] = newChart.station.id.toString();
             this.urlQuery[newChart.id + "type"] = newChart.type;
             this.urlQuery[newChart.id + "sensor"] = newChart.sensor.key;
             this.urlQuery[newChart.id + "start"] = newChart.start.getTime();
@@ -267,36 +305,39 @@ export default {
             }
             return id;
         },
-        findSensorForChart(chartId) {
-            const sensorKey = this.$route.query[chartId + "sensor"] ? this.$route.query[chartId + "sensor"] : this.getSensorWithData();
-            const sensor = this.stationSensors.find(s => {
+        findSensorForChart(chartId, data, sensors) {
+            const sensorKey = this.$route.query[chartId + "sensor"]
+                ? this.$route.query[chartId + "sensor"]
+                : this.getSensorWithData(data, sensors);
+            const sensor = sensors.find(s => {
                 return s.key == sensorKey;
             });
+            this.urlQuery[chartId + "sensor"] = sensor.key;
             return sensor;
         },
-        getSensorWithData() {
+        getSensorWithData(data, sensors) {
             // the first sensor with data
             let summaryKeys;
-            for (let i = 0; i < this.stationSummary.length; i++) {
-                summaryKeys = Object.keys(this.stationSummary[i]);
+            for (let i = 0; i < data.length; i++) {
+                summaryKeys = Object.keys(data[i]);
                 // rule out ones that only have _filters, _resampled, and date:
                 if (summaryKeys.length > 3) {
-                    i = this.stationSummary.length;
+                    i = data.length;
                 }
             }
-            const actualSensors = _.intersectionBy(summaryKeys, this.stationSensors, s => {
+            const actualSensors = _.intersectionBy(summaryKeys, sensors, s => {
                 return s.key ? s.key : s;
             });
             if (actualSensors && actualSensors.length > 0) {
                 return actualSensors[0];
             } else {
-                return this.stationSensors[0];
+                return sensors[0].key;
             }
         },
-        checkTimeWindowForChart(chartId) {
+        checkTimeWindowForChart(chartId, totalTime, deviceId) {
             let addChart = true;
-            let start = this.totalTime[0];
-            let end = this.totalTime[1];
+            let start = totalTime[0];
+            let end = totalTime[1];
             if (this.$route.query.start && this.$route.query.end) {
                 start = new Date(parseInt(this.$route.query.start));
                 end = new Date(parseInt(this.$route.query.end));
@@ -306,16 +347,24 @@ export default {
                 start = new Date(parseInt(this.$route.query[chartId + "start"]));
                 end = new Date(parseInt(this.$route.query[chartId + "end"]));
                 // fetch data if needed by triggering a time change
-                if (start.getTime() != this.totalTime[0].getTime() || end.getTime() != this.totalTime[1].getTime()) {
+                if (start.getTime() != totalTime[0].getTime() || end.getTime() != totalTime[1].getTime()) {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
-                    this.$emit("chartTimeChanged", { start: start, end: end }, chartId);
+                    const chartParam = { id: chartId, station: { device_id: deviceId } };
+                    this.$emit("timeChanged", { start: start, end: end }, chartParam);
                     if (document.getElementById("main-loading")) {
                         document.getElementById("main-loading").style.display = "none";
                     }
                 }
             }
+            this.urlQuery[chartId + "start"] = start.getTime();
+            this.urlQuery[chartId + "end"] = end.getTime();
             return { addChart: addChart, range: [start, end] };
+        },
+        getChartType(chartId) {
+            const type = this.$route.query[chartId + "type"] ? this.$route.query[chartId + "type"] : "Line";
+            this.urlQuery[chartId + "type"] = type;
+            return type;
         },
         removeChart(event) {
             const id = event.target.getAttribute("data-id");
@@ -324,8 +373,7 @@ export default {
             });
             if (index > -1) {
                 this.charts.splice(index, 1);
-                this.urlQuery.numCharts = this.charts.length;
-                // also remove all the associated params
+                // remove all the associated params
                 let keys = Object.keys(this.urlQuery);
                 keys.forEach(k => {
                     if (k.indexOf(id) == 0) {
@@ -389,87 +437,30 @@ export default {
             }
             this.updateRoute();
         },
-        chartSensorChanged(treeSelectParams) {
-            // the sensor type on a single chart instance has changed
-            const selected = treeSelectParams.sensor;
-            let chart = treeSelectParams.chart;
-            const filteredData = this.currentSummary.filter(d => {
-                return d[selected.key] === 0 || d[selected.key];
-            });
-            const extent = d3.extent(filteredData, d => {
-                return d[selected.key];
-            });
-            const chartTime = this.$refs[chart.ref][0].getTimeRange();
-
-            // set up some time range checks to see if we need to refetch data
-            const summaryStart = this.currentSummary[0].date;
-            const summaryEnd = this.currentSummary[this.currentSummary.length - 1].date;
-            const summaryStartMatch = chart.start.getTime() == summaryStart.getTime();
-            const summaryEndMatch = chart.end.getTime() == summaryEnd.getTime();
-            const changeTime = !summaryStartMatch || !summaryEndMatch;
-
-            // if it is the parent chart and they are linked, change all
-            if (chart.parent && this.linkedCharts) {
-                this.charts.forEach(c => {
-                    c.sensor = selected;
-                    // TODO:
-                    // c.treeSelectValue = c.station.name + selected.key;
-                    this.urlQuery[c.id + "sensor"] = selected.key;
-                    if (!changeTime) {
-                        this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
-                    }
-                });
-                if (changeTime) {
-                    this.showLoading();
-                    this.$emit("timeChanged", chartTime);
-                }
-            } else {
-                // otherwise, change this one, including time if needed
-                chart.sensor = selected;
-                // TODO:
-                // chart.treeSelectValue = chart.station.name + selected.key;
-                this.urlQuery[chart.id + "sensor"] = selected.key;
-                if (!changeTime) {
-                    this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
-                } else {
-                    this.showLoading(chart.id);
-                    this.$emit("chartTimeChanged", chartTime, chart.id);
-                }
-                this.unlinkCharts();
-            }
-            this.updateRoute();
-        },
         setTimeRangeByDays(event) {
-            this.showLoading();
             // method can be called by time buttons,
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
             const days = event.id ? 0 : event.target.getAttribute("data-time");
-            // TODO: consider expanding endDate to capture any new data since page loaded
-            const endDate = this.totalTime[1];
-            let range = {
-                start: new Date(endDate.getTime() - days * DAY),
-                end: endDate,
-            };
-            if (days == 0) {
-                range.start = this.totalTime[0];
-            }
-            if (event.id && !event.parent) {
-                // if a D3Chart emitted this and they are not parent,
-                // consider changing this to only affect them
-                const chart = this.charts.find(c => {
-                    return c.id == event.id;
-                });
-                if (this.$refs[chart.ref]) {
-                    this.$refs[chart.ref][0].setTimeRange(range);
-                    this.urlQuery[chart.id + "start"] = range.start.getTime();
-                    this.urlQuery[chart.id + "end"] = range.end.getTime();
-                    this.updateRoute();
+            this.charts.forEach(c => {
+                this.showLoading(c.id);
+                const endDate = c.totalTime[1];
+                let range = {
+                    start: new Date(endDate.getTime() - days * DAY),
+                    end: endDate,
+                };
+                if (days == 0) {
+                    range.start = c.totalTime[0];
                 }
-                // allow ranges to affect everything for now
-                // this.unlinkCharts();
-                // return;
-            }
+                if (this.$refs[c.ref]) {
+                    this.$refs[c.ref][0].setTimeRange(range);
+                    this.$refs[c.ref][0].setRequestedTime(range);
+                    this.urlQuery[c.id + "start"] = range.start.getTime();
+                    this.urlQuery[c.id + "end"] = range.end.getTime();
+                    this.$emit("timeChanged", range, c);
+                }
+            });
+            this.updateRoute();
             // display active state for appropriate button
             this.timeButtons.forEach(b => {
                 b.active = false;
@@ -477,7 +468,6 @@ export default {
                     b.active = true;
                 }
             });
-            this.propagateTimeChange(range);
         },
         onTimeZoomed(zoomed) {
             if (zoomed.parent && this.linkedCharts) {
@@ -494,7 +484,7 @@ export default {
                 this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
                 this.updateRoute();
                 this.unlinkCharts();
-                this.$emit("chartTimeChanged", zoomed.range, zoomed.id);
+                this.$emit("timeChanged", zoomed.range, chart);
             }
         },
         propagateTimeChange(range) {
@@ -504,48 +494,70 @@ export default {
                     this.$refs[c.ref][0].setRequestedTime(range);
                     this.urlQuery[c.id + "start"] = range.start.getTime();
                     this.urlQuery[c.id + "end"] = range.end.getTime();
+                    this.$emit("timeChanged", range, c);
                 }
             });
-            this.$emit("timeChanged", range);
-            this.urlQuery.start = range.start.getTime();
-            this.urlQuery.end = range.end.getTime();
             this.updateRoute();
         },
         onTreeSelect(selection, instanceId) {
+            this.showLoading(instanceId);
             const chart = this.charts.find(c => {
                 return c.id == instanceId;
             });
-            let query = {};
+            chart.noData = false;
+            let sensor;
             if (selection.key) {
-                query[chart.id + "sensor"] = selection.key;
-                if (selection.stationId == this.station.id) {
-                    // trigger update internally
-                    const sensor = this.stationSensors.find(s => {
-                        return s.key == selection.key;
-                    });
-                    const params = {
-                        chart: chart,
-                        sensor: sensor,
-                    };
-                    this.chartSensorChanged(params);
-                }
+                sensor = chart.sensors.find(s => {
+                    return s.key == selection.key;
+                });
+                this.urlQuery[chart.id + "sensor"] = selection.key;
+                chart.sensor = sensor;
             }
-
-            // vue throws uncaught expression: Object if the same route is pushed again
-            if (!_.isEqual(this.urlQuery, query)) {
-                this.$router.push({ name: "viewData", params: { id: selection.stationId }, query: query });
+            // if only sensor changed
+            if (selection.key && selection.stationId == chart.station.id) {
+                this.chartSensorChanged(sensor, chart);
             }
-            if (selection.stationId != this.station.id) {
-                this.$emit("stationChanged", selection.stationId);
+            // if station changed
+            if (selection.stationId != chart.station.id) {
+                this.$emit("stationChanged", selection.stationId, chart);
+                this.urlQuery[chart.id + "station"] = selection.stationId;
             }
+            this.updateRoute();
+        },
+        chartSensorChanged(selected, chart) {
+            // the sensor type on a single chart instance has changed
+            const filteredData = chart.current.filter(d => {
+                return d[selected.key] === 0 || d[selected.key];
+            });
+            const extent = d3.extent(filteredData, d => {
+                return d[selected.key];
+            });
+            // if it is the parent chart and they are linked, change all
+            if (chart.parent && this.linkedCharts) {
+                this.propagateSensorChange(selected, filteredData, extent);
+            } else {
+                // otherwise, change this one
+                this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+                this.unlinkCharts();
+            }
+            this.updateRoute();
+        },
+        propagateSensorChange(selected, filteredData, extent) {
+            this.charts.forEach(c => {
+                c.sensor = selected;
+                // TODO: some stations might not have this sensor
+                c.treeSelectValue = c.station.name + selected.key;
+                this.urlQuery[c.id + "sensor"] = selected.key;
+                this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
+            });
         },
         showLoading(chartId) {
-            if (document.getElementById("main-loading")) {
-                document.getElementById("main-loading").style.display = "block";
-            }
-            if (chartId) {
+            if (chartId && document.getElementById(chartId + "-loading")) {
                 document.getElementById(chartId + "-loading").style.display = "block";
             } else {
+                if (document.getElementById("main-loading")) {
+                    document.getElementById("main-loading").style.display = "block";
+                }
                 const loadings = document.getElementsByClassName("loading");
                 for (let i = 0; i < loadings.length; i++) {
                     loadings[i].style.display = "block";
@@ -561,26 +573,16 @@ export default {
                 loadings[i].style.display = "none";
             }
         },
-        updateAll(data) {
-            this.currentSummary = data;
-            const range =
-                data.length == 0
-                    ? this.$refs[this.charts[0].ref][0].getTimeRange()
-                    : {
-                          start: data[0].date,
-                          end: data[data.length - 1].date,
-                      };
-            // respond to a global time change event
-            this.charts.forEach(c => {
-                const filteredData = data.filter(d => {
-                    return d[c.sensor.key] === 0 || d[c.sensor.key];
-                });
-                const extent = d3.extent(filteredData, d => {
-                    return d[c.sensor.key];
-                });
-                this.$refs[c.ref][0].setTimeRange(range);
-                this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
+        resetChart(data, deviceId, chartId) {
+            const chart = this.charts.find(c => {
+                return c.id == chartId;
             });
+            // not checking pending... ?
+            chart.sensors = data[deviceId].sensors;
+            chart.station = data[deviceId].station;
+            chart.overall = data[deviceId].data;
+            chart.current = data[deviceId].data;
+            chart.totalTime = data[deviceId].timeRange;
         },
         updateChartData(data, chartId) {
             // only update url for the chart that emitted this zoom
@@ -610,14 +612,16 @@ export default {
                     pendingChart.start = range.start;
                     pendingChart.end = range.end;
                     pendingChart.data = filteredData;
+                    pendingChart.current = data;
                     pendingChart.extent = extent;
                     this.charts.push(pendingChart);
-                    if (this.charts.length == 1) {
-                        // just for sensor summary in lower right corner
-                        this.$emit("switchedSensor", pendingChart.sensor);
-                    }
+                    // if (this.charts.length == 1) {
+                    //     // just for sensor summary in lower right corner
+                    //     this.$emit("switchedSensor", pendingChart.sensor);
+                    // }
                 }
             } else {
+                chart.current = data;
                 const range =
                     data.length == 0
                         ? { start: chart.start, end: chart.end }
@@ -637,16 +641,9 @@ export default {
             }
         },
         updateRoute() {
-            // temp temp temp
-            // just for demo of Ancient Goose, keep id = 0
-            // temp temp temp
-            let stationId = this.station.id;
-            if (stationId == 159) {
-                stationId = 0;
-            }
             // vue throws uncaught expression: Object if the same route is pushed again
             if (!_.isEqual(this.prevQuery, this.urlQuery)) {
-                this.$router.push({ name: "viewData", params: { id: stationId }, query: this.urlQuery });
+                this.$router.push({ name: "viewData", query: this.urlQuery });
                 this.prevQuery = {};
                 const keys = Object.keys(this.urlQuery);
                 keys.forEach(k => {
@@ -654,33 +651,17 @@ export default {
                 });
             }
         },
-        refresh(data) {
+        refresh() {
             // refresh window (back or forward browser button pressed)
-            this.stationSummary = data;
-            this.currentSummary = data;
             this.charts = [];
             this.pending = [];
-            if (this.stationSummary.length > 0) {
-                this.initCharts();
-            } else {
-                this.foundNoData = true;
-                this.hideLoading();
-            }
-        },
-        prepareNewStation() {
-            this.showLoading();
-            this.foundNoData = false;
-            this.charts = [];
-            this.pending = [];
-            this.stationSensors = [];
-            this.stationSummary = [];
-            this.currentSummary = [];
-            this.linkedCharts = true;
+            this.noStation = false;
+            this.preloading = [];
+            this.noDataCharts = [];
             this.urlQuery = {};
             this.prevQuery = {};
-        },
-        getSyncedDate() {
-            return "Last synced " + utils.getUpdatedDate(this.station);
+            this.showLoading();
+            this.initialize();
         },
     },
 };
@@ -704,6 +685,12 @@ export default {
 }
 .size-20 {
     font-size: 20px;
+}
+.no-data {
+    font-size: 20px;
+    float: left;
+    clear: both;
+    margin: 15px;
 }
 .synced {
     margin-left: 10px;

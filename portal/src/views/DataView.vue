@@ -17,25 +17,20 @@
                     </div>
                 </router-link>
                 <div>
-                    <div id="station-name">
-                        {{ station ? station.name : "" }}
+                    <div id="project-name">
+                        {{ projects[0] ? projects[0].name : "" }}
                     </div>
                     <div class="block-label">Data visualization</div>
                 </div>
                 <DataChartControl
                     ref="dataChartControl"
-                    :combinedStationInfo="combinedStationInfo"
-                    :station="station"
-                    :noStation="noStation"
-                    :labels="labels"
-                    :totalTime="stationTimeRange"
                     :treeSelectOptions="treeSelectOptions"
+                    @stationAdded="getInitialStationData"
+                    @stationChanged="onStationChange"
                     @switchedSensor="onSensorSwitch"
                     @timeChanged="onTimeChange"
-                    @chartTimeChanged="onChartTimeChange"
-                    @stationChanged="getStationFromSelect"
                 />
-                <div id="lower-container">
+                <!-- <div id="lower-container">
                     <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" />
                     <SensorSummary
                         ref="sensorSummary"
@@ -45,7 +40,7 @@
                         :timeRange="timeRange"
                         :labels="labels"
                     />
-                </div>
+                </div> -->
             </div>
         </div>
         <div v-if="failedAuth" class="no-auth-message">
@@ -63,13 +58,13 @@
 <script>
 import _ from "lodash";
 import * as d3 from "d3";
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
 import DataChartControl from "../components/DataChartControl";
-import NotesList from "../components/NotesList";
-import SensorSummary from "../components/SensorSummary";
-import * as tempStations from "../assets/ancientGoose.json";
+// import NotesList from "../components/NotesList";
+// import SensorSummary from "../components/SensorSummary";
+// import * as tempStations from "../assets/ancientGoose.json";
 import * as utils from "../utilities";
 
 export default {
@@ -78,56 +73,23 @@ export default {
         HeaderBar,
         SidebarNav,
         DataChartControl,
-        NotesList,
-        SensorSummary,
+        // NotesList,
+        // SensorSummary,
     },
-    props: ["stationParam", "id"],
+    props: [],
     data: () => {
         return {
             user: {},
-            noStation: false,
-            station: null,
             stationId: null,
-            stationTimeRange: [],
-            stationData: [],
+            stationData: {},
             stations: [],
             projects: [],
-            sensors: [],
-            combinedStationInfo: {},
+            allSensors: [],
             selectedSensor: null,
             isAuthenticated: false,
             failedAuth: false,
             timeRange: null,
             treeSelectOptions: [],
-            // temporary label system
-            labels: {
-                ph: "pH",
-                do: "Dissolved Oxygen",
-                ec: "Electrical Conductivity",
-                tds: "Total Dissolved Solids",
-                salinity: "Salinity",
-                temp: "Temperature",
-                humidity: "Humidity",
-                temperature1: "Temperature",
-                pressure: "Pressure",
-                temperature2: "Temperature 2",
-                rain: "Rain",
-                windSpeed: "Wind Speed",
-                windDir: "Wind Direction",
-                windDirMv: "Wind Direction Raw ADC",
-                windHrMaxSpeed: "Wind Max Speed (1 hour)",
-                windHrMaxDir: "Wind Max Direction (1 hour)",
-                wind10mMaxSpeed: "Wind Max Speed (10 min)",
-                wind10mMaxDir: "Wind Max Direction (10 min)",
-                wind2mAvgSpeed: "Wind Average Speed (2 min)",
-                wind2mAvgDir: "Wind Average Direction (2 min)",
-                rainThisHour: "Rain This Hour",
-                rainPrevHour: "Rain Previous Hour",
-                distance0: "Distance 0",
-                distance1: "Distance 1",
-                distance2: "Distance 2",
-                calibration: "Calibration",
-            },
         };
     },
     async beforeCreate() {
@@ -135,22 +97,12 @@ export default {
         window.onpopstate = function(event) {
             // Note: event.state.key changes
             dataView.componentKey = event.state ? event.state.key : 0;
-            if (dataView.id != dataView.$route.params.id) {
-                dataView.getStationFromRoute();
-            } else {
-                dataView.$refs.dataChartControl.refresh(dataView.stationData);
-            }
+            dataView.$refs.dataChartControl.refresh(dataView.stationData);
         };
         this.api = new FKApi();
         this.api
             .getCurrentUser()
             .then(user => {
-                if (this.stationParam) {
-                    this.station = this.stationParam;
-                }
-                if (this.id) {
-                    this.stationId = this.id;
-                }
                 this.user = user;
                 this.isAuthenticated = true;
                 this.api.getStations().then(s => {
@@ -158,8 +110,8 @@ export default {
                     this.api
                         .getModulesMeta()
                         .then(this.processModulesMeta)
-                        .then(this.initTreeSelect)
-                        .then(this.initiateDataRetrieval);
+                        .then(this.initDataChartControl)
+                        .then(this.initTreeSelect);
                 });
                 this.api.getProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
@@ -172,23 +124,68 @@ export default {
             });
     },
     methods: {
-        async fetchSummary(start, end) {
-            if (this.station) {
-                return this.api.getStationDataSummaryByDeviceId(this.station.device_id, start, end);
-            } else if (this.stationId) {
-                // temporarily show Ancient Goose 81 (station 159) to anyone who views /dashboard/data/0
-                if (this.stationId == 0) {
-                    this.station = tempStations.stations[0];
-                    return this.api.getStationDataSummaryByDeviceId(this.station.device_id, start, end);
-                } else {
-                    return this.api.getStation(this.stationId).then(station => {
-                        this.station = station;
-                        return this.api.getStationDataSummaryByDeviceId(this.station.device_id, start, end);
-                    });
-                }
-            } else {
-                this.noStation = true;
+        initDataChartControl() {
+            if (this.$refs.dataChartControl) {
+                this.$refs.dataChartControl.initialize();
             }
+        },
+
+        getInitialStationData(id, chartId) {
+            this.api
+                .getStation(id)
+                .then(station => {
+                    const deviceId = station.device_id;
+                    this.stationData[deviceId] = {};
+                    this.stationData[deviceId].station = station;
+                    this.api
+                        .getStationDataSummaryByDeviceId(deviceId)
+                        .then(result => {
+                            this.handleInitialDataSummary(result, deviceId, chartId);
+                        })
+                        .catch(() => {
+                            this.$refs.dataChartControl.noInitialDataFound(station, chartId);
+                        });
+                })
+                .catch(() => {
+                    this.$refs.dataChartControl.noStationFound();
+                });
+        },
+
+        handleInitialDataSummary(result, deviceId, chartId, reset) {
+            if (!result) {
+                this.stationData[deviceId] = {
+                    sensors: [],
+                    data: [],
+                };
+                this.$refs.dataChartControl.initializeChart(this.stationData, deviceId, chartId);
+                return;
+            }
+            const processedData = this.processData(result);
+            let processed = processedData.data;
+            //sort data by date
+            processed.sort(function(a, b) {
+                return a.date.getTime() - b.date.getTime();
+            });
+            const origEnd = processed[processed.length - 1].date;
+            // convert to midnight of the given day
+            const endDate = new Date(origEnd.getFullYear(), origEnd.getMonth(), origEnd.getDate(), 23, 59, 59);
+
+            this.stationData[deviceId].timeRange = [processed[0].date, endDate];
+            this.stationData[deviceId].data = processed;
+            this.stationData[deviceId].sensors = processedData.sensors;
+            if (processed.length > 0) {
+                // resize div to fit sections
+                // document.getElementById("lower-container").style["min-width"] = "1100px";
+            }
+            if (reset) {
+                this.$refs.dataChartControl.resetChart(this.stationData, deviceId, chartId);
+            } else {
+                this.$refs.dataChartControl.initializeChart(this.stationData, deviceId, chartId);
+            }
+        },
+
+        async fetchSummary(deviceId, start, end) {
+            return this.api.getStationDataSummaryByDeviceId(deviceId, start, end);
         },
 
         processModulesMeta(meta) {
@@ -212,7 +209,7 @@ export default {
                             .domain([0, 1])
                             .interpolator(black);
                     }
-                    this.sensors.push({
+                    this.allSensors.push({
                         colorScale: colors,
                         unit: s.unit_of_measure,
                         key: s.key,
@@ -224,47 +221,10 @@ export default {
             return;
         },
 
-        initiateDataRetrieval() {
-            this.fetchSummary()
-                .then(result => {
-                    this.handleInitialDataSummary(result);
-                })
-                .catch(() => {
-                    this.combinedStationInfo = [];
-                });
-        },
-
-        handleInitialDataSummary(result) {
-            this.stationData = [];
-            if (!result) {
-                this.combinedStationInfo = {
-                    sensors: [],
-                    stationData: this.stationData,
-                };
-                return;
-            }
-            const processedData = this.processData(result);
-            let sensors = processedData.sensors;
-            let processed = processedData.data;
-            //sort data by date
-            processed.sort(function(a, b) {
-                return a.date.getTime() - b.date.getTime();
-            });
-            this.stationTimeRange[0] = processed[0].date;
-            this.stationTimeRange[1] = processed[processed.length - 1].date;
-            this.timeRange = { start: this.stationTimeRange[0], end: this.stationTimeRange[1] };
-            this.stationData = processed;
-            this.combinedStationInfo = { sensors: sensors, stationData: processed };
-            if (processed.length > 0) {
-                // resize div to fit sections
-                document.getElementById("lower-container").style["min-width"] = "1100px";
-            }
-        },
-
         processData(result) {
             let processed = [];
             const resultSensors = _.flatten(_.map(result.modules, "sensors"));
-            const sensors = _.intersectionBy(this.sensors, resultSensors, s => {
+            const sensors = _.intersectionBy(this.allSensors, resultSensors, s => {
                 return s.key;
             });
             result.data.forEach(d => {
@@ -280,11 +240,6 @@ export default {
             return { data: processed, sensors: sensors };
         },
 
-        handleSummary(result) {
-            const processedData = this.processData(result);
-            this.$refs.dataChartControl.updateAll(processedData.data);
-        },
-
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
@@ -297,27 +252,35 @@ export default {
                 if (s.status_json.moduleObjects) {
                     s.status_json.moduleObjects.forEach(m => {
                         let sensors = [];
+                        let addModule = true;
                         m.sensorObjects.forEach(sensor => {
-                            let dataViewSensor = this.sensors.find(sr => {
+                            let dataViewSensor = this.allSensors.find(sr => {
                                 return sr.firmwareKey == sensor.name;
                             });
-                            const sensorLabel = this.labels[dataViewSensor.key] ? this.labels[dataViewSensor.key] : sensor.name;
-                            sensors.push({
-                                id: s.name + dataViewSensor.key,
-                                label: sensorLabel,
-                                customLabel: s.name + " : " + sensorLabel,
-                                key: dataViewSensor.key,
+                            if (dataViewSensor) {
+                                const sensorLabel = this.getSensorName(m, sensor);
+                                sensors.push({
+                                    id: s.name + dataViewSensor.key,
+                                    label: sensorLabel,
+                                    customLabel: s.name + " : " + sensorLabel,
+                                    key: dataViewSensor.key,
+                                    stationId: s.id,
+                                });
+                            } else {
+                                // don't add module if sensor wasn't found
+                                addModule = false;
+                            }
+                        });
+                        if (addModule) {
+                            counterId += 1;
+                            modules.push({
+                                id: counterId,
+                                label: this.getModuleName(m),
+                                customLabel: s.name + " : " + this.getModuleName(m),
                                 stationId: s.id,
+                                children: sensors,
                             });
-                        });
-                        counterId += 1;
-                        modules.push({
-                            id: counterId,
-                            label: this.getModuleName(m),
-                            customLabel: s.name + " : " + this.getModuleName(m),
-                            stationId: s.id,
-                            children: sensors,
-                        });
+                        }
                     });
                     counterId += 1;
                     this.treeSelectOptions.push({
@@ -335,26 +298,49 @@ export default {
             this.selectedSensor = sensor;
         },
 
-        onTimeChange(range) {
-            this.timeRange = range;
-            const start = this.timeRange.start.getTime();
-            const end = this.timeRange.end.getTime();
-            this.fetchSummary(start, end).then(result => {
-                this.handleSummary(result);
+        onStationChange(stationId, chart) {
+            this.api.getStation(stationId).then(station => {
+                const deviceId = station.device_id;
+                if (this.stationData[deviceId]) {
+                    // use this station's data if we already have it
+                    this.$refs.dataChartControl.resetChart(this.stationData, deviceId, chart.id);
+                    this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
+                        const processedData = this.processData(result);
+                        this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, station);
+                    });
+                } else {
+                    this.stationData[deviceId] = {};
+                    this.stationData[deviceId].station = station;
+                    // otherwise, need to fetch data for initializing ranges, etc
+                    this.api
+                        .getStationDataSummaryByDeviceId(deviceId)
+                        .then(result => {
+                            const reset = true;
+                            this.handleInitialDataSummary(result, deviceId, chart.id, reset);
+                            // and then get the correct time window summary
+                            this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
+                                const processedData = this.processData(result);
+                                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, station);
+                            });
+                        })
+                        .catch(() => {
+                            this.$refs.dataChartControl.noDataFound(station, chart.id);
+                        });
+                }
             });
         },
 
-        onChartTimeChange(range, chartId) {
+        onTimeChange(range, chart) {
             const start = range.start.getTime();
             const end = range.end.getTime();
             // TODO: perhaps don't rely on parent chart having this id:
-            if (chartId == "chart-1") {
-                // change time range for SensorSummary
-                this.timeRange = range;
-            }
-            this.fetchSummary(start, end).then(result => {
+            // if (chart.id == "chart-1") {
+            //     // change time range for SensorSummary
+            //     this.timeRange = range;
+            // }
+            this.fetchSummary(chart.station.device_id, start, end).then(result => {
                 const processedData = this.processData(result);
-                this.$refs.dataChartControl.updateChartData(processedData.data, chartId);
+                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
             });
         },
 
@@ -363,30 +349,18 @@ export default {
             return this.$t(newName + ".name");
         },
 
-        getStationFromSelect(id) {
-            this.stationId = id;
-            this.api.getStation(this.stationId).then(station => {
-                this.station = station;
-                this.showStation();
-            });
-        },
-
-        getStationFromRoute() {
-            this.stationId = this.$route.params.id;
-            this.station = null;
-            this.showStation();
+        getSensorName(module, sensor) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
         },
 
         showStation(station) {
             if (station) {
-                this.$router.push({ name: "viewData", params: { id: station.id } });
-                this.station = station;
+                this.$router.push({ name: "viewData", query: { stationId: station.id } });
+                this.$refs.dataChartControl.refresh();
             }
-            this.$refs.dataChartControl.prepareNewStation();
-            this.selectedSensor = null;
-            this.noStation = false;
-            document.getElementById("lower-container").style["min-width"] = "700px";
-            this.initiateDataRetrieval();
+            // this.selectedSensor = null;
+            // document.getElementById("lower-container").style["min-width"] = "700px";
         },
     },
 };
@@ -420,7 +394,7 @@ export default {
     margin: 10px 0;
     font-size: 13px;
 }
-#station-name {
+#project-name {
     font-size: 24px;
     line-height: 24px;
     font-weight: bold;
@@ -435,7 +409,7 @@ export default {
 .block-label {
     margin-top: 5px;
     font-weight: normal;
-    font-size: 14px;
+    font-size: 18px;
     display: block;
 }
 </style>

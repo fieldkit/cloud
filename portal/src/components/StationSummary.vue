@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </div>
-            <router-link :to="{ name: 'viewData', params: { id: station.id } }">
+            <router-link :to="{ name: 'viewData', query: { stationId: station.id } }">
                 <div id="view-data-btn" class="section">
                     Explore Data
                 </div>

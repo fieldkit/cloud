@@ -1,11 +1,13 @@
 import { shallowMount } from "@vue/test-utils";
 import StationsView from "@/views/StationsView.vue";
 
+jest.mock("@/api/api");
+
 describe("StationsView.vue", () => {
     it("Renders a map", () => {
-        const wrapper = shallowMount(StationsView);
-        const map = wrapper.find(".stations-map");
+        const stationsView = shallowMount(StationsView);
+        const map = stationsView.find(".stations-map");
         expect(map.isVisible()).toBe(true);
-        wrapper.destroy(); // prevent warnings
+        stationsView.destroy(); // prevent warnings
     });
 });

@@ -60,12 +60,6 @@ export default new Router({
         },
         {
             path: "/dashboard/data",
-            name: "data",
-            component: DataView,
-            props: true,
-        },
-        {
-            path: "/dashboard/data/:id",
             name: "viewData",
             component: DataView,
             props: true,

@@ -62,7 +62,7 @@
 
 <script>
 import _ from "lodash";
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 import Mapbox from "mapbox-gl-vue";
 import { MAPBOX_ACCESS_TOKEN } from "../secrets";
 import HeaderBar from "../components/HeaderBar";

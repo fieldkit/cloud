@@ -47,7 +47,7 @@ export default {
         D3HistoChart,
         D3RangeChart,
     },
-    props: ["chartParam", "station", "summary"],
+    props: ["chartParam"],
     data: () => {
         return {
             chart: {},
@@ -89,7 +89,7 @@ export default {
         this.chart = this.chartParam;
         this.chart.svg = d3.select(this.$refs.d3Stage);
         this.chart.colors = this.chartParam.sensor.colorScale;
-        this.chart.panelID = this.station.device_id;
+        this.chart.panelID = this.chart.station.device_id;
         this.activateChart();
         this.initScrubber();
     },
@@ -163,12 +163,12 @@ export default {
         },
         initScrubber() {
             let d3Chart = this;
-            this.scrubberData = this.summary.filter(d => {
+            this.scrubberData = this.chart.overall.filter(d => {
                 return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
             });
             this.scrubberTimeRange = [];
-            this.scrubberTimeRange[0] = this.summary[0].date;
-            this.scrubberTimeRange[1] = this.summary[this.summary.length - 1].date;
+            this.scrubberTimeRange[0] = this.chart.totalTime[0];
+            this.scrubberTimeRange[1] = this.chart.totalTime[1];
             this.scrubberExtent = d3.extent(this.scrubberData, d => {
                 return d[d3Chart.chart.sensor.key];
             });
@@ -309,7 +309,7 @@ export default {
         },
         updateScrubber() {
             let d3Chart = this;
-            this.scrubberData = this.summary.filter(d => {
+            this.scrubberData = this.chart.overall.filter(d => {
                 return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
             });
             this.scrubberExtent = d3.extent(this.scrubberData, d => {
