@@ -208,6 +208,9 @@ func (c *StationController) Update(ctx *app.UpdateStationContext) error {
 	}
 
 	if err := p.CanModify(); err != nil {
+		if err == sql.ErrNoRows {
+			return ctx.NotFound()
+		}
 		return err
 	}
 
