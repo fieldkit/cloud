@@ -11,12 +11,6 @@ import (
 	"github.com/fieldkit/cloud/server/messages"
 )
 
-var (
-	ErrUnauthorized       error = tasks.Unauthorized("invalid username and password combination")
-	ErrInvalidToken       error = tasks.Unauthorized("invalid token")
-	ErrInvalidTokenScopes error = tasks.Unauthorized("invalid scopes in token")
-)
-
 type TasksService struct {
 	options *ControllerOptions
 }
@@ -64,7 +58,7 @@ func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *securi
 		Token:         token,
 		Scheme:        scheme,
 		Key:           s.options.JWTHMACKey,
-		InvalidToken:  ErrInvalidToken,
-		InvalidScopes: ErrInvalidTokenScopes,
+		InvalidToken:  tasks.Unauthorized("invalid token"),
+		InvalidScopes: tasks.Unauthorized("invalid scopes in token"),
 	})
 }

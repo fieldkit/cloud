@@ -39,7 +39,7 @@ func (s *FollowingService) JWTAuth(ctx context.Context, token string, scheme *se
 		Token:         token,
 		Scheme:        scheme,
 		Key:           s.options.JWTHMACKey,
-		InvalidToken:  ErrInvalidToken,
-		InvalidScopes: ErrInvalidTokenScopes,
+		InvalidToken:  following.Unauthorized("invalid token"),
+		InvalidScopes: following.Unauthorized("invalid scopes in token"),
 	})
 }

@@ -58,7 +58,7 @@ func (s *TestService) JWTAuth(ctx context.Context, token string, scheme *securit
 		Token:         token,
 		Scheme:        scheme,
 		Key:           s.options.JWTHMACKey,
-		InvalidToken:  ErrInvalidToken,
-		InvalidScopes: ErrInvalidTokenScopes,
+		InvalidToken:  test.Unauthorized("invalid token"),
+		InvalidScopes: test.Unauthorized("invalid scopes in token"),
 	})
 }

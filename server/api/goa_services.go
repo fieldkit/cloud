@@ -15,17 +15,17 @@ import (
 
 	"github.com/fieldkit/cloud/server/logging"
 
-	testsvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
+	testSvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 
-	taskssvr "github.com/fieldkit/cloud/server/api/gen/http/tasks/server"
+	tasksSvr "github.com/fieldkit/cloud/server/api/gen/http/tasks/server"
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
 
-	modulessvr "github.com/fieldkit/cloud/server/api/gen/http/modules/server"
+	modulesSvr "github.com/fieldkit/cloud/server/api/gen/http/modules/server"
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
 
 	following "github.com/fieldkit/cloud/server/api/gen/following"
-	followingsvr "github.com/fieldkit/cloud/server/api/gen/http/following/server"
+	followingSvr "github.com/fieldkit/cloud/server/api/gen/http/following/server"
 )
 
 func LogErrors() func(goa.Endpoint) goa.Endpoint {
@@ -72,15 +72,15 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 
 	eh := errorHandler()
 
-	tasksServer := taskssvr.New(tasksEndpoints, mux, dec, enc, eh, nil)
-	testServer := testsvr.New(testEndpoints, mux, dec, enc, eh, nil)
-	modulesServer := modulessvr.New(modulesEndpoints, mux, dec, enc, eh, nil)
-	followingServer := followingsvr.New(followingEndpoints, mux, dec, enc, eh, nil)
+	tasksServer := tasksSvr.New(tasksEndpoints, mux, dec, enc, eh, nil)
+	testServer := testSvr.New(testEndpoints, mux, dec, enc, eh, nil)
+	modulesServer := modulesSvr.New(modulesEndpoints, mux, dec, enc, eh, nil)
+	followingServer := followingSvr.New(followingEndpoints, mux, dec, enc, eh, nil)
 
-	taskssvr.Mount(mux, tasksServer)
-	testsvr.Mount(mux, testServer)
-	modulessvr.Mount(mux, modulesServer)
-	followingsvr.Mount(mux, followingServer)
+	tasksSvr.Mount(mux, tasksServer)
+	testSvr.Mount(mux, testServer)
+	modulesSvr.Mount(mux, modulesServer)
+	followingSvr.Mount(mux, followingServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -123,15 +123,15 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return a.Key, nil
 	})
 	if err != nil {
-		return ctx, ErrInvalidToken
+		return ctx, a.InvalidToken
 	}
 
 	if claims["scopes"] == nil {
-		return ctx, ErrInvalidTokenScopes
+		return ctx, a.InvalidScopes
 	}
 	scopes, ok := claims["scopes"].([]interface{})
 	if !ok {
-		return ctx, ErrInvalidTokenScopes
+		return ctx, a.InvalidScopes
 	}
 
 	scopesInToken := make([]string, len(scopes))
@@ -139,7 +139,7 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		scopesInToken = append(scopesInToken, scp.(string))
 	}
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
-		return ctx, ErrInvalidTokenScopes
+		return ctx, a.InvalidScopes
 	}
 
 	newCtx := logging.WithUserID(ctx, fmt.Sprintf("%v", claims["sub"]))
