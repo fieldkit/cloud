@@ -4,12 +4,6 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var JWTAuth = JWTSecurity("jwt", func() {
-	Scope("api:access", "API access")
-	Scope("api:admin", "API admin access")
-	Scope("api:ingestion", "Ingestion access")
-})
-
 var _ = Service("tasks", func() {
 	Method("five", func() {
 		HTTP(func() {

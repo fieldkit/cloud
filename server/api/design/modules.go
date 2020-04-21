@@ -1,28 +1,8 @@
 package design
 
 import (
-	cors "goa.design/plugins/v3/cors/dsl"
-
 	. "goa.design/goa/v3/dsl"
 )
-
-func commonOptions() {
-	corsRules := func() {
-		cors.Headers("Authorization", "Content-Type")
-		cors.Expose("Authorization", "Content-Type")
-		cors.Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
-	}
-
-	cors.Origin("https://fieldkit.org:8080", corsRules)
-	cors.Origin("https://*.fieldkit.org:8080", corsRules)
-	cors.Origin("https://fieldkit.org", corsRules)
-	cors.Origin("https://*.fieldkit.org", corsRules)
-	cors.Origin("https://fkdev.org", corsRules)
-	cors.Origin("https://*.fkdev.org", corsRules)
-	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
-	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
-	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
-}
 
 var _ = Service("modules", func() {
 	Method("meta", func() {
