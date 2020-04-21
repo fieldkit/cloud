@@ -32,7 +32,7 @@ require (
 	github.com/goadesign/goa v1.4.0
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.3.3
+	github.com/golang/protobuf v1.3.4
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/google/uuid v1.1.1
 	github.com/h2non/filetype v1.0.10
@@ -78,15 +78,15 @@ require (
 	go.uber.org/atomic v1.4.0
 	go.uber.org/multierr v1.1.0
 	go.uber.org/zap v1.10.0
-	goa.design/goa/v3 v3.0.10
-	goa.design/plugins/v3 v3.0.10
+	goa.design/goa/v3 v3.1.1
+	goa.design/plugins/v3 v3.1.1
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
-	golang.org/x/tools v0.0.0-20200110213125-a7a6caa82ab2
+	golang.org/x/tools v0.0.0-20200228224639-71482053b885
 	google.golang.org/appengine v1.4.0
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.7

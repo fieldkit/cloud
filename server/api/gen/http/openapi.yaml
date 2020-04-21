@@ -24,6 +24,72 @@ paths:
           schema: {}
       schemes:
       - http
+  /projects/{id}/follow:
+    get:
+      tags:
+      - following
+      summary: follow following
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: following#follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/FollowingFollowUnauthorizedResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
+  /projects/{id}/unfollow:
+    get:
+      tags:
+      - following
+      summary: unfollow following
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: following#unfollow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/FollowingUnfollowUnauthorizedResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
   /tasks/devices/{deviceId}/refresh:
     post:
       tags:
@@ -140,31 +206,41 @@ paths:
       schemes:
       - http
 definitions:
+  FollowingFollowUnauthorizedResponseBody:
+    title: FollowingFollowUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: A ut exercitationem voluptatibus modi veniam.
+  FollowingUnfollowUnauthorizedResponseBody:
+    title: FollowingUnfollowUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Impedit necessitatibus et expedita.
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Nisi consequatur recusandae eum magni modi.
+    example: Similique minima quas aspernatur fuga molestiae.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Aliquid et quia.
+    example: Molestiae reiciendis quia porro voluptatibus non.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Consectetur dolorem quia.
+    example: Molestiae ipsam cupiditate sapiente at totam dignissimos.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Ipsum voluptas.
+    example: Aut eaque ipsa unde quia qui.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Beatae et magnam ab soluta ipsam sunt.
+    example: Eius beatae.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey
