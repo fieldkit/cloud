@@ -387,20 +387,23 @@ export default {
                 const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
                 this.charts.forEach((c, i) => {
                     if (i > 0) {
-                        c.type = this.charts[0].type;
-                        c.sensor = this.charts[0].sensor;
-                        c.treeSelectValue = this.charts[0].treeSelectValue;
+                        // NOTE: linking time only for now
                         this.$refs[c.ref][0].setTimeRange(parentTime);
                         if (requested) {
                             const requestedRange = { start: requested[0], end: requested[1] };
                             this.$refs[c.ref][0].setRequestedTime(requestedRange);
                         }
-                        this.$refs[c.ref][0].updateChartType();
-                        this.$refs[c.ref][0].updateData(this.charts[0].data, this.charts[0].extent, this.charts[0].sensor.colorScale);
-                        this.urlQuery[c.id + "type"] = this.charts[0].type;
-                        this.urlQuery[c.id + "sensor"] = this.charts[0].sensor.key;
+                        this.showLoading(c.id);
+                        this.$emit("timeChanged", parentTime, c);
                         this.urlQuery[c.id + "start"] = parentTime.start.getTime();
                         this.urlQuery[c.id + "end"] = parentTime.end.getTime();
+                        // c.type = this.charts[0].type;
+                        // c.sensor = this.charts[0].sensor;
+                        // c.treeSelectValue = this.charts[0].treeSelectValue;
+                        // this.$refs[c.ref][0].updateChartType();
+                        // this.$refs[c.ref][0].updateData(this.charts[0].data, this.charts[0].extent, this.charts[0].sensor.colorScale);
+                        // this.urlQuery[c.id + "type"] = this.charts[0].type;
+                        // this.urlQuery[c.id + "sensor"] = this.charts[0].sensor.key;
                     }
                 });
                 this.updateRoute();
@@ -517,6 +520,9 @@ export default {
             if (selection.stationId != chart.station.id) {
                 this.$emit("stationChanged", selection.stationId, chart);
                 this.urlQuery[chart.id + "station"] = selection.stationId;
+            }
+            if (!chart.parent) {
+                this.unlinkCharts();
             }
             this.updateRoute();
         },
@@ -636,7 +642,6 @@ export default {
                 }
                 this.$refs[chart.ref][0].setTimeRange(range);
                 this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
-                this.unlinkCharts();
             }
         },
         updateRoute() {
