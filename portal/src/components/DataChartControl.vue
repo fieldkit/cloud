@@ -159,7 +159,7 @@ export default {
             ],
         };
     },
-    props: ["treeSelectOptions"],
+    props: ["treeSelectOptions", "allSensors"],
     methods: {
         initialize() {
             const params = Object.keys(this.$route.query);
@@ -338,11 +338,7 @@ export default {
             let addChart = true;
             let start = totalTime[0];
             let end = totalTime[1];
-            if (this.$route.query.start && this.$route.query.end) {
-                start = new Date(parseInt(this.$route.query.start));
-                end = new Date(parseInt(this.$route.query.end));
-            }
-            // but use chart's own time range, if defined
+            // use chart's URL param time range, if defined
             if (this.$route.query[chartId + "start"] && this.$route.query[chartId + "end"]) {
                 start = new Date(parseInt(this.$route.query[chartId + "start"]));
                 end = new Date(parseInt(this.$route.query[chartId + "end"]));
@@ -573,11 +569,11 @@ export default {
                 loadings[i].style.display = "none";
             }
         },
-        resetChart(data, deviceId, chartId) {
+        resetChartData(data, deviceId, chartId) {
             const chart = this.charts.find(c => {
                 return c.id == chartId;
             });
-            // not checking pending... ?
+            // not checking pending...
             chart.sensors = data[deviceId].sensors;
             chart.station = data[deviceId].station;
             chart.overall = data[deviceId].data;
@@ -635,6 +631,9 @@ export default {
                 const extent = d3.extent(filteredData, d => {
                     return d[chart.sensor.key];
                 });
+                if (this.refreshedSensor) {
+                    chart.treeSelectValue = chart.station.name + this.refreshedSensor;
+                }
                 this.$refs[chart.ref][0].setTimeRange(range);
                 this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
                 this.unlinkCharts();
@@ -651,17 +650,114 @@ export default {
                 });
             }
         },
-        refresh() {
+        refresh(data) {
             // refresh window (back or forward browser button pressed)
-            this.charts = [];
-            this.pending = [];
-            this.noStation = false;
-            this.preloading = [];
-            this.noDataCharts = [];
-            this.urlQuery = {};
-            this.prevQuery = {};
-            this.showLoading();
-            this.initialize();
+            this.refreshedSensor = null;
+            const params = Object.keys(this.$route.query);
+            params.forEach(p => {
+                // use station param to get chart id
+                let chartId, stationId;
+                if (p.indexOf("station") > -1) {
+                    chartId = p.split("station")[0];
+                    stationId = this.$route.query[p];
+                    let chart = this.charts.find(c => {
+                        return c.id == chartId;
+                    });
+                    if (chart) {
+                        const deviceId = chart.station.device_id;
+                        const chartData = data[deviceId].data;
+                        if (chartData) {
+                            this.refreshedSensor = this.resetSensor(stationId, chart);
+                            this.resetTime(stationId, chart, deviceId);
+                            this.resetType(stationId, chart);
+                            // needs to happen after sensor, time, & type resets
+                            this.resetStation(stationId, chart, data, deviceId);
+                        }
+                    } else {
+                        // add chart
+                        if (chartId) {
+                            this.$emit("stationAdded", stationId, chartId);
+                        }
+                    }
+                }
+            });
+            if (this.charts.length > 1 && params.indexOf("stationId") != 0) {
+                let chartsToDelete = [];
+                this.charts.forEach(c => {
+                    if (params.indexOf(c.id + "station") == -1) {
+                        // flag chart for removal
+                        chartsToDelete.push(c.id);
+                    }
+                });
+                chartsToDelete.forEach(chartId => {
+                    const index = this.charts.findIndex(c => {
+                        return c.id == chartId;
+                    });
+                    if (index > -1) {
+                        this.charts.splice(index, 1);
+                    }
+                });
+            }
+        },
+        resetStation(stationId, chart, data, deviceId) {
+            if (stationId != chart.station.id) {
+                this.showLoading(chart.id);
+                this.$emit("stationChanged", stationId, chart);
+            } else {
+                this.resetChartData(data, deviceId, chart.id);
+            }
+        },
+        resetTime(stationId, chart, deviceId) {
+            if (
+                parseInt(this.$route.query[chart.id + "start"]) != chart.start.getTime() ||
+                parseInt(this.$route.query[chart.id + "end"]) != chart.end.getTime()
+            ) {
+                const start = new Date(parseInt(this.$route.query[chart.id + "start"]));
+                const end = new Date(parseInt(this.$route.query[chart.id + "end"]));
+                const range = { start: start, end: end };
+                this.$refs[chart.ref][0].setTimeRange(range);
+                this.$refs[chart.ref][0].setRequestedTime(range);
+                // only trigger data update if same station
+                if (stationId == chart.station.id) {
+                    const chartParam = { id: chart.id, station: { device_id: deviceId } };
+                    this.$emit("timeChanged", range, chartParam);
+                    this.showLoading(chart.id);
+                }
+            }
+        },
+        resetSensor(stationId, chart) {
+            if (this.$route.query[chart.id + "sensor"]) {
+                const sensor = this.allSensors.find(s => {
+                    return s.key == this.$route.query[chart.id + "sensor"];
+                });
+                if (chart.sensor.key != sensor.key) {
+                    chart.sensor = sensor;
+                    // only update data if same station
+                    if (stationId == chart.station.id) {
+                        chart.treeSelectValue = chart.station.name + sensor.key;
+                        const filteredData = chart.current.filter(d => {
+                            return d[sensor.key] === 0 || d[sensor.key];
+                        });
+                        const extent = d3.extent(filteredData, d => {
+                            return d[sensor.key];
+                        });
+                        this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+                    } else {
+                        return sensor.key;
+                    }
+                }
+            }
+            return null;
+        },
+        resetType(stationId, chart) {
+            const newType = this.getChartType(chart.id);
+            if (newType != chart.type) {
+                chart.type = newType;
+                // only update data if same station
+                if (stationId == chart.station.id) {
+                    this.$refs[chart.ref][0].updateChartType();
+                }
+            }
         },
     },
 };

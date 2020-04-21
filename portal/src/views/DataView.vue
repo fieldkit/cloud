@@ -25,6 +25,7 @@
                 <DataChartControl
                     ref="dataChartControl"
                     :treeSelectOptions="treeSelectOptions"
+                    :allSensors="allSensors"
                     @stationAdded="getInitialStationData"
                     @stationChanged="onStationChange"
                     @switchedSensor="onSensorSwitch"
@@ -97,7 +98,9 @@ export default {
         window.onpopstate = function(event) {
             // Note: event.state.key changes
             dataView.componentKey = event.state ? event.state.key : 0;
-            dataView.$refs.dataChartControl.refresh(dataView.stationData);
+            if (dataView.$refs.dataChartControl) {
+                dataView.$refs.dataChartControl.refresh(dataView.stationData);
+            }
         };
         this.api = new FKApi();
         this.api
@@ -178,7 +181,7 @@ export default {
                 // document.getElementById("lower-container").style["min-width"] = "1100px";
             }
             if (reset) {
-                this.$refs.dataChartControl.resetChart(this.stationData, deviceId, chartId);
+                this.$refs.dataChartControl.resetChartData(this.stationData, deviceId, chartId);
             } else {
                 this.$refs.dataChartControl.initializeChart(this.stationData, deviceId, chartId);
             }
@@ -303,10 +306,10 @@ export default {
                 const deviceId = station.device_id;
                 if (this.stationData[deviceId]) {
                     // use this station's data if we already have it
-                    this.$refs.dataChartControl.resetChart(this.stationData, deviceId, chart.id);
+                    this.$refs.dataChartControl.resetChartData(this.stationData, deviceId, chart.id);
                     this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
                         const processedData = this.processData(result);
-                        this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, station);
+                        this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
                     });
                 } else {
                     this.stationData[deviceId] = {};
@@ -320,7 +323,7 @@ export default {
                             // and then get the correct time window summary
                             this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
                                 const processedData = this.processData(result);
-                                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, station);
+                                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
                             });
                         })
                         .catch(() => {
