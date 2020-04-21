@@ -20,3 +20,8 @@ func FollowFollowingPath(id int64) string {
 func UnfollowFollowingPath(id int64) string {
 	return fmt.Sprintf("/projects/%v/unfollow", id)
 }
+
+// FollowersFollowingPath returns the URL path to the following service followers HTTP endpoint.
+func FollowersFollowingPath(id int64) string {
+	return fmt.Sprintf("/projects/%v/followers", id)
+}

@@ -6,6 +6,8 @@ import (
 	"goa.design/goa/v3/security"
 
 	following "github.com/fieldkit/cloud/server/api/gen/following"
+
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type FollowingService struct {
@@ -50,6 +52,50 @@ func (c *FollowingService) Unfollow(ctx context.Context, payload *following.Unfo
 	}
 
 	return nil
+}
+
+func (c *FollowingService) Followers(ctx context.Context, payload *following.FollowersPayload) (page *following.FollowersPage, err error) {
+	pageSize := int32(100)
+	pageNumber := int32(0)
+	if payload.Page != nil {
+		pageNumber = int32(*payload.Page)
+	}
+
+	total := int32(0)
+	if err = c.options.Database.GetContext(ctx, &total, `SELECT COUNT(f.*) FROM fieldkit.project_follower AS f WHERE f.project_id = $1`, payload.ID); err != nil {
+		return nil, err
+	}
+
+	offset := pageNumber * pageSize
+	users := []*data.User{}
+	if err := c.options.Database.SelectContext(ctx, &users, `
+		SELECT u.* FROM fieldkit.project_follower AS f JOIN fieldkit.user AS u ON (u.id = f.follower_id)
+		WHERE f.project_id = $1 ORDER BY f.created_at DESC LIMIT $2 OFFSET $3`, payload.ID, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	followers := []*following.Follower{}
+	for _, user := range users {
+		var avatar *following.Avatar
+		if user.MediaURL != nil {
+			avatar = &following.Avatar{
+				URL: *user.MediaURL,
+			}
+		}
+		followers = append(followers, &following.Follower{
+			ID:     int64(user.ID),
+			Name:   user.Name,
+			Avatar: avatar,
+		})
+	}
+
+	page = &following.FollowersPage{
+		Followers: followers,
+		Page:      pageNumber,
+		Total:     total,
+	}
+
+	return
 }
 
 func (s *FollowingService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

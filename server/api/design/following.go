@@ -4,6 +4,36 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
+var Avatar = Type("Avatar", func() {
+	Attribute("url", String)
+	Required("url")
+})
+
+var Follower = ResultType("application/vnd.app.follower", func() {
+	TypeName("Follower")
+	Attributes(func() {
+		Attribute("id", Int64)
+		Attribute("name", String)
+		Attribute("avatar", Avatar)
+		Required("id", "name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+		Attribute("avatar")
+	})
+})
+
+var FollowersPage = ResultType("application/vnd.app.followers", func() {
+	TypeName("FollowersPage")
+	Attributes(func() {
+		Attribute("followers", CollectionOf(Follower))
+		Attribute("total", Int32)
+		Attribute("page", Int32)
+		Required("followers", "total", "page")
+	})
+})
+
 var _ = Service("following", func() {
 	commonOptions()
 
@@ -19,6 +49,10 @@ var _ = Service("following", func() {
 
 		HTTP(func() {
 			POST("projects/{id}/follow")
+
+			Header("auth:Authorization", String, "authentication token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
 		})
 	})
 
@@ -34,6 +68,27 @@ var _ = Service("following", func() {
 
 		HTTP(func() {
 			POST("projects/{id}/unfollow")
+
+			Header("auth:Authorization", String, "authentication token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
+		})
+	})
+
+	Method("followers", func() {
+		Payload(func() {
+			Attribute("id", Int64)
+			Attribute("page", Int64)
+		})
+
+		Result(FollowersPage)
+
+		HTTP(func() {
+			GET("projects/{id}/followers")
+
+			Params(func() {
+				Param("page")
+			})
 		})
 	})
 
@@ -41,9 +96,5 @@ var _ = Service("following", func() {
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
-
-		Header("auth:Authorization", String, "authentication token", func() {
-			Pattern("^Bearer [^ ]+$")
-		})
 	})
 })

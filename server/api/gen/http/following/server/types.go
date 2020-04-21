@@ -9,7 +9,16 @@ package server
 
 import (
 	following "github.com/fieldkit/cloud/server/api/gen/following"
+	followingviews "github.com/fieldkit/cloud/server/api/gen/following/views"
 )
+
+// FollowersResponseBody is the type of the "following" service "followers"
+// endpoint HTTP response body.
+type FollowersResponseBody struct {
+	Followers FollowerResponseBodyCollection `form:"followers" json:"followers" xml:"followers"`
+	Total     int32                          `form:"total" json:"total" xml:"total"`
+	Page      int32                          `form:"page" json:"page" xml:"page"`
+}
 
 // FollowUnauthorizedResponseBody is the type of the "following" service
 // "follow" endpoint HTTP response body for the "unauthorized" error.
@@ -18,6 +27,42 @@ type FollowUnauthorizedResponseBody string
 // UnfollowUnauthorizedResponseBody is the type of the "following" service
 // "unfollow" endpoint HTTP response body for the "unauthorized" error.
 type UnfollowUnauthorizedResponseBody string
+
+// FollowersUnauthorizedResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "unauthorized" error.
+type FollowersUnauthorizedResponseBody string
+
+// FollowerResponseBodyCollection is used to define fields on response body
+// types.
+type FollowerResponseBodyCollection []*FollowerResponseBody
+
+// FollowerResponseBody is used to define fields on response body types.
+type FollowerResponseBody struct {
+	ID     int64               `form:"id" json:"id" xml:"id"`
+	Name   string              `form:"name" json:"name" xml:"name"`
+	Avatar *AvatarResponseBody `form:"avatar,omitempty" json:"avatar,omitempty" xml:"avatar,omitempty"`
+}
+
+// AvatarResponseBody is used to define fields on response body types.
+type AvatarResponseBody struct {
+	URL string `form:"url" json:"url" xml:"url"`
+}
+
+// NewFollowersResponseBody builds the HTTP response body from the result of
+// the "followers" endpoint of the "following" service.
+func NewFollowersResponseBody(res *followingviews.FollowersPageView) *FollowersResponseBody {
+	body := &FollowersResponseBody{
+		Total: *res.Total,
+		Page:  *res.Page,
+	}
+	if res.Followers != nil {
+		body.Followers = make([]*FollowerResponseBody, len(res.Followers))
+		for i, val := range res.Followers {
+			body.Followers[i] = marshalFollowingviewsFollowerViewToFollowerResponseBody(val)
+		}
+	}
+	return body
+}
 
 // NewFollowUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "follow" endpoint of the "following" service.
@@ -30,6 +75,13 @@ func NewFollowUnauthorizedResponseBody(res following.Unauthorized) FollowUnautho
 // result of the "unfollow" endpoint of the "following" service.
 func NewUnfollowUnauthorizedResponseBody(res following.Unauthorized) UnfollowUnauthorizedResponseBody {
 	body := UnfollowUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewFollowersUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersUnauthorizedResponseBody(res following.Unauthorized) FollowersUnauthorizedResponseBody {
+	body := FollowersUnauthorizedResponseBody(res)
 	return body
 }
 
@@ -47,6 +99,15 @@ func NewUnfollowPayload(id int64, auth *string) *following.UnfollowPayload {
 	v := &following.UnfollowPayload{}
 	v.ID = &id
 	v.Auth = auth
+
+	return v
+}
+
+// NewFollowersPayload builds a following service followers endpoint payload.
+func NewFollowersPayload(id int64, page *int64) *following.FollowersPayload {
+	v := &following.FollowersPayload{}
+	v.ID = &id
+	v.Page = page
 
 	return v
 }

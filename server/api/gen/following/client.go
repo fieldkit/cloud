@@ -15,15 +15,17 @@ import (
 
 // Client is the "following" service client.
 type Client struct {
-	FollowEndpoint   goa.Endpoint
-	UnfollowEndpoint goa.Endpoint
+	FollowEndpoint    goa.Endpoint
+	UnfollowEndpoint  goa.Endpoint
+	FollowersEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "following" service client given the endpoints.
-func NewClient(follow, unfollow goa.Endpoint) *Client {
+func NewClient(follow, unfollow, followers goa.Endpoint) *Client {
 	return &Client{
-		FollowEndpoint:   follow,
-		UnfollowEndpoint: unfollow,
+		FollowEndpoint:    follow,
+		UnfollowEndpoint:  unfollow,
+		FollowersEndpoint: followers,
 	}
 }
 
@@ -37,4 +39,14 @@ func (c *Client) Follow(ctx context.Context, p *FollowPayload) (err error) {
 func (c *Client) Unfollow(ctx context.Context, p *UnfollowPayload) (err error) {
 	_, err = c.UnfollowEndpoint(ctx, p)
 	return
+}
+
+// Followers calls the "followers" endpoint of the "following" service.
+func (c *Client) Followers(ctx context.Context, p *FollowersPayload) (res *FollowersPage, err error) {
+	var ires interface{}
+	ires, err = c.FollowersEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*FollowersPage), nil
 }

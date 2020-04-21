@@ -16,8 +16,9 @@ import (
 
 // Endpoints wraps the "following" service endpoints.
 type Endpoints struct {
-	Follow   goa.Endpoint
-	Unfollow goa.Endpoint
+	Follow    goa.Endpoint
+	Unfollow  goa.Endpoint
+	Followers goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "following" service with endpoints.
@@ -25,8 +26,9 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Follow:   NewFollowEndpoint(s, a.JWTAuth),
-		Unfollow: NewUnfollowEndpoint(s, a.JWTAuth),
+		Follow:    NewFollowEndpoint(s, a.JWTAuth),
+		Unfollow:  NewUnfollowEndpoint(s, a.JWTAuth),
+		Followers: NewFollowersEndpoint(s),
 	}
 }
 
@@ -34,6 +36,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Follow = m(e.Follow)
 	e.Unfollow = m(e.Unfollow)
+	e.Followers = m(e.Followers)
 }
 
 // NewFollowEndpoint returns an endpoint function that calls the method
@@ -79,5 +82,19 @@ func NewUnfollowEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 			return nil, err
 		}
 		return nil, s.Unfollow(ctx, p)
+	}
+}
+
+// NewFollowersEndpoint returns an endpoint function that calls the method
+// "followers" of service "following".
+func NewFollowersEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*FollowersPayload)
+		res, err := s.Followers(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedFollowersPage(res, "default")
+		return vres, nil
 	}
 }

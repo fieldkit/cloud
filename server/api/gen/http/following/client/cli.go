@@ -61,3 +61,31 @@ func BuildUnfollowPayload(followingUnfollowID string, followingUnfollowAuth stri
 
 	return v, nil
 }
+
+// BuildFollowersPayload builds the payload for the following followers
+// endpoint from CLI flags.
+func BuildFollowersPayload(followingFollowersID string, followingFollowersPage string) (*following.FollowersPayload, error) {
+	var err error
+	var id int64
+	{
+		id, err = strconv.ParseInt(followingFollowersID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT64")
+		}
+	}
+	var page *int64
+	{
+		if followingFollowersPage != "" {
+			val, err := strconv.ParseInt(followingFollowersPage, 10, 64)
+			page = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for page, must be INT64")
+			}
+		}
+	}
+	v := &following.FollowersPayload{}
+	v.ID = &id
+	v.Page = page
+
+	return v, nil
+}

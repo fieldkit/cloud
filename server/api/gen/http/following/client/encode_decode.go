@@ -10,11 +10,13 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	following "github.com/fieldkit/cloud/server/api/gen/following"
+	followingviews "github.com/fieldkit/cloud/server/api/gen/following/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -182,4 +184,130 @@ func DecodeUnfollowResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			return nil, goahttp.ErrInvalidResponse("following", "unfollow", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// BuildFollowersRequest instantiates a HTTP request object with method and
+// path set to call the "following" service "followers" endpoint
+func (c *Client) BuildFollowersRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int64
+	)
+	{
+		p, ok := v.(*following.FollowersPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("following", "followers", "*following.FollowersPayload", v)
+		}
+		if p.ID != nil {
+			id = *p.ID
+		}
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: FollowersFollowingPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("following", "followers", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeFollowersRequest returns an encoder for requests sent to the following
+// followers server.
+func EncodeFollowersRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*following.FollowersPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("following", "followers", "*following.FollowersPayload", v)
+		}
+		values := req.URL.Query()
+		if p.Page != nil {
+			values.Add("page", fmt.Sprintf("%v", *p.Page))
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeFollowersResponse returns a decoder for responses returned by the
+// following followers endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeFollowersResponse may return the following errors:
+//	- "unauthorized" (type following.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeFollowersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body FollowersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "followers", err)
+			}
+			p := NewFollowersPageViewOK(&body)
+			view := "default"
+			vres := &followingviews.FollowersPage{Projected: p, View: view}
+			if err = followingviews.ValidateFollowersPage(vres); err != nil {
+				return nil, goahttp.ErrValidationError("following", "followers", err)
+			}
+			res := following.NewFollowersPage(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body FollowersUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "followers", err)
+			}
+			return nil, NewFollowersUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("following", "followers", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// unmarshalFollowerResponseBodyToFollowingviewsFollowerView builds a value of
+// type *followingviews.FollowerView from a value of type *FollowerResponseBody.
+func unmarshalFollowerResponseBodyToFollowingviewsFollowerView(v *FollowerResponseBody) *followingviews.FollowerView {
+	res := &followingviews.FollowerView{
+		ID:   v.ID,
+		Name: v.Name,
+	}
+	if v.Avatar != nil {
+		res.Avatar = unmarshalAvatarResponseBodyToFollowingviewsAvatarView(v.Avatar)
+	}
+
+	return res
+}
+
+// unmarshalAvatarResponseBodyToFollowingviewsAvatarView builds a value of type
+// *followingviews.AvatarView from a value of type *AvatarResponseBody.
+func unmarshalAvatarResponseBodyToFollowingviewsAvatarView(v *AvatarResponseBody) *followingviews.AvatarView {
+	if v == nil {
+		return nil
+	}
+	res := &followingviews.AvatarView{
+		URL: v.URL,
+	}
+
+	return res
 }

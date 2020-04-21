@@ -20,10 +20,11 @@ import (
 
 // Server lists the following service endpoint HTTP handlers.
 type Server struct {
-	Mounts   []*MountPoint
-	Follow   http.Handler
-	Unfollow http.Handler
-	CORS     http.Handler
+	Mounts    []*MountPoint
+	Follow    http.Handler
+	Unfollow  http.Handler
+	Followers http.Handler
+	CORS      http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -61,12 +62,15 @@ func New(
 		Mounts: []*MountPoint{
 			{"Follow", "POST", "/projects/{id}/follow"},
 			{"Unfollow", "POST", "/projects/{id}/unfollow"},
+			{"Followers", "GET", "/projects/{id}/followers"},
 			{"CORS", "OPTIONS", "/projects/{id}/follow"},
 			{"CORS", "OPTIONS", "/projects/{id}/unfollow"},
+			{"CORS", "OPTIONS", "/projects/{id}/followers"},
 		},
-		Follow:   NewFollowHandler(e.Follow, mux, decoder, encoder, errhandler, formatter),
-		Unfollow: NewUnfollowHandler(e.Unfollow, mux, decoder, encoder, errhandler, formatter),
-		CORS:     NewCORSHandler(),
+		Follow:    NewFollowHandler(e.Follow, mux, decoder, encoder, errhandler, formatter),
+		Unfollow:  NewUnfollowHandler(e.Unfollow, mux, decoder, encoder, errhandler, formatter),
+		Followers: NewFollowersHandler(e.Followers, mux, decoder, encoder, errhandler, formatter),
+		CORS:      NewCORSHandler(),
 	}
 }
 
@@ -77,6 +81,7 @@ func (s *Server) Service() string { return "following" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Follow = m(s.Follow)
 	s.Unfollow = m(s.Unfollow)
+	s.Followers = m(s.Followers)
 	s.CORS = m(s.CORS)
 }
 
@@ -84,6 +89,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountFollowHandler(mux, h.Follow)
 	MountUnfollowHandler(mux, h.Unfollow)
+	MountFollowersHandler(mux, h.Followers)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -189,6 +195,57 @@ func NewUnfollowHandler(
 	})
 }
 
+// MountFollowersHandler configures the mux to serve the "following" service
+// "followers" endpoint.
+func MountFollowersHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleFollowingOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/{id}/followers", f)
+}
+
+// NewFollowersHandler creates a HTTP handler which loads the HTTP request and
+// calls the "following" service "followers" endpoint.
+func NewFollowersHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeFollowersRequest(mux, decoder)
+		encodeResponse = EncodeFollowersResponse(encoder)
+		encodeError    = EncodeFollowersError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "followers")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "following")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service following.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -201,6 +258,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/projects/{id}/follow", f)
 	mux.Handle("OPTIONS", "/projects/{id}/unfollow", f)
+	mux.Handle("OPTIONS", "/projects/{id}/followers", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

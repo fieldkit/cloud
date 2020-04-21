@@ -57,6 +57,34 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
+  /projects/{id}/followers:
+    get:
+      tags:
+      - following
+      summary: followers following
+      operationId: following#followers
+      parameters:
+      - name: page
+        in: query
+        required: false
+        type: integer
+        format: int64
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/FollowingFollowersResponseBody'
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/FollowingFollowersUnauthorizedResponseBody'
+      schemes:
+      - http
   /projects/{id}/unfollow:
     post:
       tags:
@@ -206,41 +234,126 @@ paths:
       schemes:
       - http
 definitions:
+  AvatarResponseBody:
+    title: AvatarResponseBody
+    type: object
+    properties:
+      url:
+        type: string
+        example: Suscipit magni eaque rerum occaecati ut sunt.
+    example:
+      url: Ut sed qui facilis quaerat.
+    required:
+    - url
+  FollowerResponseBody:
+    title: 'Mediatype identifier: application/vnd.app.follower; view=default'
+    type: object
+    properties:
+      avatar:
+        $ref: '#/definitions/AvatarResponseBody'
+      id:
+        type: integer
+        example: 5169825133928420987
+        format: int64
+      name:
+        type: string
+        example: Repellendus omnis sit accusamus occaecati soluta.
+    description: FollowerResponseBody result type (default view)
+    example:
+      avatar:
+        url: Eligendi dolorem accusantium reiciendis.
+      id: 2451232622494328044
+      name: Rem laudantium molestias.
+    required:
+    - id
+    - name
+  FollowerResponseBodyCollection:
+    title: 'Mediatype identifier: application/vnd.app.follower; type=collection; view=default'
+    type: array
+    items:
+      $ref: '#/definitions/FollowerResponseBody'
+    description: FollowerCollectionResponseBody is the result type for an array of
+      FollowerResponseBody (default view)
+    example:
+    - avatar:
+        url: Eligendi dolorem accusantium reiciendis.
+      id: 3221783665047566580
+      name: Ea ut alias dignissimos sit dignissimos.
+    - avatar:
+        url: Eligendi dolorem accusantium reiciendis.
+      id: 3221783665047566580
+      name: Ea ut alias dignissimos sit dignissimos.
   FollowingFollowUnauthorizedResponseBody:
     title: FollowingFollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: A ut exercitationem voluptatibus modi veniam.
+    example: Aut qui quae et et atque.
+  FollowingFollowersResponseBody:
+    title: 'Mediatype identifier: application/vnd.app.followers; view=default'
+    type: object
+    properties:
+      followers:
+        $ref: '#/definitions/FollowerResponseBodyCollection'
+      page:
+        type: integer
+        example: 480033006
+        format: int32
+      total:
+        type: integer
+        example: 836681448
+        format: int32
+    description: FollowersResponseBody result type (default view)
+    example:
+      followers:
+      - avatar:
+          url: Eligendi dolorem accusantium reiciendis.
+        id: 3221783665047566580
+        name: Ea ut alias dignissimos sit dignissimos.
+      - avatar:
+          url: Eligendi dolorem accusantium reiciendis.
+        id: 3221783665047566580
+        name: Ea ut alias dignissimos sit dignissimos.
+      page: 1397462597
+      total: 925637298
+    required:
+    - followers
+    - total
+    - page
+  FollowingFollowersUnauthorizedResponseBody:
+    title: FollowingFollowersUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Adipisci excepturi aliquid sequi.
   FollowingUnfollowUnauthorizedResponseBody:
     title: FollowingUnfollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Impedit necessitatibus et expedita.
+    example: Tempora repudiandae voluptatibus sed.
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Similique minima quas aspernatur fuga molestiae.
+    example: Perspiciatis aut recusandae.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Molestiae reiciendis quia porro voluptatibus non.
+    example: Dolorem voluptatibus nisi mollitia ad ut.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Molestiae ipsam cupiditate sapiente at totam dignissimos.
+    example: Corrupti nesciunt beatae sed consequuntur.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Aut eaque ipsa unde quia qui.
+    example: Consequatur esse libero.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Eius beatae.
+    example: Quis quo iusto saepe et.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

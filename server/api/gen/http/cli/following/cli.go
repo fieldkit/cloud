@@ -26,7 +26,7 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `following (follow|unfollow)
+	return `following (follow|unfollow|followers)
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -35,9 +35,9 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` following follow --id 809499871555410480 --auth "Exercitationem vel sint voluptatem tenetur."` + "\n" +
+	return os.Args[0] + ` following follow --id 6913064936924338950 --auth "Voluptatum maxime quam quasi quibusdam eum sed."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 7799666313475189775` + "\n" +
+		os.Args[0] + ` test get --id 6165925750367173998` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		""
 }
@@ -61,6 +61,10 @@ func ParseEndpoint(
 		followingUnfollowFlags    = flag.NewFlagSet("unfollow", flag.ExitOnError)
 		followingUnfollowIDFlag   = followingUnfollowFlags.String("id", "REQUIRED", "")
 		followingUnfollowAuthFlag = followingUnfollowFlags.String("auth", "", "")
+
+		followingFollowersFlags    = flag.NewFlagSet("followers", flag.ExitOnError)
+		followingFollowersIDFlag   = followingFollowersFlags.String("id", "REQUIRED", "")
+		followingFollowersPageFlag = followingFollowersFlags.String("page", "", "")
 
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
@@ -88,6 +92,7 @@ func ParseEndpoint(
 	followingFlags.Usage = followingUsage
 	followingFollowFlags.Usage = followingFollowUsage
 	followingUnfollowFlags.Usage = followingUnfollowUsage
+	followingFollowersFlags.Usage = followingFollowersUsage
 
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
@@ -146,6 +151,9 @@ func ParseEndpoint(
 
 			case "unfollow":
 				epf = followingUnfollowFlags
+
+			case "followers":
+				epf = followingFollowersFlags
 
 			}
 
@@ -208,6 +216,9 @@ func ParseEndpoint(
 			case "unfollow":
 				endpoint = c.Unfollow()
 				data, err = followingc.BuildUnfollowPayload(*followingUnfollowIDFlag, *followingUnfollowAuthFlag)
+			case "followers":
+				endpoint = c.Followers()
+				data, err = followingc.BuildFollowersPayload(*followingFollowersIDFlag, *followingFollowersPageFlag)
 			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -258,6 +269,7 @@ Usage:
 COMMAND:
     follow: Follow implements follow.
     unfollow: Unfollow implements unfollow.
+    followers: Followers implements followers.
 
 Additional help:
     %s following COMMAND --help
@@ -271,7 +283,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 809499871555410480 --auth "Exercitationem vel sint voluptatem tenetur."
+    `+os.Args[0]+` following follow --id 6913064936924338950 --auth "Voluptatum maxime quam quasi quibusdam eum sed."
 `, os.Args[0])
 }
 
@@ -283,7 +295,19 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 7516973492292514895 --auth "Quam quasi quibusdam eum."
+    `+os.Args[0]+` following unfollow --id 285473116401606936 --auth "Quo rerum perspiciatis et."
+`, os.Args[0])
+}
+
+func followingFollowersUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] following followers -id INT64 -page INT64
+
+Followers implements followers.
+    -id INT64: 
+    -page INT64: 
+
+Example:
+    `+os.Args[0]+` following followers --id 7045934889339327728 --page 5565197267481699449
 `, os.Args[0])
 }
 
@@ -319,7 +343,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Quia facilis animi." --auth "Aut temporibus vitae culpa eos ut ea."
+    `+os.Args[0]+` tasks refresh- device --device-id "Nulla molestiae aliquam ut odit nostrum." --auth "Quo facilis tempore."
 `, os.Args[0])
 }
 
@@ -345,7 +369,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 7799666313475189775
+    `+os.Args[0]+` test get --id 6165925750367173998
 `, os.Args[0])
 }
 
@@ -367,7 +391,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Quibusdam eligendi ab est dolorum et qui." --auth "Deserunt earum aut eos temporibus est incidunt."
+    `+os.Args[0]+` test email --address "Similique minima quas aspernatur fuga molestiae." --auth "Molestiae reiciendis quia porro voluptatibus non."
 `, os.Args[0])
 }
 

@@ -24,6 +24,10 @@ type Client struct {
 	// endpoint.
 	UnfollowDoer goahttp.Doer
 
+	// Followers Doer is the HTTP client used to make requests to the followers
+	// endpoint.
+	FollowersDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -49,6 +53,7 @@ func NewClient(
 	return &Client{
 		FollowDoer:          doer,
 		UnfollowDoer:        doer,
+		FollowersDoer:       doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -101,6 +106,30 @@ func (c *Client) Unfollow() goa.Endpoint {
 		resp, err := c.UnfollowDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("following", "unfollow", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Followers returns an endpoint that makes HTTP requests to the following
+// service followers server.
+func (c *Client) Followers() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeFollowersRequest(c.encoder)
+		decodeResponse = DecodeFollowersResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildFollowersRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.FollowersDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("following", "followers", err)
 		}
 		return decodeResponse(resp)
 	}
