@@ -23,6 +23,9 @@ import (
 
 	modulessvr "github.com/fieldkit/cloud/server/api/gen/http/modules/server"
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+
+	following "github.com/fieldkit/cloud/server/api/gen/following"
+	followingsvr "github.com/fieldkit/cloud/server/api/gen/http/following/server"
 )
 
 func LogErrors() func(goa.Endpoint) goa.Endpoint {
@@ -49,11 +52,15 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	modulesSvc := NewModulesService(ctx, options)
 	modulesEndpoints := modules.NewEndpoints(modulesSvc)
 
+	followingSvc := NewFollowingService(ctx, options)
+	followingEndpoints := following.NewEndpoints(followingSvc)
+
 	logErrors := LogErrors()
 
 	modulesEndpoints.Use(logErrors)
 	tasksEndpoints.Use(logErrors)
 	testEndpoints.Use(logErrors)
+	followingEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -68,10 +75,12 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	tasksServer := taskssvr.New(tasksEndpoints, mux, dec, enc, eh, nil)
 	testServer := testsvr.New(testEndpoints, mux, dec, enc, eh, nil)
 	modulesServer := modulessvr.New(modulesEndpoints, mux, dec, enc, eh, nil)
+	followingServer := followingsvr.New(followingEndpoints, mux, dec, enc, eh, nil)
 
 	taskssvr.Mount(mux, tasksServer)
 	testsvr.Mount(mux, testServer)
 	modulessvr.Mount(mux, modulesServer)
+	followingsvr.Mount(mux, followingServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -82,6 +91,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range modulesServer.Mounts {
+		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range followingServer.Mounts {
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

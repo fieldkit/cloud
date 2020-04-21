@@ -25,7 +25,7 @@ paths:
       schemes:
       - http
   /projects/{id}/follow:
-    get:
+    post:
       tags:
       - following
       summary: follow following
@@ -58,7 +58,7 @@ paths:
       security:
       - jwt_header_Authorization: []
   /projects/{id}/unfollow:
-    get:
+    post:
       tags:
       - following
       summary: unfollow following
