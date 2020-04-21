@@ -3,7 +3,6 @@ import DataChartControl from "@/components/DataChartControl.vue";
 import VueRouter from "vue-router";
 import stationSummaryFixture from "./fixtures/stationSummary";
 import sensorsFixture from "./fixtures/sensors";
-import labelsFixture from "./fixtures/labels";
 import stationFixture from "./fixtures/station";
 
 jest.mock("@/api/api.js");
@@ -36,7 +35,7 @@ const treeSelectOptions = [
 const range = [new Date("1/2/20"), new Date("2/13/20 23:59:59")];
 const props = {
     treeSelectOptions: treeSelectOptions,
-    labels: labelsFixture,
+    allSensors: sensorsFixture,
 };
 const initData = {
     "123": {
