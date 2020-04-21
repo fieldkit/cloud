@@ -56,19 +56,27 @@ func NewPermissions(ctx context.Context, options *ControllerOptions) Permissions
 	}
 }
 
+func addClaimsToContext(ctx context.Context, claims jwtgo.MapClaims) context.Context {
+	newCtx := context.WithValue(ctx, "claims", claims)
+	return newCtx
+}
+
 func (p *defaultPermissions) unwrap() error {
 	if p.unwrapped != nil {
 		return nil
 	}
 
-	token := jwt.ContextJWT(p.context)
-	if token == nil {
-		return fmt.Errorf("JWT token is missing from context")
-	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
+	claims, ok := p.context.Value("claims").(jwtgo.MapClaims)
 	if !ok {
-		return fmt.Errorf("JWT claims error")
+		token := jwt.ContextJWT(p.context)
+		if token == nil {
+			return fmt.Errorf("JWT token is missing from context")
+		}
+
+		claims, ok = token.Claims.(jwtgo.MapClaims)
+		if !ok {
+			return fmt.Errorf("JWT claims error")
+		}
 	}
 
 	userID := int32(claims["sub"].(float64))

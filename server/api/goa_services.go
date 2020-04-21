@@ -142,7 +142,8 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return ctx, a.InvalidScopes
 	}
 
-	newCtx := logging.WithUserID(ctx, fmt.Sprintf("%v", claims["sub"]))
+	withClaims := addClaimsToContext(ctx, claims)
+	withLogging := logging.WithUserID(withClaims, fmt.Sprintf("%v", claims["sub"]))
 
-	return newCtx, nil
+	return withLogging, nil
 }
