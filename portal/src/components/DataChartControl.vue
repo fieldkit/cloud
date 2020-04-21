@@ -503,7 +503,7 @@ export default {
             chart.noData = false;
             let sensor;
             if (selection.key) {
-                sensor = chart.sensors.find(s => {
+                sensor = this.allSensors.find(s => {
                     return s.key == selection.key;
                 });
                 this.urlQuery[chart.id + "sensor"] = selection.key;
