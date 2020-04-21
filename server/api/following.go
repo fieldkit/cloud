@@ -23,6 +23,15 @@ func (c *FollowingService) Follow(ctx context.Context, payload *following.Follow
 
 	log.Infow("follow", "project_id", payload.ID)
 
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `INSERT INTO fieldkit.project_follower (project_id, follower_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, payload.ID, p.UserID()); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -30,6 +39,15 @@ func (c *FollowingService) Unfollow(ctx context.Context, payload *following.Unfo
 	log := Logger(ctx).Sugar()
 
 	log.Infow("unfollow", "project_id", payload.ID)
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE project_id = $1 AND follower_id = $2`, payload.ID, p.UserID()); err != nil {
+		return err
+	}
 
 	return nil
 }
