@@ -29,3 +29,7 @@ func commonOptions() {
 	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
 }
+
+func DateTimeFormatting() {
+	Format(FormatDateTime)
+}

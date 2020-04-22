@@ -26,6 +26,9 @@ import (
 
 	following "github.com/fieldkit/cloud/server/api/gen/following"
 	followingSvr "github.com/fieldkit/cloud/server/api/gen/http/following/server"
+
+	activity "github.com/fieldkit/cloud/server/api/gen/activity"
+	activitySvr "github.com/fieldkit/cloud/server/api/gen/http/activity/server"
 )
 
 func LogErrors() func(goa.Endpoint) goa.Endpoint {
@@ -55,12 +58,16 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	followingSvc := NewFollowingService(ctx, options)
 	followingEndpoints := following.NewEndpoints(followingSvc)
 
+	activitySvc := NewActivityService(ctx, options)
+	activityEndpoints := activity.NewEndpoints(activitySvc)
+
 	logErrors := LogErrors()
 
 	modulesEndpoints.Use(logErrors)
 	tasksEndpoints.Use(logErrors)
 	testEndpoints.Use(logErrors)
 	followingEndpoints.Use(logErrors)
+	activityEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -76,11 +83,13 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	testServer := testSvr.New(testEndpoints, mux, dec, enc, eh, nil)
 	modulesServer := modulesSvr.New(modulesEndpoints, mux, dec, enc, eh, nil)
 	followingServer := followingSvr.New(followingEndpoints, mux, dec, enc, eh, nil)
+	activityServer := activitySvr.New(activityEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
 	modulesSvr.Mount(mux, modulesServer)
 	followingSvr.Mount(mux, followingServer)
+	activitySvr.Mount(mux, activityServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -94,6 +103,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range followingServer.Mounts {
+		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range activityServer.Mounts {
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
