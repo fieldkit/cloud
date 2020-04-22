@@ -199,6 +199,12 @@ export default {
             this.hideLoading();
         },
         noInitialDataFound(station, chartId) {
+            const preloadingIndex = this.preloading.findIndex(p => {
+                return p.id == chartId + "station";
+            });
+            if (preloadingIndex > -1) {
+                this.preloading.splice(preloadingIndex, 1);
+            }
             const id = chartId.split("chart-")[1];
             const newChart = {
                 id: chartId,
@@ -217,6 +223,12 @@ export default {
             chart.noData = true;
         },
         initializeChart(data, deviceId, chartId) {
+            const preloadingIndex = this.preloading.findIndex(p => {
+                return p.id == chartId + "station";
+            });
+            if (preloadingIndex > -1) {
+                this.preloading.splice(preloadingIndex, 1);
+            }
             if (data[deviceId].data) {
                 this.urlQuery[chartId + "station"] = data[deviceId].station.id.toString();
                 this.addChartFromParams(data, deviceId, chartId);
@@ -265,10 +277,7 @@ export default {
                 document.getElementById(chartId + "station-loading").style.display = "none";
             }
             this.updateRoute();
-
-            // if (this.charts.length == 1) {
-            //     this.$emit("switchedSensor", newChart.sensor);
-            // }
+            this.$emit("sensorUpdate", newChart);
         },
         addChildChart() {
             const id = this.makeChartId();
@@ -288,6 +297,7 @@ export default {
             this.urlQuery[newChart.id + "sensor"] = newChart.sensor.key;
             this.urlQuery[newChart.id + "start"] = newChart.start.getTime();
             this.urlQuery[newChart.id + "end"] = newChart.end.getTime();
+            this.$emit("sensorUpdate", newChart);
             this.updateRoute();
         },
         makeChartId() {
@@ -368,6 +378,7 @@ export default {
                 return c.id == id;
             });
             if (index > -1) {
+                this.$emit("removeChart", id);
                 this.charts.splice(index, 1);
                 // remove all the associated params
                 let keys = Object.keys(this.urlQuery);
@@ -394,7 +405,8 @@ export default {
                             this.$refs[c.ref][0].setRequestedTime(requestedRange);
                         }
                         this.showLoading(c.id);
-                        this.$emit("timeChanged", parentTime, c);
+                        const fromParent = true;
+                        this.$emit("timeChanged", parentTime, c, fromParent);
                         this.urlQuery[c.id + "start"] = parentTime.start.getTime();
                         this.urlQuery[c.id + "end"] = parentTime.end.getTime();
                         // c.type = this.charts[0].type;
@@ -512,6 +524,7 @@ export default {
                 });
                 this.urlQuery[chart.id + "sensor"] = selection.key;
                 chart.sensor = sensor;
+                this.$emit("sensorUpdate", chart);
             }
             // if only sensor changed
             if (selection.key && selection.stationId == chart.station.id) {
@@ -551,6 +564,7 @@ export default {
         propagateSensorChange(selected, filteredData, extent) {
             this.charts.forEach(c => {
                 c.sensor = selected;
+                this.$emit("sensorUpdate", c);
                 // TODO: some stations might not have this sensor
                 c.treeSelectValue = c.station.name + selected.key;
                 this.urlQuery[c.id + "sensor"] = selected.key;
@@ -590,7 +604,7 @@ export default {
             chart.current = data[deviceId].data;
             chart.totalTime = data[deviceId].timeRange;
         },
-        updateChartData(data, chartId) {
+        updateChartData(data, chartId, fromParent) {
             // only update url for the chart that emitted this zoom
             const chart = this.charts.find(c => {
                 return c.id == chartId;
@@ -620,11 +634,8 @@ export default {
                     pendingChart.data = filteredData;
                     pendingChart.current = data;
                     pendingChart.extent = extent;
+                    this.$emit("sensorUpdate", pendingChart);
                     this.charts.push(pendingChart);
-                    // if (this.charts.length == 1) {
-                    //     // just for sensor summary in lower right corner
-                    //     this.$emit("switchedSensor", pendingChart.sensor);
-                    // }
                 }
             } else {
                 chart.current = data;
@@ -644,7 +655,10 @@ export default {
                 if (this.refreshedSensor) {
                     chart.treeSelectValue = chart.station.name + this.refreshedSensor;
                 }
-                this.$refs[chart.ref][0].setTimeRange(range);
+                this.$emit("sensorUpdate", chart);
+                if (!fromParent) {
+                    this.$refs[chart.ref][0].setTimeRange(range);
+                }
                 this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
             }
         },
@@ -703,6 +717,7 @@ export default {
                         return c.id == chartId;
                     });
                     if (index > -1) {
+                        this.$emit("removeChart", chartId);
                         this.charts.splice(index, 1);
                     }
                 });
@@ -728,8 +743,7 @@ export default {
                 this.$refs[chart.ref][0].setRequestedTime(range);
                 // only trigger data update if same station
                 if (stationId == chart.station.id) {
-                    const chartParam = { id: chart.id, station: { device_id: deviceId } };
-                    this.$emit("timeChanged", range, chartParam);
+                    this.$emit("timeChanged", range, chart);
                     this.showLoading(chart.id);
                 }
             }
@@ -741,6 +755,7 @@ export default {
                 });
                 if (chart.sensor.key != sensor.key) {
                     chart.sensor = sensor;
+                    this.$emit("sensorUpdate", chart);
                     // only update data if same station
                     if (stationId == chart.station.id) {
                         chart.treeSelectValue = chart.station.name + sensor.key;

@@ -28,20 +28,14 @@
                     :allSensors="allSensors"
                     @stationAdded="getInitialStationData"
                     @stationChanged="onStationChange"
-                    @switchedSensor="onSensorSwitch"
+                    @sensorUpdate="onSensorUpdate"
                     @timeChanged="onTimeChange"
+                    @removeChart="onRemoveChart"
                 />
-                <!-- <div id="lower-container">
-                    <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" />
-                    <SensorSummary
-                        ref="sensorSummary"
-                        :sensors="sensors"
-                        :selectedSensor="selectedSensor"
-                        :stationData="stationData"
-                        :timeRange="timeRange"
-                        :labels="labels"
-                    />
-                </div> -->
+                <div id="lower-container">
+                    <!-- <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" /> -->
+                    <SensorSummary ref="sensorSummary" :allSensors="allSensors" />
+                </div>
             </div>
         </div>
         <div v-if="failedAuth" class="no-auth-message">
@@ -64,7 +58,7 @@ import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
 import DataChartControl from "../components/DataChartControl";
 // import NotesList from "../components/NotesList";
-// import SensorSummary from "../components/SensorSummary";
+import SensorSummary from "../components/SensorSummary";
 // import * as tempStations from "../assets/ancientGoose.json";
 import * as utils from "../utilities";
 
@@ -75,7 +69,7 @@ export default {
         SidebarNav,
         DataChartControl,
         // NotesList,
-        // SensorSummary,
+        SensorSummary,
     },
     props: [],
     data: () => {
@@ -86,7 +80,6 @@ export default {
             stations: [],
             projects: [],
             allSensors: [],
-            selectedSensor: null,
             isAuthenticated: false,
             failedAuth: false,
             timeRange: null,
@@ -212,7 +205,10 @@ export default {
                             .domain([0, 1])
                             .interpolator(black);
                     }
+                    m.name = m.key;
+                    s.name = s.firmware_key;
                     this.allSensors.push({
+                        label: this.getSensorName(m, s),
                         colorScale: colors,
                         unit: s.unit_of_measure,
                         key: s.key,
@@ -297,10 +293,6 @@ export default {
             });
         },
 
-        onSensorSwitch(sensor) {
-            this.selectedSensor = sensor;
-        },
-
         onStationChange(stationId, chart) {
             this.api.getStation(stationId).then(station => {
                 const deviceId = station.device_id;
@@ -333,18 +325,21 @@ export default {
             });
         },
 
-        onTimeChange(range, chart) {
+        onSensorUpdate(chart) {
+            this.$refs.sensorSummary.update(chart);
+        },
+
+        onTimeChange(range, chart, fromParent) {
             const start = range.start.getTime();
             const end = range.end.getTime();
-            // TODO: perhaps don't rely on parent chart having this id:
-            // if (chart.id == "chart-1") {
-            //     // change time range for SensorSummary
-            //     this.timeRange = range;
-            // }
             this.fetchSummary(chart.station.device_id, start, end).then(result => {
                 const processedData = this.processData(result);
-                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
+                this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, fromParent);
             });
+        },
+
+        onRemoveChart(chartId) {
+            this.$refs.sensorSummary.remove(chartId);
         },
 
         getModuleName(module) {

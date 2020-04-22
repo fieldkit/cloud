@@ -1,19 +1,21 @@
 <template>
-    <div id="sensor-summary-container" v-if="this.selectedSensor">
-        <div id="sensor-title">{{ this.labels[this.selectedSensor.key] }} Statistics</div>
-        <div class="sensor-summary-block" v-for="block in this.blocks" v-bind:key="block.label">
-            <div class="block-heading">{{ block.label }}</div>
-            <div class="block-reading">
-                <span class="left">Low</span>
-                <span class="right">{{ block.stats.min }}</span>
-            </div>
-            <div class="block-reading">
-                <span class="left">Median</span>
-                <span class="right">{{ block.stats.median }}</span>
-            </div>
-            <div class="block-reading">
-                <span class="left">High</span>
-                <span class="right">{{ block.stats.max }}</span>
+    <div id="sensor-summary-container">
+        <div v-for="sensor in sensors" v-bind:key="sensor.chartId">
+            <div id="sensor-title">{{ sensor.label }} Statistics</div>
+            <div class="sensor-summary-block" v-for="block in sensor.blocks" v-bind:key="block.label">
+                <div class="block-heading">{{ block.label }}</div>
+                <div class="block-reading">
+                    <span class="left">Low</span>
+                    <span class="right">{{ block.stats.min }}</span>
+                </div>
+                <div class="block-reading">
+                    <span class="left">Median</span>
+                    <span class="right">{{ block.stats.median }}</span>
+                </div>
+                <div class="block-reading">
+                    <span class="left">High</span>
+                    <span class="right">{{ block.stats.max }}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -21,6 +23,7 @@
 
 <script>
 import * as d3 from "d3";
+import * as utils from "../utilities";
 
 const DAY = 1000 * 60 * 60 * 24;
 const WEEK = DAY * 7;
@@ -28,84 +31,110 @@ const MONTH = DAY * 30;
 
 export default {
     name: "SensorSummary",
-    props: ["selectedSensor", "stationData", "timeRange", "labels"],
-    computed: {
-        current: function() {
-            if (this.stationData && this.stationData.length > 0) {
-                let start = this.stationData[0].date;
-                let end = this.stationData[this.stationData.length - 1].date;
-                if (this.timeRange) {
-                    start = this.timeRange.start;
-                    end = this.timeRange.end;
-                }
-                let filtered = this.stationData.filter(d => {
-                    return d.date >= start && d.date <= end;
-                });
-                return this.computeStats(filtered);
-            } else {
-                return { min: "--", max: "--", median: "--" };
-            }
-        },
-        week: function() {
-            if (this.stationData && this.stationData.length > 0) {
-                let end = this.stationData[this.stationData.length - 1].date;
-                let start = new Date(end.getTime() - WEEK);
-                let filtered = this.stationData.filter(d => {
-                    return d.date >= start && d.date <= end;
-                });
-                return this.computeStats(filtered);
-            } else {
-                return { min: "--", max: "--", median: "--" };
-            }
-        },
-        month: function() {
-            if (this.stationData && this.stationData.length > 0) {
-                let end = this.stationData[this.stationData.length - 1].date;
-                let start = new Date(end.getTime() - MONTH);
-                let filtered = this.stationData.filter(d => {
-                    return d.date >= start && d.date <= end;
-                });
-                return this.computeStats(filtered);
-            } else {
-                return { min: "--", max: "--", median: "--" };
-            }
-        },
-        overall: function() {
-            if (this.stationData && this.stationData.length > 0) {
-                return this.computeStats(this.stationData);
-            } else {
-                return { min: "--", max: "--", median: "--" };
-            }
-        },
-        blocks: function() {
-            return [
-                { label: "CURRENT VIEW", stats: this.current },
-                { label: "LAST 7 DAYS", stats: this.week },
-                { label: "LAST 30 DAYS", stats: this.month },
-                { label: "OVERALL", stats: this.overall },
-            ];
-        },
-    },
+    props: ["allSensors"],
     data: () => {
-        return {};
+        return {
+            sensors: [],
+        };
     },
     methods: {
-        computeStats: function(data) {
+        update(chart) {
+            if (!chart.sensor) {
+                return;
+            }
+            const meta = this.allSensors.find(s => {
+                return s.key == chart.sensor.key;
+            });
+            let sensor = this.sensors.find(s => {
+                return s.chartId == chart.id;
+            });
+            if (sensor) {
+                // update sensor
+                sensor.blocks = this.blocks(chart);
+                sensor.label = meta ? meta.label : "";
+            } else {
+                // add sensor
+                this.sensors.push({
+                    chartId: chart.id,
+                    blocks: this.blocks(chart),
+                    label: meta ? meta.label : "",
+                });
+            }
+        },
+        remove(chartId) {
+            const index = this.sensors.findIndex(s => {
+                return s.chartId == chartId;
+            });
+            if (index > -1) {
+                this.sensors.splice(index, 1);
+            }
+        },
+        blocks(dataSet) {
+            return [
+                { label: "CURRENT VIEW", stats: this.current(dataSet) },
+                { label: "LAST 7 DAYS", stats: this.week(dataSet) },
+                { label: "LAST 30 DAYS", stats: this.month(dataSet) },
+                { label: "OVERALL", stats: this.overall(dataSet) },
+            ];
+        },
+        current(dataSet) {
+            if (dataSet.current && dataSet.current.length > 0) {
+                return this.computeStats(dataSet.current, dataSet.sensor.key);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        week(dataSet) {
+            if (dataSet.overall && dataSet.overall.length > 0) {
+                let end = dataSet.overall[dataSet.overall.length - 1].date;
+                let start = new Date(end.getTime() - WEEK);
+                let filtered = dataSet.overall.filter(d => {
+                    return d.date >= start && d.date <= end;
+                });
+                return this.computeStats(filtered, dataSet.sensor.key);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        month(dataSet) {
+            if (dataSet.overall && dataSet.overall.length > 0) {
+                let end = dataSet.overall[dataSet.overall.length - 1].date;
+                let start = new Date(end.getTime() - MONTH);
+                let filtered = dataSet.overall.filter(d => {
+                    return d.date >= start && d.date <= end;
+                });
+                return this.computeStats(filtered, dataSet.sensor.key);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        overall(dataSet) {
+            if (dataSet.overall && dataSet.overall.length > 0) {
+                return this.computeStats(dataSet.overall, dataSet.sensor.key);
+            } else {
+                return { min: "--", max: "--", median: "--" };
+            }
+        },
+        computeStats(data, key) {
             if (data.length == 0) {
                 return { min: "--", max: "--", median: "--" };
             }
 
             let sensorSummary = this;
             let extent = d3.extent(data, d => {
-                return d[sensorSummary.selectedSensor.key];
+                return d[key];
             });
             if (!extent || (!extent[0] && extent[0] != 0)) {
                 return { min: "--", max: "--", median: "--" };
             }
             let median = d3.median(data, d => {
-                return d[sensorSummary.selectedSensor.key];
+                return d[key];
             });
             return { min: extent[0].toFixed(2), max: extent[1].toFixed(2), median: median.toFixed(2) };
+        },
+        getSensorName(module, sensor) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
         },
     },
 };

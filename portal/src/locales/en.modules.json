@@ -45,6 +45,8 @@
                 "pressure": "Pressure",
                 "temperature_2": "Temperature 2",
                 "rain": "Rain",
+                "wind": "Wind",
+                "wind_mv": "Wind Raw ADC",
                 "wind_speed": "Wind Speed",
                 "wind_dir": "Wind Direction",
                 "wind_dir_mv": "Wind Direction Raw ADC",
@@ -61,6 +63,7 @@
         "distance": {
             "name": "Distance",
             "sensors": {
+                "distance": "Distance",
                 "distance_0": "Distance 0",
                 "distance_1": "Distance 1",
                 "distance_2": "Distance 2",
