@@ -422,18 +422,19 @@ export default {
             chart.type = selected;
             this.$refs[chart.ref][0].updateChartType();
             this.urlQuery[chart.id + "type"] = selected;
+            // NOTE: linking time only for now
             // if it is the parent chart and they are linked, change all
-            if (chart.parent && this.linkedCharts) {
-                this.charts.forEach((c, i) => {
-                    if (i > 0) {
-                        c.type = selected;
-                        this.$refs[c.ref][0].updateChartType();
-                        this.urlQuery[c.id + "type"] = selected;
-                    }
-                });
-            } else {
-                this.unlinkCharts();
-            }
+            // if (chart.parent && this.linkedCharts) {
+            //     this.charts.forEach((c, i) => {
+            //         if (i > 0) {
+            //             c.type = selected;
+            //             this.$refs[c.ref][0].updateChartType();
+            //             this.urlQuery[c.id + "type"] = selected;
+            //         }
+            //     });
+            // } else {
+            //     this.unlinkCharts();
+            // }
             this.updateRoute();
         },
         setTimeRangeByDays(event) {
@@ -521,9 +522,10 @@ export default {
                 this.$emit("stationChanged", selection.stationId, chart);
                 this.urlQuery[chart.id + "station"] = selection.stationId;
             }
-            if (!chart.parent) {
-                this.unlinkCharts();
-            }
+            // NOTE: linking time only for now
+            // if (!chart.parent) {
+            //     this.unlinkCharts();
+            // }
             this.updateRoute();
         },
         chartSensorChanged(selected, chart) {
@@ -534,14 +536,16 @@ export default {
             const extent = d3.extent(filteredData, d => {
                 return d[selected.key];
             });
-            // if it is the parent chart and they are linked, change all
-            if (chart.parent && this.linkedCharts) {
-                this.propagateSensorChange(selected, filteredData, extent);
-            } else {
-                // otherwise, change this one
-                this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
-                this.unlinkCharts();
-            }
+            // NOTE: linking time only for now
+            this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+            // // if it is the parent chart and they are linked, change all
+            // if (chart.parent && this.linkedCharts) {
+            //     this.propagateSensorChange(selected, filteredData, extent);
+            // } else {
+            //     // otherwise, change this one
+            //     this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+            //     this.unlinkCharts();
+            // }
             this.updateRoute();
         },
         propagateSensorChange(selected, filteredData, extent) {
