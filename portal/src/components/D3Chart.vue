@@ -309,6 +309,12 @@ export default {
         },
         updateScrubber() {
             let d3Chart = this;
+
+            this.scrubberTimeRange = [];
+            this.scrubberTimeRange[0] = this.chart.totalTime[0];
+            this.scrubberTimeRange[1] = this.chart.totalTime[1];
+            this.scrubberX.domain(this.scrubberTimeRange);
+
             this.scrubberData = this.chart.overall.filter(d => {
                 return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
             });
