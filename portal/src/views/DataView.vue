@@ -360,9 +360,10 @@ export default {
         showStation(station) {
             if (station) {
                 this.$router.push({ name: "viewData", query: { stationId: station.id } });
-                this.$refs.dataChartControl.refresh();
+                this.stationData = {};
+                this.$refs.dataChartControl.reset();
+                this.$refs.dataChartControl.initialize();
             }
-            // this.selectedSensor = null;
             // document.getElementById("lower-container").style["min-width"] = "700px";
         },
     },

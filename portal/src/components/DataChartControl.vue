@@ -768,6 +768,17 @@ export default {
                 }
             }
         },
+        reset() {
+            this.noStation = false;
+            this.charts = [];
+            this.pending = [];
+            this.preloading = [];
+            this.noDataCharts = [];
+            this.linkedCharts = false;
+            this.urlQuery = {};
+            this.prevQuery = {};
+            this.showLoading();
+        },
     },
 };
 </script>
