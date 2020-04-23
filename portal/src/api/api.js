@@ -386,11 +386,11 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
-    getFieldNotes(station) {
+    getFieldNotes(stationId) {
         const token = this.token.getToken();
         return axios({
             method: "GET",
-            url: this.baseUrl + "/stations/" + station.id + "/field-notes",
+            url: this.baseUrl + "/stations/" + stationId + "/field-notes",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,

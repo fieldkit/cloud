@@ -1,5 +1,5 @@
 <template>
-    <div id="notes-list-container" v-if="this.station">
+    <div id="notes-list-container">
         <!-- <div id="notes-title">Notes & Comments</div> -->
         <!-- temporarily commandeered for field notes -->
         <div id="notes-title">Field Notes</div>
@@ -11,7 +11,7 @@
                 <div class="creator">{{ note.creator }}</div>
                 <div class="date">on {{ getDate(note.created) }}</div>
             </div>
-            <div v-if="isAuthenticated && note.media_id">
+            <div v-if="note.media_id">
                 <img alt="Field Note image" :src="getImageUrl(note)" class="field-note-image" />
             </div>
             <div class="content-line">
@@ -40,34 +40,39 @@ const categoryLabels = {
 
 export default {
     name: "NotesList",
-    props: ["station", "selectedSensor", "isAuthenticated"],
-    watch: {
-        station() {
-            if (this.station) {
-                this.getFieldNotes();
-            }
-        },
-    },
+    props: [],
     data: () => {
         return {
             baseUrl: API_HOST,
             notes: [],
+            ids: [],
         };
     },
     methods: {
+        updateNotes(ids) {
+            this.ids = ids;
+            this.notes = [];
+            this.getFieldNotes();
+        },
         getFieldNotes() {
             const api = new FKApi();
-            api.getFieldNotes(this.station).then(result => {
-                this.notes = result.notes.map(n => {
-                    if (n.category_key != "default") {
-                        n.title = categoryLabels[n.category_key];
-                    }
-                    return n;
+            this.ids.forEach(id => {
+                api.getFieldNotes(id).then(result => {
+                    this.notes = _.concat(
+                        this.notes,
+                        result.notes.map(n => {
+                            n.stationId = id;
+                            if (n.category_key != "default") {
+                                n.title = categoryLabels[n.category_key];
+                            }
+                            return n;
+                        })
+                    );
                 });
             });
         },
         getImageUrl(note) {
-            return this.baseUrl + "/stations/" + this.station.id + "/field-note-media/" + note.media_id;
+            return this.baseUrl + "/stations/" + note.stationId + "/field-note-media/" + note.media_id;
         },
         getDate(strDate) {
             let d = new Date(strDate);
@@ -77,8 +82,11 @@ export default {
             const fieldNoteId = event.target.getAttribute("data-id");
             if (window.confirm("Are you sure you want to delete this note?")) {
                 const api = new FKApi();
+                const note = this.notes.find(n => {
+                    return n.id == fieldNoteId;
+                });
                 const params = {
-                    stationId: this.station.id,
+                    stationId: note.stationId,
                     fieldNoteId: fieldNoteId,
                 };
                 api.deleteFieldNote(params).then(() => {

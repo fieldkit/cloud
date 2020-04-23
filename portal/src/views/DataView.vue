@@ -28,12 +28,13 @@
                     :allSensors="allSensors"
                     @stationAdded="getInitialStationData"
                     @stationChanged="onStationChange"
+                    @stationIdsUpdate="onStationIdsUpdate"
                     @sensorUpdate="onSensorUpdate"
                     @timeChanged="onTimeChange"
                     @removeChart="onRemoveChart"
                 />
                 <div id="lower-container">
-                    <!-- <NotesList :station="station" :selectedSensor="selectedSensor" :isAuthenticated="isAuthenticated" /> -->
+                    <NotesList ref="notesList" />
                     <SensorSummary ref="sensorSummary" :allSensors="allSensors" />
                 </div>
             </div>
@@ -57,7 +58,7 @@ import FKApi from "@/api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
 import DataChartControl from "../components/DataChartControl";
-// import NotesList from "../components/NotesList";
+import NotesList from "../components/NotesList";
 import SensorSummary from "../components/SensorSummary";
 // import * as tempStations from "../assets/ancientGoose.json";
 import * as utils from "../utilities";
@@ -68,7 +69,7 @@ export default {
         HeaderBar,
         SidebarNav,
         DataChartControl,
-        // NotesList,
+        NotesList,
         SensorSummary,
     },
     props: [],
@@ -171,7 +172,7 @@ export default {
             this.stationData[deviceId].sensors = processedData.sensors;
             if (processed.length > 0) {
                 // resize div to fit sections
-                // document.getElementById("lower-container").style["min-width"] = "1100px";
+                document.getElementById("lower-container").style["min-width"] = "1100px";
             }
             if (reset) {
                 this.$refs.dataChartControl.resetChartData(this.stationData, deviceId, chartId);
@@ -325,6 +326,10 @@ export default {
             });
         },
 
+        onStationIdsUpdate(ids) {
+            this.$refs.notesList.updateNotes(ids);
+        },
+
         onSensorUpdate(chart) {
             this.$refs.sensorSummary.update(chart);
         },
@@ -359,7 +364,7 @@ export default {
                 this.$refs.dataChartControl.reset();
                 this.$refs.dataChartControl.initialize();
             }
-            // document.getElementById("lower-container").style["min-width"] = "700px";
+            document.getElementById("lower-container").style["min-width"] = "700px";
         },
     },
 };

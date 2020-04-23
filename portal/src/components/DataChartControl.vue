@@ -121,6 +121,7 @@ export default {
             pending: [],
             preloading: [],
             noDataCharts: [],
+            stationIds: [],
             linkedCharts: false,
             urlQuery: {},
             prevQuery: {},
@@ -276,6 +277,7 @@ export default {
             if (document.getElementById(chartId + "station-loading")) {
                 document.getElementById(chartId + "station-loading").style.display = "none";
             }
+            this.updateIds();
             this.updateRoute();
             this.$emit("sensorUpdate", newChart);
         },
@@ -298,6 +300,7 @@ export default {
             this.urlQuery[newChart.id + "start"] = newChart.start.getTime();
             this.urlQuery[newChart.id + "end"] = newChart.end.getTime();
             this.$emit("sensorUpdate", newChart);
+            this.updateIds();
             this.updateRoute();
         },
         makeChartId() {
@@ -387,6 +390,7 @@ export default {
                         delete this.urlQuery[k];
                     }
                 });
+                this.updateIds();
                 this.updateRoute();
             }
         },
@@ -603,6 +607,7 @@ export default {
             chart.overall = data[deviceId].data;
             chart.current = data[deviceId].data;
             chart.totalTime = data[deviceId].timeRange;
+            this.updateIds();
         },
         updateChartData(data, chartId, fromParent) {
             // only update url for the chart that emitted this zoom
@@ -636,6 +641,7 @@ export default {
                     pendingChart.extent = extent;
                     this.$emit("sensorUpdate", pendingChart);
                     this.charts.push(pendingChart);
+                    this.updateIds();
                 }
             } else {
                 chart.current = data;
@@ -671,6 +677,17 @@ export default {
                 keys.forEach(k => {
                     this.prevQuery[k] = this.urlQuery[k];
                 });
+            }
+        },
+        updateIds() {
+            let stationIds = _.uniq(
+                _.map(this.charts, c => {
+                    return c.station.id;
+                })
+            );
+            if (stationIds.sort().join("") != this.stationIds.sort().join("")) {
+                this.stationIds = stationIds;
+                this.$emit("stationIdsUpdate", this.stationIds);
             }
         },
         refresh(data) {
@@ -721,6 +738,7 @@ export default {
                         this.charts.splice(index, 1);
                     }
                 });
+                this.updateIds();
             }
         },
         resetStation(stationId, chart, data, deviceId) {
@@ -789,6 +807,7 @@ export default {
             this.pending = [];
             this.preloading = [];
             this.noDataCharts = [];
+            this.stationIds = [];
             this.linkedCharts = false;
             this.urlQuery = {};
             this.prevQuery = {};
