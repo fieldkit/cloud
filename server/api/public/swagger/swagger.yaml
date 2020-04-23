@@ -245,7 +245,7 @@ definitions:
       device_id: Aspernatur ut vero aut omnis.
       name: Ut debitis.
       status_json:
-        Consequatur eius corrupti voluptates.: 063bafc2-2cdd-473e-996c-459d363235bd
+        Consequatur eius corrupti voluptates.: 617ee1d1-8ac7-42c4-9447-931f275ad5b8
     properties:
       device_id:
         example: Aspernatur ut vero aut omnis.
@@ -256,7 +256,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Consequatur eius corrupti voluptates.: 063bafc2-2cdd-473e-996c-459d363235bd
+          Consequatur eius corrupti voluptates.: 617ee1d1-8ac7-42c4-9447-931f275ad5b8
         type: object
     required:
     - name
@@ -573,6 +573,14 @@ definitions:
       meta: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
+    - data:
+        Facilis quis blanditiis recusandae est.: true
+      id: 4.96580577271105e+18
+      location:
+      - 0.8522260143236732
+      meta: 2.827138534810339e+18
+      record: 1.2626736114732598e+18
+      time: "2000-09-09T05:59:52Z"
     items:
       $ref: '#/definitions/DeviceDataRecord'
     title: 'Mediatype identifier: application/vnd.app.device.data.record+json; type=collection;
@@ -592,17 +600,17 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+          Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+          Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+          Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -667,7 +675,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+        Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -675,7 +683,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+          Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
         type: object
       id:
         example: 4.464267130479644e+18
@@ -701,17 +709,12 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+        Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
-      id: 4.464267130479644e+18
-      record: 3.682513715611599e+17
-      time: "1984-12-27T14:09:02Z"
-    - data:
-        Cumque nihil.: d7ec121b-87a6-4c55-9ae5-075dcae872db
+        Cumque nihil.: b311ad1e-d5f3-40b3-a3d6-17802ca2acbe
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1680,7 +1683,7 @@ definitions:
       versions:
       - data:
         - d:
-            Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+            Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -1754,7 +1757,7 @@ definitions:
         example:
         - data:
           - d:
-              Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+              Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
             location:
             - 0.18978283373136304
             - 0.18978283373136304
@@ -1833,7 +1836,7 @@ definitions:
   JSONDataRow:
     example:
       d:
-        Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+        Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
       location:
       - 0.18978283373136304
       - 0.18978283373136304
@@ -1846,7 +1849,7 @@ definitions:
       d:
         additionalProperties: true
         example:
-          Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+          Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
         type: object
       location:
         example:
@@ -1912,7 +1915,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+          Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -1979,7 +1982,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+            Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2057,7 +2060,7 @@ definitions:
     example:
       data:
       - d:
-          Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+          Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
         location:
         - 0.18978283373136304
         - 0.18978283373136304
@@ -2130,7 +2133,7 @@ definitions:
       data:
         example:
         - d:
-            Perspiciatis quasi error voluptatem et.: 9254ffc3-d394-48e3-a849-ce37b4aeee1f
+            Perspiciatis quasi error voluptatem et.: becccc79-601c-475e-a8d5-b70ffafb5b06
           location:
           - 0.18978283373136304
           - 0.18978283373136304
@@ -2561,9 +2564,9 @@ definitions:
       series:
       - name: Qui velit aut hic quibusdam est rem.
         rows:
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
     properties:
       series:
         $ref: '#/definitions/SeriesDataCollection'
@@ -2649,20 +2652,20 @@ definitions:
     example:
       name: Qui velit aut hic quibusdam est rem.
       rows:
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
     properties:
       name:
         example: Qui velit aut hic quibusdam est rem.
         type: string
       rows:
         example:
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-        - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+        - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
         items:
-          example: 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
+          example: eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
         type: array
     required:
     - name
@@ -2675,9 +2678,9 @@ definitions:
     example:
     - name: Qui velit aut hic quibusdam est rem.
       rows:
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
-      - 4f8101f9-3b7a-44d6-8d55-2dee3c720d92
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
+      - eda79ef9-20ba-46bb-8977-bc92e4c7cc4c
     items:
       $ref: '#/definitions/SeriesData'
     title: 'Mediatype identifier: application/vnd.app.series+json; type=collection;
@@ -3535,7 +3538,7 @@ definitions:
     example:
       name: Aliquid hic soluta ab quia enim rem.
       status_json:
-        Possimus ut et tempore.: 0692a398-34f4-4faf-8e30-3c7f26557939
+        Possimus ut et tempore.: 0ed94b8f-2f53-48b9-8823-47d2ed290685
     properties:
       name:
         example: Aliquid hic soluta ab quia enim rem.
@@ -3543,7 +3546,7 @@ definitions:
       status_json:
         additionalProperties: true
         example:
-          Possimus ut et tempore.: 0692a398-34f4-4faf-8e30-3c7f26557939
+          Possimus ut et tempore.: 0ed94b8f-2f53-48b9-8823-47d2ed290685
         type: object
     required:
     - name
@@ -6506,6 +6509,36 @@ paths:
       summary: photo station
       tags:
       - station
+  /stations/{stationId}/projects:
+    get:
+      description: |-
+        List the station's projects
+
+        Required security scopes:
+          * `api:access`
+      operationId: project#list station
+      parameters:
+      - in: path
+        name: stationId
+        required: true
+        type: integer
+      produces:
+      - application/vnd.app.projects+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Projects'
+        "400":
+          description: Bad Request
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list station project
+      tags:
+      - project
   /swagger.json:
     get:
       operationId: swagger#/swagger.json

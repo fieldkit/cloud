@@ -2947,6 +2947,7 @@ type ProjectController interface {
 	InviteUser(*InviteUserProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
+	ListStation(*ListStationProjectContext) error
 	RemoveStation(*RemoveStationProjectContext) error
 	RemoveUser(*RemoveUserProjectContext) error
 	SaveImage(*SaveImageProjectContext) error
@@ -2964,6 +2965,7 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/stations/:stationId/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/members", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -3128,6 +3130,23 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/user/projects", ctrl.MuxHandler("list current", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "ListCurrent", "route", "GET /user/projects", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListStationProjectContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.ListStation(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleProjectOrigin(h)
+	service.Mux.Handle("GET", "/stations/:stationId/projects", ctrl.MuxHandler("list station", h, nil))
+	service.LogInfo("mount", "ctrl", "Project", "action", "ListStation", "route", "GET /stations/:stationId/projects", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

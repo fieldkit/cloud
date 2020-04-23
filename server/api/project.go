@@ -212,6 +212,15 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	return ctx.OK(ProjectUserAndProjectsType(projects))
 }
 
+func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) error {
+	projects := []*data.Project{}
+	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name", ctx.StationID); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectsType(projects, data.PublicRole))
+}
+
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {

@@ -2959,6 +2959,49 @@ func (ctx *ListCurrentProjectContext) BadRequest() error {
 	return nil
 }
 
+// ListStationProjectContext provides the project list station action context.
+type ListStationProjectContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	StationID int
+}
+
+// NewListStationProjectContext parses the incoming request URL and body, performs validations and creates the
+// context used by the project controller list station action.
+func NewListStationProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListStationProjectContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListStationProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramStationID := req.Params["stationId"]
+	if len(paramStationID) > 0 {
+		rawStationID := paramStationID[0]
+		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
+			rctx.StationID = stationID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListStationProjectContext) OK(r *Projects) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.projects+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListStationProjectContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // RemoveStationProjectContext provides the project remove station action context.
 type RemoveStationProjectContext struct {
 	context.Context

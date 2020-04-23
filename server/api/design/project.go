@@ -151,6 +151,19 @@ var _ = Resource("project", func() {
 		})
 	})
 
+	Action("list station", func() {
+		Routing(GET("stations/:stationId/projects"))
+		Description("List the station's projects")
+		Params(func() {
+			Param("stationId", Integer)
+			Required("stationId")
+		})
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(Projects)
+		})
+	})
+
 	Action("save image", func() {
 		Routing(POST("/projects/:projectId/media"))
 		Description("Save a project image")

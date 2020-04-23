@@ -333,6 +333,41 @@ func (c *Client) NewListCurrentProjectRequest(ctx context.Context, path string) 
 	return req, nil
 }
 
+// ListStationProjectPath computes a request path to the list station action of project.
+func ListStationProjectPath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/stations/%s/projects", param0)
+}
+
+// List the station's projects
+func (c *Client) ListStationProject(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewListStationProjectRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListStationProjectRequest create the request corresponding to the list station action endpoint of the project resource.
+func (c *Client) NewListStationProjectRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // RemoveStationProjectPath computes a request path to the remove station action of project.
 func RemoveStationProjectPath(projectID int, stationID int) string {
 	param0 := strconv.Itoa(projectID)
