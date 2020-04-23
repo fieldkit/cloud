@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 

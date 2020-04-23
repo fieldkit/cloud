@@ -749,7 +749,7 @@ export default {
                 this.resetChartData(data, deviceId, chart.id);
             }
         },
-        resetTime(stationId, chart, deviceId) {
+        resetTime(stationId, chart) {
             if (
                 parseInt(this.$route.query[chart.id + "start"]) != chart.start.getTime() ||
                 parseInt(this.$route.query[chart.id + "end"]) != chart.end.getTime()

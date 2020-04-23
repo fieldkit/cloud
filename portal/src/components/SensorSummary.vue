@@ -120,7 +120,6 @@ export default {
                 return { min: "--", max: "--", median: "--" };
             }
 
-            let sensorSummary = this;
             let extent = d3.extent(data, d => {
                 return d[key];
             });
