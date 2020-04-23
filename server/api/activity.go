@@ -42,29 +42,20 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 
 	offset := pageNumber * pageSize
 
-	// TODO Parallelize
-
-	deployed := []*data.StationDeployedWM{}
-	if err := c.options.Database.SelectContext(ctx, &deployed, `
-		SELECT
-			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
-		FROM fieldkit.station_deployed AS a
-		WHERE a.id IN (
-			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
-		)`, payload.ID, pageSize, offset); err != nil {
+	r, err := NewActivityRepository(c.options)
+	if err != nil {
 		return nil, err
 	}
 
-	ingested := []*data.StationIngestionWM{}
-	query := `
-		SELECT
-			a.id, a.created_at, a.station_id, a.data_ingestion_id, a.data_records, a.errors, a.uploader_id, u.name AS uploader_name
-		FROM fieldkit.station_ingestion AS a JOIN
-             fieldkit.user AS u ON (u.id = a.uploader_id)
-		WHERE a.id IN (
-			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
-		)`
-	if err := data.SelectContextCustom(ctx, c.options.Database, &ingested, data.ScanStationIngestionWM, query, payload.ID, pageSize, offset); err != nil {
+	// TODO Parallelize
+
+	deployed, err := r.QueryStationDeployed(ctx, payload.ID, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	ingested, err := r.QueryStationIngested(ctx, payload.ID, pageSize, offset)
+	if err != nil {
 		return nil, err
 	}
 
@@ -149,6 +140,41 @@ func NewActivityRepository(options *ControllerOptions) (r *ActivityRepository, e
 	}
 
 	return
+}
+
+func (r *ActivityRepository) QueryStationDeployed(ctx context.Context, id int64, pageSize, offset int32) ([]*data.StationDeployedWM, error) {
+	deployed := []*data.StationDeployedWM{}
+	query := `
+		SELECT
+			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
+		FROM fieldkit.station_deployed AS a
+		WHERE a.id IN (
+			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`
+
+	if err := r.options.Database.SelectContext(ctx, &deployed, query, id, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	return deployed, nil
+}
+
+func (r *ActivityRepository) QueryStationIngested(ctx context.Context, id int64, pageSize, offset int32) ([]*data.StationIngestionWM, error) {
+	ingested := []*data.StationIngestionWM{}
+	query := `
+		SELECT
+			a.id, a.created_at, a.station_id, a.data_ingestion_id, a.data_records, a.errors, a.uploader_id, u.name AS uploader_name
+		FROM fieldkit.station_ingestion AS a JOIN
+             fieldkit.user AS u ON (u.id = a.uploader_id)
+		WHERE a.id IN (
+			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`
+
+	if err := data.SelectContextCustom(ctx, r.options.Database, &ingested, data.ScanStationIngestionWM, query, id, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	return ingested, nil
 }
 
 type StationActivitiesByCreatedAt []*activity.StationActivity

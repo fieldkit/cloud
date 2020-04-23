@@ -101,7 +101,7 @@ func NewProjectResponseBody(res *activityviews.ProjectActivityPageView) *Project
 // NewStationPayload builds a activity service station endpoint payload.
 func NewStationPayload(id int64, page *int64, auth *string) *activity.StationPayload {
 	v := &activity.StationPayload{}
-	v.ID = &id
+	v.ID = id
 	v.Page = page
 	v.Auth = auth
 
@@ -111,7 +111,7 @@ func NewStationPayload(id int64, page *int64, auth *string) *activity.StationPay
 // NewProjectPayload builds a activity service project endpoint payload.
 func NewProjectPayload(id int64, page *int64, auth *string) *activity.ProjectPayload {
 	v := &activity.ProjectPayload{}
-	v.ID = &id
+	v.ID = id
 	v.Page = page
 	v.Auth = auth
 

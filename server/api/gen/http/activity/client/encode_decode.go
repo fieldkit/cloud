@@ -31,9 +31,7 @@ func (c *Client) BuildStationRequest(ctx context.Context, v interface{}) (*http.
 		if !ok {
 			return nil, goahttp.ErrInvalidType("activity", "station", "*activity.StationPayload", v)
 		}
-		if p.ID != nil {
-			id = *p.ID
-		}
+		id = p.ID
 	}
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: StationActivityPath(id)}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -121,9 +119,7 @@ func (c *Client) BuildProjectRequest(ctx context.Context, v interface{}) (*http.
 		if !ok {
 			return nil, goahttp.ErrInvalidType("activity", "project", "*activity.ProjectPayload", v)
 		}
-		if p.ID != nil {
-			id = *p.ID
-		}
+		id = p.ID
 	}
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProjectActivityPath(id)}
 	req, err := http.NewRequest("GET", u.String(), nil)

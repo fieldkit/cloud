@@ -41,7 +41,7 @@ var MethodNames = [2]string{"station", "project"}
 // StationPayload is the payload type of the activity service station method.
 type StationPayload struct {
 	Auth *string
-	ID   *int64
+	ID   int64
 	Page *int64
 }
 
@@ -56,7 +56,7 @@ type StationActivityPage struct {
 // ProjectPayload is the payload type of the activity service project method.
 type ProjectPayload struct {
 	Auth *string
-	ID   *int64
+	ID   int64
 	Page *int64
 }
 

@@ -42,7 +42,7 @@ func BuildStationPayload(activityStationID string, activityStationPage string, a
 		}
 	}
 	v := &activity.StationPayload{}
-	v.ID = &id
+	v.ID = id
 	v.Page = page
 	v.Auth = auth
 
@@ -77,7 +77,7 @@ func BuildProjectPayload(activityProjectID string, activityProjectPage string, a
 		}
 	}
 	v := &activity.ProjectPayload{}
-	v.ID = &id
+	v.ID = id
 	v.Page = page
 	v.Auth = auth
 

@@ -86,6 +86,7 @@ var _ = Service("activity", func() {
 			Token("auth")
 			Attribute("id", Int64)
 			Attribute("page", Int64)
+			Required("id")
 		})
 
 		Result(StationActivityPage)
@@ -112,6 +113,7 @@ var _ = Service("activity", func() {
 			Token("auth")
 			Attribute("id", Int64)
 			Attribute("page", Int64)
+			Required("id")
 		})
 
 		Result(ProjectActivityPage)
