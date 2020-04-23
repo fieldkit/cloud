@@ -32,9 +32,9 @@ type StationDeployedWM struct {
 	Location   Location  `db:"location" json:"location"`
 }
 
-type Uploader struct {
-	ID   int64  `db:"uploader_id" json:"id"`
-	Name string `db:"uploader_name" json:"name"`
+type AuthorOrUploaderWM struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type IngestedWM struct {
@@ -44,14 +44,45 @@ type IngestedWM struct {
 
 type StationIngestionWM struct {
 	StationActivity
-	Uploader Uploader   `json:"uploader"`
-	Data     IngestedWM `json:"data"`
-	Errors   bool       `db:"errors" json:"errors"`
+	Uploader AuthorOrUploaderWM `json:"uploader"`
+	Data     IngestedWM         `json:"data"`
+	Errors   bool               `db:"errors" json:"errors"`
 }
 
 func ScanStationIngestionWM(rows *sqlx.Rows) (interface{}, error) {
 	v := &StationIngestionWM{}
 	if err := rows.Scan(&v.ID, &v.CreatedAt, &v.StationID, &v.Data.ID, &v.Data.Records, &v.Errors, &v.Uploader.ID, &v.Uploader.Name); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+type ProjectActivity struct {
+	ID        int64     `db:"id" json:"-"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	ProjectID int64     `db:"project_id" json:"-"`
+}
+
+type ProjectUpdate struct {
+	ProjectActivity
+	AuthorID int64  `db:"author_id" json:"-"`
+	Body     string `db:"body" json:"body"`
+}
+
+type ProjectStationActivity struct {
+	ProjectActivity
+	StationActivityID int64 `db:"station_activity_id" json:"-"`
+}
+
+type ProjectUpdateWM struct {
+	ProjectActivity
+	Author AuthorOrUploaderWM `json:"author"`
+	Body   string             `db:"body" json:"body"`
+}
+
+func ScanProjectUpdateWM(rows *sqlx.Rows) (interface{}, error) {
+	v := &ProjectUpdateWM{}
+	if err := rows.Scan(&v.ID, &v.CreatedAt, &v.ProjectID, &v.Body, &v.Author.ID, &v.Author.Name); err != nil {
 		return nil, err
 	}
 	return v, nil

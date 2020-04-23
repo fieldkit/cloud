@@ -40,14 +40,14 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		return nil, err
 	}
 
-	offset := pageNumber * pageSize
-
 	r, err := NewActivityRepository(c.options)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO Parallelize
+
+	offset := pageNumber * pageSize
 
 	deployed, err := r.QueryStationDeployed(ctx, payload.ID, pageSize, offset)
 	if err != nil {
@@ -98,10 +98,15 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 }
 
 func (c *ActivityService) Project(ctx context.Context, payload *activity.ProjectPayload) (page *activity.ProjectActivityPage, err error) {
-	// pageSize := int32(100)
+	pageSize := int32(100)
 	pageNumber := int32(0)
 	if payload.Page != nil {
 		pageNumber = int32(*payload.Page)
+	}
+
+	project := &data.Project{}
+	if err = c.options.Database.GetContext(ctx, project, `SELECT * FROM fieldkit.project WHERE id = $1`, payload.ID); err != nil {
+		return nil, err
 	}
 
 	total := int32(0)
@@ -109,7 +114,36 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		return nil, err
 	}
 
-	activities := []*activity.ProjectActivity{}
+	r, err := NewActivityRepository(c.options)
+	if err != nil {
+		return nil, err
+	}
+
+	offset := pageNumber * pageSize
+
+	updates, err := r.QueryProjectUpdate(ctx, payload.ID, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	activities := make([]*activity.ProjectActivity, 0, len(updates))
+
+	projectSummary := &activity.ProjectSummary{
+		ID:   int64(project.ID),
+		Name: project.Name,
+	}
+
+	for _, a := range updates {
+		activities = append(activities, &activity.ProjectActivity{
+			ID:        a.ID,
+			CreatedAt: a.CreatedAt.Unix() * 1000,
+			Project:   projectSummary,
+			Type:      getActivityTypeName(a),
+			Meta:      a,
+		})
+	}
+
+	sort.Sort(ProjectActivitiesByCreatedAt(activities))
 
 	page = &activity.ProjectActivityPage{
 		Activities: activities,
@@ -170,11 +204,29 @@ func (r *ActivityRepository) QueryStationIngested(ctx context.Context, id int64,
 			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
 		)`
 
-	if err := data.SelectContextCustom(ctx, r.options.Database, &ingested, data.ScanStationIngestionWM, query, id, pageSize, offset); err != nil {
+	if err := r.options.Querier.SelectContextCustom(ctx, &ingested, data.ScanStationIngestionWM, query, id, pageSize, offset); err != nil {
 		return nil, err
 	}
 
 	return ingested, nil
+}
+
+func (r *ActivityRepository) QueryProjectUpdate(ctx context.Context, id int64, pageSize, offset int32) ([]*data.ProjectUpdateWM, error) {
+	updates := []*data.ProjectUpdateWM{}
+	query := `
+		SELECT
+			a.id, a.created_at, a.project_id, a.body, a.author_id, u.name AS author_name
+		FROM fieldkit.project_update AS a JOIN
+             fieldkit.user AS u ON (u.id = a.author_id)
+		WHERE a.id IN (
+			SELECT id FROM fieldkit.project_activity WHERE project_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`
+
+	if err := r.options.Querier.SelectContextCustom(ctx, &updates, data.ScanProjectUpdateWM, query, id, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	return updates, nil
 }
 
 type StationActivitiesByCreatedAt []*activity.StationActivity
@@ -188,6 +240,20 @@ func (s StationActivitiesByCreatedAt) Swap(i, j int) {
 }
 
 func (s StationActivitiesByCreatedAt) Less(i, j int) bool {
+	return s[i].CreatedAt > s[j].CreatedAt
+}
+
+type ProjectActivitiesByCreatedAt []*activity.ProjectActivity
+
+func (s ProjectActivitiesByCreatedAt) Len() int {
+	return len(s)
+}
+
+func (s ProjectActivitiesByCreatedAt) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s ProjectActivitiesByCreatedAt) Less(i, j int) bool {
 	return s[i].CreatedAt > s[j].CreatedAt
 }
 
