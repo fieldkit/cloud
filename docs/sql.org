@@ -1,6 +1,18 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
-SELECT u.id AS user_id, u.name AS user, u.email AS email, p.id AS project_id, p.name AS project_name
+SELECT *
+         FROM fieldkit.station_activity AS a
+	LEFT JOIN fieldkit.station_deployed AS sd ON (a.id = sd.id)
+	LEFT JOIN fieldkit.station_ingestion AS si ON (a.id = si.id)
+	ORDER BY a.created DESC
+
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+SELECT u.id AS user_id, u.name AS user, p.id AS project_id, p.name AS project_name
          FROM fieldkit.user AS u
 	LEFT JOIN fieldkit.project_user AS pu ON (pu.user_id = u.id)
 	LEFT JOIN fieldkit.project AS p ON (p.id = pu.project_id)
@@ -9,34 +21,31 @@ SELECT u.id AS user_id, u.name AS user, u.email AS email, p.id AS project_id, p.
 #+END_SRC
 
 #+RESULTS:
-| user_id | user             | email                            | project_id | project_name             |
-|---------+------------------+----------------------------------+------------+--------------------------|
-|       2 | Jacob Lewallen   | jacob@conservify.org             |          1 | Demo Project             |
-|       3 | Shah Selbe       | shah@conservify.org              |          3 | Default FieldKit Project |
-|       4 | Libbey White     | libbey@conservify.org            |          5 | Default FieldKit Project |
-|       4 | Libbey White     | libbey@conservify.org            |          9 | Test project             |
-|       5 | Bradley Gawthrop | bradley@conservify.org           |            |                          |
-|       6 | Kristi Cervania  | kristi@conservify.org            |            |                          |
-|       7 | Susan Allen      | susan@susanallen.me              |          4 | Default FieldKit Project |
-|       7 | Susan Allen      | susan@susanallen.me              |          8 | Susan Test Project       |
-|       8 | Graeme Rae       | graemerae@gmail.com              |          2 | Default FieldKit Project |
-|       9 | Lauren McElroy   | lauren@conservify.org            |            |                          |
-|      10 | Jer Throp        | jer@conservify.org               |          6 | Default FieldKit Project |
-|      11 | Ricky            | ricky@adventurescientists.org    |            |                          |
-|      12 | Max Littlefield  | Max@adventurescientists.org      |            |                          |
-|      13 | Kristi           | cervaniakris@gmail.com           |            |                          |
-|      16 | Michelle Todhack | michelle@adventurescientists.org |            |                          |
-|      21 | Paulo            | paolivas@fiu.edu                 |          7 | FIU FieldKit Test        |
-|      22 | testsusan        | suedonym85+1@gmail.com           |         10 | Default FieldKit Project |
-|      25 | sudantest        | suedonym85@gmail.com             |         11 | Default FieldKit Project |
-|      26 | Demo             | demo@conservify.org              |          1 | Demo Project             |
-|      26 | Demo             | demo@conservify.org              |         12 | Default FieldKit Project |
-|      27 | Ari              | ahkoeppel@gmail.com              |         13 | Default FieldKit Project |
-|      28 | RobertH          | robertherrera042@gmail.com       |            |                          |
-|      29 | MatthewStockard  | matthewc.stockard@gmail.com      |            |                          |
-|      30 | nick mian        | nickmian@gmail.com               |            |                          |
-|      31 | Gary Ananian     | gary@kernriverconservancy.org    |         14 | Default FieldKit Project |
-|      32 | Marvin           | marvinroesinger1992@gmail.com    |            |                          |
+| user_id | user             | project_id | project_name             |
+|---------+------------------+------------+--------------------------|
+|       1 | Demo User        |            |                          |
+|       2 | Jacob Lewallen   |          7 | Default FieldKit Project |
+|       3 | Test User        |            |                          |
+|       4 | NewPerson        |            |                          |
+|       5 | Shah Selbe       |          8 | Default FieldKit Project |
+|       5 | Shah Selbe       |         16 | Moore Demo               |
+|       6 | Libbey White     |          5 | FieldKit Project         |
+|       6 | Libbey White     |         17 | Snails                   |
+|       7 | Felicia Chang    |            |                          |
+|       8 | Bradley Gawthrop |            |                          |
+|      10 | Tester           |            |                          |
+|      14 | Kristi Cervania  |          6 | Default FieldKit Project |
+|      15 | Lauren McElroy   |         14 | Default FieldKit Project |
+|      16 | Susan Allen      |         10 | Default FieldKit Project |
+|      16 | Susan Allen      |         22 | Susan's Test Project     |
+|      18 | Kristi-Test      |            |                          |
+|      19 | Jer Thorp        |          9 | Default FieldKit Project |
+|      20 | Graeme           |         15 | Default FieldKit Project |
+|      21 | Ricky            |            |                          |
+|      22 | Paulo            |         24 | Default FieldKit Project |
+|      25 | Ricky            |            |                          |
+|      27 | Libbey           |            |                          |
+|      28 | susantest        |            |                          |
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
@@ -50,29 +59,35 @@ SELECT s.id AS station_id, s.name AS station_name, o.id AS owner_id, o.name AS o
 #+END_SRC
 
 #+RESULTS:
-| station_id | station_name           | owner_id | owner           | project_id | project_name       |
-|------------+------------------------+----------+-----------------+------------+--------------------|
-|          1 | Ambitious Stingray 65  |        2 | Jacob Lewallen  |            |                    |
-|          2 | Admired Goose 81       |       10 | Jer Throp       |            |                    |
-|          3 | Nice-nice Lizard 98    |        6 | Kristi Cervania |            |                    |
-|          5 | swift fieldkit         |        8 | Graeme Rae      |            |                    |
-|          6 | Bewitched Husky 17     |        2 | Jacob Lewallen  |            |                    |
-|          7 | Scholarly Eagle 59     |       12 | Max Littlefield |            |                    |
-|          8 | Unusual Goat 80        |       12 | Max Littlefield |            |                    |
-|          9 | Extroverted Dolphin 12 |       12 | Max Littlefield |            |                    |
-|         10 | Superb Kangaroo 63     |       12 | Max Littlefield |            |                    |
-|         11 | Fuzzy Chicken 8        |        7 | Susan Allen     |          8 | Susan Test Project |
-|         12 | Jolly Penguin 81       |        2 | Jacob Lewallen  |          1 | Demo Project       |
-|         13 | Athletic Quail 73      |        3 | Shah Selbe      |            |                    |
-|         14 | Loud Dog 19            |       21 | Paulo           |          7 | FIU FieldKit Test  |
-|         15 | Massive Panda          |       21 | Paulo           |          7 | FIU FieldKit Test  |
-|         16 | Formal Mayfly 65       |        3 | Shah Selbe      |            |                    |
-|         17 | Gifted Sloth 44        |        2 | Jacob Lewallen  |            |                    |
-|         18 | Notable Dog 27         |       27 | Ari             |            |                    |
-|         19 | Chatty Mayfly 85       |       31 | Gary Ananian    |            |                    |
-|         20 | Highland Park Selbe    |        3 | Shah Selbe      |            |                    |
-|         21 | Handy Dragonfly 25     |        3 | Shah Selbe      |            |                    |
-|         22 | Joyous Rat 3           |        2 | Jacob Lewallen  |            |                    |
+| station_id | station_name           | owner_id | owner            | project_id | project_name             |
+|------------+------------------------+----------+------------------+------------+--------------------------|
+|          1 | feldspar               |       10 | Tester           |            |                          |
+|          3 | quartz                 |       10 | Tester           |          1 | Demo Project             |
+|         13 | Friendly Horse 11      |        2 | Jacob Lewallen   |            |                          |
+|         15 | Quiet Catfish 86       |        2 | Jacob Lewallen   |            |                          |
+|         16 | Formal Mayfly 65       |        2 | Jacob Lewallen   |            |                          |
+|         19 | Stupid Sloth 44        |        2 | Jacob Lewallen   |            |                          |
+|        154 | Vibrant Lizard 98      |        6 | Libbey White     |          5 | FieldKit Project         |
+|        159 | Admired Goose 81       |        2 | Jacob Lewallen   |            |                          |
+|        162 | Green Zebra 85         |        8 | Bradley Gawthrop |            |                          |
+|        163 | Tender Dog 79          |        2 | Jacob Lewallen   |            |                          |
+|        164 | Breezy Stingray 71     |       15 | Lauren McElroy   |            |                          |
+|        165 | Brown Dodo 10          |        5 | Shah Selbe       |            |                          |
+|        169 | mica                   |        6 | Libbey White     |         17 | Snails                   |
+|        170 | Massive Jellyfish 86   |        2 | Jacob Lewallen   |            |                          |
+|        171 | Noteworthy Warthog 54  |        5 | Shah Selbe       |            |                          |
+|        172 | Tremendous Stingray 21 |        5 | Shah Selbe       |            |                          |
+|        173 | Impressive Hound 101   |       20 | Graeme           |         15 | Default FieldKit Project |
+|        174 | Huge Falcon 36         |       16 | Susan Allen      |         10 | Default FieldKit Project |
+|        174 | Huge Falcon 36         |       16 | Susan Allen      |         22 | Susan's Test Project     |
+|        175 | Pleasant Jellyfish 60  |       15 | Lauren McElroy   |            |                          |
+|        176 | Calm Panda 40          |       15 | Lauren McElroy   |            |                          |
+|        177 | Bewitched Husky 17     |        5 | Shah Selbe       |          8 | Default FieldKit Project |
+|        177 | Bewitched Husky 17     |        5 | Shah Selbe       |         16 | Moore Demo               |
+|        178 | Ambitious Stingray 65  |        5 | Shah Selbe       |            |                          |
+|        179 | super panda            |       22 | Paulo            |         24 | Default FieldKit Project |
+|        180 | Lucky Sloth 2          |        5 | Shah Selbe       |            |                          |
+|        181 | Highland Park Selbe    |        5 | Shah Selbe       |            |                          |
 
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
@@ -84,10 +99,8 @@ INSERT INTO fieldkit.project_user (project_id, user_id) VALUES (1, 26) ON CONFLI
 #+END_SRC
 
 #+RESULTS:
-| UPDATE 1   |
-|------------|
-| INSERT 0 0 |
-| INSERT 0 0 |
+| UPDATE 1 |
+|----------|
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 

@@ -2,12 +2,15 @@ package api
 
 import (
 	"context"
+	"reflect"
+	"sort"
+	"strings"
 
 	"goa.design/goa/v3/security"
 
 	activity "github.com/fieldkit/cloud/server/api/gen/activity"
 
-	_ "github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type ActivityService struct {
@@ -21,10 +24,15 @@ func NewActivityService(ctx context.Context, options *ControllerOptions) *Activi
 }
 
 func (c *ActivityService) Station(ctx context.Context, payload *activity.StationPayload) (page *activity.StationActivityPage, err error) {
-	// pageSize := int32(100)
+	pageSize := int32(100)
 	pageNumber := int32(0)
 	if payload.Page != nil {
 		pageNumber = int32(*payload.Page)
+	}
+
+	station := &data.Station{}
+	if err = c.options.Database.GetContext(ctx, station, `SELECT * FROM fieldkit.station WHERE id = $1`, payload.ID); err != nil {
+		return nil, err
 	}
 
 	total := int32(0)
@@ -32,7 +40,63 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		return nil, err
 	}
 
-	activities := []*activity.StationActivity{}
+	offset := pageNumber * pageSize
+
+	// TODO Parallelize
+
+	deployed := []*data.StationDeployedWM{}
+	if err := c.options.Database.SelectContext(ctx, &deployed, `
+		SELECT
+			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
+		FROM fieldkit.station_deployed AS a
+		WHERE a.id IN (
+			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`, payload.ID, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	ingested := []*data.StationIngestionWM{}
+	query := `
+		SELECT
+			a.id, a.created_at, a.station_id, a.data_ingestion_id, a.data_records, a.errors, a.uploader_id, u.name AS uploader_name
+		FROM fieldkit.station_ingestion AS a JOIN
+             fieldkit.user AS u ON (u.id = a.uploader_id)
+		WHERE a.id IN (
+			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`
+	if err := data.SelectContextCustom(ctx, c.options.Database, &ingested, data.ScanStationIngestionWM, query, payload.ID, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	activities := make([]*activity.StationActivity, 0, len(deployed)+len(ingested))
+
+	stationSummary := &activity.StationSummary{
+		ID:   int64(station.ID),
+		Name: station.Name,
+	}
+
+	for _, a := range deployed {
+		activities = append(activities, &activity.StationActivity{
+			ID:        a.ID,
+			CreatedAt: a.CreatedAt.Unix() * 1000,
+			Station:   stationSummary,
+			Type:      getActivityTypeName(a),
+			Meta:      a,
+		})
+	}
+
+	for _, a := range ingested {
+		activities = append(activities, &activity.StationActivity{
+			ID:        a.ID,
+			CreatedAt: a.CreatedAt.Unix() * 1000,
+			Station:   stationSummary,
+			Type:      getActivityTypeName(a),
+			Meta:      a,
+		})
+	}
+
+	sort.Sort(StationActivitiesByCreatedAt(activities))
+
 	page = &activity.StationActivityPage{
 		Activities: activities,
 		Page:       pageNumber,
@@ -55,6 +119,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	}
 
 	activities := []*activity.ProjectActivity{}
+
 	page = &activity.ProjectActivityPage{
 		Activities: activities,
 		Page:       pageNumber,
@@ -72,4 +137,42 @@ func (s *ActivityService) JWTAuth(ctx context.Context, token string, scheme *sec
 		InvalidToken:  nil,
 		InvalidScopes: nil,
 	})
+}
+
+type ActivityRepository struct {
+	options *ControllerOptions
+}
+
+func NewActivityRepository(options *ControllerOptions) (r *ActivityRepository, err error) {
+	r = &ActivityRepository{
+		options: options,
+	}
+
+	return
+}
+
+type StationActivitiesByCreatedAt []*activity.StationActivity
+
+func (s StationActivitiesByCreatedAt) Len() int {
+	return len(s)
+}
+
+func (s StationActivitiesByCreatedAt) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s StationActivitiesByCreatedAt) Less(i, j int) bool {
+	return s[i].CreatedAt > s[j].CreatedAt
+}
+
+func getActivityTypeName(v interface{}) string {
+	return strings.ReplaceAll(getTypeName(v), "WM", "")
+}
+
+func getTypeName(v interface{}) string {
+	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
+		return t.Elem().Name()
+	} else {
+		return t.Name()
+	}
 }

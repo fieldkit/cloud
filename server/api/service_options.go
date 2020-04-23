@@ -9,6 +9,7 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
@@ -18,6 +19,7 @@ type ControllerOptions struct {
 	Config       *ApiConfiguration
 	Session      *session.Session
 	Database     *sqlxcache.DB
+	Querier      *data.Querier
 	Backend      *backend.Backend
 	JWTHMACKey   []byte
 	Emailer      email.Emailer
@@ -45,6 +47,7 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	controllerOptions = &ControllerOptions{
 		Session:      awsSession,
 		Database:     database,
+		Querier:      data.NewQuerier(database),
 		Backend:      be,
 		Emailer:      emailer,
 		JWTHMACKey:   jwtHMACKey,

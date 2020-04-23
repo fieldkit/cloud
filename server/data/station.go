@@ -14,6 +14,7 @@ type Station struct {
 	OwnerID    int32          `db:"owner_id,omitempty"`
 	CreatedAt  time.Time      `db:"created_at,omitempty"`
 	StatusJSON types.JSONText `db:"status_json"`
+	Private    bool           `db:"private"`
 }
 
 type StationLog struct {
