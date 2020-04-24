@@ -34,26 +34,10 @@ type options struct {
 	Email    string
 	Password string
 
-	Project    string
-	Expedition string
-
-	DeviceName string
-	DeviceId   string
-	StreamName string
-
-	Latitude         float64
-	Longitude        float64
-	LocationPrimeZip string
-
-	FirmwareID   int
-	FirmwareURL  string
-	FirmwareETag string
-
 	Module  string
 	Profile string
 
-	FirmwareDirectory string
-	FirmwareFile      string
+	FirmwareFile string
 
 	DryRun bool
 }
@@ -298,24 +282,9 @@ func main() {
 	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "fk instance hostname")
 	flag.StringVar(&o.Email, "email", "info@conservify.org", "email")
 	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password")
-
-	flag.StringVar(&o.Project, "project", "www", "project")
-	flag.StringVar(&o.Expedition, "expedition", "", "expedition")
-	flag.StringVar(&o.DeviceName, "device-name", "", "device name")
-	flag.StringVar(&o.DeviceId, "device-id", "", "device id")
-	flag.StringVar(&o.StreamName, "stream-name", "", "stream name")
-
-	flag.Float64Var(&o.Longitude, "longitude", 0, "longitude")
-	flag.Float64Var(&o.Latitude, "latitude", 0, "latitude")
-	flag.StringVar(&o.LocationPrimeZip, "location-prime-zip", "", "zipcode to prime the location with")
-
-	flag.IntVar(&o.FirmwareID, "firmware-id", 0, "firmware id")
-
 	flag.StringVar(&o.Module, "module", "", "override module")
 	flag.StringVar(&o.Profile, "profile", "", "override profile")
-
 	flag.StringVar(&o.FirmwareFile, "firmware-file", "", "firmware file")
-
 	flag.BoolVar(&o.DryRun, "dry", false, "dry run")
 
 	flag.Parse()
@@ -331,42 +300,6 @@ func main() {
 		err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
 		if err != nil {
 			log.Fatalf("error adding firmware: %v", err)
-		}
-	}
-
-	if o.DeviceId != "" && o.DeviceName != "" {
-		device, err := fktesting.CreateWebDevice(ctx, c, o.Project, o.DeviceName, o.DeviceId, "")
-		if err != nil {
-			log.Fatalf("error creating device: %v", err)
-		}
-
-		log.Printf("associated %v", device)
-
-		if o.Latitude != 0 && o.Longitude != 0 {
-			log.Printf("setting location %v,%v", o.Longitude, o.Latitude)
-			err := fktesting.UpdateLocation(ctx, c, device, o.Longitude, o.Latitude)
-			if err != nil {
-				log.Fatalf("error updating location: %v", err)
-			}
-		}
-	}
-
-	if o.FirmwareID > 0 {
-		device, err := fktesting.FindExistingDevice(ctx, c, o.Project, o.DeviceId, true)
-		if err != nil {
-			log.Fatalf("error creating device: %v", err)
-		}
-
-		if device == nil {
-			log.Fatalf("unable to find device")
-		}
-
-		if device != nil {
-			log.Printf("updating firmware %v", o.FirmwareID)
-			err := fktesting.UpdateFirmware(ctx, c, device.ID, o.FirmwareID)
-			if err != nil {
-				log.Fatalf("error updating firmware: %v", err)
-			}
 		}
 	}
 }

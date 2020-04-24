@@ -15,36 +15,6 @@ import (
 	"strconv"
 )
 
-// ExpeditionGetIDPicturePath computes a request path to the expedition get id action of picture.
-func ExpeditionGetIDPicturePath(expeditionID int) string {
-	param0 := strconv.Itoa(expeditionID)
-
-	return fmt.Sprintf("/expeditions/%s/picture", param0)
-}
-
-// Get a expedition's picture
-func (c *Client) ExpeditionGetIDPicture(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewExpeditionGetIDPictureRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewExpeditionGetIDPictureRequest create the request corresponding to the expedition get id action endpoint of the picture resource.
-func (c *Client) NewExpeditionGetIDPictureRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
 // ProjectGetIDPicturePath computes a request path to the project get id action of picture.
 func ProjectGetIDPicturePath(projectID int) string {
 	param0 := strconv.Itoa(projectID)

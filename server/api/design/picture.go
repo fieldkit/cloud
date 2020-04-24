@@ -58,17 +58,4 @@ var _ = Resource("picture", func() {
 			Media("image/png")
 		})
 	})
-
-	Action("expedition get id", func() {
-		Routing(GET("expeditions/:expeditionId/picture"))
-		Description("Get a expedition's picture")
-		Params(func() {
-			Param("expeditionId", Integer)
-			Required("expeditionId")
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media("image/png")
-		})
-	})
 })

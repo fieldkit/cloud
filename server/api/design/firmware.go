@@ -19,7 +19,6 @@ var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 })
 
 var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
-	Reference(Source)
 	Attribute("deviceId", Integer)
 	Required("deviceId")
 	Attribute("firmwareId", Integer)

@@ -230,12 +230,3 @@ func (c *PictureController) ProjectGetID(ctx *app.ProjectGetIDPictureContext) er
 
 	return ctx.OK(picture)
 }
-
-func (c *PictureController) ExpeditionGetID(ctx *app.ExpeditionGetIDPictureContext) error {
-	picture, err := ExpeditionDefaultPicture(int64(ctx.ExpeditionID))
-	if err != nil {
-		return err
-	}
-
-	return ctx.OK(picture)
-}
