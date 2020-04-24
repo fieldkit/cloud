@@ -52,13 +52,32 @@ func isOutgoingFirmwareOlderThanIncoming(compiled string, fw *data.DeviceFirmwar
 }
 
 func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
+	buildNumber := 0
+	buildTime := 0
+	metaFields, _ := fw.GetMeta()
+	if metaFields != nil {
+		if raw, ok := metaFields["Build-Number"]; ok {
+			if v, err := strconv.ParseInt(raw.(string), 10, 32); err == nil {
+				buildNumber = int(v)
+			}
+		}
+		if raw, ok := metaFields["Build-Time"]; ok {
+			if p, err := time.Parse("20060102_150405", raw.(string)); err == nil {
+				buildTime = int(p.Unix())
+			}
+		}
+	}
+
 	return &app.FirmwareSummary{
-		ID:      int(fw.ID),
-		Time:    fw.Time,
-		Module:  fw.Module,
-		Profile: fw.Profile,
-		Etag:    fw.ETag,
-		URL:     fw.URL,
+		ID:          int(fw.ID),
+		Time:        fw.Time,
+		Module:      fw.Module,
+		Profile:     fw.Profile,
+		Etag:        fw.ETag,
+		URL:         fw.URL,
+		Meta:        metaFields,
+		BuildNumber: buildNumber,
+		BuildTime:   buildTime,
 	}
 }
 

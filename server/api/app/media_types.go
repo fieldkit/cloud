@@ -704,12 +704,15 @@ func (mt *FieldNotes) Validate() (err error) {
 //
 // Identifier: application/vnd.app.firmware+json; view=default
 type FirmwareSummary struct {
-	Etag    string    `form:"etag" json:"etag" yaml:"etag" xml:"etag"`
-	ID      int       `form:"id" json:"id" yaml:"id" xml:"id"`
-	Module  string    `form:"module" json:"module" yaml:"module" xml:"module"`
-	Profile string    `form:"profile" json:"profile" yaml:"profile" xml:"profile"`
-	Time    time.Time `form:"time" json:"time" yaml:"time" xml:"time"`
-	URL     string    `form:"url" json:"url" yaml:"url" xml:"url"`
+	BuildNumber int                    `form:"buildNumber" json:"buildNumber" yaml:"buildNumber" xml:"buildNumber"`
+	BuildTime   int                    `form:"buildTime" json:"buildTime" yaml:"buildTime" xml:"buildTime"`
+	Etag        string                 `form:"etag" json:"etag" yaml:"etag" xml:"etag"`
+	ID          int                    `form:"id" json:"id" yaml:"id" xml:"id"`
+	Meta        map[string]interface{} `form:"meta" json:"meta" yaml:"meta" xml:"meta"`
+	Module      string                 `form:"module" json:"module" yaml:"module" xml:"module"`
+	Profile     string                 `form:"profile" json:"profile" yaml:"profile" xml:"profile"`
+	Time        time.Time              `form:"time" json:"time" yaml:"time" xml:"time"`
+	URL         string                 `form:"url" json:"url" yaml:"url" xml:"url"`
 }
 
 // Validate validates the FirmwareSummary media type instance.
@@ -727,6 +730,10 @@ func (mt *FirmwareSummary) Validate() (err error) {
 	if mt.URL == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
 	}
+	if mt.Meta == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "meta"))
+	}
+
 	return
 }
 

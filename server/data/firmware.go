@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -15,4 +16,12 @@ type Firmware struct {
 	ETag      string         `db:"etag"`
 	Meta      types.JSONText `db:"meta"`
 	Available bool           `db:"available"`
+}
+
+func (f *Firmware) GetMeta() (fields map[string]interface{}, err error) {
+	err = json.Unmarshal(f.Meta, &fields)
+	if err != nil {
+		return nil, err
+	}
+	return
 }
