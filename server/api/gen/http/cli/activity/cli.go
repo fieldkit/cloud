@@ -16,6 +16,7 @@ import (
 	activityc "github.com/fieldkit/cloud/server/api/gen/http/activity/client"
 	followingc "github.com/fieldkit/cloud/server/api/gen/http/following/client"
 	modulesc "github.com/fieldkit/cloud/server/api/gen/http/modules/client"
+	projectc "github.com/fieldkit/cloud/server/api/gen/http/project/client"
 	tasksc "github.com/fieldkit/cloud/server/api/gen/http/tasks/client"
 	testc "github.com/fieldkit/cloud/server/api/gen/http/test/client"
 	goahttp "goa.design/goa/v3/http"
@@ -29,6 +30,7 @@ import (
 func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
+project update
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -37,11 +39,13 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 6080657362268086325 --page 5376548474285186168 --auth "Iure quasi."` + "\n" +
-		os.Args[0] + ` following follow --id 8553307744897445340 --auth "Veniam in eos dolor in dolorem."` + "\n" +
+	return os.Args[0] + ` activity station --id 5486421500064581089 --page 6088390071233654030 --auth "Architecto optio est."` + "\n" +
+		os.Args[0] + ` following follow --id 3062136359637568530 --auth "Dolor voluptate ipsum vero."` + "\n" +
+		os.Args[0] + ` project update --body '{
+      "body": "Quam aut quod."
+   }' --id 2037873105037522950 --auth "Corrupti asperiores omnis iusto repellat tenetur quos."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 373217653558449232` + "\n" +
-		os.Args[0] + ` modules meta` + "\n" +
+		os.Args[0] + ` test get --id 5826561164485653265` + "\n" +
 		""
 }
 
@@ -81,6 +85,13 @@ func ParseEndpoint(
 		followingFollowersIDFlag   = followingFollowersFlags.String("id", "REQUIRED", "")
 		followingFollowersPageFlag = followingFollowersFlags.String("page", "", "")
 
+		projectFlags = flag.NewFlagSet("project", flag.ContinueOnError)
+
+		projectUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
+		projectUpdateBodyFlag = projectUpdateFlags.String("body", "REQUIRED", "")
+		projectUpdateIDFlag   = projectUpdateFlags.String("id", "REQUIRED", "")
+		projectUpdateAuthFlag = projectUpdateFlags.String("auth", "", "")
+
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
 		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
@@ -113,6 +124,9 @@ func ParseEndpoint(
 	followingUnfollowFlags.Usage = followingUnfollowUsage
 	followingFollowersFlags.Usage = followingFollowersUsage
 
+	projectFlags.Usage = projectUsage
+	projectUpdateFlags.Usage = projectUpdateUsage
+
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
 	tasksRefreshDeviceFlags.Usage = tasksRefreshDeviceUsage
@@ -144,6 +158,8 @@ func ParseEndpoint(
 			svcf = activityFlags
 		case "following":
 			svcf = followingFlags
+		case "project":
+			svcf = projectFlags
 		case "tasks":
 			svcf = tasksFlags
 		case "test":
@@ -185,6 +201,13 @@ func ParseEndpoint(
 
 			case "followers":
 				epf = followingFollowersFlags
+
+			}
+
+		case "project":
+			switch epn {
+			case "update":
+				epf = projectUpdateFlags
 
 			}
 
@@ -261,6 +284,13 @@ func ParseEndpoint(
 				endpoint = c.Followers()
 				data, err = followingc.BuildFollowersPayload(*followingFollowersIDFlag, *followingFollowersPageFlag)
 			}
+		case "project":
+			c := projectc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "update":
+				endpoint = c.Update()
+				data, err = projectc.BuildUpdatePayload(*projectUpdateBodyFlag, *projectUpdateIDFlag, *projectUpdateAuthFlag)
+			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -323,7 +353,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 6080657362268086325 --page 5376548474285186168 --auth "Iure quasi."
+    `+os.Args[0]+` activity station --id 5486421500064581089 --page 6088390071233654030 --auth "Architecto optio est."
 `, os.Args[0])
 }
 
@@ -336,7 +366,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 6252355947394424007 --page 1472691811713346493 --auth "Beatae magni aliquam perferendis facilis."
+    `+os.Args[0]+` activity project --id 1371476681718665877 --page 9071673630128706644 --auth "Dolorem similique."
 `, os.Args[0])
 }
 
@@ -364,7 +394,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 8553307744897445340 --auth "Veniam in eos dolor in dolorem."
+    `+os.Args[0]+` following follow --id 3062136359637568530 --auth "Dolor voluptate ipsum vero."
 `, os.Args[0])
 }
 
@@ -376,7 +406,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 6662948449049487245 --auth "Vero voluptas vitae harum est."
+    `+os.Args[0]+` following unfollow --id 9214093855381097241 --auth "Minima aut."
 `, os.Args[0])
 }
 
@@ -388,7 +418,35 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 7655476663666812645 --page 5461354606995255224
+    `+os.Args[0]+` following followers --id 52167979398353265 --page 2519381270872651426
+`, os.Args[0])
+}
+
+// projectUsage displays the usage of the project command and its subcommands.
+func projectUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the project service interface.
+Usage:
+    %s [globalflags] project COMMAND [flags]
+
+COMMAND:
+    update: Update implements update.
+
+Additional help:
+    %s project COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func projectUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project update -body JSON -id INT64 -auth STRING
+
+Update implements update.
+    -body JSON: 
+    -id INT64: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project update --body '{
+      "body": "Quam aut quod."
+   }' --id 2037873105037522950 --auth "Corrupti asperiores omnis iusto repellat tenetur quos."
 `, os.Args[0])
 }
 
@@ -424,7 +482,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Quis earum nulla." --auth "Dolores ut quam aut quod eum itaque."
+    `+os.Args[0]+` tasks refresh- device --device-id "Aut numquam aliquam in." --auth "Laborum suscipit ut."
 `, os.Args[0])
 }
 
@@ -450,7 +508,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 373217653558449232
+    `+os.Args[0]+` test get --id 5826561164485653265
 `, os.Args[0])
 }
 
@@ -472,7 +530,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Nobis tempore." --auth "Numquam aliquam in quod laborum suscipit ut."
+    `+os.Args[0]+` test email --address "Quidem a asperiores consequatur architecto quam fugit." --auth "Consequatur aliquam dignissimos quia."
 `, os.Args[0])
 }
 

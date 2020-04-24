@@ -54,6 +54,7 @@ func ScanStationIngestionWM(rows *sqlx.Rows) (interface{}, error) {
 	if err := rows.Scan(&v.ID, &v.CreatedAt, &v.StationID, &v.Data.ID, &v.Data.Records, &v.Errors, &v.Uploader.ID, &v.Uploader.Name); err != nil {
 		return nil, err
 	}
+
 	return v, nil
 }
 
@@ -85,5 +86,6 @@ func ScanProjectUpdateWM(rows *sqlx.Rows) (interface{}, error) {
 	if err := rows.Scan(&v.ID, &v.CreatedAt, &v.ProjectID, &v.Body, &v.Author.ID, &v.Author.Name); err != nil {
 		return nil, err
 	}
+
 	return v, nil
 }
