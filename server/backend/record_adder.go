@@ -250,8 +250,11 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 
 type WriteInfo struct {
 	TotalRecords int64
+	DataRecords  int64
+	MetaRecords  int64
 	MetaErrors   int64
 	DataErrors   int64
+	StationID    *int32
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (info *WriteInfo, err error) {
@@ -369,8 +372,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		"start_human", prettyTime(ra.statistics.start),
 		"end_human", prettyTime(ra.statistics.end))
 
+	var stationID *int32
 	if station != nil {
 		withInfo = withInfo.With("station_name", station.Name)
+		stationID = &station.ID
 	}
 
 	withInfo.Infow("processed")
@@ -383,8 +388,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 
 	info = &WriteInfo{
 		TotalRecords: int64(totalRecords),
+		MetaRecords:  int64(metaProcessed),
+		DataRecords:  int64(dataProcessed),
 		MetaErrors:   int64(metaErrors),
 		DataErrors:   int64(dataErrors),
+		StationID:    stationID,
 	}
 
 	return

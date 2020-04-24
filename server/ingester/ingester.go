@@ -133,9 +133,10 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
 
 		if err := o.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time: ingestion.Time,
-			ID:   ingestion.ID,
-			URL:  saved.URL,
+			Time:   ingestion.Time,
+			ID:     ingestion.ID,
+			URL:    saved.URL,
+			UserID: int64(userID),
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}

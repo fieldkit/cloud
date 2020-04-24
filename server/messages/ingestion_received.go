@@ -7,4 +7,5 @@ type IngestionReceived struct {
 	ID      int64
 	URL     string
 	Verbose bool
+	UserID  int64
 }

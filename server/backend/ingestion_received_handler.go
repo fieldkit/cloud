@@ -2,14 +2,15 @@ package backend
 
 import (
 	"context"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/messages"
-
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type IngestionReceivedHandler struct {
@@ -51,6 +52,39 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		if err != nil {
 			return err
 		}
+	}
+
+	if err := recordIngestionActivity(ctx, h.Database, m, info); err != nil {
+		log.Errow("ingestion", "error", err)
+	} else {
+		log.Infow("activity added")
+	}
+
+	return nil
+}
+
+func recordIngestionActivity(ctx context.Context, database *sqlxcache.DB, m *messages.IngestionReceived, info *WriteInfo) error {
+	if info.StationID == nil {
+		return nil
+	}
+
+	if info.DataRecords > 0 {
+		return nil
+	}
+
+	activity := &data.StationIngestion{
+		StationActivity: data.StationActivity{
+			CreatedAt: time.Now(),
+			StationID: int64(*info.StationID),
+		},
+		UploaderID:      m.UserID,
+		DataIngestionID: m.ID,
+		DataRecords:     info.DataRecords,
+		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
+	}
+
+	if _, err := database.NamedExecContext(ctx, `INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors) VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)`, &activity); err != nil {
+		return err
 	}
 
 	return nil
