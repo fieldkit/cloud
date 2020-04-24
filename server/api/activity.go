@@ -49,22 +49,22 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 
 	offset := pageNumber * pageSize
 
-	deployed, err := r.QueryStationDeployed(ctx, payload.ID, pageSize, offset)
+	deployed, err := r.QueryStationDeployed(ctx, nil, &payload.ID, pageSize, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	ingested, err := r.QueryStationIngested(ctx, payload.ID, pageSize, offset)
+	ingested, err := r.QueryStationIngested(ctx, nil, &payload.ID, pageSize, offset)
 	if err != nil {
 		return nil, err
 	}
-
-	activities := make([]*activity.StationActivity, 0, len(deployed)+len(ingested))
 
 	stationSummary := &activity.StationSummary{
 		ID:   int64(station.ID),
 		Name: station.Name,
 	}
+
+	activities := make([]*activity.StationActivity, 0, len(deployed)+len(ingested))
 
 	for _, a := range deployed {
 		activities = append(activities, &activity.StationActivity{
@@ -126,14 +126,57 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		return nil, err
 	}
 
-	activities := make([]*activity.ProjectActivity, 0, len(updates))
+	deployed, err := r.QueryStationDeployed(ctx, &payload.ID, nil, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	ingested, err := r.QueryStationIngested(ctx, &payload.ID, nil, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := r.QueryProjectActivityStations(ctx, payload.ID, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	stationsByID := make(map[int32]*activity.StationSummary)
+	for _, station := range stations {
+		stationsByID[station.ID] = &activity.StationSummary{
+			ID:   int64(station.ID),
+			Name: station.Name,
+		}
+	}
 
 	projectSummary := &activity.ProjectSummary{
 		ID:   int64(project.ID),
 		Name: project.Name,
 	}
 
+	activities := make([]*activity.ProjectActivity, 0, len(updates))
+
 	for _, a := range updates {
+		activities = append(activities, &activity.ProjectActivity{
+			ID:        a.ID,
+			CreatedAt: a.CreatedAt.Unix() * 1000,
+			Project:   projectSummary,
+			Type:      getActivityTypeName(a),
+			Meta:      a,
+		})
+	}
+
+	for _, a := range deployed {
+		activities = append(activities, &activity.ProjectActivity{
+			ID:        a.ID,
+			CreatedAt: a.CreatedAt.Unix() * 1000,
+			Project:   projectSummary,
+			Type:      getActivityTypeName(a),
+			Meta:      a,
+		})
+	}
+
+	for _, a := range ingested {
 		activities = append(activities, &activity.ProjectActivity{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
@@ -176,43 +219,42 @@ func NewActivityRepository(options *ControllerOptions) (r *ActivityRepository, e
 	return
 }
 
-func (r *ActivityRepository) QueryStationDeployed(ctx context.Context, id int64, pageSize, offset int32) ([]*data.StationDeployedWM, error) {
-	deployed := []*data.StationDeployedWM{}
+func (r *ActivityRepository) QueryStationDeployed(ctx context.Context, projectID, stationID *int64, pageSize, offset int32) ([]*data.StationDeployedWM, error) {
 	query := `
 		SELECT
 			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
 		FROM fieldkit.station_deployed AS a
 		WHERE a.id IN (
-			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1 OR $1 IS NULL) AND (station_id = $2 OR $2 IS NULL) ORDER BY created_at DESC LIMIT $3 OFFSET $4
 		)`
 
-	if err := r.options.Database.SelectContext(ctx, &deployed, query, id, pageSize, offset); err != nil {
+	deployed := []*data.StationDeployedWM{}
+	if err := r.options.Database.SelectContext(ctx, &deployed, query, projectID, stationID, pageSize, offset); err != nil {
 		return nil, err
 	}
 
 	return deployed, nil
 }
 
-func (r *ActivityRepository) QueryStationIngested(ctx context.Context, id int64, pageSize, offset int32) ([]*data.StationIngestionWM, error) {
-	ingested := []*data.StationIngestionWM{}
+func (r *ActivityRepository) QueryStationIngested(ctx context.Context, projectID, stationID *int64, pageSize, offset int32) ([]*data.StationIngestionWM, error) {
 	query := `
 		SELECT
 			a.id, a.created_at, a.station_id, a.data_ingestion_id, a.data_records, a.errors, a.uploader_id, u.name AS uploader_name
 		FROM fieldkit.station_ingestion AS a JOIN
              fieldkit.user AS u ON (u.id = a.uploader_id)
 		WHERE a.id IN (
-			SELECT id FROM fieldkit.station_activity WHERE station_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
+			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1 OR $1 IS NULL) AND (station_id = $2 OR $2 IS NULL) ORDER BY created_at DESC LIMIT $3 OFFSET $4
 		)`
 
-	if err := r.options.Querier.SelectContextCustom(ctx, &ingested, data.ScanStationIngestionWM, query, id, pageSize, offset); err != nil {
+	ingested := []*data.StationIngestionWM{}
+	if err := r.options.Querier.SelectContextCustom(ctx, &ingested, data.ScanStationIngestionWM, query, projectID, stationID, pageSize, offset); err != nil {
 		return nil, err
 	}
 
 	return ingested, nil
 }
 
-func (r *ActivityRepository) QueryProjectUpdate(ctx context.Context, id int64, pageSize, offset int32) ([]*data.ProjectUpdateWM, error) {
-	updates := []*data.ProjectUpdateWM{}
+func (r *ActivityRepository) QueryProjectUpdate(ctx context.Context, projectID int64, pageSize, offset int32) ([]*data.ProjectUpdateWM, error) {
 	query := `
 		SELECT
 			a.id, a.created_at, a.project_id, a.body, a.author_id, u.name AS author_name
@@ -222,11 +264,26 @@ func (r *ActivityRepository) QueryProjectUpdate(ctx context.Context, id int64, p
 			SELECT id FROM fieldkit.project_activity WHERE project_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
 		)`
 
-	if err := r.options.Querier.SelectContextCustom(ctx, &updates, data.ScanProjectUpdateWM, query, id, pageSize, offset); err != nil {
+	updates := []*data.ProjectUpdateWM{}
+	if err := r.options.Querier.SelectContextCustom(ctx, &updates, data.ScanProjectUpdateWM, query, projectID, pageSize, offset); err != nil {
 		return nil, err
 	}
 
 	return updates, nil
+}
+
+func (r *ActivityRepository) QueryProjectActivityStations(ctx context.Context, projectID int64, pageSize, offset int32) ([]*data.Station, error) {
+	query := `
+		SELECT s.* FROM fieldkit.station AS s WHERE s.id IN (
+			SELECT station_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1) ORDER BY created_at DESC LIMIT $2 OFFSET $3
+		)`
+
+	stations := []*data.Station{}
+	if err := r.options.Database.SelectContext(ctx, &stations, query, projectID, pageSize, offset); err != nil {
+		return nil, err
+	}
+
+	return stations, nil
 }
 
 type StationActivitiesByCreatedAt []*activity.StationActivity

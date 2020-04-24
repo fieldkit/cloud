@@ -1,5 +1,47 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
+CREATE OR REPLACE VIEW fieldkit.project_and_station_activity AS
+	SELECT sa.created_at, ps.project_id, sa.station_id, sa.id AS station_activity_id, NULL AS project_activity_id FROM
+			fieldkit.project_station AS ps
+	   JOIN fieldkit.station_activity AS sa ON (ps.station_id = sa.station_id)
+	UNION
+	SELECT pa.created_at, pa.project_id, NULL, NULL, pa.id AS project_activity_id FROM
+		   fieldkit.project_activity AS pa;
+
+SELECT * FROM fieldkit.project_and_station_activity;
+
+#+END_SRC
+
+#+RESULTS:
+| CREATE VIEW                |            |            |                     |                     |
+|----------------------------+------------+------------+---------------------+---------------------|
+| created_at                 | project_id | station_id | station_activity_id | project_activity_id |
+| 2020-04-24 17:42:51.568139 |          1 |          1 |                   1 |                     |
+| 2020-04-24 17:42:51.575901 |          1 |          1 |                   2 |                     |
+| 2020-04-24 17:50:31.004445 |          1 |            |                     |                   1 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+insert into fieldkit.project_station (project_id, station_id) values (1, 1) on conflict do nothing;
+insert into fieldkit.project_update  (created_at, project_id, author_id, body) values (now(), 1, 2, 'Hello!');
+insert into fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors) values (now(), 1, 2, 15, 100, false);
+insert into fieldkit.station_deployed  (created_at, station_id, deployed_at, location) values (now(), 1, now(), st_setsrid(st_point(-71.104, 42.315), 4326));
+/*
+insert into fieldkit.project_station_activity (created_at, project_id, station_activity_id) values ('2020-04-22 18:51:56.583585', 1, 1);
+insert into fieldkit.project_station_activity (created_at, project_id, station_activity_id) values ('2020-04-22 18:51:56.583585', 1, 2);
+*/
+
+#+END_SRC
+
+#+RESULTS:
+| INSERT 0 1 |
+|------------|
+| INSERT 0 1 |
+| INSERT 0 1 |
+| INSERT 0 1 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
 SELECT *
          FROM fieldkit.station_activity AS a
 	LEFT JOIN fieldkit.station_deployed AS sd ON (a.id = sd.id)
@@ -112,3 +154,28 @@ SELECT ST_Buffer(ST_GeomFromText('POINT(1 1)'), 10) ~ ST_MakeBox2D(ST_MakePoint(
 | contains |
 |----------|
 | t        |
+
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
+SELECT * FROM fieldkit.project_and_station_activity ORDER BY created_at DESC;
+
+		SELECT
+			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
+		FROM fieldkit.station_deployed AS a
+		WHERE a.id IN (
+
+			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE (1 IS NULL OR project_id = 1) AND (1 IS NULL OR station_id = 1) ORDER BY created_at DESC
+
+		)
+
+#+END_SRC
+
+#+RESULTS:
+| created_at                 |                 project_id | station_id | station_activity_id        | project_activity_id                          |
+|----------------------------+----------------------------+------------+----------------------------+----------------------------------------------|
+| 2020-04-24 18:04:39.921296 |                          1 |          1 | 2                          |                                              |
+| 2020-04-24 18:04:39.916216 |                          1 |          1 | 1                          |                                              |
+| 2020-04-24 18:04:39.911111 |                          1 |            |                            | 1                                            |
+| id                         |                 created_at | station_id | deployed_at                | location                                     |
+| 2                          | 2020-04-24 18:04:39.921296 |          1 | 2020-04-24 18:04:39.921296 | \x01010000002db29defa7c651c0b81e85eb51284540 |
