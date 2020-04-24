@@ -196,44 +196,18 @@ func DecodeProjectResponse(decoder func(*http.Response) goahttp.Decoder, restore
 	}
 }
 
-// unmarshalStationActivityResponseBodyToActivityviewsStationActivityView
-// builds a value of type *activityviews.StationActivityView from a value of
-// type *StationActivityResponseBody.
-func unmarshalStationActivityResponseBodyToActivityviewsStationActivityView(v *StationActivityResponseBody) *activityviews.StationActivityView {
-	res := &activityviews.StationActivityView{
-		ID:        v.ID,
-		CreatedAt: v.CreatedAt,
-		Type:      v.Type,
-		Meta:      v.Meta,
-	}
-	res.Station = unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView(v.Station)
-
-	return res
-}
-
-// unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView builds
-// a value of type *activityviews.StationSummaryView from a value of type
-// *StationSummaryResponseBody.
-func unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView(v *StationSummaryResponseBody) *activityviews.StationSummaryView {
-	res := &activityviews.StationSummaryView{
-		ID:   v.ID,
-		Name: v.Name,
-	}
-
-	return res
-}
-
-// unmarshalProjectActivityResponseBodyToActivityviewsProjectActivityView
-// builds a value of type *activityviews.ProjectActivityView from a value of
-// type *ProjectActivityResponseBody.
-func unmarshalProjectActivityResponseBodyToActivityviewsProjectActivityView(v *ProjectActivityResponseBody) *activityviews.ProjectActivityView {
-	res := &activityviews.ProjectActivityView{
+// unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView builds a
+// value of type *activityviews.ActivityEntryView from a value of type
+// *ActivityEntryResponseBody.
+func unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView(v *ActivityEntryResponseBody) *activityviews.ActivityEntryView {
+	res := &activityviews.ActivityEntryView{
 		ID:        v.ID,
 		CreatedAt: v.CreatedAt,
 		Type:      v.Type,
 		Meta:      v.Meta,
 	}
 	res.Project = unmarshalProjectSummaryResponseBodyToActivityviewsProjectSummaryView(v.Project)
+	res.Station = unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView(v.Station)
 
 	return res
 }
@@ -243,6 +217,18 @@ func unmarshalProjectActivityResponseBodyToActivityviewsProjectActivityView(v *P
 // *ProjectSummaryResponseBody.
 func unmarshalProjectSummaryResponseBodyToActivityviewsProjectSummaryView(v *ProjectSummaryResponseBody) *activityviews.ProjectSummaryView {
 	res := &activityviews.ProjectSummaryView{
+		ID:   v.ID,
+		Name: v.Name,
+	}
+
+	return res
+}
+
+// unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView builds
+// a value of type *activityviews.StationSummaryView from a value of type
+// *StationSummaryResponseBody.
+func unmarshalStationSummaryResponseBodyToActivityviewsStationSummaryView(v *StationSummaryResponseBody) *activityviews.StationSummaryView {
+	res := &activityviews.StationSummaryView{
 		ID:   v.ID,
 		Name: v.Name,
 	}

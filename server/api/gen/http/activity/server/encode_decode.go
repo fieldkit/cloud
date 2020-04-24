@@ -142,40 +142,11 @@ func DecodeProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 	}
 }
 
-// marshalActivityviewsStationActivityViewToStationActivityResponseBody builds
-// a value of type *StationActivityResponseBody from a value of type
-// *activityviews.StationActivityView.
-func marshalActivityviewsStationActivityViewToStationActivityResponseBody(v *activityviews.StationActivityView) *StationActivityResponseBody {
-	res := &StationActivityResponseBody{
-		ID:        *v.ID,
-		CreatedAt: *v.CreatedAt,
-		Type:      *v.Type,
-		Meta:      v.Meta,
-	}
-	if v.Station != nil {
-		res.Station = marshalActivityviewsStationSummaryViewToStationSummaryResponseBody(v.Station)
-	}
-
-	return res
-}
-
-// marshalActivityviewsStationSummaryViewToStationSummaryResponseBody builds a
-// value of type *StationSummaryResponseBody from a value of type
-// *activityviews.StationSummaryView.
-func marshalActivityviewsStationSummaryViewToStationSummaryResponseBody(v *activityviews.StationSummaryView) *StationSummaryResponseBody {
-	res := &StationSummaryResponseBody{
-		ID:   *v.ID,
-		Name: *v.Name,
-	}
-
-	return res
-}
-
-// marshalActivityviewsProjectActivityViewToProjectActivityResponseBody builds
-// a value of type *ProjectActivityResponseBody from a value of type
-// *activityviews.ProjectActivityView.
-func marshalActivityviewsProjectActivityViewToProjectActivityResponseBody(v *activityviews.ProjectActivityView) *ProjectActivityResponseBody {
-	res := &ProjectActivityResponseBody{
+// marshalActivityviewsActivityEntryViewToActivityEntryResponseBody builds a
+// value of type *ActivityEntryResponseBody from a value of type
+// *activityviews.ActivityEntryView.
+func marshalActivityviewsActivityEntryViewToActivityEntryResponseBody(v *activityviews.ActivityEntryView) *ActivityEntryResponseBody {
+	res := &ActivityEntryResponseBody{
 		ID:        *v.ID,
 		CreatedAt: *v.CreatedAt,
 		Type:      *v.Type,
@@ -183,6 +154,9 @@ func marshalActivityviewsProjectActivityViewToProjectActivityResponseBody(v *act
 	}
 	if v.Project != nil {
 		res.Project = marshalActivityviewsProjectSummaryViewToProjectSummaryResponseBody(v.Project)
+	}
+	if v.Station != nil {
+		res.Station = marshalActivityviewsStationSummaryViewToStationSummaryResponseBody(v.Station)
 	}
 
 	return res
@@ -193,6 +167,18 @@ func marshalActivityviewsProjectActivityViewToProjectActivityResponseBody(v *act
 // *activityviews.ProjectSummaryView.
 func marshalActivityviewsProjectSummaryViewToProjectSummaryResponseBody(v *activityviews.ProjectSummaryView) *ProjectSummaryResponseBody {
 	res := &ProjectSummaryResponseBody{
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+
+	return res
+}
+
+// marshalActivityviewsStationSummaryViewToStationSummaryResponseBody builds a
+// value of type *StationSummaryResponseBody from a value of type
+// *activityviews.StationSummaryView.
+func marshalActivityviewsStationSummaryViewToStationSummaryResponseBody(v *activityviews.StationSummaryView) *StationSummaryResponseBody {
+	res := &StationSummaryResponseBody{
 		ID:   *v.ID,
 		Name: *v.Name,
 	}

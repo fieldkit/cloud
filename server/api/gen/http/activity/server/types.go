@@ -15,46 +15,28 @@ import (
 // StationResponseBody is the type of the "activity" service "station" endpoint
 // HTTP response body.
 type StationResponseBody struct {
-	Activities StationActivityResponseBodyCollection `form:"activities" json:"activities" xml:"activities"`
-	Total      int32                                 `form:"total" json:"total" xml:"total"`
-	Page       int32                                 `form:"page" json:"page" xml:"page"`
+	Activities ActivityEntryResponseBodyCollection `form:"activities" json:"activities" xml:"activities"`
+	Total      int32                               `form:"total" json:"total" xml:"total"`
+	Page       int32                               `form:"page" json:"page" xml:"page"`
 }
 
 // ProjectResponseBody is the type of the "activity" service "project" endpoint
 // HTTP response body.
 type ProjectResponseBody struct {
-	Activities ProjectActivityResponseBodyCollection `form:"activities" json:"activities" xml:"activities"`
-	Total      int32                                 `form:"total" json:"total" xml:"total"`
-	Page       int32                                 `form:"page" json:"page" xml:"page"`
+	Activities ActivityEntryResponseBodyCollection `form:"activities" json:"activities" xml:"activities"`
+	Total      int32                               `form:"total" json:"total" xml:"total"`
+	Page       int32                               `form:"page" json:"page" xml:"page"`
 }
 
-// StationActivityResponseBodyCollection is used to define fields on response
+// ActivityEntryResponseBodyCollection is used to define fields on response
 // body types.
-type StationActivityResponseBodyCollection []*StationActivityResponseBody
+type ActivityEntryResponseBodyCollection []*ActivityEntryResponseBody
 
-// StationActivityResponseBody is used to define fields on response body types.
-type StationActivityResponseBody struct {
-	ID        int64                       `form:"id" json:"id" xml:"id"`
-	Station   *StationSummaryResponseBody `form:"station" json:"station" xml:"station"`
-	CreatedAt int64                       `form:"created_at" json:"created_at" xml:"created_at"`
-	Type      string                      `form:"type" json:"type" xml:"type"`
-	Meta      interface{}                 `form:"meta" json:"meta" xml:"meta"`
-}
-
-// StationSummaryResponseBody is used to define fields on response body types.
-type StationSummaryResponseBody struct {
-	ID   int64  `form:"id" json:"id" xml:"id"`
-	Name string `form:"name" json:"name" xml:"name"`
-}
-
-// ProjectActivityResponseBodyCollection is used to define fields on response
-// body types.
-type ProjectActivityResponseBodyCollection []*ProjectActivityResponseBody
-
-// ProjectActivityResponseBody is used to define fields on response body types.
-type ProjectActivityResponseBody struct {
+// ActivityEntryResponseBody is used to define fields on response body types.
+type ActivityEntryResponseBody struct {
 	ID        int64                       `form:"id" json:"id" xml:"id"`
 	Project   *ProjectSummaryResponseBody `form:"project" json:"project" xml:"project"`
+	Station   *StationSummaryResponseBody `form:"station" json:"station" xml:"station"`
 	CreatedAt int64                       `form:"created_at" json:"created_at" xml:"created_at"`
 	Type      string                      `form:"type" json:"type" xml:"type"`
 	Meta      interface{}                 `form:"meta" json:"meta" xml:"meta"`
@@ -62,6 +44,12 @@ type ProjectActivityResponseBody struct {
 
 // ProjectSummaryResponseBody is used to define fields on response body types.
 type ProjectSummaryResponseBody struct {
+	ID   int64  `form:"id" json:"id" xml:"id"`
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// StationSummaryResponseBody is used to define fields on response body types.
+type StationSummaryResponseBody struct {
 	ID   int64  `form:"id" json:"id" xml:"id"`
 	Name string `form:"name" json:"name" xml:"name"`
 }
@@ -74,9 +62,9 @@ func NewStationResponseBody(res *activityviews.StationActivityPageView) *Station
 		Page:  *res.Page,
 	}
 	if res.Activities != nil {
-		body.Activities = make([]*StationActivityResponseBody, len(res.Activities))
+		body.Activities = make([]*ActivityEntryResponseBody, len(res.Activities))
 		for i, val := range res.Activities {
-			body.Activities[i] = marshalActivityviewsStationActivityViewToStationActivityResponseBody(val)
+			body.Activities[i] = marshalActivityviewsActivityEntryViewToActivityEntryResponseBody(val)
 		}
 	}
 	return body
@@ -90,9 +78,9 @@ func NewProjectResponseBody(res *activityviews.ProjectActivityPageView) *Project
 		Page:  *res.Page,
 	}
 	if res.Activities != nil {
-		body.Activities = make([]*ProjectActivityResponseBody, len(res.Activities))
+		body.Activities = make([]*ActivityEntryResponseBody, len(res.Activities))
 		for i, val := range res.Activities {
-			body.Activities[i] = marshalActivityviewsProjectActivityViewToProjectActivityResponseBody(val)
+			body.Activities[i] = marshalActivityviewsActivityEntryViewToActivityEntryResponseBody(val)
 		}
 	}
 	return body

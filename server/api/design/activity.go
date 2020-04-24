@@ -10,18 +10,26 @@ var StationSummary = Type("StationSummary", func() {
 	Required("id", "name")
 })
 
-var StationActivity = ResultType("application/vnd.app.station.activity", func() {
-	TypeName("StationActivity")
+var ProjectSummary = Type("ProjectSummary", func() {
+	Attribute("id", Int64)
+	Attribute("name", String)
+	Required("id", "name")
+})
+
+var ActivityEntry = ResultType("application/vnd.app.activity.entry", func() {
+	TypeName("ActivityEntry")
 	Attributes(func() {
 		Attribute("id", Int64)
+		Attribute("project", ProjectSummary)
 		Attribute("station", StationSummary)
 		Attribute("created_at", Int64)
 		Attribute("type", String)
 		Attribute("meta", Any)
-		Required("id", "station", "created_at", "type", "meta")
+		Required("id", "project", "station", "created_at", "type", "meta")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("project")
 		Attribute("station")
 		Attribute("created_at")
 		Attribute("type")
@@ -32,42 +40,17 @@ var StationActivity = ResultType("application/vnd.app.station.activity", func() 
 var StationActivityPage = ResultType("application/vnd.app.station.activity.page", func() {
 	TypeName("StationActivityPage")
 	Attributes(func() {
-		Attribute("activities", CollectionOf(StationActivity))
+		Attribute("activities", CollectionOf(ActivityEntry))
 		Attribute("total", Int32)
 		Attribute("page", Int32)
 		Required("activities", "total", "page")
 	})
 })
 
-var ProjectSummary = Type("ProjectSummary", func() {
-	Attribute("id", Int64)
-	Attribute("name", String)
-	Required("id", "name")
-})
-
-var ProjectActivity = ResultType("application/vnd.app.project.activity", func() {
-	TypeName("ProjectActivity")
-	Attributes(func() {
-		Attribute("id", Int64)
-		Attribute("project", ProjectSummary)
-		Attribute("created_at", Int64)
-		Attribute("type", String)
-		Attribute("meta", Any)
-		Required("id", "project", "created_at", "type", "meta")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("project")
-		Attribute("created_at")
-		Attribute("type")
-		Attribute("meta")
-	})
-})
-
 var ProjectActivityPage = ResultType("application/vnd.app.project.activity.page", func() {
 	TypeName("ProjectActivityPage")
 	Attributes(func() {
-		Attribute("activities", CollectionOf(ProjectActivity))
+		Attribute("activities", CollectionOf(ActivityEntry))
 		Attribute("total", Int32)
 		Attribute("page", Int32)
 		Required("activities", "total", "page")

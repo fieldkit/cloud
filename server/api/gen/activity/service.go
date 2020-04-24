@@ -48,7 +48,7 @@ type StationPayload struct {
 // StationActivityPage is the result type of the activity service station
 // method.
 type StationActivityPage struct {
-	Activities StationActivityCollection
+	Activities ActivityEntryCollection
 	Total      int32
 	Page       int32
 }
@@ -63,37 +63,28 @@ type ProjectPayload struct {
 // ProjectActivityPage is the result type of the activity service project
 // method.
 type ProjectActivityPage struct {
-	Activities ProjectActivityCollection
+	Activities ActivityEntryCollection
 	Total      int32
 	Page       int32
 }
 
-type StationActivityCollection []*StationActivity
+type ActivityEntryCollection []*ActivityEntry
 
-type StationActivity struct {
+type ActivityEntry struct {
 	ID        int64
+	Project   *ProjectSummary
 	Station   *StationSummary
 	CreatedAt int64
 	Type      string
 	Meta      interface{}
 }
 
-type StationSummary struct {
+type ProjectSummary struct {
 	ID   int64
 	Name string
 }
 
-type ProjectActivityCollection []*ProjectActivity
-
-type ProjectActivity struct {
-	ID        int64
-	Project   *ProjectSummary
-	CreatedAt int64
-	Type      string
-	Meta      interface{}
-}
-
-type ProjectSummary struct {
+type StationSummary struct {
 	ID   int64
 	Name string
 }
@@ -137,7 +128,7 @@ func newStationActivityPage(vres *activityviews.StationActivityPageView) *Statio
 		res.Page = *vres.Page
 	}
 	if vres.Activities != nil {
-		res.Activities = newStationActivityCollection(vres.Activities)
+		res.Activities = newActivityEntryCollection(vres.Activities)
 	}
 	return res
 }
@@ -150,36 +141,35 @@ func newStationActivityPageView(res *StationActivityPage) *activityviews.Station
 		Page:  &res.Page,
 	}
 	if res.Activities != nil {
-		vres.Activities = newStationActivityCollectionView(res.Activities)
+		vres.Activities = newActivityEntryCollectionView(res.Activities)
 	}
 	return vres
 }
 
-// newStationActivityCollection converts projected type
-// StationActivityCollection to service type StationActivityCollection.
-func newStationActivityCollection(vres activityviews.StationActivityCollectionView) StationActivityCollection {
-	res := make(StationActivityCollection, len(vres))
+// newActivityEntryCollection converts projected type ActivityEntryCollection
+// to service type ActivityEntryCollection.
+func newActivityEntryCollection(vres activityviews.ActivityEntryCollectionView) ActivityEntryCollection {
+	res := make(ActivityEntryCollection, len(vres))
 	for i, n := range vres {
-		res[i] = newStationActivity(n)
+		res[i] = newActivityEntry(n)
 	}
 	return res
 }
 
-// newStationActivityCollectionView projects result type
-// StationActivityCollection to projected type StationActivityCollectionView
-// using the "default" view.
-func newStationActivityCollectionView(res StationActivityCollection) activityviews.StationActivityCollectionView {
-	vres := make(activityviews.StationActivityCollectionView, len(res))
+// newActivityEntryCollectionView projects result type ActivityEntryCollection
+// to projected type ActivityEntryCollectionView using the "default" view.
+func newActivityEntryCollectionView(res ActivityEntryCollection) activityviews.ActivityEntryCollectionView {
+	vres := make(activityviews.ActivityEntryCollectionView, len(res))
 	for i, n := range res {
-		vres[i] = newStationActivityView(n)
+		vres[i] = newActivityEntryView(n)
 	}
 	return vres
 }
 
-// newStationActivity converts projected type StationActivity to service type
-// StationActivity.
-func newStationActivity(vres *activityviews.StationActivityView) *StationActivity {
-	res := &StationActivity{
+// newActivityEntry converts projected type ActivityEntry to service type
+// ActivityEntry.
+func newActivityEntry(vres *activityviews.ActivityEntryView) *ActivityEntry {
+	res := &ActivityEntry{
 		Meta: vres.Meta,
 	}
 	if vres.ID != nil {
@@ -191,20 +181,26 @@ func newStationActivity(vres *activityviews.StationActivityView) *StationActivit
 	if vres.Type != nil {
 		res.Type = *vres.Type
 	}
+	if vres.Project != nil {
+		res.Project = transformActivityviewsProjectSummaryViewToProjectSummary(vres.Project)
+	}
 	if vres.Station != nil {
 		res.Station = transformActivityviewsStationSummaryViewToStationSummary(vres.Station)
 	}
 	return res
 }
 
-// newStationActivityView projects result type StationActivity to projected
-// type StationActivityView using the "default" view.
-func newStationActivityView(res *StationActivity) *activityviews.StationActivityView {
-	vres := &activityviews.StationActivityView{
+// newActivityEntryView projects result type ActivityEntry to projected type
+// ActivityEntryView using the "default" view.
+func newActivityEntryView(res *ActivityEntry) *activityviews.ActivityEntryView {
+	vres := &activityviews.ActivityEntryView{
 		ID:        &res.ID,
 		CreatedAt: &res.CreatedAt,
 		Type:      &res.Type,
 		Meta:      res.Meta,
+	}
+	if res.Project != nil {
+		vres.Project = transformProjectSummaryToActivityviewsProjectSummaryView(res.Project)
 	}
 	if res.Station != nil {
 		vres.Station = transformStationSummaryToActivityviewsStationSummaryView(res.Station)
@@ -223,7 +219,7 @@ func newProjectActivityPage(vres *activityviews.ProjectActivityPageView) *Projec
 		res.Page = *vres.Page
 	}
 	if vres.Activities != nil {
-		res.Activities = newProjectActivityCollection(vres.Activities)
+		res.Activities = newActivityEntryCollection(vres.Activities)
 	}
 	return res
 }
@@ -236,91 +232,9 @@ func newProjectActivityPageView(res *ProjectActivityPage) *activityviews.Project
 		Page:  &res.Page,
 	}
 	if res.Activities != nil {
-		vres.Activities = newProjectActivityCollectionView(res.Activities)
+		vres.Activities = newActivityEntryCollectionView(res.Activities)
 	}
 	return vres
-}
-
-// newProjectActivityCollection converts projected type
-// ProjectActivityCollection to service type ProjectActivityCollection.
-func newProjectActivityCollection(vres activityviews.ProjectActivityCollectionView) ProjectActivityCollection {
-	res := make(ProjectActivityCollection, len(vres))
-	for i, n := range vres {
-		res[i] = newProjectActivity(n)
-	}
-	return res
-}
-
-// newProjectActivityCollectionView projects result type
-// ProjectActivityCollection to projected type ProjectActivityCollectionView
-// using the "default" view.
-func newProjectActivityCollectionView(res ProjectActivityCollection) activityviews.ProjectActivityCollectionView {
-	vres := make(activityviews.ProjectActivityCollectionView, len(res))
-	for i, n := range res {
-		vres[i] = newProjectActivityView(n)
-	}
-	return vres
-}
-
-// newProjectActivity converts projected type ProjectActivity to service type
-// ProjectActivity.
-func newProjectActivity(vres *activityviews.ProjectActivityView) *ProjectActivity {
-	res := &ProjectActivity{
-		Meta: vres.Meta,
-	}
-	if vres.ID != nil {
-		res.ID = *vres.ID
-	}
-	if vres.CreatedAt != nil {
-		res.CreatedAt = *vres.CreatedAt
-	}
-	if vres.Type != nil {
-		res.Type = *vres.Type
-	}
-	if vres.Project != nil {
-		res.Project = transformActivityviewsProjectSummaryViewToProjectSummary(vres.Project)
-	}
-	return res
-}
-
-// newProjectActivityView projects result type ProjectActivity to projected
-// type ProjectActivityView using the "default" view.
-func newProjectActivityView(res *ProjectActivity) *activityviews.ProjectActivityView {
-	vres := &activityviews.ProjectActivityView{
-		ID:        &res.ID,
-		CreatedAt: &res.CreatedAt,
-		Type:      &res.Type,
-		Meta:      res.Meta,
-	}
-	if res.Project != nil {
-		vres.Project = transformProjectSummaryToActivityviewsProjectSummaryView(res.Project)
-	}
-	return vres
-}
-
-// transformActivityviewsStationSummaryViewToStationSummary builds a value of
-// type *StationSummary from a value of type *activityviews.StationSummaryView.
-func transformActivityviewsStationSummaryViewToStationSummary(v *activityviews.StationSummaryView) *StationSummary {
-	if v == nil {
-		return nil
-	}
-	res := &StationSummary{
-		ID:   *v.ID,
-		Name: *v.Name,
-	}
-
-	return res
-}
-
-// transformStationSummaryToActivityviewsStationSummaryView builds a value of
-// type *activityviews.StationSummaryView from a value of type *StationSummary.
-func transformStationSummaryToActivityviewsStationSummaryView(v *StationSummary) *activityviews.StationSummaryView {
-	res := &activityviews.StationSummaryView{
-		ID:   &v.ID,
-		Name: &v.Name,
-	}
-
-	return res
 }
 
 // transformActivityviewsProjectSummaryViewToProjectSummary builds a value of
@@ -337,10 +251,35 @@ func transformActivityviewsProjectSummaryViewToProjectSummary(v *activityviews.P
 	return res
 }
 
+// transformActivityviewsStationSummaryViewToStationSummary builds a value of
+// type *StationSummary from a value of type *activityviews.StationSummaryView.
+func transformActivityviewsStationSummaryViewToStationSummary(v *activityviews.StationSummaryView) *StationSummary {
+	if v == nil {
+		return nil
+	}
+	res := &StationSummary{
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+
+	return res
+}
+
 // transformProjectSummaryToActivityviewsProjectSummaryView builds a value of
 // type *activityviews.ProjectSummaryView from a value of type *ProjectSummary.
 func transformProjectSummaryToActivityviewsProjectSummaryView(v *ProjectSummary) *activityviews.ProjectSummaryView {
 	res := &activityviews.ProjectSummaryView{
+		ID:   &v.ID,
+		Name: &v.Name,
+	}
+
+	return res
+}
+
+// transformStationSummaryToActivityviewsStationSummaryView builds a value of
+// type *activityviews.StationSummaryView from a value of type *StationSummary.
+func transformStationSummaryToActivityviewsStationSummaryView(v *StationSummary) *activityviews.StationSummaryView {
+	res := &activityviews.StationSummaryView{
 		ID:   &v.ID,
 		Name: &v.Name,
 	}

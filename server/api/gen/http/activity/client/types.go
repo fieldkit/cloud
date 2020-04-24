@@ -15,46 +15,28 @@ import (
 // StationResponseBody is the type of the "activity" service "station" endpoint
 // HTTP response body.
 type StationResponseBody struct {
-	Activities StationActivityCollectionResponseBody `form:"activities,omitempty" json:"activities,omitempty" xml:"activities,omitempty"`
-	Total      *int32                                `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
-	Page       *int32                                `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
+	Activities ActivityEntryCollectionResponseBody `form:"activities,omitempty" json:"activities,omitempty" xml:"activities,omitempty"`
+	Total      *int32                              `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+	Page       *int32                              `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
 }
 
 // ProjectResponseBody is the type of the "activity" service "project" endpoint
 // HTTP response body.
 type ProjectResponseBody struct {
-	Activities ProjectActivityCollectionResponseBody `form:"activities,omitempty" json:"activities,omitempty" xml:"activities,omitempty"`
-	Total      *int32                                `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
-	Page       *int32                                `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
+	Activities ActivityEntryCollectionResponseBody `form:"activities,omitempty" json:"activities,omitempty" xml:"activities,omitempty"`
+	Total      *int32                              `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+	Page       *int32                              `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
 }
 
-// StationActivityCollectionResponseBody is used to define fields on response
+// ActivityEntryCollectionResponseBody is used to define fields on response
 // body types.
-type StationActivityCollectionResponseBody []*StationActivityResponseBody
+type ActivityEntryCollectionResponseBody []*ActivityEntryResponseBody
 
-// StationActivityResponseBody is used to define fields on response body types.
-type StationActivityResponseBody struct {
-	ID        *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Station   *StationSummaryResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
-	CreatedAt *int64                      `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
-	Type      *string                     `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
-	Meta      interface{}                 `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
-}
-
-// StationSummaryResponseBody is used to define fields on response body types.
-type StationSummaryResponseBody struct {
-	ID   *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-}
-
-// ProjectActivityCollectionResponseBody is used to define fields on response
-// body types.
-type ProjectActivityCollectionResponseBody []*ProjectActivityResponseBody
-
-// ProjectActivityResponseBody is used to define fields on response body types.
-type ProjectActivityResponseBody struct {
+// ActivityEntryResponseBody is used to define fields on response body types.
+type ActivityEntryResponseBody struct {
 	ID        *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Project   *ProjectSummaryResponseBody `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Station   *StationSummaryResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
 	CreatedAt *int64                      `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	Type      *string                     `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 	Meta      interface{}                 `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
@@ -66,6 +48,12 @@ type ProjectSummaryResponseBody struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
+// StationSummaryResponseBody is used to define fields on response body types.
+type StationSummaryResponseBody struct {
+	ID   *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
 // NewStationActivityPageViewOK builds a "activity" service "station" endpoint
 // result from a HTTP "OK" response.
 func NewStationActivityPageViewOK(body *StationResponseBody) *activityviews.StationActivityPageView {
@@ -73,9 +61,9 @@ func NewStationActivityPageViewOK(body *StationResponseBody) *activityviews.Stat
 		Total: body.Total,
 		Page:  body.Page,
 	}
-	v.Activities = make([]*activityviews.StationActivityView, len(body.Activities))
+	v.Activities = make([]*activityviews.ActivityEntryView, len(body.Activities))
 	for i, val := range body.Activities {
-		v.Activities[i] = unmarshalStationActivityResponseBodyToActivityviewsStationActivityView(val)
+		v.Activities[i] = unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView(val)
 	}
 
 	return v
@@ -88,20 +76,20 @@ func NewProjectActivityPageViewOK(body *ProjectResponseBody) *activityviews.Proj
 		Total: body.Total,
 		Page:  body.Page,
 	}
-	v.Activities = make([]*activityviews.ProjectActivityView, len(body.Activities))
+	v.Activities = make([]*activityviews.ActivityEntryView, len(body.Activities))
 	for i, val := range body.Activities {
-		v.Activities[i] = unmarshalProjectActivityResponseBodyToActivityviewsProjectActivityView(val)
+		v.Activities[i] = unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView(val)
 	}
 
 	return v
 }
 
-// ValidateStationActivityCollectionResponseBody runs the validations defined
-// on StationActivityCollectionResponseBody
-func ValidateStationActivityCollectionResponseBody(body StationActivityCollectionResponseBody) (err error) {
+// ValidateActivityEntryCollectionResponseBody runs the validations defined on
+// ActivityEntryCollectionResponseBody
+func ValidateActivityEntryCollectionResponseBody(body ActivityEntryCollectionResponseBody) (err error) {
 	for _, e := range body {
 		if e != nil {
-			if err2 := ValidateStationActivityResponseBody(e); err2 != nil {
+			if err2 := ValidateActivityEntryResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -109,65 +97,17 @@ func ValidateStationActivityCollectionResponseBody(body StationActivityCollectio
 	return
 }
 
-// ValidateStationActivityResponseBody runs the validations defined on
-// StationActivityResponseBody
-func ValidateStationActivityResponseBody(body *StationActivityResponseBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Station == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("station", "body"))
-	}
-	if body.CreatedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
-	}
-	if body.Type == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("type", "body"))
-	}
-	if body.Meta == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("meta", "body"))
-	}
-	if body.Station != nil {
-		if err2 := ValidateStationSummaryResponseBody(body.Station); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateStationSummaryResponseBody runs the validations defined on
-// StationSummaryResponseBody
-func ValidateStationSummaryResponseBody(body *StationSummaryResponseBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	return
-}
-
-// ValidateProjectActivityCollectionResponseBody runs the validations defined
-// on ProjectActivityCollectionResponseBody
-func ValidateProjectActivityCollectionResponseBody(body ProjectActivityCollectionResponseBody) (err error) {
-	for _, e := range body {
-		if e != nil {
-			if err2 := ValidateProjectActivityResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// ValidateProjectActivityResponseBody runs the validations defined on
-// ProjectActivityResponseBody
-func ValidateProjectActivityResponseBody(body *ProjectActivityResponseBody) (err error) {
+// ValidateActivityEntryResponseBody runs the validations defined on
+// ActivityEntryResponseBody
+func ValidateActivityEntryResponseBody(body *ActivityEntryResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	if body.Project == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("project", "body"))
+	}
+	if body.Station == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("station", "body"))
 	}
 	if body.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
@@ -183,12 +123,29 @@ func ValidateProjectActivityResponseBody(body *ProjectActivityResponseBody) (err
 			err = goa.MergeErrors(err, err2)
 		}
 	}
+	if body.Station != nil {
+		if err2 := ValidateStationSummaryResponseBody(body.Station); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
 // ValidateProjectSummaryResponseBody runs the validations defined on
 // ProjectSummaryResponseBody
 func ValidateProjectSummaryResponseBody(body *ProjectSummaryResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateStationSummaryResponseBody runs the validations defined on
+// StationSummaryResponseBody
+func ValidateStationSummaryResponseBody(body *StationSummaryResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}

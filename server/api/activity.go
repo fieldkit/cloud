@@ -64,10 +64,10 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		Name: station.Name,
 	}
 
-	activities := make([]*activity.StationActivity, 0, len(deployed)+len(ingested))
+	activities := make([]*activity.ActivityEntry, 0, len(deployed)+len(ingested))
 
 	for _, a := range deployed {
-		activities = append(activities, &activity.StationActivity{
+		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Station:   stationSummary,
@@ -77,7 +77,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 	}
 
 	for _, a := range ingested {
-		activities = append(activities, &activity.StationActivity{
+		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Station:   stationSummary,
@@ -86,7 +86,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		})
 	}
 
-	sort.Sort(StationActivitiesByCreatedAt(activities))
+	sort.Sort(ActivitiesByCreatedAt(activities))
 
 	page = &activity.StationActivityPage{
 		Activities: activities,
@@ -141,9 +141,9 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		return nil, err
 	}
 
-	stationsByID := make(map[int32]*activity.StationSummary)
+	stationsByID := make(map[int64]*activity.StationSummary)
 	for _, station := range stations {
-		stationsByID[station.ID] = &activity.StationSummary{
+		stationsByID[int64(station.ID)] = &activity.StationSummary{
 			ID:   int64(station.ID),
 			Name: station.Name,
 		}
@@ -154,10 +154,10 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		Name: project.Name,
 	}
 
-	activities := make([]*activity.ProjectActivity, 0, len(updates))
+	activities := make([]*activity.ActivityEntry, 0, len(updates))
 
 	for _, a := range updates {
-		activities = append(activities, &activity.ProjectActivity{
+		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
@@ -167,7 +167,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	}
 
 	for _, a := range deployed {
-		activities = append(activities, &activity.ProjectActivity{
+		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
@@ -177,16 +177,17 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	}
 
 	for _, a := range ingested {
-		activities = append(activities, &activity.ProjectActivity{
+		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
+			Station:   stationsByID[a.StationID],
 			Type:      getActivityTypeName(a),
 			Meta:      a,
 		})
 	}
 
-	sort.Sort(ProjectActivitiesByCreatedAt(activities))
+	sort.Sort(ActivitiesByCreatedAt(activities))
 
 	page = &activity.ProjectActivityPage{
 		Activities: activities,
@@ -286,31 +287,17 @@ func (r *ActivityRepository) QueryProjectActivityStations(ctx context.Context, p
 	return stations, nil
 }
 
-type StationActivitiesByCreatedAt []*activity.StationActivity
+type ActivitiesByCreatedAt []*activity.ActivityEntry
 
-func (s StationActivitiesByCreatedAt) Len() int {
+func (s ActivitiesByCreatedAt) Len() int {
 	return len(s)
 }
 
-func (s StationActivitiesByCreatedAt) Swap(i, j int) {
+func (s ActivitiesByCreatedAt) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func (s StationActivitiesByCreatedAt) Less(i, j int) bool {
-	return s[i].CreatedAt > s[j].CreatedAt
-}
-
-type ProjectActivitiesByCreatedAt []*activity.ProjectActivity
-
-func (s ProjectActivitiesByCreatedAt) Len() int {
-	return len(s)
-}
-
-func (s ProjectActivitiesByCreatedAt) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s ProjectActivitiesByCreatedAt) Less(i, j int) bool {
+func (s ActivitiesByCreatedAt) Less(i, j int) bool {
 	return s[i].CreatedAt > s[j].CreatedAt
 }
 

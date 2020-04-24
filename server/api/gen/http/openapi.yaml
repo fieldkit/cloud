@@ -306,53 +306,134 @@ paths:
       schemes:
       - http
 definitions:
+  ActivityEntryResponseBody:
+    title: 'Mediatype identifier: application/vnd.app.activity.entry; view=default'
+    type: object
+    properties:
+      created_at:
+        type: integer
+        example: 3468908841579358006
+        format: int64
+      id:
+        type: integer
+        example: 3072237865390360984
+        format: int64
+      meta:
+        example: Vitae non qui dolore earum perspiciatis.
+      project:
+        $ref: '#/definitions/ProjectSummaryResponseBody'
+      station:
+        $ref: '#/definitions/StationSummaryResponseBody'
+      type:
+        type: string
+        example: Non vitae.
+    description: ActivityEntryResponseBody result type (default view)
+    example:
+      created_at: 2786782174333546569
+      id: 7332078300190363827
+      meta: Quibusdam in.
+      project:
+        id: 7436001330053072599
+        name: Sint aut modi.
+      station:
+        id: 8912933545598277937
+        name: Provident dolor dolorum et.
+      type: Consequatur at amet.
+    required:
+    - id
+    - project
+    - station
+    - created_at
+    - type
+    - meta
+  ActivityEntryResponseBodyCollection:
+    title: 'Mediatype identifier: application/vnd.app.activity.entry; type=collection;
+      view=default'
+    type: array
+    items:
+      $ref: '#/definitions/ActivityEntryResponseBody'
+    description: ActivityEntryCollectionResponseBody is the result type for an array
+      of ActivityEntryResponseBody (default view)
+    example:
+    - created_at: 5486421500064581089
+      id: 3326745769059566974
+      meta: Occaecati et perferendis.
+      project:
+        id: 7436001330053072599
+        name: Sint aut modi.
+      station:
+        id: 8912933545598277937
+        name: Provident dolor dolorum et.
+      type: Consequatur architecto optio est fugit quos sed.
+    - created_at: 5486421500064581089
+      id: 3326745769059566974
+      meta: Occaecati et perferendis.
+      project:
+        id: 7436001330053072599
+        name: Sint aut modi.
+      station:
+        id: 8912933545598277937
+        name: Provident dolor dolorum et.
+      type: Consequatur architecto optio est fugit quos sed.
+    - created_at: 5486421500064581089
+      id: 3326745769059566974
+      meta: Occaecati et perferendis.
+      project:
+        id: 7436001330053072599
+        name: Sint aut modi.
+      station:
+        id: 8912933545598277937
+        name: Provident dolor dolorum et.
+      type: Consequatur architecto optio est fugit quos sed.
+    - created_at: 5486421500064581089
+      id: 3326745769059566974
+      meta: Occaecati et perferendis.
+      project:
+        id: 7436001330053072599
+        name: Sint aut modi.
+      station:
+        id: 8912933545598277937
+        name: Provident dolor dolorum et.
+      type: Consequatur architecto optio est fugit quos sed.
   ActivityProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.project.activity.page; view=default'
     type: object
     properties:
       activities:
-        $ref: '#/definitions/ProjectActivityResponseBodyCollection'
+        $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1841900342
+        example: 729491107
         format: int32
       total:
         type: integer
-        example: 443225210
+        example: 1990057909
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
       activities:
-      - created_at: 3346156873610408092
-        id: 5225424589986487905
-        meta: Ipsum vero voluptas vitae.
+      - created_at: 5486421500064581089
+        id: 3326745769059566974
+        meta: Occaecati et perferendis.
         project:
-          id: 5199285293916262886
-          name: Dolor in dolorem similique error ut.
-        type: Et debitis autem dolor.
-      - created_at: 3346156873610408092
-        id: 5225424589986487905
-        meta: Ipsum vero voluptas vitae.
+          id: 7436001330053072599
+          name: Sint aut modi.
+        station:
+          id: 8912933545598277937
+          name: Provident dolor dolorum et.
+        type: Consequatur architecto optio est fugit quos sed.
+      - created_at: 5486421500064581089
+        id: 3326745769059566974
+        meta: Occaecati et perferendis.
         project:
-          id: 5199285293916262886
-          name: Dolor in dolorem similique error ut.
-        type: Et debitis autem dolor.
-      - created_at: 3346156873610408092
-        id: 5225424589986487905
-        meta: Ipsum vero voluptas vitae.
-        project:
-          id: 5199285293916262886
-          name: Dolor in dolorem similique error ut.
-        type: Et debitis autem dolor.
-      - created_at: 3346156873610408092
-        id: 5225424589986487905
-        meta: Ipsum vero voluptas vitae.
-        project:
-          id: 5199285293916262886
-          name: Dolor in dolorem similique error ut.
-        type: Et debitis autem dolor.
-      page: 964855619
-      total: 458499656
+          id: 7436001330053072599
+          name: Sint aut modi.
+        station:
+          id: 8912933545598277937
+          name: Provident dolor dolorum et.
+        type: Consequatur architecto optio est fugit quos sed.
+      page: 1671298209
+      total: 711077855
     required:
     - activities
     - total
@@ -362,34 +443,40 @@ definitions:
     type: object
     properties:
       activities:
-        $ref: '#/definitions/StationActivityResponseBodyCollection'
+        $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1092427830
+        example: 1772861818
         format: int32
       total:
         type: integer
-        example: 1459823807
+        example: 1062094643
         format: int32
     description: StationResponseBody result type (default view)
     example:
       activities:
-      - created_at: 3245699681067865054
-        id: 5486421500064581089
-        meta: Asperiores vitae ipsam corrupti ea.
+      - created_at: 5486421500064581089
+        id: 3326745769059566974
+        meta: Occaecati et perferendis.
+        project:
+          id: 7436001330053072599
+          name: Sint aut modi.
         station:
-          id: 6088390071233654030
-          name: Architecto optio est.
-        type: Sed enim occaecati et.
-      - created_at: 3245699681067865054
-        id: 5486421500064581089
-        meta: Asperiores vitae ipsam corrupti ea.
+          id: 8912933545598277937
+          name: Provident dolor dolorum et.
+        type: Consequatur architecto optio est fugit quos sed.
+      - created_at: 5486421500064581089
+        id: 3326745769059566974
+        meta: Occaecati et perferendis.
+        project:
+          id: 7436001330053072599
+          name: Sint aut modi.
         station:
-          id: 6088390071233654030
-          name: Architecto optio est.
-        type: Sed enim occaecati et.
-      page: 1988382422
-      total: 494818087
+          id: 8912933545598277937
+          name: Provident dolor dolorum et.
+        type: Consequatur architecto optio est fugit quos sed.
+      page: 1757239305
+      total: 1185743574
     required:
     - activities
     - total
@@ -400,9 +487,9 @@ definitions:
     properties:
       url:
         type: string
-        example: Est sint quasi.
+        example: Ipsum sit itaque rerum.
     example:
-      url: Et ipsum quibusdam sunt.
+      url: Ad in cumque aut sit velit.
     required:
     - url
   FollowerResponseBody:
@@ -413,17 +500,17 @@ definitions:
         $ref: '#/definitions/AvatarResponseBody'
       id:
         type: integer
-        example: 7071601584264578697
+        example: 4679635549788073785
         format: int64
       name:
         type: string
-        example: Consequatur quod autem ut illum.
+        example: Molestiae aliquid.
     description: FollowerResponseBody result type (default view)
     example:
       avatar:
-        url: Ut quam aut quod eum.
-      id: 5917212423970776706
-      name: Deleniti reprehenderit animi consequuntur qui inventore.
+        url: Perspiciatis doloremque.
+      id: 3725013081908955775
+      name: Nesciunt ut et.
     required:
     - id
     - name
@@ -436,18 +523,22 @@ definitions:
       FollowerResponseBody (default view)
     example:
     - avatar:
-        url: Ut quam aut quod eum.
-      id: 4097978423987182926
-      name: Nulla assumenda.
+        url: Perspiciatis doloremque.
+      id: 8944683791525516609
+      name: Aut amet.
     - avatar:
-        url: Ut quam aut quod eum.
-      id: 4097978423987182926
-      name: Nulla assumenda.
+        url: Perspiciatis doloremque.
+      id: 8944683791525516609
+      name: Aut amet.
+    - avatar:
+        url: Perspiciatis doloremque.
+      id: 8944683791525516609
+      name: Aut amet.
   FollowingFollowUnauthorizedResponseBody:
     title: FollowingFollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Et tempora voluptas voluptatem.
+    example: Perspiciatis omnis commodi tempora ut officia.
   FollowingFollowersResponseBody:
     title: 'Mediatype identifier: application/vnd.app.followers; view=default'
     type: object
@@ -456,33 +547,25 @@ definitions:
         $ref: '#/definitions/FollowerResponseBodyCollection'
       page:
         type: integer
-        example: 1103844794
+        example: 193027135
         format: int32
       total:
         type: integer
-        example: 1649246591
+        example: 972399850
         format: int32
     description: FollowersResponseBody result type (default view)
     example:
       followers:
       - avatar:
-          url: Ut quam aut quod eum.
-        id: 4097978423987182926
-        name: Nulla assumenda.
+          url: Perspiciatis doloremque.
+        id: 8944683791525516609
+        name: Aut amet.
       - avatar:
-          url: Ut quam aut quod eum.
-        id: 4097978423987182926
-        name: Nulla assumenda.
-      - avatar:
-          url: Ut quam aut quod eum.
-        id: 4097978423987182926
-        name: Nulla assumenda.
-      - avatar:
-          url: Ut quam aut quod eum.
-        id: 4097978423987182926
-        name: Nulla assumenda.
-      page: 945462026
-      total: 768165659
+          url: Perspiciatis doloremque.
+        id: 8944683791525516609
+        name: Aut amet.
+      page: 1712760879
+      total: 1593962380
     required:
     - followers
     - total
@@ -491,171 +574,43 @@ definitions:
     title: FollowingFollowersUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Aut assumenda maiores sint sit in.
+    example: Reprehenderit sit deserunt est doloribus accusamus illo.
   FollowingUnfollowUnauthorizedResponseBody:
     title: FollowingUnfollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Aut repellat et unde omnis maiores rem.
-  ProjectActivityResponseBody:
-    title: 'Mediatype identifier: application/vnd.app.project.activity; view=default'
-    type: object
-    properties:
-      created_at:
-        type: integer
-        example: 5493676528348475138
-        format: int64
-      id:
-        type: integer
-        example: 7944552339456373507
-        format: int64
-      meta:
-        example: Ut et perferendis veniam vel.
-      project:
-        $ref: '#/definitions/ProjectSummaryResponseBody'
-      type:
-        type: string
-        example: Sit velit quaerat ut.
-    description: ProjectActivityResponseBody result type (default view)
-    example:
-      created_at: 7356251962937509818
-      id: 6846016294457432939
-      meta: Modi magni beatae animi sed.
-      project:
-        id: 5199285293916262886
-        name: Dolor in dolorem similique error ut.
-      type: Reprehenderit sit deserunt est doloribus accusamus illo.
-    required:
-    - id
-    - project
-    - created_at
-    - type
-    - meta
-  ProjectActivityResponseBodyCollection:
-    title: 'Mediatype identifier: application/vnd.app.project.activity; type=collection;
-      view=default'
-    type: array
-    items:
-      $ref: '#/definitions/ProjectActivityResponseBody'
-    description: ProjectActivityCollectionResponseBody is the result type for an array
-      of ProjectActivityResponseBody (default view)
-    example:
-    - created_at: 3346156873610408092
-      id: 5225424589986487905
-      meta: Ipsum vero voluptas vitae.
-      project:
-        id: 5199285293916262886
-        name: Dolor in dolorem similique error ut.
-      type: Et debitis autem dolor.
-    - created_at: 3346156873610408092
-      id: 5225424589986487905
-      meta: Ipsum vero voluptas vitae.
-      project:
-        id: 5199285293916262886
-        name: Dolor in dolorem similique error ut.
-      type: Et debitis autem dolor.
+    example: Numquam commodi ut in natus eos.
   ProjectSummaryResponseBody:
     title: ProjectSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 6569590502572380571
+        example: 6433030965608229216
         format: int64
       name:
         type: string
-        example: Occaecati molestiae aliquid explicabo ipsum.
+        example: Consequatur aliquam dignissimos quia.
     example:
-      id: 2432642086653717671
-      name: Rerum veniam ad in.
+      id: 6004395135312033861
+      name: Quia omnis fugiat.
     required:
     - id
     - name
-  StationActivityResponseBody:
-    title: 'Mediatype identifier: application/vnd.app.station.activity; view=default'
-    type: object
-    properties:
-      created_at:
-        type: integer
-        example: 2786782174333546569
-        format: int64
-      id:
-        type: integer
-        example: 4759091417389918951
-        format: int64
-      meta:
-        example: Quibusdam in.
-      station:
-        $ref: '#/definitions/StationSummaryResponseBody'
-      type:
-        type: string
-        example: Consequatur at amet.
-    description: StationActivityResponseBody result type (default view)
-    example:
-      created_at: 4561661760049580604
-      id: 2940409114609081586
-      meta: Perspiciatis omnis commodi tempora ut officia.
-      station:
-        id: 6088390071233654030
-        name: Architecto optio est.
-      type: Iure delectus odio neque ea alias.
-    required:
-    - id
-    - station
-    - created_at
-    - type
-    - meta
-  StationActivityResponseBodyCollection:
-    title: 'Mediatype identifier: application/vnd.app.station.activity; type=collection;
-      view=default'
-    type: array
-    items:
-      $ref: '#/definitions/StationActivityResponseBody'
-    description: StationActivityCollectionResponseBody is the result type for an array
-      of StationActivityResponseBody (default view)
-    example:
-    - created_at: 3245699681067865054
-      id: 5486421500064581089
-      meta: Asperiores vitae ipsam corrupti ea.
-      station:
-        id: 6088390071233654030
-        name: Architecto optio est.
-      type: Sed enim occaecati et.
-    - created_at: 3245699681067865054
-      id: 5486421500064581089
-      meta: Asperiores vitae ipsam corrupti ea.
-      station:
-        id: 6088390071233654030
-        name: Architecto optio est.
-      type: Sed enim occaecati et.
-    - created_at: 3245699681067865054
-      id: 5486421500064581089
-      meta: Asperiores vitae ipsam corrupti ea.
-      station:
-        id: 6088390071233654030
-        name: Architecto optio est.
-      type: Sed enim occaecati et.
-    - created_at: 3245699681067865054
-      id: 5486421500064581089
-      meta: Asperiores vitae ipsam corrupti ea.
-      station:
-        id: 6088390071233654030
-        name: Architecto optio est.
-      type: Sed enim occaecati et.
   StationSummaryResponseBody:
     title: StationSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 1972138218893876778
+        example: 3004401495262376821
         format: int64
       name:
         type: string
-        example: Ipsam non vitae neque vitae non.
+        example: Facere repellat ut.
     example:
-      id: 6966341089960532853
-      name: Earum perspiciatis at.
+      id: 7577586275964425592
+      name: Labore consequatur accusantium dolor totam dolores.
     required:
     - id
     - name
@@ -663,27 +618,27 @@ definitions:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Alias est eum.
+    example: Modi magni beatae animi sed.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Fuga quia libero.
+    example: Molestiae magni vitae.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Inventore accusantium et deserunt.
+    example: Omnis id.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Libero voluptate iusto.
+    example: Et unde omnis maiores.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Officia explicabo reprehenderit quia et voluptas.
+    example: Numquam et tempora voluptas voluptatem ut aut.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

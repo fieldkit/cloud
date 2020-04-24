@@ -31,22 +31,29 @@ type ProjectActivityPage struct {
 
 // StationActivityPageView is a type that runs validations on a projected type.
 type StationActivityPageView struct {
-	Activities StationActivityCollectionView
+	Activities ActivityEntryCollectionView
 	Total      *int32
 	Page       *int32
 }
 
-// StationActivityCollectionView is a type that runs validations on a projected
+// ActivityEntryCollectionView is a type that runs validations on a projected
 // type.
-type StationActivityCollectionView []*StationActivityView
+type ActivityEntryCollectionView []*ActivityEntryView
 
-// StationActivityView is a type that runs validations on a projected type.
-type StationActivityView struct {
+// ActivityEntryView is a type that runs validations on a projected type.
+type ActivityEntryView struct {
 	ID        *int64
+	Project   *ProjectSummaryView
 	Station   *StationSummaryView
 	CreatedAt *int64
 	Type      *string
 	Meta      interface{}
+}
+
+// ProjectSummaryView is a type that runs validations on a projected type.
+type ProjectSummaryView struct {
+	ID   *int64
+	Name *string
 }
 
 // StationSummaryView is a type that runs validations on a projected type.
@@ -57,28 +64,9 @@ type StationSummaryView struct {
 
 // ProjectActivityPageView is a type that runs validations on a projected type.
 type ProjectActivityPageView struct {
-	Activities ProjectActivityCollectionView
+	Activities ActivityEntryCollectionView
 	Total      *int32
 	Page       *int32
-}
-
-// ProjectActivityCollectionView is a type that runs validations on a projected
-// type.
-type ProjectActivityCollectionView []*ProjectActivityView
-
-// ProjectActivityView is a type that runs validations on a projected type.
-type ProjectActivityView struct {
-	ID        *int64
-	Project   *ProjectSummaryView
-	CreatedAt *int64
-	Type      *string
-	Meta      interface{}
-}
-
-// ProjectSummaryView is a type that runs validations on a projected type.
-type ProjectSummaryView struct {
-	ID   *int64
-	Name *string
 }
 
 var (
@@ -100,45 +88,25 @@ var (
 			"page",
 		},
 	}
-	// StationActivityCollectionMap is a map of attribute names in result type
-	// StationActivityCollection indexed by view name.
-	StationActivityCollectionMap = map[string][]string{
+	// ActivityEntryCollectionMap is a map of attribute names in result type
+	// ActivityEntryCollection indexed by view name.
+	ActivityEntryCollectionMap = map[string][]string{
 		"default": []string{
 			"id",
+			"project",
 			"station",
 			"created_at",
 			"type",
 			"meta",
 		},
 	}
-	// StationActivityMap is a map of attribute names in result type
-	// StationActivity indexed by view name.
-	StationActivityMap = map[string][]string{
+	// ActivityEntryMap is a map of attribute names in result type ActivityEntry
+	// indexed by view name.
+	ActivityEntryMap = map[string][]string{
 		"default": []string{
 			"id",
+			"project",
 			"station",
-			"created_at",
-			"type",
-			"meta",
-		},
-	}
-	// ProjectActivityCollectionMap is a map of attribute names in result type
-	// ProjectActivityCollection indexed by view name.
-	ProjectActivityCollectionMap = map[string][]string{
-		"default": []string{
-			"id",
-			"project",
-			"created_at",
-			"type",
-			"meta",
-		},
-	}
-	// ProjectActivityMap is a map of attribute names in result type
-	// ProjectActivity indexed by view name.
-	ProjectActivityMap = map[string][]string{
-		"default": []string{
-			"id",
-			"project",
 			"created_at",
 			"type",
 			"meta",
@@ -180,29 +148,32 @@ func ValidateStationActivityPageView(result *StationActivityPageView) (err error
 		err = goa.MergeErrors(err, goa.MissingFieldError("page", "result"))
 	}
 	if result.Activities != nil {
-		if err2 := ValidateStationActivityCollectionView(result.Activities); err2 != nil {
+		if err2 := ValidateActivityEntryCollectionView(result.Activities); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
 }
 
-// ValidateStationActivityCollectionView runs the validations defined on
-// StationActivityCollectionView using the "default" view.
-func ValidateStationActivityCollectionView(result StationActivityCollectionView) (err error) {
+// ValidateActivityEntryCollectionView runs the validations defined on
+// ActivityEntryCollectionView using the "default" view.
+func ValidateActivityEntryCollectionView(result ActivityEntryCollectionView) (err error) {
 	for _, item := range result {
-		if err2 := ValidateStationActivityView(item); err2 != nil {
+		if err2 := ValidateActivityEntryView(item); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
 }
 
-// ValidateStationActivityView runs the validations defined on
-// StationActivityView using the "default" view.
-func ValidateStationActivityView(result *StationActivityView) (err error) {
+// ValidateActivityEntryView runs the validations defined on ActivityEntryView
+// using the "default" view.
+func ValidateActivityEntryView(result *ActivityEntryView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Project == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("project", "result"))
 	}
 	if result.Station == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("station", "result"))
@@ -216,10 +187,27 @@ func ValidateStationActivityView(result *StationActivityView) (err error) {
 	if result.Meta == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("meta", "result"))
 	}
+	if result.Project != nil {
+		if err2 := ValidateProjectSummaryView(result.Project); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	if result.Station != nil {
 		if err2 := ValidateStationSummaryView(result.Station); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateProjectSummaryView runs the validations defined on
+// ProjectSummaryView.
+func ValidateProjectSummaryView(result *ProjectSummaryView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	return
 }
@@ -246,58 +234,9 @@ func ValidateProjectActivityPageView(result *ProjectActivityPageView) (err error
 		err = goa.MergeErrors(err, goa.MissingFieldError("page", "result"))
 	}
 	if result.Activities != nil {
-		if err2 := ValidateProjectActivityCollectionView(result.Activities); err2 != nil {
+		if err2 := ValidateActivityEntryCollectionView(result.Activities); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
-	}
-	return
-}
-
-// ValidateProjectActivityCollectionView runs the validations defined on
-// ProjectActivityCollectionView using the "default" view.
-func ValidateProjectActivityCollectionView(result ProjectActivityCollectionView) (err error) {
-	for _, item := range result {
-		if err2 := ValidateProjectActivityView(item); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateProjectActivityView runs the validations defined on
-// ProjectActivityView using the "default" view.
-func ValidateProjectActivityView(result *ProjectActivityView) (err error) {
-	if result.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
-	}
-	if result.Project == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("project", "result"))
-	}
-	if result.CreatedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "result"))
-	}
-	if result.Type == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("type", "result"))
-	}
-	if result.Meta == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("meta", "result"))
-	}
-	if result.Project != nil {
-		if err2 := ValidateProjectSummaryView(result.Project); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateProjectSummaryView runs the validations defined on
-// ProjectSummaryView.
-func ValidateProjectSummaryView(result *ProjectSummaryView) (err error) {
-	if result.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
-	}
-	if result.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	return
 }

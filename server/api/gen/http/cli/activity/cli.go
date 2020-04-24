@@ -37,10 +37,10 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 3454423471380820097 --page 6027780237197828541 --auth "Consectetur provident dolor dolorum."` + "\n" +
-		os.Args[0] + ` following follow --id 4684560664961247643 --auth "Facilis tempore rerum corporis."` + "\n" +
+	return os.Args[0] + ` activity station --id 6080657362268086325 --page 5376548474285186168 --auth "Iure quasi."` + "\n" +
+		os.Args[0] + ` following follow --id 8553307744897445340 --auth "Veniam in eos dolor in dolorem."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 5826561164485653265` + "\n" +
+		os.Args[0] + ` test get --id 373217653558449232` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		""
 }
@@ -323,7 +323,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 3454423471380820097 --page 6027780237197828541 --auth "Consectetur provident dolor dolorum."
+    `+os.Args[0]+` activity station --id 6080657362268086325 --page 5376548474285186168 --auth "Iure quasi."
 `, os.Args[0])
 }
 
@@ -336,7 +336,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 4471353304546675052 --page 1079981991649777374 --auth "Mollitia vel aut accusantium cum aut."
+    `+os.Args[0]+` activity project --id 6252355947394424007 --page 1472691811713346493 --auth "Beatae magni aliquam perferendis facilis."
 `, os.Args[0])
 }
 
@@ -364,7 +364,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 4684560664961247643 --auth "Facilis tempore rerum corporis."
+    `+os.Args[0]+` following follow --id 8553307744897445340 --auth "Veniam in eos dolor in dolorem."
 `, os.Args[0])
 }
 
@@ -376,7 +376,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 52167979398353265 --auth "Nisi consequatur vel facilis."
+    `+os.Args[0]+` following unfollow --id 6662948449049487245 --auth "Vero voluptas vitae harum est."
 `, os.Args[0])
 }
 
@@ -388,7 +388,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 8759007681543899155 --page 9078410795086589887
+    `+os.Args[0]+` following followers --id 7655476663666812645 --page 5461354606995255224
 `, os.Args[0])
 }
 
@@ -424,7 +424,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Nobis tempore." --auth "Numquam aliquam in quod laborum suscipit ut."
+    `+os.Args[0]+` tasks refresh- device --device-id "Quis earum nulla." --auth "Dolores ut quam aut quod eum itaque."
 `, os.Args[0])
 }
 
@@ -450,7 +450,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 5826561164485653265
+    `+os.Args[0]+` test get --id 373217653558449232
 `, os.Args[0])
 }
 
@@ -472,7 +472,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Quidem a asperiores consequatur architecto quam fugit." --auth "Consequatur aliquam dignissimos quia."
+    `+os.Args[0]+` test email --address "Nobis tempore." --auth "Numquam aliquam in quod laborum suscipit ut."
 `, os.Args[0])
 }
 
