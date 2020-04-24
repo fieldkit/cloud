@@ -72,6 +72,7 @@ type ActivityEntryCollection []*ActivityEntry
 
 type ActivityEntry struct {
 	ID        int64
+	Key       string
 	Project   *ProjectSummary
 	Station   *StationSummary
 	CreatedAt int64
@@ -175,6 +176,9 @@ func newActivityEntry(vres *activityviews.ActivityEntryView) *ActivityEntry {
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
+	if vres.Key != nil {
+		res.Key = *vres.Key
+	}
 	if vres.CreatedAt != nil {
 		res.CreatedAt = *vres.CreatedAt
 	}
@@ -195,6 +199,7 @@ func newActivityEntry(vres *activityviews.ActivityEntryView) *ActivityEntry {
 func newActivityEntryView(res *ActivityEntry) *activityviews.ActivityEntryView {
 	vres := &activityviews.ActivityEntryView{
 		ID:        &res.ID,
+		Key:       &res.Key,
 		CreatedAt: &res.CreatedAt,
 		Type:      &res.Type,
 		Meta:      res.Meta,

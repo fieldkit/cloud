@@ -148,6 +148,7 @@ func DecodeProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 func marshalActivityviewsActivityEntryViewToActivityEntryResponseBody(v *activityviews.ActivityEntryView) *ActivityEntryResponseBody {
 	res := &ActivityEntryResponseBody{
 		ID:        *v.ID,
+		Key:       *v.Key,
 		CreatedAt: *v.CreatedAt,
 		Type:      *v.Type,
 		Meta:      v.Meta,

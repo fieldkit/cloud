@@ -202,6 +202,7 @@ func DecodeProjectResponse(decoder func(*http.Response) goahttp.Decoder, restore
 func unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView(v *ActivityEntryResponseBody) *activityviews.ActivityEntryView {
 	res := &activityviews.ActivityEntryView{
 		ID:        v.ID,
+		Key:       v.Key,
 		CreatedAt: v.CreatedAt,
 		Type:      v.Type,
 		Meta:      v.Meta,

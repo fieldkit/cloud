@@ -46,7 +46,7 @@ type StationIngestionWM struct {
 	StationActivity
 	Uploader AuthorOrUploaderWM `json:"uploader"`
 	Data     IngestedWM         `json:"data"`
-	Errors   bool               `db:"errors" json:"errors"`
+	Errors   bool               `json:"errors" db:"errors"`
 }
 
 func ScanStationIngestionWM(rows *sqlx.Rows) (interface{}, error) {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -69,6 +70,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 	for _, a := range deployed {
 		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
+			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Station:   stationSummary,
 			Type:      getActivityTypeName(a),
@@ -79,6 +81,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 	for _, a := range ingested {
 		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
+			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Station:   stationSummary,
 			Type:      getActivityTypeName(a),
@@ -159,6 +162,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	for _, a := range updates {
 		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
+			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
 			Type:      getActivityTypeName(a),
@@ -169,6 +173,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	for _, a := range deployed {
 		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
+			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
 			Type:      getActivityTypeName(a),
@@ -179,6 +184,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	for _, a := range ingested {
 		activities = append(activities, &activity.ActivityEntry{
 			ID:        a.ID,
+			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
 			Station:   stationsByID[a.StationID],

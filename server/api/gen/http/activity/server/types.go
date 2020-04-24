@@ -35,6 +35,7 @@ type ActivityEntryResponseBodyCollection []*ActivityEntryResponseBody
 // ActivityEntryResponseBody is used to define fields on response body types.
 type ActivityEntryResponseBody struct {
 	ID        int64                       `form:"id" json:"id" xml:"id"`
+	Key       string                      `form:"key" json:"key" xml:"key"`
 	Project   *ProjectSummaryResponseBody `form:"project" json:"project" xml:"project"`
 	Station   *StationSummaryResponseBody `form:"station" json:"station" xml:"station"`
 	CreatedAt int64                       `form:"created_at" json:"created_at" xml:"created_at"`

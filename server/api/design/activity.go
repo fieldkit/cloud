@@ -20,15 +20,17 @@ var ActivityEntry = ResultType("application/vnd.app.activity.entry", func() {
 	TypeName("ActivityEntry")
 	Attributes(func() {
 		Attribute("id", Int64)
+		Attribute("key", String)
 		Attribute("project", ProjectSummary)
 		Attribute("station", StationSummary)
 		Attribute("created_at", Int64)
 		Attribute("type", String)
 		Attribute("meta", Any)
-		Required("id", "project", "station", "created_at", "type", "meta")
+		Required("id", "key", "project", "station", "created_at", "type", "meta")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("key")
 		Attribute("project")
 		Attribute("station")
 		Attribute("created_at")

@@ -43,6 +43,7 @@ type ActivityEntryCollectionView []*ActivityEntryView
 // ActivityEntryView is a type that runs validations on a projected type.
 type ActivityEntryView struct {
 	ID        *int64
+	Key       *string
 	Project   *ProjectSummaryView
 	Station   *StationSummaryView
 	CreatedAt *int64
@@ -93,6 +94,7 @@ var (
 	ActivityEntryCollectionMap = map[string][]string{
 		"default": []string{
 			"id",
+			"key",
 			"project",
 			"station",
 			"created_at",
@@ -105,6 +107,7 @@ var (
 	ActivityEntryMap = map[string][]string{
 		"default": []string{
 			"id",
+			"key",
 			"project",
 			"station",
 			"created_at",
@@ -171,6 +174,9 @@ func ValidateActivityEntryCollectionView(result ActivityEntryCollectionView) (er
 func ValidateActivityEntryView(result *ActivityEntryView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
 	}
 	if result.Project == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("project", "result"))

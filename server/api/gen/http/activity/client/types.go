@@ -35,6 +35,7 @@ type ActivityEntryCollectionResponseBody []*ActivityEntryResponseBody
 // ActivityEntryResponseBody is used to define fields on response body types.
 type ActivityEntryResponseBody struct {
 	ID        *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Key       *string                     `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Project   *ProjectSummaryResponseBody `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Station   *StationSummaryResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
 	CreatedAt *int64                      `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
@@ -102,6 +103,9 @@ func ValidateActivityEntryCollectionResponseBody(body ActivityEntryCollectionRes
 func ValidateActivityEntryResponseBody(body *ActivityEntryResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
 	}
 	if body.Project == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("project", "body"))
