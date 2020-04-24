@@ -18,6 +18,17 @@ type UpdateRequestBody struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// UpdateUnauthorizedResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody string
+
+// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "project" service.
+func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
+	body := UpdateUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewUpdatePayload builds a project service update endpoint payload.
 func NewUpdatePayload(body *UpdateRequestBody, id int64, auth *string) *project.UpdatePayload {
 	v := &project.UpdatePayload{

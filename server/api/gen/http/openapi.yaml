@@ -186,6 +186,10 @@ paths:
       responses:
         "200":
           description: OK response.
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/ProjectUpdateUnauthorizedResponseBody'
       schemes:
       - http
       security:
@@ -348,33 +352,33 @@ definitions:
     properties:
       created_at:
         type: integer
-        example: 7547285348525734610
+        example: 7514638001280817070
         format: int64
       id:
         type: integer
-        example: 4759091417389918951
+        example: 6015279816589827216
         format: int64
       meta:
-        example: Perspiciatis omnis commodi tempora ut officia.
+        example: Aliquid explicabo ipsum sit.
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       station:
         $ref: '#/definitions/StationSummaryResponseBody'
       type:
         type: string
-        example: Neque ea alias.
+        example: Commodi ut in natus eos et occaecati.
     description: ActivityEntryResponseBody result type (default view)
     example:
-      created_at: 6269895511753342887
-      id: 7514638001280817070
-      meta: Eos et occaecati molestiae aliquid explicabo.
+      created_at: 8838864789025062606
+      id: 9059594398280129002
+      meta: Ut nesciunt ut.
       project:
         id: 3154713732921053033
         name: Occaecati et perferendis.
       station:
         id: 3749521312036636972
         name: Ipsam corrupti ea dolorum.
-      type: Ut in.
+      type: Ad in cumque aut sit velit.
     required:
     - id
     - project
@@ -421,6 +425,16 @@ definitions:
         id: 3749521312036636972
         name: Ipsam corrupti ea dolorum.
       type: Beatae magni aliquam perferendis facilis.
+    - created_at: 1472691811713346493
+      id: 6214483488355277271
+      meta: Vel aut accusantium.
+      project:
+        id: 3154713732921053033
+        name: Occaecati et perferendis.
+      station:
+        id: 3749521312036636972
+        name: Ipsam corrupti ea dolorum.
+      type: Beatae magni aliquam perferendis facilis.
   ActivityProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.project.activity.page; view=default'
     type: object
@@ -429,11 +443,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1747552566
+        example: 490767365
         format: int32
       total:
         type: integer
-        example: 573679883
+        example: 1712760879
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
@@ -468,8 +482,8 @@ definitions:
           id: 3749521312036636972
           name: Ipsam corrupti ea dolorum.
         type: Beatae magni aliquam perferendis facilis.
-      page: 442176392
-      total: 1279096242
+      page: 965900215
+      total: 52361809
     required:
     - activities
     - total
@@ -482,11 +496,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 2109351194
+        example: 972399850
         format: int32
       total:
         type: integer
-        example: 566393622
+        example: 1491263493
         format: int32
     description: StationResponseBody result type (default view)
     example:
@@ -521,8 +535,8 @@ definitions:
           id: 3749521312036636972
           name: Ipsam corrupti ea dolorum.
         type: Beatae magni aliquam perferendis facilis.
-      page: 763468930
-      total: 2057958577
+      page: 1593962380
+      total: 193027135
     required:
     - activities
     - total
@@ -533,9 +547,9 @@ definitions:
     properties:
       url:
         type: string
-        example: Illo iusto modi magni beatae.
+        example: Numquam et tempora voluptas voluptatem ut aut.
     example:
-      url: Sed recusandae molestiae magni vitae dolorem numquam.
+      url: Et unde omnis maiores.
     required:
     - url
   FollowerResponseBody:
@@ -546,17 +560,17 @@ definitions:
         $ref: '#/definitions/AvatarResponseBody'
       id:
         type: integer
-        example: 224892259121824166
+        example: 4453745162932695382
         format: int64
       name:
         type: string
-        example: Deserunt est doloribus.
+        example: Molestiae magni vitae.
     description: FollowerResponseBody result type (default view)
     example:
       avatar:
         url: Non sed a nostrum.
-      id: 7134691977437916367
-      name: Voluptas voluptatem ut aut repellat et unde.
+      id: 2027538065178946044
+      name: Id consequatur.
     required:
     - id
     - name
@@ -580,15 +594,11 @@ definitions:
         url: Non sed a nostrum.
       id: 2034953970000477736
       name: Facilis architecto sed.
-    - avatar:
-        url: Non sed a nostrum.
-      id: 2034953970000477736
-      name: Facilis architecto sed.
   FollowingFollowUnauthorizedResponseBody:
     title: FollowingFollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Velit quaerat ut nesciunt ut et.
+    example: Est doloribus accusamus illo iusto.
   FollowingFollowersResponseBody:
     title: 'Mediatype identifier: application/vnd.app.followers; view=default'
     type: object
@@ -597,11 +607,11 @@ definitions:
         $ref: '#/definitions/FollowerResponseBodyCollection'
       page:
         type: integer
-        example: 472072992
+        example: 872285930
         format: int32
       total:
         type: integer
-        example: 243973931
+        example: 1197390650
         format: int32
     description: FollowersResponseBody result type (default view)
     example:
@@ -614,8 +624,8 @@ definitions:
           url: Non sed a nostrum.
         id: 2034953970000477736
         name: Facilis architecto sed.
-      page: 1813364595
-      total: 1646485548
+      page: 1824152815
+      total: 750387350
     required:
     - followers
     - total
@@ -624,26 +634,26 @@ definitions:
     title: FollowingFollowersUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quod autem ut illum et.
+    example: Sint quasi possimus et.
   FollowingUnfollowUnauthorizedResponseBody:
     title: FollowingUnfollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Veniam vel nisi placeat ad.
+    example: Magni beatae animi.
   ProjectSummaryResponseBody:
     title: ProjectSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 1972138218893876778
+        example: 7332078300190363827
         format: int64
       name:
         type: string
-        example: Ipsam non vitae neque vitae non.
+        example: Et consequatur at.
     example:
-      id: 6966341089960532853
-      name: Earum perspiciatis at.
+      id: 243563514652582216
+      name: Quibusdam in.
     required:
     - id
     - name
@@ -653,25 +663,30 @@ definitions:
     properties:
       body:
         type: string
-        example: Sint quasi possimus et.
+        example: Animi consequuntur qui.
     example:
-      body: Quibusdam sunt quis rerum deleniti.
+      body: Sit quis fuga est magnam facilis aut.
     required:
     - body
+  ProjectUpdateUnauthorizedResponseBody:
+    title: ProjectUpdateUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Quibusdam sunt quis rerum deleniti.
   StationSummaryResponseBody:
     title: StationSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 2786782174333546569
+        example: 2940409114609081586
         format: int64
       name:
         type: string
-        example: Consequatur at amet.
+        example: Voluptatibus iure delectus odio neque ea alias.
     example:
-      id: 6395964898701089048
-      name: In aliquam suscipit voluptatibus iure.
+      id: 1551477806904876671
+      name: Omnis commodi tempora ut officia.
     required:
     - id
     - name
@@ -679,27 +694,27 @@ definitions:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Animi consequuntur qui.
+    example: Maiores sint sit in vel alias est.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Sit quis fuga est magnam facilis aut.
+    example: Recusandae fuga quia libero.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Officia explicabo reprehenderit quia et voluptas.
+    example: Inventore accusantium et deserunt.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Recusandae fuga quia libero.
+    example: Libero voluptate iusto.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Maiores sint sit in vel alias est.
+    example: Officia explicabo reprehenderit quia et voluptas.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

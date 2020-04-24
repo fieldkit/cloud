@@ -45,7 +45,7 @@ func UsageExamples() string {
       "body": "Quam aut quod."
    }' --id 2037873105037522950 --auth "Corrupti asperiores omnis iusto repellat tenetur quos."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 5826561164485653265` + "\n" +
+		os.Args[0] + ` test get --id 3465575395264144433` + "\n" +
 		""
 }
 
@@ -482,7 +482,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Aut numquam aliquam in." --auth "Laborum suscipit ut."
+    `+os.Args[0]+` tasks refresh- device --device-id "Laborum suscipit ut." --auth "Nemo est hic et debitis."
 `, os.Args[0])
 }
 
@@ -508,7 +508,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 5826561164485653265
+    `+os.Args[0]+` test get --id 3465575395264144433
 `, os.Args[0])
 }
 
@@ -530,7 +530,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Quidem a asperiores consequatur architecto quam fugit." --auth "Consequatur aliquam dignissimos quia."
+    `+os.Args[0]+` test email --address "Libero quia omnis fugiat." --auth "Facere facere repellat."
 `, os.Args[0])
 }
 

@@ -41,3 +41,16 @@ type UpdatePayload struct {
 	ID   int64
 	Body string
 }
+
+// credentials are invalid
+type Unauthorized string
+
+// Error returns an error description.
+func (e Unauthorized) Error() string {
+	return "credentials are invalid"
+}
+
+// ErrorName returns "unauthorized".
+func (e Unauthorized) ErrorName() string {
+	return "unauthorized"
+}

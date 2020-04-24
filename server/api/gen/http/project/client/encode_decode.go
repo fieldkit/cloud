@@ -66,6 +66,9 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // DecodeUpdateResponse returns a decoder for responses returned by the project
 // update endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeUpdateResponse may return the following errors:
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
 func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -83,6 +86,16 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body UpdateUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			return nil, NewUpdateUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("project", "update", resp.StatusCode, string(body))

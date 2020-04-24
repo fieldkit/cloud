@@ -30,6 +30,9 @@ var _ = Service("project", func() {
 		})
 	})
 
+	Error("unauthorized", String, "credentials are invalid")
+
 	HTTP(func() {
+		Response("unauthorized", StatusUnauthorized)
 	})
 })

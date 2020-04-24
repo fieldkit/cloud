@@ -52,7 +52,7 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 		Token:         token,
 		Scheme:        scheme,
 		Key:           s.options.JWTHMACKey,
-		InvalidToken:  nil,
-		InvalidScopes: nil,
+		InvalidToken:  project.Unauthorized("invalid token"),
+		InvalidScopes: project.Unauthorized("invalid scopes in token"),
 	})
 }
