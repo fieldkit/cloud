@@ -261,14 +261,6 @@ export default {
                             children: m.sensors,
                         });
                     });
-                    counterId += 1;
-                    this.treeSelectOptions.push({
-                        id: counterId,
-                        label: s.name,
-                        customLabel: s.name,
-                        stationId: s.id,
-                        children: modules,
-                    });
                 } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
                     const modulesResult = this.extractModulesAndSensors(s, s.status_json.statusJson.modules);
                     modulesResult.forEach(m => {
@@ -282,6 +274,14 @@ export default {
                         });
                     });
                 }
+                counterId += 1;
+                this.treeSelectOptions.push({
+                    id: counterId,
+                    label: s.name,
+                    customLabel: s.name,
+                    stationId: s.id,
+                    children: modules,
+                });
             });
         },
 
