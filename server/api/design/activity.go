@@ -83,9 +83,7 @@ var _ = Service("activity", func() {
 				Param("page")
 			})
 
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
+			httpAuthentication()
 		})
 	})
 
@@ -110,9 +108,7 @@ var _ = Service("activity", func() {
 				Param("page")
 			})
 
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
+			httpAuthentication()
 		})
 	})
 

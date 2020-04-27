@@ -15,18 +15,46 @@ import (
 
 // Client is the "project" service client.
 type Client struct {
-	UpdateEndpoint goa.Endpoint
+	UpdateEndpoint       goa.Endpoint
+	InvitesEndpoint      goa.Endpoint
+	AcceptInviteEndpoint goa.Endpoint
+	RejectInviteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(update goa.Endpoint) *Client {
+func NewClient(update, invites, acceptInvite, rejectInvite goa.Endpoint) *Client {
 	return &Client{
-		UpdateEndpoint: update,
+		UpdateEndpoint:       update,
+		InvitesEndpoint:      invites,
+		AcceptInviteEndpoint: acceptInvite,
+		RejectInviteEndpoint: rejectInvite,
 	}
 }
 
 // Update calls the "update" endpoint of the "project" service.
 func (c *Client) Update(ctx context.Context, p *UpdatePayload) (err error) {
 	_, err = c.UpdateEndpoint(ctx, p)
+	return
+}
+
+// Invites calls the "invites" endpoint of the "project" service.
+func (c *Client) Invites(ctx context.Context, p *InvitesPayload) (res *PendingInvites, err error) {
+	var ires interface{}
+	ires, err = c.InvitesEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*PendingInvites), nil
+}
+
+// AcceptInvite calls the "accept invite" endpoint of the "project" service.
+func (c *Client) AcceptInvite(ctx context.Context, p *AcceptInvitePayload) (err error) {
+	_, err = c.AcceptInviteEndpoint(ctx, p)
+	return
+}
+
+// RejectInvite calls the "reject invite" endpoint of the "project" service.
+func (c *Client) RejectInvite(ctx context.Context, p *RejectInvitePayload) (err error) {
+	_, err = c.RejectInviteEndpoint(ctx, p)
 	return
 }

@@ -30,7 +30,7 @@ import (
 func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
-project update
+project (update|invites|accept- invite|reject- invite)
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -39,13 +39,13 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 3245699681067865054 --page 6214483488355277271 --auth "Enim occaecati et perferendis asperiores vitae."` + "\n" +
-		os.Args[0] + ` following follow --id 343528989186680944 --auth "Perspiciatis doloremque."` + "\n" +
+	return os.Args[0] + ` activity station --id 4901102416227285199 --page 8553307744897445340 --auth "Veniam in eos dolor in dolorem."` + "\n" +
+		os.Args[0] + ` following follow --id 8922159228118147378 --auth "Quod eum itaque corrupti asperiores omnis iusto."` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Nobis tempore."
-   }' --id 6171153226389699817 --auth "Aliquam in quod laborum."` + "\n" +
+      "body": "Facere repellat ut."
+   }' --id 7577586275964425592 --auth "Labore consequatur accusantium dolor totam dolores."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 7577586275964425592` + "\n" +
+		os.Args[0] + ` test get --id 2984855983272144925` + "\n" +
 		""
 }
 
@@ -90,7 +90,18 @@ func ParseEndpoint(
 		projectUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
 		projectUpdateBodyFlag = projectUpdateFlags.String("body", "REQUIRED", "")
 		projectUpdateIDFlag   = projectUpdateFlags.String("id", "REQUIRED", "")
-		projectUpdateAuthFlag = projectUpdateFlags.String("auth", "", "")
+		projectUpdateAuthFlag = projectUpdateFlags.String("auth", "REQUIRED", "")
+
+		projectInvitesFlags    = flag.NewFlagSet("invites", flag.ExitOnError)
+		projectInvitesAuthFlag = projectInvitesFlags.String("auth", "REQUIRED", "")
+
+		projectAcceptInviteFlags    = flag.NewFlagSet("accept- invite", flag.ExitOnError)
+		projectAcceptInviteIDFlag   = projectAcceptInviteFlags.String("id", "REQUIRED", "")
+		projectAcceptInviteAuthFlag = projectAcceptInviteFlags.String("auth", "REQUIRED", "")
+
+		projectRejectInviteFlags    = flag.NewFlagSet("reject- invite", flag.ExitOnError)
+		projectRejectInviteIDFlag   = projectRejectInviteFlags.String("id", "REQUIRED", "")
+		projectRejectInviteAuthFlag = projectRejectInviteFlags.String("auth", "REQUIRED", "")
 
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
@@ -126,6 +137,9 @@ func ParseEndpoint(
 
 	projectFlags.Usage = projectUsage
 	projectUpdateFlags.Usage = projectUpdateUsage
+	projectInvitesFlags.Usage = projectInvitesUsage
+	projectAcceptInviteFlags.Usage = projectAcceptInviteUsage
+	projectRejectInviteFlags.Usage = projectRejectInviteUsage
 
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
@@ -209,6 +223,15 @@ func ParseEndpoint(
 			case "update":
 				epf = projectUpdateFlags
 
+			case "invites":
+				epf = projectInvitesFlags
+
+			case "accept- invite":
+				epf = projectAcceptInviteFlags
+
+			case "reject- invite":
+				epf = projectRejectInviteFlags
+
 			}
 
 		case "tasks":
@@ -290,6 +313,15 @@ func ParseEndpoint(
 			case "update":
 				endpoint = c.Update()
 				data, err = projectc.BuildUpdatePayload(*projectUpdateBodyFlag, *projectUpdateIDFlag, *projectUpdateAuthFlag)
+			case "invites":
+				endpoint = c.Invites()
+				data, err = projectc.BuildInvitesPayload(*projectInvitesAuthFlag)
+			case "accept- invite":
+				endpoint = c.AcceptInvite()
+				data, err = projectc.BuildAcceptInvitePayload(*projectAcceptInviteIDFlag, *projectAcceptInviteAuthFlag)
+			case "reject- invite":
+				endpoint = c.RejectInvite()
+				data, err = projectc.BuildRejectInvitePayload(*projectRejectInviteIDFlag, *projectRejectInviteAuthFlag)
 			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -353,7 +385,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 3245699681067865054 --page 6214483488355277271 --auth "Enim occaecati et perferendis asperiores vitae."
+    `+os.Args[0]+` activity station --id 4901102416227285199 --page 8553307744897445340 --auth "Veniam in eos dolor in dolorem."
 `, os.Args[0])
 }
 
@@ -366,7 +398,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 3564629015996628995 --page 6264850308329228339 --auth "Voluptatem a in provident ullam facilis."
+    `+os.Args[0]+` activity project --id 2353815047342128820 --page 3345337708604400436 --auth "A nostrum voluptatum qui odio quis."
 `, os.Args[0])
 }
 
@@ -394,7 +426,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 343528989186680944 --auth "Perspiciatis doloremque."
+    `+os.Args[0]+` following follow --id 8922159228118147378 --auth "Quod eum itaque corrupti asperiores omnis iusto."
 `, os.Args[0])
 }
 
@@ -406,7 +438,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 3639159256254407470 --auth "Non sed a nostrum."
+    `+os.Args[0]+` following unfollow --id 8403666887871798544 --auth "Tempore aut numquam aliquam in quod laborum."
 `, os.Args[0])
 }
 
@@ -418,7 +450,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 5065645685327175683 --page 8922159228118147378
+    `+os.Args[0]+` following followers --id 5826561164485653265 --page 6709774753631418749
 `, os.Args[0])
 }
 
@@ -430,6 +462,9 @@ Usage:
 
 COMMAND:
     update: Update implements update.
+    invites: Invites implements invites.
+    accept- invite: AcceptInvite implements accept invite.
+    reject- invite: RejectInvite implements reject invite.
 
 Additional help:
     %s project COMMAND --help
@@ -445,8 +480,43 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Nobis tempore."
-   }' --id 6171153226389699817 --auth "Aliquam in quod laborum."
+      "body": "Facere repellat ut."
+   }' --id 7577586275964425592 --auth "Labore consequatur accusantium dolor totam dolores."
+`, os.Args[0])
+}
+
+func projectInvitesUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project invites -auth STRING
+
+Invites implements invites.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project invites --auth "Dolore earum perspiciatis."
+`, os.Args[0])
+}
+
+func projectAcceptInviteUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project accept- invite -id INT64 -auth STRING
+
+AcceptInvite implements accept invite.
+    -id INT64: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project accept- invite --id 4561661760049580604 --auth "Iure delectus odio neque ea alias."
+`, os.Args[0])
+}
+
+func projectRejectInviteUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project reject- invite -id INT64 -auth STRING
+
+RejectInvite implements reject invite.
+    -id INT64: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project reject- invite --id 6269895511753342887 --auth "Ut in."
 `, os.Args[0])
 }
 
@@ -482,7 +552,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Fugit dolor consequatur aliquam dignissimos quia nobis." --auth "Quia omnis fugiat."
+    `+os.Args[0]+` tasks refresh- device --device-id "Velit quaerat ut nesciunt ut et." --auth "Veniam vel nisi placeat ad."
 `, os.Args[0])
 }
 
@@ -508,7 +578,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 7577586275964425592
+    `+os.Args[0]+` test get --id 2984855983272144925
 `, os.Args[0])
 }
 
@@ -530,7 +600,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Dolore earum perspiciatis." --auth "Esse et consequatur at amet perferendis quibusdam."
+    `+os.Args[0]+` test email --address "Magni vitae dolorem numquam." --auth "Tempora voluptas voluptatem ut aut."
 `, os.Args[0])
 }
 

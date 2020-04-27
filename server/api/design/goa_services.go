@@ -30,6 +30,12 @@ func commonOptions() {
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
 }
 
+func httpAuthentication() {
+	Header("auth:Authorization", String, "authentication token", func() {
+		Pattern("^Bearer [^ ]+$")
+	})
+}
+
 func DateTimeFormatting() {
 	Format(FormatDateTime)
 }

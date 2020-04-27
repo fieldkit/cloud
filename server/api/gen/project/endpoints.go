@@ -16,7 +16,10 @@ import (
 
 // Endpoints wraps the "project" service endpoints.
 type Endpoints struct {
-	Update goa.Endpoint
+	Update       goa.Endpoint
+	Invites      goa.Endpoint
+	AcceptInvite goa.Endpoint
+	RejectInvite goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "project" service with endpoints.
@@ -24,13 +27,19 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Update: NewUpdateEndpoint(s, a.JWTAuth),
+		Update:       NewUpdateEndpoint(s, a.JWTAuth),
+		Invites:      NewInvitesEndpoint(s, a.JWTAuth),
+		AcceptInvite: NewAcceptInviteEndpoint(s, a.JWTAuth),
+		RejectInvite: NewRejectInviteEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "project" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Update = m(e.Update)
+	e.Invites = m(e.Invites)
+	e.AcceptInvite = m(e.AcceptInvite)
+	e.RejectInvite = m(e.RejectInvite)
 }
 
 // NewUpdateEndpoint returns an endpoint function that calls the method
@@ -44,14 +53,72 @@ func NewUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
 			RequiredScopes: []string{"api:access"},
 		}
-		var token string
-		if p.Auth != nil {
-			token = *p.Auth
-		}
-		ctx, err = authJWTFn(ctx, token, &sc)
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
 		if err != nil {
 			return nil, err
 		}
 		return nil, s.Update(ctx, p)
+	}
+}
+
+// NewInvitesEndpoint returns an endpoint function that calls the method
+// "invites" of service "project".
+func NewInvitesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*InvitesPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Invites(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedPendingInvites(res, "default")
+		return vres, nil
+	}
+}
+
+// NewAcceptInviteEndpoint returns an endpoint function that calls the method
+// "accept invite" of service "project".
+func NewAcceptInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AcceptInvitePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.AcceptInvite(ctx, p)
+	}
+}
+
+// NewRejectInviteEndpoint returns an endpoint function that calls the method
+// "reject invite" of service "project".
+func NewRejectInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*RejectInvitePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.RejectInvite(ctx, p)
 	}
 }

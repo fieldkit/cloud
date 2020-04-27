@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	project "github.com/fieldkit/cloud/server/api/gen/project"
+	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -50,7 +51,7 @@ func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 
 		var (
 			id   int64
-			auth *string
+			auth string
 
 			params = mux.Vars(r)
 		)
@@ -62,20 +63,18 @@ func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			id = v
 		}
-		authRaw := r.Header.Get("Authorization")
-		if authRaw != "" {
-			auth = &authRaw
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewUpdatePayload(&body, id, auth)
-		if payload.Auth != nil {
-			if strings.Contains(*payload.Auth, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
-				payload.Auth = &cred
-			}
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
 		}
 
 		return payload, nil
@@ -108,4 +107,245 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// EncodeInvitesResponse returns an encoder for responses returned by the
+// project invites endpoint.
+func EncodeInvitesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*projectviews.PendingInvites)
+		enc := encoder(ctx, w)
+		body := NewInvitesResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeInvitesRequest returns a decoder for requests sent to the project
+// invites endpoint.
+func DecodeInvitesRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			auth string
+			err  error
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewInvitesPayload(auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeInvitesError returns an encoder for errors returned by the invites
+// project endpoint.
+func EncodeInvitesError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(project.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewInvitesUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeAcceptInviteResponse returns an encoder for responses returned by the
+// project accept invite endpoint.
+func EncodeAcceptInviteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeAcceptInviteRequest returns a decoder for requests sent to the project
+// accept invite endpoint.
+func DecodeAcceptInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			id   int64
+			auth string
+			err  error
+
+			params = mux.Vars(r)
+		)
+		{
+			idRaw := params["id"]
+			v, err2 := strconv.ParseInt(idRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+			}
+			id = v
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewAcceptInvitePayload(id, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeAcceptInviteError returns an encoder for errors returned by the accept
+// invite project endpoint.
+func EncodeAcceptInviteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(project.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAcceptInviteUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeRejectInviteResponse returns an encoder for responses returned by the
+// project reject invite endpoint.
+func EncodeRejectInviteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeRejectInviteRequest returns a decoder for requests sent to the project
+// reject invite endpoint.
+func DecodeRejectInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			id   int64
+			auth string
+			err  error
+
+			params = mux.Vars(r)
+		)
+		{
+			idRaw := params["id"]
+			v, err2 := strconv.ParseInt(idRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+			}
+			id = v
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRejectInvitePayload(id, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeRejectInviteError returns an encoder for errors returned by the reject
+// invite project endpoint.
+func EncodeRejectInviteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(project.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRejectInviteUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// marshalProjectviewsPendingInviteViewToPendingInviteResponseBody builds a
+// value of type *PendingInviteResponseBody from a value of type
+// *projectviews.PendingInviteView.
+func marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(v *projectviews.PendingInviteView) *PendingInviteResponseBody {
+	res := &PendingInviteResponseBody{
+		ID:   *v.ID,
+		Time: *v.Time,
+	}
+	if v.Project != nil {
+		res.Project = marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v.Project)
+	}
+
+	return res
+}
+
+// marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody builds a
+// value of type *ProjectSummaryResponseBody from a value of type
+// *projectviews.ProjectSummaryView.
+func marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v *projectviews.ProjectSummaryView) *ProjectSummaryResponseBody {
+	res := &ProjectSummaryResponseBody{
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+
+	return res
 }

@@ -20,6 +20,18 @@ type Client struct {
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
 
+	// Invites Doer is the HTTP client used to make requests to the invites
+	// endpoint.
+	InvitesDoer goahttp.Doer
+
+	// AcceptInvite Doer is the HTTP client used to make requests to the accept
+	// invite endpoint.
+	AcceptInviteDoer goahttp.Doer
+
+	// RejectInvite Doer is the HTTP client used to make requests to the reject
+	// invite endpoint.
+	RejectInviteDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -44,6 +56,9 @@ func NewClient(
 ) *Client {
 	return &Client{
 		UpdateDoer:          doer,
+		InvitesDoer:         doer,
+		AcceptInviteDoer:    doer,
+		RejectInviteDoer:    doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -72,6 +87,78 @@ func (c *Client) Update() goa.Endpoint {
 		resp, err := c.UpdateDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Invites returns an endpoint that makes HTTP requests to the project service
+// invites server.
+func (c *Client) Invites() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeInvitesRequest(c.encoder)
+		decodeResponse = DecodeInvitesResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildInvitesRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.InvitesDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "invites", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AcceptInvite returns an endpoint that makes HTTP requests to the project
+// service accept invite server.
+func (c *Client) AcceptInvite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAcceptInviteRequest(c.encoder)
+		decodeResponse = DecodeAcceptInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAcceptInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AcceptInviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "accept invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// RejectInvite returns an endpoint that makes HTTP requests to the project
+// service reject invite server.
+func (c *Client) RejectInvite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRejectInviteRequest(c.encoder)
+		decodeResponse = DecodeRejectInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRejectInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RejectInviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "reject invite", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -9,6 +9,7 @@ package server
 
 import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
+	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -18,9 +19,53 @@ type UpdateRequestBody struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// InvitesResponseBody is the type of the "project" service "invites" endpoint
+// HTTP response body.
+type InvitesResponseBody struct {
+	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
+}
+
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// InvitesUnauthorizedResponseBody is the type of the "project" service
+// "invites" endpoint HTTP response body for the "unauthorized" error.
+type InvitesUnauthorizedResponseBody string
+
+// AcceptInviteUnauthorizedResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "unauthorized" error.
+type AcceptInviteUnauthorizedResponseBody string
+
+// RejectInviteUnauthorizedResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "unauthorized" error.
+type RejectInviteUnauthorizedResponseBody string
+
+// PendingInviteResponseBody is used to define fields on response body types.
+type PendingInviteResponseBody struct {
+	ID      int64                       `form:"id" json:"id" xml:"id"`
+	Project *ProjectSummaryResponseBody `form:"project" json:"project" xml:"project"`
+	Time    int64                       `form:"time" json:"time" xml:"time"`
+}
+
+// ProjectSummaryResponseBody is used to define fields on response body types.
+type ProjectSummaryResponseBody struct {
+	ID   int64  `form:"id" json:"id" xml:"id"`
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// NewInvitesResponseBody builds the HTTP response body from the result of the
+// "invites" endpoint of the "project" service.
+func NewInvitesResponseBody(res *projectviews.PendingInvitesView) *InvitesResponseBody {
+	body := &InvitesResponseBody{}
+	if res.Pending != nil {
+		body.Pending = make([]*PendingInviteResponseBody, len(res.Pending))
+		for i, val := range res.Pending {
+			body.Pending[i] = marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(val)
+		}
+	}
+	return body
+}
 
 // NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "project" service.
@@ -29,11 +74,60 @@ func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthori
 	return body
 }
 
+// NewInvitesUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "invites" endpoint of the "project" service.
+func NewInvitesUnauthorizedResponseBody(res project.Unauthorized) InvitesUnauthorizedResponseBody {
+	body := InvitesUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewAcceptInviteUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteUnauthorizedResponseBody(res project.Unauthorized) AcceptInviteUnauthorizedResponseBody {
+	body := AcceptInviteUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRejectInviteUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteUnauthorizedResponseBody(res project.Unauthorized) RejectInviteUnauthorizedResponseBody {
+	body := RejectInviteUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewUpdatePayload builds a project service update endpoint payload.
-func NewUpdatePayload(body *UpdateRequestBody, id int64, auth *string) *project.UpdatePayload {
+func NewUpdatePayload(body *UpdateRequestBody, id int64, auth string) *project.UpdatePayload {
 	v := &project.UpdatePayload{
 		Body: *body.Body,
 	}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewInvitesPayload builds a project service invites endpoint payload.
+func NewInvitesPayload(auth string) *project.InvitesPayload {
+	v := &project.InvitesPayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewAcceptInvitePayload builds a project service accept invite endpoint
+// payload.
+func NewAcceptInvitePayload(id int64, auth string) *project.AcceptInvitePayload {
+	v := &project.AcceptInvitePayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewRejectInvitePayload builds a project service reject invite endpoint
+// payload.
+func NewRejectInvitePayload(id int64, auth string) *project.RejectInvitePayload {
+	v := &project.RejectInvitePayload{}
 	v.ID = id
 	v.Auth = auth
 
