@@ -571,7 +571,6 @@ export default {
             this.updateRoute();
         },
         onTreeSelect(selection, instanceId) {
-            this.showLoading(instanceId);
             const chart = this.charts.find(c => {
                 return c.id == instanceId;
             });
@@ -591,6 +590,7 @@ export default {
             }
             // if station changed
             if (selection.stationId != chart.station.id) {
+                this.showLoading(instanceId);
                 this.$emit("stationChanged", selection.stationId, chart);
                 this.urlQuery[chart.id + "station"] = selection.stationId;
             }
