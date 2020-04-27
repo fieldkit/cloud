@@ -119,3 +119,28 @@ func (a *AWSSESEmailer) SendRecoveryToken(person *data.User, recoveryToken *data
 
 	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
 }
+
+func (a *AWSSESEmailer) SendProjectInvitation(sender *data.User, invite *data.ProjectInvite) error {
+	options := &templateOptions{
+		Sender: sender,
+		Invite: invite,
+		Source: a.source,
+		Domain: a.domain,
+	}
+
+	subjectBuffer := bytes.NewBuffer([]byte{})
+	if err := a.templates.ProjectInvitation.Subject.Execute(subjectBuffer, options); err != nil {
+		return err
+	}
+
+	bodyTextBuffer := bytes.NewBuffer([]byte{})
+	if err := a.templates.ProjectInvitation.BodyText.Execute(bodyTextBuffer, options); err != nil {
+		return err
+	}
+
+	toAddresses := []*string{
+		aws.String(invite.InvitedEmail),
+	}
+
+	return a.send(subjectBuffer.String(), bodyTextBuffer.String(), toAddresses)
+}

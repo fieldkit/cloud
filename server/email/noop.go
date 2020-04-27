@@ -30,12 +30,6 @@ func NewNoopEmailer(source, domain string, override []*string) (e Emailer, err e
 	return
 }
 
-type templateOptions struct {
-	ValidationToken *data.ValidationToken
-	RecoveryToken   *data.RecoveryToken
-	Source, Domain  string
-}
-
 func (e noopEmailer) SendValidationToken(person *data.User, validationToken *data.ValidationToken) error {
 	options := &templateOptions{
 		ValidationToken: validationToken,
@@ -84,6 +78,33 @@ func (e noopEmailer) SendRecoveryToken(person *data.User, recoveryToken *data.Re
 	}
 
 	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", person.Email, subjectBuffer.String(), bodyBuffer.String())
+
+	return nil
+}
+
+func (e noopEmailer) SendProjectInvitation(sender *data.User, invite *data.ProjectInvite) error {
+	options := &templateOptions{
+		Sender: sender,
+		Invite: invite,
+		Source: e.source,
+		Domain: e.domain,
+	}
+
+	subjectBuffer := bytes.NewBuffer([]byte{})
+	if err := e.templates.ProjectInvitation.Subject.Execute(subjectBuffer, options); err != nil {
+		return err
+	}
+
+	bodyBuffer := bytes.NewBuffer([]byte{})
+	if err := e.templates.ProjectInvitation.BodyText.Execute(bodyBuffer, options); err != nil {
+		return err
+	}
+
+	if e.override != nil {
+		fmt.Printf("Override: %v", e.override)
+	}
+
+	fmt.Printf("To: %s\nSubject: %s\n\n%s\n\n", invite.InvitedEmail, subjectBuffer.String(), bodyBuffer.String())
 
 	return nil
 }

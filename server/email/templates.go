@@ -3,11 +3,22 @@ package email
 import (
 	html "html/template"
 	text "text/template"
+
+	"github.com/fieldkit/cloud/server/data"
 )
 
+type templateOptions struct {
+	Sender          *data.User
+	Invite          *data.ProjectInvite
+	ValidationToken *data.ValidationToken
+	RecoveryToken   *data.RecoveryToken
+	Source, Domain  string
+}
+
 type EmailTemplates struct {
-	Validation *EmailTemplate
-	Recovery   *EmailTemplate
+	Validation        *EmailTemplate
+	Recovery          *EmailTemplate
+	ProjectInvitation *EmailTemplate
 }
 
 func NewEmailTemplates() (e *EmailTemplates, err error) {
@@ -21,9 +32,15 @@ func NewEmailTemplates() (e *EmailTemplates, err error) {
 		return nil, err
 	}
 
+	projectInvitation, err := NewProjectInvitationEmailTemplate()
+	if err != nil {
+		return nil, err
+	}
+
 	e = &EmailTemplates{
-		Validation: validation,
-		Recovery:   recovery,
+		Validation:        validation,
+		Recovery:          recovery,
+		ProjectInvitation: projectInvitation,
 	}
 
 	return
@@ -82,6 +99,38 @@ func NewRecoveryEmailTemplate() (et *EmailTemplate, err error) {
 
 	bodyTextText := `To recovery your Fieldkit account, navigate to:
 https://portal.{{.Domain}}/dashboard/user/reset?token={{.RecoveryToken.Token}}`
+
+	bodyHTMLText := bodyTextText
+
+	subject, err := text.New("subject").Parse(subjectText)
+	if err != nil {
+		return nil, err
+	}
+
+	bodyText, err := text.New("body").Parse(bodyTextText)
+	if err != nil {
+		return nil, err
+	}
+
+	bodyHTML, err := html.New("body").Parse(bodyHTMLText)
+	if err != nil {
+		return nil, err
+	}
+
+	et = &EmailTemplate{
+		Subject:  subject,
+		BodyText: bodyText,
+		BodyHTML: bodyHTML,
+	}
+
+	return
+}
+
+func NewProjectInvitationEmailTemplate() (et *EmailTemplate, err error) {
+	subjectText := `Recovery your Fieldkit account`
+
+	bodyTextText := `You have been invited to new FieldKit project. To view the invitation, click here:
+https://portal.{{.Domain}}/projects/invitation?token={{.ProjectInvite.Token}}`
 
 	bodyHTMLText := bodyTextText
 

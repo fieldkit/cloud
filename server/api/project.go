@@ -303,7 +303,26 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token) VALUES ($1, $2, $3, $4, $5)", ctx.ProjectID, p.UserID(), ctx.Payload.Email, time.Now(), token); err != nil {
+	invite = &data.ProjectInvite{
+		ProjectID:    int32(ctx.ProjectID),
+		UserID:       p.UserID(),
+		InvitedEmail: ctx.Payload.Email,
+		InvitedTime:  time.Now(),
+		Token:        token,
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `
+		INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token) VALUES ($1, $2, $3, $4, $5)
+		`, invite.ProjectID, invite.UserID, invite.InvitedEmail, invite.InvitedTime, invite.Token); err != nil {
+		return err
+	}
+
+	sender := &data.User{}
+	if err := c.options.Database.GetContext(ctx, sender, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", p.UserID()); err != nil {
+		return err
+	}
+
+	if err := c.options.Emailer.SendProjectInvitation(sender, invite); err != nil {
 		return err
 	}
 
