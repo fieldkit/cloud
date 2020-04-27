@@ -55,7 +55,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 	}
 
 	if err := recordIngestionActivity(ctx, h.Database, m, info); err != nil {
-		log.Errow("ingestion", "error", err)
+		log.Errorw("ingestion", "error", err)
 	} else {
 		log.Infow("activity added")
 	}
