@@ -50,9 +50,7 @@ var _ = Service("following", func() {
 		HTTP(func() {
 			POST("projects/{id}/follow")
 
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
+			httpAuthentication()
 		})
 	})
 
@@ -69,9 +67,7 @@ var _ = Service("following", func() {
 		HTTP(func() {
 			POST("projects/{id}/unfollow")
 
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
+			httpAuthentication()
 		})
 	})
 

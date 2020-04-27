@@ -298,7 +298,12 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		}
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time) VALUES ($1, $2, $3, $4)", ctx.ProjectID, p.UserID(), ctx.Payload.Email, time.Now()); err != nil {
+	token, err := data.NewToken(20)
+	if err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token) VALUES ($1, $2, $3, $4, $5)", ctx.ProjectID, p.UserID(), ctx.Payload.Email, time.Now(), token); err != nil {
 		return err
 	}
 

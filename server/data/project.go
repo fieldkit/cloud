@@ -60,4 +60,5 @@ type ProjectInvite struct {
 	InvitedTime  time.Time  `db:"invited_time"`
 	AcceptedTime *time.Time `db:"accepted_time"`
 	RejectedTime *time.Time `db:"rejected_time"`
+	Token        Token      `db:"token" json:"token"`
 }
