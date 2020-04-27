@@ -69,6 +69,27 @@ var _ = Service("project", func() {
 		})
 	})
 
+	Method("lookup invite", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Token("token")
+			Required("token")
+		})
+
+		Result(PendingInvites)
+
+		HTTP(func() {
+			GET("projects/invites/{token}")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("accept invite", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -108,8 +129,10 @@ var _ = Service("project", func() {
 	})
 
 	Error("unauthorized", String, "credentials are invalid")
+	Error("not-found", String, "not found")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
+		Response("not-found", StatusNotFound)
 	})
 })

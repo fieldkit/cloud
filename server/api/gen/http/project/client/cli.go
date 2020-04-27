@@ -59,6 +59,24 @@ func BuildInvitesPayload(projectInvitesAuth string) (*project.InvitesPayload, er
 	return v, nil
 }
 
+// BuildLookupInvitePayload builds the payload for the project lookup invite
+// endpoint from CLI flags.
+func BuildLookupInvitePayload(projectLookupInviteToken string, projectLookupInviteAuth string) (*project.LookupInvitePayload, error) {
+	var token string
+	{
+		token = projectLookupInviteToken
+	}
+	var auth string
+	{
+		auth = projectLookupInviteAuth
+	}
+	v := &project.LookupInvitePayload{}
+	v.Token = token
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildAcceptInvitePayload builds the payload for the project accept invite
 // endpoint from CLI flags.
 func BuildAcceptInvitePayload(projectAcceptInviteID string, projectAcceptInviteAuth string) (*project.AcceptInvitePayload, error) {

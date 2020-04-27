@@ -24,6 +24,10 @@ type Client struct {
 	// endpoint.
 	InvitesDoer goahttp.Doer
 
+	// LookupInvite Doer is the HTTP client used to make requests to the lookup
+	// invite endpoint.
+	LookupInviteDoer goahttp.Doer
+
 	// AcceptInvite Doer is the HTTP client used to make requests to the accept
 	// invite endpoint.
 	AcceptInviteDoer goahttp.Doer
@@ -57,6 +61,7 @@ func NewClient(
 	return &Client{
 		UpdateDoer:          doer,
 		InvitesDoer:         doer,
+		LookupInviteDoer:    doer,
 		AcceptInviteDoer:    doer,
 		RejectInviteDoer:    doer,
 		CORSDoer:            doer,
@@ -111,6 +116,30 @@ func (c *Client) Invites() goa.Endpoint {
 		resp, err := c.InvitesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "invites", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// LookupInvite returns an endpoint that makes HTTP requests to the project
+// service lookup invite server.
+func (c *Client) LookupInvite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeLookupInviteRequest(c.encoder)
+		decodeResponse = DecodeLookupInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildLookupInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.LookupInviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "lookup invite", err)
 		}
 		return decodeResponse(resp)
 	}

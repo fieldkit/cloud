@@ -18,6 +18,7 @@ import (
 type Endpoints struct {
 	Update       goa.Endpoint
 	Invites      goa.Endpoint
+	LookupInvite goa.Endpoint
 	AcceptInvite goa.Endpoint
 	RejectInvite goa.Endpoint
 }
@@ -29,6 +30,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Update:       NewUpdateEndpoint(s, a.JWTAuth),
 		Invites:      NewInvitesEndpoint(s, a.JWTAuth),
+		LookupInvite: NewLookupInviteEndpoint(s, a.JWTAuth),
 		AcceptInvite: NewAcceptInviteEndpoint(s, a.JWTAuth),
 		RejectInvite: NewRejectInviteEndpoint(s, a.JWTAuth),
 	}
@@ -38,6 +40,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Update = m(e.Update)
 	e.Invites = m(e.Invites)
+	e.LookupInvite = m(e.LookupInvite)
 	e.AcceptInvite = m(e.AcceptInvite)
 	e.RejectInvite = m(e.RejectInvite)
 }
@@ -77,6 +80,30 @@ func NewInvitesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 			return nil, err
 		}
 		res, err := s.Invites(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedPendingInvites(res, "default")
+		return vres, nil
+	}
+}
+
+// NewLookupInviteEndpoint returns an endpoint function that calls the method
+// "lookup invite" of service "project".
+func NewLookupInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*LookupInvitePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.LookupInvite(ctx, p)
 		if err != nil {
 			return nil, err
 		}

@@ -25,17 +25,47 @@ type InvitesResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
 }
 
+// LookupInviteResponseBody is the type of the "project" service "lookup
+// invite" endpoint HTTP response body.
+type LookupInviteResponseBody struct {
+	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
+}
+
+// UpdateNotFoundResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// InvitesNotFoundResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "not-found" error.
+type InvitesNotFoundResponseBody string
 
 // InvitesUnauthorizedResponseBody is the type of the "project" service
 // "invites" endpoint HTTP response body for the "unauthorized" error.
 type InvitesUnauthorizedResponseBody string
 
+// LookupInviteNotFoundResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "not-found" error.
+type LookupInviteNotFoundResponseBody string
+
+// LookupInviteUnauthorizedResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "unauthorized" error.
+type LookupInviteUnauthorizedResponseBody string
+
+// AcceptInviteNotFoundResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "not-found" error.
+type AcceptInviteNotFoundResponseBody string
+
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
 type AcceptInviteUnauthorizedResponseBody string
+
+// RejectInviteNotFoundResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "not-found" error.
+type RejectInviteNotFoundResponseBody string
 
 // RejectInviteUnauthorizedResponseBody is the type of the "project" service
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
@@ -67,10 +97,37 @@ func NewInvitesResponseBody(res *projectviews.PendingInvitesView) *InvitesRespon
 	return body
 }
 
+// NewLookupInviteResponseBody builds the HTTP response body from the result of
+// the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupInviteResponseBody {
+	body := &LookupInviteResponseBody{}
+	if res.Pending != nil {
+		body.Pending = make([]*PendingInviteResponseBody, len(res.Pending))
+		for i, val := range res.Pending {
+			body.Pending[i] = marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseBody {
+	body := UpdateNotFoundResponseBody(res)
+	return body
+}
+
 // NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "project" service.
 func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
 	body := UpdateUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewInvitesNotFoundResponseBody builds the HTTP response body from the result
+// of the "invites" endpoint of the "project" service.
+func NewInvitesNotFoundResponseBody(res project.NotFound) InvitesNotFoundResponseBody {
+	body := InvitesNotFoundResponseBody(res)
 	return body
 }
 
@@ -81,10 +138,38 @@ func NewInvitesUnauthorizedResponseBody(res project.Unauthorized) InvitesUnautho
 	return body
 }
 
+// NewLookupInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteNotFoundResponseBody(res project.NotFound) LookupInviteNotFoundResponseBody {
+	body := LookupInviteNotFoundResponseBody(res)
+	return body
+}
+
+// NewLookupInviteUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteUnauthorizedResponseBody(res project.Unauthorized) LookupInviteUnauthorizedResponseBody {
+	body := LookupInviteUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewAcceptInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteNotFoundResponseBody(res project.NotFound) AcceptInviteNotFoundResponseBody {
+	body := AcceptInviteNotFoundResponseBody(res)
+	return body
+}
+
 // NewAcceptInviteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "accept invite" endpoint of the "project" service.
 func NewAcceptInviteUnauthorizedResponseBody(res project.Unauthorized) AcceptInviteUnauthorizedResponseBody {
 	body := AcceptInviteUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRejectInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteNotFoundResponseBody(res project.NotFound) RejectInviteNotFoundResponseBody {
+	body := RejectInviteNotFoundResponseBody(res)
 	return body
 }
 
@@ -109,6 +194,16 @@ func NewUpdatePayload(body *UpdateRequestBody, id int64, auth string) *project.U
 // NewInvitesPayload builds a project service invites endpoint payload.
 func NewInvitesPayload(auth string) *project.InvitesPayload {
 	v := &project.InvitesPayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewLookupInvitePayload builds a project service lookup invite endpoint
+// payload.
+func NewLookupInvitePayload(token string, auth string) *project.LookupInvitePayload {
+	v := &project.LookupInvitePayload{}
+	v.Token = token
 	v.Auth = auth
 
 	return v

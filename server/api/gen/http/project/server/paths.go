@@ -21,6 +21,11 @@ func InvitesProjectPath() string {
 	return "/projects/invites/pending"
 }
 
+// LookupInviteProjectPath returns the URL path to the project service lookup invite HTTP endpoint.
+func LookupInviteProjectPath(token string) string {
+	return fmt.Sprintf("/projects/invites/%v", token)
+}
+
 // AcceptInviteProjectPath returns the URL path to the project service accept invite HTTP endpoint.
 func AcceptInviteProjectPath(id int64) string {
 	return fmt.Sprintf("/projects/invites/%v/accept", id)

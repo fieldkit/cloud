@@ -47,9 +47,6 @@ type RefreshDevicePayload struct {
 // credentials are invalid
 type Unauthorized string
 
-// token scopes are invalid
-type InvalidScopes string
-
 // Error returns an error description.
 func (e Unauthorized) Error() string {
 	return "credentials are invalid"
@@ -58,14 +55,4 @@ func (e Unauthorized) Error() string {
 // ErrorName returns "unauthorized".
 func (e Unauthorized) ErrorName() string {
 	return "unauthorized"
-}
-
-// Error returns an error description.
-func (e InvalidScopes) Error() string {
-	return "token scopes are invalid"
-}
-
-// ErrorName returns "invalid-scopes".
-func (e InvalidScopes) ErrorName() string {
-	return "invalid-scopes"
 }

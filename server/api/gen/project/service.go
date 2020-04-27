@@ -20,6 +20,8 @@ type Service interface {
 	Update(context.Context, *UpdatePayload) (err error)
 	// Invites implements invites.
 	Invites(context.Context, *InvitesPayload) (res *PendingInvites, err error)
+	// LookupInvite implements lookup invite.
+	LookupInvite(context.Context, *LookupInvitePayload) (res *PendingInvites, err error)
 	// AcceptInvite implements accept invite.
 	AcceptInvite(context.Context, *AcceptInvitePayload) (err error)
 	// RejectInvite implements reject invite.
@@ -40,7 +42,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"update", "invites", "accept invite", "reject invite"}
+var MethodNames = [5]string{"update", "invites", "lookup invite", "accept invite", "reject invite"}
 
 // UpdatePayload is the payload type of the project service update method.
 type UpdatePayload struct {
@@ -57,6 +59,13 @@ type InvitesPayload struct {
 // PendingInvites is the result type of the project service invites method.
 type PendingInvites struct {
 	Pending []*PendingInvite
+}
+
+// LookupInvitePayload is the payload type of the project service lookup invite
+// method.
+type LookupInvitePayload struct {
+	Auth  string
+	Token string
 }
 
 // AcceptInvitePayload is the payload type of the project service accept invite
@@ -87,6 +96,9 @@ type ProjectSummary struct {
 // credentials are invalid
 type Unauthorized string
 
+// not found
+type NotFound string
+
 // Error returns an error description.
 func (e Unauthorized) Error() string {
 	return "credentials are invalid"
@@ -95,6 +107,16 @@ func (e Unauthorized) Error() string {
 // ErrorName returns "unauthorized".
 func (e Unauthorized) ErrorName() string {
 	return "unauthorized"
+}
+
+// Error returns an error description.
+func (e NotFound) Error() string {
+	return "not found"
+}
+
+// ErrorName returns "not-found".
+func (e NotFound) ErrorName() string {
+	return "not-found"
 }
 
 // NewPendingInvites initializes result type PendingInvites from viewed result

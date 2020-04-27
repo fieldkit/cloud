@@ -23,6 +23,7 @@ type Server struct {
 	Mounts       []*MountPoint
 	Update       http.Handler
 	Invites      http.Handler
+	LookupInvite http.Handler
 	AcceptInvite http.Handler
 	RejectInvite http.Handler
 	CORS         http.Handler
@@ -63,15 +64,18 @@ func New(
 		Mounts: []*MountPoint{
 			{"Update", "POST", "/projects/{id}/update"},
 			{"Invites", "GET", "/projects/invites/pending"},
+			{"LookupInvite", "GET", "/projects/invites/{token}"},
 			{"AcceptInvite", "POST", "/projects/invites/{id}/accept"},
 			{"RejectInvite", "POST", "/projects/invites/{id}/reject"},
 			{"CORS", "OPTIONS", "/projects/{id}/update"},
 			{"CORS", "OPTIONS", "/projects/invites/pending"},
+			{"CORS", "OPTIONS", "/projects/invites/{token}"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/accept"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/reject"},
 		},
 		Update:       NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		Invites:      NewInvitesHandler(e.Invites, mux, decoder, encoder, errhandler, formatter),
+		LookupInvite: NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
 		AcceptInvite: NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
 		RejectInvite: NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
 		CORS:         NewCORSHandler(),
@@ -85,6 +89,7 @@ func (s *Server) Service() string { return "project" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Update = m(s.Update)
 	s.Invites = m(s.Invites)
+	s.LookupInvite = m(s.LookupInvite)
 	s.AcceptInvite = m(s.AcceptInvite)
 	s.RejectInvite = m(s.RejectInvite)
 	s.CORS = m(s.CORS)
@@ -94,6 +99,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateHandler(mux, h.Update)
 	MountInvitesHandler(mux, h.Invites)
+	MountLookupInviteHandler(mux, h.LookupInvite)
 	MountAcceptInviteHandler(mux, h.AcceptInvite)
 	MountRejectInviteHandler(mux, h.RejectInvite)
 	MountCORSHandler(mux, h.CORS)
@@ -180,6 +186,57 @@ func NewInvitesHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "invites")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountLookupInviteHandler configures the mux to serve the "project" service
+// "lookup invite" endpoint.
+func MountLookupInviteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/invites/{token}", f)
+}
+
+// NewLookupInviteHandler creates a HTTP handler which loads the HTTP request
+// and calls the "project" service "lookup invite" endpoint.
+func NewLookupInviteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeLookupInviteRequest(mux, decoder)
+		encodeResponse = EncodeLookupInviteResponse(encoder)
+		encodeError    = EncodeLookupInviteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "lookup invite")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -315,6 +372,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/projects/{id}/update", f)
 	mux.Handle("OPTIONS", "/projects/invites/pending", f)
+	mux.Handle("OPTIONS", "/projects/invites/{token}", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/accept", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/reject", f)
 }

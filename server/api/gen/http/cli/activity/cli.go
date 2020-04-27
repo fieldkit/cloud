@@ -30,7 +30,7 @@ import (
 func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
-project (update|invites|accept- invite|reject- invite)
+project (update|invites|lookup- invite|accept- invite|reject- invite)
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -39,13 +39,13 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 4901102416227285199 --page 8553307744897445340 --auth "Veniam in eos dolor in dolorem."` + "\n" +
-		os.Args[0] + ` following follow --id 8922159228118147378 --auth "Quod eum itaque corrupti asperiores omnis iusto."` + "\n" +
+	return os.Args[0] + ` activity station --id 4487926062717036772 --page 4634291350431276384 --auth "Ut ut quis et debitis autem dolor."` + "\n" +
+		os.Args[0] + ` following follow --id 6740613319328712823 --auth "Asperiores omnis iusto."` + "\n" +
 		os.Args[0] + ` project update --body '{
       "body": "Facere repellat ut."
    }' --id 7577586275964425592 --auth "Labore consequatur accusantium dolor totam dolores."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
-		os.Args[0] + ` test get --id 2984855983272144925` + "\n" +
+		os.Args[0] + ` test get --id 4521611668044992240` + "\n" +
 		""
 }
 
@@ -95,6 +95,10 @@ func ParseEndpoint(
 		projectInvitesFlags    = flag.NewFlagSet("invites", flag.ExitOnError)
 		projectInvitesAuthFlag = projectInvitesFlags.String("auth", "REQUIRED", "")
 
+		projectLookupInviteFlags     = flag.NewFlagSet("lookup- invite", flag.ExitOnError)
+		projectLookupInviteTokenFlag = projectLookupInviteFlags.String("token", "REQUIRED", "")
+		projectLookupInviteAuthFlag  = projectLookupInviteFlags.String("auth", "REQUIRED", "")
+
 		projectAcceptInviteFlags    = flag.NewFlagSet("accept- invite", flag.ExitOnError)
 		projectAcceptInviteIDFlag   = projectAcceptInviteFlags.String("id", "REQUIRED", "")
 		projectAcceptInviteAuthFlag = projectAcceptInviteFlags.String("auth", "REQUIRED", "")
@@ -138,6 +142,7 @@ func ParseEndpoint(
 	projectFlags.Usage = projectUsage
 	projectUpdateFlags.Usage = projectUpdateUsage
 	projectInvitesFlags.Usage = projectInvitesUsage
+	projectLookupInviteFlags.Usage = projectLookupInviteUsage
 	projectAcceptInviteFlags.Usage = projectAcceptInviteUsage
 	projectRejectInviteFlags.Usage = projectRejectInviteUsage
 
@@ -225,6 +230,9 @@ func ParseEndpoint(
 
 			case "invites":
 				epf = projectInvitesFlags
+
+			case "lookup- invite":
+				epf = projectLookupInviteFlags
 
 			case "accept- invite":
 				epf = projectAcceptInviteFlags
@@ -316,6 +324,9 @@ func ParseEndpoint(
 			case "invites":
 				endpoint = c.Invites()
 				data, err = projectc.BuildInvitesPayload(*projectInvitesAuthFlag)
+			case "lookup- invite":
+				endpoint = c.LookupInvite()
+				data, err = projectc.BuildLookupInvitePayload(*projectLookupInviteTokenFlag, *projectLookupInviteAuthFlag)
 			case "accept- invite":
 				endpoint = c.AcceptInvite()
 				data, err = projectc.BuildAcceptInvitePayload(*projectAcceptInviteIDFlag, *projectAcceptInviteAuthFlag)
@@ -385,7 +396,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 4901102416227285199 --page 8553307744897445340 --auth "Veniam in eos dolor in dolorem."
+    `+os.Args[0]+` activity station --id 4487926062717036772 --page 4634291350431276384 --auth "Ut ut quis et debitis autem dolor."
 `, os.Args[0])
 }
 
@@ -398,7 +409,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 2353815047342128820 --page 3345337708604400436 --auth "A nostrum voluptatum qui odio quis."
+    `+os.Args[0]+` activity project --id 9078410795086589887 --page 1611986273183493350 --auth "Earum nulla assumenda dolores."
 `, os.Args[0])
 }
 
@@ -426,7 +437,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 8922159228118147378 --auth "Quod eum itaque corrupti asperiores omnis iusto."
+    `+os.Args[0]+` following follow --id 6740613319328712823 --auth "Asperiores omnis iusto."
 `, os.Args[0])
 }
 
@@ -463,6 +474,7 @@ Usage:
 COMMAND:
     update: Update implements update.
     invites: Invites implements invites.
+    lookup- invite: LookupInvite implements lookup invite.
     accept- invite: AcceptInvite implements accept invite.
     reject- invite: RejectInvite implements reject invite.
 
@@ -492,7 +504,19 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Dolore earum perspiciatis."
+    `+os.Args[0]+` project invites --auth "Aliquam suscipit."
+`, os.Args[0])
+}
+
+func projectLookupInviteUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project lookup- invite -token STRING -auth STRING
+
+LookupInvite implements lookup invite.
+    -token STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project lookup- invite --token "Occaecati molestiae aliquid explicabo ipsum." --auth "Itaque rerum."
 `, os.Args[0])
 }
 
@@ -504,7 +528,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 4561661760049580604 --auth "Iure delectus odio neque ea alias."
+    `+os.Args[0]+` project accept- invite --id 7356251962937509818 --auth "Reprehenderit sit deserunt est doloribus accusamus illo."
 `, os.Args[0])
 }
 
@@ -516,7 +540,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 6269895511753342887 --auth "Ut in."
+    `+os.Args[0]+` project reject- invite --id 8829525658332825003 --auth "Tempora voluptas voluptatem ut aut."
 `, os.Args[0])
 }
 
@@ -552,7 +576,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Velit quaerat ut nesciunt ut et." --auth "Veniam vel nisi placeat ad."
+    `+os.Args[0]+` tasks refresh- device --device-id "Quibusdam sunt quis rerum deleniti." --auth "Animi consequuntur qui."
 `, os.Args[0])
 }
 
@@ -578,7 +602,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 2984855983272144925
+    `+os.Args[0]+` test get --id 4521611668044992240
 `, os.Args[0])
 }
 
@@ -600,7 +624,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Magni vitae dolorem numquam." --auth "Tempora voluptas voluptatem ut aut."
+    `+os.Args[0]+` test email --address "Explicabo reprehenderit quia et voluptas natus libero." --auth "Iusto dolorem inventore accusantium et deserunt maiores."
 `, os.Args[0])
 }
 

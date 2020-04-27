@@ -34,7 +34,6 @@ var _ = Service("tasks", func() {
 	})
 
 	Error("unauthorized", String, "credentials are invalid")
-	Error("invalid-scopes", String, "token scopes are invalid")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)

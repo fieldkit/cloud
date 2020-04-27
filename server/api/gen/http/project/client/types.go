@@ -25,17 +25,47 @@ type InvitesResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
 }
 
+// LookupInviteResponseBody is the type of the "project" service "lookup
+// invite" endpoint HTTP response body.
+type LookupInviteResponseBody struct {
+	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+}
+
+// UpdateNotFoundResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// InvitesNotFoundResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "not-found" error.
+type InvitesNotFoundResponseBody string
 
 // InvitesUnauthorizedResponseBody is the type of the "project" service
 // "invites" endpoint HTTP response body for the "unauthorized" error.
 type InvitesUnauthorizedResponseBody string
 
+// LookupInviteNotFoundResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "not-found" error.
+type LookupInviteNotFoundResponseBody string
+
+// LookupInviteUnauthorizedResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "unauthorized" error.
+type LookupInviteUnauthorizedResponseBody string
+
+// AcceptInviteNotFoundResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "not-found" error.
+type AcceptInviteNotFoundResponseBody string
+
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
 type AcceptInviteUnauthorizedResponseBody string
+
+// RejectInviteNotFoundResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "not-found" error.
+type RejectInviteNotFoundResponseBody string
 
 // RejectInviteUnauthorizedResponseBody is the type of the "project" service
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
@@ -63,6 +93,12 @@ func NewUpdateRequestBody(p *project.UpdatePayload) *UpdateRequestBody {
 	return body
 }
 
+// NewUpdateNotFound builds a project service update endpoint not-found error.
+func NewUpdateNotFound(body UpdateNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
 // NewUpdateUnauthorized builds a project service update endpoint unauthorized
 // error.
 func NewUpdateUnauthorized(body UpdateUnauthorizedResponseBody) project.Unauthorized {
@@ -82,6 +118,12 @@ func NewInvitesPendingInvitesOK(body *InvitesResponseBody) *projectviews.Pending
 	return v
 }
 
+// NewInvitesNotFound builds a project service invites endpoint not-found error.
+func NewInvitesNotFound(body InvitesNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
 // NewInvitesUnauthorized builds a project service invites endpoint
 // unauthorized error.
 func NewInvitesUnauthorized(body InvitesUnauthorizedResponseBody) project.Unauthorized {
@@ -89,10 +131,50 @@ func NewInvitesUnauthorized(body InvitesUnauthorizedResponseBody) project.Unauth
 	return v
 }
 
+// NewLookupInvitePendingInvitesOK builds a "project" service "lookup invite"
+// endpoint result from a HTTP "OK" response.
+func NewLookupInvitePendingInvitesOK(body *LookupInviteResponseBody) *projectviews.PendingInvitesView {
+	v := &projectviews.PendingInvitesView{}
+	v.Pending = make([]*projectviews.PendingInviteView, len(body.Pending))
+	for i, val := range body.Pending {
+		v.Pending[i] = unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView(val)
+	}
+
+	return v
+}
+
+// NewLookupInviteNotFound builds a project service lookup invite endpoint
+// not-found error.
+func NewLookupInviteNotFound(body LookupInviteNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewLookupInviteUnauthorized builds a project service lookup invite endpoint
+// unauthorized error.
+func NewLookupInviteUnauthorized(body LookupInviteUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewAcceptInviteNotFound builds a project service accept invite endpoint
+// not-found error.
+func NewAcceptInviteNotFound(body AcceptInviteNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
 // NewAcceptInviteUnauthorized builds a project service accept invite endpoint
 // unauthorized error.
 func NewAcceptInviteUnauthorized(body AcceptInviteUnauthorizedResponseBody) project.Unauthorized {
 	v := project.Unauthorized(body)
+	return v
+}
+
+// NewRejectInviteNotFound builds a project service reject invite endpoint
+// not-found error.
+func NewRejectInviteNotFound(body RejectInviteNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
 	return v
 }
 

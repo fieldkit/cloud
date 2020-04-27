@@ -96,6 +96,55 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 	return
 }
 
+func (c *ProjectService) LookupInvite(ctx context.Context, payload *project.LookupInvitePayload) (invites *project.PendingInvites, err error) {
+	_, err = NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	all := []*data.ProjectInvite{}
+	if err := c.options.Database.SelectContext(ctx, &all, `
+		SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.token = $1
+		`, payload.Token); err != nil {
+		return nil, err
+	}
+
+	if len(all) != 1 {
+		return nil, project.NotFound("invalid invite token")
+	}
+
+	projects := []*data.Project{}
+	if err := c.options.Database.SelectContext(ctx, &projects, `
+		SELECT * FROM fieldkit.project WHERE id = $1
+		`, all[0].ProjectID); err != nil {
+		return nil, err
+	}
+
+	projectsByID := make(map[int32]*data.Project)
+	for _, p := range projects {
+		projectsByID[p.ID] = p
+	}
+
+	pending := make([]*project.PendingInvite, 0)
+	for _, i := range all {
+		p := projectsByID[i.ProjectID]
+		pending = append(pending, &project.PendingInvite{
+			ID:   int64(i.ID),
+			Time: i.InvitedTime.Unix() * 1000,
+			Project: &project.ProjectSummary{
+				ID:   int64(p.ID),
+				Name: p.Name,
+			},
+		})
+	}
+
+	invites = &project.PendingInvites{
+		Pending: pending,
+	}
+
+	return
+}
+
 func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.AcceptInvitePayload) (err error) {
 	log := Logger(ctx).Sugar()
 

@@ -17,15 +17,17 @@ import (
 type Client struct {
 	UpdateEndpoint       goa.Endpoint
 	InvitesEndpoint      goa.Endpoint
+	LookupInviteEndpoint goa.Endpoint
 	AcceptInviteEndpoint goa.Endpoint
 	RejectInviteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(update, invites, acceptInvite, rejectInvite goa.Endpoint) *Client {
+func NewClient(update, invites, lookupInvite, acceptInvite, rejectInvite goa.Endpoint) *Client {
 	return &Client{
 		UpdateEndpoint:       update,
 		InvitesEndpoint:      invites,
+		LookupInviteEndpoint: lookupInvite,
 		AcceptInviteEndpoint: acceptInvite,
 		RejectInviteEndpoint: rejectInvite,
 	}
@@ -41,6 +43,16 @@ func (c *Client) Update(ctx context.Context, p *UpdatePayload) (err error) {
 func (c *Client) Invites(ctx context.Context, p *InvitesPayload) (res *PendingInvites, err error) {
 	var ires interface{}
 	ires, err = c.InvitesEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*PendingInvites), nil
+}
+
+// LookupInvite calls the "lookup invite" endpoint of the "project" service.
+func (c *Client) LookupInvite(ctx context.Context, p *LookupInvitePayload) (res *PendingInvites, err error) {
+	var ires interface{}
+	ires, err = c.LookupInviteEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
