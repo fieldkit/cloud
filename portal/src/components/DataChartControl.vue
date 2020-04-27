@@ -28,6 +28,17 @@
                     >
                         {{ btn.label }}
                     </div>
+                    <div class="calendar-container">
+                        <v-date-picker
+                            class="vc-calendar"
+                            mode="range"
+                            v-model="overallRange"
+                            :popover="{ placement: 'bottom left' }"
+                            :masks="{ input: 'MM/DD/YY' }"
+                            @popoverWillShow="onPopoverWillShow"
+                            @popoverDidHide="onPopoverDidHide"
+                        />
+                    </div>
                 </div>
                 <div class="spacer"></div>
             </div>
@@ -158,6 +169,14 @@ export default {
                     value: 0,
                 },
             ],
+            overallRange: {
+                start: new Date(2020, 0, 1),
+                end: new Date(2020, 0, 1),
+            },
+            prevOverallRange: {
+                start: new Date(2020, 0, 1),
+                end: new Date(2020, 0, 1),
+            },
         };
     },
     props: ["treeSelectOptions", "allSensors"],
@@ -277,6 +296,8 @@ export default {
             if (document.getElementById(chartId + "station-loading")) {
                 document.getElementById(chartId + "station-loading").style.display = "none";
             }
+            // update custom date range with each new chart?
+            this.overallRange = { start: totalTime[0], end: totalTime[1] };
             this.updateIds();
             this.updateRoute();
             this.$emit("sensorUpdate", newChart);
@@ -453,20 +474,54 @@ export default {
             // }
             this.updateRoute();
         },
+        onPopoverWillShow() {
+            // store value to compare to prevent hovering from
+            // triggering time chages
+            this.prevOverallRange = this.overallRange;
+        },
+        onPopoverDidHide() {
+            // using this event to avoid triggering date changes
+            // when matching this.overallRange to displayed date range
+            if (
+                this.prevOverallRange.start.getTime() != this.overallRange.start.getTime() ||
+                this.prevOverallRange.end.getTime() != this.overallRange.end.getTime()
+            ) {
+                this.charts.forEach(c => {
+                    this.showLoading(c.id);
+                    if (this.$refs[c.ref]) {
+                        this.$refs[c.ref][0].setTimeRange(this.overallRange);
+                        this.$refs[c.ref][0].setRequestedTime(this.overallRange);
+                        this.urlQuery[c.id + "start"] = this.overallRange.start.getTime();
+                        this.urlQuery[c.id + "end"] = this.overallRange.end.getTime();
+                        this.$emit("timeChanged", this.overallRange, c);
+                    }
+                });
+                this.updateRoute();
+                // display active state for appropriate button
+                this.timeButtons.forEach(b => {
+                    b.active = false;
+                });
+            }
+        },
         setTimeRangeByDays(event) {
             // method can be called by time buttons,
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
             const days = event.id ? 0 : event.target.getAttribute("data-time");
-            this.charts.forEach(c => {
+            let range;
+            this.charts.forEach((c, i) => {
                 this.showLoading(c.id);
                 const endDate = c.totalTime[1];
-                let range = {
+                range = {
                     start: new Date(endDate.getTime() - days * DAY),
                     end: endDate,
                 };
                 if (days == 0) {
                     range.start = c.totalTime[0];
+                }
+                // when to update the custom date range?
+                if (i == 0) {
+                    this.overallRange = range;
                 }
                 if (this.$refs[c.ref]) {
                     this.$refs[c.ref][0].setTimeRange(range);
@@ -862,7 +917,17 @@ export default {
 }
 #time-control-container {
     float: right;
-    margin-right: 10px;
+    margin-right: 37px;
+}
+.calendar-container {
+    float: left;
+    margin: 25px 0 0 15px;
+}
+.vc-calendar /deep/ input {
+    font-size: 12px;
+    width: 137px;
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
 }
 .compare-btn {
     font-size: 12px;
@@ -882,17 +947,18 @@ export default {
 .time-btn {
     font-size: 12px;
     float: left;
-    margin: 25px 10px;
+    margin: 35px 10px 0 10px;
 }
 .time-btn {
     cursor: pointer;
 }
 .time-btn.active {
     text-decoration: underline;
+    font-weight: bold;
 }
 .spacer {
     float: left;
-    width: 1070px;
+    width: 1053px;
     margin: 0 0 20px 10px;
     border-top: 1px solid rgb(230, 230, 230);
 }
