@@ -11,6 +11,7 @@ require (
 	github.com/aws/aws-sdk-go v1.29.20
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cenkalti/backoff v0.0.0-20170309153948-3db60c813733
+	github.com/client9/misspell v0.3.4 // indirect
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
 	github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e
@@ -32,7 +33,7 @@ require (
 	github.com/goadesign/goa v1.4.0
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.3.4
+	github.com/golang/protobuf v1.3.5
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
 	github.com/google/uuid v1.1.1
 	github.com/h2non/filetype v1.0.10
@@ -65,10 +66,10 @@ require (
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v0.0.0-20180103174451-36e9d2ebbde5
 	github.com/segmentio/ksuid v1.0.1
-	github.com/sirupsen/logrus v0.0.0-20190331131941-a6c0064cfaf9
+	github.com/sirupsen/logrus v1.4.2
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
-	github.com/spf13/cobra v0.0.0-20170314171253-7be4beda01ec
-	github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff
+	github.com/spf13/cobra v0.0.3
+	github.com/spf13/pflag v1.0.3
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c
@@ -78,16 +79,17 @@ require (
 	go.uber.org/atomic v1.4.0
 	go.uber.org/multierr v1.1.0
 	go.uber.org/zap v1.10.0
-	goa.design/goa/v3 v3.1.1
+	goa.design/goa/v3 v3.1.2
 	goa.design/plugins/v3 v3.1.1
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
-	golang.org/x/tools v0.0.0-20200228224639-71482053b885
+	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	google.golang.org/appengine v1.4.0
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.2.8
+	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 )
