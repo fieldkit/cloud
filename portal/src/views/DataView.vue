@@ -250,37 +250,16 @@ export default {
             this.stations.forEach(s => {
                 let modules = [];
                 if (s.status_json.moduleObjects) {
-                    s.status_json.moduleObjects.forEach(m => {
-                        let sensors = [];
-                        let addModule = true;
-                        m.sensorObjects.forEach(sensor => {
-                            let dataViewSensor = this.allSensors.find(sr => {
-                                return sr.firmwareKey == sensor.name;
-                            });
-                            if (dataViewSensor) {
-                                const sensorLabel = this.getSensorName(m, sensor);
-                                sensors.push({
-                                    id: s.name + dataViewSensor.key,
-                                    label: sensorLabel,
-                                    customLabel: s.name + " : " + sensorLabel,
-                                    key: dataViewSensor.key,
-                                    stationId: s.id,
-                                });
-                            } else {
-                                // don't add module if sensor wasn't found
-                                addModule = false;
-                            }
+                    const modulesResult = this.extractModulesAndSensors(s, s.status_json.moduleObjects);
+                    modulesResult.forEach(m => {
+                        counterId += 1;
+                        modules.push({
+                            id: counterId,
+                            label: m.name,
+                            customLabel: s.name + " : " + m.name,
+                            stationId: s.id,
+                            children: m.sensors,
                         });
-                        if (addModule) {
-                            counterId += 1;
-                            modules.push({
-                                id: counterId,
-                                label: this.getModuleName(m),
-                                customLabel: s.name + " : " + this.getModuleName(m),
-                                stationId: s.id,
-                                children: sensors,
-                            });
-                        }
                     });
                     counterId += 1;
                     this.treeSelectOptions.push({
@@ -290,8 +269,51 @@ export default {
                         stationId: s.id,
                         children: modules,
                     });
+                } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
+                    const modulesResult = this.extractModulesAndSensors(s, s.status_json.statusJson.modules);
+                    modulesResult.forEach(m => {
+                        counterId += 1;
+                        modules.push({
+                            id: counterId,
+                            label: m.name,
+                            customLabel: s.name + " : " + m.name,
+                            stationId: s.id,
+                            children: m.sensors,
+                        });
+                    });
                 }
             });
+        },
+
+        extractModulesAndSensors(station, modules) {
+            let result = [];
+            modules.forEach(m => {
+                let sensors = [];
+                let addModule = true;
+                const moduleSensors = m.sensorObjects ? m.sensorObjects : m.sensors;
+                moduleSensors.forEach(sensor => {
+                    let dataViewSensor = this.allSensors.find(sr => {
+                        return sr.firmwareKey == sensor.name;
+                    });
+                    if (dataViewSensor) {
+                        const sensorLabel = this.getSensorName(m, sensor);
+                        sensors.push({
+                            id: station.name + dataViewSensor.key,
+                            label: sensorLabel,
+                            customLabel: station.name + " : " + sensorLabel,
+                            key: dataViewSensor.key,
+                            stationId: station.id,
+                        });
+                    } else {
+                        // don't add module if sensor wasn't found
+                        addModule = false;
+                    }
+                });
+                if (addModule) {
+                    result.push({ name: this.getModuleName(m), sensors: sensors });
+                }
+            });
+            return result;
         },
 
         onStationChange(stationId, chart) {
