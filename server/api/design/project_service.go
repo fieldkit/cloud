@@ -100,10 +100,15 @@ var _ = Service("project", func() {
 			Required("auth")
 			Attribute("id", Int64)
 			Required("id")
+			Attribute("token", String)
 		})
 
 		HTTP(func() {
 			POST("projects/invites/{id}/accept")
+
+			Params(func() {
+				Param("token")
+			})
 
 			httpAuthentication()
 		})
@@ -119,10 +124,15 @@ var _ = Service("project", func() {
 			Required("auth")
 			Attribute("id", Int64)
 			Required("id")
+			Attribute("token", String)
 		})
 
 		HTTP(func() {
 			POST("projects/invites/{id}/reject")
+
+			Params(func() {
+				Param("token")
+			})
 
 			httpAuthentication()
 		})

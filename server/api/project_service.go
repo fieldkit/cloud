@@ -164,7 +164,16 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 	}
 
 	if user.Email != invite.InvitedEmail {
-		return project.Unauthorized("permission denied")
+		if payload.Token == nil {
+			return project.Unauthorized("permission denied")
+		}
+		given := data.Token{}
+		if err := given.UnmarshalText([]byte(*payload.Token)); err != nil {
+			return err
+		}
+		if given.String() != invite.Token.String() {
+			return project.Unauthorized("permission denied")
+		}
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.project_invite SET accepted_time = NOW() WHERE id = $1`, payload.ID); err != nil {
@@ -202,7 +211,16 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 	}
 
 	if user.Email != invite.InvitedEmail {
-		return project.Unauthorized("permission denied")
+		if payload.Token == nil {
+			return project.Unauthorized("permission denied")
+		}
+		given := data.Token{}
+		if err := given.UnmarshalText([]byte(*payload.Token)); err != nil {
+			return err
+		}
+		if given.String() != invite.Token.String() {
+			return project.Unauthorized("permission denied")
+		}
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.project_invite SET rejected_time = NOW() WHERE id = $1`, payload.ID); err != nil {

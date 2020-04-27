@@ -23,7 +23,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateID string, projec
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Facere repellat ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Consequatur accusantium dolor totam.\"\n   }'")
 		}
 	}
 	var id int64
@@ -79,7 +79,7 @@ func BuildLookupInvitePayload(projectLookupInviteToken string, projectLookupInvi
 
 // BuildAcceptInvitePayload builds the payload for the project accept invite
 // endpoint from CLI flags.
-func BuildAcceptInvitePayload(projectAcceptInviteID string, projectAcceptInviteAuth string) (*project.AcceptInvitePayload, error) {
+func BuildAcceptInvitePayload(projectAcceptInviteID string, projectAcceptInviteToken string, projectAcceptInviteAuth string) (*project.AcceptInvitePayload, error) {
 	var err error
 	var id int64
 	{
@@ -88,12 +88,19 @@ func BuildAcceptInvitePayload(projectAcceptInviteID string, projectAcceptInviteA
 			return nil, fmt.Errorf("invalid value for id, must be INT64")
 		}
 	}
+	var token *string
+	{
+		if projectAcceptInviteToken != "" {
+			token = &projectAcceptInviteToken
+		}
+	}
 	var auth string
 	{
 		auth = projectAcceptInviteAuth
 	}
 	v := &project.AcceptInvitePayload{}
 	v.ID = id
+	v.Token = token
 	v.Auth = auth
 
 	return v, nil
@@ -101,7 +108,7 @@ func BuildAcceptInvitePayload(projectAcceptInviteID string, projectAcceptInviteA
 
 // BuildRejectInvitePayload builds the payload for the project reject invite
 // endpoint from CLI flags.
-func BuildRejectInvitePayload(projectRejectInviteID string, projectRejectInviteAuth string) (*project.RejectInvitePayload, error) {
+func BuildRejectInvitePayload(projectRejectInviteID string, projectRejectInviteToken string, projectRejectInviteAuth string) (*project.RejectInvitePayload, error) {
 	var err error
 	var id int64
 	{
@@ -110,12 +117,19 @@ func BuildRejectInvitePayload(projectRejectInviteID string, projectRejectInviteA
 			return nil, fmt.Errorf("invalid value for id, must be INT64")
 		}
 	}
+	var token *string
+	{
+		if projectRejectInviteToken != "" {
+			token = &projectRejectInviteToken
+		}
+	}
 	var auth string
 	{
 		auth = projectRejectInviteAuth
 	}
 	v := &project.RejectInvitePayload{}
 	v.ID = id
+	v.Token = token
 	v.Auth = auth
 
 	return v, nil

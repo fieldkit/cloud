@@ -356,6 +356,11 @@ func EncodeAcceptInviteRequest(encoder func(*http.Request) goahttp.Encoder) func
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.Token != nil {
+			values.Add("token", *p.Token)
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -448,6 +453,11 @@ func EncodeRejectInviteRequest(encoder func(*http.Request) goahttp.Encoder) func
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.Token != nil {
+			values.Add("token", *p.Token)
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

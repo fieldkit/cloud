@@ -71,15 +71,17 @@ type LookupInvitePayload struct {
 // AcceptInvitePayload is the payload type of the project service accept invite
 // method.
 type AcceptInvitePayload struct {
-	Auth string
-	ID   int64
+	Auth  string
+	ID    int64
+	Token *string
 }
 
 // RejectInvitePayload is the payload type of the project service reject invite
 // method.
 type RejectInvitePayload struct {
-	Auth string
-	ID   int64
+	Auth  string
+	ID    int64
+	Token *string
 }
 
 type PendingInvite struct {

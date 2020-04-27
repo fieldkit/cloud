@@ -295,9 +295,10 @@ func EncodeAcceptInviteResponse(encoder func(context.Context, http.ResponseWrite
 func DecodeAcceptInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id   int64
-			auth string
-			err  error
+			id    int64
+			token *string
+			auth  string
+			err   error
 
 			params = mux.Vars(r)
 		)
@@ -309,6 +310,10 @@ func DecodeAcceptInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 			}
 			id = v
 		}
+		tokenRaw := r.URL.Query().Get("token")
+		if tokenRaw != "" {
+			token = &tokenRaw
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -316,7 +321,7 @@ func DecodeAcceptInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		if err != nil {
 			return nil, err
 		}
-		payload := NewAcceptInvitePayload(id, auth)
+		payload := NewAcceptInvitePayload(id, token, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -381,9 +386,10 @@ func EncodeRejectInviteResponse(encoder func(context.Context, http.ResponseWrite
 func DecodeRejectInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id   int64
-			auth string
-			err  error
+			id    int64
+			token *string
+			auth  string
+			err   error
 
 			params = mux.Vars(r)
 		)
@@ -395,6 +401,10 @@ func DecodeRejectInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 			}
 			id = v
 		}
+		tokenRaw := r.URL.Query().Get("token")
+		if tokenRaw != "" {
+			token = &tokenRaw
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -402,7 +412,7 @@ func DecodeRejectInviteRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		if err != nil {
 			return nil, err
 		}
-		payload := NewRejectInvitePayload(id, auth)
+		payload := NewRejectInvitePayload(id, token, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

@@ -211,9 +211,10 @@ func NewLookupInvitePayload(token string, auth string) *project.LookupInvitePayl
 
 // NewAcceptInvitePayload builds a project service accept invite endpoint
 // payload.
-func NewAcceptInvitePayload(id int64, auth string) *project.AcceptInvitePayload {
+func NewAcceptInvitePayload(id int64, token *string, auth string) *project.AcceptInvitePayload {
 	v := &project.AcceptInvitePayload{}
 	v.ID = id
+	v.Token = token
 	v.Auth = auth
 
 	return v
@@ -221,9 +222,10 @@ func NewAcceptInvitePayload(id int64, auth string) *project.AcceptInvitePayload 
 
 // NewRejectInvitePayload builds a project service reject invite endpoint
 // payload.
-func NewRejectInvitePayload(id int64, auth string) *project.RejectInvitePayload {
+func NewRejectInvitePayload(id int64, token *string, auth string) *project.RejectInvitePayload {
 	v := &project.RejectInvitePayload{}
 	v.ID = id
+	v.Token = token
 	v.Auth = auth
 
 	return v
