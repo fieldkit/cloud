@@ -211,7 +211,7 @@ export default {
 <style scoped>
 #station-summary-container {
     background-color: #ffffff;
-    width: 350px;
+    width: 415px;
     position: absolute;
     top: 145px;
     left: 300px;
@@ -282,7 +282,7 @@ export default {
 }
 .left-reading,
 .right-reading {
-    width: 40%;
+    width: 42%;
     margin: 8px 0;
     padding: 5px 10px;
     background-color: #f4f5f7;
