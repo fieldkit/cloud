@@ -190,9 +190,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 		return err
 	}
 
-	log.Infow("accepting", "invite", invite)
-
-	_ = p
+	log.Infow("accepting", "invite_id", invite.ID)
 
 	return nil
 }
@@ -232,9 +230,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 		return err
 	}
 
-	log.Infow("rejecting", "invite", invite)
-
-	_ = p
+	log.Infow("rejecting", "invite_id", invite.ID)
 
 	return nil
 }
