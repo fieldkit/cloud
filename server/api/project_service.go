@@ -102,15 +102,15 @@ func (c *ProjectService) LookupInvite(ctx context.Context, payload *project.Look
 		return nil, err
 	}
 
-	tokenBytes, err := data.DecodeBinaryString(payload.Token)
-	if err != nil {
+	inviteToken := &data.ValidationToken{}
+	if err := inviteToken.Token.UnmarshalText([]byte(payload.Token)); err != nil {
 		return nil, err
 	}
 
 	all := []*data.ProjectInvite{}
 	if err := c.options.Database.SelectContext(ctx, &all, `
 		SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.token = $1
-		`, tokenBytes); err != nil {
+		`, inviteToken.Token); err != nil {
 		return nil, err
 	}
 
