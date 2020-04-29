@@ -92,7 +92,7 @@ export default {
                 this.startDate = _project.start_time;
                 this.endDate = _project.end_time;
                 this.tags = _project.tags;
-                this.publicProject = _project.private;
+                this.publicProject = !_project.private;
                 this.updateDisplayDates();
                 if (_project.media_url) {
                     this.imageUrl = this.baseUrl + "/projects/" + _project.id + "/media";
@@ -116,7 +116,7 @@ export default {
                 goal: this.goal,
                 location: this.location,
                 name: this.name,
-                private: this.publicProject,
+                private: !this.publicProject,
                 slug: "proj-" + Date.now(),
                 start_time: this.startDate,
                 tags: this.tags,
