@@ -130,7 +130,7 @@ func NewProjectInvitationEmailTemplate() (et *EmailTemplate, err error) {
 	subjectText := `Recovery your Fieldkit account`
 
 	bodyTextText := `You have been invited to new FieldKit project. To view the invitation, click here:
-https://portal.{{.Domain}}/projects/invitation?token={{.ProjectInvite.Token}}`
+https://portal.{{.Domain}}/projects/invitation?token={{.Invite.Token}}`
 
 	bodyHTMLText := bodyTextText
 
