@@ -111,7 +111,7 @@ func (p *defaultPermissions) ForProjectByID(id int) (permissions ProjectPermissi
 	}
 
 	projectUser := &data.ProjectUser{}
-	if err := p.options.Database.GetContext(p.context, projectUser, "SELECT p.* FROM fieldkit.project_user AS p WHERE p.user_id = $1", p.UserID()); err != nil {
+	if err := p.options.Database.GetContext(p.context, projectUser, "SELECT p.* FROM fieldkit.project_user AS p WHERE p.user_id = $1 AND p.project_id = $2", p.UserID(), id); err != nil {
 		if err != sql.ErrNoRows {
 			return nil, err
 		}
