@@ -71,7 +71,7 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 
 	all := []*data.ProjectInvite{}
 	if err := c.options.Database.SelectContext(ctx, &all, `
-		SELECT pi.* FROM fieldkit.project_invite AS pi JOIN fieldkit.user AS u ON (pi.invited_email = u.email) WHERE u.id = $1
+		SELECT pi.* FROM fieldkit.project_invite AS pi JOIN fieldkit.user AS u ON (pi.invited_email = u.email) WHERE u.id = $1 AND (pi.accepted_time IS NULL AND pi.rejected_time IS NULL)
 		`, p.UserID()); err != nil {
 		return nil, err
 	}
