@@ -21,7 +21,6 @@
                 <div class="validation-error" id="name-too-long" v-if="nameTooLong">
                     Name must be less than 256 letters.
                 </div>
-                <div class="validation-error" id="name-has-space" v-if="nameHasSpace">Name must not contain spaces.</div>
             </div>
             <div class="outer-input-container">
                 <div :class="'input-container ' + (isLoggingIn ? '' : ' middle-container')">
@@ -171,7 +170,6 @@ export default {
             isLoggingIn: true,
             noName: false,
             nameTooLong: false,
-            nameHasSpace: false,
             confirmPassword: "",
             passwordsNotMatch: false,
             accountCreated: false,
@@ -269,7 +267,6 @@ export default {
                 return;
             }
             let matches = this.name.match(/\s/g);
-            this.nameHasSpace = matches && matches.length > 0;
             this.nameTooLong = this.name.length > 255;
         },
 
