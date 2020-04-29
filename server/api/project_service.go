@@ -164,7 +164,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 	}
 
 	invite := &data.ProjectInvite{}
-	if err := c.options.Database.GetContext(ctx, &invite, `SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.id = $1`, payload.ID); err != nil {
+	if err := c.options.Database.GetContext(ctx, invite, `SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.id = $1`, payload.ID); err != nil {
 		return err
 	}
 
@@ -211,7 +211,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 	}
 
 	invite := &data.ProjectInvite{}
-	if err := c.options.Database.GetContext(ctx, &invite, `SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.id = $1`, payload.ID); err != nil {
+	if err := c.options.Database.GetContext(ctx, invite, `SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.id = $1`, payload.ID); err != nil {
 		return err
 	}
 
