@@ -352,6 +352,45 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
+  /stations/@/{id}/details:
+    get:
+      tags:
+      - station
+      summary: station station
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: station#station
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/StationStationResponseBody'
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/StationStationUnauthorizedResponseBody'
+        "404":
+          description: Not Found response.
+          schema:
+            $ref: '#/definitions/StationStationNotFoundResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
   /stations/{id}/activity:
     get:
       tags:
@@ -510,37 +549,37 @@ definitions:
     properties:
       created_at:
         type: integer
-        example: 6719994661863109356
+        example: 4781490519588557821
         format: int64
       id:
         type: integer
-        example: 7219371916175828053
+        example: 280926595296192557
         format: int64
       key:
         type: string
-        example: Cupiditate corrupti.
+        example: Quia velit.
       meta:
-        example: Ab aliquam in assumenda magni tenetur deleniti.
+        example: Explicabo vel dignissimos sit.
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       station:
         $ref: '#/definitions/StationSummaryResponseBody'
       type:
         type: string
-        example: Aut nam et similique qui aperiam atque.
+        example: Quisquam qui.
     description: ActivityEntryResponseBody result type (default view)
     example:
-      created_at: 8299627002827774540
-      id: 7134918490231707556
-      key: Sit nisi laborum laboriosam.
-      meta: Debitis beatae.
+      created_at: 1616191176580245674
+      id: 4973431729677819677
+      key: Voluptas quo sit voluptas deleniti.
+      meta: Iure illo odio quod.
       project:
-        id: 3447383911419632806
-        name: Quia laboriosam assumenda nisi consequatur vel.
+        id: 3935033802229042877
+        name: Earum odio.
       station:
-        id: 4777539563246704252
-        name: Sed hic non sed a.
-      type: Ut quasi nihil.
+        id: 6527264551474073732
+        name: Reiciendis voluptatem quisquam.
+      type: Modi distinctio ea et.
     required:
     - id
     - key
@@ -558,39 +597,39 @@ definitions:
     description: ActivityEntryCollectionResponseBody is the result type for an array
       of ActivityEntryResponseBody (default view)
     example:
-    - created_at: 6175829186511380616
-      id: 5461354606995255224
-      key: Corporis minima aut amet nam.
-      meta: Ut quam aut quod eum.
+    - created_at: 8648786087331153504
+      id: 5835085579399476144
+      key: Ut et nemo est hic et debitis.
+      meta: Aliquam dignissimos quia nobis libero quia.
       project:
-        id: 3447383911419632806
-        name: Quia laboriosam assumenda nisi consequatur vel.
+        id: 3935033802229042877
+        name: Earum odio.
       station:
-        id: 4777539563246704252
-        name: Sed hic non sed a.
-      type: Qui odio quis earum nulla assumenda.
-    - created_at: 6175829186511380616
-      id: 5461354606995255224
-      key: Corporis minima aut amet nam.
-      meta: Ut quam aut quod eum.
+        id: 6527264551474073732
+        name: Reiciendis voluptatem quisquam.
+      type: A asperiores consequatur architecto quam fugit dolor.
+    - created_at: 8648786087331153504
+      id: 5835085579399476144
+      key: Ut et nemo est hic et debitis.
+      meta: Aliquam dignissimos quia nobis libero quia.
       project:
-        id: 3447383911419632806
-        name: Quia laboriosam assumenda nisi consequatur vel.
+        id: 3935033802229042877
+        name: Earum odio.
       station:
-        id: 4777539563246704252
-        name: Sed hic non sed a.
-      type: Qui odio quis earum nulla assumenda.
-    - created_at: 6175829186511380616
-      id: 5461354606995255224
-      key: Corporis minima aut amet nam.
-      meta: Ut quam aut quod eum.
+        id: 6527264551474073732
+        name: Reiciendis voluptatem quisquam.
+      type: A asperiores consequatur architecto quam fugit dolor.
+    - created_at: 8648786087331153504
+      id: 5835085579399476144
+      key: Ut et nemo est hic et debitis.
+      meta: Aliquam dignissimos quia nobis libero quia.
       project:
-        id: 3447383911419632806
-        name: Quia laboriosam assumenda nisi consequatur vel.
+        id: 3935033802229042877
+        name: Earum odio.
       station:
-        id: 4777539563246704252
-        name: Sed hic non sed a.
-      type: Qui odio quis earum nulla assumenda.
+        id: 6527264551474073732
+        name: Reiciendis voluptatem quisquam.
+      type: A asperiores consequatur architecto quam fugit dolor.
   ActivityProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.project.activity.page; view=default'
     type: object
@@ -599,39 +638,61 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1242414396
+        example: 1375256375
         format: int32
       total:
         type: integer
-        example: 1108454175
+        example: 1802595242
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
       activities:
-      - created_at: 6175829186511380616
-        id: 5461354606995255224
-        key: Corporis minima aut amet nam.
-        meta: Ut quam aut quod eum.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
+          id: 3935033802229042877
+          name: Earum odio.
         station:
-          id: 4777539563246704252
-          name: Sed hic non sed a.
-        type: Qui odio quis earum nulla assumenda.
-      - created_at: 6175829186511380616
-        id: 5461354606995255224
-        key: Corporis minima aut amet nam.
-        meta: Ut quam aut quod eum.
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
+          id: 3935033802229042877
+          name: Earum odio.
         station:
-          id: 4777539563246704252
-          name: Sed hic non sed a.
-        type: Qui odio quis earum nulla assumenda.
-      page: 404753865
-      total: 1687406487
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
+        project:
+          id: 3935033802229042877
+          name: Earum odio.
+        station:
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
+        project:
+          id: 3935033802229042877
+          name: Earum odio.
+        station:
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      page: 631793275
+      total: 655829539
     required:
     - activities
     - total
@@ -644,39 +705,61 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 202898600
+        example: 129914939
         format: int32
       total:
         type: integer
-        example: 1001199697
+        example: 769677021
         format: int32
     description: StationResponseBody result type (default view)
     example:
       activities:
-      - created_at: 6175829186511380616
-        id: 5461354606995255224
-        key: Corporis minima aut amet nam.
-        meta: Ut quam aut quod eum.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
+          id: 3935033802229042877
+          name: Earum odio.
         station:
-          id: 4777539563246704252
-          name: Sed hic non sed a.
-        type: Qui odio quis earum nulla assumenda.
-      - created_at: 6175829186511380616
-        id: 5461354606995255224
-        key: Corporis minima aut amet nam.
-        meta: Ut quam aut quod eum.
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
+          id: 3935033802229042877
+          name: Earum odio.
         station:
-          id: 4777539563246704252
-          name: Sed hic non sed a.
-        type: Qui odio quis earum nulla assumenda.
-      page: 1455037517
-      total: 1520197130
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
+        project:
+          id: 3935033802229042877
+          name: Earum odio.
+        station:
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      - created_at: 8648786087331153504
+        id: 5835085579399476144
+        key: Ut et nemo est hic et debitis.
+        meta: Aliquam dignissimos quia nobis libero quia.
+        project:
+          id: 3935033802229042877
+          name: Earum odio.
+        station:
+          id: 6527264551474073732
+          name: Reiciendis voluptatem quisquam.
+        type: A asperiores consequatur architecto quam fugit dolor.
+      page: 512389317
+      total: 771407072
     required:
     - activities
     - total
@@ -687,9 +770,9 @@ definitions:
     properties:
       url:
         type: string
-        example: Mollitia totam id quibusdam autem reprehenderit aliquam.
+        example: Quia voluptas similique aliquam excepturi et nobis.
     example:
-      url: Id repellat iusto tenetur dolorem nam.
+      url: Sunt veniam esse et repellendus sit.
     required:
     - url
   FollowerResponseBody:
@@ -700,17 +783,17 @@ definitions:
         $ref: '#/definitions/AvatarResponseBody'
       id:
         type: integer
-        example: 9179457146160618455
+        example: 2861495735816618087
         format: int64
       name:
         type: string
-        example: Distinctio repellat dolorem ipsa sit nam.
+        example: Dicta beatae hic eos a provident.
     description: FollowerResponseBody result type (default view)
     example:
       avatar:
-        url: Quia nobis libero quia.
-      id: 2442527037873298499
-      name: Qui est sequi.
+        url: Natus eos et occaecati.
+      id: 3894107913239411830
+      name: Sit iste voluptas ut.
     required:
     - id
     - name
@@ -723,26 +806,18 @@ definitions:
       FollowerResponseBody (default view)
     example:
     - avatar:
-        url: Quia nobis libero quia.
-      id: 7609268779910630430
-      name: Quam fugit dolor consequatur aliquam.
+        url: Natus eos et occaecati.
+      id: 5383157966376952469
+      name: Facilis numquam commodi ut.
     - avatar:
-        url: Quia nobis libero quia.
-      id: 7609268779910630430
-      name: Quam fugit dolor consequatur aliquam.
-    - avatar:
-        url: Quia nobis libero quia.
-      id: 7609268779910630430
-      name: Quam fugit dolor consequatur aliquam.
-    - avatar:
-        url: Quia nobis libero quia.
-      id: 7609268779910630430
-      name: Quam fugit dolor consequatur aliquam.
+        url: Natus eos et occaecati.
+      id: 5383157966376952469
+      name: Facilis numquam commodi ut.
   FollowingFollowUnauthorizedResponseBody:
     title: FollowingFollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Iusto dolores.
+    example: Odio maxime.
   FollowingFollowersResponseBody:
     title: 'Mediatype identifier: application/vnd.app.followers; view=default'
     type: object
@@ -751,25 +826,29 @@ definitions:
         $ref: '#/definitions/FollowerResponseBodyCollection'
       page:
         type: integer
-        example: 591928225
+        example: 1752246910
         format: int32
       total:
         type: integer
-        example: 1979983755
+        example: 180067423
         format: int32
     description: FollowersResponseBody result type (default view)
     example:
       followers:
       - avatar:
-          url: Quia nobis libero quia.
-        id: 7609268779910630430
-        name: Quam fugit dolor consequatur aliquam.
+          url: Natus eos et occaecati.
+        id: 5383157966376952469
+        name: Facilis numquam commodi ut.
       - avatar:
-          url: Quia nobis libero quia.
-        id: 7609268779910630430
-        name: Quam fugit dolor consequatur aliquam.
-      page: 1395122474
-      total: 2054671489
+          url: Natus eos et occaecati.
+        id: 5383157966376952469
+        name: Facilis numquam commodi ut.
+      - avatar:
+          url: Natus eos et occaecati.
+        id: 5383157966376952469
+        name: Facilis numquam commodi ut.
+      page: 1060617020
+      total: 1725135840
     required:
     - followers
     - total
@@ -778,32 +857,43 @@ definitions:
     title: FollowingFollowersUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Nemo voluptatem.
+    example: Fugiat omnis sed vel.
   FollowingUnfollowUnauthorizedResponseBody:
     title: FollowingUnfollowUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Sapiente nobis quaerat nesciunt ut dicta laudantium.
+    example: Quo et eum ut reprehenderit libero.
+  ImageRefResponseBody:
+    title: ImageRefResponseBody
+    type: object
+    properties:
+      url:
+        type: string
+        example: Consequatur omnis molestiae aut.
+    example:
+      url: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+    required:
+    - url
   PendingInviteResponseBody:
     title: PendingInviteResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 2332802505764138602
+        example: 2587552997851748059
         format: int64
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       time:
         type: integer
-        example: 8548087274381729518
+        example: 4134045918724087180
         format: int64
     example:
-      id: 1996835851892515123
+      id: 1245164885861824327
       project:
-        id: 3447383911419632806
-        name: Quia laboriosam assumenda nisi consequatur vel.
-      time: 8136271461735829520
+        id: 3935033802229042877
+        name: Earum odio.
+      time: 795987181610422048
     required:
     - id
     - project
@@ -812,17 +902,17 @@ definitions:
     title: ProjectAcceptInviteNotFoundResponseBody
     type: string
     description: not found
-    example: Quidem repellendus atque perspiciatis.
+    example: Est omnis.
   ProjectAcceptInviteUnauthorizedResponseBody:
     title: ProjectAcceptInviteUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Est quidem deleniti necessitatibus fugiat velit sed.
+    example: Excepturi est veritatis ratione doloremque quia.
   ProjectInvitesNotFoundResponseBody:
     title: ProjectInvitesNotFoundResponseBody
     type: string
     description: not found
-    example: Omnis sed consequatur.
+    example: Velit non saepe quos aliquid totam.
   ProjectInvitesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -832,56 +922,56 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
-        - id: 1551477806904876671
+        - id: 7134691977437916367
           project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
-        - id: 1551477806904876671
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
+        - id: 7134691977437916367
           project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
-        - id: 1551477806904876671
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
+        - id: 7134691977437916367
           project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
+        - id: 7134691977437916367
+          project:
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
     description: InvitesResponseBody result type (default view)
     example:
       pending:
-      - id: 1551477806904876671
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
-        project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
     required:
     - pending
   ProjectInvitesUnauthorizedResponseBody:
     title: ProjectInvitesUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Expedita consequuntur voluptatum tenetur ut dolor iusto.
+    example: Voluptas esse occaecati voluptates.
   ProjectLookupInviteNotFoundResponseBody:
     title: ProjectLookupInviteNotFoundResponseBody
     type: string
     description: not found
-    example: Ea fugiat quas ex natus eaque.
+    example: Sequi aliquam velit eveniet.
   ProjectLookupInviteResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -891,75 +981,70 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
-        - id: 1551477806904876671
+        - id: 7134691977437916367
           project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
-        - id: 1551477806904876671
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
+        - id: 7134691977437916367
           project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
-        - id: 1551477806904876671
-          project:
-            id: 3447383911419632806
-            name: Quia laboriosam assumenda nisi consequatur vel.
-          time: 2932066668171088077
+            id: 3935033802229042877
+            name: Earum odio.
+          time: 1061947067536649931
     description: Lookup InviteResponseBody result type (default view)
     example:
       pending:
-      - id: 1551477806904876671
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
-      - id: 1551477806904876671
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
+      - id: 7134691977437916367
         project:
-          id: 3447383911419632806
-          name: Quia laboriosam assumenda nisi consequatur vel.
-        time: 2932066668171088077
+          id: 3935033802229042877
+          name: Earum odio.
+        time: 1061947067536649931
     required:
     - pending
   ProjectLookupInviteUnauthorizedResponseBody:
     title: ProjectLookupInviteUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quia velit.
+    example: Labore doloribus voluptas consequuntur illum dolores quo.
   ProjectRejectInviteNotFoundResponseBody:
     title: ProjectRejectInviteNotFoundResponseBody
     type: string
     description: not found
-    example: Voluptatem possimus sint sint aut.
+    example: Fugit impedit quidem labore autem.
   ProjectRejectInviteUnauthorizedResponseBody:
     title: ProjectRejectInviteUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Beatae magnam et tempora exercitationem.
+    example: Et quis optio voluptatibus quas dolor.
   ProjectSummaryResponseBody:
     title: ProjectSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 9155692648436913183
+        example: 4341575906931714311
         format: int64
       name:
         type: string
-        example: Est aut temporibus.
+        example: Fugiat quas ex natus.
     example:
-      id: 6025190543071451924
-      name: Quis exercitationem autem cumque velit enim.
+      id: 5613084908585335094
+      name: Est quidem deleniti necessitatibus fugiat velit sed.
     required:
     - id
     - name
@@ -967,65 +1052,266 @@ definitions:
     title: ProjectUpdateNotFoundResponseBody
     type: string
     description: not found
-    example: Vitae qui ad.
+    example: Neque harum.
   ProjectUpdateRequestBody:
     title: ProjectUpdateRequestBody
     type: object
     properties:
       body:
         type: string
-        example: Molestias cumque.
+        example: Aut dolor est sequi vel velit eos.
     example:
-      body: Labore quaerat saepe.
+      body: Est aut iste earum qui.
     required:
     - body
   ProjectUpdateUnauthorizedResponseBody:
     title: ProjectUpdateUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Possimus eum sed iusto porro.
+    example: Quibusdam aliquid.
+  StationOwnerResponseBody:
+    title: StationOwnerResponseBody
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1982095326
+        format: int32
+      name:
+        type: string
+        example: Consequatur omnis rerum et pariatur.
+    example:
+      id: 1546546432
+      name: Dignissimos illum ab adipisci consequatur et facilis.
+    required:
+    - id
+    - name
+  StationPhotosResponseBody:
+    title: StationPhotosResponseBody
+    type: object
+    properties:
+      small:
+        type: string
+        example: Perspiciatis magnam fugiat repellendus.
+    example:
+      small: Aut eos tenetur.
+    required:
+    - small
+  StationStationNotFoundResponseBody:
+    title: StationStationNotFoundResponseBody
+    type: string
+    description: not found
+    example: Quasi dolorem placeat a.
+  StationStationResponseBody:
+    title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
+    type: object
+    properties:
+      device_id:
+        type: string
+        example: Corporis quam rerum omnis.
+      id:
+        type: integer
+        example: 1742609606
+        format: int32
+      images:
+        type: array
+        items:
+          $ref: '#/definitions/ImageRefResponseBody'
+        example:
+        - url: Hic aut nam et similique qui.
+        - url: Hic aut nam et similique qui.
+      name:
+        type: string
+        example: Aliquam aut est.
+      owner:
+        $ref: '#/definitions/StationOwnerResponseBody'
+      photos:
+        $ref: '#/definitions/StationPhotosResponseBody'
+      read_only:
+        type: boolean
+        example: false
+      uploads:
+        type: array
+        items:
+          $ref: '#/definitions/StationUploadResponseBody'
+        example:
+        - blocks:
+          - 190588057897244188
+          - 5154687276973302881
+          - 2546252234366462519
+          id: 2920417339524806997
+          size: 5430013960920797921
+          time: 8354332868448807316
+          type: Enim ipsum molestias.
+          upload_id: Optio voluptatibus quis exercitationem autem cumque.
+          url: Odio voluptatem dolorem.
+        - blocks:
+          - 190588057897244188
+          - 5154687276973302881
+          - 2546252234366462519
+          id: 2920417339524806997
+          size: 5430013960920797921
+          time: 8354332868448807316
+          type: Enim ipsum molestias.
+          upload_id: Optio voluptatibus quis exercitationem autem cumque.
+          url: Odio voluptatem dolorem.
+    description: StationResponseBody result type (default view)
+    example:
+      device_id: Et omnis consectetur assumenda.
+      id: 834376722
+      images:
+      - url: Hic aut nam et similique qui.
+      - url: Hic aut nam et similique qui.
+      - url: Hic aut nam et similique qui.
+      - url: Hic aut nam et similique qui.
+      name: Sit ipsam consequatur impedit voluptatem facere corporis.
+      owner:
+        id: 1158021204
+        name: Corrupti voluptas neque.
+      photos:
+        small: Atque ut ab aliquam in assumenda magni.
+      read_only: false
+      uploads:
+      - blocks:
+        - 190588057897244188
+        - 5154687276973302881
+        - 2546252234366462519
+        id: 2920417339524806997
+        size: 5430013960920797921
+        time: 8354332868448807316
+        type: Enim ipsum molestias.
+        upload_id: Optio voluptatibus quis exercitationem autem cumque.
+        url: Odio voluptatem dolorem.
+      - blocks:
+        - 190588057897244188
+        - 5154687276973302881
+        - 2546252234366462519
+        id: 2920417339524806997
+        size: 5430013960920797921
+        time: 8354332868448807316
+        type: Enim ipsum molestias.
+        upload_id: Optio voluptatibus quis exercitationem autem cumque.
+        url: Odio voluptatem dolorem.
+      - blocks:
+        - 190588057897244188
+        - 5154687276973302881
+        - 2546252234366462519
+        id: 2920417339524806997
+        size: 5430013960920797921
+        time: 8354332868448807316
+        type: Enim ipsum molestias.
+        upload_id: Optio voluptatibus quis exercitationem autem cumque.
+        url: Odio voluptatem dolorem.
+    required:
+    - id
+    - name
+    - owner
+    - device_id
+    - uploads
+    - images
+    - photos
+    - read_only
+  StationStationUnauthorizedResponseBody:
+    title: StationStationUnauthorizedResponseBody
+    type: string
+    description: credentials are invalid
+    example: Quia natus.
   StationSummaryResponseBody:
     title: StationSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 2198464512681848529
+        example: 71959842371533053
         format: int64
       name:
         type: string
-        example: Dolorem et enim ipsum.
+        example: Repellendus atque perspiciatis quo beatae magnam et.
     example:
-      id: 4157611018174479128
-      name: Consequatur qui consequatur.
+      id: 3378666266697758838
+      name: Est voluptatem possimus sint sint aut.
     required:
     - id
     - name
+  StationUploadResponseBody:
+    title: StationUploadResponseBody
+    type: object
+    properties:
+      blocks:
+        type: array
+        items:
+          type: integer
+          example: 5675808951244207212
+          format: int64
+        example:
+        - 8077413289712931019
+        - 4709161023334643932
+        - 7305042128034328460
+      id:
+        type: integer
+        example: 6546237315506585011
+        format: int64
+      size:
+        type: integer
+        example: 5890121434226169022
+        format: int64
+      time:
+        type: integer
+        example: 3298028782423943191
+        format: int64
+      type:
+        type: string
+        example: Et id fuga ad aut consequuntur et.
+      upload_id:
+        type: string
+        example: Sequi qui.
+      url:
+        type: string
+        example: Minima dignissimos.
+    example:
+      blocks:
+      - 343192541494198032
+      - 6939903678658135773
+      - 9220583740525450439
+      id: 3533639455505033779
+      size: 8318051413112630202
+      time: 4012211043050441801
+      type: Voluptatem dolorum ut libero ducimus vitae.
+      upload_id: Dolor omnis.
+      url: Voluptate est.
+    required:
+    - id
+    - time
+    - upload_id
+    - size
+    - url
+    - type
+    - blocks
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Accusantium quisquam qui ut explicabo.
+    example: Aut qui ea fuga.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Dignissimos sit consequuntur.
+    example: Adipisci debitis eaque esse cupiditate ducimus.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Odio quod quis.
+    example: Cupiditate et.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Laborum modi distinctio ea et dolor iure.
+    example: Exercitationem delectus totam eaque exercitationem illo dicta.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Voluptas quo sit voluptas deleniti.
+    example: Ut quam aliquid quo voluptate atque qui.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

@@ -25,8 +25,6 @@ var PendingInvites = ResultType("application/vnd.app.invites.pending", func() {
 })
 
 var _ = Service("project", func() {
-	commonOptions()
-
 	Method("update", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -145,4 +143,6 @@ var _ = Service("project", func() {
 		Response("unauthorized", StatusUnauthorized)
 		Response("not-found", StatusNotFound)
 	})
+
+	commonOptions()
 })

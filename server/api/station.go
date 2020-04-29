@@ -262,29 +262,17 @@ func (c *StationController) Get(ctx *app.GetStationContext) error {
 		return err
 	}
 
-	station := &data.Station{}
-	if err := c.options.Database.GetContext(ctx, station, "SELECT * FROM fieldkit.station WHERE id = $1", ctx.StationID); err != nil {
+	r, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
 		return err
 	}
 
-	owner := &data.User{}
-	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", station.OwnerID); err != nil {
+	sf, err := r.QueryStationFull(ctx, int32(ctx.StationID))
+	if err != nil {
 		return err
 	}
 
-	ingestions := []*data.Ingestion{}
-	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
-		return err
-	}
-
-	noteMedia := []*data.FieldNoteMediaForStation{}
-	if err := c.options.Database.SelectContext(ctx, &noteMedia, `
-		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.id = $1 ORDER BY fnm.created DESC`, ctx.StationID); err != nil {
-		return err
-	}
-
-	svm, err := StationType(p, station, owner, ingestions, noteMedia)
+	svm, err := StationType(p, sf.Station, sf.Owner, sf.Ingestions, sf.Media)
 	if err != nil {
 		return err
 	}

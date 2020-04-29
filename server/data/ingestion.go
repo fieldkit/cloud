@@ -63,6 +63,14 @@ func (a *Int64Range) Scan(src interface{}) error {
 	return fmt.Errorf("pq: cannot convert %T to Int64Range", src)
 }
 
+func (a *Int64Range) ToInt64Array() []int64 {
+	rv := make([]int64, len(*a))
+	for i, value := range *a {
+		rv[i] = int64(value)
+	}
+	return rv
+}
+
 func (a *Int64Range) ToIntArray() []int {
 	rv := make([]int, len(*a))
 	for i, value := range *a {

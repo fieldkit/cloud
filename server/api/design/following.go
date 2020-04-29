@@ -35,8 +35,6 @@ var FollowersPage = ResultType("application/vnd.app.followers", func() {
 })
 
 var _ = Service("following", func() {
-	commonOptions()
-
 	Method("follow", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -93,4 +91,6 @@ var _ = Service("following", func() {
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 	})
+
+	commonOptions()
 })

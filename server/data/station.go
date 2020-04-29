@@ -42,3 +42,10 @@ func (s *Station) GetStatus() (map[string]interface{}, error) {
 	}
 	return parsed, nil
 }
+
+type StationFull struct {
+	Station    *Station
+	Owner      *User
+	Ingestions []*Ingestion
+	Media      []*FieldNoteMediaForStation
+}

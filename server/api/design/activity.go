@@ -60,8 +60,6 @@ var ProjectActivityPage = ResultType("application/vnd.app.project.activity.page"
 })
 
 var _ = Service("activity", func() {
-	commonOptions()
-
 	Method("station", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -114,4 +112,6 @@ var _ = Service("activity", func() {
 
 	HTTP(func() {
 	})
+
+	commonOptions()
 })
