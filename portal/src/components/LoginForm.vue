@@ -193,7 +193,7 @@ export default {
                 const isAuthenticated = await this.api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
-                    this.$router.push({ name: "projects" });
+                    this.$router.push(this.$route.query.redirect || { name: "projects" });
                 } else {
                     alert("Unfortunately we were unable to log you in. Please check your credentials and try again.");
                 }

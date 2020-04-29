@@ -50,7 +50,7 @@
             <div v-if="failedAuth" id="no-auth">
                 <p>
                     Please
-                    <router-link :to="{ name: 'login' }" class="show-link">
+                    <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
                         log in
                     </router-link>
                     to view stations.
