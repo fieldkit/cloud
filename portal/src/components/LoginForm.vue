@@ -397,10 +397,6 @@ input {
     font-size: 18px;
     padding-bottom: 2px;
 }
-.floating-label {
-    font-size: 16px;
-    color: #6a6d71;
-}
 .email-img,
 .password-img {
     width: 20px;
