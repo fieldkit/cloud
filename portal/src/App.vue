@@ -56,6 +56,7 @@ input:invalid {
     box-shadow: none;
 }
 .inputText {
+    outline: 0;
     color: #2c3e50;
     font-size: 14px;
     width: inherit;
