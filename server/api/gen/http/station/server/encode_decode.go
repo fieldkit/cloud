@@ -162,3 +162,34 @@ func marshalStationviewsStationPhotosViewToStationPhotosResponseBody(v *stationv
 
 	return res
 }
+
+// marshalStationviewsStationModuleViewToStationModuleResponseBody builds a
+// value of type *StationModuleResponseBody from a value of type
+// *stationviews.StationModuleView.
+func marshalStationviewsStationModuleViewToStationModuleResponseBody(v *stationviews.StationModuleView) *StationModuleResponseBody {
+	res := &StationModuleResponseBody{
+		ID:       *v.ID,
+		Name:     *v.Name,
+		Position: *v.Position,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = marshalStationviewsStationSensorViewToStationSensorResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalStationviewsStationSensorViewToStationSensorResponseBody builds a
+// value of type *StationSensorResponseBody from a value of type
+// *stationviews.StationSensorView.
+func marshalStationviewsStationSensorViewToStationSensorResponseBody(v *stationviews.StationSensorView) *StationSensorResponseBody {
+	res := &StationSensorResponseBody{
+		Name:          *v.Name,
+		UnitOfMeasure: *v.UnitOfMeasure,
+	}
+
+	return res
+}

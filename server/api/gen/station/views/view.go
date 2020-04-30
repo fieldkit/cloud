@@ -21,14 +21,21 @@ type StationFull struct {
 
 // StationFullView is a type that runs validations on a projected type.
 type StationFullView struct {
-	ID       *int32
-	Name     *string
-	Owner    *StationOwnerView
-	DeviceID *string
-	Uploads  []*StationUploadView
-	Images   []*ImageRefView
-	Photos   *StationPhotosView
-	ReadOnly *bool
+	ID                 *int32
+	Name               *string
+	Owner              *StationOwnerView
+	DeviceID           *string
+	Uploads            []*StationUploadView
+	Images             []*ImageRefView
+	Photos             *StationPhotosView
+	ReadOnly           *bool
+	Battery            *float32
+	RecordingStartedAt *int64
+	MemoryUsed         *int32
+	MemoryAvailable    *int32
+	FirmwareNumber     *int32
+	FirmwareTime       *int32
+	Modules            []*StationModuleView
 }
 
 // StationOwnerView is a type that runs validations on a projected type.
@@ -58,6 +65,20 @@ type StationPhotosView struct {
 	Small *string
 }
 
+// StationModuleView is a type that runs validations on a projected type.
+type StationModuleView struct {
+	ID       *string
+	Name     *string
+	Position *int32
+	Sensors  []*StationSensorView
+}
+
+// StationSensorView is a type that runs validations on a projected type.
+type StationSensorView struct {
+	Name          *string
+	UnitOfMeasure *string
+}
+
 var (
 	// StationFullMap is a map of attribute names in result type StationFull
 	// indexed by view name.
@@ -71,6 +92,13 @@ var (
 			"images",
 			"photos",
 			"read_only",
+			"battery",
+			"recording_started_at",
+			"memory_used",
+			"memory_available",
+			"firmware_number",
+			"firmware_time",
+			"modules",
 		},
 	}
 )
@@ -114,6 +142,27 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.ReadOnly == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "result"))
 	}
+	if result.Battery == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("battery", "result"))
+	}
+	if result.RecordingStartedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("recording_started_at", "result"))
+	}
+	if result.MemoryUsed == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("memory_used", "result"))
+	}
+	if result.MemoryAvailable == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("memory_available", "result"))
+	}
+	if result.FirmwareNumber == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_number", "result"))
+	}
+	if result.FirmwareTime == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_time", "result"))
+	}
+	if result.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))
+	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -136,6 +185,13 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Photos != nil {
 		if err2 := ValidateStationPhotosView(result.Photos); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range result.Modules {
+		if e != nil {
+			if err2 := ValidateStationModuleView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -190,6 +246,41 @@ func ValidateImageRefView(result *ImageRefView) (err error) {
 func ValidateStationPhotosView(result *StationPhotosView) (err error) {
 	if result.Small == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("small", "result"))
+	}
+	return
+}
+
+// ValidateStationModuleView runs the validations defined on StationModuleView.
+func ValidateStationModuleView(result *StationModuleView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Position == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("position", "result"))
+	}
+	if result.Sensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "result"))
+	}
+	for _, e := range result.Sensors {
+		if e != nil {
+			if err2 := ValidateStationSensorView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationSensorView runs the validations defined on StationSensorView.
+func ValidateStationSensorView(result *StationSensorView) (err error) {
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.UnitOfMeasure == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
 	}
 	return
 }

@@ -41,12 +41,12 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 8403666887871798544 --page 702412357108235302 --auth "Aut numquam aliquam in."` + "\n" +
-		os.Args[0] + ` following follow --id 2703031546288750985 --auth "Vitae neque."` + "\n" +
+	return os.Args[0] + ` activity station --id 6710679302131361784 --page 895906383415002158 --auth "Ut ut eligendi labore consequatur accusantium dolor."` + "\n" +
+		os.Args[0] + ` following follow --id 9059594398280129002 --auth "Veniam ad in."` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "In cumque aut sit velit quaerat ut."
-   }' --id 7818632026238009416 --auth "Et perferendis veniam vel."` + "\n" +
-		os.Args[0] + ` station station --id 1382248057 --auth "Et nihil quas occaecati minus autem nemo."` + "\n" +
+      "body": "Est sint quasi."
+   }' --id 3634971538215414815 --auth "Ipsum quibusdam."` + "\n" +
+		os.Args[0] + ` station station --id 1006615123 --auth "Laborum laboriosam soluta qui ut quasi."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
 		""
 }
@@ -425,7 +425,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 8403666887871798544 --page 702412357108235302 --auth "Aut numquam aliquam in."
+    `+os.Args[0]+` activity station --id 6710679302131361784 --page 895906383415002158 --auth "Ut ut eligendi labore consequatur accusantium dolor."
 `, os.Args[0])
 }
 
@@ -438,7 +438,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 2039732461194112458 --page 7816285458348604520 --auth "Eligendi labore consequatur."
+    `+os.Args[0]+` activity project --id 6552875825465500342 --page 7514638001280817070 --auth "Commodi ut in natus eos et occaecati."
 `, os.Args[0])
 }
 
@@ -466,7 +466,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 2703031546288750985 --auth "Vitae neque."
+    `+os.Args[0]+` following follow --id 9059594398280129002 --auth "Veniam ad in."
 `, os.Args[0])
 }
 
@@ -478,7 +478,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 6395964898701089048 --auth "In aliquam suscipit voluptatibus iure."
+    `+os.Args[0]+` following unfollow --id 206458457246705123 --auth "Veniam vel nisi placeat ad."
 `, os.Args[0])
 }
 
@@ -490,7 +490,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 5668624215108705483 --page 7229229070317498791
+    `+os.Args[0]+` following followers --id 2984855983272144925 --page 1534489462036194883
 `, os.Args[0])
 }
 
@@ -521,8 +521,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "In cumque aut sit velit quaerat ut."
-   }' --id 7818632026238009416 --auth "Et perferendis veniam vel."
+      "body": "Est sint quasi."
+   }' --id 3634971538215414815 --auth "Ipsum quibusdam."
 `, os.Args[0])
 }
 
@@ -533,7 +533,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Magni vitae dolorem numquam."
+    `+os.Args[0]+` project invites --auth "Maiores sint sit in vel alias est."
 `, os.Args[0])
 }
 
@@ -545,7 +545,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Est sint quasi." --auth "Et ipsum quibusdam sunt."
+    `+os.Args[0]+` project lookup- invite --token "Et deserunt." --auth "Ut qui quisquam molestiae alias repellendus officiis."
 `, os.Args[0])
 }
 
@@ -558,7 +558,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 4521611668044992240 --token "Sit in vel alias." --auth "Eum recusandae fuga quia libero est."
+    `+os.Args[0]+` project accept- invite --id 4805209426506720159 --token "Occaecati minus autem nemo similique cupiditate corrupti." --auth "Neque est aut temporibus."
 `, os.Args[0])
 }
 
@@ -571,7 +571,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 33367226559098622 --token "Molestiae alias repellendus officiis." --auth "Dolorum deleniti."
+    `+os.Args[0]+` project reject- invite --id 3805588473667112890 --token "Molestias rerum consequatur qui consequatur." --auth "Hic aut nam et similique qui."
 `, os.Args[0])
 }
 
@@ -596,7 +596,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station station --id 1382248057 --auth "Et nihil quas occaecati minus autem nemo."
+    `+os.Args[0]+` station station --id 1006615123 --auth "Laborum laboriosam soluta qui ut quasi."
 `, os.Args[0])
 }
 
@@ -632,7 +632,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Aliquam harum id repellat iusto tenetur." --auth "Nam ut quod."
+    `+os.Args[0]+` tasks refresh- device --device-id "Voluptatem possimus sint sint aut." --auth "Accusantium quisquam qui ut explicabo."
 `, os.Args[0])
 }
 
@@ -658,7 +658,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 6174267019460474675
+    `+os.Args[0]+` test get --id 7691373380732457695
 `, os.Args[0])
 }
 
@@ -680,7 +680,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Rerum labore." --auth "Saepe ut facilis."
+    `+os.Args[0]+` test email --address "Et dolor iure illo odio quod." --auth "Autem maxime quis nihil quia aut sunt."
 `, os.Args[0])
 }
 

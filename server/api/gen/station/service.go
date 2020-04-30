@@ -44,14 +44,21 @@ type StationPayload struct {
 
 // StationFull is the result type of the station service station method.
 type StationFull struct {
-	ID       int32
-	Name     string
-	Owner    *StationOwner
-	DeviceID string
-	Uploads  []*StationUpload
-	Images   []*ImageRef
-	Photos   *StationPhotos
-	ReadOnly bool
+	ID                 int32
+	Name               string
+	Owner              *StationOwner
+	DeviceID           string
+	Uploads            []*StationUpload
+	Images             []*ImageRef
+	Photos             *StationPhotos
+	ReadOnly           bool
+	Battery            float32
+	RecordingStartedAt int64
+	MemoryUsed         int32
+	MemoryAvailable    int32
+	FirmwareNumber     int32
+	FirmwareTime       int32
+	Modules            []*StationModule
 }
 
 type StationOwner struct {
@@ -75,6 +82,18 @@ type ImageRef struct {
 
 type StationPhotos struct {
 	Small string
+}
+
+type StationModule struct {
+	ID       string
+	Name     string
+	Position int32
+	Sensors  []*StationSensor
+}
+
+type StationSensor struct {
+	Name          string
+	UnitOfMeasure string
 }
 
 // credentials are invalid
@@ -132,6 +151,24 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
 	}
+	if vres.Battery != nil {
+		res.Battery = *vres.Battery
+	}
+	if vres.RecordingStartedAt != nil {
+		res.RecordingStartedAt = *vres.RecordingStartedAt
+	}
+	if vres.MemoryUsed != nil {
+		res.MemoryUsed = *vres.MemoryUsed
+	}
+	if vres.MemoryAvailable != nil {
+		res.MemoryAvailable = *vres.MemoryAvailable
+	}
+	if vres.FirmwareNumber != nil {
+		res.FirmwareNumber = *vres.FirmwareNumber
+	}
+	if vres.FirmwareTime != nil {
+		res.FirmwareTime = *vres.FirmwareTime
+	}
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
 	}
@@ -150,6 +187,12 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Photos != nil {
 		res.Photos = transformStationviewsStationPhotosViewToStationPhotos(vres.Photos)
 	}
+	if vres.Modules != nil {
+		res.Modules = make([]*StationModule, len(vres.Modules))
+		for i, val := range vres.Modules {
+			res.Modules[i] = transformStationviewsStationModuleViewToStationModule(val)
+		}
+	}
 	return res
 }
 
@@ -157,10 +200,16 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 // StationFullView using the "default" view.
 func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	vres := &stationviews.StationFullView{
-		ID:       &res.ID,
-		Name:     &res.Name,
-		DeviceID: &res.DeviceID,
-		ReadOnly: &res.ReadOnly,
+		ID:                 &res.ID,
+		Name:               &res.Name,
+		DeviceID:           &res.DeviceID,
+		ReadOnly:           &res.ReadOnly,
+		Battery:            &res.Battery,
+		RecordingStartedAt: &res.RecordingStartedAt,
+		MemoryUsed:         &res.MemoryUsed,
+		MemoryAvailable:    &res.MemoryAvailable,
+		FirmwareNumber:     &res.FirmwareNumber,
+		FirmwareTime:       &res.FirmwareTime,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
@@ -179,6 +228,12 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	}
 	if res.Photos != nil {
 		vres.Photos = transformStationPhotosToStationviewsStationPhotosView(res.Photos)
+	}
+	if res.Modules != nil {
+		vres.Modules = make([]*stationviews.StationModuleView, len(res.Modules))
+		for i, val := range res.Modules {
+			vres.Modules[i] = transformStationModuleToStationviewsStationModuleView(val)
+		}
 	}
 	return vres
 }
@@ -247,6 +302,38 @@ func transformStationviewsStationPhotosViewToStationPhotos(v *stationviews.Stati
 	return res
 }
 
+// transformStationviewsStationModuleViewToStationModule builds a value of type
+// *StationModule from a value of type *stationviews.StationModuleView.
+func transformStationviewsStationModuleViewToStationModule(v *stationviews.StationModuleView) *StationModule {
+	if v == nil {
+		return nil
+	}
+	res := &StationModule{
+		ID:       *v.ID,
+		Name:     *v.Name,
+		Position: *v.Position,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*StationSensor, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = transformStationviewsStationSensorViewToStationSensor(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationSensorViewToStationSensor builds a value of type
+// *StationSensor from a value of type *stationviews.StationSensorView.
+func transformStationviewsStationSensorViewToStationSensor(v *stationviews.StationSensorView) *StationSensor {
+	res := &StationSensor{
+		Name:          *v.Name,
+		UnitOfMeasure: *v.UnitOfMeasure,
+	}
+
+	return res
+}
+
 // transformStationOwnerToStationviewsStationOwnerView builds a value of type
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
@@ -294,6 +381,35 @@ func transformImageRefToStationviewsImageRefView(v *ImageRef) *stationviews.Imag
 func transformStationPhotosToStationviewsStationPhotosView(v *StationPhotos) *stationviews.StationPhotosView {
 	res := &stationviews.StationPhotosView{
 		Small: &v.Small,
+	}
+
+	return res
+}
+
+// transformStationModuleToStationviewsStationModuleView builds a value of type
+// *stationviews.StationModuleView from a value of type *StationModule.
+func transformStationModuleToStationviewsStationModuleView(v *StationModule) *stationviews.StationModuleView {
+	res := &stationviews.StationModuleView{
+		ID:       &v.ID,
+		Name:     &v.Name,
+		Position: &v.Position,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = transformStationSensorToStationviewsStationSensorView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationSensorToStationviewsStationSensorView builds a value of type
+// *stationviews.StationSensorView from a value of type *StationSensor.
+func transformStationSensorToStationviewsStationSensorView(v *StationSensor) *stationviews.StationSensorView {
+	res := &stationviews.StationSensorView{
+		Name:          &v.Name,
+		UnitOfMeasure: &v.UnitOfMeasure,
 	}
 
 	return res

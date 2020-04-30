@@ -16,14 +16,21 @@ import (
 // StationResponseBody is the type of the "station" service "station" endpoint
 // HTTP response body.
 type StationResponseBody struct {
-	ID       *int32                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name     *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Owner    *StationOwnerResponseBody    `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
-	DeviceID *string                      `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
-	Uploads  []*StationUploadResponseBody `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
-	Images   []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
-	Photos   *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
-	ReadOnly *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	ID                 *int32                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name               *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Owner              *StationOwnerResponseBody    `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	DeviceID           *string                      `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	Uploads            []*StationUploadResponseBody `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
+	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
+	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
+	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
 // StationNotFoundResponseBody is the type of the "station" service "station"
@@ -61,14 +68,34 @@ type StationPhotosResponseBody struct {
 	Small *string `form:"small,omitempty" json:"small,omitempty" xml:"small,omitempty"`
 }
 
+// StationModuleResponseBody is used to define fields on response body types.
+type StationModuleResponseBody struct {
+	ID       *string                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name     *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Position *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Sensors  []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+}
+
+// StationSensorResponseBody is used to define fields on response body types.
+type StationSensorResponseBody struct {
+	Name          *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	UnitOfMeasure *string `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+}
+
 // NewStationFullViewOK builds a "station" service "station" endpoint result
 // from a HTTP "OK" response.
 func NewStationFullViewOK(body *StationResponseBody) *stationviews.StationFullView {
 	v := &stationviews.StationFullView{
-		ID:       body.ID,
-		Name:     body.Name,
-		DeviceID: body.DeviceID,
-		ReadOnly: body.ReadOnly,
+		ID:                 body.ID,
+		Name:               body.Name,
+		DeviceID:           body.DeviceID,
+		ReadOnly:           body.ReadOnly,
+		Battery:            body.Battery,
+		RecordingStartedAt: body.RecordingStartedAt,
+		MemoryUsed:         body.MemoryUsed,
+		MemoryAvailable:    body.MemoryAvailable,
+		FirmwareNumber:     body.FirmwareNumber,
+		FirmwareTime:       body.FirmwareTime,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -80,6 +107,10 @@ func NewStationFullViewOK(body *StationResponseBody) *stationviews.StationFullVi
 		v.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	v.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(body.Photos)
+	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
+	for i, val := range body.Modules {
+		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
 
 	return v
 }
@@ -150,6 +181,43 @@ func ValidateImageRefResponseBody(body *ImageRefResponseBody) (err error) {
 func ValidateStationPhotosResponseBody(body *StationPhotosResponseBody) (err error) {
 	if body.Small == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("small", "body"))
+	}
+	return
+}
+
+// ValidateStationModuleResponseBody runs the validations defined on
+// StationModuleResponseBody
+func ValidateStationModuleResponseBody(body *StationModuleResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Position == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("position", "body"))
+	}
+	if body.Sensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "body"))
+	}
+	for _, e := range body.Sensors {
+		if e != nil {
+			if err2 := ValidateStationSensorResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationSensorResponseBody runs the validations defined on
+// StationSensorResponseBody
+func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.UnitOfMeasure == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
 	}
 	return
 }

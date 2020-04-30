@@ -15,14 +15,21 @@ import (
 // StationResponseBody is the type of the "station" service "station" endpoint
 // HTTP response body.
 type StationResponseBody struct {
-	ID       int32                        `form:"id" json:"id" xml:"id"`
-	Name     string                       `form:"name" json:"name" xml:"name"`
-	Owner    *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
-	DeviceID string                       `form:"device_id" json:"device_id" xml:"device_id"`
-	Uploads  []*StationUploadResponseBody `form:"uploads" json:"uploads" xml:"uploads"`
-	Images   []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
-	Photos   *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
-	ReadOnly bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	ID                 int32                        `form:"id" json:"id" xml:"id"`
+	Name               string                       `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                       `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
+	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
+	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
+	MemoryAvailable    int32                        `form:"memory_available" json:"memory_available" xml:"memory_available"`
+	FirmwareNumber     int32                        `form:"firmware_number" json:"firmware_number" xml:"firmware_number"`
+	FirmwareTime       int32                        `form:"firmware_time" json:"firmware_time" xml:"firmware_time"`
+	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
 }
 
 // StationNotFoundResponseBody is the type of the "station" service "station"
@@ -60,14 +67,34 @@ type StationPhotosResponseBody struct {
 	Small string `form:"small" json:"small" xml:"small"`
 }
 
+// StationModuleResponseBody is used to define fields on response body types.
+type StationModuleResponseBody struct {
+	ID       string                       `form:"id" json:"id" xml:"id"`
+	Name     string                       `form:"name" json:"name" xml:"name"`
+	Position int32                        `form:"position" json:"position" xml:"position"`
+	Sensors  []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+}
+
+// StationSensorResponseBody is used to define fields on response body types.
+type StationSensorResponseBody struct {
+	Name          string `form:"name" json:"name" xml:"name"`
+	UnitOfMeasure string `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
+}
+
 // NewStationResponseBody builds the HTTP response body from the result of the
 // "station" endpoint of the "station" service.
 func NewStationResponseBody(res *stationviews.StationFullView) *StationResponseBody {
 	body := &StationResponseBody{
-		ID:       *res.ID,
-		Name:     *res.Name,
-		DeviceID: *res.DeviceID,
-		ReadOnly: *res.ReadOnly,
+		ID:                 *res.ID,
+		Name:               *res.Name,
+		DeviceID:           *res.DeviceID,
+		ReadOnly:           *res.ReadOnly,
+		Battery:            *res.Battery,
+		RecordingStartedAt: *res.RecordingStartedAt,
+		MemoryUsed:         *res.MemoryUsed,
+		MemoryAvailable:    *res.MemoryAvailable,
+		FirmwareNumber:     *res.FirmwareNumber,
+		FirmwareTime:       *res.FirmwareTime,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -86,6 +113,12 @@ func NewStationResponseBody(res *stationviews.StationFullView) *StationResponseB
 	}
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.Modules != nil {
+		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
+		for i, val := range res.Modules {
+			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
 	}
 	return body
 }

@@ -178,3 +178,32 @@ func unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v *Statio
 
 	return res
 }
+
+// unmarshalStationModuleResponseBodyToStationviewsStationModuleView builds a
+// value of type *stationviews.StationModuleView from a value of type
+// *StationModuleResponseBody.
+func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *StationModuleResponseBody) *stationviews.StationModuleView {
+	res := &stationviews.StationModuleView{
+		ID:       v.ID,
+		Name:     v.Name,
+		Position: v.Position,
+	}
+	res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
+	for i, val := range v.Sensors {
+		res.Sensors[i] = unmarshalStationSensorResponseBodyToStationviewsStationSensorView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationSensorResponseBodyToStationviewsStationSensorView builds a
+// value of type *stationviews.StationSensorView from a value of type
+// *StationSensorResponseBody.
+func unmarshalStationSensorResponseBodyToStationviewsStationSensorView(v *StationSensorResponseBody) *stationviews.StationSensorView {
+	res := &stationviews.StationSensorView{
+		Name:          v.Name,
+		UnitOfMeasure: v.UnitOfMeasure,
+	}
+
+	return res
+}
