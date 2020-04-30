@@ -41,7 +41,7 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 7834676686010202878 --page 5158797373030410480 --auth "Quasi possimus et ipsum."` + "\n" +
+	return os.Args[0] + ` activity station --id 5158797373030410480 --page 1169930495805814804 --auth "Possimus et ipsum quibusdam."` + "\n" +
 		os.Args[0] + ` following follow --id 7808253253060335735 --auth "Quidem error vitae aliquid et."` + "\n" +
 		os.Args[0] + ` project update --body '{
       "body": "Ut ab."
@@ -52,8 +52,9 @@ func UsageExamples() string {
       "status_json": {
          "Atque perspiciatis.": "Beatae magnam et tempora exercitationem.",
          "Voluptatem possimus sint sint aut.": "Accusantium quisquam qui ut explicabo."
-      }
-   }' --auth "Dignissimos sit consequuntur."` + "\n" +
+      },
+      "status_pb": "Dignissimos sit consequuntur."
+   }' --auth "Voluptas quo sit voluptas deleniti."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
 		""
 }
@@ -487,7 +488,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 7834676686010202878 --page 5158797373030410480 --auth "Quasi possimus et ipsum."
+    `+os.Args[0]+` activity station --id 5158797373030410480 --page 1169930495805814804 --auth "Possimus et ipsum quibusdam."
 `, os.Args[0])
 }
 
@@ -669,8 +670,9 @@ Example:
       "status_json": {
          "Atque perspiciatis.": "Beatae magnam et tempora exercitationem.",
          "Voluptatem possimus sint sint aut.": "Accusantium quisquam qui ut explicabo."
-      }
-   }' --auth "Dignissimos sit consequuntur."
+      },
+      "status_pb": "Dignissimos sit consequuntur."
+   }' --auth "Voluptas quo sit voluptas deleniti."
 `, os.Args[0])
 }
 
@@ -682,7 +684,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1880669335 --auth "Suscipit saepe qui quibusdam dolor omnis."
+    `+os.Args[0]+` station get --id 934165679 --auth "Dolor omnis."
 `, os.Args[0])
 }
 
@@ -700,8 +702,9 @@ Example:
       "status_json": {
          "Atque qui magni exercitationem.": "Totam eaque.",
          "Esse cupiditate.": "Aut ut quam aliquid quo."
-      }
-   }' --id 1207355257 --auth "Dicta rem cupiditate."
+      },
+      "status_pb": "Illo dicta rem."
+   }' --id 848745265 --auth "Eaque veniam qui."
 `, os.Args[0])
 }
 
@@ -712,7 +715,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Minus repellendus adipisci sint ipsa provident est."
+    `+os.Args[0]+` station list- mine --auth "Dolorem quo non earum culpa."
 `, os.Args[0])
 }
 
@@ -724,7 +727,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 183867628 --auth "Culpa neque."
+    `+os.Args[0]+` station list- project --id 48171469 --auth "Sed rem dicta accusamus pariatur."
 `, os.Args[0])
 }
 
@@ -736,7 +739,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 48171469 --auth "Sed rem dicta accusamus pariatur."
+    `+os.Args[0]+` station photo --id 258610457 --auth "Officiis natus."
 `, os.Args[0])
 }
 
@@ -772,7 +775,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Distinctio reiciendis omnis quia." --auth "Laborum vero odio fugit."
+    `+os.Args[0]+` tasks refresh- device --device-id "Cumque odit omnis." --auth "Repellendus aut temporibus."
 `, os.Args[0])
 }
 
@@ -798,7 +801,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 7490092115764204883
+    `+os.Args[0]+` test get --id 4985938252868972266
 `, os.Args[0])
 }
 
@@ -820,7 +823,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Veniam et sapiente." --auth "At quae incidunt omnis excepturi corporis."
+    `+os.Args[0]+` test email --address "Et iusto accusamus repellendus nulla." --auth "Velit veniam."
 `, os.Args[0])
 }
 

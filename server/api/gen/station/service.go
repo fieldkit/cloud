@@ -53,6 +53,7 @@ type AddPayload struct {
 	Name       string
 	DeviceID   string
 	StatusJSON map[string]interface{}
+	StatusPb   *string
 }
 
 // StationFull is the result type of the station service add method.
@@ -87,6 +88,7 @@ type UpdatePayload struct {
 	ID         int32
 	Name       string
 	StatusJSON map[string]interface{}
+	StatusPb   *string
 }
 
 // ListMinePayload is the payload type of the station service list mine method.

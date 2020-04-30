@@ -19,6 +19,7 @@ type AddRequestBody struct {
 	Name       *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	DeviceID   *string                `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
 	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
+	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
@@ -26,6 +27,7 @@ type AddRequestBody struct {
 type UpdateRequestBody struct {
 	Name       *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
+	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -547,6 +549,7 @@ func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
 		Name:     *body.Name,
 		DeviceID: *body.DeviceID,
+		StatusPb: body.StatusPb,
 	}
 	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
 	for key, val := range body.StatusJSON {
@@ -571,7 +574,8 @@ func NewGetPayload(id int32, auth string) *station.GetPayload {
 // NewUpdatePayload builds a station service update endpoint payload.
 func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.UpdatePayload {
 	v := &station.UpdatePayload{
-		Name: *body.Name,
+		Name:     *body.Name,
+		StatusPb: body.StatusPb,
 	}
 	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
 	for key, val := range body.StatusJSON {

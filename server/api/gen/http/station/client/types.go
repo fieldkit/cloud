@@ -19,6 +19,7 @@ type AddRequestBody struct {
 	Name       string                 `form:"name" json:"name" xml:"name"`
 	DeviceID   string                 `form:"device_id" json:"device_id" xml:"device_id"`
 	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
+	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
@@ -26,6 +27,7 @@ type AddRequestBody struct {
 type UpdateRequestBody struct {
 	Name       string                 `form:"name" json:"name" xml:"name"`
 	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
+	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -246,6 +248,7 @@ func NewAddRequestBody(p *station.AddPayload) *AddRequestBody {
 	body := &AddRequestBody{
 		Name:     p.Name,
 		DeviceID: p.DeviceID,
+		StatusPb: p.StatusPb,
 	}
 	if p.StatusJSON != nil {
 		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
@@ -262,7 +265,8 @@ func NewAddRequestBody(p *station.AddPayload) *AddRequestBody {
 // "update" endpoint of the "station" service.
 func NewUpdateRequestBody(p *station.UpdatePayload) *UpdateRequestBody {
 	body := &UpdateRequestBody{
-		Name: p.Name,
+		Name:     p.Name,
+		StatusPb: p.StatusPb,
 	}
 	if p.StatusJSON != nil {
 		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
