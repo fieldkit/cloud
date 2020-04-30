@@ -151,33 +151,6 @@ var _ = Resource("station", func() {
 		})
 	})
 
-	Action("update", func() {
-		Routing(PATCH("stations/:stationId"))
-		Description("Update a station")
-		Params(func() {
-			Param("stationId", Integer)
-			Required("stationId")
-		})
-		Payload(UpdateStationPayload)
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Station)
-		})
-	})
-
-	Action("get", func() {
-		Routing(GET("stations/@/:stationId"))
-		Description("Get a station")
-		Params(func() {
-			Param("stationId", Integer)
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Station)
-		})
-	})
-
 	Action("list", func() {
 		Routing(GET("stations"))
 		Description("List stations")
@@ -193,18 +166,6 @@ var _ = Resource("station", func() {
 		Response(BadRequest)
 		Response(OK, func() {
 			Media(Stations)
-		})
-	})
-
-	Action("delete", func() {
-		Routing(DELETE("stations/:stationId"))
-		Description("Delete station")
-		Params(func() {
-			Param("stationId", Integer)
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Status(204)
 		})
 	})
 

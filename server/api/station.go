@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -201,84 +200,6 @@ func (c *StationController) Add(ctx *app.AddStationContext) error {
 	return ctx.OK(svm)
 }
 
-func (c *StationController) Update(ctx *app.UpdateStationContext) error {
-	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		if err == sql.ErrNoRows {
-			return ctx.NotFound()
-		}
-		return err
-	}
-
-	station := &data.Station{
-		ID:   int32(ctx.StationID),
-		Name: ctx.Payload.Name,
-	}
-
-	station.SetStatus(ctx.Payload.StatusJSON)
-
-	if err := c.options.Database.NamedGetContext(ctx, station, "UPDATE fieldkit.station SET name = :name, status_json = :status_json WHERE id = :id RETURNING *", station); err != nil {
-		if err == sql.ErrNoRows {
-			return ctx.NotFound()
-		}
-		return err
-	}
-
-	owner := &data.User{}
-	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", p.Station().OwnerID); err != nil {
-		return err
-	}
-
-	ingestions := []*data.Ingestion{}
-	if err := c.options.Database.SelectContext(ctx, &ingestions, "SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10", station.DeviceID); err != nil {
-		return err
-	}
-
-	noteMedia := []*data.FieldNoteMediaForStation{}
-	if err := c.options.Database.SelectContext(ctx, &noteMedia, `
-		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.id = $1 ORDER BY fnm.created DESC`, ctx.StationID); err != nil {
-		return err
-	}
-
-	svm, err := StationType(p, station, owner, ingestions, noteMedia)
-	if err != nil {
-		return err
-	}
-	return ctx.OK(svm)
-}
-
-func (c *StationController) Get(ctx *app.GetStationContext) error {
-	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanView(); err != nil {
-		return err
-	}
-
-	r, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	sf, err := r.QueryStationFull(ctx, int32(ctx.StationID))
-	if err != nil {
-		return err
-	}
-
-	svm, err := StationType(p, sf.Station, sf.Owner, sf.Ingestions, sf.Media)
-	if err != nil {
-		return err
-	}
-	return ctx.OK(svm)
-}
-
 func (c *StationController) ListProject(ctx *app.ListProjectStationContext) error {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
@@ -355,23 +276,6 @@ func (c *StationController) List(ctx *app.ListStationContext) error {
 	}
 
 	return ctx.OK(stationsWm)
-}
-
-func (c *StationController) Delete(ctx *app.DeleteStationContext) error {
-	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		return err
-	}
-
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.station WHERE id = $1", ctx.StationID); err != nil {
-		return err
-	}
-
-	return ctx.OK()
 }
 
 func (c *StationController) Photo(ctx *app.PhotoStationContext) error {

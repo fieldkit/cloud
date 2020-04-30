@@ -103,7 +103,7 @@ var _ = Service("station", func() {
 		Result(StationFull)
 
 		HTTP(func() {
-			GET("stations/@/{id}/details")
+			GET("stations/@/{id}")
 
 			httpAuthentication()
 		})
@@ -127,7 +127,7 @@ var _ = Service("station", func() {
 		Result(StationFull)
 
 		HTTP(func() {
-			POST("stations/@/{id}/details")
+			POST("stations/{id}")
 
 			httpAuthentication()
 		})

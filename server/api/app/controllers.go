@@ -2155,12 +2155,9 @@ func handleRecordsOrigin(h goa.Handler) goa.Handler {
 type StationController interface {
 	goa.Muxer
 	Add(*AddStationContext) error
-	Delete(*DeleteStationContext) error
-	Get(*GetStationContext) error
 	List(*ListStationContext) error
 	ListProject(*ListProjectStationContext) error
 	Photo(*PhotoStationContext) error
-	Update(*UpdateStationContext) error
 }
 
 // MountStationController "mounts" a Station resource controller on the given service.
@@ -2168,8 +2165,6 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/stations/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/stations/@/:stationId", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/photo", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 
@@ -2195,40 +2190,6 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("POST", "/stations", ctrl.MuxHandler("add", h, unmarshalAddStationPayload))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Add", "route", "POST /stations", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewDeleteStationContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.Delete(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleStationOrigin(h)
-	service.Mux.Handle("DELETE", "/stations/:stationId", ctrl.MuxHandler("delete", h, nil))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Delete", "route", "DELETE /stations/:stationId", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewGetStationContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.Get(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleStationOrigin(h)
-	service.Mux.Handle("GET", "/stations/@/:stationId", ctrl.MuxHandler("get", h, nil))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Get", "route", "GET /stations/@/:stationId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -2279,29 +2240,6 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	h = handleStationOrigin(h)
 	service.Mux.Handle("GET", "/stations/:stationId/photo", ctrl.MuxHandler("photo", h, nil))
 	service.LogInfo("mount", "ctrl", "Station", "action", "Photo", "route", "GET /stations/:stationId/photo")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewUpdateStationContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*UpdateStationPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Update(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleStationOrigin(h)
-	service.Mux.Handle("PATCH", "/stations/:stationId", ctrl.MuxHandler("update", h, unmarshalUpdateStationPayload))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Update", "route", "PATCH /stations/:stationId", "security", "jwt")
 }
 
 // handleStationOrigin applies the CORS response headers corresponding to the origin.
@@ -2467,21 +2405,6 @@ func handleStationOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddStationPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddStationPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addStationPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
-}
-
-// unmarshalUpdateStationPayload unmarshals the request body into the context request data Payload field.
-func unmarshalUpdateStationPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &updateStationPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
