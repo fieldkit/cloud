@@ -57,7 +57,7 @@
         <div v-if="failedAuth" class="no-auth-message">
             <p>
                 Please
-                <router-link :to="{ name: 'login' }" class="show-link">
+                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
                     log in
                 </router-link>
                 to view projects.

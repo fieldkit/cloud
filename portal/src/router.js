@@ -1,11 +1,12 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Login from "./views/LoginView.vue";
 import DataView from "./views/DataView.vue";
+import InvitesView from "./views/InvitesView.vue";
+import LoginView from "./views/LoginView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
+import ResetPasswordView from "./views/ResetPasswordView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
-import ResetPasswordView from "./views/ResetPasswordView.vue";
 
 Vue.use(Router);
 
@@ -17,7 +18,13 @@ export default new Router({
             path: "/",
             alias: "/login",
             name: "login",
-            component: Login,
+            component: LoginView,
+        },
+        {
+            path: "/projects/invitation",
+            name: "viewInvites",
+            component: InvitesView,
+            props: true,
         },
         {
             path: "/dashboard/user",

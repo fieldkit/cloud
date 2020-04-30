@@ -21,7 +21,6 @@
                 <div class="validation-error" id="name-too-long" v-if="nameTooLong">
                     Name must be less than 256 letters.
                 </div>
-                <div class="validation-error" id="name-has-space" v-if="nameHasSpace">Name must not contain spaces.</div>
             </div>
             <div class="outer-input-container">
                 <div :class="'input-container ' + (isLoggingIn ? '' : ' middle-container')">
@@ -136,11 +135,18 @@
 
         <div id="notification" v-if="accountCreated || accountFailed">
             <div v-if="accountCreated">
-                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
-                <p class="success">Account Created</p>
-                <div class="notification-text">We sent you an account validation email.</div>
-                <div class="create-link" v-on:click="returnToLogin">
-                    Go back to Log In
+                <div v-if="!resendingCreate">
+                    <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                    <p class="success">Account Created</p>
+                    <div class="notification-text">We sent you an account validation email.</div>
+                    <button v-on:click="resendCreate" class="resubmit-btn">Resend Email</button>
+                    <div class="create-link" v-on:click="returnToLogin">
+                        Go back to Log In
+                    </div>
+                </div>
+                <div class="resending" v-if="resendingCreate">
+                    <img alt="Resending" src="../assets/Icon_Syncing2.png" width="57px" />
+                    <p class="reset-heading">Resending</p>
                 </div>
             </div>
             <div v-if="accountFailed" class="notification-container">
@@ -171,7 +177,6 @@ export default {
             isLoggingIn: true,
             noName: false,
             nameTooLong: false,
-            nameHasSpace: false,
             confirmPassword: "",
             passwordsNotMatch: false,
             accountCreated: false,
@@ -181,6 +186,8 @@ export default {
             resetEmail: "",
             sendingReset: false,
             resendingReset: false,
+            resendingCreate: false,
+            newUser: {},
         };
     },
     async beforeCreate() {
@@ -193,7 +200,7 @@ export default {
                 const isAuthenticated = await this.api.authenticated();
                 if (isAuthenticated) {
                     this.userToken = auth;
-                    this.$router.push({ name: "projects" });
+                    this.$router.push(this.$route.query.redirect || { name: "projects" });
                 } else {
                     alert("Unfortunately we were unable to log you in. Please check your credentials and try again.");
                 }
@@ -213,7 +220,8 @@ export default {
 
                 this.api
                     .register(user)
-                    .then(() => {
+                    .then(result => {
+                        this.newUser = result;
                         this.accountCreated = true;
                     })
                     .catch(() => {
@@ -269,7 +277,6 @@ export default {
                 return;
             }
             let matches = this.name.match(/\s/g);
-            this.nameHasSpace = matches && matches.length > 0;
             this.nameTooLong = this.name.length > 255;
         },
 
@@ -308,6 +315,17 @@ export default {
             this.resetSent = false;
             this.resendingReset = true;
             setTimeout(this.sendResetEmail, 500);
+        },
+
+        sendCreateRequest() {
+            this.api.resendCreateAccount(this.newUser.id).then(() => {
+                this.resendingCreate = false;
+            });
+        },
+
+        resendCreate() {
+            this.resendingCreate = true;
+            setTimeout(this.sendCreateRequest, 500);
         },
     },
 };

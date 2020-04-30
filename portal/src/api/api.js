@@ -50,6 +50,13 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    resendCreateAccount(userId) {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/users/" + userId + "/validate-email",
+        }).then(this._handleResponse.bind(this));
+    }
+
     updatePassword(data) {
         const token = this.token.getToken();
         return axios({
@@ -133,13 +140,6 @@ class FKApi {
     }
 
     sendInvite(data) {
-        // temp! until there is a real email invitation in place,
-        // only allow this to be tested with @conservify.org emails
-        if (data.email.indexOf("@conservify.org") == -1) {
-            return new Promise(resolve => {
-                resolve("pseudo-invited!");
-            });
-        }
         const token = this.token.getToken();
         return axios({
             method: "POST",
@@ -149,6 +149,54 @@ class FKApi {
                 Authorization: token,
             },
             data: { email: data.email },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getInvitesByToken(inviteToken) {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/invites/" + inviteToken,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    getInvitesByUser() {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/invites/pending",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    acceptInvite(inviteId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/invites/" + inviteId + "/accept",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    declineInvite(inviteId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/invites/" + inviteId + "/reject",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
         }).then(this._handleResponse.bind(this));
     }
 

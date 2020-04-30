@@ -11,7 +11,7 @@
                     </router-link>
                 </div>
                 <div class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</div>
-                <router-link :to="{ name: 'login' }" class="log-in" v-if="!isAuthenticated">
+                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                     Log in
                 </router-link>
             </div>
