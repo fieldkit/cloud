@@ -93,9 +93,10 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 	}
 
 	if err := ra.database.NamedGetContext(ctx, &provision.ID, `
-		    INSERT INTO fieldkit.provision (device_id, generation, created, updated)
-		    VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
-		    DO UPDATE SET updated = NOW() RETURNING id`, provision); err != nil {
+		INSERT INTO fieldkit.provision (device_id, generation, created, updated)
+		VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
+		DO UPDATE SET updated = NOW() RETURNING id
+		`, provision); err != nil {
 		return nil, err
 	}
 
@@ -193,7 +194,8 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		if err := ra.database.NamedGetContext(ctx, &metaRecord, `
 		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
 		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
-                    RETURNING *`, metaRecord); err != nil {
+			RETURNING *
+			`, metaRecord); err != nil {
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
@@ -237,10 +239,11 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 
 		if err := ra.database.NamedGetContext(ctx, &dataRecord, `
-			    INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
-			    VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-			    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
-			    RETURNING id`, dataRecord); err != nil {
+			INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
+			VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
+			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
+			RETURNING id
+			`, dataRecord); err != nil {
 			return nil, err
 		}
 	}
