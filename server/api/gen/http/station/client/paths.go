@@ -13,10 +13,15 @@ import (
 
 // StationStationPath returns the URL path to the station service station HTTP endpoint.
 func StationStationPath(id int32) string {
-	return fmt.Sprintf("/stations/@/%v/details", id)
+	return fmt.Sprintf("/stations/%v", id)
+}
+
+// StationStationPath2 returns the URL path to the station service station HTTP endpoint.
+func StationStationPath2(id int32) string {
+	return fmt.Sprintf("/stations/@/%v", id)
 }
 
 // UpdateStationPath returns the URL path to the station service update HTTP endpoint.
 func UpdateStationPath(id int32) string {
-	return fmt.Sprintf("/stations/@/%v/details", id)
+	return fmt.Sprintf("/stations/%v", id)
 }

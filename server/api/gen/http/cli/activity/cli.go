@@ -46,7 +46,7 @@ func UsageExamples() string {
 		os.Args[0] + ` project update --body '{
       "body": "Sint quasi possimus et."
    }' --id 7461510584236083209 --auth "Sunt quis."` + "\n" +
-		os.Args[0] + ` station station --id 1006615123 --auth "Laborum laboriosam soluta qui ut quasi."` + "\n" +
+		os.Args[0] + ` station station --id 901048168 --auth "Laboriosam soluta qui ut quasi nihil vero."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
 		""
 }
@@ -609,7 +609,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station station --id 1006615123 --auth "Laborum laboriosam soluta qui ut quasi."
+    `+os.Args[0]+` station station --id 901048168 --auth "Laboriosam soluta qui ut quasi nihil vero."
 `, os.Args[0])
 }
 

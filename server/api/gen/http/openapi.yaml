@@ -352,7 +352,46 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
-  /stations/@/{id}/details:
+  /stations/@/{id}:
+    get:
+      tags:
+      - station
+      summary: station station
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: station#station#1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/StationStationResponseBody'
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/StationStationUnauthorizedResponseBody'
+        "404":
+          description: Not Found response.
+          schema:
+            $ref: '#/definitions/StationStationNotFoundResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
+  /stations/{id}:
     get:
       tags:
       - station
@@ -1172,10 +1211,10 @@ definitions:
         items:
           $ref: '#/definitions/ImageRefResponseBody'
         example:
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
       memory_available:
         type: integer
         example: 1088685341
@@ -1249,41 +1288,41 @@ definitions:
           $ref: '#/definitions/StationUploadResponseBody'
         example:
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
     description: StationResponseBody result type (default view)
     example:
       battery: 0.41217765
@@ -1292,8 +1331,8 @@ definitions:
       firmware_time: 837888795
       id: 667690372
       images:
-      - url: Sit nam dolorem mollitia totam id.
-      - url: Sit nam dolorem mollitia totam id.
+      - url: Nam dolorem mollitia totam id.
+      - url: Nam dolorem mollitia totam id.
       memory_available: 1364294851
       memory_used: 118732904
       modules:
@@ -1319,49 +1358,49 @@ definitions:
           unit_of_measure: Corporis possimus eum.
       name: Laudantium maxime totam.
       owner:
-        id: 1529723388
-        name: Debitis beatae.
+        id: 1986860609
+        name: Quam voluptatem illum ea dolorem adipisci.
       photos:
         small: Autem reprehenderit.
       read_only: true
       recording_started_at: 4097218579443192073
       uploads:
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
     required:
     - id
     - name
@@ -1453,10 +1492,10 @@ definitions:
         items:
           $ref: '#/definitions/ImageRefResponseBody'
         example:
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
-        - url: Sit nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
+        - url: Nam dolorem mollitia totam id.
       memory_available:
         type: integer
         example: 901603459
@@ -1520,23 +1559,23 @@ definitions:
           $ref: '#/definitions/StationUploadResponseBody'
         example:
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
         - blocks:
-          - 2158785424609171725
           - 2372739846461020348
-          id: 1118095373303354860
-          size: 7247355678576483787
-          time: 4300119959110271883
-          type: Quaerat nesciunt ut dicta laudantium eos soluta.
-          upload_id: Ea dolorem adipisci ab.
-          url: Eaque iusto dolores ut sapiente.
+          - 2943012989969916972
+          id: 5336129199397589450
+          size: 8707264858930901579
+          time: 7247355678576483787
+          type: Eos soluta distinctio.
+          upload_id: Eaque iusto dolores ut sapiente.
+          url: Nesciunt ut dicta.
     description: UpdateResponseBody result type (default view)
     example:
       battery: 0.21686256
@@ -1545,9 +1584,9 @@ definitions:
       firmware_time: 109440388
       id: 1577662745
       images:
-      - url: Sit nam dolorem mollitia totam id.
-      - url: Sit nam dolorem mollitia totam id.
-      - url: Sit nam dolorem mollitia totam id.
+      - url: Nam dolorem mollitia totam id.
+      - url: Nam dolorem mollitia totam id.
+      - url: Nam dolorem mollitia totam id.
       memory_available: 107392341
       memory_used: 1413639661
       modules:
@@ -1573,31 +1612,31 @@ definitions:
           unit_of_measure: Corporis possimus eum.
       name: Est at quas perspiciatis nisi laudantium.
       owner:
-        id: 1529723388
-        name: Debitis beatae.
+        id: 1986860609
+        name: Quam voluptatem illum ea dolorem adipisci.
       photos:
         small: Autem reprehenderit.
       read_only: false
       recording_started_at: 9034289492120087135
       uploads:
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
       - blocks:
-        - 2158785424609171725
         - 2372739846461020348
-        id: 1118095373303354860
-        size: 7247355678576483787
-        time: 4300119959110271883
-        type: Quaerat nesciunt ut dicta laudantium eos soluta.
-        upload_id: Ea dolorem adipisci ab.
-        url: Eaque iusto dolores ut sapiente.
+        - 2943012989969916972
+        id: 5336129199397589450
+        size: 8707264858930901579
+        time: 7247355678576483787
+        type: Eos soluta distinctio.
+        upload_id: Eaque iusto dolores ut sapiente.
+        url: Nesciunt ut dicta.
     required:
     - id
     - name

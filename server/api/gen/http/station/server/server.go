@@ -59,9 +59,11 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Station", "GET", "/stations/@/{id}/details"},
-			{"Update", "POST", "/stations/@/{id}/details"},
-			{"CORS", "OPTIONS", "/stations/@/{id}/details"},
+			{"Station", "GET", "/stations/{id}"},
+			{"Station", "GET", "/stations/@/{id}"},
+			{"Update", "POST", "/stations/{id}"},
+			{"CORS", "OPTIONS", "/stations/{id}"},
+			{"CORS", "OPTIONS", "/stations/@/{id}"},
 		},
 		Station: NewStationHandler(e.Station, mux, decoder, encoder, errhandler, formatter),
 		Update:  NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
@@ -95,7 +97,8 @@ func MountStationHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/stations/@/{id}/details", f)
+	mux.Handle("GET", "/stations/{id}", f)
+	mux.Handle("GET", "/stations/@/{id}", f)
 }
 
 // NewStationHandler creates a HTTP handler which loads the HTTP request and
@@ -146,7 +149,7 @@ func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/stations/@/{id}/details", f)
+	mux.Handle("POST", "/stations/{id}", f)
 }
 
 // NewUpdateHandler creates a HTTP handler which loads the HTTP request and
@@ -198,7 +201,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/stations/@/{id}/details", f)
+	mux.Handle("OPTIONS", "/stations/{id}", f)
+	mux.Handle("OPTIONS", "/stations/@/{id}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

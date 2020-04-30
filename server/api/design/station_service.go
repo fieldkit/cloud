@@ -103,6 +103,7 @@ var _ = Service("station", func() {
 		Result(StationFull)
 
 		HTTP(func() {
+			GET("stations/{id}")
 			GET("stations/@/{id}")
 
 			httpAuthentication()
