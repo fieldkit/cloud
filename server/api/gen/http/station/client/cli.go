@@ -16,14 +16,52 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildStationPayload builds the payload for the station station endpoint from
-// CLI flags.
-func BuildStationPayload(stationStationID string, stationStationAuth string) (*station.StationPayload, error) {
+// BuildAddPayload builds the payload for the station add endpoint from CLI
+// flags.
+func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.AddPayload, error) {
+	var err error
+	var body AddRequestBody
+	{
+		err = json.Unmarshal([]byte(stationAddBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Sapiente nobis quaerat nesciunt ut dicta laudantium.\",\n      \"name\": \"Iusto dolores.\",\n      \"status_json\": {\n         \"Distinctio repellat dolorem ipsa sit nam.\": \"Mollitia totam id quibusdam autem reprehenderit aliquam.\",\n         \"Id repellat iusto tenetur dolorem nam.\": \"Quod qui est sequi ullam doloribus.\",\n         \"Qui quas similique.\": \"Voluptatem corporis possimus eum sed iusto.\"\n      }\n   }'")
+		}
+		if body.StatusJSON == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var auth string
+	{
+		auth = stationAddAuth
+	}
+	v := &station.AddPayload{
+		Name:     body.Name,
+		DeviceID: body.DeviceID,
+	}
+	if body.StatusJSON != nil {
+		v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+		for key, val := range body.StatusJSON {
+			tk := key
+			tv := val
+			v.StatusJSON[tk] = tv
+		}
+	}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildGetPayload builds the payload for the station get endpoint from CLI
+// flags.
+func BuildGetPayload(stationGetID string, stationGetAuth string) (*station.GetPayload, error) {
 	var err error
 	var id int32
 	{
 		var v int64
-		v, err = strconv.ParseInt(stationStationID, 10, 32)
+		v, err = strconv.ParseInt(stationGetID, 10, 32)
 		id = int32(v)
 		if err != nil {
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
@@ -31,9 +69,9 @@ func BuildStationPayload(stationStationID string, stationStationAuth string) (*s
 	}
 	var auth string
 	{
-		auth = stationStationAuth
+		auth = stationGetAuth
 	}
-	v := &station.StationPayload{}
+	v := &station.GetPayload{}
 	v.ID = id
 	v.Auth = auth
 
@@ -48,7 +86,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Perspiciatis quo.\",\n      \"status_json\": {\n         \"Deleniti quis laborum modi distinctio ea et.\": \"Iure illo odio quod.\",\n         \"Et tempora exercitationem est.\": \"Possimus sint sint aut eaque accusantium quisquam.\",\n         \"Ut explicabo vel dignissimos sit consequuntur perspiciatis.\": \"Quo sit.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Non saepe quos.\",\n      \"status_json\": {\n         \"Qui neque dignissimos labore doloribus voluptas consequuntur.\": \"Dolores quo eum sequi.\"\n      }\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))

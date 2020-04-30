@@ -88,7 +88,30 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 })
 
 var _ = Service("station", func() {
-	Method("station", func() {
+	Method("add", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("name", String)
+			Attribute("device_id", String)
+			Attribute("status_json", MapOf(String, Any))
+			Required("name", "device_id", "status_json")
+		})
+
+		Result(StationFull)
+
+		HTTP(func() {
+			POST("stations")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("get", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
@@ -136,10 +159,12 @@ var _ = Service("station", func() {
 
 	Error("unauthorized", String, "credentials are invalid")
 	Error("not-found", String, "not found")
+	Error("bad-request", String, "bad request")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 		Response("not-found", StatusNotFound)
+		Response("bad-request", StatusBadRequest)
 	})
 
 	commonOptions()

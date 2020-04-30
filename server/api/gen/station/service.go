@@ -16,8 +16,10 @@ import (
 
 // Service is the station service interface.
 type Service interface {
-	// Station implements station.
-	Station(context.Context, *StationPayload) (res *StationFull, err error)
+	// Add implements add.
+	Add(context.Context, *AddPayload) (res *StationFull, err error)
+	// Get implements get.
+	Get(context.Context, *GetPayload) (res *StationFull, err error)
 	// Update implements update.
 	Update(context.Context, *UpdatePayload) (res *StationFull, err error)
 }
@@ -36,15 +38,17 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"station", "update"}
+var MethodNames = [3]string{"add", "get", "update"}
 
-// StationPayload is the payload type of the station service station method.
-type StationPayload struct {
-	Auth string
-	ID   int32
+// AddPayload is the payload type of the station service add method.
+type AddPayload struct {
+	Auth       string
+	Name       string
+	DeviceID   string
+	StatusJSON map[string]interface{}
 }
 
-// StationFull is the result type of the station service station method.
+// StationFull is the result type of the station service add method.
 type StationFull struct {
 	ID                 int32
 	Name               string
@@ -61,6 +65,12 @@ type StationFull struct {
 	FirmwareNumber     int32
 	FirmwareTime       int32
 	Modules            []*StationModule
+}
+
+// GetPayload is the payload type of the station service get method.
+type GetPayload struct {
+	Auth string
+	ID   int32
 }
 
 // UpdatePayload is the payload type of the station service update method.
@@ -112,6 +122,9 @@ type Unauthorized string
 // not found
 type NotFound string
 
+// bad request
+type BadRequest string
+
 // Error returns an error description.
 func (e Unauthorized) Error() string {
 	return "credentials are invalid"
@@ -130,6 +143,16 @@ func (e NotFound) Error() string {
 // ErrorName returns "not-found".
 func (e NotFound) ErrorName() string {
 	return "not-found"
+}
+
+// Error returns an error description.
+func (e BadRequest) Error() string {
+	return "bad request"
+}
+
+// ErrorName returns "bad-request".
+func (e BadRequest) ErrorName() string {
+	return "bad-request"
 }
 
 // NewStationFull initializes result type StationFull from viewed result type

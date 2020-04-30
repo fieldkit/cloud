@@ -13,6 +13,14 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// AddRequestBody is the type of the "station" service "add" endpoint HTTP
+// request body.
+type AddRequestBody struct {
+	Name       *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	DeviceID   *string                `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
+}
+
 // UpdateRequestBody is the type of the "station" service "update" endpoint
 // HTTP request body.
 type UpdateRequestBody struct {
@@ -20,9 +28,29 @@ type UpdateRequestBody struct {
 	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
 }
 
-// StationResponseBody is the type of the "station" service "station" endpoint
-// HTTP response body.
-type StationResponseBody struct {
+// AddResponseBody is the type of the "station" service "add" endpoint HTTP
+// response body.
+type AddResponseBody struct {
+	ID                 int32                        `form:"id" json:"id" xml:"id"`
+	Name               string                       `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                       `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
+	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
+	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
+	MemoryAvailable    int32                        `form:"memory_available" json:"memory_available" xml:"memory_available"`
+	FirmwareNumber     int32                        `form:"firmware_number" json:"firmware_number" xml:"firmware_number"`
+	FirmwareTime       int32                        `form:"firmware_time" json:"firmware_time" xml:"firmware_time"`
+	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+}
+
+// GetResponseBody is the type of the "station" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
 	ID                 int32                        `form:"id" json:"id" xml:"id"`
 	Name               string                       `form:"name" json:"name" xml:"name"`
 	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
@@ -60,13 +88,33 @@ type UpdateResponseBody struct {
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
 }
 
-// StationNotFoundResponseBody is the type of the "station" service "station"
-// endpoint HTTP response body for the "not-found" error.
-type StationNotFoundResponseBody string
+// AddBadRequestResponseBody is the type of the "station" service "add"
+// endpoint HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody string
 
-// StationUnauthorizedResponseBody is the type of the "station" service
-// "station" endpoint HTTP response body for the "unauthorized" error.
-type StationUnauthorizedResponseBody string
+// AddNotFoundResponseBody is the type of the "station" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody string
+
+// AddUnauthorizedResponseBody is the type of the "station" service "add"
+// endpoint HTTP response body for the "unauthorized" error.
+type AddUnauthorizedResponseBody string
+
+// GetBadRequestResponseBody is the type of the "station" service "get"
+// endpoint HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody string
+
+// GetNotFoundResponseBody is the type of the "station" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody string
+
+// GetUnauthorizedResponseBody is the type of the "station" service "get"
+// endpoint HTTP response body for the "unauthorized" error.
+type GetUnauthorizedResponseBody string
+
+// UpdateBadRequestResponseBody is the type of the "station" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
 
 // UpdateNotFoundResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "not-found" error.
@@ -117,10 +165,52 @@ type StationSensorResponseBody struct {
 	UnitOfMeasure string `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
 }
 
-// NewStationResponseBody builds the HTTP response body from the result of the
-// "station" endpoint of the "station" service.
-func NewStationResponseBody(res *stationviews.StationFullView) *StationResponseBody {
-	body := &StationResponseBody{
+// NewAddResponseBody builds the HTTP response body from the result of the
+// "add" endpoint of the "station" service.
+func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
+	body := &AddResponseBody{
+		ID:                 *res.ID,
+		Name:               *res.Name,
+		DeviceID:           *res.DeviceID,
+		ReadOnly:           *res.ReadOnly,
+		Battery:            *res.Battery,
+		RecordingStartedAt: *res.RecordingStartedAt,
+		MemoryUsed:         *res.MemoryUsed,
+		MemoryAvailable:    *res.MemoryAvailable,
+		FirmwareNumber:     *res.FirmwareNumber,
+		FirmwareTime:       *res.FirmwareTime,
+	}
+	if res.Owner != nil {
+		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
+	}
+	if res.Uploads != nil {
+		body.Uploads = make([]*StationUploadResponseBody, len(res.Uploads))
+		for i, val := range res.Uploads {
+			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
+		}
+	}
+	if res.Images != nil {
+		body.Images = make([]*ImageRefResponseBody, len(res.Images))
+		for i, val := range res.Images {
+			body.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
+		}
+	}
+	if res.Photos != nil {
+		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.Modules != nil {
+		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
+		for i, val := range res.Modules {
+			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewGetResponseBody builds the HTTP response body from the result of the
+// "get" endpoint of the "station" service.
+func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
+	body := &GetResponseBody{
 		ID:                 *res.ID,
 		Name:               *res.Name,
 		DeviceID:           *res.DeviceID,
@@ -201,17 +291,52 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 	return body
 }
 
-// NewStationNotFoundResponseBody builds the HTTP response body from the result
-// of the "station" endpoint of the "station" service.
-func NewStationNotFoundResponseBody(res station.NotFound) StationNotFoundResponseBody {
-	body := StationNotFoundResponseBody(res)
+// NewAddBadRequestResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "station" service.
+func NewAddBadRequestResponseBody(res station.BadRequest) AddBadRequestResponseBody {
+	body := AddBadRequestResponseBody(res)
 	return body
 }
 
-// NewStationUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "station" endpoint of the "station" service.
-func NewStationUnauthorizedResponseBody(res station.Unauthorized) StationUnauthorizedResponseBody {
-	body := StationUnauthorizedResponseBody(res)
+// NewAddNotFoundResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "station" service.
+func NewAddNotFoundResponseBody(res station.NotFound) AddNotFoundResponseBody {
+	body := AddNotFoundResponseBody(res)
+	return body
+}
+
+// NewAddUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "station" service.
+func NewAddUnauthorizedResponseBody(res station.Unauthorized) AddUnauthorizedResponseBody {
+	body := AddUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewGetBadRequestResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "station" service.
+func NewGetBadRequestResponseBody(res station.BadRequest) GetBadRequestResponseBody {
+	body := GetBadRequestResponseBody(res)
+	return body
+}
+
+// NewGetNotFoundResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "station" service.
+func NewGetNotFoundResponseBody(res station.NotFound) GetNotFoundResponseBody {
+	body := GetNotFoundResponseBody(res)
+	return body
+}
+
+// NewGetUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "station" service.
+func NewGetUnauthorizedResponseBody(res station.Unauthorized) GetUnauthorizedResponseBody {
+	body := GetUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "station" service.
+func NewUpdateBadRequestResponseBody(res station.BadRequest) UpdateBadRequestResponseBody {
+	body := UpdateBadRequestResponseBody(res)
 	return body
 }
 
@@ -229,9 +354,26 @@ func NewUpdateUnauthorizedResponseBody(res station.Unauthorized) UpdateUnauthori
 	return body
 }
 
-// NewStationPayload builds a station service station endpoint payload.
-func NewStationPayload(id int32, auth string) *station.StationPayload {
-	v := &station.StationPayload{}
+// NewAddPayload builds a station service add endpoint payload.
+func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
+	v := &station.AddPayload{
+		Name:     *body.Name,
+		DeviceID: *body.DeviceID,
+	}
+	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+	for key, val := range body.StatusJSON {
+		tk := key
+		tv := val
+		v.StatusJSON[tk] = tv
+	}
+	v.Auth = auth
+
+	return v
+}
+
+// NewGetPayload builds a station service get endpoint payload.
+func NewGetPayload(id int32, auth string) *station.GetPayload {
+	v := &station.GetPayload{}
 	v.ID = id
 	v.Auth = auth
 
@@ -253,6 +395,20 @@ func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.U
 	v.Auth = auth
 
 	return v
+}
+
+// ValidateAddRequestBody runs the validations defined on AddRequestBody
+func ValidateAddRequestBody(body *AddRequestBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "body"))
+	}
+	if body.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
+	}
+	return
 }
 
 // ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody

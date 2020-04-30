@@ -20,21 +20,126 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeStationResponse returns an encoder for responses returned by the
-// station station endpoint.
-func EncodeStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeAddResponse returns an encoder for responses returned by the station
+// add endpoint.
+func EncodeAddResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*stationviews.StationFull)
 		enc := encoder(ctx, w)
-		body := NewStationResponseBody(res.Projected)
+		body := NewAddResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeStationRequest returns a decoder for requests sent to the station
-// station endpoint.
-func DecodeStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeAddRequest returns a decoder for requests sent to the station add
+// endpoint.
+func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body AddRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateAddRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			auth string
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewAddPayload(&body, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeAddError returns an encoder for errors returned by the add station
+// endpoint.
+func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(station.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(station.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeGetResponse returns an encoder for responses returned by the station
+// get endpoint.
+func EncodeGetResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.StationFull)
+		enc := encoder(ctx, w)
+		body := NewGetResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetRequest returns a decoder for requests sent to the station get
+// endpoint.
+func DecodeGetRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			id   int32
@@ -58,7 +163,7 @@ func DecodeStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		if err != nil {
 			return nil, err
 		}
-		payload := NewStationPayload(id, auth)
+		payload := NewGetPayload(id, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -69,9 +174,9 @@ func DecodeStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 	}
 }
 
-// EncodeStationError returns an encoder for errors returned by the station
-// station endpoint.
-func EncodeStationError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeGetError returns an encoder for errors returned by the get station
+// endpoint.
+func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -79,6 +184,18 @@ func EncodeStationError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
 			enc := encoder(ctx, w)
@@ -86,7 +203,7 @@ func EncodeStationError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewStationNotFoundResponseBody(res)
+				body = NewGetNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -98,7 +215,7 @@ func EncodeStationError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewStationUnauthorizedResponseBody(res)
+				body = NewGetUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -183,6 +300,18 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
 			enc := encoder(ctx, w)

@@ -19,23 +19,13 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
-// BuildStationRequest instantiates a HTTP request object with method and path
-// set to call the "station" service "station" endpoint
-func (c *Client) BuildStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	var (
-		id int32
-	)
-	{
-		p, ok := v.(*station.StationPayload)
-		if !ok {
-			return nil, goahttp.ErrInvalidType("station", "station", "*station.StationPayload", v)
-		}
-		id = p.ID
-	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: StationStationPath(id)}
-	req, err := http.NewRequest("GET", u.String(), nil)
+// BuildAddRequest instantiates a HTTP request object with method and path set
+// to call the "station" service "add" endpoint
+func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddStationPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("station", "station", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("station", "add", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -44,30 +34,35 @@ func (c *Client) BuildStationRequest(ctx context.Context, v interface{}) (*http.
 	return req, nil
 }
 
-// EncodeStationRequest returns an encoder for requests sent to the station
-// station server.
-func EncodeStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeAddRequest returns an encoder for requests sent to the station add
+// server.
+func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*station.StationPayload)
+		p, ok := v.(*station.AddPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("station", "station", "*station.StationPayload", v)
+			return goahttp.ErrInvalidType("station", "add", "*station.AddPayload", v)
 		}
 		{
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		body := NewAddRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("station", "add", err)
+		}
 		return nil
 	}
 }
 
-// DecodeStationResponse returns a decoder for responses returned by the
-// station station endpoint. restoreBody controls whether the response body
-// should be restored after having been read.
-// DecodeStationResponse may return the following errors:
+// DecodeAddResponse returns a decoder for responses returned by the station
+// add endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeAddResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
 //	- "not-found" (type station.NotFound): http.StatusNotFound
 //	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
-func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -84,44 +79,172 @@ func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restore
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body StationResponseBody
+				body AddResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("station", "station", err)
+				return nil, goahttp.ErrDecodingError("station", "add", err)
 			}
-			p := NewStationFullViewOK(&body)
+			p := NewAddStationFullOK(&body)
 			view := "default"
 			vres := &stationviews.StationFull{Projected: p, View: view}
 			if err = stationviews.ValidateStationFull(vres); err != nil {
-				return nil, goahttp.ErrValidationError("station", "station", err)
+				return nil, goahttp.ErrValidationError("station", "add", err)
 			}
 			res := station.NewStationFull(vres)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body AddBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "add", err)
+			}
+			return nil, NewAddBadRequest(body)
 		case http.StatusNotFound:
 			var (
-				body StationNotFoundResponseBody
+				body AddNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("station", "station", err)
+				return nil, goahttp.ErrDecodingError("station", "add", err)
 			}
-			return nil, NewStationNotFound(body)
+			return nil, NewAddNotFound(body)
 		case http.StatusUnauthorized:
 			var (
-				body StationUnauthorizedResponseBody
+				body AddUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("station", "station", err)
+				return nil, goahttp.ErrDecodingError("station", "add", err)
 			}
-			return nil, NewStationUnauthorized(body)
+			return nil, NewAddUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("station", "station", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("station", "add", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGetRequest instantiates a HTTP request object with method and path set
+// to call the "station" service "get" endpoint
+func (c *Client) BuildGetRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*station.GetPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "get", "*station.GetPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetStationPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "get", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetRequest returns an encoder for requests sent to the station get
+// server.
+func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.GetPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "get", "*station.GetPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeGetResponse returns a decoder for responses returned by the station
+// get endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeGetResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "get", err)
+			}
+			p := NewGetStationFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "get", err)
+			}
+			res := station.NewStationFull(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body GetBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "get", err)
+			}
+			return nil, NewGetBadRequest(body)
+		case http.StatusNotFound:
+			var (
+				body GetNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "get", err)
+			}
+			return nil, NewGetNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body GetUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "get", err)
+			}
+			return nil, NewGetUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "get", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -175,6 +298,7 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // update endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeUpdateResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
 //	- "not-found" (type station.NotFound): http.StatusNotFound
 //	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -210,6 +334,16 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			}
 			res := station.NewStationFull(vres)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body UpdateBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update", err)
+			}
+			return nil, NewUpdateBadRequest(body)
 		case http.StatusNotFound:
 			var (
 				body UpdateNotFoundResponseBody

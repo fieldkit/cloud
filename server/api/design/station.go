@@ -139,18 +139,6 @@ var _ = Resource("station", func() {
 		Scope("api:access")
 	})
 
-	Action("add", func() {
-		Routing(POST("stations"))
-		Description("Add a station")
-		Payload(AddStationPayload)
-		Response(BadRequest, func() {
-			Media(BadRequestResponse)
-		})
-		Response(OK, func() {
-			Media(Station)
-		})
-	})
-
 	Action("list", func() {
 		Routing(GET("stations"))
 		Description("List stations")

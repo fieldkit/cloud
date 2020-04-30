@@ -1998,42 +1998,6 @@ func (ctx *ResolvedRecordsContext) NotFound() error {
 	return nil
 }
 
-// AddStationContext provides the station add action context.
-type AddStationContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Payload *AddStationPayload
-}
-
-// NewAddStationContext parses the incoming request URL and body, performs validations and creates the
-// context used by the station controller add action.
-func NewAddStationContext(ctx context.Context, r *http.Request, service *goa.Service) (*AddStationContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := AddStationContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *AddStationContext) OK(r *Station) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.station+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *AddStationContext) BadRequest(r *BadRequestResponse) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.brr+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
-}
-
 // ListStationContext provides the station list action context.
 type ListStationContext struct {
 	context.Context

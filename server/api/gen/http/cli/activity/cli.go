@@ -32,7 +32,7 @@ func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
 project (update|invites|lookup- invite|accept- invite|reject- invite)
-station (station|update)
+station (add|get|update)
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -41,12 +41,20 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 7191988627656179935 --page 6966341089960532853 --auth "Earum perspiciatis at."` + "\n" +
-		os.Args[0] + ` following follow --id 8186297011915552622 --auth "Quaerat ut nesciunt."` + "\n" +
+	return os.Args[0] + ` activity station --id 3054056133329874644 --page 7178171152420430389 --auth "Perspiciatis omnis commodi tempora ut officia."` + "\n" +
+		os.Args[0] + ` following follow --id 7910901733617006899 --auth "Dolorem numquam et tempora."` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Sint quasi possimus et."
-   }' --id 7461510584236083209 --auth "Sunt quis."` + "\n" +
-		os.Args[0] + ` station station --id 901048168 --auth "Laboriosam soluta qui ut quasi nihil vero."` + "\n" +
+      "body": "Quia libero est officia."
+   }' --id 5284039700769422437 --auth "Quia et voluptas natus libero voluptate."` + "\n" +
+		os.Args[0] + ` station add --body '{
+      "device_id": "Sapiente nobis quaerat nesciunt ut dicta laudantium.",
+      "name": "Iusto dolores.",
+      "status_json": {
+         "Distinctio repellat dolorem ipsa sit nam.": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
+         "Id repellat iusto tenetur dolorem nam.": "Quod qui est sequi ullam doloribus.",
+         "Qui quas similique.": "Voluptatem corporis possimus eum sed iusto."
+      }
+   }' --auth "Qui vitae qui ad iusto molestias."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
 		""
 }
@@ -113,9 +121,13 @@ func ParseEndpoint(
 
 		stationFlags = flag.NewFlagSet("station", flag.ContinueOnError)
 
-		stationStationFlags    = flag.NewFlagSet("station", flag.ExitOnError)
-		stationStationIDFlag   = stationStationFlags.String("id", "REQUIRED", "")
-		stationStationAuthFlag = stationStationFlags.String("auth", "REQUIRED", "")
+		stationAddFlags    = flag.NewFlagSet("add", flag.ExitOnError)
+		stationAddBodyFlag = stationAddFlags.String("body", "REQUIRED", "")
+		stationAddAuthFlag = stationAddFlags.String("auth", "REQUIRED", "")
+
+		stationGetFlags    = flag.NewFlagSet("get", flag.ExitOnError)
+		stationGetIDFlag   = stationGetFlags.String("id", "REQUIRED", "")
+		stationGetAuthFlag = stationGetFlags.String("auth", "REQUIRED", "")
 
 		stationUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
 		stationUpdateBodyFlag = stationUpdateFlags.String("body", "REQUIRED", "")
@@ -162,7 +174,8 @@ func ParseEndpoint(
 	projectRejectInviteFlags.Usage = projectRejectInviteUsage
 
 	stationFlags.Usage = stationUsage
-	stationStationFlags.Usage = stationStationUsage
+	stationAddFlags.Usage = stationAddUsage
+	stationGetFlags.Usage = stationGetUsage
 	stationUpdateFlags.Usage = stationUpdateUsage
 
 	tasksFlags.Usage = tasksUsage
@@ -265,8 +278,11 @@ func ParseEndpoint(
 
 		case "station":
 			switch epn {
-			case "station":
-				epf = stationStationFlags
+			case "add":
+				epf = stationAddFlags
+
+			case "get":
+				epf = stationGetFlags
 
 			case "update":
 				epf = stationUpdateFlags
@@ -368,9 +384,12 @@ func ParseEndpoint(
 		case "station":
 			c := stationc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "station":
-				endpoint = c.Station()
-				data, err = stationc.BuildStationPayload(*stationStationIDFlag, *stationStationAuthFlag)
+			case "add":
+				endpoint = c.Add()
+				data, err = stationc.BuildAddPayload(*stationAddBodyFlag, *stationAddAuthFlag)
+			case "get":
+				endpoint = c.Get()
+				data, err = stationc.BuildGetPayload(*stationGetIDFlag, *stationGetAuthFlag)
 			case "update":
 				endpoint = c.Update()
 				data, err = stationc.BuildUpdatePayload(*stationUpdateBodyFlag, *stationUpdateIDFlag, *stationUpdateAuthFlag)
@@ -437,7 +456,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 7191988627656179935 --page 6966341089960532853 --auth "Earum perspiciatis at."
+    `+os.Args[0]+` activity station --id 3054056133329874644 --page 7178171152420430389 --auth "Perspiciatis omnis commodi tempora ut officia."
 `, os.Args[0])
 }
 
@@ -450,7 +469,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 3691130509522544045 --page 7859911811095789579 --auth "Ipsum sit itaque rerum."
+    `+os.Args[0]+` activity project --id 2409872928586216206 --page 2785209347511362274 --auth "Accusamus illo iusto modi magni."
 `, os.Args[0])
 }
 
@@ -478,7 +497,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 8186297011915552622 --auth "Quaerat ut nesciunt."
+    `+os.Args[0]+` following follow --id 7910901733617006899 --auth "Dolorem numquam et tempora."
 `, os.Args[0])
 }
 
@@ -490,7 +509,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 2984855983272144925 --auth "Iusto modi magni."
+    `+os.Args[0]+` following unfollow --id 8691339857581182502 --auth "Autem ut illum."
 `, os.Args[0])
 }
 
@@ -502,7 +521,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 7910901733617006899 --page 1969241031730602024
+    `+os.Args[0]+` following followers --id 1835067728128991674 --page 7461510584236083209
 `, os.Args[0])
 }
 
@@ -533,8 +552,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Sint quasi possimus et."
-   }' --id 7461510584236083209 --auth "Sunt quis."
+      "body": "Quia libero est officia."
+   }' --id 5284039700769422437 --auth "Quia et voluptas natus libero voluptate."
 `, os.Args[0])
 }
 
@@ -545,7 +564,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Recusandae fuga quia libero."
+    `+os.Args[0]+` project invites --auth "Dolorum deleniti."
 `, os.Args[0])
 }
 
@@ -557,7 +576,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Aut dolorum deleniti dolore veritatis aliquid." --auth "Quidem error vitae aliquid et."
+    `+os.Args[0]+` project lookup- invite --token "Neque est aut temporibus." --auth "Voluptatibus quis exercitationem autem."
 `, os.Args[0])
 }
 
@@ -570,7 +589,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 4973663201888496553 --token "Corrupti voluptas neque." --auth "Aut temporibus."
+    `+os.Args[0]+` project accept- invite --id 3245571167081836993 --token "Qui consequatur." --auth "Hic aut nam et similique qui."
 `, os.Args[0])
 }
 
@@ -583,7 +602,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 3805588473667112890 --token "Molestias rerum consequatur qui consequatur." --auth "Hic aut nam et similique qui."
+    `+os.Args[0]+` project reject- invite --id 4323379036019030955 --token "Laborum laboriosam soluta qui ut quasi." --auth "Vero debitis."
 `, os.Args[0])
 }
 
@@ -594,22 +613,43 @@ Usage:
     %s [globalflags] station COMMAND [flags]
 
 COMMAND:
-    station: Station implements station.
+    add: Add implements add.
+    get: Get implements get.
     update: Update implements update.
 
 Additional help:
     %s station COMMAND --help
 `, os.Args[0], os.Args[0])
 }
-func stationStationUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station station -id INT32 -auth STRING
+func stationAddUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station add -body JSON -auth STRING
 
-Station implements station.
+Add implements add.
+    -body JSON: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station add --body '{
+      "device_id": "Sapiente nobis quaerat nesciunt ut dicta laudantium.",
+      "name": "Iusto dolores.",
+      "status_json": {
+         "Distinctio repellat dolorem ipsa sit nam.": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
+         "Id repellat iusto tenetur dolorem nam.": "Quod qui est sequi ullam doloribus.",
+         "Qui quas similique.": "Voluptatem corporis possimus eum sed iusto."
+      }
+   }' --auth "Qui vitae qui ad iusto molestias."
+`, os.Args[0])
+}
+
+func stationGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station get -id INT32 -auth STRING
+
+Get implements get.
     -id INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station station --id 901048168 --auth "Laboriosam soluta qui ut quasi nihil vero."
+    `+os.Args[0]+` station get --id 291339793 --auth "Voluptas ut mollitia nisi amet."
 `, os.Args[0])
 }
 
@@ -623,13 +663,11 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Perspiciatis quo.",
+      "name": "Non saepe quos.",
       "status_json": {
-         "Deleniti quis laborum modi distinctio ea et.": "Iure illo odio quod.",
-         "Et tempora exercitationem est.": "Possimus sint sint aut eaque accusantium quisquam.",
-         "Ut explicabo vel dignissimos sit consequuntur perspiciatis.": "Quo sit."
+         "Qui neque dignissimos labore doloribus voluptas consequuntur.": "Dolores quo eum sequi."
       }
-   }' --id 1235407595 --auth "Maxime quis nihil quia aut."
+   }' --id 1336269270 --auth "Eveniet sed."
 `, os.Args[0])
 }
 
@@ -665,7 +703,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Repellendus sit." --auth "Aut sit iste."
+    `+os.Args[0]+` tasks refresh- device --device-id "Facilis impedit corporis quam." --auth "Omnis neque."
 `, os.Args[0])
 }
 
@@ -691,7 +729,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 4555315418280626657
+    `+os.Args[0]+` test get --id 362543203534867101
 `, os.Args[0])
 }
 
@@ -713,7 +751,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Neque harum." --auth "Aut dolor est sequi vel velit eos."
+    `+os.Args[0]+` test email --address "Aut consequuntur et a." --auth "Eveniet esse suscipit saepe qui quibusdam dolor."
 `, os.Args[0])
 }
 

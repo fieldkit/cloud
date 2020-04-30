@@ -137,69 +137,6 @@ func NewStationController(service *goa.Service, options *ControllerOptions) *Sta
 	}
 }
 
-func (c *StationController) Add(ctx *app.AddStationContext) error {
-	log := Logger(ctx).Sugar()
-
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
-	deviceId, err := hex.DecodeString(ctx.Payload.DeviceID)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("adding station", "device_id", ctx.Payload.DeviceID)
-
-	owner := &data.User{}
-	if err := c.options.Database.GetContext(ctx, owner, "SELECT * FROM fieldkit.user WHERE id = $1", p.UserID()); err != nil {
-		return err
-	}
-
-	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, "SELECT * FROM fieldkit.station WHERE device_id = $1", deviceId); err != nil {
-		return err
-	}
-
-	if len(stations) > 0 {
-		existing := stations[0]
-
-		if existing.OwnerID != p.UserID() {
-			return ctx.BadRequest(&app.BadRequestResponse{
-				Key:     "stationAlreadyRegistered",
-				Message: "This station is already registered.",
-			})
-		}
-
-		svm, err := StationType(p, existing, owner, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
-		if err != nil {
-			return err
-		}
-
-		return ctx.OK(svm)
-	}
-
-	station := &data.Station{
-		Name:     ctx.Payload.Name,
-		OwnerID:  p.UserID(),
-		DeviceID: deviceId,
-	}
-
-	station.SetStatus(ctx.Payload.StatusJSON)
-
-	if err := c.options.Database.NamedGetContext(ctx, station, "INSERT INTO fieldkit.station (name, device_id, owner_id, status_json) VALUES (:name, :device_id, :owner_id, :status_json) RETURNING *", station); err != nil {
-		return err
-	}
-
-	svm, err := StationType(p, station, owner, make([]*data.Ingestion, 0), make([]*data.FieldNoteMediaForStation, 0))
-	if err != nil {
-		return err
-	}
-
-	return ctx.OK(svm)
-}
-
 func (c *StationController) ListProject(ctx *app.ListProjectStationContext) error {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {

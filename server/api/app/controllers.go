@@ -2154,7 +2154,6 @@ func handleRecordsOrigin(h goa.Handler) goa.Handler {
 // StationController is the controller interface for the Station actions.
 type StationController interface {
 	goa.Muxer
-	Add(*AddStationContext) error
 	List(*ListStationContext) error
 	ListProject(*ListProjectStationContext) error
 	Photo(*PhotoStationContext) error
@@ -2167,29 +2166,6 @@ func MountStationController(service *goa.Service, ctrl StationController) {
 	service.Mux.Handle("OPTIONS", "/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/photo", ctrl.MuxHandler("preflight", handleStationOrigin(cors.HandlePreflight()), nil))
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewAddStationContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*AddStationPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Add(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleStationOrigin(h)
-	service.Mux.Handle("POST", "/stations", ctrl.MuxHandler("add", h, unmarshalAddStationPayload))
-	service.LogInfo("mount", "ctrl", "Station", "action", "Add", "route", "POST /stations", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -2400,21 +2376,6 @@ func handleStationOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
-}
-
-// unmarshalAddStationPayload unmarshals the request body into the context request data Payload field.
-func unmarshalAddStationPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &addStationPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
 }
 
 // SwaggerController is the controller interface for the Swagger actions.

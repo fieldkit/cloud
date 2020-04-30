@@ -16,8 +16,9 @@ import (
 
 // Endpoints wraps the "station" service endpoints.
 type Endpoints struct {
-	Station goa.Endpoint
-	Update  goa.Endpoint
+	Add    goa.Endpoint
+	Get    goa.Endpoint
+	Update goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -25,22 +26,24 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Station: NewStationEndpoint(s, a.JWTAuth),
-		Update:  NewUpdateEndpoint(s, a.JWTAuth),
+		Add:    NewAddEndpoint(s, a.JWTAuth),
+		Get:    NewGetEndpoint(s, a.JWTAuth),
+		Update: NewUpdateEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "station" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Station = m(e.Station)
+	e.Add = m(e.Add)
+	e.Get = m(e.Get)
 	e.Update = m(e.Update)
 }
 
-// NewStationEndpoint returns an endpoint function that calls the method
-// "station" of service "station".
-func NewStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewAddEndpoint returns an endpoint function that calls the method "add" of
+// service "station".
+func NewAddEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*StationPayload)
+		p := req.(*AddPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -51,7 +54,31 @@ func NewStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 		if err != nil {
 			return nil, err
 		}
-		res, err := s.Station(ctx, p)
+		res, err := s.Add(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedStationFull(res, "default")
+		return vres, nil
+	}
+}
+
+// NewGetEndpoint returns an endpoint function that calls the method "get" of
+// service "station".
+func NewGetEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Get(ctx, p)
 		if err != nil {
 			return nil, err
 		}

@@ -17,9 +17,11 @@ import (
 
 // Client lists the station service endpoint HTTP clients.
 type Client struct {
-	// Station Doer is the HTTP client used to make requests to the station
-	// endpoint.
-	StationDoer goahttp.Doer
+	// Add Doer is the HTTP client used to make requests to the add endpoint.
+	AddDoer goahttp.Doer
+
+	// Get Doer is the HTTP client used to make requests to the get endpoint.
+	GetDoer goahttp.Doer
 
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
@@ -47,7 +49,8 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		StationDoer:         doer,
+		AddDoer:             doer,
+		GetDoer:             doer,
 		UpdateDoer:          doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
@@ -58,15 +61,15 @@ func NewClient(
 	}
 }
 
-// Station returns an endpoint that makes HTTP requests to the station service
-// station server.
-func (c *Client) Station() goa.Endpoint {
+// Add returns an endpoint that makes HTTP requests to the station service add
+// server.
+func (c *Client) Add() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeStationRequest(c.encoder)
-		decodeResponse = DecodeStationResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeAddRequest(c.encoder)
+		decodeResponse = DecodeAddResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildStationRequest(ctx, v)
+		req, err := c.BuildAddRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -74,9 +77,33 @@ func (c *Client) Station() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.StationDoer.Do(req)
+		resp, err := c.AddDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("station", "station", err)
+			return nil, goahttp.ErrRequestError("station", "add", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Get returns an endpoint that makes HTTP requests to the station service get
+// server.
+func (c *Client) Get() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetRequest(c.encoder)
+		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildGetRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "get", err)
 		}
 		return decodeResponse(resp)
 	}

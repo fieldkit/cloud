@@ -15,22 +15,34 @@ import (
 
 // Client is the "station" service client.
 type Client struct {
-	StationEndpoint goa.Endpoint
-	UpdateEndpoint  goa.Endpoint
+	AddEndpoint    goa.Endpoint
+	GetEndpoint    goa.Endpoint
+	UpdateEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(station, update goa.Endpoint) *Client {
+func NewClient(add, get, update goa.Endpoint) *Client {
 	return &Client{
-		StationEndpoint: station,
-		UpdateEndpoint:  update,
+		AddEndpoint:    add,
+		GetEndpoint:    get,
+		UpdateEndpoint: update,
 	}
 }
 
-// Station calls the "station" endpoint of the "station" service.
-func (c *Client) Station(ctx context.Context, p *StationPayload) (res *StationFull, err error) {
+// Add calls the "add" endpoint of the "station" service.
+func (c *Client) Add(ctx context.Context, p *AddPayload) (res *StationFull, err error) {
 	var ires interface{}
-	ires, err = c.StationEndpoint(ctx, p)
+	ires, err = c.AddEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationFull), nil
+}
+
+// Get calls the "get" endpoint of the "station" service.
+func (c *Client) Get(ctx context.Context, p *GetPayload) (res *StationFull, err error) {
+	var ires interface{}
+	ires, err = c.GetEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

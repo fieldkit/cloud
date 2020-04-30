@@ -11,13 +11,18 @@ import (
 	"fmt"
 )
 
-// StationStationPath returns the URL path to the station service station HTTP endpoint.
-func StationStationPath(id int32) string {
+// AddStationPath returns the URL path to the station service add HTTP endpoint.
+func AddStationPath() string {
+	return "/stations"
+}
+
+// GetStationPath returns the URL path to the station service get HTTP endpoint.
+func GetStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v", id)
 }
 
-// StationStationPath2 returns the URL path to the station service station HTTP endpoint.
-func StationStationPath2(id int32) string {
+// GetStationPath2 returns the URL path to the station service get HTTP endpoint.
+func GetStationPath2(id int32) string {
 	return fmt.Sprintf("/stations/@/%v", id)
 }
 

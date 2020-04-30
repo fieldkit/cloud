@@ -20,10 +20,11 @@ import (
 
 // Server lists the station service endpoint HTTP handlers.
 type Server struct {
-	Mounts  []*MountPoint
-	Station http.Handler
-	Update  http.Handler
-	CORS    http.Handler
+	Mounts []*MountPoint
+	Add    http.Handler
+	Get    http.Handler
+	Update http.Handler
+	CORS   http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -59,15 +60,18 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Station", "GET", "/stations/{id}"},
-			{"Station", "GET", "/stations/@/{id}"},
+			{"Add", "POST", "/stations"},
+			{"Get", "GET", "/stations/{id}"},
+			{"Get", "GET", "/stations/@/{id}"},
 			{"Update", "POST", "/stations/{id}"},
+			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/stations/@/{id}"},
 		},
-		Station: NewStationHandler(e.Station, mux, decoder, encoder, errhandler, formatter),
-		Update:  NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		CORS:    NewCORSHandler(),
+		Add:    NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Get:    NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Update: NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		CORS:   NewCORSHandler(),
 	}
 }
 
@@ -76,21 +80,74 @@ func (s *Server) Service() string { return "station" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.Station = m(s.Station)
+	s.Add = m(s.Add)
+	s.Get = m(s.Get)
 	s.Update = m(s.Update)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the station endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountStationHandler(mux, h.Station)
+	MountAddHandler(mux, h.Add)
+	MountGetHandler(mux, h.Get)
 	MountUpdateHandler(mux, h.Update)
 	MountCORSHandler(mux, h.CORS)
 }
 
-// MountStationHandler configures the mux to serve the "station" service
-// "station" endpoint.
-func MountStationHandler(mux goahttp.Muxer, h http.Handler) {
+// MountAddHandler configures the mux to serve the "station" service "add"
+// endpoint.
+func MountAddHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/stations", f)
+}
+
+// NewAddHandler creates a HTTP handler which loads the HTTP request and calls
+// the "station" service "add" endpoint.
+func NewAddHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAddRequest(mux, decoder)
+		encodeResponse = EncodeAddResponse(encoder)
+		encodeError    = EncodeAddError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "add")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetHandler configures the mux to serve the "station" service "get"
+// endpoint.
+func MountGetHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleStationOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -101,9 +158,9 @@ func MountStationHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/stations/@/{id}", f)
 }
 
-// NewStationHandler creates a HTTP handler which loads the HTTP request and
-// calls the "station" service "station" endpoint.
-func NewStationHandler(
+// NewGetHandler creates a HTTP handler which loads the HTTP request and calls
+// the "station" service "get" endpoint.
+func NewGetHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -112,13 +169,13 @@ func NewStationHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeStationRequest(mux, decoder)
-		encodeResponse = EncodeStationResponse(encoder)
-		encodeError    = EncodeStationError(encoder, formatter)
+		decodeRequest  = DecodeGetRequest(mux, decoder)
+		encodeResponse = EncodeGetResponse(encoder)
+		encodeError    = EncodeGetError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "station")
+		ctx = context.WithValue(ctx, goa.MethodKey, "get")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -201,6 +258,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
+	mux.Handle("OPTIONS", "/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}", f)
 	mux.Handle("OPTIONS", "/stations/@/{id}", f)
 }

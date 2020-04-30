@@ -24,7 +24,63 @@ func NewStationService(ctx context.Context, options *ControllerOptions) *Station
 	}
 }
 
-func (c *StationService) Station(ctx context.Context, payload *station.StationPayload) (response *station.StationFull, err error) {
+func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	deviceId, err := hex.DecodeString(payload.DeviceID)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("adding station", "device_id", payload.DeviceID)
+
+	owner := &data.User{}
+	if err := c.options.Database.GetContext(ctx, owner, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+		return nil, err
+	}
+
+	stations := []*data.Station{}
+	if err := c.options.Database.SelectContext(ctx, &stations, `SELECT * FROM fieldkit.station WHERE device_id = $1`, deviceId); err != nil {
+		return nil, err
+	}
+
+	if len(stations) > 0 {
+		existing := stations[0]
+
+		if existing.OwnerID != p.UserID() {
+			return nil, station.BadRequest("station already registered to another user")
+		}
+
+		return c.Get(ctx, &station.GetPayload{
+			Auth: payload.Auth,
+			ID:   existing.ID,
+		})
+	}
+
+	adding := &data.Station{
+		OwnerID:  p.UserID(),
+		Name:     payload.Name,
+		DeviceID: deviceId,
+	}
+
+	adding.SetStatus(payload.StatusJSON)
+
+	if err := c.options.Database.NamedGetContext(ctx, adding, `INSERT INTO fieldkit.station (name, device_id, owner_id, status_json) VALUES (:name, :device_id, :owner_id, :status_json) RETURNING *`, adding); err != nil {
+		return nil, err
+	}
+
+	return c.Get(ctx, &station.GetPayload{
+		Auth: payload.Auth,
+		ID:   adding.ID,
+	})
+}
+
+func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (response *station.StationFull, err error) {
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -87,7 +143,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 		return nil, err
 	}
 
-	return c.Station(ctx, &station.StationPayload{
+	return c.Get(ctx, &station.GetPayload{
 		Auth: payload.Auth,
 		ID:   payload.ID,
 	})
