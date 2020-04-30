@@ -50,6 +50,13 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    resendCreateAccount(userId) {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/users/" + userId + "/validate-email",
+        }).then(this._handleResponse.bind(this));
+    }
+
     updatePassword(data) {
         const token = this.token.getToken();
         return axios({
