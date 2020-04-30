@@ -16,12 +16,14 @@ import (
 // Client is the "station" service client.
 type Client struct {
 	StationEndpoint goa.Endpoint
+	UpdateEndpoint  goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(station goa.Endpoint) *Client {
+func NewClient(station, update goa.Endpoint) *Client {
 	return &Client{
 		StationEndpoint: station,
+		UpdateEndpoint:  update,
 	}
 }
 
@@ -29,6 +31,16 @@ func NewClient(station goa.Endpoint) *Client {
 func (c *Client) Station(ctx context.Context, p *StationPayload) (res *StationFull, err error) {
 	var ires interface{}
 	ires, err = c.StationEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationFull), nil
+}
+
+// Update calls the "update" endpoint of the "station" service.
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *StationFull, err error) {
+	var ires interface{}
+	ires, err = c.UpdateEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

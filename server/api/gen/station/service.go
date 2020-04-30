@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// Station implements station.
 	Station(context.Context, *StationPayload) (res *StationFull, err error)
+	// Update implements update.
+	Update(context.Context, *UpdatePayload) (res *StationFull, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -34,7 +36,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"station"}
+var MethodNames = [2]string{"station", "update"}
 
 // StationPayload is the payload type of the station service station method.
 type StationPayload struct {
@@ -59,6 +61,14 @@ type StationFull struct {
 	FirmwareNumber     int32
 	FirmwareTime       int32
 	Modules            []*StationModule
+}
+
+// UpdatePayload is the payload type of the station service update method.
+type UpdatePayload struct {
+	Auth       string
+	ID         int32
+	Name       string
+	StatusJSON map[string]interface{}
 }
 
 type StationOwner struct {

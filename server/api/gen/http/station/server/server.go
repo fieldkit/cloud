@@ -22,6 +22,7 @@ import (
 type Server struct {
 	Mounts  []*MountPoint
 	Station http.Handler
+	Update  http.Handler
 	CORS    http.Handler
 }
 
@@ -59,9 +60,11 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Station", "GET", "/stations/@/{id}/details"},
+			{"Update", "POST", "/stations/@/{id}/details"},
 			{"CORS", "OPTIONS", "/stations/@/{id}/details"},
 		},
 		Station: NewStationHandler(e.Station, mux, decoder, encoder, errhandler, formatter),
+		Update:  NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		CORS:    NewCORSHandler(),
 	}
 }
@@ -72,12 +75,14 @@ func (s *Server) Service() string { return "station" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Station = m(s.Station)
+	s.Update = m(s.Update)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the station endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountStationHandler(mux, h.Station)
+	MountUpdateHandler(mux, h.Update)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -111,6 +116,57 @@ func NewStationHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "station")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUpdateHandler configures the mux to serve the "station" service
+// "update" endpoint.
+func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/stations/@/{id}/details", f)
+}
+
+// NewUpdateHandler creates a HTTP handler which loads the HTTP request and
+// calls the "station" service "update" endpoint.
+func NewUpdateHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateRequest(mux, decoder)
+		encodeResponse = EncodeUpdateResponse(encoder)
+		encodeError    = EncodeUpdateError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
 		payload, err := decodeRequest(r)
 		if err != nil {

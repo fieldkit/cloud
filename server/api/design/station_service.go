@@ -109,6 +109,30 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("update", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("name", String)
+			Attribute("status_json", MapOf(String, Any))
+			Required("name", "status_json")
+		})
+
+		Result(StationFull)
+
+		HTTP(func() {
+			POST("stations/@/{id}/details")
+
+			httpAuthentication()
+		})
+	})
+
 	Error("unauthorized", String, "credentials are invalid")
 	Error("not-found", String, "not found")
 

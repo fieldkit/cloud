@@ -126,6 +126,117 @@ func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restore
 	}
 }
 
+// BuildUpdateRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "update" endpoint
+func (c *Client) BuildUpdateRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*station.UpdatePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "update", "*station.UpdatePayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateStationPath(id)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "update", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateRequest returns an encoder for requests sent to the station
+// update server.
+func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.UpdatePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "update", "*station.UpdatePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		body := NewUpdateRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("station", "update", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateResponse returns a decoder for responses returned by the station
+// update endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeUpdateResponse may return the following errors:
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update", err)
+			}
+			p := NewUpdateStationFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "update", err)
+			}
+			res := station.NewStationFull(vres)
+			return res, nil
+		case http.StatusNotFound:
+			var (
+				body UpdateNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update", err)
+			}
+			return nil, NewUpdateNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body UpdateUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update", err)
+			}
+			return nil, NewUpdateUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "update", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.

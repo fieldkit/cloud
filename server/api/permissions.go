@@ -107,7 +107,7 @@ func (p *defaultPermissions) ForProjectByID(id int) (permissions ProjectPermissi
 
 	project := &data.Project{}
 	if err := p.options.Database.GetContext(p.context, project, "SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1", id); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("project not found: %v", err)
 	}
 
 	projectUser := &data.ProjectUser{}
@@ -134,7 +134,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 
 	station := &data.Station{}
 	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.id = $1", id); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("station not found: %v", err)
 	}
 
 	permissions = &stationPermissions{
@@ -152,7 +152,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 
 	station := &data.Station{}
 	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.device_id = $1", id); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("station not found: %v", err)
 	}
 
 	permissions = &stationPermissions{

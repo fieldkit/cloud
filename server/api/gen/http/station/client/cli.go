@@ -8,10 +8,12 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
 	station "github.com/fieldkit/cloud/server/api/gen/station"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildStationPayload builds the payload for the station station endpoint from
@@ -32,6 +34,53 @@ func BuildStationPayload(stationStationID string, stationStationAuth string) (*s
 		auth = stationStationAuth
 	}
 	v := &station.StationPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildUpdatePayload builds the payload for the station update endpoint from
+// CLI flags.
+func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, stationUpdateAuth string) (*station.UpdatePayload, error) {
+	var err error
+	var body UpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(stationUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Perspiciatis quo.\",\n      \"status_json\": {\n         \"Deleniti quis laborum modi distinctio ea et.\": \"Iure illo odio quod.\",\n         \"Et tempora exercitationem est.\": \"Possimus sint sint aut eaque accusantium quisquam.\",\n         \"Ut explicabo vel dignissimos sit consequuntur perspiciatis.\": \"Quo sit.\"\n      }\n   }'")
+		}
+		if body.StatusJSON == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationUpdateID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationUpdateAuth
+	}
+	v := &station.UpdatePayload{
+		Name: body.Name,
+	}
+	if body.StatusJSON != nil {
+		v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+		for key, val := range body.StatusJSON {
+			tk := key
+			tv := val
+			v.StatusJSON[tk] = tv
+		}
+	}
 	v.ID = id
 	v.Auth = auth
 

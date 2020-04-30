@@ -17,6 +17,7 @@ import (
 // Endpoints wraps the "station" service endpoints.
 type Endpoints struct {
 	Station goa.Endpoint
+	Update  goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -25,12 +26,14 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		Station: NewStationEndpoint(s, a.JWTAuth),
+		Update:  NewUpdateEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "station" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Station = m(e.Station)
+	e.Update = m(e.Update)
 }
 
 // NewStationEndpoint returns an endpoint function that calls the method
@@ -49,6 +52,30 @@ func NewStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 			return nil, err
 		}
 		res, err := s.Station(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedStationFull(res, "default")
+		return vres, nil
+	}
+}
+
+// NewUpdateEndpoint returns an endpoint function that calls the method
+// "update" of service "station".
+func NewUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdatePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Update(ctx, p)
 		if err != nil {
 			return nil, err
 		}

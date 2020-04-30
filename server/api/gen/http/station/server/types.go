@@ -10,11 +10,39 @@ package server
 import (
 	station "github.com/fieldkit/cloud/server/api/gen/station"
 	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
+	goa "goa.design/goa/v3/pkg"
 )
+
+// UpdateRequestBody is the type of the "station" service "update" endpoint
+// HTTP request body.
+type UpdateRequestBody struct {
+	Name       *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	StatusJSON map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
+}
 
 // StationResponseBody is the type of the "station" service "station" endpoint
 // HTTP response body.
 type StationResponseBody struct {
+	ID                 int32                        `form:"id" json:"id" xml:"id"`
+	Name               string                       `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                       `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
+	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
+	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
+	MemoryAvailable    int32                        `form:"memory_available" json:"memory_available" xml:"memory_available"`
+	FirmwareNumber     int32                        `form:"firmware_number" json:"firmware_number" xml:"firmware_number"`
+	FirmwareTime       int32                        `form:"firmware_time" json:"firmware_time" xml:"firmware_time"`
+	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+}
+
+// UpdateResponseBody is the type of the "station" service "update" endpoint
+// HTTP response body.
+type UpdateResponseBody struct {
 	ID                 int32                        `form:"id" json:"id" xml:"id"`
 	Name               string                       `form:"name" json:"name" xml:"name"`
 	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
@@ -39,6 +67,14 @@ type StationNotFoundResponseBody string
 // StationUnauthorizedResponseBody is the type of the "station" service
 // "station" endpoint HTTP response body for the "unauthorized" error.
 type StationUnauthorizedResponseBody string
+
+// UpdateNotFoundResponseBody is the type of the "station" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
+// UpdateUnauthorizedResponseBody is the type of the "station" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody string
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
@@ -123,6 +159,48 @@ func NewStationResponseBody(res *stationviews.StationFullView) *StationResponseB
 	return body
 }
 
+// NewUpdateResponseBody builds the HTTP response body from the result of the
+// "update" endpoint of the "station" service.
+func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBody {
+	body := &UpdateResponseBody{
+		ID:                 *res.ID,
+		Name:               *res.Name,
+		DeviceID:           *res.DeviceID,
+		ReadOnly:           *res.ReadOnly,
+		Battery:            *res.Battery,
+		RecordingStartedAt: *res.RecordingStartedAt,
+		MemoryUsed:         *res.MemoryUsed,
+		MemoryAvailable:    *res.MemoryAvailable,
+		FirmwareNumber:     *res.FirmwareNumber,
+		FirmwareTime:       *res.FirmwareTime,
+	}
+	if res.Owner != nil {
+		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
+	}
+	if res.Uploads != nil {
+		body.Uploads = make([]*StationUploadResponseBody, len(res.Uploads))
+		for i, val := range res.Uploads {
+			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
+		}
+	}
+	if res.Images != nil {
+		body.Images = make([]*ImageRefResponseBody, len(res.Images))
+		for i, val := range res.Images {
+			body.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
+		}
+	}
+	if res.Photos != nil {
+		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.Modules != nil {
+		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
+		for i, val := range res.Modules {
+			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
+	}
+	return body
+}
+
 // NewStationNotFoundResponseBody builds the HTTP response body from the result
 // of the "station" endpoint of the "station" service.
 func NewStationNotFoundResponseBody(res station.NotFound) StationNotFoundResponseBody {
@@ -137,6 +215,20 @@ func NewStationUnauthorizedResponseBody(res station.Unauthorized) StationUnautho
 	return body
 }
 
+// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "station" service.
+func NewUpdateNotFoundResponseBody(res station.NotFound) UpdateNotFoundResponseBody {
+	body := UpdateNotFoundResponseBody(res)
+	return body
+}
+
+// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "station" service.
+func NewUpdateUnauthorizedResponseBody(res station.Unauthorized) UpdateUnauthorizedResponseBody {
+	body := UpdateUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewStationPayload builds a station service station endpoint payload.
 func NewStationPayload(id int32, auth string) *station.StationPayload {
 	v := &station.StationPayload{}
@@ -144,4 +236,32 @@ func NewStationPayload(id int32, auth string) *station.StationPayload {
 	v.Auth = auth
 
 	return v
+}
+
+// NewUpdatePayload builds a station service update endpoint payload.
+func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.UpdatePayload {
+	v := &station.UpdatePayload{
+		Name: *body.Name,
+	}
+	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+	for key, val := range body.StatusJSON {
+		tk := key
+		tv := val
+		v.StatusJSON[tk] = tv
+	}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
+func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
+	}
+	return
 }

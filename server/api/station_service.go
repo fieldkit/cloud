@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"fmt"
 
@@ -60,6 +61,36 @@ func (c *StationService) Station(ctx context.Context, payload *station.StationPa
 	}
 
 	return
+}
+
+func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return nil, err
+	}
+
+	updated := &data.Station{
+		ID:   payload.ID,
+		Name: payload.Name,
+	}
+
+	updated.SetStatus(payload.StatusJSON)
+
+	if err := c.options.Database.NamedGetContext(ctx, updated, "UPDATE fieldkit.station SET name = :name, status_json = :status_json WHERE id = :id RETURNING *", updated); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, station.NotFound("station not found")
+		}
+		return nil, err
+	}
+
+	return c.Station(ctx, &station.StationPayload{
+		Auth: payload.Auth,
+		ID:   payload.ID,
+	})
 }
 
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
