@@ -38,7 +38,7 @@ button {
     color: #2c3e50;
 }
 .main-panel h1 {
-    font-size: 38px;
+    font-size: 36px;
     margin-top: 40px;
 }
 .main-panel .container {

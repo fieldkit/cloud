@@ -368,6 +368,7 @@ export default {
 
 .action-container {
     float: left;
+    clear: both;
 }
 .save-btn {
     width: 300px;

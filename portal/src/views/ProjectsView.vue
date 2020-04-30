@@ -23,19 +23,38 @@
                         <h1>{{ projectsTitle }}</h1>
                         <div v-for="project in projects" v-bind:key="project.id" class="project-container">
                             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
-                                <div v-if="project.media_url" class="custom-project-image-container">
-                                    <img alt="Fieldkit Project" :src="getImageUrl(project)" class="custom-project-image" />
+                                <div class="project-image-container">
+                                    <img
+                                        alt="Fieldkit Project"
+                                        v-if="project.media_url"
+                                        :src="getImageUrl(project)"
+                                        class="project-image"
+                                    />
+                                    <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                                 </div>
-                                <div v-else>
-                                    <img alt="Default Fieldkit Project" src="../assets/fieldkit_project.png" />
-                                </div>
+                                <img v-if="project.private" alt="Private project" src="../assets/private.png" class="private-icon" />
+
                                 <div class="project-name">{{ project.name }}</div>
                                 <div class="project-description">{{ project.description }}</div>
+                                <div class="stats-icon-container">
+                                    <div class="stat follows">
+                                        <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
+                                        <span>12</span>
+                                    </div>
+                                    <div class="stat notifications">
+                                        <img alt="Notifications" src="../assets/notification.png" class="notify-icon" />
+                                        <span>2</span>
+                                    </div>
+                                    <div class="stat comments">
+                                        <img alt="Comments" src="../assets/comment.png" class="comment-icon" />
+                                        <span>3</span>
+                                    </div>
+                                </div>
                             </router-link>
                         </div>
                     </div>
                     <div class="container">
-                        <h1>Community</h1>
+                        <h1>Community Projects</h1>
                     </div>
                 </div>
                 <!-- add or update a project -->
@@ -210,6 +229,7 @@ export default {
             this.activeProject = null;
             this.resetFlags();
             this.viewingAll = true;
+            this.$router.push({ name: "projects" });
         },
         resetFlags() {
             this.viewingAll = false;
@@ -234,7 +254,7 @@ export default {
 
 <style scoped>
 #inner-container {
-    width: 780px;
+    width: 1080px;
     margin: 40px 60px;
 }
 #loading {
@@ -255,6 +275,7 @@ export default {
     float: left;
 }
 #add-project {
+    margin: 40px 0 0 0;
     float: right;
     padding: 12px;
     cursor: pointer;
@@ -263,27 +284,50 @@ export default {
     vertical-align: bottom;
 }
 .project-container {
+    position: relative;
     float: left;
-    width: 276px;
-    height: 225px;
-    margin: 0 20px 20px 0;
+    width: 270px;
+    height: 265px;
+    margin: 0 25px 25px 0;
     border: 1px solid rgb(235, 235, 235);
 }
 .project-name {
     font-weight: bold;
     font-size: 16px;
-    margin: 10px 20px 0 20px;
+    margin: 10px 15px 0 15px;
 }
 .project-description {
     font-weight: lighter;
     font-size: 14px;
-    margin: 0 20px 10px 20px;
+    margin: 0 15px 10px 15px;
 }
-.custom-project-image-container {
+.project-image-container {
+    height: 138px;
     text-align: center;
+    border-bottom: 1px solid rgb(235, 235, 235);
 }
-.custom-project-image {
-    max-width: 275px;
-    max-height: 135px;
+.project-image {
+    max-width: 270px;
+    max-height: 138px;
+}
+.private-icon {
+    float: right;
+    margin: -14px 14px 0 0;
+    position: relative;
+    z-index: 10;
+}
+.stats-icon-container {
+    position: absolute;
+    bottom: 20px;
+}
+.stat {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 14px 0 15px;
+}
+.stat img {
+    float: left;
+    margin: 2px 4px 0 0;
 }
 </style>
