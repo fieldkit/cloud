@@ -342,6 +342,300 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 	}
 }
 
+// EncodeListMineResponse returns an encoder for responses returned by the
+// station list mine endpoint.
+func EncodeListMineResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.StationsFull)
+		enc := encoder(ctx, w)
+		body := NewListMineResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListMineRequest returns a decoder for requests sent to the station
+// list mine endpoint.
+func DecodeListMineRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			auth string
+			err  error
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListMinePayload(auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListMineError returns an encoder for errors returned by the list mine
+// station endpoint.
+func EncodeListMineError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListMineBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(station.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListMineNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(station.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListMineUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeListProjectResponse returns an encoder for responses returned by the
+// station list project endpoint.
+func EncodeListProjectResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.StationsFull)
+		enc := encoder(ctx, w)
+		body := NewListProjectResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListProjectRequest returns a decoder for requests sent to the station
+// list project endpoint.
+func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			id   int32
+			auth string
+			err  error
+
+			params = mux.Vars(r)
+		)
+		{
+			idRaw := params["id"]
+			v, err2 := strconv.ParseInt(idRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+			}
+			id = int32(v)
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListProjectPayload(id, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListProjectError returns an encoder for errors returned by the list
+// project station endpoint.
+func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(station.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(station.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodePhotoResponse returns an encoder for responses returned by the station
+// photo endpoint.
+func EncodePhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*station.PhotoResult)
+		val := res.Length
+		lengths := strconv.FormatInt(val, 10)
+		w.Header().Set("Content-Length", lengths)
+		w.Header().Set("Content-Type", res.ContentType)
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodePhotoRequest returns a decoder for requests sent to the station photo
+// endpoint.
+func DecodePhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			id   int32
+			auth string
+			err  error
+
+			params = mux.Vars(r)
+		)
+		{
+			idRaw := params["id"]
+			v, err2 := strconv.ParseInt(idRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+			}
+			id = int32(v)
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewPhotoPayload(id, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodePhotoError returns an encoder for errors returned by the photo station
+// endpoint.
+func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewPhotoBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(station.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewPhotoNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(station.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewPhotoUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalStationviewsStationOwnerViewToStationOwnerResponseBody builds a value
 // of type *StationOwnerResponseBody from a value of type
 // *stationviews.StationOwnerView.
@@ -423,6 +717,50 @@ func marshalStationviewsStationSensorViewToStationSensorResponseBody(v *stationv
 	res := &StationSensorResponseBody{
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
+	}
+
+	return res
+}
+
+// marshalStationviewsStationFullViewToStationFullResponseBody builds a value
+// of type *StationFullResponseBody from a value of type
+// *stationviews.StationFullView.
+func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews.StationFullView) *StationFullResponseBody {
+	res := &StationFullResponseBody{
+		ID:                 *v.ID,
+		Name:               *v.Name,
+		DeviceID:           *v.DeviceID,
+		ReadOnly:           *v.ReadOnly,
+		Battery:            *v.Battery,
+		RecordingStartedAt: *v.RecordingStartedAt,
+		MemoryUsed:         *v.MemoryUsed,
+		MemoryAvailable:    *v.MemoryAvailable,
+		FirmwareNumber:     *v.FirmwareNumber,
+		FirmwareTime:       *v.FirmwareTime,
+	}
+	if v.Owner != nil {
+		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)
+	}
+	if v.Uploads != nil {
+		res.Uploads = make([]*StationUploadResponseBody, len(v.Uploads))
+		for i, val := range v.Uploads {
+			res.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
+		}
+	}
+	if v.Images != nil {
+		res.Images = make([]*ImageRefResponseBody, len(v.Images))
+		for i, val := range v.Images {
+			res.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
+		}
+	}
+	if v.Photos != nil {
+		res.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(v.Photos)
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*StationModuleResponseBody, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
 	}
 
 	return res

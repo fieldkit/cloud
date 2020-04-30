@@ -35,7 +35,6 @@ func CreateApiService(ctx context.Context, controllerOptions *ControllerOptions,
 	app.MountTwitterController(service, NewTwitterController(service, controllerOptions))
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
-	app.MountStationController(service, NewStationController(service, controllerOptions))
 	app.MountFieldNoteController(service, NewFieldNoteController(service, controllerOptions))
 	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))
 	app.MountJSONDataController(service, NewJSONDataController(ctx, service, controllerOptions))

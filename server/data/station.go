@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"time"
 
@@ -41,6 +42,10 @@ func (s *Station) GetStatus() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return parsed, nil
+}
+
+func (s *Station) DeviceIDHex() string {
+	return hex.EncodeToString(s.DeviceID)
 }
 
 type StationFull struct {

@@ -19,6 +19,14 @@ type StationFull struct {
 	View string
 }
 
+// StationsFull is the viewed result type that is projected based on a view.
+type StationsFull struct {
+	// Type to project
+	Projected *StationsFullView
+	// View to render
+	View string
+}
+
 // StationFullView is a type that runs validations on a projected type.
 type StationFullView struct {
 	ID                 *int32
@@ -79,10 +87,47 @@ type StationSensorView struct {
 	UnitOfMeasure *string
 }
 
+// StationsFullView is a type that runs validations on a projected type.
+type StationsFullView struct {
+	Stations StationFullCollectionView
+}
+
+// StationFullCollectionView is a type that runs validations on a projected
+// type.
+type StationFullCollectionView []*StationFullView
+
 var (
 	// StationFullMap is a map of attribute names in result type StationFull
 	// indexed by view name.
 	StationFullMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"owner",
+			"device_id",
+			"uploads",
+			"images",
+			"photos",
+			"read_only",
+			"battery",
+			"recording_started_at",
+			"memory_used",
+			"memory_available",
+			"firmware_number",
+			"firmware_time",
+			"modules",
+		},
+	}
+	// StationsFullMap is a map of attribute names in result type StationsFull
+	// indexed by view name.
+	StationsFullMap = map[string][]string{
+		"default": []string{
+			"stations",
+		},
+	}
+	// StationFullCollectionMap is a map of attribute names in result type
+	// StationFullCollection indexed by view name.
+	StationFullCollectionMap = map[string][]string{
 		"default": []string{
 			"id",
 			"name",
@@ -109,6 +154,18 @@ func ValidateStationFull(result *StationFull) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateStationFullView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateStationsFull runs the validations defined on the viewed result type
+// StationsFull.
+func ValidateStationsFull(result *StationsFull) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateStationsFullView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -281,6 +338,29 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 	}
 	if result.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
+	}
+	return
+}
+
+// ValidateStationsFullView runs the validations defined on StationsFullView
+// using the "default" view.
+func ValidateStationsFullView(result *StationsFullView) (err error) {
+
+	if result.Stations != nil {
+		if err2 := ValidateStationFullCollectionView(result.Stations); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateStationFullCollectionView runs the validations defined on
+// StationFullCollectionView using the "default" view.
+func ValidateStationFullCollectionView(result StationFullCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateStationFullView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

@@ -88,6 +88,18 @@ type UpdateResponseBody struct {
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
 }
 
+// ListMineResponseBody is the type of the "station" service "list mine"
+// endpoint HTTP response body.
+type ListMineResponseBody struct {
+	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+}
+
+// ListProjectResponseBody is the type of the "station" service "list project"
+// endpoint HTTP response body.
+type ListProjectResponseBody struct {
+	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+}
+
 // AddBadRequestResponseBody is the type of the "station" service "add"
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
@@ -123,6 +135,42 @@ type UpdateNotFoundResponseBody string
 // UpdateUnauthorizedResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// ListMineBadRequestResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody string
+
+// ListMineNotFoundResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody string
+
+// ListMineUnauthorizedResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "unauthorized" error.
+type ListMineUnauthorizedResponseBody string
+
+// ListProjectBadRequestResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "bad-request" error.
+type ListProjectBadRequestResponseBody string
+
+// ListProjectNotFoundResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "not-found" error.
+type ListProjectNotFoundResponseBody string
+
+// ListProjectUnauthorizedResponseBody is the type of the "station" service
+// "list project" endpoint HTTP response body for the "unauthorized" error.
+type ListProjectUnauthorizedResponseBody string
+
+// PhotoBadRequestResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "bad-request" error.
+type PhotoBadRequestResponseBody string
+
+// PhotoNotFoundResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "not-found" error.
+type PhotoNotFoundResponseBody string
+
+// PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "unauthorized" error.
+type PhotoUnauthorizedResponseBody string
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
@@ -163,6 +211,29 @@ type StationModuleResponseBody struct {
 type StationSensorResponseBody struct {
 	Name          string `form:"name" json:"name" xml:"name"`
 	UnitOfMeasure string `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
+}
+
+// StationFullResponseBodyCollection is used to define fields on response body
+// types.
+type StationFullResponseBodyCollection []*StationFullResponseBody
+
+// StationFullResponseBody is used to define fields on response body types.
+type StationFullResponseBody struct {
+	ID                 int32                        `form:"id" json:"id" xml:"id"`
+	Name               string                       `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                       `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
+	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
+	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
+	MemoryAvailable    int32                        `form:"memory_available" json:"memory_available" xml:"memory_available"`
+	FirmwareNumber     int32                        `form:"firmware_number" json:"firmware_number" xml:"firmware_number"`
+	FirmwareTime       int32                        `form:"firmware_time" json:"firmware_time" xml:"firmware_time"`
+	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -291,6 +362,32 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 	return body
 }
 
+// NewListMineResponseBody builds the HTTP response body from the result of the
+// "list mine" endpoint of the "station" service.
+func NewListMineResponseBody(res *stationviews.StationsFullView) *ListMineResponseBody {
+	body := &ListMineResponseBody{}
+	if res.Stations != nil {
+		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewListProjectResponseBody builds the HTTP response body from the result of
+// the "list project" endpoint of the "station" service.
+func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProjectResponseBody {
+	body := &ListProjectResponseBody{}
+	if res.Stations != nil {
+		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+		}
+	}
+	return body
+}
+
 // NewAddBadRequestResponseBody builds the HTTP response body from the result
 // of the "add" endpoint of the "station" service.
 func NewAddBadRequestResponseBody(res station.BadRequest) AddBadRequestResponseBody {
@@ -354,6 +451,69 @@ func NewUpdateUnauthorizedResponseBody(res station.Unauthorized) UpdateUnauthori
 	return body
 }
 
+// NewListMineBadRequestResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "station" service.
+func NewListMineBadRequestResponseBody(res station.BadRequest) ListMineBadRequestResponseBody {
+	body := ListMineBadRequestResponseBody(res)
+	return body
+}
+
+// NewListMineNotFoundResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "station" service.
+func NewListMineNotFoundResponseBody(res station.NotFound) ListMineNotFoundResponseBody {
+	body := ListMineNotFoundResponseBody(res)
+	return body
+}
+
+// NewListMineUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "station" service.
+func NewListMineUnauthorizedResponseBody(res station.Unauthorized) ListMineUnauthorizedResponseBody {
+	body := ListMineUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewListProjectBadRequestResponseBody builds the HTTP response body from the
+// result of the "list project" endpoint of the "station" service.
+func NewListProjectBadRequestResponseBody(res station.BadRequest) ListProjectBadRequestResponseBody {
+	body := ListProjectBadRequestResponseBody(res)
+	return body
+}
+
+// NewListProjectNotFoundResponseBody builds the HTTP response body from the
+// result of the "list project" endpoint of the "station" service.
+func NewListProjectNotFoundResponseBody(res station.NotFound) ListProjectNotFoundResponseBody {
+	body := ListProjectNotFoundResponseBody(res)
+	return body
+}
+
+// NewListProjectUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "list project" endpoint of the "station" service.
+func NewListProjectUnauthorizedResponseBody(res station.Unauthorized) ListProjectUnauthorizedResponseBody {
+	body := ListProjectUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewPhotoBadRequestResponseBody builds the HTTP response body from the result
+// of the "photo" endpoint of the "station" service.
+func NewPhotoBadRequestResponseBody(res station.BadRequest) PhotoBadRequestResponseBody {
+	body := PhotoBadRequestResponseBody(res)
+	return body
+}
+
+// NewPhotoNotFoundResponseBody builds the HTTP response body from the result
+// of the "photo" endpoint of the "station" service.
+func NewPhotoNotFoundResponseBody(res station.NotFound) PhotoNotFoundResponseBody {
+	body := PhotoNotFoundResponseBody(res)
+	return body
+}
+
+// NewPhotoUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "photo" endpoint of the "station" service.
+func NewPhotoUnauthorizedResponseBody(res station.Unauthorized) PhotoUnauthorizedResponseBody {
+	body := PhotoUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -391,6 +551,32 @@ func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.U
 		tv := val
 		v.StatusJSON[tk] = tv
 	}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewListMinePayload builds a station service list mine endpoint payload.
+func NewListMinePayload(auth string) *station.ListMinePayload {
+	v := &station.ListMinePayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewListProjectPayload builds a station service list project endpoint payload.
+func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
+	v := &station.ListProjectPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewPhotoPayload builds a station service photo endpoint payload.
+func NewPhotoPayload(id int32, auth string) *station.PhotoPayload {
+	v := &station.PhotoPayload{}
 	v.ID = id
 	v.Auth = auth
 

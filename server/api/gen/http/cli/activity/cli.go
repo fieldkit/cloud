@@ -32,7 +32,7 @@ func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
 project (update|invites|lookup- invite|accept- invite|reject- invite)
-station (add|get|update)
+station (add|get|update|list- mine|list- project|photo)
 tasks (five|refresh- device)
 test (get|error|email)
 modules meta
@@ -41,20 +41,19 @@ modules meta
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 3054056133329874644 --page 7178171152420430389 --auth "Perspiciatis omnis commodi tempora ut officia."` + "\n" +
-		os.Args[0] + ` following follow --id 7910901733617006899 --auth "Dolorem numquam et tempora."` + "\n" +
+	return os.Args[0] + ` activity station --id 2463936337610127267 --page 7505681122882926067 --auth "Aut sit."` + "\n" +
+		os.Args[0] + ` following follow --id 2183157839884534792 --auth "Ut illum et est."` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Quia libero est officia."
-   }' --id 5284039700769422437 --auth "Quia et voluptas natus libero voluptate."` + "\n" +
+      "body": "Dolorem inventore."
+   }' --id 4850889053895604672 --auth "Deserunt maiores ut qui quisquam."` + "\n" +
 		os.Args[0] + ` station add --body '{
-      "device_id": "Sapiente nobis quaerat nesciunt ut dicta laudantium.",
-      "name": "Iusto dolores.",
+      "device_id": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
+      "name": "Ipsa sit nam.",
       "status_json": {
-         "Distinctio repellat dolorem ipsa sit nam.": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
-         "Id repellat iusto tenetur dolorem nam.": "Quod qui est sequi ullam doloribus.",
-         "Qui quas similique.": "Voluptatem corporis possimus eum sed iusto."
+         "Quod qui est sequi ullam doloribus.": "Qui quas similique.",
+         "Repellat iusto.": "Dolorem nam."
       }
-   }' --auth "Qui vitae qui ad iusto molestias."` + "\n" +
+   }' --auth "Voluptatem corporis possimus eum sed iusto."` + "\n" +
 		os.Args[0] + ` tasks five` + "\n" +
 		""
 }
@@ -134,6 +133,17 @@ func ParseEndpoint(
 		stationUpdateIDFlag   = stationUpdateFlags.String("id", "REQUIRED", "")
 		stationUpdateAuthFlag = stationUpdateFlags.String("auth", "REQUIRED", "")
 
+		stationListMineFlags    = flag.NewFlagSet("list- mine", flag.ExitOnError)
+		stationListMineAuthFlag = stationListMineFlags.String("auth", "REQUIRED", "")
+
+		stationListProjectFlags    = flag.NewFlagSet("list- project", flag.ExitOnError)
+		stationListProjectIDFlag   = stationListProjectFlags.String("id", "REQUIRED", "")
+		stationListProjectAuthFlag = stationListProjectFlags.String("auth", "REQUIRED", "")
+
+		stationPhotoFlags    = flag.NewFlagSet("photo", flag.ExitOnError)
+		stationPhotoIDFlag   = stationPhotoFlags.String("id", "REQUIRED", "")
+		stationPhotoAuthFlag = stationPhotoFlags.String("auth", "REQUIRED", "")
+
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
 		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
@@ -177,6 +187,9 @@ func ParseEndpoint(
 	stationAddFlags.Usage = stationAddUsage
 	stationGetFlags.Usage = stationGetUsage
 	stationUpdateFlags.Usage = stationUpdateUsage
+	stationListMineFlags.Usage = stationListMineUsage
+	stationListProjectFlags.Usage = stationListProjectUsage
+	stationPhotoFlags.Usage = stationPhotoUsage
 
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
@@ -287,6 +300,15 @@ func ParseEndpoint(
 			case "update":
 				epf = stationUpdateFlags
 
+			case "list- mine":
+				epf = stationListMineFlags
+
+			case "list- project":
+				epf = stationListProjectFlags
+
+			case "photo":
+				epf = stationPhotoFlags
+
 			}
 
 		case "tasks":
@@ -393,6 +415,15 @@ func ParseEndpoint(
 			case "update":
 				endpoint = c.Update()
 				data, err = stationc.BuildUpdatePayload(*stationUpdateBodyFlag, *stationUpdateIDFlag, *stationUpdateAuthFlag)
+			case "list- mine":
+				endpoint = c.ListMine()
+				data, err = stationc.BuildListMinePayload(*stationListMineAuthFlag)
+			case "list- project":
+				endpoint = c.ListProject()
+				data, err = stationc.BuildListProjectPayload(*stationListProjectIDFlag, *stationListProjectAuthFlag)
+			case "photo":
+				endpoint = c.Photo()
+				data, err = stationc.BuildPhotoPayload(*stationPhotoIDFlag, *stationPhotoAuthFlag)
 			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -456,7 +487,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 3054056133329874644 --page 7178171152420430389 --auth "Perspiciatis omnis commodi tempora ut officia."
+    `+os.Args[0]+` activity station --id 2463936337610127267 --page 7505681122882926067 --auth "Aut sit."
 `, os.Args[0])
 }
 
@@ -469,7 +500,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 2409872928586216206 --page 2785209347511362274 --auth "Accusamus illo iusto modi magni."
+    `+os.Args[0]+` activity project --id 9160643300496516392 --page 6351922923946891406 --auth "Unde omnis."
 `, os.Args[0])
 }
 
@@ -497,7 +528,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 7910901733617006899 --auth "Dolorem numquam et tempora."
+    `+os.Args[0]+` following follow --id 2183157839884534792 --auth "Ut illum et est."
 `, os.Args[0])
 }
 
@@ -509,7 +540,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 8691339857581182502 --auth "Autem ut illum."
+    `+os.Args[0]+` following unfollow --id 3146881042366564871 --auth "Animi consequuntur qui."
 `, os.Args[0])
 }
 
@@ -521,7 +552,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 1835067728128991674 --page 7461510584236083209
+    `+os.Args[0]+` following followers --id 4521611668044992240 --page 5612179599996282479
 `, os.Args[0])
 }
 
@@ -552,8 +583,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Quia libero est officia."
-   }' --id 5284039700769422437 --auth "Quia et voluptas natus libero voluptate."
+      "body": "Dolorem inventore."
+   }' --id 4850889053895604672 --auth "Deserunt maiores ut qui quisquam."
 `, os.Args[0])
 }
 
@@ -564,7 +595,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Dolorum deleniti."
+    `+os.Args[0]+` project invites --auth "Et quaerat."
 `, os.Args[0])
 }
 
@@ -576,7 +607,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Neque est aut temporibus." --auth "Voluptatibus quis exercitationem autem."
+    `+os.Args[0]+` project lookup- invite --token "Exercitationem autem cumque velit." --auth "Odio voluptatem dolorem."
 `, os.Args[0])
 }
 
@@ -589,7 +620,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 3245571167081836993 --token "Qui consequatur." --auth "Hic aut nam et similique qui."
+    `+os.Args[0]+` project accept- invite --id 761280452784866084 --token "In assumenda magni tenetur deleniti." --auth "Quis sit nisi laborum."
 `, os.Args[0])
 }
 
@@ -602,7 +633,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 4323379036019030955 --token "Laborum laboriosam soluta qui ut quasi." --auth "Vero debitis."
+    `+os.Args[0]+` project reject- invite --id 4300119959110271883 --token "Ea dolorem adipisci ab." --auth "Provident eaque iusto dolores ut."
 `, os.Args[0])
 }
 
@@ -616,6 +647,9 @@ COMMAND:
     add: Add implements add.
     get: Get implements get.
     update: Update implements update.
+    list- mine: ListMine implements list mine.
+    list- project: ListProject implements list project.
+    photo: Photo implements photo.
 
 Additional help:
     %s station COMMAND --help
@@ -630,14 +664,13 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "device_id": "Sapiente nobis quaerat nesciunt ut dicta laudantium.",
-      "name": "Iusto dolores.",
+      "device_id": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
+      "name": "Ipsa sit nam.",
       "status_json": {
-         "Distinctio repellat dolorem ipsa sit nam.": "Mollitia totam id quibusdam autem reprehenderit aliquam.",
-         "Id repellat iusto tenetur dolorem nam.": "Quod qui est sequi ullam doloribus.",
-         "Qui quas similique.": "Voluptatem corporis possimus eum sed iusto."
+         "Quod qui est sequi ullam doloribus.": "Qui quas similique.",
+         "Repellat iusto.": "Dolorem nam."
       }
-   }' --auth "Qui vitae qui ad iusto molestias."
+   }' --auth "Voluptatem corporis possimus eum sed iusto."
 `, os.Args[0])
 }
 
@@ -649,7 +682,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 291339793 --auth "Voluptas ut mollitia nisi amet."
+    `+os.Args[0]+` station get --id 1552066962 --auth "Eos sunt veniam esse."
 `, os.Args[0])
 }
 
@@ -663,11 +696,46 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Non saepe quos.",
+      "name": "Qui voluptatem consequatur reprehenderit.",
       "status_json": {
-         "Qui neque dignissimos labore doloribus voluptas consequuntur.": "Dolores quo eum sequi."
+         "Esse occaecati voluptates a velit non.": "Quos aliquid."
       }
-   }' --id 1336269270 --auth "Eveniet sed."
+   }' --id 1614473039 --auth "Neque dignissimos."
+`, os.Args[0])
+}
+
+func stationListMineUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- mine -auth STRING
+
+ListMine implements list mine.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- mine --auth "Et quis optio voluptatibus quas dolor."
+`, os.Args[0])
+}
+
+func stationListProjectUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- project -id INT32 -auth STRING
+
+ListProject implements list project.
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- project --id 921146028 --auth "Pariatur pariatur."
+`, os.Args[0])
+}
+
+func stationPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station photo -id INT32 -auth STRING
+
+Photo implements photo.
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station photo --id 1371400764 --auth "Minima dignissimos."
 `, os.Args[0])
 }
 
@@ -703,7 +771,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Facilis impedit corporis quam." --auth "Omnis neque."
+    `+os.Args[0]+` tasks refresh- device --device-id "In aperiam voluptatem perspiciatis libero." --auth "Et nesciunt sint ea perspiciatis magnam fugiat."
 `, os.Args[0])
 }
 
@@ -729,7 +797,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 362543203534867101
+    `+os.Args[0]+` test get --id 1393915921587821291
 `, os.Args[0])
 }
 
@@ -751,7 +819,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Aut consequuntur et a." --auth "Eveniet esse suscipit saepe qui quibusdam dolor."
+    `+os.Args[0]+` test email --address "Facere corporis eum et omnis consectetur." --auth "Quaerat sit possimus autem."
 `, os.Args[0])
 }
 

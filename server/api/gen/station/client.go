@@ -9,23 +9,30 @@ package station
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
 
 // Client is the "station" service client.
 type Client struct {
-	AddEndpoint    goa.Endpoint
-	GetEndpoint    goa.Endpoint
-	UpdateEndpoint goa.Endpoint
+	AddEndpoint         goa.Endpoint
+	GetEndpoint         goa.Endpoint
+	UpdateEndpoint      goa.Endpoint
+	ListMineEndpoint    goa.Endpoint
+	ListProjectEndpoint goa.Endpoint
+	PhotoEndpoint       goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, update goa.Endpoint) *Client {
+func NewClient(add, get, update, listMine, listProject, photo goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint:    add,
-		GetEndpoint:    get,
-		UpdateEndpoint: update,
+		AddEndpoint:         add,
+		GetEndpoint:         get,
+		UpdateEndpoint:      update,
+		ListMineEndpoint:    listMine,
+		ListProjectEndpoint: listProject,
+		PhotoEndpoint:       photo,
 	}
 }
 
@@ -57,4 +64,35 @@ func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *StationFull
 		return
 	}
 	return ires.(*StationFull), nil
+}
+
+// ListMine calls the "list mine" endpoint of the "station" service.
+func (c *Client) ListMine(ctx context.Context, p *ListMinePayload) (res *StationsFull, err error) {
+	var ires interface{}
+	ires, err = c.ListMineEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationsFull), nil
+}
+
+// ListProject calls the "list project" endpoint of the "station" service.
+func (c *Client) ListProject(ctx context.Context, p *ListProjectPayload) (res *StationsFull, err error) {
+	var ires interface{}
+	ires, err = c.ListProjectEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationsFull), nil
+}
+
+// Photo calls the "photo" endpoint of the "station" service.
+func (c *Client) Photo(ctx context.Context, p *PhotoPayload) (res *PhotoResult, resp io.ReadCloser, err error) {
+	var ires interface{}
+	ires, err = c.PhotoEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	o := ires.(*PhotoResponseData)
+	return o.Result, o.Body, nil
 }

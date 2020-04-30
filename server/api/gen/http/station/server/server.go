@@ -9,6 +9,7 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -20,11 +21,14 @@ import (
 
 // Server lists the station service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Add    http.Handler
-	Get    http.Handler
-	Update http.Handler
-	CORS   http.Handler
+	Mounts      []*MountPoint
+	Add         http.Handler
+	Get         http.Handler
+	Update      http.Handler
+	ListMine    http.Handler
+	ListProject http.Handler
+	Photo       http.Handler
+	CORS        http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -64,14 +68,22 @@ func New(
 			{"Get", "GET", "/stations/{id}"},
 			{"Get", "GET", "/stations/@/{id}"},
 			{"Update", "POST", "/stations/{id}"},
+			{"ListMine", "GET", "/stations"},
+			{"ListProject", "GET", "/projects/{id}/stations"},
+			{"Photo", "GET", "/stations/{id}/photo"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/stations/@/{id}"},
+			{"CORS", "OPTIONS", "/projects/{id}/stations"},
+			{"CORS", "OPTIONS", "/stations/{id}/photo"},
 		},
-		Add:    NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Get:    NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		Update: NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		CORS:   NewCORSHandler(),
+		Add:         NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Get:         NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Update:      NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		ListMine:    NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		ListProject: NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
+		Photo:       NewPhotoHandler(e.Photo, mux, decoder, encoder, errhandler, formatter),
+		CORS:        NewCORSHandler(),
 	}
 }
 
@@ -83,6 +95,9 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Add = m(s.Add)
 	s.Get = m(s.Get)
 	s.Update = m(s.Update)
+	s.ListMine = m(s.ListMine)
+	s.ListProject = m(s.ListProject)
+	s.Photo = m(s.Photo)
 	s.CORS = m(s.CORS)
 }
 
@@ -91,6 +106,9 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountGetHandler(mux, h.Get)
 	MountUpdateHandler(mux, h.Update)
+	MountListMineHandler(mux, h.ListMine)
+	MountListProjectHandler(mux, h.ListProject)
+	MountPhotoHandler(mux, h.Photo)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -248,6 +266,167 @@ func NewUpdateHandler(
 	})
 }
 
+// MountListMineHandler configures the mux to serve the "station" service "list
+// mine" endpoint.
+func MountListMineHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/stations", f)
+}
+
+// NewListMineHandler creates a HTTP handler which loads the HTTP request and
+// calls the "station" service "list mine" endpoint.
+func NewListMineHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListMineRequest(mux, decoder)
+		encodeResponse = EncodeListMineResponse(encoder)
+		encodeError    = EncodeListMineError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list mine")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountListProjectHandler configures the mux to serve the "station" service
+// "list project" endpoint.
+func MountListProjectHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/{id}/stations", f)
+}
+
+// NewListProjectHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "list project" endpoint.
+func NewListProjectHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListProjectRequest(mux, decoder)
+		encodeResponse = EncodeListProjectResponse(encoder)
+		encodeError    = EncodeListProjectError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list project")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountPhotoHandler configures the mux to serve the "station" service "photo"
+// endpoint.
+func MountPhotoHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/stations/{id}/photo", f)
+}
+
+// NewPhotoHandler creates a HTTP handler which loads the HTTP request and
+// calls the "station" service "photo" endpoint.
+func NewPhotoHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodePhotoRequest(mux, decoder)
+		encodeResponse = EncodePhotoResponse(encoder)
+		encodeError    = EncodePhotoError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "photo")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		o := res.(*station.PhotoResponseData)
+		defer o.Body.Close()
+		if err := encodeResponse(ctx, w, o.Result); err != nil {
+			errhandler(ctx, w, err)
+			return
+		}
+		if _, err := io.Copy(w, o.Body); err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service station.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -261,6 +440,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}", f)
 	mux.Handle("OPTIONS", "/stations/@/{id}", f)
+	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
+	mux.Handle("OPTIONS", "/stations/{id}/photo", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

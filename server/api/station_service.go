@@ -1,10 +1,15 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"io"
+	"io/ioutil"
 
 	"goa.design/goa/v3/security"
 
@@ -149,6 +154,109 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	})
 }
 
+func (c *StationService) ListMine(ctx context.Context, payload *station.ListMinePayload) (response *station.StationsFull, err error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	sfs, err := r.QueryStationFullByOwnerID(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := transformStationFull(p, sfs)
+	if err != nil {
+		return nil, err
+	}
+
+	response = &station.StationsFull{
+		Stations: stations,
+	}
+
+	return
+}
+
+func (c *StationService) ListProject(ctx context.Context, payload *station.ListProjectPayload) (response *station.StationsFull, err error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	sfs, err := r.QueryStationFullByProjectID(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := transformStationFull(p, sfs)
+	if err != nil {
+		return nil, err
+	}
+
+	response = &station.StationsFull{
+		Stations: stations,
+	}
+
+	return
+}
+
+func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayload) (*station.PhotoResult, io.ReadCloser, error) {
+	x := uint(124)
+	y := uint(100)
+
+	allMedia := []*data.FieldNoteMediaForStation{}
+	if err := c.options.Database.SelectContext(ctx, &allMedia, `
+		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
+		WHERE s.id = $1 ORDER BY fnm.created DESC`, payload.ID); err != nil {
+		return defaultPhoto(payload.ID)
+	}
+
+	if len(allMedia) == 0 {
+		return defaultPhoto(payload.ID)
+	}
+
+	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+
+	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
+	if err != nil {
+		return defaultPhoto(payload.ID)
+	}
+
+	original, _, err := image.Decode(lm.Reader)
+	if err != nil {
+		return defaultPhoto(payload.ID)
+	}
+
+	cropped, err := SmartCrop(original, x, y)
+	if err != nil {
+		return defaultPhoto(payload.ID)
+	}
+
+	options := jpeg.Options{
+		Quality: 80,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := jpeg.Encode(buf, cropped, &options); err != nil {
+		return nil, nil, err
+	}
+
+	return &station.PhotoResult{
+		Length:      int64(len(buf.Bytes())),
+		ContentType: "image/jpg",
+	}, ioutil.NopCloser(buf), nil
+}
+
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:         token,
@@ -183,4 +291,47 @@ func transformUploads(from []*data.Ingestion) (to []*station.StationUpload) {
 		})
 	}
 	return to
+}
+
+func transformStationFull(p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
+	stations := make([]*station.StationFull, 0)
+
+	for _, sf := range sfs {
+		sp, err := p.ForStation(sf.Station)
+		if err != nil {
+			return nil, err
+		}
+
+		stations = append(stations, &station.StationFull{
+			ID:       sf.Station.ID,
+			Name:     sf.Station.Name,
+			ReadOnly: sp.IsReadOnly(),
+			Owner: &station.StationOwner{
+				ID:   sf.Owner.ID,
+				Name: sf.Owner.Name,
+			},
+			DeviceID: hex.EncodeToString(sf.Station.DeviceID),
+			Uploads:  transformUploads(sf.Ingestions),
+			Images:   transformImages(sf.Station.ID, sf.Media),
+			Photos: &station.StationPhotos{
+				Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
+			},
+		})
+	}
+
+	return stations, nil
+}
+
+func defaultPhoto(id int32) (*station.PhotoResult, io.ReadCloser, error) {
+	defaultPhotoContentType := "image/png"
+	defaultPhoto, err := StationDefaultPicture(int64(id))
+	if err != nil {
+		// NOTE This, hopefully never happens because we've got no image to send back.
+		return nil, nil, err
+	}
+
+	return &station.PhotoResult{
+		ContentType: defaultPhotoContentType,
+		Length:      int64(len(defaultPhoto)),
+	}, ioutil.NopCloser(bytes.NewBuffer(defaultPhoto)), nil
 }

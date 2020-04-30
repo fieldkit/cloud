@@ -88,6 +88,18 @@ type UpdateResponseBody struct {
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
+// ListMineResponseBody is the type of the "station" service "list mine"
+// endpoint HTTP response body.
+type ListMineResponseBody struct {
+	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
+// ListProjectResponseBody is the type of the "station" service "list project"
+// endpoint HTTP response body.
+type ListProjectResponseBody struct {
+	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
 // AddBadRequestResponseBody is the type of the "station" service "add"
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
@@ -123,6 +135,42 @@ type UpdateNotFoundResponseBody string
 // UpdateUnauthorizedResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// ListMineBadRequestResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody string
+
+// ListMineNotFoundResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody string
+
+// ListMineUnauthorizedResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "unauthorized" error.
+type ListMineUnauthorizedResponseBody string
+
+// ListProjectBadRequestResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "bad-request" error.
+type ListProjectBadRequestResponseBody string
+
+// ListProjectNotFoundResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "not-found" error.
+type ListProjectNotFoundResponseBody string
+
+// ListProjectUnauthorizedResponseBody is the type of the "station" service
+// "list project" endpoint HTTP response body for the "unauthorized" error.
+type ListProjectUnauthorizedResponseBody string
+
+// PhotoBadRequestResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "bad-request" error.
+type PhotoBadRequestResponseBody string
+
+// PhotoNotFoundResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "not-found" error.
+type PhotoNotFoundResponseBody string
+
+// PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "unauthorized" error.
+type PhotoUnauthorizedResponseBody string
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
@@ -163,6 +211,29 @@ type StationModuleResponseBody struct {
 type StationSensorResponseBody struct {
 	Name          *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	UnitOfMeasure *string `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+}
+
+// StationFullCollectionResponseBody is used to define fields on response body
+// types.
+type StationFullCollectionResponseBody []*StationFullResponseBody
+
+// StationFullResponseBody is used to define fields on response body types.
+type StationFullResponseBody struct {
+	ID                 *int32                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name               *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Owner              *StationOwnerResponseBody    `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	DeviceID           *string                      `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	Uploads            []*StationUploadResponseBody `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
+	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
+	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
+	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
@@ -355,6 +426,101 @@ func NewUpdateUnauthorized(body UpdateUnauthorizedResponseBody) station.Unauthor
 	return v
 }
 
+// NewListMineStationsFullOK builds a "station" service "list mine" endpoint
+// result from a HTTP "OK" response.
+func NewListMineStationsFullOK(body *ListMineResponseBody) *stationviews.StationsFullView {
+	v := &stationviews.StationsFullView{}
+	v.Stations = make([]*stationviews.StationFullView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalStationFullResponseBodyToStationviewsStationFullView(val)
+	}
+
+	return v
+}
+
+// NewListMineBadRequest builds a station service list mine endpoint
+// bad-request error.
+func NewListMineBadRequest(body ListMineBadRequestResponseBody) station.BadRequest {
+	v := station.BadRequest(body)
+	return v
+}
+
+// NewListMineNotFound builds a station service list mine endpoint not-found
+// error.
+func NewListMineNotFound(body ListMineNotFoundResponseBody) station.NotFound {
+	v := station.NotFound(body)
+	return v
+}
+
+// NewListMineUnauthorized builds a station service list mine endpoint
+// unauthorized error.
+func NewListMineUnauthorized(body ListMineUnauthorizedResponseBody) station.Unauthorized {
+	v := station.Unauthorized(body)
+	return v
+}
+
+// NewListProjectStationsFullOK builds a "station" service "list project"
+// endpoint result from a HTTP "OK" response.
+func NewListProjectStationsFullOK(body *ListProjectResponseBody) *stationviews.StationsFullView {
+	v := &stationviews.StationsFullView{}
+	v.Stations = make([]*stationviews.StationFullView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalStationFullResponseBodyToStationviewsStationFullView(val)
+	}
+
+	return v
+}
+
+// NewListProjectBadRequest builds a station service list project endpoint
+// bad-request error.
+func NewListProjectBadRequest(body ListProjectBadRequestResponseBody) station.BadRequest {
+	v := station.BadRequest(body)
+	return v
+}
+
+// NewListProjectNotFound builds a station service list project endpoint
+// not-found error.
+func NewListProjectNotFound(body ListProjectNotFoundResponseBody) station.NotFound {
+	v := station.NotFound(body)
+	return v
+}
+
+// NewListProjectUnauthorized builds a station service list project endpoint
+// unauthorized error.
+func NewListProjectUnauthorized(body ListProjectUnauthorizedResponseBody) station.Unauthorized {
+	v := station.Unauthorized(body)
+	return v
+}
+
+// NewPhotoResultOK builds a "station" service "photo" endpoint result from a
+// HTTP "OK" response.
+func NewPhotoResultOK(length int64, contentType string) *station.PhotoResult {
+	v := &station.PhotoResult{}
+	v.Length = length
+	v.ContentType = contentType
+
+	return v
+}
+
+// NewPhotoBadRequest builds a station service photo endpoint bad-request error.
+func NewPhotoBadRequest(body PhotoBadRequestResponseBody) station.BadRequest {
+	v := station.BadRequest(body)
+	return v
+}
+
+// NewPhotoNotFound builds a station service photo endpoint not-found error.
+func NewPhotoNotFound(body PhotoNotFoundResponseBody) station.NotFound {
+	v := station.NotFound(body)
+	return v
+}
+
+// NewPhotoUnauthorized builds a station service photo endpoint unauthorized
+// error.
+func NewPhotoUnauthorized(body PhotoUnauthorizedResponseBody) station.Unauthorized {
+	v := station.Unauthorized(body)
+	return v
+}
+
 // ValidateStationOwnerResponseBody runs the validations defined on
 // StationOwnerResponseBody
 func ValidateStationOwnerResponseBody(body *StationOwnerResponseBody) (err error) {
@@ -445,6 +611,101 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 	}
 	if body.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
+	}
+	return
+}
+
+// ValidateStationFullCollectionResponseBody runs the validations defined on
+// StationFullCollectionResponseBody
+func ValidateStationFullCollectionResponseBody(body StationFullCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateStationFullResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationFullResponseBody runs the validations defined on
+// StationFullResponseBody
+func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
+	}
+	if body.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "body"))
+	}
+	if body.Uploads == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("uploads", "body"))
+	}
+	if body.Images == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("images", "body"))
+	}
+	if body.Photos == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("photos", "body"))
+	}
+	if body.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "body"))
+	}
+	if body.Battery == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("battery", "body"))
+	}
+	if body.RecordingStartedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("recording_started_at", "body"))
+	}
+	if body.MemoryUsed == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("memory_used", "body"))
+	}
+	if body.MemoryAvailable == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("memory_available", "body"))
+	}
+	if body.FirmwareNumber == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_number", "body"))
+	}
+	if body.FirmwareTime == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_time", "body"))
+	}
+	if body.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "body"))
+	}
+	if body.Owner != nil {
+		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Uploads {
+		if e != nil {
+			if err2 := ValidateStationUploadResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Images {
+		if e != nil {
+			if err2 := ValidateImageRefResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	if body.Photos != nil {
+		if err2 := ValidateStationPhotosResponseBody(body.Photos); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Modules {
+		if e != nil {
+			if err2 := ValidateStationModuleResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }

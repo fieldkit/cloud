@@ -24,7 +24,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Sapiente nobis quaerat nesciunt ut dicta laudantium.\",\n      \"name\": \"Iusto dolores.\",\n      \"status_json\": {\n         \"Distinctio repellat dolorem ipsa sit nam.\": \"Mollitia totam id quibusdam autem reprehenderit aliquam.\",\n         \"Id repellat iusto tenetur dolorem nam.\": \"Quod qui est sequi ullam doloribus.\",\n         \"Qui quas similique.\": \"Voluptatem corporis possimus eum sed iusto.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Mollitia totam id quibusdam autem reprehenderit aliquam.\",\n      \"name\": \"Ipsa sit nam.\",\n      \"status_json\": {\n         \"Quod qui est sequi ullam doloribus.\": \"Qui quas similique.\",\n         \"Repellat iusto.\": \"Dolorem nam.\"\n      }\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
@@ -86,7 +86,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Non saepe quos.\",\n      \"status_json\": {\n         \"Qui neque dignissimos labore doloribus voluptas consequuntur.\": \"Dolores quo eum sequi.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Qui voluptatem consequatur reprehenderit.\",\n      \"status_json\": {\n         \"Esse occaecati voluptates a velit non.\": \"Quos aliquid.\"\n      }\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
@@ -119,6 +119,67 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 			v.StatusJSON[tk] = tv
 		}
 	}
+	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListMinePayload builds the payload for the station list mine endpoint
+// from CLI flags.
+func BuildListMinePayload(stationListMineAuth string) (*station.ListMinePayload, error) {
+	var auth string
+	{
+		auth = stationListMineAuth
+	}
+	v := &station.ListMinePayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListProjectPayload builds the payload for the station list project
+// endpoint from CLI flags.
+func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth string) (*station.ListProjectPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationListProjectID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationListProjectAuth
+	}
+	v := &station.ListProjectPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildPhotoPayload builds the payload for the station photo endpoint from CLI
+// flags.
+func BuildPhotoPayload(stationPhotoID string, stationPhotoAuth string) (*station.PhotoPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationPhotoID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationPhotoAuth
+	}
+	v := &station.PhotoPayload{}
 	v.ID = id
 	v.Auth = auth
 

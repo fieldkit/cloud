@@ -87,6 +87,17 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 	})
 })
 
+var StationsFull = ResultType("application/vnd.app.stations.full", func() {
+	TypeName("StationsFull")
+	Attributes(func() {
+		Attribute("stations", CollectionOf(StationFull))
+		Required("stations")
+	})
+	View("default", func() {
+		Attribute("stations")
+	})
+})
+
 var _ = Service("station", func() {
 	Method("add", func() {
 		Security(JWTAuth, func() {
@@ -152,6 +163,79 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			POST("stations/{id}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("list mine", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		Result(StationsFull)
+
+		HTTP(func() {
+			GET("stations")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("list project", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+		})
+
+		Result(StationsFull)
+
+		HTTP(func() {
+			GET("projects/{id}/stations")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("photo", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+		})
+
+		Result(func() {
+			Attribute("length", Int64)
+			Required("length")
+			Attribute("content_type", String)
+			Required("content_type")
+		})
+
+		HTTP(func() {
+			GET("stations/{id}/photo")
+
+			SkipResponseBodyEncodeDecode()
+
+			Response(func() {
+				Header("length:Content-Length")
+				Header("content_type:Content-Type")
+			})
 
 			httpAuthentication()
 		})

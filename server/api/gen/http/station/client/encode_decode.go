@@ -13,10 +13,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	station "github.com/fieldkit/cloud/server/api/gen/station"
 	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddRequest instantiates a HTTP request object with method and path set
@@ -371,6 +373,358 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildListMineRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "list mine" endpoint
+func (c *Client) BuildListMineRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListMineStationPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "list mine", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListMineRequest returns an encoder for requests sent to the station
+// list mine server.
+func EncodeListMineRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ListMinePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "list mine", "*station.ListMinePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeListMineResponse returns a decoder for responses returned by the
+// station list mine endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeListMineResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeListMineResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListMineResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list mine", err)
+			}
+			p := NewListMineStationsFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationsFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationsFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "list mine", err)
+			}
+			res := station.NewStationsFull(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body ListMineBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list mine", err)
+			}
+			return nil, NewListMineBadRequest(body)
+		case http.StatusNotFound:
+			var (
+				body ListMineNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list mine", err)
+			}
+			return nil, NewListMineNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body ListMineUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list mine", err)
+			}
+			return nil, NewListMineUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "list mine", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildListProjectRequest instantiates a HTTP request object with method and
+// path set to call the "station" service "list project" endpoint
+func (c *Client) BuildListProjectRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*station.ListProjectPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "list project", "*station.ListProjectPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListProjectStationPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "list project", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListProjectRequest returns an encoder for requests sent to the station
+// list project server.
+func EncodeListProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ListProjectPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "list project", "*station.ListProjectPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeListProjectResponse returns a decoder for responses returned by the
+// station list project endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeListProjectResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeListProjectResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListProjectResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project", err)
+			}
+			p := NewListProjectStationsFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationsFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationsFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project", err)
+			}
+			res := station.NewStationsFull(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body ListProjectBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project", err)
+			}
+			return nil, NewListProjectBadRequest(body)
+		case http.StatusNotFound:
+			var (
+				body ListProjectNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project", err)
+			}
+			return nil, NewListProjectNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body ListProjectUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project", err)
+			}
+			return nil, NewListProjectUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "list project", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildPhotoRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "photo" endpoint
+func (c *Client) BuildPhotoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*station.PhotoPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "photo", "*station.PhotoPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: PhotoStationPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "photo", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodePhotoRequest returns an encoder for requests sent to the station photo
+// server.
+func EncodePhotoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.PhotoPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "photo", "*station.PhotoPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodePhotoResponse returns a decoder for responses returned by the station
+// photo endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodePhotoResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodePhotoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				length      int64
+				contentType string
+				err         error
+			)
+			{
+				lengthRaw := resp.Header.Get("Content-Length")
+				if lengthRaw == "" {
+					return nil, goahttp.ErrValidationError("station", "photo", goa.MissingFieldError("Content-Length", "header"))
+				}
+				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("length", lengthRaw, "integer"))
+				}
+				length = v
+			}
+			contentTypeRaw := resp.Header.Get("Content-Type")
+			if contentTypeRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
+			}
+			contentType = contentTypeRaw
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "photo", err)
+			}
+			res := NewPhotoResultOK(length, contentType)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body PhotoBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "photo", err)
+			}
+			return nil, NewPhotoBadRequest(body)
+		case http.StatusNotFound:
+			var (
+				body PhotoNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "photo", err)
+			}
+			return nil, NewPhotoNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body PhotoUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "photo", err)
+			}
+			return nil, NewPhotoUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "photo", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -448,6 +802,40 @@ func unmarshalStationSensorResponseBodyToStationviewsStationSensorView(v *Statio
 	res := &stationviews.StationSensorView{
 		Name:          v.Name,
 		UnitOfMeasure: v.UnitOfMeasure,
+	}
+
+	return res
+}
+
+// unmarshalStationFullResponseBodyToStationviewsStationFullView builds a value
+// of type *stationviews.StationFullView from a value of type
+// *StationFullResponseBody.
+func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFullResponseBody) *stationviews.StationFullView {
+	res := &stationviews.StationFullView{
+		ID:                 v.ID,
+		Name:               v.Name,
+		DeviceID:           v.DeviceID,
+		ReadOnly:           v.ReadOnly,
+		Battery:            v.Battery,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
+	}
+	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
+	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))
+	for i, val := range v.Uploads {
+		res.Uploads[i] = unmarshalStationUploadResponseBodyToStationviewsStationUploadView(val)
+	}
+	res.Images = make([]*stationviews.ImageRefView, len(v.Images))
+	for i, val := range v.Images {
+		res.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
+	}
+	res.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v.Photos)
+	res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
+	for i, val := range v.Modules {
+		res.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
 	}
 
 	return res

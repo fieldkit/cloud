@@ -9,6 +9,7 @@ package station
 
 import (
 	"context"
+	"io"
 
 	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
 	"goa.design/goa/v3/security"
@@ -22,6 +23,12 @@ type Service interface {
 	Get(context.Context, *GetPayload) (res *StationFull, err error)
 	// Update implements update.
 	Update(context.Context, *UpdatePayload) (res *StationFull, err error)
+	// ListMine implements list mine.
+	ListMine(context.Context, *ListMinePayload) (res *StationsFull, err error)
+	// ListProject implements list project.
+	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
+	// Photo implements photo.
+	Photo(context.Context, *PhotoPayload) (res *PhotoResult, body io.ReadCloser, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -38,7 +45,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"add", "get", "update"}
+var MethodNames = [6]string{"add", "get", "update", "list mine", "list project", "photo"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -81,6 +88,35 @@ type UpdatePayload struct {
 	StatusJSON map[string]interface{}
 }
 
+// ListMinePayload is the payload type of the station service list mine method.
+type ListMinePayload struct {
+	Auth string
+}
+
+// StationsFull is the result type of the station service list mine method.
+type StationsFull struct {
+	Stations StationFullCollection
+}
+
+// ListProjectPayload is the payload type of the station service list project
+// method.
+type ListProjectPayload struct {
+	Auth string
+	ID   int32
+}
+
+// PhotoPayload is the payload type of the station service photo method.
+type PhotoPayload struct {
+	Auth string
+	ID   int32
+}
+
+// PhotoResult is the result type of the station service photo method.
+type PhotoResult struct {
+	Length      int64
+	ContentType string
+}
+
 type StationOwner struct {
 	ID   int32
 	Name string
@@ -115,6 +151,8 @@ type StationSensor struct {
 	Name          string
 	UnitOfMeasure string
 }
+
+type StationFullCollection []*StationFull
 
 // credentials are invalid
 type Unauthorized string
@@ -166,6 +204,19 @@ func NewStationFull(vres *stationviews.StationFull) *StationFull {
 func NewViewedStationFull(res *StationFull, view string) *stationviews.StationFull {
 	p := newStationFullView(res)
 	return &stationviews.StationFull{Projected: p, View: "default"}
+}
+
+// NewStationsFull initializes result type StationsFull from viewed result type
+// StationsFull.
+func NewStationsFull(vres *stationviews.StationsFull) *StationsFull {
+	return newStationsFull(vres.Projected)
+}
+
+// NewViewedStationsFull initializes viewed result type StationsFull from
+// result type StationsFull using the given view.
+func NewViewedStationsFull(res *StationsFull, view string) *stationviews.StationsFull {
+	p := newStationsFullView(res)
+	return &stationviews.StationsFull{Projected: p, View: "default"}
 }
 
 // newStationFull converts projected type StationFull to service type
@@ -267,6 +318,46 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		for i, val := range res.Modules {
 			vres.Modules[i] = transformStationModuleToStationviewsStationModuleView(val)
 		}
+	}
+	return vres
+}
+
+// newStationsFull converts projected type StationsFull to service type
+// StationsFull.
+func newStationsFull(vres *stationviews.StationsFullView) *StationsFull {
+	res := &StationsFull{}
+	if vres.Stations != nil {
+		res.Stations = newStationFullCollection(vres.Stations)
+	}
+	return res
+}
+
+// newStationsFullView projects result type StationsFull to projected type
+// StationsFullView using the "default" view.
+func newStationsFullView(res *StationsFull) *stationviews.StationsFullView {
+	vres := &stationviews.StationsFullView{}
+	if res.Stations != nil {
+		vres.Stations = newStationFullCollectionView(res.Stations)
+	}
+	return vres
+}
+
+// newStationFullCollection converts projected type StationFullCollection to
+// service type StationFullCollection.
+func newStationFullCollection(vres stationviews.StationFullCollectionView) StationFullCollection {
+	res := make(StationFullCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newStationFull(n)
+	}
+	return res
+}
+
+// newStationFullCollectionView projects result type StationFullCollection to
+// projected type StationFullCollectionView using the "default" view.
+func newStationFullCollectionView(res StationFullCollection) stationviews.StationFullCollectionView {
+	vres := make(stationviews.StationFullCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newStationFullView(n)
 	}
 	return vres
 }

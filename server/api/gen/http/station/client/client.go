@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 
+	station "github.com/fieldkit/cloud/server/api/gen/station"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -25,6 +26,17 @@ type Client struct {
 
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
+
+	// ListMine Doer is the HTTP client used to make requests to the list mine
+	// endpoint.
+	ListMineDoer goahttp.Doer
+
+	// ListProject Doer is the HTTP client used to make requests to the list
+	// project endpoint.
+	ListProjectDoer goahttp.Doer
+
+	// Photo Doer is the HTTP client used to make requests to the photo endpoint.
+	PhotoDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -52,6 +64,9 @@ func NewClient(
 		AddDoer:             doer,
 		GetDoer:             doer,
 		UpdateDoer:          doer,
+		ListMineDoer:        doer,
+		ListProjectDoer:     doer,
+		PhotoDoer:           doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -130,5 +145,82 @@ func (c *Client) Update() goa.Endpoint {
 			return nil, goahttp.ErrRequestError("station", "update", err)
 		}
 		return decodeResponse(resp)
+	}
+}
+
+// ListMine returns an endpoint that makes HTTP requests to the station service
+// list mine server.
+func (c *Client) ListMine() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListMineRequest(c.encoder)
+		decodeResponse = DecodeListMineResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListMineRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListMineDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "list mine", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListProject returns an endpoint that makes HTTP requests to the station
+// service list project server.
+func (c *Client) ListProject() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListProjectRequest(c.encoder)
+		decodeResponse = DecodeListProjectResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListProjectRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListProjectDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "list project", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Photo returns an endpoint that makes HTTP requests to the station service
+// photo server.
+func (c *Client) Photo() goa.Endpoint {
+	var (
+		encodeRequest  = EncodePhotoRequest(c.encoder)
+		decodeResponse = DecodePhotoResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildPhotoRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.PhotoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "photo", err)
+		}
+		res, err := decodeResponse(resp)
+		if err != nil {
+			resp.Body.Close()
+			return nil, goahttp.ErrDecodingError("station", "photo", err)
+		}
+		return &station.PhotoResponseData{Result: res.(*station.PhotoResult), Body: resp.Body}, nil
 	}
 }

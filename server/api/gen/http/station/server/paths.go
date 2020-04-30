@@ -30,3 +30,18 @@ func GetStationPath2(id int32) string {
 func UpdateStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v", id)
 }
+
+// ListMineStationPath returns the URL path to the station service list mine HTTP endpoint.
+func ListMineStationPath() string {
+	return "/stations"
+}
+
+// ListProjectStationPath returns the URL path to the station service list project HTTP endpoint.
+func ListProjectStationPath(id int32) string {
+	return fmt.Sprintf("/projects/%v/stations", id)
+}
+
+// PhotoStationPath returns the URL path to the station service photo HTTP endpoint.
+func PhotoStationPath(id int32) string {
+	return fmt.Sprintf("/stations/%v/photo", id)
+}
