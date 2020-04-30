@@ -20,6 +20,7 @@ import (
 
 type RecordAdder struct {
 	verbose    bool
+	handler    RecordHandler
 	database   *sqlxcache.DB
 	files      files.FileArchive
 	metrics    *logging.Metrics
@@ -31,12 +32,13 @@ type ParsedRecord struct {
 	DataRecord   *pb.DataRecord
 }
 
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, verbose bool) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
 	return &RecordAdder{
 		verbose:    verbose,
 		database:   db,
 		files:      files,
 		metrics:    metrics,
+		handler:    handler,
 		statistics: &newRecordStatistics{},
 	}
 }
@@ -198,6 +200,10 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			`, metaRecord); err != nil {
 			return nil, err
 		}
+
+		if err := ra.handler.OnMeta(ctx, pr.DataRecord, &metaRecord, provision); err != nil {
+			return nil, err
+		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Readings == nil {
 			verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
@@ -244,6 +250,10 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
 			RETURNING id
 			`, dataRecord); err != nil {
+			return nil, err
+		}
+
+		if err := ra.handler.OnData(ctx, pr.DataRecord, &dataRecord, provision); err != nil {
 			return nil, err
 		}
 	}

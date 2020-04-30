@@ -36,7 +36,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics, m.Verbose)
+	handler := NewStationModelRecordHandler(h.Database)
+
+	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics, handler, m.Verbose)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
