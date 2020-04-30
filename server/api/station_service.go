@@ -105,6 +105,11 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
+	status, err := sf.Station.GetStatus()
+	if err != nil {
+		return nil, err
+	}
+
 	response = &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
@@ -113,9 +118,10 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
 		},
-		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
-		Uploads:  transformUploads(sf.Ingestions),
-		Images:   transformImages(sf.Station.ID, sf.Media),
+		DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
+		Uploads:    transformUploads(sf.Ingestions),
+		Images:     transformImages(sf.Station.ID, sf.Media),
+		StatusJSON: status,
 		Photos: &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		},
@@ -302,6 +308,11 @@ func transformStationFull(p Permissions, sfs []*data.StationFull) ([]*station.St
 			return nil, err
 		}
 
+		status, err := sf.Station.GetStatus()
+		if err != nil {
+			return nil, err
+		}
+
 		stations = append(stations, &station.StationFull{
 			ID:       sf.Station.ID,
 			Name:     sf.Station.Name,
@@ -310,9 +321,10 @@ func transformStationFull(p Permissions, sfs []*data.StationFull) ([]*station.St
 				ID:   sf.Owner.ID,
 				Name: sf.Owner.Name,
 			},
-			DeviceID: hex.EncodeToString(sf.Station.DeviceID),
-			Uploads:  transformUploads(sf.Ingestions),
-			Images:   transformImages(sf.Station.ID, sf.Media),
+			DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
+			Uploads:    transformUploads(sf.Ingestions),
+			Images:     transformImages(sf.Station.ID, sf.Media),
+			StatusJSON: status,
 			Photos: &station.StationPhotos{
 				Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 			},

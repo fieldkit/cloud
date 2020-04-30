@@ -833,6 +833,12 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		res.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	res.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v.Photos)
+	res.StatusJSON = make(map[string]interface{}, len(v.StatusJSON))
+	for key, val := range v.StatusJSON {
+		tk := key
+		tv := val
+		res.StatusJSON[tk] = tv
+	}
 	res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
 	for i, val := range v.Modules {
 		res.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)

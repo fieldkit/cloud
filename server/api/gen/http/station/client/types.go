@@ -39,6 +39,7 @@ type AddResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	StatusJSON         map[string]interface{}       `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
 	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
@@ -59,6 +60,7 @@ type GetResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	StatusJSON         map[string]interface{}       `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
 	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
@@ -79,6 +81,7 @@ type UpdateResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	StatusJSON         map[string]interface{}       `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
 	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
@@ -227,6 +230,7 @@ type StationFullResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody   `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                        `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	StatusJSON         map[string]interface{}       `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
 	Battery            *float32                     `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                       `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
@@ -296,6 +300,12 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		v.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	v.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(body.Photos)
+	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+	for key, val := range body.StatusJSON {
+		tk := key
+		tv := val
+		v.StatusJSON[tk] = tv
+	}
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
@@ -347,6 +357,12 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		v.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	v.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(body.Photos)
+	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+	for key, val := range body.StatusJSON {
+		tk := key
+		tv := val
+		v.StatusJSON[tk] = tv
+	}
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
@@ -398,6 +414,12 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		v.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	v.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(body.Photos)
+	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
+	for key, val := range body.StatusJSON {
+		tk := key
+		tv := val
+		v.StatusJSON[tk] = tv
+	}
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
@@ -654,6 +676,9 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.ReadOnly == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "body"))
+	}
+	if body.StatusJSON == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
 	}
 	if body.Battery == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("battery", "body"))

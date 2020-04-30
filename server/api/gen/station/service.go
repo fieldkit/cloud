@@ -65,6 +65,7 @@ type StationFull struct {
 	Images             []*ImageRef
 	Photos             *StationPhotos
 	ReadOnly           bool
+	StatusJSON         map[string]interface{}
 	Battery            float32
 	RecordingStartedAt int64
 	MemoryUsed         int32
@@ -271,6 +272,14 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Photos != nil {
 		res.Photos = transformStationviewsStationPhotosViewToStationPhotos(vres.Photos)
 	}
+	if vres.StatusJSON != nil {
+		res.StatusJSON = make(map[string]interface{}, len(vres.StatusJSON))
+		for key, val := range vres.StatusJSON {
+			tk := key
+			tv := val
+			res.StatusJSON[tk] = tv
+		}
+	}
 	if vres.Modules != nil {
 		res.Modules = make([]*StationModule, len(vres.Modules))
 		for i, val := range vres.Modules {
@@ -312,6 +321,14 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	}
 	if res.Photos != nil {
 		vres.Photos = transformStationPhotosToStationviewsStationPhotosView(res.Photos)
+	}
+	if res.StatusJSON != nil {
+		vres.StatusJSON = make(map[string]interface{}, len(res.StatusJSON))
+		for key, val := range res.StatusJSON {
+			tk := key
+			tv := val
+			vres.StatusJSON[tk] = tv
+		}
 	}
 	if res.Modules != nil {
 		vres.Modules = make([]*stationviews.StationModuleView, len(res.Modules))

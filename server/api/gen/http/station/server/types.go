@@ -39,6 +39,7 @@ type AddResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}       `form:"status_json" json:"status_json" xml:"status_json"`
 	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
 	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
 	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
@@ -59,6 +60,7 @@ type GetResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}       `form:"status_json" json:"status_json" xml:"status_json"`
 	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
 	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
 	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
@@ -79,6 +81,7 @@ type UpdateResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}       `form:"status_json" json:"status_json" xml:"status_json"`
 	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
 	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
 	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
@@ -227,6 +230,7 @@ type StationFullResponseBody struct {
 	Images             []*ImageRefResponseBody      `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody   `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                         `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}       `form:"status_json" json:"status_json" xml:"status_json"`
 	Battery            float32                      `form:"battery" json:"battery" xml:"battery"`
 	RecordingStartedAt int64                        `form:"recording_started_at" json:"recording_started_at" xml:"recording_started_at"`
 	MemoryUsed         int32                        `form:"memory_used" json:"memory_used" xml:"memory_used"`
@@ -268,6 +272,14 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 	}
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.StatusJSON != nil {
+		body.StatusJSON = make(map[string]interface{}, len(res.StatusJSON))
+		for key, val := range res.StatusJSON {
+			tk := key
+			tv := val
+			body.StatusJSON[tk] = tv
+		}
 	}
 	if res.Modules != nil {
 		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
@@ -311,6 +323,14 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
 	}
+	if res.StatusJSON != nil {
+		body.StatusJSON = make(map[string]interface{}, len(res.StatusJSON))
+		for key, val := range res.StatusJSON {
+			tk := key
+			tv := val
+			body.StatusJSON[tk] = tv
+		}
+	}
 	if res.Modules != nil {
 		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
 		for i, val := range res.Modules {
@@ -352,6 +372,14 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 	}
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.StatusJSON != nil {
+		body.StatusJSON = make(map[string]interface{}, len(res.StatusJSON))
+		for key, val := range res.StatusJSON {
+			tk := key
+			tv := val
+			body.StatusJSON[tk] = tv
+		}
 	}
 	if res.Modules != nil {
 		body.Modules = make([]*StationModuleResponseBody, len(res.Modules))
