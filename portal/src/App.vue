@@ -58,18 +58,17 @@ input:invalid {
 .inputText {
     outline: 0;
     color: #2c3e50;
-    font-size: 14px;
+    font-size: 16px;
     width: inherit;
     border: none;
     border-bottom: 2px solid rgb(235, 235, 235);
-    font-size: 15px;
     padding-bottom: 4px;
 }
 .inputText:focus {
     border-bottom: 2px solid #52b5e4;
 }
 .floating-label {
-    color: rgb(85, 85, 85);
+    color: #6a6d71;
     position: relative;
     top: -24px;
     pointer-events: none;
