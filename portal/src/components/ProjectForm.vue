@@ -4,20 +4,44 @@
             <img alt="Close" src="../assets/close.png" />
         </div>
         <h2>{{ this.formHeading }}</h2>
-        <input v-model="name" placeholder="Project Name" class="text-input wide-text-input" />
-        <input v-model="description" placeholder="Short Description" class="text-input wide-text-input" />
-        <input v-model="goal" placeholder="Project Goal" class="text-input wide-text-input" />
+        <div class="outer-input-container">
+            <div class="input-container">
+                <input v-model="name" class="inputText" required="" />
+                <span class="floating-label">Project Name</span>
+            </div>
+        </div>
+        <div class="outer-input-container">
+            <div class="input-container">
+                <input v-model="description" class="inputText" required="" />
+                <span class="floating-label">Short Description</span>
+            </div>
+        </div>
+        <div class="outer-input-container">
+            <div class="input-container">
+                <input v-model="goal" class="inputText" required="" />
+                <span class="floating-label">Project Goal</span>
+            </div>
+        </div>
         <div class="image-container">
             <img alt="Project image" :src="imageUrl" class="custom-image" v-if="hasImage && !previewImage" />
             <img :src="previewImage" class="custom-image" v-if="!hasImage || previewImage" />
             <img alt="Add project image" src="../assets/add_image.png" class="custom-image" v-if="!hasImage && !previewImage" />
-            <br />
-            {{ this.hasImage ? "Update your project image: " : "Add an image to your project: " }}
+            <div class="image-instruct">{{ this.hasImage ? "Change image " : "Add an image to your project " }}</div>
             <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
         </div>
-        <input v-model="location" placeholder="Location" class="text-input wide-text-input" />
+        <div class="outer-input-container">
+            <div class="input-container">
+                <input v-model="location" class="inputText" required="" />
+                <span class="floating-label">Location</span>
+            </div>
+        </div>
         <div id="start-date">
-            <input v-model="displayStartDate" placeholder="Start Date" class="text-input" />
+            <div class="outer-input-container">
+                <div class="input-container">
+                    <input v-model="displayStartDate" class="inputText" required="" />
+                    <span class="floating-label">Start Date</span>
+                </div>
+            </div>
             <v-date-picker v-model="startDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
@@ -25,28 +49,40 @@
             </v-date-picker>
         </div>
         <div id="end-date">
-            <input v-model="displayEndDate" placeholder="End Date" class="text-input" />
+            <div class="outer-input-container">
+                <div class="input-container">
+                    <input v-model="displayEndDate" class="inputText" required="" />
+                    <span class="floating-label">End Date</span>
+                </div>
+            </div>
             <v-date-picker v-model="endDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
                 <button>
                     <img alt="Calendar" src="../assets/calendar.png" />
                 </button>
             </v-date-picker>
         </div>
-        <input v-model="tags" placeholder="Add Tags" class="text-input wide-text-input" />
+        <div class="outer-input-container">
+            <div class="input-container">
+                <input v-model="tags" class="inputText" required="" />
+                <span class="floating-label">Tags</span>
+            </div>
+        </div>
         <div id="public-checkbox-container">
             <input type="checkbox" id="checkbox" v-model="publicProject" />
             <label for="checkbox">Make this project public</label>
             <img alt="Info" src="../assets/info.png" />
         </div>
-        <button class="save-btn" v-if="formType == 'add'" v-on:click="addProject">
-            Add
-        </button>
-        <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProject">
-            Update
-        </button>
-        <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProject">
-            <img alt="Info" src="../assets/Delete.png" />
-            Delete this project
+        <div class="action-container">
+            <button class="save-btn" v-if="formType == 'add'" v-on:click="addProject">
+                Add
+            </button>
+            <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProject">
+                Update
+            </button>
+            <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProject">
+                <img alt="Info" src="../assets/Delete.png" />
+                Delete this project
+            </div>
         </div>
     </div>
 </template>
@@ -251,17 +287,25 @@ export default {
 <style scoped>
 #project-form-container {
     width: 700px;
+    float: left;
     padding: 0 15px 15px 15px;
-    margin: 60px 0;
+    margin: 25px 0;
     border: 1px solid rgb(215, 220, 225);
 }
-.wide-text-input {
+.outer-input-container {
+    float: left;
     width: 98%;
-    border: none;
-    border-bottom: 2px solid rgb(235, 235, 235);
-    font-size: 15px;
-    margin: 15px 0;
-    padding-bottom: 4px;
+    margin: 19px 0 0 0;
+}
+#start-date .outer-input-container,
+#end-date .outer-input-container {
+    width: 100%;
+    margin: 0;
+}
+.input-container {
+    margin: auto;
+    width: 100%;
+    text-align: left;
 }
 .image-container {
     width: 98%;
@@ -271,22 +315,31 @@ export default {
 .custom-image {
     max-width: 275px;
     max-height: 135px;
+    margin-right: 10px;
 }
-#start-date input,
-#end-date input {
-    width: 90%;
-    border: none;
-    font-size: 15px;
-    margin: 0;
-    padding: 0;
-    vertical-align: bottom;
+.image-instruct {
+    font-size: 14px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+#start-date,
+#end-date {
+    width: 47%;
+    margin: 19px 0 0 0;
+}
+#start-date {
+    float: left;
+}
+#end-date {
+    float: right;
 }
 #start-date button,
 #end-date button {
-    float: right;
+    position: absolute;
+    margin: -4px 0 0 -30px;
     background: none;
     padding: 0;
-    margin: 0;
     border: none;
 }
 #start-date img,
@@ -294,19 +347,6 @@ export default {
     vertical-align: bottom;
     padding-bottom: 2px;
     margin-left: 4px;
-}
-#start-date,
-#end-date {
-    line-height: 1.75;
-    width: 47%;
-    margin: 15px 0;
-    border-bottom: 2px solid rgb(235, 235, 235);
-}
-#start-date {
-    float: left;
-}
-#end-date {
-    float: right;
 }
 #public-checkbox-container {
     margin: 15px 0;
@@ -326,6 +366,9 @@ export default {
     margin: 2px 5px;
 }
 
+.action-container {
+    float: left;
+}
 .save-btn {
     width: 300px;
     height: 50px;
