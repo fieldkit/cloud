@@ -8,6 +8,7 @@ export FIELDKIT_API_DOMAIN=127.0.0.1:8080
 export FIELDKIT_API_HOST=http://127.0.0.1:8080
 export FIELDKIT_HTTP_SCHEME=http
 export FIELDKIT_MEDIA_BUCKET_NAME=fk-media
+export FIELDKIT_STREAMS_BUCKET_NAME=fk-streams
 
 set -xe
 
