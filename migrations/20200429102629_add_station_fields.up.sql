@@ -14,6 +14,9 @@ CREATE TABLE fieldkit.station_module (
 	meta_record_id integer REFERENCES fieldkit.meta_record(id),
 	position INTEGER NOT NULL,
 	hardware_id bytea NOT NULL,
+	manufacturer INTEGER NOT NULL,
+	kind INTEGER NOT NULL,
+	version INTEGER NOT NULL,
 	name varchar NOT NULL
 );
 

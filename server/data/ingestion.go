@@ -229,6 +229,9 @@ type StationModule struct {
 	Position     uint32 `db:"position" json:"position"`
 	HardwareID   []byte `db:"hardware_id" json:"hardware_id"`
 	Name         string `db:"name" json:"name"`
+	Manufacturer uint32 `db:"manufacturer" json:"manufacturer"`
+	Kind         uint32 `db:"kind" json:"kind"`
+	Version      uint32 `db:"version" json:"version"`
 }
 
 type ModuleSensor struct {
