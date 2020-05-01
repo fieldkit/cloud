@@ -38,7 +38,8 @@ var StationSensor = Type("StationSensor", func() {
 })
 
 var StationModule = Type("StationModule", func() {
-	Attribute("id", String)
+	Attribute("id", Int64)
+	Attribute("hardware_id", String)
 	Attribute("name", String)
 	Attribute("position", Int32)
 	Attribute("sensors", ArrayOf(StationSensor))

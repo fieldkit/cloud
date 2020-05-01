@@ -76,10 +76,11 @@ type StationPhotosView struct {
 
 // StationModuleView is a type that runs validations on a projected type.
 type StationModuleView struct {
-	ID       *string
-	Name     *string
-	Position *int32
-	Sensors  []*StationSensorView
+	ID         *int64
+	HardwareID *string
+	Name       *string
+	Position   *int32
+	Sensors    []*StationSensorView
 }
 
 // StationSensorView is a type that runs validations on a projected type.

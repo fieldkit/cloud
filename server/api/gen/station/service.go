@@ -144,10 +144,11 @@ type StationPhotos struct {
 }
 
 type StationModule struct {
-	ID       string
-	Name     string
-	Position int32
-	Sensors  []*StationSensor
+	ID         int64
+	HardwareID *string
+	Name       string
+	Position   int32
+	Sensors    []*StationSensor
 }
 
 type StationSensor struct {
@@ -452,9 +453,10 @@ func transformStationviewsStationModuleViewToStationModule(v *stationviews.Stati
 		return nil
 	}
 	res := &StationModule{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		Position: *v.Position,
+		ID:         *v.ID,
+		HardwareID: v.HardwareID,
+		Name:       *v.Name,
+		Position:   *v.Position,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -533,9 +535,10 @@ func transformStationPhotosToStationviewsStationPhotosView(v *StationPhotos) *st
 // *stationviews.StationModuleView from a value of type *StationModule.
 func transformStationModuleToStationviewsStationModuleView(v *StationModule) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:       &v.ID,
-		Name:     &v.Name,
-		Position: &v.Position,
+		ID:         &v.ID,
+		HardwareID: v.HardwareID,
+		Name:       &v.Name,
+		Position:   &v.Position,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))

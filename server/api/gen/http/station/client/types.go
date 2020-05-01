@@ -206,10 +206,11 @@ type StationPhotosResponseBody struct {
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
-	ID       *string                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name     *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Position *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
-	Sensors  []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+	ID         *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	HardwareID *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
+	Name       *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Position   *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Sensors    []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.

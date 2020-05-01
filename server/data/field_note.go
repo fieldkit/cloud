@@ -10,7 +10,7 @@ type FieldNoteQueryResult struct {
 	UserID           int32     `db:"user_id"`
 	CategoryKey      string    `json:"category_key"`
 	Note             *string   `db:"note"`
-	MediaID    		 *int32    `db:"media_id"`
+	MediaID          *int32    `db:"media_id"`
 	MediaURL         *string   `json:"media_url"`
 	MediaContentType *string   `json:"media_content_type"`
 	Creator          string    `json:"creator"`
@@ -40,9 +40,9 @@ type FieldNoteMedia struct {
 	URL         string    `db:"url"`
 }
 
-type FieldNoteMediaForStation struct {
-	StationID   int32     `db:"station_id"`
+type MediaForStation struct {
 	ID          int32     `db:"id,omitempty"`
+	StationID   int32     `db:"station_id"`
 	UserID      int32     `db:"user_id"`
 	ContentType string    `db:"content_type"`
 	Created     time.Time `db:"created"`

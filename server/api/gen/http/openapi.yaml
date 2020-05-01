@@ -1331,40 +1331,38 @@ definitions:
     title: StationAddBadRequestResponseBody
     type: string
     description: bad request
-    example: Consequuntur in voluptatem.
+    example: Vitae dolor nisi.
   StationAddNotFoundResponseBody:
     title: StationAddNotFoundResponseBody
     type: string
     description: not found
-    example: Rerum laborum quasi.
+    example: Vel occaecati tenetur laudantium cumque consequuntur.
   StationAddRequestBody:
     title: StationAddRequestBody
     type: object
     properties:
       device_id:
         type: string
-        example: Nostrum occaecati facilis placeat dolorem.
+        example: Quis voluptas est et explicabo.
       name:
         type: string
-        example: Sint tempore nesciunt error.
+        example: Ea non.
       status_json:
         type: object
         example:
-          Ea non.: Quis voluptas est et explicabo.
-          Harum aut minima omnis voluptates.: Totam sit tempore aliquam vel.
-          Rerum vel occaecati tenetur laudantium.: Consequuntur enim vitae dolor nisi.
+          Aut minima omnis.: Iusto totam sit tempore aliquam vel.
+          Ex praesentium.: Occaecati qui non.
         additionalProperties: true
       status_pb:
         type: string
-        example: Ex praesentium.
+        example: Enim beatae.
     example:
-      device_id: Enim beatae.
-      name: Occaecati qui non.
+      device_id: Expedita iste ut maxime corporis.
+      name: Ut dicta minima eligendi repudiandae.
       status_json:
-        Dicta minima.: Repudiandae aut expedita.
-        Eius et.: Omnis tempore aut maxime.
-        Ut maxime.: Itaque nesciunt.
-      status_pb: Quia ad.
+        Iste eius et quisquam omnis.: Aut maxime aut quia ad et aliquid.
+        Omnis odio et.: Fugiat officiis sit nemo.
+      status_pb: Eveniet odit.
     required:
     - name
     - device_id
@@ -1414,26 +1412,45 @@ definitions:
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
+          sensors:
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
       name:
         type: string
         example: A nulla quod itaque.
@@ -1484,70 +1501,82 @@ definitions:
           url: Quis nihil quia aut sunt reprehenderit nulla.
     description: AddResponseBody result type (default view)
     example:
-      battery: 0.5389547
-      device_id: Dolores ut odit.
-      firmware_number: 1739228850
-      firmware_time: 841938753
-      id: 1370097098
+      battery: 0.6202878
+      device_id: Vero aut qui eveniet.
+      firmware_number: 2055218750
+      firmware_time: 366597141
+      id: 1411312564
       images:
       - url: Eos dicta beatae hic eos a provident.
       - url: Eos dicta beatae hic eos a provident.
       - url: Eos dicta beatae hic eos a provident.
-      - url: Eos dicta beatae hic eos a provident.
-      memory_available: 1131900223
-      memory_used: 1759531944
+      memory_available: 1367619093
+      memory_used: 1034235113
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      name: Similique similique vel.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      name: Architecto et.
       owner:
         id: 376298831
         name: Modi distinctio ea et.
       photos:
         small: Quia voluptas similique aliquam excepturi et nobis.
       read_only: true
-      recording_started_at: 3489172206106679782
+      recording_started_at: 6566737281582645309
       status_json:
-        Architecto et.: Vero aut qui eveniet.
-        Eveniet ipsum aperiam et.: Deleniti impedit ipsam enim minima.
+        Doloremque qui.: Sit provident quidem qui voluptatem.
+        Eaque deleniti impedit ipsam enim.: Recusandae modi.
+        Ipsa ea rerum laborum quasi.: Consequuntur in voluptatem.
       uploads:
       - blocks:
         - 1437216138199832797
@@ -1614,7 +1643,7 @@ definitions:
     title: StationAddUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quidem qui voluptatem nulla ipsa.
+    example: Facilis placeat dolorem expedita minima.
   StationFullResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
@@ -1660,26 +1689,32 @@ definitions:
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
       name:
         type: string
         example: Facere voluptas consequatur reiciendis dolor totam.
@@ -1752,46 +1787,58 @@ definitions:
       memory_available: 1557696607
       memory_used: 444039368
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
       name: Provident provident eum et aut.
       owner:
         id: 376298831
@@ -1888,36 +1935,45 @@ definitions:
       memory_available: 1480414766
       memory_used: 2064030648
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
       name: Harum blanditiis aut dolor est sequi.
       owner:
         id: 376298831
@@ -1965,36 +2021,45 @@ definitions:
       memory_available: 1480414766
       memory_used: 2064030648
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
       name: Harum blanditiis aut dolor est sequi.
       owner:
         id: 376298831
@@ -2042,36 +2107,45 @@ definitions:
       memory_available: 1480414766
       memory_used: 2064030648
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
       name: Harum blanditiis aut dolor est sequi.
       owner:
         id: 376298831
@@ -2111,34 +2185,34 @@ definitions:
     title: StationGetBadRequestResponseBody
     type: string
     description: bad request
-    example: Laudantium eveniet.
+    example: Ipsum sunt unde eos quis saepe vel.
   StationGetNotFoundResponseBody:
     title: StationGetNotFoundResponseBody
     type: string
     description: not found
-    example: Aliquid occaecati voluptatem sit provident nam molestiae.
+    example: Cumque quaerat fuga.
   StationGetResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
     properties:
       battery:
         type: number
-        example: 0.36528897
+        example: 0.82045156
         format: float
       device_id:
         type: string
-        example: Et magnam fugiat officiis sit nemo.
+        example: Voluptatem quibusdam iusto animi ducimus.
       firmware_number:
         type: integer
-        example: 1075753049
+        example: 718663422
         format: int32
       firmware_time:
         type: integer
-        example: 1887742923
+        example: 1693922936
         format: int32
       id:
         type: integer
-        example: 1106954460
+        example: 550155760
         format: int32
       images:
         type: array
@@ -2147,63 +2221,74 @@ definitions:
         example:
         - url: Eos dicta beatae hic eos a provident.
         - url: Eos dicta beatae hic eos a provident.
-        - url: Eos dicta beatae hic eos a provident.
       memory_available:
         type: integer
-        example: 1359593517
+        example: 2050203666
         format: int32
       memory_used:
         type: integer
-        example: 623696472
+        example: 737103399
         format: int32
       modules:
         type: array
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
       name:
         type: string
-        example: Cupiditate omnis.
+        example: Eius quas at eligendi sed sunt.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -2213,14 +2298,15 @@ definitions:
         example: false
       recording_started_at:
         type: integer
-        example: 7512451572013163896
+        example: 1310641038461415158
         format: int64
       status_json:
         type: object
         example:
-          Eius quas at eligendi sed sunt.: Voluptatem quibusdam iusto animi ducimus.
-          Minima fugit.: Adipisci recusandae enim numquam.
-          Sit et alias.: Illum sint dolore consequatur tenetur aut.
+          Adipisci recusandae enim numquam.: Adipisci aut non quis aut ea omnis.
+          Illum sint dolore consequatur tenetur aut.: Minima fugit.
+          Molestiae rerum consequuntur ea accusamus.: Similique aliquam iure atque
+            porro eius.
         additionalProperties: true
       uploads:
         type: array
@@ -2249,94 +2335,71 @@ definitions:
           type: Maxime fugit quo.
           upload_id: Odio quod quis.
           url: Quis nihil quia aut sunt reprehenderit nulla.
-        - blocks:
-          - 1437216138199832797
-          - 7543769012325091838
-          - 4223463151736228485
-          - 2829849072368158893
-          id: 9059092657650581608
-          size: 3305737635478945653
-          time: 8558867025767775490
-          type: Maxime fugit quo.
-          upload_id: Odio quod quis.
-          url: Quis nihil quia aut sunt reprehenderit nulla.
-        - blocks:
-          - 1437216138199832797
-          - 7543769012325091838
-          - 4223463151736228485
-          - 2829849072368158893
-          id: 9059092657650581608
-          size: 3305737635478945653
-          time: 8558867025767775490
-          type: Maxime fugit quo.
-          upload_id: Odio quod quis.
-          url: Quis nihil quia aut sunt reprehenderit nulla.
     description: GetResponseBody result type (default view)
     example:
-      battery: 0.8281113
-      device_id: Similique aliquam iure atque porro eius.
-      firmware_number: 2065467435
-      firmware_time: 433493980
-      id: 1021267219
+      battery: 0.99372536
+      device_id: Sed qui natus enim exercitationem.
+      firmware_number: 295273145
+      firmware_time: 708005994
+      id: 1217045692
       images:
       - url: Eos dicta beatae hic eos a provident.
       - url: Eos dicta beatae hic eos a provident.
       - url: Eos dicta beatae hic eos a provident.
-      - url: Eos dicta beatae hic eos a provident.
-      memory_available: 1681380124
-      memory_used: 322779905
+      memory_available: 1491809463
+      memory_used: 1954136694
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
-        sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      name: Molestiae rerum consequuntur ea accusamus.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      name: Aperiam soluta.
       owner:
         id: 376298831
         name: Modi distinctio ea et.
       photos:
         small: Quia voluptas similique aliquam excepturi et nobis.
       read_only: false
-      recording_started_at: 4087211270136255947
+      recording_started_at: 7977471649612454361
       status_json:
-        Ea modi.: Aut aperiam soluta laboriosam sed qui.
-        Enim exercitationem et ut quo illo.: Quaerat porro delectus accusantium.
+        Atque blanditiis.: Omnis in quo qui aliquid occaecati.
+        Quaerat porro delectus accusantium.: Voluptatem voluptas dolorum earum soluta
+          accusamus laborum.
       uploads:
       - blocks:
         - 1437216138199832797
@@ -2381,7 +2444,7 @@ definitions:
     title: StationGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Est atque blanditiis ipsa omnis in quo.
+    example: Voluptatibus tempora eum.
   StationListMineBadRequestResponseBody:
     title: StationListMineBadRequestResponseBody
     type: string
@@ -2413,36 +2476,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2490,36 +2562,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2567,36 +2648,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2644,36 +2734,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2747,36 +2846,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2824,36 +2932,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2901,36 +3018,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -2978,36 +3104,45 @@ definitions:
         memory_available: 1480414766
         memory_used: 2064030648
         modules:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
         name: Harum blanditiis aut dolor est sequi.
         owner:
           id: 376298831
@@ -3054,38 +3189,43 @@ definitions:
     title: StationModuleResponseBody
     type: object
     properties:
-      id:
+      hardware_id:
         type: string
-        example: Molestiae quia aut fugiat aspernatur dolor asperiores.
+        example: Quia aut fugiat aspernatur dolor asperiores et.
+      id:
+        type: integer
+        example: 1668526423787089015
+        format: int64
       name:
         type: string
-        example: Quod facilis hic ea incidunt.
+        example: Facilis hic ea incidunt saepe et.
       position:
         type: integer
-        example: 2091723228
+        example: 2139792664
         format: int32
       sensors:
         type: array
         items:
           $ref: '#/definitions/StationSensorResponseBody'
         example:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
     example:
-      id: Quasi explicabo.
-      name: Sunt ut ut quae sunt.
-      position: 493394141
+      hardware_id: Vel sunt.
+      id: 2596078575164013552
+      name: Ut odit.
+      position: 1772041437
       sensors:
-      - name: Nisi amet iure odit maiores fugiat.
-        unit_of_measure: Sed vel iure quibusdam aliquid.
-      - name: Nisi amet iure odit maiores fugiat.
-        unit_of_measure: Sed vel iure quibusdam aliquid.
-      - name: Nisi amet iure odit maiores fugiat.
-        unit_of_measure: Sed vel iure quibusdam aliquid.
+      - name: Iure odit maiores fugiat omnis sed.
+        unit_of_measure: Iure quibusdam aliquid.
+      - name: Iure odit maiores fugiat omnis sed.
+        unit_of_measure: Iure quibusdam aliquid.
+      - name: Iure odit maiores fugiat omnis sed.
+        unit_of_measure: Iure quibusdam aliquid.
+      - name: Iure odit maiores fugiat omnis sed.
+        unit_of_measure: Iure quibusdam aliquid.
     required:
     - id
     - name
@@ -3140,13 +3280,13 @@ definitions:
     properties:
       name:
         type: string
-        example: Quo et deserunt sequi.
+        example: Deserunt sequi est sunt qui occaecati.
       unit_of_measure:
         type: string
-        example: Sunt qui.
+        example: Sapiente tempore a dicta culpa aperiam incidunt.
     example:
-      name: Aperiam sapiente.
-      unit_of_measure: A dicta culpa aperiam incidunt quia repudiandae.
+      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
+      unit_of_measure: Ut quae sunt in officia perspiciatis maiores.
     required:
     - name
     - unit_of_measure
@@ -3212,7 +3352,7 @@ definitions:
         format: float
       device_id:
         type: string
-        example: Unde eos quis saepe vel soluta.
+        example: Nesciunt aperiam et velit dignissimos.
       firmware_number:
         type: integer
         example: 1837309443
@@ -3223,14 +3363,13 @@ definitions:
         format: int32
       id:
         type: integer
-        example: 570968200
+        example: 1462170997
         format: int32
       images:
         type: array
         items:
           $ref: '#/definitions/ImageRefResponseBody'
         example:
-        - url: Eos dicta beatae hic eos a provident.
         - url: Eos dicta beatae hic eos a provident.
         - url: Eos dicta beatae hic eos a provident.
         - url: Eos dicta beatae hic eos a provident.
@@ -3247,49 +3386,61 @@ definitions:
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-        - id: Sunt veniam esse et repellendus sit.
-          name: Aut sit iste.
-          position: 1599442994
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+        - hardware_id: Veniam esse et repellendus sit unde.
+          id: 8526550986221361521
+          name: Sit iste voluptas ut.
+          position: 1963125610
           sensors:
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
-          - name: Nisi amet iure odit maiores fugiat.
-            unit_of_measure: Sed vel iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
+          - name: Iure odit maiores fugiat omnis sed.
+            unit_of_measure: Iure quibusdam aliquid.
       name:
         type: string
-        example: Eum dolorum cumque quaerat fuga quia ipsum.
+        example: Quia iure enim quia magni debitis voluptatem.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -3304,26 +3455,15 @@ definitions:
       status_json:
         type: object
         example:
-          Et fugiat.: Enim dolor adipisci ipsum necessitatibus ea placeat.
-          Magni debitis voluptatem.: Nesciunt aperiam et velit dignissimos.
-          Voluptates delectus aut non tenetur et et.: Sed et animi aut possimus.
+          Dolor adipisci ipsum necessitatibus.: Placeat autem voluptates delectus
+            aut non.
+          Et et.: Sed et animi aut possimus.
         additionalProperties: true
       uploads:
         type: array
         items:
           $ref: '#/definitions/StationUploadResponseBody'
         example:
-        - blocks:
-          - 1437216138199832797
-          - 7543769012325091838
-          - 4223463151736228485
-          - 2829849072368158893
-          id: 9059092657650581608
-          size: 3305737635478945653
-          time: 8558867025767775490
-          type: Maxime fugit quo.
-          upload_id: Odio quod quis.
-          url: Quis nihil quia aut sunt reprehenderit nulla.
         - blocks:
           - 1437216138199832797
           - 7543769012325091838
@@ -3371,46 +3511,58 @@ definitions:
       memory_available: 484197116
       memory_used: 1606474405
       modules:
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-      - id: Sunt veniam esse et repellendus sit.
-        name: Aut sit iste.
-        position: 1599442994
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+      - hardware_id: Veniam esse et repellendus sit unde.
+        id: 8526550986221361521
+        name: Sit iste voluptas ut.
+        position: 1963125610
         sensors:
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
-        - name: Nisi amet iure odit maiores fugiat.
-          unit_of_measure: Sed vel iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
+        - name: Iure odit maiores fugiat omnis sed.
+          unit_of_measure: Iure quibusdam aliquid.
       name: Nihil et et pariatur consectetur velit.
       owner:
         id: 376298831

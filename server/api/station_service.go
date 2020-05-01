@@ -105,29 +105,7 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	status, err := sf.Station.GetStatus()
-	if err != nil {
-		return nil, err
-	}
-
-	response = &station.StationFull{
-		ID:       sf.Station.ID,
-		Name:     sf.Station.Name,
-		ReadOnly: p.IsReadOnly(),
-		Owner: &station.StationOwner{
-			ID:   sf.Owner.ID,
-			Name: sf.Owner.Name,
-		},
-		DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
-		Uploads:    transformUploads(sf.Ingestions),
-		Images:     transformImages(sf.Station.ID, sf.Media),
-		StatusJSON: status,
-		Photos: &station.StationPhotos{
-			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
-		},
-	}
-
-	return
+	return transformStationFull(p, sf)
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
@@ -176,7 +154,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformStationFull(p, sfs)
+	stations, err := transformAllStationFull(p, sfs)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +182,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformStationFull(p, sfs)
+	stations, err := transformAllStationFull(p, sfs)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +198,7 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 	x := uint(124)
 	y := uint(100)
 
-	allMedia := []*data.FieldNoteMediaForStation{}
+	allMedia := []*data.MediaForStation{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
 		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
 		WHERE s.id = $1 ORDER BY fnm.created DESC`, payload.ID); err != nil {
@@ -273,7 +251,7 @@ func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *secu
 	})
 }
 
-func transformImages(id int32, from []*data.FieldNoteMediaForStation) (to []*station.ImageRef) {
+func transformImages(id int32, from []*data.MediaForStation) (to []*station.ImageRef) {
 	to = make([]*station.ImageRef, 0, len(from))
 	for _, v := range from {
 		to = append(to, &station.ImageRef{
@@ -299,36 +277,74 @@ func transformUploads(from []*data.Ingestion) (to []*station.StationUpload) {
 	return to
 }
 
-func transformStationFull(p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
+func transformModules(from *data.StationFull) (to []*station.StationModule) {
+	to = make([]*station.StationModule, 0)
+	for _, v := range from.Modules {
+		sensors := make([]*station.StationSensor, 0)
+
+		for _, s := range from.Sensors {
+			if s.ModuleID == v.ID {
+				sensors = append(sensors, &station.StationSensor{
+					Name:          s.Name,
+					UnitOfMeasure: s.UnitOfMeasure,
+				})
+			}
+		}
+
+		hardwareID := hex.EncodeToString(v.HardwareID)
+
+		to = append(to, &station.StationModule{
+			ID:         v.ID,
+			HardwareID: &hardwareID,
+			Name:       v.Name,
+			Position:   int32(v.Position),
+			Sensors:    sensors,
+		})
+
+	}
+	return
+}
+
+func transformStationFull(p Permissions, sf *data.StationFull) (*station.StationFull, error) {
+	sp, err := p.ForStation(sf.Station)
+	if err != nil {
+		return nil, err
+	}
+
+	status, err := sf.Station.GetStatus()
+	if err != nil {
+		return nil, err
+	}
+
+	return &station.StationFull{
+		ID:       sf.Station.ID,
+		Name:     sf.Station.Name,
+		ReadOnly: sp.IsReadOnly(),
+		Owner: &station.StationOwner{
+			ID:   sf.Owner.ID,
+			Name: sf.Owner.Name,
+		},
+		DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
+		Uploads:    transformUploads(sf.Ingestions),
+		Images:     transformImages(sf.Station.ID, sf.Media),
+		Modules:    transformModules(sf),
+		StatusJSON: status,
+		Photos: &station.StationPhotos{
+			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
+		},
+	}, nil
+}
+
+func transformAllStationFull(p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		sp, err := p.ForStation(sf.Station)
+		after, err := transformStationFull(p, sf)
 		if err != nil {
 			return nil, err
 		}
 
-		status, err := sf.Station.GetStatus()
-		if err != nil {
-			return nil, err
-		}
-
-		stations = append(stations, &station.StationFull{
-			ID:       sf.Station.ID,
-			Name:     sf.Station.Name,
-			ReadOnly: sp.IsReadOnly(),
-			Owner: &station.StationOwner{
-				ID:   sf.Owner.ID,
-				Name: sf.Owner.Name,
-			},
-			DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
-			Uploads:    transformUploads(sf.Ingestions),
-			Images:     transformImages(sf.Station.ID, sf.Media),
-			StatusJSON: status,
-			Photos: &station.StationPhotos{
-				Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
-			},
-		})
+		stations = append(stations, after)
 	}
 
 	return stations, nil

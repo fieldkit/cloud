@@ -58,20 +58,7 @@ type StationFull struct {
 	Station    *Station
 	Owner      *User
 	Ingestions []*Ingestion
-	Media      []*FieldNoteMediaForStation
-	Modules    []*Module
-}
-
-type Module struct {
-	ID         int64  `db:"id"`
-	StationID  int64  `db:"station_id"`
-	HardwareID string `db:"hardware_id"`
-	Name       string `db:"name"`
-}
-
-type Sensor struct {
-	ID       int64  `db:"id"`
-	ModuleID int64  `db:"module_id"`
-	Name     string `db:"name"`
-	Units    string `db:"units"`
+	Media      []*MediaForStation
+	Modules    []*StationModule
+	Sensors    []*ModuleSensor
 }

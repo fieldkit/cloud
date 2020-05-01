@@ -696,9 +696,10 @@ func marshalStationviewsStationPhotosViewToStationPhotosResponseBody(v *stationv
 // *stationviews.StationModuleView.
 func marshalStationviewsStationModuleViewToStationModuleResponseBody(v *stationviews.StationModuleView) *StationModuleResponseBody {
 	res := &StationModuleResponseBody{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		Position: *v.Position,
+		ID:         *v.ID,
+		HardwareID: v.HardwareID,
+		Name:       *v.Name,
+		Position:   *v.Position,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))

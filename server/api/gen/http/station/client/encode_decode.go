@@ -783,9 +783,10 @@ func unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v *Statio
 // *StationModuleResponseBody.
 func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *StationModuleResponseBody) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:       v.ID,
-		Name:     v.Name,
-		Position: v.Position,
+		ID:         v.ID,
+		HardwareID: v.HardwareID,
+		Name:       v.Name,
+		Position:   v.Position,
 	}
 	res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
 	for i, val := range v.Sensors {
