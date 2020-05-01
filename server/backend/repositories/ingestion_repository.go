@@ -51,7 +51,9 @@ func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, i
 }
 
 func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id, totalRecords, metaErrors, dataErrors int64) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET total_records = $1, meta_errors = $2, data_errors = $3, completed = NOW() WHERE id = $4`, totalRecords, metaErrors, dataErrors, id); err != nil {
+	if _, err := r.Database.ExecContext(ctx, `
+		UPDATE fieldkit.ingestion SET total_records = $1, meta_errors = $2, data_errors = $3, completed = NOW(), errors = $4 WHERE id = $5
+		`, totalRecords, metaErrors, dataErrors, (metaErrors+dataErrors) > 0, id); err != nil {
 		return err
 	}
 	return nil
