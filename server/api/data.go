@@ -37,6 +37,11 @@ func NewDataController(ctx context.Context, service *goa.Service, options *Contr
 func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 	log := Logger(ctx).Sugar()
 
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
 	ir, err := repositories.NewIngestionRepository(c.options.Database)
 	if err != nil {
 		return err
@@ -50,9 +55,10 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 	for _, i := range pending {
 		log.Infow("queueing", "ingestion_id", i.ID)
 		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time: i.Time,
-			ID:   i.ID,
-			URL:  i.URL,
+			Time:   i.Time,
+			ID:     i.ID,
+			URL:    i.URL,
+			UserID: int64(p.UserID()),
 		})
 	}
 
@@ -90,6 +96,7 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 		Time:    i.Time,
 		ID:      i.ID,
 		URL:     i.URL,
+		UserID:  int64(p.UserID()),
 		Verbose: true,
 	})
 
