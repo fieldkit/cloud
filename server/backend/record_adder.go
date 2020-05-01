@@ -79,7 +79,9 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 	// TODO Verify we have a valid generation.
 
 	provisions := []*data.Provision{}
-	if err := ra.database.SelectContext(ctx, &provisions, `SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2`, i.DeviceID, i.GenerationID); err != nil {
+	if err := ra.database.SelectContext(ctx, &provisions, `
+		SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2
+		`, i.DeviceID, i.GenerationID); err != nil {
 		return nil, err
 	}
 
@@ -107,7 +109,9 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 
 func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
 	records := []*data.MetaRecord{}
-	if err := ra.database.SelectContext(ctx, &records, `SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2`, provisionId, number); err != nil {
+	if err := ra.database.SelectContext(ctx, &records, `
+		SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2
+		`, provisionId, number); err != nil {
 		return nil, err
 	}
 

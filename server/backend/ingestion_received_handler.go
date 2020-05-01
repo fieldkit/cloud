@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -56,16 +58,16 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		}
 	}
 
-	if err := recordIngestionActivity(ctx, h.Database, m, info); err != nil {
-		log.Errorw("ingestion", "error", err)
-	} else {
-		log.Infow("activity added")
+	if info != nil {
+		if err := recordIngestionActivity(ctx, log, h.Database, m, info); err != nil {
+			log.Errorw("ingestion", "error", err)
+		}
 	}
 
 	return nil
 }
 
-func recordIngestionActivity(ctx context.Context, database *sqlxcache.DB, m *messages.IngestionReceived, info *WriteInfo) error {
+func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, database *sqlxcache.DB, m *messages.IngestionReceived, info *WriteInfo) error {
 	if info.StationID == nil {
 		return nil
 	}
@@ -85,9 +87,15 @@ func recordIngestionActivity(ctx context.Context, database *sqlxcache.DB, m *mes
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}
 
-	if _, err := database.NamedExecContext(ctx, `INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors) VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)`, &activity); err != nil {
+	if _, err := database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
+		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)
+		ON CONFLICT (data_ingestion_id) DO NOTHING
+		`, &activity); err != nil {
 		return err
 	}
+
+	log.Infow("upserted", "activity_id", activity.ID)
 
 	return nil
 }

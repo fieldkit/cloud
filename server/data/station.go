@@ -9,13 +9,19 @@ import (
 )
 
 type Station struct {
-	ID         int32          `db:"id,omitempty"`
-	Name       string         `db:"name"`
-	DeviceID   []byte         `db:"device_id"`
-	OwnerID    int32          `db:"owner_id,omitempty"`
-	CreatedAt  time.Time      `db:"created_at,omitempty"`
-	StatusJSON types.JSONText `db:"status_json"`
-	Private    bool           `db:"private"`
+	ID                 int32          `db:"id,omitempty"`
+	Name               string         `db:"name"`
+	DeviceID           []byte         `db:"device_id"`
+	OwnerID            int32          `db:"owner_id,omitempty"`
+	CreatedAt          time.Time      `db:"created_at,omitempty"`
+	StatusJSON         types.JSONText `db:"status_json"`
+	Private            bool           `db:"private"`
+	Battery            *float32       `db:"battery"`
+	RecordingStartedAt *int64         `db:"recording_started_at"`
+	MemoryUsed         *int64         `db:"memory_used"`
+	MemoryAvailable    *int64         `db:"memory_available"`
+	FirmwareNumber     *int64         `db:"firmware_number"`
+	FirmwareTime       *int64         `db:"firmware_time"`
 }
 
 type StationLog struct {

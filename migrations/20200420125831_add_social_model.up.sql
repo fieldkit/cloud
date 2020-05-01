@@ -58,3 +58,9 @@ CREATE OR REPLACE VIEW fieldkit.project_and_station_activity AS
     UNION
 	SELECT pa.created_at, pa.project_id, NULL, NULL, pa.id AS project_activity_id
 	  FROM fieldkit.project_activity AS pa;
+
+
+/**
+ * One of these per ingestion, this makes things idempotent.
+ */
+CREATE UNIQUE INDEX ON fieldkit.station_ingestion(data_ingestion_id);

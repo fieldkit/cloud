@@ -221,3 +221,21 @@ func DecodeBinaryString(s string) ([]byte, error) {
 
 	return nil, fmt.Errorf("unable to decode binary string: %s", s)
 }
+
+type StationModule struct {
+	ID           int64  `db:"id" json:"id"`
+	ProvisionID  int64  `db:"provision_id" json:"provision_id"`
+	MetaRecordID int64  `db:"meta_record_id" json:"meta_record_id"`
+	Position     uint32 `db:"position" json:"position"`
+	HardwareID   []byte `db:"hardware_id" json:"hardware_id"`
+	Name         string `db:"name" json:"name"`
+}
+
+type ModuleSensor struct {
+	ID            int64    `db:"id" json:"id"`
+	ModuleID      int64    `db:"module_id" json:"module_id"`
+	Position      uint32   `db:"position" json:"position"`
+	UnitOfMeasure string   `db:"unit_of_measure" json:"unit_of_measure"`
+	Name          string   `db:"name" json:"name"`
+	Reading       *float64 `db:"reading" json:"reading"`
+}

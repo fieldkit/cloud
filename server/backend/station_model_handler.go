@@ -21,6 +21,39 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord, db *data.MetaRecord, p *data.Provision) error {
+	for _, m := range r.Modules {
+		module := &data.StationModule{
+			ProvisionID:  p.ID,
+			MetaRecordID: db.ID,
+			HardwareID:   m.Id,
+			Position:     m.Position,
+			Name:         m.Name,
+		}
+		if err := h.database.NamedGetContext(ctx, module, `
+		    INSERT INTO fieldkit.station_module (provision_id, meta_record_id, hardware_id, position, name) VALUES (:provision_id, :meta_record_id, :hardware_id, :position, :name)
+		    ON CONFLICT (hardware_id) DO UPDATE SET position = EXCLUDED.position, name = EXCLUDED.name
+			RETURNING *
+			`, module); err != nil {
+			return err
+		}
+
+		for position, s := range m.Sensors {
+			sensor := &data.ModuleSensor{
+				ModuleID:      module.ID,
+				Position:      uint32(position),
+				UnitOfMeasure: s.UnitOfMeasure,
+				Name:          s.Name,
+			}
+			if err := h.database.NamedGetContext(ctx, sensor, `
+				INSERT INTO fieldkit.module_sensor (module_id, position, unit_of_measure, name, reading) VALUES (:module_id, :position, :unit_of_measure, :name, :reading)
+				ON CONFLICT (module_id, position) DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure, name = EXCLUDED.name, reading = EXCLUDED.reading
+				RETURNING *
+				`, sensor); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 
