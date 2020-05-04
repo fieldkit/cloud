@@ -16,10 +16,12 @@ DOCKER_TAG ?= master
 
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 
-default: setup binaries tests
+default: setup binaries tests gotests
+
+ci: setup binaries tests
 
 setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
-	env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
+	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
 
 legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 	cp $^ $@
@@ -36,7 +38,6 @@ portal/node_modules:
 	cd portal && npm install
 
 tests: portal/node_modules
-	cd server && go test ./...
 	cd portal && vue-cli-service test:unit
 
 gotests:

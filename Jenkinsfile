@@ -20,7 +20,7 @@ which go
 docker ps -a
 go version
 make clean
-make
+make ci
 """
             }
         }
