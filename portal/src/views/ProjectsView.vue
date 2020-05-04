@@ -12,6 +12,12 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
+            <router-link :to="{ name: 'projects' }" v-if="!viewingAll">
+                <div class="projects-link">
+                    <span class="small-arrow">&lt;</span>
+                    Back to Projects
+                </div>
+            </router-link>
             <div id="inner-container">
                 <!-- display all projects -->
                 <div id="projects-container" v-if="viewingAll">
@@ -253,9 +259,22 @@ export default {
 </script>
 
 <style scoped>
+.small-arrow {
+    font-size: 11px;
+    float: left;
+    margin: 2px 5px 0 0;
+}
+.projects-link {
+    margin: 40px 0 0 90px;
+    font-size: 14px;
+}
 #inner-container {
-    width: 1080px;
-    margin: 40px 60px;
+    margin: 20px 60px;
+    overflow: scroll;
+}
+#projects-container {
+    width: 890px;
+    margin: 20px 0 0 0;
 }
 #loading {
     width: 100%;
@@ -288,7 +307,7 @@ export default {
     float: left;
     width: 270px;
     height: 265px;
-    margin: 0 25px 25px 0;
+    margin: 0 12px 25px 12px;
     border: 1px solid rgb(235, 235, 235);
 }
 .project-name {
