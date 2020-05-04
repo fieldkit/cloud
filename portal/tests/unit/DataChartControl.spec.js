@@ -68,6 +68,7 @@ describe("DataChartControl.vue", () => {
             mocks: {
                 $route,
             },
+            stubs: ["v-date-picker"],
             propsData: props,
         });
         await dataChartControl.vm.$nextTick();
@@ -83,6 +84,7 @@ describe("DataChartControl.vue", () => {
                 $route,
                 $router,
             },
+            stubs: ["v-date-picker"],
             propsData: props,
         });
         dataChartControl.vm.initializeChart(initData, "123", "chart-1");
@@ -102,6 +104,7 @@ describe("DataChartControl.vue", () => {
             localVue,
             router,
             propsData: props,
+            stubs: ["v-date-picker"],
         });
         dataChartControl.vm.initializeChart(initData, "123", "chart-1");
         await dataChartControl.vm.$nextTick();
@@ -118,6 +121,7 @@ describe("DataChartControl.vue", () => {
             localVue,
             router,
             propsData: props,
+            stubs: ["v-date-picker"],
         });
         expect(dataChartControl.vm.$route.query["chart-1sensor"]).toBeUndefined();
         dataChartControl.vm.initializeChart(initData, "123", "chart-1");
@@ -138,6 +142,7 @@ describe("DataChartControl.vue", () => {
                 $route,
                 $router,
             },
+            stubs: ["v-date-picker"],
             propsData: props,
         });
         dataChartControl.vm.initializeChart(initData, "123", "chart-1");
@@ -155,6 +160,7 @@ describe("DataChartControl.vue", () => {
             localVue,
             router,
             propsData: props,
+            stubs: ["v-date-picker"],
         });
         let numCharts = getNumberOfCharts(Object.keys(dataChartControl.vm.$route.query));
         expect(numCharts).toBe(0);
@@ -174,6 +180,7 @@ describe("DataChartControl.vue", () => {
                 $route,
                 $router,
             },
+            stubs: ["v-date-picker"],
             propsData: props,
         });
         dataChartControl.vm.initializeChart(initData, "123", "chart-1");
@@ -193,6 +200,7 @@ describe("DataChartControl.vue", () => {
             localVue,
             router,
             propsData: props,
+            stubs: ["v-date-picker"],
         });
         let numCharts = getNumberOfCharts(Object.keys(dataChartControl.vm.$route.query));
         expect(numCharts).toBe(0);
@@ -218,6 +226,7 @@ describe("DataChartControl.vue", () => {
                 $route,
                 $router,
             },
+            stubs: ["v-date-picker"],
             propsData: props,
         });
         dataChartControl.vm.initialize();
