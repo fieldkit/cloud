@@ -70,6 +70,7 @@ require (
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
+	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c

@@ -35,7 +35,11 @@ portal/node_modules:
 	cd portal && npm install
 
 tests: portal/node_modules
+	cd server && go test ./...
 	cd portal && vue-cli-service test:unit
+
+gotests:
+	cd server && go test ./...
 
 dev-portal: portal/node_modules
 	cd portal && npm run serve
