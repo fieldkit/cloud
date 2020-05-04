@@ -50,10 +50,10 @@ ingester: $(BUILD)/ingester
 fktool: $(BUILD)/fktool
 
 $(BUILD)/server: $(SERVER_SOURCES)
-	cd server && $(GO) build -o $@ server.go
+	cd server/cmd/server && $(GO) build -o $@
 
 $(BUILD)/ingester: $(SERVER_SOURCES)
-	cd server && $(GO) build -o $@ ingester.go
+	cd server/cmd/ingester && $(GO) build -o $@
 
 $(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
 	cd server/tools/fktool && $(GO) build -o $@ *.go

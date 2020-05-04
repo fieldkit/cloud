@@ -5,5 +5,5 @@ COPY . /app
 WORKDIR /app
 
 RUN mkdir /app/build && \
-    go build -o /app/build/server -ldflags '-extldflags "-static"' server.go && \
-    go build -o /app/build/ingester -ldflags '-extldflags "-static"' ingester.go
+    go build -o /app/build/server -ldflags '-extldflags "-static"' cmd/server/server.go && \
+    go build -o /app/build/ingester -ldflags '-extldflags "-static"' cmd/ingester/ingester.go
