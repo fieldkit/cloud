@@ -154,8 +154,47 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	}
 
 	provisions := []*data.Provision{}
+	if err := r.Database.SelectContext(ctx, &provisions, `
+		SELECT
+			p.*
+		FROM fieldkit.provision AS p
+		WHERE p.device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
+		ORDER BY p.created DESC
+		`, id); err != nil {
+		return nil, err
+	}
+
 	modules := []*data.StationModule{}
+	if err := r.Database.SelectContext(ctx, &modules, `
+		SELECT
+			sm.*
+		FROM fieldkit.station_module AS sm
+		WHERE sm.provision_id IN (
+			SELECT id FROM fieldkit.provision WHERE device_id IN (
+				SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+			)
+		)
+		ORDER BY sm.position
+		`, id); err != nil {
+		return nil, err
+	}
+
 	sensors := []*data.ModuleSensor{}
+	if err := r.Database.SelectContext(ctx, &sensors, `
+		SELECT
+			ms.*
+		FROM fieldkit.module_sensor AS ms
+		WHERE ms.module_id IN (
+			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+				)
+			)
+		)
+		ORDER BY ms.position
+		`, id); err != nil {
+		return nil, err
+	}
 
 	return r.toStationFull(stations, owners, ingestions, media, provisions, modules, sensors)
 }
@@ -201,8 +240,55 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	}
 
 	provisions := []*data.Provision{}
+	if err := r.Database.SelectContext(ctx, &provisions, `
+		SELECT
+			p.*
+		FROM fieldkit.provision AS p
+		WHERE p.device_id IN (
+			SELECT device_id FROM fieldkit.station WHERE id IN (
+				SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+			)
+		)
+		ORDER BY p.created DESC
+		`, id); err != nil {
+		return nil, err
+	}
+
 	modules := []*data.StationModule{}
+	if err := r.Database.SelectContext(ctx, &modules, `
+		SELECT
+			sm.*
+		FROM fieldkit.station_module AS sm
+		WHERE sm.provision_id IN (
+			SELECT id FROM fieldkit.provision WHERE device_id IN (
+				SELECT device_id FROM fieldkit.station WHERE id IN (
+					SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+				)
+			)
+		)
+		ORDER BY sm.position
+		`, id); err != nil {
+		return nil, err
+	}
+
 	sensors := []*data.ModuleSensor{}
+	if err := r.Database.SelectContext(ctx, &sensors, `
+		SELECT
+			ms.*
+		FROM fieldkit.module_sensor AS ms
+		WHERE ms.module_id IN (
+			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE id IN (
+						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+					)
+				)
+			)
+		)
+		ORDER BY ms.position
+		`, id); err != nil {
+		return nil, err
+	}
 
 	return r.toStationFull(stations, owners, ingestions, media, provisions, modules, sensors)
 }
