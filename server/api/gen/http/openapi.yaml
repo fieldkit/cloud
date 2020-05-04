@@ -603,7 +603,7 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
-    post:
+    patch:
       tags:
       - station
       summary: update station

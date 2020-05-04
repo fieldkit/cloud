@@ -265,7 +265,7 @@ func (c *Client) BuildUpdateRequest(ctx context.Context, v interface{}) (*http.R
 		id = p.ID
 	}
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateStationPath(id)}
-	req, err := http.NewRequest("POST", u.String(), nil)
+	req, err := http.NewRequest("PATCH", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("station", "update", u.String(), err)
 	}

@@ -167,7 +167,7 @@ var _ = Service("station", func() {
 		Result(StationFull)
 
 		HTTP(func() {
-			POST("stations/{id}")
+			PATCH("stations/{id}")
 
 			httpAuthentication()
 		})

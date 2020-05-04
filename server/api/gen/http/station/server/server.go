@@ -67,7 +67,7 @@ func New(
 			{"Add", "POST", "/stations"},
 			{"Get", "GET", "/stations/{id}"},
 			{"Get", "GET", "/stations/@/{id}"},
-			{"Update", "POST", "/stations/{id}"},
+			{"Update", "PATCH", "/stations/{id}"},
 			{"ListMine", "GET", "/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
 			{"Photo", "GET", "/stations/{id}/photo"},
@@ -224,7 +224,7 @@ func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/stations/{id}", f)
+	mux.Handle("PATCH", "/stations/{id}", f)
 }
 
 // NewUpdateHandler creates a HTTP handler which loads the HTTP request and
