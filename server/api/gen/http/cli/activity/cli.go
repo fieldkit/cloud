@@ -20,6 +20,7 @@ import (
 	stationc "github.com/fieldkit/cloud/server/api/gen/http/station/client"
 	tasksc "github.com/fieldkit/cloud/server/api/gen/http/tasks/client"
 	testc "github.com/fieldkit/cloud/server/api/gen/http/test/client"
+	userc "github.com/fieldkit/cloud/server/api/gen/http/user/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -35,17 +36,18 @@ project (update|invites|lookup- invite|accept- invite|reject- invite)
 station (add|get|update|list- mine|list- project|photo)
 tasks (five|refresh- device)
 test (get|error|email)
+user roles
 modules meta
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 5158797373030410480 --page 1169930495805814804 --auth "Possimus et ipsum quibusdam."` + "\n" +
-		os.Args[0] + ` following follow --id 7808253253060335735 --auth "Quidem error vitae aliquid et."` + "\n" +
+	return os.Args[0] + ` activity station --id 1060022461665793244 --page 9185035368170386046 --auth "Inventore sit quis."` + "\n" +
+		os.Args[0] + ` following follow --id 4308578724422581315 --auth "Error vitae aliquid et quaerat similique sit."` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Ut ab."
-   }' --id 6876030226691316593 --auth "Assumenda magni tenetur deleniti."` + "\n" +
+      "body": "Ab aliquam in assumenda magni tenetur deleniti."
+   }' --id 7134918490231707556 --auth "Sit nisi laborum laboriosam."` + "\n" +
 		os.Args[0] + ` station add --body '{
       "device_id": "Fugiat velit sed aut.",
       "name": "Ex natus eaque impedit est quidem deleniti.",
@@ -164,6 +166,11 @@ func ParseEndpoint(
 		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
 		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
 
+		userFlags = flag.NewFlagSet("user", flag.ContinueOnError)
+
+		userRolesFlags    = flag.NewFlagSet("roles", flag.ExitOnError)
+		userRolesAuthFlag = userRolesFlags.String("auth", "REQUIRED", "")
+
 		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
 
 		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
@@ -201,6 +208,9 @@ func ParseEndpoint(
 	testErrorFlags.Usage = testErrorUsage
 	testEmailFlags.Usage = testEmailUsage
 
+	userFlags.Usage = userUsage
+	userRolesFlags.Usage = userRolesUsage
+
 	modulesFlags.Usage = modulesUsage
 	modulesMetaFlags.Usage = modulesMetaUsage
 
@@ -231,6 +241,8 @@ func ParseEndpoint(
 			svcf = tasksFlags
 		case "test":
 			svcf = testFlags
+		case "user":
+			svcf = userFlags
 		case "modules":
 			svcf = modulesFlags
 		default:
@@ -332,6 +344,13 @@ func ParseEndpoint(
 
 			case "email":
 				epf = testEmailFlags
+
+			}
+
+		case "user":
+			switch epn {
+			case "roles":
+				epf = userRolesFlags
 
 			}
 
@@ -449,6 +468,13 @@ func ParseEndpoint(
 				endpoint = c.Email()
 				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
 			}
+		case "user":
+			c := userc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "roles":
+				endpoint = c.Roles()
+				data, err = userc.BuildRolesPayload(*userRolesAuthFlag)
+			}
 		case "modules":
 			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -488,7 +514,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 5158797373030410480 --page 1169930495805814804 --auth "Possimus et ipsum quibusdam."
+    `+os.Args[0]+` activity station --id 1060022461665793244 --page 9185035368170386046 --auth "Inventore sit quis."
 `, os.Args[0])
 }
 
@@ -501,7 +527,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 4702121072547338975 --page 791233028451398606 --auth "Ut qui quisquam molestiae alias repellendus officiis."
+    `+os.Args[0]+` activity project --id 8816657830348650526 --page 8977962800843297053 --auth "Quisquam molestiae alias repellendus officiis aut."
 `, os.Args[0])
 }
 
@@ -529,7 +555,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 7808253253060335735 --auth "Quidem error vitae aliquid et."
+    `+os.Args[0]+` following follow --id 4308578724422581315 --auth "Error vitae aliquid et quaerat similique sit."
 `, os.Args[0])
 }
 
@@ -541,7 +567,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 2206190510026158554 --auth "Nemo similique cupiditate corrupti voluptas neque est."
+    `+os.Args[0]+` following unfollow --id 5452370707435534299 --auth "Aut temporibus."
 `, os.Args[0])
 }
 
@@ -553,7 +579,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 2897136126741734210 --page 2272442359367634531
+    `+os.Args[0]+` following followers --id 5430013960920797921 --page 3594915953782018094
 `, os.Args[0])
 }
 
@@ -584,8 +610,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Ut ab."
-   }' --id 6876030226691316593 --auth "Assumenda magni tenetur deleniti."
+      "body": "Ab aliquam in assumenda magni tenetur deleniti."
+   }' --id 7134918490231707556 --auth "Sit nisi laborum laboriosam."
 `, os.Args[0])
 }
 
@@ -596,7 +622,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Voluptatem illum ea dolorem adipisci ab aut."
+    `+os.Args[0]+` project invites --auth "Aut provident."
 `, os.Args[0])
 }
 
@@ -824,6 +850,30 @@ Email implements email.
 
 Example:
     `+os.Args[0]+` test email --address "Et iusto accusamus repellendus nulla." --auth "Velit veniam."
+`, os.Args[0])
+}
+
+// userUsage displays the usage of the user command and its subcommands.
+func userUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the user service interface.
+Usage:
+    %s [globalflags] user COMMAND [flags]
+
+COMMAND:
+    roles: Roles implements roles.
+
+Additional help:
+    %s user COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func userRolesUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] user roles -auth STRING
+
+Roles implements roles.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` user roles --auth "Voluptate fuga molestiae."
 `, os.Args[0])
 }
 

@@ -35,6 +35,9 @@ import (
 
 	stationSvr "github.com/fieldkit/cloud/server/api/gen/http/station/server"
 	station "github.com/fieldkit/cloud/server/api/gen/station"
+
+	userSvr "github.com/fieldkit/cloud/server/api/gen/http/user/server"
+	user "github.com/fieldkit/cloud/server/api/gen/user"
 )
 
 func LogErrors() func(goa.Endpoint) goa.Endpoint {
@@ -73,6 +76,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	stationSvc := NewStationService(ctx, options)
 	stationEndpoints := station.NewEndpoints(stationSvc)
 
+	userSvc := NewUserService(ctx, options)
+	userEndpoints := user.NewEndpoints(userSvc)
+
 	logErrors := LogErrors()
 
 	modulesEndpoints.Use(logErrors)
@@ -82,6 +88,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	activityEndpoints.Use(logErrors)
 	projectEndpoints.Use(logErrors)
 	stationEndpoints.Use(logErrors)
+	userEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -100,6 +107,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	activityServer := activitySvr.New(activityEndpoints, mux, dec, enc, eh, nil)
 	projectServer := projectSvr.New(projectEndpoints, mux, dec, enc, eh, nil)
 	stationServer := stationSvr.New(stationEndpoints, mux, dec, enc, eh, nil)
+	userServer := userSvr.New(userEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -108,6 +116,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 	activitySvr.Mount(mux, activityServer)
 	projectSvr.Mount(mux, projectServer)
 	stationSvr.Mount(mux, stationServer)
+	userSvr.Mount(mux, userServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -130,6 +139,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range stationServer.Mounts {
+		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range userServer.Mounts {
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

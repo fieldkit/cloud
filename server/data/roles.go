@@ -3,6 +3,7 @@ package data
 type Role struct {
 	ID              int32
 	Name            string
+	persisted       bool
 	readOnlyProject bool
 }
 
@@ -21,6 +22,10 @@ var (
 		// NOTE This is never persisted.
 		Name:            "Public",
 		readOnlyProject: true,
+	}
+	AvailableRoles = []*Role{
+		MemberRole,
+		OwnerRole,
 	}
 	Roles = []*Role{
 		MemberRole,
