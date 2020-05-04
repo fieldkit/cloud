@@ -9,9 +9,9 @@ require (
 	github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
 	github.com/aws/aws-lambda-go v0.0.0-20180413184133-ea03c2814414
 	github.com/aws/aws-sdk-go v1.29.20
+	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cenkalti/backoff v0.0.0-20170309153948-3db60c813733
-	github.com/client9/misspell v0.3.4 // indirect
 	github.com/conservify/gonaturalist v0.0.0-20190530183130-1509fd074b2c
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
 	github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e
@@ -31,25 +31,26 @@ require (
 	github.com/go-logfmt/logfmt v0.4.0
 	github.com/go-stack/stack v1.8.0
 	github.com/goadesign/goa v1.4.0
-	github.com/gogo/protobuf v1.3.0
+	github.com/gogo/protobuf v1.3.1
+	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
 	github.com/golang/protobuf v1.3.5
-	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.1
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
-	github.com/hashicorp/golang-lru v0.0.0-20180201235237-0fb14efe8c47
+	github.com/hashicorp/golang-lru v0.5.1
 	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect
 	github.com/hongshibao/go-kdtree v0.0.0-20180503061502-0de4e8305acf
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
-	github.com/jmoiron/sqlx v0.0.0-20171020205521-3379e5993990
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/kelseyhightower/envconfig v0.0.0-20170206223400-8bf4bbfc795e
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
-	github.com/lib/pq v0.0.0-20171022192043-b609790bd85e
+	github.com/lib/pq v1.3.0
 	github.com/llgcode/draw2d v0.0.0-20161104081029-1286d3b2030a
 	github.com/lucasb-eyer/go-colorful v0.0.0-20170223221042-c900de9dbbc7
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
@@ -64,7 +65,7 @@ require (
 	github.com/paulmach/go.geojson v0.0.0-20170327170536-40612a87147b
 	github.com/pkg/errors v0.9.1
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
-	github.com/satori/go.uuid v0.0.0-20180103174451-36e9d2ebbde5
+	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/segmentio/ksuid v1.0.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
@@ -82,15 +83,13 @@ require (
 	go.uber.org/zap v1.10.0
 	goa.design/goa/v3 v3.1.2
 	goa.design/plugins/v3 v3.1.1
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
-	golang.org/x/image v0.0.0-20170322222000-c0851fbc5b92
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
+	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
-	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
-	golang.org/x/sys v0.0.0-20190916202348-b4ddaad3f8a3
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	google.golang.org/appengine v1.4.0
+	google.golang.org/appengine v1.6.5
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.8
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 )

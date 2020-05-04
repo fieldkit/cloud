@@ -1,10 +1,10 @@
 ALTER TABLE fieldkit.twitter_oauth DROP COLUMN source_id;
 
-DROP VIEW  fieldkit.device_locations_view;
-DROP VIEW  fieldkit.record_visible;
+DROP VIEW IF EXISTS fieldkit.device_locations_view;
+DROP VIEW IF EXISTS fieldkit.record_visible;
 
-DROP TABLE fieldkit.record_analysis;
-DROP TABLE fieldkit.old_record;
+DROP TABLE IF EXISTS fieldkit.record_analysis;
+DROP TABLE IF EXISTS fieldkit.old_record;
 
 DROP TABLE fieldkit.source_twitter_account;
 DROP TABLE fieldkit.device_stream;

@@ -75,7 +75,11 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	adding.SetStatus(payload.StatusJSON)
 
-	if err := c.options.Database.NamedGetContext(ctx, adding, `INSERT INTO fieldkit.station (name, device_id, owner_id, status_json) VALUES (:name, :device_id, :owner_id, :status_json) RETURNING *`, adding); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, adding, `
+		INSERT INTO fieldkit.station (name, device_id, owner_id, status_json)
+		VALUES (:name, :device_id, :owner_id, :status_json)
+		RETURNING *
+		`, adding); err != nil {
 		return nil, err
 	}
 

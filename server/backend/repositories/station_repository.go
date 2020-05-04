@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/conservify/sqlxcache"
 
@@ -19,7 +20,9 @@ func NewStationRepository(database *sqlxcache.DB) (rr *StationRepository, err er
 
 func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
 	station = &data.Station{}
-	if err := r.Database.GetContext(ctx, station, `SELECT * FROM fieldkit.station WHERE device_id = $1`, deviceIdBytes); err != nil {
+	if err := r.Database.GetContext(ctx, station, `
+		SELECT * FROM fieldkit.station WHERE device_id = $1
+		`, deviceIdBytes); err != nil {
 		return nil, err
 	}
 	return station, nil
@@ -27,7 +30,9 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 
 func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
 	stations := []*data.Station{}
-	if err := r.Database.SelectContext(ctx, &stations, `SELECT * FROM fieldkit.station WHERE device_id = $1`, deviceIdBytes); err != nil {
+	if err := r.Database.SelectContext(ctx, &stations, `
+		SELECT * FROM fieldkit.station WHERE device_id = $1
+		`, deviceIdBytes); err != nil {
 		return nil, err
 	}
 	if len(stations) != 1 {
@@ -42,6 +47,10 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		SELECT * FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
 		return nil, err
+	}
+
+	if len(stations) != 1 {
+		return nil, fmt.Errorf("no such station: %v", id)
 	}
 
 	owners := []*data.User{}
