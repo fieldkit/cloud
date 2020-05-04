@@ -173,7 +173,7 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 	return
 }
 
-func NewCopierTool(o *options) (copier *CopierTool, err error) {
+func NewCopierTool(ctx context.Context, o *options) (copier *CopierTool, err error) {
 	session, err := createAwsSession()
 	if err != nil {
 		panic(err)
@@ -184,14 +184,22 @@ func NewCopierTool(o *options) (copier *CopierTool, err error) {
 		panic(err)
 	}
 
-	sourceFiles := files.NewS3FileArchive(session, "fk-streams")
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
+
+	sourceFiles, err := files.NewS3FileArchive(session, metrics, "fk-streams")
+	if err != nil {
+		panic(err)
+	}
 
 	destinyDb, err := sqlxcache.Open("postgres", o.DestinyURL)
 	if err != nil {
 		panic(err)
 	}
 
-	destinyFiles := files.NewS3FileArchive(session, "fkprod-streams")
+	destinyFiles, err := files.NewS3FileArchive(session, metrics, "fkprod-streams")
+	if err != nil {
+		panic(err)
+	}
 
 	copier = &CopierTool{
 		Source: &EnvServices{
@@ -223,7 +231,7 @@ func main() {
 
 	logging.Configure(false, "copier")
 
-	copier, err := NewCopierTool(options)
+	copier, err := NewCopierTool(ctx, options)
 	if err != nil {
 		panic(err)
 	}
