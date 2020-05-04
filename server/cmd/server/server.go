@@ -192,8 +192,11 @@ func main() {
 		panic(err)
 	}
 
-	v3Handler := api.CreateGoaV3Handler(ctx, controllerOptions)
-	service, err := api.CreateApiService(ctx, controllerOptions, v3Handler)
+	apiHandler, err := api.CreateApi(ctx, controllerOptions)
+	if err != nil {
+		panic(err)
+	}
+
 	notFoundHandler := http.NotFoundHandler()
 
 	portalServer := notFoundHandler
@@ -236,7 +239,7 @@ func main() {
 		if req.URL.Path == "/ingestion" {
 			ingesterHandler.ServeHTTP(w, req)
 		} else {
-			service.Mux.ServeHTTP(w, req)
+			apiHandler.ServeHTTP(w, req)
 		}
 	}
 
@@ -287,7 +290,7 @@ func main() {
 	}
 
 	if err := server.ListenAndServe(); err != nil {
-		service.LogError("startup", "err", err)
+		log.Errorw("startup", "err", err)
 	}
 }
 

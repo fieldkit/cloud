@@ -41,7 +41,7 @@ tests: portal/node_modules
 	cd portal && vue-cli-service test:unit
 
 gotests:
-	cd server && go test ./...
+	cd server && go test -p 1 ./...
 
 dev-portal: portal/node_modules
 	cd portal && npm run serve

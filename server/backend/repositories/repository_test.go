@@ -8,11 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const PostgresURL = "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public"
-
 func TestQueryStationByID(t *testing.T) {
 	assert := assert.New(t)
-	e, err := tests.NewTestEnv(PostgresURL)
+	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
 	fd, err := e.AddStations(1)
@@ -30,7 +28,7 @@ func TestQueryStationByID(t *testing.T) {
 
 func TestQueryStationsByOwnerID(t *testing.T) {
 	assert := assert.New(t)
-	e, err := tests.NewTestEnv(PostgresURL)
+	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
 	_, err = e.AddStations(5)
@@ -51,7 +49,7 @@ func TestQueryStationsByOwnerID(t *testing.T) {
 
 func TestQueryStationsByProjectID(t *testing.T) {
 	assert := assert.New(t)
-	e, err := tests.NewTestEnv(PostgresURL)
+	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
 	_, err = e.AddStations(5)

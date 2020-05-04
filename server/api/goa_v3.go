@@ -54,7 +54,7 @@ func LogErrors() func(goa.Endpoint) goa.Endpoint {
 	}
 }
 
-func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Handler {
+func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
 	testSvc := NewTestSevice(ctx, options)
 	testEndpoints := test.NewEndpoints(testSvc)
 
@@ -145,7 +145,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) http.Ha
 		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
-	return mux
+	return mux, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {
