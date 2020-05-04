@@ -12,12 +12,12 @@
             <div class="view-user">
                 <div id="user-name">Hi, {{ this.user.name }}</div>
                 <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
-                <div v-for="invite in pending" class="project-row">
+                <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
                     <div class="project-name">{{ invite.project.name }}</div>
                     <div class="accept-link" :data-id="invite.id" v-on:click="accept">Accept invitation</div>
                     <div class="decline-link" :data-id="invite.id" v-on:click="decline">Decline invitation</div>
                 </div>
-                <div v-for="invite in resolved" class="project-row">
+                <div v-for="invite in resolved" v-bind:key="invite.id" class="project-row">
                     <div class="project-name">{{ invite.project.name }}</div>
                     <div class="status">{{ invite.status }}</div>
                 </div>
@@ -103,7 +103,7 @@ export default {
         },
         accept(event) {
             const inviteId = event.target.getAttribute("data-id");
-            this.api.acceptInvite(inviteId).then(result => {
+            this.api.acceptInvite(inviteId).then(() => {
                 const index = this.pending.findIndex(p => {
                     return p.id == inviteId;
                 });
@@ -116,7 +116,7 @@ export default {
         },
         decline(event) {
             const inviteId = event.target.getAttribute("data-id");
-            this.api.declineInvite(inviteId).then(result => {
+            this.api.declineInvite(inviteId).then(() => {
                 const index = this.pending.findIndex(p => {
                     return p.id == inviteId;
                 });

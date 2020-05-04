@@ -276,7 +276,6 @@ export default {
             if (this.noName) {
                 return;
             }
-            let matches = this.name.match(/\s/g);
             this.nameTooLong = this.name.length > 255;
         },
 

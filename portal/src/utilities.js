@@ -68,3 +68,37 @@ export function convertOldFirmwareResponse(module) {
     }
     return module.name;
 }
+
+export function getModuleImg(module) {
+    let img = "";
+    switch (module.name) {
+        case "modules.distance":
+            img = "Icon_Distance_Module.png";
+            break;
+        case "modules.weather":
+            img = "Icon_Weather_Module.png ";
+            break;
+        case "modules.water.ec":
+            img = "Icon_WaterConductivity_Module.png";
+            break;
+        case "modules.water.ph":
+            img = "Icon_WaterpH_Module.png";
+            break;
+        case "modules.water.do":
+            img = "Icon_DissolvedOxygen_Module.png";
+            break;
+        case "modules.water.temp":
+            img = "Icon_WaterTemp_Module.png";
+            break;
+        case "modules.water.orp":
+            img = "Icon_Water_Module.png";
+            break;
+        case "modules.water.unknown":
+            img = "Icon_Water_Module.png";
+            break;
+        default:
+            img = "Icon_Generic_Module.png";
+            break;
+    }
+    return img;
+}

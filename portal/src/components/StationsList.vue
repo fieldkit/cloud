@@ -65,20 +65,9 @@ export default {
             return images("./" + img);
         },
         getModuleImg(module) {
-            let images = require.context("../assets/", false, /\.png$/);
-            let img = "placeholder.png";
-            // Note: this is not a trustworthy way of figuring out what icons to show,
-            // as the user could rename their module anything
-            if (module.name.indexOf("Water") > -1) {
-                img = "water.png";
-            }
-            if (module.name.indexOf("Weather") > -1) {
-                img = "weather.png";
-            }
-            if (module.name.indexOf("Ocean") > -1) {
-                img = "ocean.png";
-            }
-            return images("./" + img);
+            let imgPath = require.context("../assets/", false, /\.png$/);
+            let img = utils.getModuleImg(module);
+            return imgPath("./" + img);
         },
     },
 };

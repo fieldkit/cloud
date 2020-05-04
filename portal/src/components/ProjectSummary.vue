@@ -1,155 +1,168 @@
 <template>
     <div id="project-summary-container" v-if="viewingSummary">
-        <div class="project-container" v-if="this.project">
-            <div v-if="project.media_url" class="left tall custom-project-image-container">
-                <img alt="Fieldkit Project image" :src="getImageUrl(project)" class="custom-project-image" />
-            </div>
-            <div v-else class="left tall">
-                <img alt="Fieldkit Project image" src="../assets/fieldkit_project.png" />
-            </div>
+        <div class="project-container" v-if="project">
             <div class="left">
-                <div id="project-name">{{ this.project.name }}</div>
-                <div id="edit-project">
-                    <img alt="Edit project" src="../assets/edit.png" v-on:click="editProject" />
-                </div>
-                <div class="project-element">{{ this.project.description }}</div>
-                <div class="project-element">{{ this.project.location }}</div>
-                <div class="left project-element">
-                    <div class="left" v-if="displayStartDate">
-                        <span class="date-label">Start Date</span>
-                        <br />
-                        {{ this.displayStartDate }}
+                <div id="project-name">{{ project.name }}</div>
+                <div class="dashboard-heading">Project Dashboard</div>
+                <div class="project-image-actions-container">
+                    <img alt="Fieldkit Project" v-if="project.media_url" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+
+                    <div class="actions-icon-container">
+                        <div class="action left">
+                            <img src="../assets/update.png" />
+                            <div class="label">Update</div>
+                        </div>
+                        <div class="action">
+                            <img src="../assets/profile.png" />
+                            <div class="label">View Profile</div>
+                        </div>
+                        <div class="action right">
+                            <img src="../assets/share.png" />
+                            <div class="label">Share</div>
+                        </div>
                     </div>
-                    <div class="left end-date" v-if="displayEndDate">
-                        <span class="date-label">End Date</span>
-                        <br />
-                        {{ this.displayEndDate }}
+                    <div class="stat follows">
+                        <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
+                        <span>22 Follows</span>
+                    </div>
+                </div>
+                <div class="project-details-container">
+                    <div class="section-heading">Project Details</div>
+                    <div v-on:click="editProject" class="edit-link">Edit Project</div>
+                    <div class="goal-and-description">
+                        <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                        <div class="project-detail">{{ project.description }}</div>
+                    </div>
+                    <div class="time-and-location">
+                        <div class="time" v-if="displayStartDate">
+                            <img alt="Calendar" src="../assets/icon-calendar.png" class="icon" />
+                            Started {{ displayStartDate }}
+                        </div>
+                        <div class="time" v-if="displayRunTime">
+                            <img alt="Time" src="../assets/icon-time.png" class="icon" />
+                            {{ displayRunTime }}
+                        </div>
+                        <div class="location" v-if="project.location">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            {{ project.location }}
+                        </div>
+                    </div>
+                    <div class="space"></div>
+                    <div class="team-icons">
+                        <div class="icon-section-label">Team</div>
+                        <img v-for="user in projectUsers" v-bind:key="user.id" alt="User image" :src="user.userImage" class="user-icon" />
+                    </div>
+                    <div class="module-icons">
+                        <div class="icon-section-label">Modules</div>
+                        <img v-for="module in modules" v-bind:key="module" alt="Module icon" class="module-icon" :src="module" />
                     </div>
                 </div>
             </div>
-            <div class="spacer"></div>
-            <div class="section">
-                <div class="section-control" v-on:click="toggleStations">
-                    <div class="toggle-image-container">
-                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingStations" />
-                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingStations" />
-                    </div>
-                    <div class="section-heading" v-if="projectStations.length != 0">
-                        FieldKit Stations ({{ this.projectStations.length }})
-                    </div>
-                    <div class="section-heading" v-else>FieldKit Stations</div>
-                </div>
-                <div class="section-content" v-if="viewingStations">
-                    <div class="station-dropdown">
-                        Add a station:
-                        <select v-model="stationOption" v-on:change="stationSelected">
-                            <option v-for="station in userStations" v-bind:value="station.id" v-bind:key="station.id">
+            <div class="stations-container">
+                <div class="section-heading stations-heading">FieldKit Stations</div>
+                <div class="space"></div>
+                <div class="stations-list">
+                    <div v-for="station in projectStations" v-bind:key="station.id">
+                        <div class="station-box">
+                            <div class="delete-link">
+                                <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
+                            </div>
+                            <span class="station-name" v-on:click="showStation(station)">
                                 {{ station.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="stations-container">
-                        <div v-for="station in projectStations" v-bind:key="station.id">
-                            <div class="station-cell">
-                                <div class="delete-link">
-                                    <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
-                                </div>
-                                <span class="station-name" v-on:click="showStation(station)">
-                                    {{ station.name }}
-                                </span>
-                                <br />
-                                Last seen {{ getUpdatedDate(station) }}
-                            </div>
+                            </span>
+                            <div class="last-seen">Last seen {{ getUpdatedDate(station) }}</div>
                         </div>
+                    </div>
+                </div>
+                <div class="stations-map">
+                    <mapbox
+                        :access-token="mapboxToken"
+                        :map-options="{
+                            style: 'mapbox://styles/mapbox/outdoors-v11',
+                            center: coordinates,
+                            zoom: 10,
+                        }"
+                        :nav-control="{
+                            show: true,
+                            position: 'bottom-left',
+                        }"
+                        @map-init="mapInitialized"
+                    />
+                </div>
+            </div>
+
+            <div class="manage-team-container">
+                <div class="section-heading">Manage Team</div>
+                <div class="users-container">
+                    <div class="user-row">
+                        <div class="cell-heading">Members ({{ projectUsers.length }})</div>
+                        <div class="cell-heading">Role</div>
+                        <div class="cell-heading"></div>
+                        <div class="cell"></div>
+                    </div>
+                    <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
+                        <div class="cell">
+                            <img alt="User image" :src="user.userImage" class="user-icon" />
+                            {{ user.user.name }}
+                            <br />
+                            <span class="email">{{ user.user.email }}</span>
+                        </div>
+                        <div class="cell">{{ user.role }}</div>
+                        <div class="cell">{{ user.membership }}</div>
+                        <div class="cell">
+                            <img
+                                alt="Remove user"
+                                src="../assets/close-icon.png"
+                                class="remove-btn"
+                                :data-user="user.user.id"
+                                v-on:click="removeUser"
+                            />
+                        </div>
+                    </div>
+                    <div class="user-row">
+                        <div class="cell">
+                            <input
+                                class="text-input"
+                                placeholder="New member email"
+                                keyboardType="email"
+                                autocorrect="false"
+                                autocapitalizationType="none"
+                                v-model="inviteEmail"
+                                @blur="checkEmail"
+                            />
+                            <span class="validation-error" id="no-email" v-if="noEmail">
+                                Email is a required field.
+                            </span>
+                            <span class="validation-error" id="email-not-valid" v-if="emailNotValid">
+                                Must be a valid email address.
+                            </span>
+                        </div>
+                        <div class="cell"></div>
+                        <div class="cell">
+                            <button class="invite-btn" v-on:click="sendInvite">Invite</button>
+                        </div>
+                        <div class="cell"></div>
                     </div>
                 </div>
             </div>
-            <div class="spacer"></div>
-            <div class="section">
-                <div class="section-control" v-on:click="toggleActivity">
-                    <div class="toggle-image-container">
-                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingActivity" />
-                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingActivity" />
-                    </div>
-                    <div class="section-heading">Recent Activity</div>
-                </div>
-                <div class="section-content" v-if="viewingActivity">
-                    Check back soon for a recent activity feed!
-                </div>
-            </div>
-            <div class="spacer"></div>
-            <div class="section">
-                <div class="section-control" v-on:click="toggleTeam">
-                    <div class="toggle-image-container">
-                        <img alt="Toggle FieldKit Stations section" src="../assets/right.png" v-if="!viewingTeam" />
-                        <img alt="Toggle FieldKit Stations section" src="../assets/down.png" v-if="viewingTeam" />
-                    </div>
-                    <div class="section-heading">Team</div>
-                </div>
-                <div class="section-content" v-if="viewingTeam">
-                    <div class="users-container">
-                        <div class="user-row">
-                            <div class="cell-heading">Members ({{ this.projectUsers.length }})</div>
-                            <div class="cell-heading">Role</div>
-                            <div class="cell-heading">Status</div>
-                            <div class="cell"></div>
-                        </div>
-                        <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
-                            <div class="cell">
-                                {{ user.user.name }}
-                                <br />
-                                <span class="email">{{ user.user.email }}</span>
-                            </div>
-                            <div class="cell">{{ user.role }}</div>
-                            <div class="cell">{{ user.membership }}</div>
-                            <div class="cell">
-                                <img
-                                    alt="Remove user"
-                                    src="../assets/close.png"
-                                    class="remove-btn"
-                                    :data-user="user.user.id"
-                                    v-on:click="removeUser"
-                                />
-                            </div>
-                        </div>
-                        <div class="user-row">
-                            <div class="cell">
-                                <input
-                                    class="text-input"
-                                    placeholder="New member email"
-                                    keyboardType="email"
-                                    autocorrect="false"
-                                    autocapitalizationType="none"
-                                    v-model="inviteEmail"
-                                    @blur="checkEmail"
-                                />
-                                <span class="validation-error" id="no-email" v-if="noEmail">
-                                    Email is a required field.
-                                </span>
-                                <span class="validation-error" id="email-not-valid" v-if="emailNotValid">
-                                    Must be a valid email address.
-                                </span>
-                            </div>
-                            <div class="cell"></div>
-                            <div class="cell">
-                                <button class="save-btn" v-on:click="sendInvite">Invite</button>
-                            </div>
-                            <div class="cell"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="spacer"></div>
         </div>
     </div>
 </template>
 
 <script>
+import _ from "lodash";
+import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
+import Mapbox from "mapbox-gl-vue";
+import { MAPBOX_ACCESS_TOKEN } from "../secrets";
 
 export default {
     name: "ProjectSummary",
+    components: {
+        Mapbox,
+    },
     data: () => {
         return {
             baseUrl: API_HOST,
@@ -159,12 +172,16 @@ export default {
             viewingActivity: false,
             viewingTeam: false,
             displayStartDate: "",
-            displayEndDate: "",
+            displayRunTime: "",
             projectUsers: [],
             inviteEmail: "",
             noEmail: false,
             emailNotValid: false,
             stationOption: "",
+            timeUnits: ["seconds", "minutes", "hours", "days", "weeks", "months", "years"],
+            modules: [],
+            coordinates: [-118, 34],
+            mapboxToken: MAPBOX_ACCESS_TOKEN,
         };
     },
     props: ["project", "userStations", "users"],
@@ -176,7 +193,10 @@ export default {
         },
         users() {
             if (this.users) {
-                this.projectUsers = this.users;
+                this.projectUsers = this.users.map(u => {
+                    u.userImage = this.baseUrl + "/user/" + u.user.id + "/media";
+                    return u;
+                });
             }
         },
     },
@@ -189,19 +209,10 @@ export default {
             this.projectStations = [];
             this.fetchStations();
             this.updateDisplayDates();
-            this.viewingStations = false;
-            this.viewingActivity = false;
-            this.viewingTeam = false;
             this.inviteEmail = "";
         },
-        toggleStations() {
-            this.viewingStations = !this.viewingStations;
-        },
-        toggleActivity() {
-            this.viewingActivity = !this.viewingActivity;
-        },
-        toggleTeam() {
-            this.viewingTeam = !this.viewingTeam;
+        mapInitialized(map) {
+            this.map = map;
         },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
@@ -210,6 +221,28 @@ export default {
             const api = new FKApi();
             api.getStationsByProject(this.project.id).then(result => {
                 this.projectStations = result.stations;
+                this.modules = [];
+                if (this.projectStations) {
+                    this.projectStations.forEach((s, i) => {
+                        if (i == 0 && s.status_json.latitude && this.map) {
+                            this.map.setCenter({
+                                lat: parseFloat(s.status_json.latitude),
+                                lng: parseFloat(s.status_json.longitude),
+                            });
+                        }
+                        if (s.status_json.moduleObjects) {
+                            s.status_json.moduleObjects.forEach(m => {
+                                this.modules.push(this.getModuleImg(m));
+                            });
+                        } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
+                            s.status_json.statusJson.modules.forEach(m => {
+                                this.modules.push(this.getModuleImg(m));
+                            });
+                        }
+                        // could also use readings, if present
+                    });
+                    this.modules = _.uniq(this.modules);
+                }
             });
         },
         stationSelected() {
@@ -287,14 +320,10 @@ export default {
         },
         updateDisplayDates() {
             this.displayStartDate = "";
-            this.displayEndDate = "";
             if (this.project.start_time) {
                 let d = new Date(this.project.start_time);
                 this.displayStartDate = d.toLocaleDateString("en-US");
-            }
-            if (this.project.end_time) {
-                let d = new Date(this.project.end_time);
-                this.displayEndDate = d.toLocaleDateString("en-US");
+                this.getRunTime();
             }
         },
         getUpdatedDate(station) {
@@ -311,162 +340,297 @@ export default {
         showStation(station) {
             this.$emit("showStation", station);
         },
+        getRunTime() {
+            let start = new Date(this.project.start_time);
+            let end, runTense;
+            if (this.project.end_time) {
+                end = new Date(this.project.end_time);
+                runTense = "Ran for ";
+            } else {
+                // assume it's still running?
+                end = new Date();
+                runTense = "Running for ";
+            }
+            // get interval and convert to seconds
+            const interval = (end.getTime() - start.getTime()) / 1000;
+            let displayValue = interval;
+            let unit = 0;
+            // unit is an index into this.timeUnits
+            if (interval < 60) {
+                // already set to seconds
+            } else if (interval < 3600) {
+                // minutes
+                unit = 1;
+                displayValue /= 60;
+                displayValue = Math.round(displayValue);
+            } else if (interval < 86400) {
+                // hours
+                unit = 2;
+                displayValue /= 3600;
+                displayValue = Math.round(displayValue);
+            } else if (interval < 604800) {
+                // days
+                unit = 3;
+                displayValue /= 86400;
+                displayValue = Math.round(displayValue);
+            } else if (interval < 2628000) {
+                // weeks
+                unit = 4;
+                displayValue /= 604800;
+                displayValue = Math.round(displayValue);
+            } else if (interval < 31535965) {
+                // months
+                unit = 5;
+                displayValue /= 2628000;
+                displayValue = Math.round(displayValue);
+            } else {
+                // years
+                unit = 6;
+                displayValue /= 31535965;
+                displayValue = Math.round(displayValue);
+            }
+            this.displayRunTime = runTense + displayValue + " " + this.timeUnits[unit];
+        },
+        getModuleImg(module) {
+            let imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
+            let img = utils.getModuleImg(module);
+            return imgPath("./" + img);
+        },
+        getModuleName(module) {
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".name");
+        },
     },
 };
 </script>
 
 <style scoped>
 #project-summary-container {
+    width: 1080px;
+    margin: 0 0 0 30px;
     background-color: #ffffff;
-    padding: 0 15px 15px 15px;
     z-index: 2;
+}
+#project-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 15px 0 0;
+    display: inline-block;
+}
+.dashboard-heading {
+    font-size: 18px;
 }
 .show-link {
     text-decoration: underline;
 }
 .project-container {
-    padding: 10px;
-    margin: 20px 0;
     font-size: 16px;
     font-weight: lighter;
     overflow: hidden;
 }
-.section {
-    width: 100%;
+.project-image-actions-container {
+    width: 288px;
+    height: 295px;
     float: left;
+    margin: 17px 22px 0 0;
+    padding: 25px;
+    border: 1px solid #d8dce0;
+    text-align: center;
 }
-.spacer {
-    float: left;
-    width: 100%;
-    margin: 20px 0;
-    border-bottom: 1px solid rgb(215, 220, 225);
-    height: 1px;
+.project-image {
+    max-width: 288px;
+    max-height: 139px;
 }
-.tall {
-    height: 100%;
+.actions-icon-container {
+    width: 288px;
+    margin: 30px 0 0 0;
+    border-bottom: 1px solid #d8dce0;
 }
-.left {
-    float: left;
-}
-.right {
-    float: right;
-}
-.project-element {
-    max-width: 425px;
+.actions-icon-container .label {
     font-size: 14px;
-    margin: 10px 20px 0 20px;
+    font-weight: bold;
 }
-.date-label {
-    font-size: 12px;
-    color: rgb(134, 134, 134);
-}
-.end-date {
-    margin-left: 20px;
-}
-.toggle-image-container {
+.action {
     display: inline-block;
-    float: left;
-    width: 40px;
+    margin: 0 0 17px 0;
 }
-.section-control {
-    cursor: pointer;
-}
-.section-content {
-    clear: both;
+.action.left {
     float: left;
-    padding-bottom: 20px;
-    margin: 20px 0 10px 20px;
+    margin-left: 6px;
+}
+.action.right {
+    float: right;
+    margin-right: 6px;
+}
+.stat {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 24px 0;
+}
+.stat img {
+    margin-right: 12px;
+}
+
+.project-details-container {
+    width: 610px;
+    height: 295px;
+    float: left;
+    margin: 17px 22px 0 0;
+    padding: 25px;
+    border: 1px solid #d8dce0;
 }
 .section-heading {
     font-size: 20px;
-    font-weight: normal;
-    margin-top: 8px;
-    display: inline-block;
-}
-#project-name {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 15px 0 20px;
-    display: inline-block;
-}
-#edit-project {
-    display: inline-block;
-    cursor: pointer;
-}
-.custom-project-image-container {
-    text-align: center;
-}
-.custom-project-image {
-    max-width: 275px;
-    max-height: 135px;
-}
-.station-dropdown {
+    font-weight: 600;
     float: left;
-    clear: both;
-    margin-bottom: 20px;
+    margin: 0 0 35px 0;
 }
-.station-dropdown select {
-    font-size: 16px;
-    border: 1px solid lightgray;
-    border-radius: 4px;
-    padding: 2px 4px;
+.stations-heading {
+    margin: 25px 0 25px 25px;
 }
-.stations-container {
-    display: grid;
-    width: 720px;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 40px;
-    grid-gap: 40px;
-}
-.station-cell {
-    font-size: 14px;
-    padding: 10px;
-    border: 1px solid rgb(215, 220, 225);
+.stations-container .space {
+    margin: 0;
 }
 .station-name {
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
+}
+.last-seen {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6a6d71;
+}
+.edit-link {
+    float: right;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
+}
+.goal-and-description {
+    float: left;
+    clear: both;
+    width: 320px;
+}
+.project-detail {
+    font-size: 16px;
+    line-height: 24px;
+}
+.time-and-location {
+    float: right;
+    width: 230px;
+    font-size: 14px;
+}
+.time,
+.location {
+    margin: 0 0 8px 0;
+}
+.space {
+    width: 100%;
+    float: left;
+    margin: 30px 0 0 0;
+    border-bottom: solid 1px #d8dce0;
+}
+.team-icons,
+.module-icons {
+    margin: 22px 0 0 0;
+    width: 225px;
+    float: left;
+}
+.module-icons {
+    margin: 22px 0 0 50px;
+    float: left;
+}
+.icon-section-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+.user-icon,
+.module-icon {
+    width: 35px;
+    margin: 0 5px;
+}
+
+.stations-container,
+.manage-team-container {
+    width: 1022px;
+    float: left;
+    margin: 22px 0 0 0;
+    border: 1px solid #d8dce0;
+}
+.manage-team-container {
+    width: 972px;
+    padding: 25px;
+}
+.stations-list {
+    width: 345px;
+    height: 332px;
+    float: left;
+}
+.stations-map {
+    width: 677px;
+    height: 332px;
+    float: left;
+}
+#map {
+    width: 677px;
+    height: 332px;
+}
+.station-box {
+    width: 274px;
+    height: 38px;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #d8dce0;
 }
 .delete-link {
     float: right;
-    /*opacity: 0;*/
+    opacity: 0;
 }
 .delete-link:hover {
     opacity: 1;
 }
+.users-container {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+.invite-btn {
+    width: 80px;
+    height: 28px;
+    border-radius: 3px;
+    border: 1px solid #cccdcf;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #ffffff;
+    cursor: pointer;
+}
 .user-row {
     display: grid;
-    grid-template-columns: 280px 200px 200px 40px;
+    font-size: 13px;
+    grid-template-columns: 322px 193px 389px 40px;
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
 }
 .cell-heading {
+    font-size: 14px;
     font-weight: bold;
 }
-.email {
-    font-size: 14px;
+.users-container .user-icon {
+    float: left;
 }
 .text-input {
     border: none;
     border-radius: 5px;
-    background: rgb(240, 240, 240);
     font-size: 15px;
     padding: 4px 0 4px 8px;
-}
-.save-btn {
-    padding: 2px 8px;
-    font-size: 15px;
-    color: white;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 .validation-error {
     color: #c42c44;
     display: block;
 }
 .remove-btn {
+    margin: 12px 0 0 0;
+    float: right;
     cursor: pointer;
 }
 #close-form-btn {
