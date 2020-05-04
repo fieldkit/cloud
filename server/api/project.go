@@ -102,7 +102,7 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		EndTime:     ctx.Payload.EndTime,
 	}
 
-	role := data.OwnerRole
+	role := data.AdministratorRole
 
 	if err := c.options.Database.NamedGetContext(ctx, project, `
 		INSERT INTO fieldkit.project (name, slug, description, goal, location, tags, private, start_time, end_time) VALUES
@@ -160,7 +160,7 @@ func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
 		EndTime:     ctx.Payload.EndTime,
 	}
 
-	role := data.OwnerRole
+	role := data.AdministratorRole
 
 	if err := c.options.Database.NamedGetContext(ctx, project, `
 		UPDATE fieldkit.project SET name = :name, slug = :slug, description = :description, goal = :goal, location = :location,
@@ -242,7 +242,7 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, data.OwnerRole))
+	return ctx.OK(ProjectType(project, data.AdministratorRole))
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {

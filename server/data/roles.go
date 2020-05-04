@@ -13,9 +13,9 @@ var (
 		Name:            "Member",
 		readOnlyProject: true,
 	}
-	OwnerRole = &Role{
+	AdministratorRole = &Role{
 		ID:              1,
-		Name:            "Owner",
+		Name:            "Administrator",
 		readOnlyProject: false,
 	}
 	PublicRole = &Role{
@@ -25,11 +25,11 @@ var (
 	}
 	AvailableRoles = []*Role{
 		MemberRole,
-		OwnerRole,
+		AdministratorRole,
 	}
 	Roles = []*Role{
 		MemberRole,
-		OwnerRole,
+		AdministratorRole,
 		PublicRole,
 	}
 )
