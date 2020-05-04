@@ -25,13 +25,10 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/health"
+	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/jobs"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/social"
-	"github.com/fieldkit/cloud/server/social/twitter"
-
-	"github.com/fieldkit/cloud/server/ingester"
 )
 
 type Config struct {
@@ -170,22 +167,6 @@ func main() {
 	ingesterConfig := getIngesterConfig()
 
 	ingesterHandler, _ := ingester.NewIngester(ctx, ingesterConfig)
-
-	if flag.Arg(0) == "twitter" {
-		twitterListCredentialer := be.TwitterListCredentialer()
-		social.Twitter(social.TwitterOptions{
-			Backend: be,
-			StreamOptions: twitter.StreamOptions{
-				UserLister:       twitterListCredentialer,
-				UserCredentialer: twitterListCredentialer,
-				ConsumerKey:      config.TwitterConsumerKey,
-				ConsumerSecret:   config.TwitterConsumerSecret,
-				Domain:           config.Domain,
-			},
-		})
-
-		os.Exit(0)
-	}
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
