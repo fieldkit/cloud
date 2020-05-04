@@ -14,8 +14,7 @@ BUILD ?= $(abspath build)
 WORKING_DIRECTORY ?= `pwd`
 DOCKER_TAG ?= master
 
-SERVER_SOURCES = $(shell find server -type f -name '*.go' -not -path "server/vendor/*")
-TESTING_SOURCES = $(shell find testing -type f -name '*.go' -not -path "server/vendor/*")
+SERVER_SOURCES = $(shell find server -type f -name '*.go')
 
 default: setup binaries tests
 
@@ -55,10 +54,10 @@ $(BUILD)/server: $(SERVER_SOURCES)
 $(BUILD)/ingester: $(SERVER_SOURCES)
 	cd server/cmd/ingester && $(GO) build -o $@
 
-$(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+$(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES)
 	cd server/tools/fktool && $(GO) build -o $@ *.go
 
-$(BUILD)/fkstreams: server/tools/fktool/*.go $(SERVER_SOURCES) $(TESTING_SOURCES)
+$(BUILD)/fkstreams: server/tools/fktool/*.go $(SERVER_SOURCES)
 	cd server/tools/fkstreams && $(GO) build -o $@ *.go
 
 generate:
