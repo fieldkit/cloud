@@ -117,10 +117,10 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 
 		if err := o.Database.NamedGetContext(ctx, ingestion, `
-				    INSERT INTO fieldkit.ingestion
-					(time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags) VALUES
-					(NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
-				    RETURNING *`, ingestion); err != nil {
+			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
+			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
+			RETURNING *
+			`, ingestion); err != nil {
 			return err
 		}
 
