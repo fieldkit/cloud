@@ -149,13 +149,7 @@ func findMigrationsDirectory() (string, error) {
 	return "", fmt.Errorf("unable to find migrations directory")
 }
 
-func (e *TestEnv) NewAuthorizationHeader() string {
-	user := &data.User{
-		ID:    1,
-		Admin: false,
-		Email: "",
-	}
-
+func (e *TestEnv) NewAuthorizationHeaderForUser(user *data.User) string {
 	now := time.Now()
 	refreshToken, err := data.NewRefreshToken(user.ID, 20, now.Add(time.Duration(72)*time.Hour))
 	if err != nil {
@@ -166,4 +160,14 @@ func (e *TestEnv) NewAuthorizationHeader() string {
 	signedToken, err := token.SignedString(e.JWTHMACKey)
 
 	return "Bearer " + signedToken
+}
+
+func (e *TestEnv) NewAuthorizationHeader() string {
+	user := &data.User{
+		ID:    1,
+		Admin: false,
+		Email: "",
+	}
+
+	return e.NewAuthorizationHeaderForUser(user)
 }

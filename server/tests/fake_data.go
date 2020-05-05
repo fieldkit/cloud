@@ -10,9 +10,9 @@ import (
 )
 
 type FakeStations struct {
-	OwnerID   int32
-	ProjectID int32
-	Stations  []*data.Station
+	Owner    *data.User
+	Project  *data.Project
+	Stations []*data.Station
 }
 
 func (e *TestEnv) AddUser(pw string) (*data.User, error) {
@@ -97,8 +97,24 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 	}
 
 	return &FakeStations{
-		OwnerID:   owner.ID,
-		ProjectID: project.ID,
-		Stations:  stations,
+		Owner:    owner,
+		Project:  project,
+		Stations: stations,
 	}, nil
+}
+
+func (e *TestEnv) NewStation(owner *data.User) *data.Station {
+	name := faker.Name()
+
+	hasher := sha1.New()
+	hasher.Write([]byte(name))
+	deviceID := hasher.Sum(nil)
+
+	station := &data.Station{
+		OwnerID:  owner.ID,
+		DeviceID: deviceID,
+		Name:     name,
+	}
+
+	return station
 }

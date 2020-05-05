@@ -40,7 +40,7 @@ func TestQueryStationsByOwnerID(t *testing.T) {
 	r, err := NewStationRepository(e.DB)
 	assert.NoError(err)
 
-	sfs, err := r.QueryStationFullByOwnerID(e.Ctx, fd.OwnerID)
+	sfs, err := r.QueryStationFullByOwnerID(e.Ctx, fd.Owner.ID)
 	assert.NoError(err)
 
 	assert.NotNil(sfs)
@@ -61,7 +61,7 @@ func TestQueryStationsByProjectID(t *testing.T) {
 	r, err := NewStationRepository(e.DB)
 	assert.NoError(err)
 
-	sfs, err := r.QueryStationFullByProjectID(e.Ctx, fd.ProjectID)
+	sfs, err := r.QueryStationFullByProjectID(e.Ctx, fd.Project.ID)
 	assert.NoError(err)
 
 	assert.NotNil(sfs)

@@ -48,6 +48,7 @@ require (
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kelseyhightower/envconfig v0.0.0-20170206223400-8bf4bbfc795e
+	github.com/kinbiko/jsonassert v1.0.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/lib/pq v1.3.0
