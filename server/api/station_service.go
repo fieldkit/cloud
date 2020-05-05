@@ -247,11 +247,11 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  station.Unauthorized("invalid token"),
-		InvalidScopes: station.Unauthorized("invalid scopes in token"),
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: func(m string) error { return station.Unauthorized(m) },
+		NotFound:     func(m string) error { return station.NotFound(m) },
 	})
 }
 

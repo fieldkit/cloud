@@ -100,10 +100,10 @@ func (c *FollowingService) Followers(ctx context.Context, payload *following.Fol
 
 func (s *FollowingService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  following.Unauthorized("invalid token"),
-		InvalidScopes: following.Unauthorized("invalid scopes in token"),
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: func(m string) error { return following.Unauthorized(m) },
+		NotFound:     nil,
 	})
 }

@@ -157,12 +157,14 @@ func errorHandler() func(context.Context, http.ResponseWriter, error) {
 	}
 }
 
+type GenerateError func(string) error
+
 type AuthAttempt struct {
-	Token         string
-	Scheme        *security.JWTScheme
-	Key           []byte
-	InvalidToken  error
-	InvalidScopes error
+	Token        string
+	Scheme       *security.JWTScheme
+	Key          []byte
+	Unauthorized GenerateError
+	NotFound     GenerateError
 }
 
 func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
@@ -171,15 +173,15 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return a.Key, nil
 	})
 	if err != nil {
-		return ctx, a.InvalidToken
+		return ctx, a.Unauthorized("invalid token")
 	}
 
 	if claims["scopes"] == nil {
-		return ctx, a.InvalidScopes
+		return ctx, a.Unauthorized("invalid scopes")
 	}
 	scopes, ok := claims["scopes"].([]interface{})
 	if !ok {
-		return ctx, a.InvalidScopes
+		return ctx, a.Unauthorized("invalid scopes")
 	}
 
 	scopesInToken := make([]string, len(scopes))
@@ -187,11 +189,12 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		scopesInToken = append(scopesInToken, scp.(string))
 	}
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
-		return ctx, a.InvalidScopes
+		return ctx, a.Unauthorized("invalid scopes")
 	}
 
 	withClaims := addClaimsToContext(ctx, claims)
-	withLogging := logging.WithUserID(withClaims, fmt.Sprintf("%v", claims["sub"]))
+	withAttempt := addAuthAttemptToContext(withClaims, &a)
+	withLogging := logging.WithUserID(withAttempt, fmt.Sprintf("%v", claims["sub"]))
 
 	return withLogging, nil
 }

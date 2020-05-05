@@ -55,10 +55,10 @@ func (c *TasksService) RefreshDevice(ctx context.Context, payload *tasks.Refresh
 
 func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  tasks.Unauthorized("invalid token"),
-		InvalidScopes: tasks.Unauthorized("invalid scopes in token"),
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: func(m string) error { return tasks.Unauthorized(m) },
+		NotFound:     nil,
 	})
 }

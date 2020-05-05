@@ -135,3 +135,45 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 
 	assert.Equal("\"station already registered to another user\"\n", rr.Body.String())
 }
+
+func TestUpdateMyStation(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), strings.NewReader(payload))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+}
+
+func TestUpdateAnotherPersonsStation(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	badActor, err := e.AddUser("")
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), strings.NewReader(payload))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(badActor))
+	rr := tests.ExecuteRequest(req, api)
+
+	fmt.Println(rr.Body.String())
+	assert.Equal(http.StatusUnauthorized, rr.Code)
+}

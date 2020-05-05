@@ -55,10 +55,10 @@ func (sc *TestService) Email(ctx context.Context, payload *test.EmailPayload) er
 
 func (s *TestService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  test.Unauthorized("invalid token"),
-		InvalidScopes: test.Unauthorized("invalid scopes in token"),
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: func(m string) error { return test.Unauthorized(m) },
+		NotFound:     nil,
 	})
 }

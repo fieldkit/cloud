@@ -237,10 +237,10 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 
 func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  project.Unauthorized("invalid token"),
-		InvalidScopes: project.Unauthorized("invalid scopes in token"),
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: func(m string) error { return project.Unauthorized(m) },
+		NotFound:     func(m string) error { return project.NotFound(m) },
 	})
 }

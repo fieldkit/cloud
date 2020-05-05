@@ -206,11 +206,11 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 
 func (s *ActivityService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
-		Token:         token,
-		Scheme:        scheme,
-		Key:           s.options.JWTHMACKey,
-		InvalidToken:  nil,
-		InvalidScopes: nil,
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		Unauthorized: nil,
+		NotFound:     nil,
 	})
 }
 

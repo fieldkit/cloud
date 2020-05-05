@@ -7,7 +7,7 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 
-	"github.com/goadesign/goa"
+	_ "github.com/goadesign/goa"
 
 	"github.com/goadesign/goa/middleware/security/jwt"
 
@@ -39,7 +39,8 @@ type Permissions interface {
 }
 
 type unwrappedPermissions struct {
-	userID int32
+	userID      int32
+	authAttempt *AuthAttempt
 }
 
 type defaultPermissions struct {
@@ -56,9 +57,42 @@ func NewPermissions(ctx context.Context, options *ControllerOptions) Permissions
 	}
 }
 
+func addAuthAttemptToContext(ctx context.Context, aa *AuthAttempt) context.Context {
+	newCtx := context.WithValue(ctx, "authAttempt", aa)
+	return newCtx
+}
+
+func getAuthAttempt(ctx context.Context) *AuthAttempt {
+	if v, ok := ctx.Value("authAttempt").(*AuthAttempt); ok {
+		return v
+	}
+	return nil
+}
+
 func addClaimsToContext(ctx context.Context, claims jwtgo.MapClaims) context.Context {
 	newCtx := context.WithValue(ctx, "claims", claims)
 	return newCtx
+}
+
+func getClaims(ctx context.Context) (jwtgo.MapClaims, bool) {
+	if v, ok := ctx.Value("claims").(jwtgo.MapClaims); ok {
+		return v, true
+	}
+	return nil, false
+}
+
+func (p *defaultPermissions) unauthorized(m string) error {
+	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Unauthorized == nil {
+		return fmt.Errorf("unable to make error (%v)", m)
+	}
+	return p.unwrapped.authAttempt.Unauthorized(m)
+}
+
+func (p *defaultPermissions) notFound(m string) error {
+	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.NotFound == nil {
+		return fmt.Errorf("unable to make error (%v)", m)
+	}
+	return p.unwrapped.authAttempt.NotFound(m)
 }
 
 func (p *defaultPermissions) unwrap() error {
@@ -66,23 +100,36 @@ func (p *defaultPermissions) unwrap() error {
 		return nil
 	}
 
-	claims, ok := p.context.Value("claims").(jwtgo.MapClaims)
+	authAttempt := getAuthAttempt(p.context)
+	if authAttempt == nil {
+		authAttempt = &AuthAttempt{
+			Unauthorized: func(m string) error {
+				return fmt.Errorf(m)
+			},
+			NotFound: func(m string) error {
+				return fmt.Errorf(m)
+			},
+		}
+	}
+
+	claims, ok := getClaims(p.context)
 	if !ok {
 		token := jwt.ContextJWT(p.context)
 		if token == nil {
-			return fmt.Errorf("JWT token is missing from context")
+			return authAttempt.Unauthorized("JWT token is missing from context")
 		}
 
 		claims, ok = token.Claims.(jwtgo.MapClaims)
 		if !ok {
-			return fmt.Errorf("JWT claims error")
+			return authAttempt.Unauthorized("JWT claims error")
 		}
 	}
 
 	userID := int32(claims["sub"].(float64))
 
 	p.unwrapped = &unwrappedPermissions{
-		userID: userID,
+		authAttempt: authAttempt,
+		userID:      userID,
 	}
 
 	return nil
@@ -107,7 +154,7 @@ func (p *defaultPermissions) ForProjectByID(id int) (permissions ProjectPermissi
 
 	project := &data.Project{}
 	if err := p.options.Database.GetContext(p.context, project, "SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1", id); err != nil {
-		return nil, fmt.Errorf("project not found: %v", err)
+		return nil, p.notFound(fmt.Sprintf("project not found: %v", err))
 	}
 
 	projectUser := &data.ProjectUser{}
@@ -134,7 +181,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 
 	station := &data.Station{}
 	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.id = $1", id); err != nil {
-		return nil, fmt.Errorf("station not found: %v", err)
+		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
 
 	permissions = &stationPermissions{
@@ -152,7 +199,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 
 	station := &data.Station{}
 	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.device_id = $1", id); err != nil {
-		return nil, fmt.Errorf("station not found: %v", err)
+		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
 
 	permissions = &stationPermissions{
@@ -191,7 +238,7 @@ func (p *stationPermissions) CanView() error {
 
 func (p *stationPermissions) CanModify() error {
 	if p.station.OwnerID != p.UserID() {
-		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized"))
+		return p.unauthorized("unauthorized")
 	}
 	return nil
 }
@@ -216,12 +263,12 @@ func (p *projectPermissions) CanView() error {
 
 func (p *projectPermissions) CanModify() error {
 	if p.projectUser == nil {
-		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized (public)"))
+		return p.unauthorized(fmt.Sprintf("unauthorized (public)"))
 	}
 
 	role := p.projectUser.LookupRole()
 	if role.IsProjectReadOnly() {
-		return goa.ErrUnauthorized(fmt.Sprintf("unauthorized (%s)", role.Name))
+		return p.unauthorized(fmt.Sprintf("unauthorized (%s)", role.Name))
 	}
 
 	return nil
