@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -17,13 +16,13 @@ var (
 	testHandler http.Handler
 )
 
-func NewTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error) {
+func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 	if testHandler != nil {
 		log.Printf("using existing test api")
 		return testHandler, nil
 	}
 
-	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+	metrics := logging.NewMetrics(e.Ctx, &logging.MetricsSettings{
 		Prefix:  "fk.tests",
 		Address: "",
 	})
@@ -33,7 +32,7 @@ func NewTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error)
 		return nil, err
 	}
 
-	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, e.PostgresURL, "messages")
+	jq, err := jobs.NewPqJobQueue(e.Ctx, database, metrics, e.PostgresURL, "messages")
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +51,12 @@ func NewTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error)
 		Emailer:    "default",
 	}
 
-	controllerOptions, err := CreateServiceOptions(ctx, apiConfig, database, be, jq, nil, metrics)
+	controllerOptions, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, metrics)
 	if err != nil {
 		return nil, err
 	}
 
-	apiHandler, err := CreateApi(ctx, controllerOptions)
+	apiHandler, err := CreateApi(e.Ctx, controllerOptions)
 	if err != nil {
 		return nil, err
 	}

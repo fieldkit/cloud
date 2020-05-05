@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -11,13 +10,11 @@ import (
 )
 
 func TestGetModuleMeta(t *testing.T) {
-	ctx := context.Background()
-
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	api, err := NewTestableApi(ctx, e)
+	api, err := NewTestableApi(e)
 	assert.NoError(err)
 	assert.NotNil(api)
 
