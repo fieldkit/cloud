@@ -28,6 +28,7 @@ type ControllerOptions struct {
 	Metrics      *logging.Metrics
 	Publisher    jobs.MessagePublisher
 	Buckets      *BucketNames
+
 	// Twitter
 	ConsumerKey    string
 	ConsumerSecret string

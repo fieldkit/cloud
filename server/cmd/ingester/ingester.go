@@ -33,8 +33,8 @@ func main() {
 
 	notFoundHandler := http.NotFoundHandler()
 	statusHandler := health.StatusHandler(ctx)
-	monitoring := logging.Monitoring(ingesterOptions.Metrics)
-	coreHandler := monitoring(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	monitoringMiddleware := logging.Monitoring(ingesterOptions.Metrics)
+	coreHandler := monitoringMiddleware(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			statusHandler.ServeHTTP(w, req)
 			return

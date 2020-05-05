@@ -60,6 +60,38 @@ type Config struct {
 	Help bool
 }
 
+func loadConfiguration() (*Config, error) {
+	var config Config
+
+	flag.BoolVar(&config.Help, "help", false, "usage")
+
+	flag.Parse()
+
+	if config.Help {
+		flag.Usage()
+		envconfig.Usage("server", &config)
+		os.Exit(0)
+	}
+
+	if err := envconfig.Process("FIELDKIT", &config); err != nil {
+		return nil, err
+	}
+
+	if config.ApiDomain == "" {
+		config.ApiDomain = "api." + config.Domain
+	}
+
+	if config.PortalDomain == "" {
+		config.PortalDomain = "portal." + config.Domain
+	}
+
+	if config.ApiHost == "" {
+		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
+	}
+
+	return &config, nil
+}
+
 func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 	log := logging.Logger(ctx).Sugar()
 
@@ -84,76 +116,37 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 	}
 }
 
-func main() {
-	var config Config
-
-	flag.BoolVar(&config.Help, "help", false, "usage")
-
-	flag.Parse()
-
-	ctx := context.Background()
-
-	if config.Help {
-		flag.Usage()
-		envconfig.Usage("server", &config)
-		os.Exit(0)
-	}
-
-	if err := envconfig.Process("FIELDKIT", &config); err != nil {
-		panic(err)
-	}
-
-	if config.ApiDomain == "" {
-		config.ApiDomain = "api." + config.Domain
-	}
-
-	if config.PortalDomain == "" {
-		config.PortalDomain = "portal." + config.Domain
-	}
-
-	if config.ApiHost == "" {
-		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
-	}
-
-	logging.Configure(config.LoggingFull, "service")
-
-	log := logging.Logger(ctx).Sugar()
-
-	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
-		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
-		With("email_override", config.EmailOverride).
-		Infow("config")
-
-	database, err := sqlxcache.Open("postgres", config.PostgresURL)
-	if err != nil {
-		panic(err)
-	}
-
-	awsSessionOptions := getAwsSessionOptions(ctx, &config)
-
-	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
-	if err != nil {
-		panic(err)
-	}
-
-	be, err := backend.New(config.PostgresURL)
-	if err != nil {
-		panic(err)
-	}
-
+func createApi(ctx context.Context, config *Config) (http.Handler, *api.ControllerOptions, error) {
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
 		Prefix:  "fk.service",
 		Address: config.StatsdAddress,
 	})
 
-	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
+	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
+	}
+
+	be, err := backend.New(config.PostgresURL)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	awsSessionOptions := getAwsSessionOptions(ctx, config)
+
+	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	files, err := createFileArchive(ctx, config, awsSession, metrics)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
+	}
+
+	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
+	if err != nil {
+		return nil, nil, err
 	}
 
 	ingestionReceivedHandler := &backend.IngestionReceivedHandler{
@@ -163,13 +156,6 @@ func main() {
 	}
 
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
-
-	ingesterConfig := getIngesterConfig()
-
-	ingesterHandler, _, err := ingester.NewIngester(ctx, ingesterConfig)
-	if err != nil {
-		panic(err)
-	}
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
@@ -187,15 +173,59 @@ func main() {
 
 	err = jq.Listen(ctx, 1)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, awsSession, metrics)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	apiHandler, err := api.CreateApi(ctx, controllerOptions)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return apiHandler, controllerOptions, nil
+}
+
+func createIngester(ctx context.Context) (http.Handler, error) {
+	ingesterConfig, err := getIngesterConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	ingesterHandler, _, err := ingester.NewIngester(ctx, ingesterConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return ingesterHandler, nil
+}
+
+func main() {
+	ctx := context.Background()
+
+	config, err := loadConfiguration()
+	if err != nil {
+		panic(err)
+	}
+
+	logging.Configure(config.LoggingFull, "service")
+
+	log := logging.Logger(ctx).Sugar()
+
+	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
+		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
+		With("email_override", config.EmailOverride).
+		Infow("config")
+
+	ingesterHandler, err := createIngester(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	apiHandler, services, err := createApi(ctx, config)
 	if err != nil {
 		panic(err)
 	}
@@ -248,8 +278,8 @@ func main() {
 
 	staticLog := log.Named("http").Named("static")
 	statusHandler := health.StatusHandler(ctx)
-	monitoring := logging.Monitoring(metrics)
-	coreHandler := monitoring(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	monitoringMiddleware := logging.Monitoring(services.Metrics)
+	coreHandler := monitoringMiddleware(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
 			statusHandler.ServeHTTP(w, req)
 			return
@@ -297,7 +327,7 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, config Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
+func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
 	switch config.Archiver {
 	case "default":
 		return files.NewLocalFilesArchive(), nil
@@ -311,13 +341,13 @@ func createFileArchive(ctx context.Context, config Config, awsSession *session.S
 	}
 }
 
-func getIngesterConfig() *ingester.Config {
-	var config ingester.Config
+func getIngesterConfig() (*ingester.Config, error) {
+	config := &ingester.Config{}
 
-	err := envconfig.Process("FIELDKIT", &config)
+	err := envconfig.Process("FIELDKIT", config)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return &config
+	return config, nil
 }

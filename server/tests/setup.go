@@ -15,11 +15,14 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	"github.com/fieldkit/cloud/server/logging"
 )
 
 type TestEnv struct {
-	Ctx context.Context
-	DB  *sqlxcache.DB
+	Ctx         context.Context
+	DB          *sqlxcache.DB
+	PostgresURL string
 }
 
 const PostgresURL = "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public"
@@ -33,6 +36,8 @@ func NewTestEnv() (e *TestEnv, err error) {
 		log.Printf("using existing test env")
 		return globalEnv, nil
 	}
+
+	logging.Configure(false, "tests")
 
 	ctx := context.Background()
 
@@ -82,8 +87,9 @@ func NewTestEnv() (e *TestEnv, err error) {
 	}
 
 	e = &TestEnv{
-		Ctx: ctx,
-		DB:  testDb,
+		Ctx:         ctx,
+		DB:          testDb,
+		PostgresURL: testUrl,
 	}
 
 	globalEnv = e
