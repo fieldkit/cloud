@@ -7,8 +7,6 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 
-	_ "github.com/goadesign/goa"
-
 	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -66,7 +64,7 @@ func getAuthAttempt(ctx context.Context) *AuthAttempt {
 	if v, ok := ctx.Value("authAttempt").(*AuthAttempt); ok {
 		return v
 	}
-	return nil
+	return NewGoaV2AuthAttemptForErrors()
 }
 
 func addClaimsToContext(ctx context.Context, claims jwtgo.MapClaims) context.Context {
@@ -82,7 +80,7 @@ func getClaims(ctx context.Context) (jwtgo.MapClaims, bool) {
 }
 
 func (p *defaultPermissions) unauthorized(m string) error {
-	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Unauthorized == nil {
+	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.NotFound == nil {
 		return fmt.Errorf("unable to make error (%v)", m)
 	}
 	return p.unwrapped.authAttempt.Unauthorized(m)
@@ -101,17 +99,6 @@ func (p *defaultPermissions) unwrap() error {
 	}
 
 	authAttempt := getAuthAttempt(p.context)
-	if authAttempt == nil {
-		authAttempt = &AuthAttempt{
-			Unauthorized: func(m string) error {
-				return fmt.Errorf(m)
-			},
-			NotFound: func(m string) error {
-				return fmt.Errorf(m)
-			},
-		}
-	}
-
 	claims, ok := getClaims(p.context)
 	if !ok {
 		token := jwt.ContextJWT(p.context)

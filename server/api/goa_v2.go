@@ -104,3 +104,26 @@ func setupErrorHandling() {
 		return errBadRequest(message, keyvals...)
 	}
 }
+
+func NewGoaV2AuthAttemptForErrors() *AuthAttempt {
+	return &AuthAttempt{
+		Unauthorized: func(m string) error {
+			return &goa.ErrorResponse{
+				Code:   "unauthorized",
+				ID:     newErrorID(),
+				Meta:   map[string]interface{}{},
+				Detail: m,
+				Status: 401,
+			}
+		},
+		NotFound: func(m string) error {
+			return &goa.ErrorResponse{
+				Code:   "not_found",
+				ID:     newErrorID(),
+				Meta:   map[string]interface{}{},
+				Detail: m,
+				Status: 404,
+			}
+		},
+	}
+}

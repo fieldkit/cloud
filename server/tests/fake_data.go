@@ -59,8 +59,8 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 	}
 
 	if _, err := e.DB.ExecContext(e.Ctx, `
-		INSERT INTO fieldkit.project_user (project_id, user_id) VALUES ($1, $2)
-		`, project.ID, owner.ID); err != nil {
+		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
+		`, project.ID, owner.ID, data.AdministratorRole.ID); err != nil {
 		return nil, err
 	}
 

@@ -174,6 +174,5 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(badActor))
 	rr := tests.ExecuteRequest(req, api)
 
-	fmt.Println(rr.Body.String())
 	assert.Equal(http.StatusUnauthorized, rr.Code)
 }
