@@ -21,7 +21,7 @@ docker ps -a
 go version
 make clean
 make ci
-make ci-db-tests || true
+make ci-db-tests
 """
             }
         }
