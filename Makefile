@@ -23,13 +23,13 @@ ci: setup binaries tests
 ci-db-tests:
 	rm -rf active-schema
 	mkdir -p active-schema
-	docker-compose stop postgres || true
-	docker-compose rm -f postgres || true
-	docker-compose up -d postgres
+	docker stop fktests-pg || true
+	docker rm fktests-pg || true
+	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -d mdillon/postgis
 	sleep 5 # TODO Add a loop here to check
-	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cloud_postgres_1`; \
+	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v ./...
-	docker-compose stop postgres || true
+	docker stop fktests-pg || true
 
 setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
 	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
