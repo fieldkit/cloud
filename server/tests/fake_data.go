@@ -15,21 +15,31 @@ type FakeStations struct {
 	Stations  []*data.Station
 }
 
-func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
+func (e *TestEnv) AddUser(pw string) (*data.User, error) {
 	email := faker.Email()
-	owner := &data.User{
+	user := &data.User{
 		Name:     faker.Name(),
 		Username: email,
 		Email:    email,
-		Password: []byte("IGNORE"),
 		Bio:      faker.Sentence(),
 	}
 
-	if err := e.DB.NamedGetContext(e.Ctx, owner, `
+	user.SetPassword(pw)
+
+	if err := e.DB.NamedGetContext(e.Ctx, user, `
 		INSERT INTO fieldkit.user (name, username, email, password, bio)
 		VALUES (:name, :email, :email, :password, :bio)
 		RETURNING *
-		`, owner); err != nil {
+		`, user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
+	owner, err := e.AddUser("passwordpassword")
+	if err != nil {
 		return nil, err
 	}
 
