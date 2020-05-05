@@ -2,11 +2,13 @@ package tests
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/url"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "github.com/lib/pq"
 
@@ -16,6 +18,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/logging"
 )
 
@@ -23,6 +26,8 @@ type TestEnv struct {
 	Ctx         context.Context
 	DB          *sqlxcache.DB
 	PostgresURL string
+	SessionKey  string
+	JWTHMACKey  []byte
 }
 
 const PostgresURL = "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public"
@@ -86,10 +91,18 @@ func NewTestEnv() (e *TestEnv, err error) {
 		return nil, err
 	}
 
+	testSessionKey := "AzhG6aOqy2jbx7KSrmkOJGe+RY75nsZsr+ByneiMLBo="
+	jwtHMACKey, err := base64.StdEncoding.DecodeString(testSessionKey)
+	if err != nil {
+		return nil, err
+	}
+
 	e = &TestEnv{
 		Ctx:         ctx,
 		DB:          testDb,
 		PostgresURL: testUrl,
+		SessionKey:  testSessionKey,
+		JWTHMACKey:  jwtHMACKey,
 	}
 
 	globalEnv = e
@@ -124,4 +137,23 @@ func findMigrationsDirectory() (string, error) {
 	}
 
 	return "", fmt.Errorf("unable to find migrations directory")
+}
+
+func (e *TestEnv) NewAuthorizationHeader() string {
+	user := &data.User{
+		ID:    1,
+		Admin: false,
+		Email: "",
+	}
+
+	now := time.Now()
+	refreshToken, err := data.NewRefreshToken(user.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	if err != nil {
+		panic(err)
+	}
+
+	token := user.NewToken(now, refreshToken)
+	signedToken, err := token.SignedString(e.JWTHMACKey)
+
+	return "Bearer " + signedToken
 }

@@ -48,8 +48,8 @@ func NewTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error)
 		// ApiDomain:    "",
 		// Domain:       "",
 		// PortalDomain: "",
-		// SessionKey:   "",
-		Emailer: "default",
+		SessionKey: e.SessionKey,
+		Emailer:    "default",
 	}
 
 	controllerOptions, err := CreateServiceOptions(ctx, apiConfig, database, be, jq, nil, metrics)

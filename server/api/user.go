@@ -68,26 +68,6 @@ func ProjectUsersType(users []*data.ProjectUserAndUser, invites []*data.ProjectI
 	}
 }
 
-func NewToken(now time.Time, user *data.User, refreshToken *data.RefreshToken) *jwtgo.Token {
-	scopes := []string{"api:access"}
-
-	if user.Admin {
-		scopes = []string{"api:access", "api:admin"}
-	}
-
-	token := jwtgo.New(jwtgo.SigningMethodHS512)
-	token.Claims = jwtgo.MapClaims{
-		"iat":           now.Unix(),
-		"exp":           now.Add(time.Hour * 168).Unix(),
-		"sub":           user.ID,
-		"email":         user.Email,
-		"refresh_token": refreshToken.Token.String(),
-		"scopes":        scopes,
-	}
-
-	return token
-}
-
 type UserController struct {
 	*goa.Controller
 	options *ControllerOptions
@@ -339,7 +319,7 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 		return ctx.Unauthorized(fmt.Errorf("invalid email or password"))
 	}
 
-	token := NewToken(now, user, refreshToken)
+	token := user.NewToken(now, refreshToken)
 	signedToken, err := token.SignedString(c.options.JWTHMACKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign token: %s", err) // internal error
@@ -492,7 +472,7 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 		return err
 	}
 
-	jwtToken := NewToken(now, user, refreshToken)
+	jwtToken := user.NewToken(now, refreshToken)
 	signedToken, err := jwtToken.SignedString(c.options.JWTHMACKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign token: %s", err) // internal error

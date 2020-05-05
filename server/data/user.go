@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+
+	jwtgo "github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -49,18 +51,19 @@ type User struct {
 	Admin            bool    `db:"admin"`
 }
 
-func (p *User) SetPassword(password string) error {
+func (user *User) SetPassword(password string) error {
 	hashedPassword, err := generateHashFromPassword(password)
 	if err != nil {
 		return err
 	}
 
-	p.Password = hashedPassword
+	user.Password = hashedPassword
+
 	return nil
 }
 
-func (p *User) CheckPassword(password string) error {
-	hashedPassword, err := compareHashAndPassword(p.Password, password)
+func (user *User) CheckPassword(password string) error {
+	hashedPassword, err := compareHashAndPassword(user.Password, password)
 	if err == bcrypt.ErrMismatchedHashAndPassword {
 		return IncorrectPasswordError
 	}
@@ -70,10 +73,30 @@ func (p *User) CheckPassword(password string) error {
 	}
 
 	if hashedPassword != nil {
-		p.Password = hashedPassword
+		user.Password = hashedPassword
 	}
 
 	return nil
+}
+
+func (user *User) NewToken(now time.Time, refreshToken *RefreshToken) *jwtgo.Token {
+	scopes := []string{"api:access"}
+
+	if user.Admin {
+		scopes = []string{"api:access", "api:admin"}
+	}
+
+	token := jwtgo.New(jwtgo.SigningMethodHS512)
+	token.Claims = jwtgo.MapClaims{
+		"iat":           now.Unix(),
+		"exp":           now.Add(time.Hour * 168).Unix(),
+		"sub":           user.ID,
+		"email":         user.Email,
+		"refresh_token": refreshToken.Token.String(),
+		"scopes":        scopes,
+	}
+
+	return token
 }
 
 type ValidationToken struct {
