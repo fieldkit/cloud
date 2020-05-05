@@ -121,28 +121,28 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	log := Logger(ctx).Sugar()
 
 	for _, m := range testServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range tasksServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range modulesServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range followingServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range activityServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range projectServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range stationServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range userServer.Mounts {
-		log.Infow("mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
 	return mux, nil
