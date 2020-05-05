@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/conservify/sqlxcache"
@@ -12,7 +13,16 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func createTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error) {
+var (
+	testHandler http.Handler
+)
+
+func NewTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, error) {
+	if testHandler != nil {
+		log.Printf("using existing test api")
+		return testHandler, nil
+	}
+
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
 		Prefix:  "fk.tests",
 		Address: "",
@@ -51,6 +61,8 @@ func createTestableApi(ctx context.Context, e *tests.TestEnv) (http.Handler, err
 	if err != nil {
 		return nil, err
 	}
+
+	testHandler = apiHandler
 
 	return apiHandler, nil
 }

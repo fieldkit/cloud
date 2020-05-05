@@ -17,7 +17,7 @@ func TestGetModuleMeta(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	api, err := createTestableApi(ctx, e)
+	api, err := NewTestableApi(ctx, e)
 	assert.NoError(err)
 	assert.NotNil(api)
 
