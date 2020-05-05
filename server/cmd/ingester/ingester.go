@@ -26,7 +26,11 @@ func main() {
 
 	log.With("streams_bucket_name", config.StreamsBucketName).Info("config")
 
-	ingesterHandler, ingesterOptions := ingester.NewIngester(ctx, config)
+	ingesterHandler, ingesterOptions, err := ingester.NewIngester(ctx, config)
+	if err != nil {
+		panic(err)
+	}
+
 	notFoundHandler := http.NotFoundHandler()
 	statusHandler := health.StatusHandler(ctx)
 	monitoring := logging.Monitoring(ingesterOptions.Metrics)

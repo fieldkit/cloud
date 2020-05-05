@@ -18,15 +18,15 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 )
 
-func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOptions) {
+func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOptions, error) {
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	awsSession, err := session.NewSessionWithOptions(getAwsSessionOptions(config))
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
@@ -36,22 +36,22 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 
 	files, err := createFileArchive(ctx, config, awsSession, metrics)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	jwtMiddleware, err := api.NewJWTMiddleware(jwtHMACKey)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	publisher, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	options := &IngesterOptions{
@@ -64,7 +64,7 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 
 	handler := Ingester(ctx, options)
 
-	return handler, options
+	return handler, options, nil
 }
 
 func getAwsSessionOptions(config *Config) session.Options {

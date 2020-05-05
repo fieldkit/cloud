@@ -166,7 +166,10 @@ func main() {
 
 	ingesterConfig := getIngesterConfig()
 
-	ingesterHandler, _ := ingester.NewIngester(ctx, ingesterConfig)
+	ingesterHandler, _, err := ingester.NewIngester(ctx, ingesterConfig)
+	if err != nil {
+		panic(err)
+	}
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
