@@ -11,11 +11,12 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
+	"github.com/kelseyhightower/envconfig"
+
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/kelseyhightower/envconfig"
 
 	_ "github.com/lib/pq"
 

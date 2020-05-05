@@ -20,6 +20,17 @@ default: setup binaries tests gotests
 
 ci: setup binaries tests
 
+ci-db-tests:
+	rm -rf active-schema
+	mkdir -p active-schema
+	docker-compose stop postgres || true
+	docker-compose rm -f postgres || true
+	docker-compose up -d postgres
+	sleep 5 # TODO Add a loop here to check
+	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cloud_postgres_1`; \
+	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v ./...
+	docker-compose stop postgres || true
+
 setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
 	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
 

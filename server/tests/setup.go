@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/kelseyhightower/envconfig"
+
 	_ "github.com/lib/pq"
 
 	"github.com/conservify/sqlxcache"
@@ -30,7 +32,9 @@ type TestEnv struct {
 	JWTHMACKey  []byte
 }
 
-const PostgresURL = "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public"
+type TestConfig struct {
+	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" required:"true"`
+}
 
 var (
 	globalEnv *TestEnv
@@ -42,22 +46,28 @@ func NewTestEnv() (e *TestEnv, err error) {
 		return globalEnv, nil
 	}
 
+	config := &TestConfig{}
+
+	if err := envconfig.Process("FIELDKIT", config); err != nil {
+		return nil, err
+	}
+
 	logging.Configure(false, "tests")
 
 	ctx := context.Background()
 
-	originalUrl := PostgresURL
-	originalDb, err := sqlxcache.Open("postgres", originalUrl)
+	originalDb, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}
 
 	databaseName := "fktest"
-	testUrl, err := changeConnectionStringDatabase(originalUrl, databaseName)
+	testUrl, err := changeConnectionStringDatabase(config.PostgresURL, databaseName)
 	if err != nil {
 		return nil, err
 	}
 
+	log.Printf("postgres-url = %s", config.PostgresURL)
 	log.Printf("creating test database")
 
 	if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", databaseName)); err != nil {
