@@ -3,6 +3,7 @@ package ingester
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"mime"
 	"net/http"
@@ -20,7 +21,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/errors"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/goahelpers"
 	"github.com/fieldkit/cloud/server/jobs"
@@ -40,26 +40,6 @@ type IngesterOptions struct {
 	Metrics                  *logging.Metrics
 }
 
-func getUserID(ctx context.Context) (int32, error) {
-	log := Logger(ctx).Sugar()
-
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return 0, fmt.Errorf("JWT token is missing from context")
-	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return 0, fmt.Errorf("JWT claims error")
-	}
-
-	id := int32(claims["sub"].(float64))
-
-	log.Infow("scopes", "scopes", claims["scopes"], "user_id", id)
-
-	return id, nil
-}
-
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	errorHandler := goahelpers.ErrorHandler(true)
 
@@ -73,6 +53,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		if req.Method == http.MethodGet {
 			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("{}"))
 			return nil
 		}
 
@@ -80,9 +61,12 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		o.Metrics.UserID(userID)
 
-		headers, err := NewIncomingHeaders(req)
+		headers, err := newIncomingHeaders(req)
 		if err != nil {
-			return errors.Structured(err, "headers", req.Header)
+			if err := writeInvalidHeaders(ctx, w, req); err != nil {
+				return err
+			}
+			return nil
 		}
 
 		o.Metrics.IngestionDevice(headers.FkDeviceID)
@@ -141,16 +125,13 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			log.Warnw("publishing", "err", err)
 		}
 
-		w.WriteHeader(http.StatusOK)
-
-		return nil
+		return writeSuccess(ctx, w, req, ingestion)
 	}))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 
-		err := handler(ctx, w, req)
-		if err != nil {
+		if err := handler(ctx, w, req); err != nil {
 			log := Logger(ctx).Sugar()
 			log.Errorw("error", "error", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -173,7 +154,7 @@ type IncomingHeaders struct {
 	FkFlags         []int64
 }
 
-func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
+func newIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	contentType := req.Header.Get(common.ContentTypeHeaderName)
 	mediaType, mediaTypeParams, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -238,8 +219,74 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	return headers, nil
 }
 
+func writeSuccess(ctx context.Context, w http.ResponseWriter, req *http.Request, ingestion *data.Ingestion) error {
+	payload, err := json.Marshal(
+		struct {
+			ID       int64  `json:"id"`
+			UploadID string `json:"upload_id"`
+		}{
+			ID:       ingestion.ID,
+			UploadID: ingestion.UploadID,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(payload)
+
+	return nil
+}
+
+func writeInvalidHeaders(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	log := Logger(ctx).Sugar()
+
+	log.Errorw("headers", "headers", req.Header)
+
+	payload, err := json.Marshal(
+		struct {
+			Message string      `json:"message"`
+			Headers interface{} `json:"headers"`
+		}{
+			Message: "invalid headers",
+			Headers: req.Header,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write(payload)
+
+	return nil
+}
+
 func useMiddleware(middleware goa.Middleware, next goa.Handler) goa.Handler {
 	return func(ctx context.Context, res http.ResponseWriter, req *http.Request) error {
 		return middleware(next)(ctx, res, req)
 	}
+}
+
+func getUserID(ctx context.Context) (int32, error) {
+	log := Logger(ctx).Sugar()
+
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return 0, fmt.Errorf("JWT token is missing from context")
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("JWT claims error")
+	}
+
+	id := int32(claims["sub"].(float64))
+
+	log.Infow("scopes", "scopes", claims["scopes"], "user_id", id)
+
+	return id, nil
 }
