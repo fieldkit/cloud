@@ -12,8 +12,3 @@ type TwitterAccount struct {
 	AccessToken      string `db:"access_token"`
 	AccessSecret     string `db:"access_secret"`
 }
-
-type TwitterAccountSource struct {
-	Source
-	TwitterAccount
-}

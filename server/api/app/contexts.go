@@ -1856,51 +1856,6 @@ func (ctx *ResolvedRecordsContext) NotFound() error {
 	return nil
 }
 
-// CallbackTwitterContext provides the twitter callback action context.
-type CallbackTwitterContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	OauthToken    string
-	OauthVerifier *string
-}
-
-// NewCallbackTwitterContext parses the incoming request URL and body, performs validations and creates the
-// context used by the twitter controller callback action.
-func NewCallbackTwitterContext(ctx context.Context, r *http.Request, service *goa.Service) (*CallbackTwitterContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := CallbackTwitterContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramOauthToken := req.Params["oauthToken"]
-	if len(paramOauthToken) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("oauthToken"))
-	} else {
-		rawOauthToken := paramOauthToken[0]
-		rctx.OauthToken = rawOauthToken
-	}
-	paramOauthVerifier := req.Params["oauthVerifier"]
-	if len(paramOauthVerifier) > 0 {
-		rawOauthVerifier := paramOauthVerifier[0]
-		rctx.OauthVerifier = &rawOauthVerifier
-	}
-	return &rctx, err
-}
-
-// Found sends a HTTP response with status code 302.
-func (ctx *CallbackTwitterContext) Found() error {
-	ctx.ResponseData.WriteHeader(302)
-	return nil
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *CallbackTwitterContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // AddUserContext provides the user add action context.
 type AddUserContext struct {
 	context.Context

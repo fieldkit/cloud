@@ -24,13 +24,6 @@ type Station struct {
 	FirmwareTime       *int64         `db:"firmware_time"`
 }
 
-type StationLog struct {
-	ID        int32  `db:"id,omitempty"`
-	StationID int32  `db:"station_id,omitempty"`
-	Timestamp string `db:"timestamp"`
-	Body      string `db:"body"`
-}
-
 func (s *Station) SetStatus(data interface{}) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {

@@ -36,7 +36,6 @@ func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOption
 	app.MountSwaggerController(service, NewSwaggerController(service))
 	app.MountUserController(service, NewUserController(service, controllerOptions))
 	app.MountProjectController(service, NewProjectController(service, controllerOptions))
-	app.MountTwitterController(service, NewTwitterController(service, controllerOptions))
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
 	app.MountFieldNoteController(service, NewFieldNoteController(service, controllerOptions))
